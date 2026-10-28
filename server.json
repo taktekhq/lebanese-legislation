@@ -1,0 +1,10 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.lebaneselegislation/mcp",
+  "title": "Lebanese Legislation",
+  "description": "Search and read Lebanese laws, articles, court rulings and Gazette issues. Verbatim texts only.",
+  "repository": {"url": "https://github.com/taktekhq/lebaneselegislation-mcp", "source": "github"},
+  "websiteUrl": "https://lebaneselegislation.com",
+  "version": "1.0.0",
+  "remotes": [{"type": "streamable-http", "url": "https://lebaneselegislation.com/mcp"}]
+}
