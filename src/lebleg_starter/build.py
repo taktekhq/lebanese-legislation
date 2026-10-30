@@ -255,7 +255,7 @@ def dump_database(dsn, destination, pg_dump="pg_dump"):
                 "--extension=pg_trgm",
             ]
             command += ["--table=public." + name for name in tables]
-            subprocess.run(command, env=env, stdout=stream, check=True)
+            subprocess.run(command, env=env, stdout=stream, stderr=subprocess.PIPE, check=True)
             stream.flush()
             os.fsync(stream.fileno())
         os.link(temporary, destination)  # Atomic and refuses an unrelated existing destination.
@@ -281,6 +281,7 @@ def export_release(dsn, out, manifest, pg_dump):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--database-url", default=os.getenv("DATABASE_URL"))
+    parser.add_argument("--no-export", action="store_true", help="Finalize staging without writing a dump")
     parser.add_argument("--snapshot-dir", required=True, help="Directory containing the pinned data/*.parquet files")
     parser.add_argument("--revision", required=True)
     parser.add_argument("--as-of-date", type=date.fromisoformat, default=date.today())
@@ -294,6 +295,10 @@ def main(argv=None):
     parser.add_argument("--embedding-batch-size", type=int, choices=range(1, 101), default=32)
     parser.add_argument("--max-input-tokens", type=int)
     parser.add_argument("--embedding-budget-ledger")
+    parser.add_argument("--daily-embedding-budget-dir")
+    parser.add_argument("--daily-embedding-usd", default="1")
+    parser.add_argument("--embedding-usd-per-million", default="0.15")
+    parser.add_argument("--budget-timezone", default="Asia/Beirut")
     parser.add_argument("--pg-dump", default=os.getenv("PG_DUMP_BIN", "pg_dump"))
     parser.add_argument(
         "--resume", action="store_true", help="Continue this exact local staging build after a coverage report"
@@ -338,7 +343,7 @@ def main(argv=None):
                 ):
                     raise ValueError("finalized release count mismatch")
             validate_chunks(conn)
-            return export_release(args.database_url, out, manifest, args.pg_dump)
+            return 0 if args.no_export else export_release(args.database_url, out, manifest, args.pg_dump)
         if args.resume:
             state = conn.execute(
                 "SELECT release_id,revision,tables,to_jsonb(s)->>'as_of_date' FROM lebleg_build_state s"
@@ -373,6 +378,11 @@ def main(argv=None):
 
             conn.commit()
             provider = GeminiEmbedder(os.environ["GEMINI_API_KEY"])
+            if args.daily_embedding_budget_dir:
+                from .budget import DailyBudgetedEmbedder
+
+                provider = DailyBudgetedEmbedder(provider, args.daily_embedding_budget_dir,
+                    args.daily_embedding_usd, args.embedding_usd_per_million, args.budget_timezone)
             if args.max_input_tokens is not None:
                 from .budget import BudgetedEmbedder
 
@@ -435,4 +445,4 @@ def main(argv=None):
         conn.execute("CREATE TABLE lebleg_release(release_id text PRIMARY KEY,manifest jsonb NOT NULL)")
         conn.execute("INSERT INTO lebleg_release VALUES(%s,%s)", (args.release_id, Jsonb(manifest)))
         conn.execute("ANALYZE")
-    return export_release(args.database_url, out, manifest, args.pg_dump)
+    return 0 if args.no_export else export_release(args.database_url, out, manifest, args.pg_dump)

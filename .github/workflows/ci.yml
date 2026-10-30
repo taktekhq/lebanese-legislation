@@ -28,6 +28,7 @@ jobs:
       - run: docker build --target mcp -t lebleg-test-mcp .
       - run: pytest -q
         env:
+          LEBLEG_PIPELINE_IMAGE_TEST: "1"
           LEBLEG_TEST_ADMIN_DSN: host=127.0.0.1 port=55433 user=starter password=test dbname=starter
           RUNTIME_TEST_DSN: host=127.0.0.1 port=55433 user=starter password=test dbname=starter
           LEBLEG_TEST_IMAGE: lebleg-test-postgres

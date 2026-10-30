@@ -156,6 +156,8 @@ def test_finalized_release_can_resume_after_dump_failure_without_reloading(db, t
     dsn = make_conninfo(os.environ['LEBLEG_TEST_ADMIN_DSN'],dbname=db.info.dbname)
     argv = ['--database-url',dsn,'--snapshot-dir','does-not-exist','--revision','a'*40,'--release-id','test-release',
             '--as-of-date','2026-10-30','--output-dir',str(tmp_path),'--resume','--embed-missing']
+    assert main(argv+['--no-export','--pg-dump','/bin/false']) == 0
+    assert not (tmp_path/'corpus.dump').exists()
     with pytest.raises(subprocess.CalledProcessError):
         main(argv+['--pg-dump','/bin/false'])
     assert not (tmp_path/'corpus.dump').exists()

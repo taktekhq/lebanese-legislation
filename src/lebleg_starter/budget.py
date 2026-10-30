@@ -87,3 +87,42 @@ class BudgetedEmbedder:
             raise BudgetError("invalid input token count")
         self._reserve(counted + 16 * len(texts), len(texts))
         return self.provider.embed(texts, query=False)
+
+
+class DailyBudgetedEmbedder:
+    """Share conservative daily reservations across builds and worker restarts."""
+
+    def __init__(self, provider, ledger_dir, daily_usd='1', usd_per_million='0.15',
+                 timezone='Asia/Beirut', clock=None):
+        from datetime import UTC, datetime
+        from decimal import Decimal, InvalidOperation
+        from zoneinfo import ZoneInfo
+
+        try:
+            cap, price = Decimal(str(daily_usd)), Decimal(str(usd_per_million))
+            if not cap.is_finite() or not price.is_finite() or cap <= 0 or price <= 0:
+                raise ValueError()
+            self.max_tokens = int(cap * 1_000_000 / price)
+            if self.max_tokens <= 0:
+                raise ValueError()
+            self.zone = ZoneInfo(timezone)
+        except (ValueError, InvalidOperation, KeyError):
+            raise BudgetError('invalid daily embedding budget') from None
+        self.provider = provider
+        self.model = provider.model
+        self.root = Path(ledger_dir)
+        self.clock = clock or (lambda: datetime.now(UTC))
+
+    def count_tokens(self, texts):
+        return self.provider.count_tokens(texts)
+
+    def embed(self, texts, query=False):
+        if query or not texts:
+            raise BudgetError('offline budget accepts document batches only')
+        counted = self.provider.count_tokens(texts)
+        if type(counted) is not int or counted <= 0:
+            raise BudgetError('invalid input token count')
+        day = self.clock().astimezone(self.zone).date().isoformat()
+        budget = BudgetedEmbedder(self.provider, self.max_tokens, self.root / (day + '.json'))
+        budget._reserve(counted + 16 * len(texts), len(texts))
+        return self.provider.embed(texts, query=False)
