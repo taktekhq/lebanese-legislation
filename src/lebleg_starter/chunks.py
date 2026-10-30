@@ -6,6 +6,8 @@ MODEL = 'gemini-embedding-001'
 DIMENSIONS = 768
 CHUNK_SIZE = 900
 OVERLAP = 120
+# Unicode White_Space property used by Go unicode.IsSpace, excluding Python-only C0 separators.
+GO_WHITESPACE = "\t\n\v\f\r \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000"
 
 
 @dataclass(frozen=True)
@@ -21,7 +23,7 @@ def digest(text: str) -> str:
 
 
 def chunks(text: str):
-    if not text.strip():
+    if not text.strip(GO_WHITESPACE):
         return
     hashed = digest(text)
     for start in range(0, len(text), CHUNK_SIZE - OVERLAP):

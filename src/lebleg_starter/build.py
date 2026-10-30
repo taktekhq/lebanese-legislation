@@ -48,24 +48,32 @@ def reuse_vectors(target, source, source_table='public.semantic_chunks'):
     return inserted
 
 
-def missing_chunks(conn):
+def _canonical_chunks(conn, checkpoint=False):
     # Generate canonical expected boundaries rather than counting unchecked rows.
-    with conn.cursor(name='missing_documents') as rows:
+    with conn.cursor(name='missing_documents', withhold=checkpoint) as rows:
         rows.execute('SELECT kind,source_id,part,lang,title,text,hash FROM source_documents ORDER BY kind,source_id,part,lang')
         for row in rows:
             saved = {r[0]: r[1:] for r in conn.execute('SELECT chunk_start,chunk_end,text,hash FROM semantic_chunks WHERE model=%s AND kind=%s AND source_id=%s AND part=%s AND lang=%s', (MODEL, *row[:4]))}
             for chunk in chunks(row[5]):
-                if saved.get(chunk.start) != (chunk.end, chunk.text, chunk.hash):
-                    yield row[:5], chunk
+                yield row[:5], chunk, saved.get(chunk.start) == (chunk.end, chunk.text, chunk.hash)
+
+
+def missing_chunks(conn, checkpoint=False):
+    for ref, chunk, present in _canonical_chunks(conn, checkpoint=checkpoint):
+        if not present:
+            yield ref, chunk
 
 
 def coverage(conn):
-    expected = conn.execute("SELECT coalesce(sum(CASE WHEN btrim(text)='' THEN 0 WHEN length(text)<=900 THEN 1 ELSE 1+ceil((length(text)-900)/780.0)::int END),0)::bigint FROM source_documents").fetchone()[0]
-    missing = sum(1 for _ in missing_chunks(conn))
-    return {'expected': expected, 'indexed': expected - missing, 'missing': missing}
+    expected = indexed = 0
+    for _, _, present in _canonical_chunks(conn):
+        expected += 1
+        indexed += int(present)
+    return {'expected': expected, 'indexed': indexed, 'missing': expected-indexed}
 
 
-def fill_missing(conn, embedder, cap):
+def fill_missing(conn, embedder, cap, checkpoint=False):
+    """Fill within cap; checkpoint=True commits each successful provider batch."""
     missing = coverage(conn)['missing']
     if cap < 0 or missing > cap:
         raise ValueError(f'missing embeddings {missing} exceeds explicit cap {cap}')
@@ -82,13 +90,17 @@ def fill_missing(conn, embedder, cap):
                 VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT(model,kind,source_id,part,lang,hash,chunk_start)
                 DO UPDATE SET title=excluded.title,text=excluded.text,chunk_end=excluded.chunk_end,embedding=excluded.embedding,updated_at=now()''',
                          (MODEL, *ref, chunk.text, chunk.hash, chunk.start, chunk.end, encoded))
-    for ref, chunk in missing_chunks(conn):
+    for ref, chunk in missing_chunks(conn, checkpoint=checkpoint):
         batch.append((ref, chunk))
         if len(batch) == 32:
             save(batch)
+            if checkpoint:
+                conn.commit()
             batch = []
     if batch:
         save(batch)
+        if checkpoint:
+            conn.commit()
     return missing
 
 
@@ -160,7 +172,7 @@ def main(argv=None):
             conn.execute('INSERT INTO lebleg_build_state VALUES(%s,%s,%s)',(args.release_id,args.revision,Jsonb(tables)))
         if conn.execute("SELECT extversion FROM pg_extension WHERE extname='vector'").fetchone()[0] != '0.8.2':
             raise ValueError('build requires pgvector 0.8.2')
-        if args.reuse_database_url and not args.resume:
+        if args.reuse_database_url:
             with psycopg.connect(args.reuse_database_url, options='-c default_transaction_read_only=on') as source:
                 reuse_vectors(conn, source)
         report = coverage(conn)
@@ -168,7 +180,8 @@ def main(argv=None):
         print(json.dumps(report), flush=True)
         if report['missing'] and args.embed_missing:
             from .embedding import GeminiEmbedder
-            fill_missing(conn, GeminiEmbedder(os.environ['GEMINI_API_KEY']), args.max_new_embeddings)
+            conn.commit()
+            fill_missing(conn, GeminiEmbedder(os.environ['GEMINI_API_KEY']), args.max_new_embeddings, checkpoint=True)
             report = coverage(conn)
         if report['missing']:
             # Useful staging output remains local. There is no readiness row or dump.
