@@ -95,7 +95,8 @@ def write_snapshot(db, path, row=None):
         pq.write_table(pa.Table.from_pylist(samples.get(table,[]),schema=pa.schema(fields)),path/(table+'.parquet'))
 
 
-def test_real_optional_sidecar_and_metadata_preserve_original(db,tmp_path):
+@pytest.mark.parametrize('include_counts', [False, True])
+def test_real_optional_sidecar_and_metadata_preserve_original(db,tmp_path,include_counts):
     row=record()
     write_snapshot(db,tmp_path,row)
     assert sources.import_parquet(db,tmp_path)['article_calculated_current']==1
@@ -122,7 +123,15 @@ def test_real_optional_sidecar_and_metadata_preserve_original(db,tmp_path):
             yield cursor
     service=SearchService.__new__(SearchService)
     service.connection,service.provider=connection,None
-    passage=service.search('5,000,000,000',semantic=False)['passages'][0]
+    result=service.search('5,000,000,000',semantic=False,kinds=['article'],year=1983,include_counts=include_counts)
+    passage=result['passages'][0]
+    if include_counts:
+        assert result['exact_counts']=={'article':1}
+    assert service.search('5,000,000,000',semantic=False,kinds=['article'],year=1984,include_counts=include_counts)['passages']==[]
+    later=service.search('5,000,000,000',semantic=False,kinds=['article'],year=1983,offset=1,include_counts=include_counts)
+    assert later['passages']==[]
+    if include_counts:
+        assert later['exact_counts']=={'article':1}
     assert passage['text']==text
     assert passage['source_hash']==hashed
     assert passage['metadata']['calculated_current']==row['calculated_current']

@@ -210,9 +210,29 @@ class SearchService:
                 ).fetchone()["ready"]
             )
 
-    def search(self, query, limit=8, semantic=True, select=False):
-        if not isinstance(query, str) or not query.strip() or len(query) > 500 or not 1 <= limit <= 16:
-            raise SearchError("query must contain 1 to 500 characters and limit 1 to 16")
+    def search(
+        self, query, limit=8, semantic=True, select=False, *, kinds=None, year=None, offset=0, include_counts=False
+    ):
+        if not isinstance(query, str) or not query.strip() or len(query) > 500 or not 1 <= limit <= 50:
+            raise SearchError("query must contain 1 to 500 characters and limit 1 to 50")
+        allowed_kinds = {"law", "article", "ruling", "opinion", "agreement", "research", "doctrine"}
+        if kinds is not None and (not isinstance(kinds, (list, tuple)) or not kinds or not set(kinds) <= allowed_kinds):
+            raise SearchError("invalid source kinds")
+        if year is not None and (isinstance(year, bool) or not isinstance(year, int) or not 1 <= year <= 2100):
+            raise SearchError("invalid year")
+        if isinstance(offset, bool) or not isinstance(offset, int) or not 0 <= offset <= 10000:
+            raise SearchError("invalid offset")
+        filters, filter_params = [], []
+        if kinds:
+            filters.append("kind = ANY(%s)")
+            filter_params.append(list(kinds))
+        if year:
+            filters.append(
+                "coalesce(metadata->>'year',substring(coalesce(metadata->>'issued_on',metadata->>'date','') from 1 for 4))=%s"
+            )
+            filter_params.append(str(year))
+        extra = " AND " + " AND ".join(filters) if filters else ""
+        exact_counts = {}
         semantic_status = "not_requested"
         selection_status = "not_requested"
         with self.connection() as conn:
@@ -225,27 +245,78 @@ class SearchService:
             if embedding["model"] != MODEL or embedding["dimensions"] != 768:
                 raise SearchError("incompatible embedding model")
             target = citation_target(query)
-            order = " ORDER BY kind,source_id,part,lang LIMIT %s"
+            order = " ORDER BY kind,source_id,part,lang LIMIT %s OFFSET %s"
+            group_key = "kind,source_id,CASE WHEN kind='article' THEN part ELSE '' END"
             if target:
                 conditions, params = _citation_conditions(target)
-                rows = conn.execute(
-                    "SELECT * FROM source_documents WHERE " + " AND ".join(conditions) + order, params + [limit]
-                ).fetchall()
+                where = " AND ".join(conditions) + extra
+                if include_counts:
+                    rows = conn.execute(
+                        "SELECT DISTINCT ON ("
+                        + group_key
+                        + ") * FROM source_documents WHERE "
+                        + where
+                        + " ORDER BY "
+                        + group_key
+                        + ",part,lang LIMIT %s OFFSET %s",
+                        params + filter_params + [limit, offset],
+                    ).fetchall()
+                else:
+                    rows = conn.execute(
+                        "SELECT * FROM source_documents WHERE " + where + order,
+                        params + filter_params + [limit, offset],
+                    ).fetchall()
+                count_params = params + filter_params
             else:
                 escaped = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
                 pattern = "%" + escaped + "%"
-                rows = conn.execute(
-                    "SELECT * FROM source_documents WHERE title ILIKE %s ESCAPE '\\'" + order, (pattern, limit)
-                ).fetchall()
-                remaining = limit - len(rows)
-                if remaining:
-                    rows.extend(
-                        conn.execute(
-                            "SELECT * FROM source_documents WHERE (text ILIKE %s ESCAPE '\\' OR metadata->'calculated_current'->>'text_ar' ILIKE %s ESCAPE '\\') AND NOT (title ILIKE %s ESCAPE '\\')"
-                            + order,
-                            (pattern, pattern, pattern, remaining),
-                        ).fetchall()
-                    )
+                where = "(title ILIKE %s ESCAPE '\\' OR text ILIKE %s ESCAPE '\\' OR metadata->'calculated_current'->>'text_ar' ILIKE %s ESCAPE '\\')" + extra
+                count_params = [pattern, pattern, pattern] + filter_params
+                if include_counts:
+                    rows = conn.execute(
+                        "SELECT * FROM (SELECT DISTINCT ON ("
+                        + group_key
+                        + ") *, "
+                        + "CASE WHEN title ILIKE %s ESCAPE '\\' THEN 0 ELSE 1 END AS match_priority "
+                        + "FROM source_documents WHERE "
+                        + where
+                        + " ORDER BY "
+                        + group_key
+                        + ",match_priority,part,lang) hits ORDER BY match_priority,kind,source_id,part,lang LIMIT %s OFFSET %s",
+                        [pattern] + count_params + [limit, offset],
+                    ).fetchall()
+                else:
+                    title_count = 0
+                    if offset:
+                        title_count = conn.execute(
+                            "SELECT count(*) AS count FROM source_documents WHERE title ILIKE %s ESCAPE '\\'" + extra,
+                            [pattern] + filter_params,
+                        ).fetchone()["count"]
+                    rows = conn.execute(
+                        "SELECT * FROM source_documents WHERE title ILIKE %s ESCAPE '\\'" + extra + order,
+                        [pattern] + filter_params + [limit, offset],
+                    ).fetchall()
+                    remaining = limit - len(rows)
+                    if remaining:
+                        rows.extend(
+                            conn.execute(
+                                "SELECT * FROM source_documents WHERE (text ILIKE %s ESCAPE '\\' OR metadata->'calculated_current'->>'text_ar' ILIKE %s ESCAPE '\\') AND NOT (title ILIKE %s ESCAPE '\\')"
+                                + extra
+                                + order,
+                                [pattern, pattern, pattern] + filter_params + [remaining, max(0, offset - title_count)],
+                            ).fetchall()
+                        )
+            if include_counts:
+                exact_counts = {
+                    r["kind"]: r["count"]
+                    for r in conn.execute(
+                        "SELECT kind,count(DISTINCT (source_id,CASE WHEN kind='article' THEN part ELSE '' END)) AS count "
+                        + "FROM source_documents WHERE "
+                        + where
+                        + " GROUP BY kind",
+                        count_params,
+                    ).fetchall()
+                }
             passages = []
             for row in rows:
                 full = row["text"]
@@ -270,7 +341,7 @@ class SearchService:
             # An explicit citation never falls back to a different source.
             if semantic:
                 semantic_status = "not_needed" if target or len(passages) >= limit else "unavailable"
-            if not target and semantic and self.provider and len(passages) < limit:
+            if not target and not offset and semantic and self.provider and len(passages) < limit:
                 if self.provider.model != embedding["model"]:
                     raise SearchError("incompatible embedding model")
                 try:
@@ -283,8 +354,10 @@ class SearchService:
                     candidates = conn.execute(
                         """SELECT c.*,d.text AS source_text,d.hash AS source_hash,d.source_url,d.metadata
                         FROM semantic_chunks c JOIN source_documents d USING(kind,source_id,part,lang)
-                        WHERE c.model=%s ORDER BY c.embedding <=> %s::halfvec LIMIT %s""",
-                        (MODEL, literal, limit * 4),
+                        WHERE c.model=%s"""
+                        + extra.replace("kind = ANY", "c.kind = ANY")
+                        + " ORDER BY c.embedding <=> %s::halfvec LIMIT %s",
+                        [MODEL] + filter_params + [literal, limit * 4],
                     ).fetchall()
                     refs = {(p["kind"], p["source_id"], p["part"], p["lang"]) for p in passages}
                     for row in candidates:
@@ -315,6 +388,7 @@ class SearchService:
             "evidence_status": "passages_found" if passages else "insufficient_evidence",
             "semantic_status": semantic_status,
             "selection_status": selection_status,
+            **({"exact_counts": exact_counts} if include_counts else {}),
         }
 
 
