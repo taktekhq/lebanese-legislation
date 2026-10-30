@@ -303,6 +303,18 @@ class ReleaseSteps:
     def metadata(self, job, scans=False):
         from huggingface_hub import CommitOperationAdd, HfApi
         source = self.co.source(job['repo'])
+        api = HfApi(token=self.token)
+        head = api.repo_info(job['repo'], repo_type='dataset').sha
+        if scans:
+            if self.co.fingerprint(job['repo'],head) != job['fingerprint']:
+                return {'ok':True,'status':'skipped'}
+        else:
+            current = json.loads(_read(api,job['repo'],'releases/latest.json',head))
+            if current.get('release_id') != job['release_id']:
+                return {'ok':True,'status':'skipped'}
+            raw_manifest = (self.directory(job)/'release'/'manifest.json').read_bytes()
+            if current.get('manifest_sha256') != hashlib.sha256(raw_manifest).hexdigest():
+                raise ValueError('latest release identity mismatch')
         if scans:
             counts = json.loads((self.directory(job) / 'scan-counts.json').read_text())
             body = f"{counts['documents']:,} source PDFs and {counts['pages']:,} pages. Mixed print and handwriting; transcription labels remain separate."
@@ -313,8 +325,6 @@ class ReleaseSteps:
             body = f"**PostgreSQL + pgvector:** [Download the database dump]({base}/resolve/main/releases/{job['release_id']}/{manifest['dump']['path']}?download=true). {counts['source_documents']:,} source records and {counts['semantic_chunks']:,} indexed passages."
             if self.config.get('setup_url'):
                 body += f" [Run with Docker]({self.config['setup_url']})."
-        api = HfApi(token=self.token)
-        head = api.repo_info(job['repo'], repo_type='dataset').sha
         original = _read(api, job['repo'], 'README.md', head).decode()
         updated = update_block(original, body)
         if updated != original:
