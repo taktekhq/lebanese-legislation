@@ -60,6 +60,14 @@ def test_real_typed_parquet_and_source_eligibility(db, tmp_path):
     page = next(r for r in rows if r[0]=='ruling' and r[2]=='1')[5]
     assert page['identifier']=='7' and page['decided_on']=='2020-01-02'
     assert page['low_confidence'] is True and page['model']=='public-extractor'
+    assert page['date']=='2020-01-02'
+    from lebleg_starter.sources import refresh_metadata
+    before=db.execute('SELECT kind,source_id,part,lang,ctid FROM source_documents ORDER BY 1,2,3,4').fetchall()
+    refresh_metadata(db)
+    assert db.execute('SELECT kind,source_id,part,lang,ctid FROM source_documents ORDER BY 1,2,3,4').fetchall()==before
+    db.execute("UPDATE source_documents SET metadata=metadata||'{\"date\":\"1999-01-01\"}'::jsonb WHERE kind='ruling'")
+    refresh_metadata(db)
+    assert db.execute("SELECT DISTINCT metadata->>'date' FROM source_documents WHERE kind='ruling'").fetchall()==[('1999-01-01',)]
 
 
 def test_arrow_contract_rejects_narrowing_float_and_changed_timestamp():
@@ -78,3 +86,11 @@ def test_arrow_contract_rejects_narrowing_float_and_changed_timestamp():
 def test_article_source_url_uses_the_site_unicode_whitespace_slug():
     url,_ = source_details('article',10,'1 مكرر','ar',{'kind':'قانون'})
     assert url == 'https://lebaneselegislation.com/law/10/article/1-%D9%85%D9%83%D8%B1%D8%B1/'
+
+
+def test_generic_dates_cover_all_public_date_fields_and_preserve_explicit_date():
+    for key in ('issued_on','decided_on','signed_on','published_on'):
+        _,metadata=source_details('ruling',8,'','ar',{key:date(2020,1,2)})
+        assert metadata['date']=='2020-01-02'
+    _,metadata=source_details('ruling',8,'','ar',{'date':date(1999,1,1),'decided_on':date(2020,1,2)})
+    assert metadata['date']=='1999-01-01'

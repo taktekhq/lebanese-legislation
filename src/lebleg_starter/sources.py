@@ -32,6 +32,11 @@ def source_details(kind, source_id, part, lang, fields):
     for key in ('number', 'issued_on', 'decided_on', 'signed_on', 'published_on', 'date', 'year', 'low_confidence', 'source_url', 'source', 'confidence', 'model', 'read_at'):
         if fields.get(key) is not None:
             metadata['identifier' if key == 'number' else key] = str(fields[key]) if key in ('issued_on', 'decided_on', 'signed_on', 'published_on', 'date', 'read_at') else fields[key]
+    if 'date' not in metadata:
+        for key in ('issued_on','decided_on','signed_on','published_on'):
+            if key in metadata:
+                metadata['date']=metadata[key]
+                break
     return url, metadata
 
 
@@ -119,4 +124,4 @@ def refresh_metadata(conn):
     special = conn.execute("SELECT d.source_id,d.part,d.lang,l.kind FROM source_documents d JOIN legislation l ON l.id=d.source_id WHERE d.kind='article' AND d.part~%s",('['+GO_WHITESPACE+']',)).fetchall()
     for sid,part,lang,kind in special:
         url,_ = source_details('article',sid,part,lang,{'kind':kind})
-        conn.execute("UPDATE source_documents SET source_url=%s WHERE kind='article' AND source_id=%s AND part=%s AND lang=%s",(url,sid,part,lang))
+        conn.execute("UPDATE source_documents SET source_url=%s WHERE kind='article' AND source_id=%s AND part=%s AND lang=%s AND source_url IS DISTINCT FROM %s",(url,sid,part,lang,url))
