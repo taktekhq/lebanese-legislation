@@ -45,8 +45,8 @@ Stop services with `docker compose down`. This preserves the database and downlo
 | `releases/<release-id>/manifest.json` | Source commit, counts, embedding settings, versions, licence and SHA-256 |
 | `releases/latest.json` | Pointer to the latest verified database release |
 | `ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2` | PostgreSQL 18.6 with pgvector 0.8.2 |
-| `ghcr.io/taktekhq/lebanese-legislation-starter:0.1.2` | Restore CLI and search API |
-| `ghcr.io/taktekhq/lebanese-legislation-starter:publisher-0.1.2` | Optional tools for rebuilding and publishing snapshots |
+| `ghcr.io/taktekhq/lebanese-legislation-starter:0.1.3` | Restore CLI and search API |
+| `ghcr.io/taktekhq/lebanese-legislation-starter:publisher-0.1.3` | Optional tools for rebuilding and publishing snapshots |
 
 Database data is downloaded separately, not baked into the Docker image. The dump stores index definitions; PostgreSQL constructs the HNSW index during restore. It does not contain a portable copy of PostgreSQL's physical index files.
 
