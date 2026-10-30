@@ -19,13 +19,17 @@ jobs:
           for i in $(seq 1 60); do docker exec lebleg-test pg_isready -U starter && break; sleep 1; done
           mkdir -p /tmp/pg18-bin
           for client in pg_dump pg_restore; do
-            printf '#!/bin/sh\nexec docker run --rm -i --network host -v /tmp:/tmp -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -e PGPASSWORD -e PGOPTIONS --entrypoint %s lebleg-test-postgres "$@"\n' "$client" > "/tmp/pg18-bin/$client"
+            printf '#!/bin/sh\nexec docker run --rm -i --network host -v /tmp:/tmp -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -e PGHOST -e PGPORT -e PGUSER -e PGDATABASE -e PGSSLMODE -e PGPASSWORD -e PGOPTIONS --entrypoint %s lebleg-test-postgres "$@"\n' "$client" > "/tmp/pg18-bin/$client"
             chmod +x "/tmp/pg18-bin/$client"
           done
           echo '/tmp/pg18-bin' >> "$GITHUB_PATH"
       - run: pytest -q
         env:
           LEBLEG_TEST_ADMIN_DSN: host=127.0.0.1 port=55433 user=starter password=test dbname=starter
+          RUNTIME_TEST_DSN: host=127.0.0.1 port=55433 user=starter password=test dbname=starter
           LEBLEG_TEST_IMAGE: lebleg-test-postgres
+          PG_DUMP_BIN: /tmp/pg18-bin/pg_dump
+          LEBLEG_TEST_PGDUMP: /tmp/pg18-bin/pg_dump
+          LEBLEG_TEST_PGRESTORE: /tmp/pg18-bin/pg_restore
           PG_RESTORE_BIN: /tmp/pg18-bin/pg_restore
       - run: docker build --target runtime --build-arg POSTGRES_IMAGE=lebleg-test-postgres -t lebleg-runtime .
