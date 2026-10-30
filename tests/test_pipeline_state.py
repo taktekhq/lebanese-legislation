@@ -1,4 +1,5 @@
 import pytest
+
 from lebleg_starter.pipeline_state import Ledger, content_fingerprint, worker_lock
 
 
