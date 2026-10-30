@@ -170,3 +170,44 @@ def test_real_rejects_ineligible_sidecar(db,tmp_path,mutation):
         pq.write_table(pa.Table.from_pylist(rows,schema=table.schema),path)
     with pytest.raises(ValueError,match='calculated'):
         sources.import_parquet(db,tmp_path)
+
+
+@pytest.mark.parametrize('include_counts', [False, True])
+def test_literal_derived_scope_preserves_other_laws_raw_matches(db,tmp_path,include_counts):
+    from contextlib import contextmanager
+
+    from psycopg.rows import dict_row
+    from psycopg.types.json import Jsonb
+    from test_runtime import manifest
+
+    from lebleg_starter.search import SearchService
+    row=record()
+    write_snapshot(db,tmp_path,row)
+    sources.import_parquet(db,tmp_path)
+    sources.derive_documents(db)
+    # A calculated view belongs only to original Arabic article records in its
+    # statutory scope. Other resources may still match their own raw wording.
+    for kind,sid,lang,text,metadata in [
+        ('article',1,'ar','ordinary',{'calculated_current':row['calculated_current']}),
+        ('article',244565,'fr','ordinary',{'calculated_current':row['calculated_current']}),
+        ('article',244565,'en','ordinary',{'calculated_current':row['calculated_current']}),
+        ('law',244565,'ar','ordinary',{'calculated_current':row['calculated_current']}),
+        ('article',99,'ar','المبلغ 5,000,000,000 ليرة',{}),
+    ]:
+        db.execute('INSERT INTO source_documents VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+                   (kind,sid,'86',lang,'عنوان',text,digest(text),'https://example.org/source',Jsonb(metadata)))
+    db.execute('CREATE TABLE lebleg_release(release_id text,manifest jsonb)')
+    db.execute('CREATE TABLE restore_receipt(singleton boolean,manifest jsonb)')
+    m=manifest()
+    db.execute('INSERT INTO lebleg_release VALUES(%s,%s)',(m['release_id'],Jsonb(m)))
+    db.execute('INSERT INTO restore_receipt VALUES(true,%s)',(Jsonb(m),))
+    @contextmanager
+    def connection():
+        with db.cursor(row_factory=dict_row) as cursor:
+            yield cursor
+    service=SearchService.__new__(SearchService)
+    service.connection,service.provider=connection,None
+    result=service.search('5,000,000,000',limit=50,semantic=False,include_counts=include_counts)
+    assert {(p['kind'],p['source_id'],p['lang']) for p in result['passages']}=={('article',244565,'ar'),('article',99,'ar')}
+    if include_counts:
+        assert result['exact_counts']=={'article':2}
