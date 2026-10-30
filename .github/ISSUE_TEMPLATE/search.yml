@@ -1,0 +1,26 @@
+name: Missing search result
+description: Help us find a legal text that search missed.
+title: 'Search: '
+body:
+  - type: markdown
+    attributes:
+      value: Use public legal sources. Send sensitive details privately to taktekbot@taktek.io.
+  - type: input
+    id: query
+    attributes:
+      label: What did you search for?
+    validations:
+      required: true
+  - type: input
+    id: expected
+    attributes:
+      label: Which text should appear?
+      description: Include its public URL, number or year.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened?
+    validations:
+      required: true
