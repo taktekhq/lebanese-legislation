@@ -1,6 +1,11 @@
 name: publish images
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: Package version to publish from this ref
+        required: true
+        default: 0.1.0
   push:
     tags: ['v*']
 permissions:
@@ -17,7 +22,31 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Validate immutable image versions
+        id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          VERSION=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            test "$GITHUB_REF_NAME" = "v$VERSION"
+          else
+            test "$REQUESTED_VERSION" = "$VERSION"
+          fi
+          for TAG in "$VERSION" "publisher-$VERSION"; do
+            if docker manifest inspect "ghcr.io/taktekhq/lebanese-legislation-starter:$TAG" >/dev/null 2>&1; then
+              echo "Refusing to replace published image $TAG" >&2
+              exit 1
+            fi
+          done
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if docker manifest inspect ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2 >/dev/null 2>&1; then
+            echo 'build_postgres=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'build_postgres=true' >> "$GITHUB_OUTPUT"
+          fi
       - uses: docker/build-push-action@v6
+        if: steps.version.outputs.build_postgres == 'true'
         with:
           context: .
           file: docker/postgres.Dockerfile
@@ -28,10 +57,10 @@ jobs:
           context: .
           target: runtime
           push: true
-          tags: ghcr.io/taktekhq/lebanese-legislation-starter:0.1.0
+          tags: ghcr.io/taktekhq/lebanese-legislation-starter:${{ steps.version.outputs.version }}
       - uses: docker/build-push-action@v6
         with:
           context: .
           target: publisher
           push: true
-          tags: ghcr.io/taktekhq/lebanese-legislation-starter:publisher-0.1.0
+          tags: ghcr.io/taktekhq/lebanese-legislation-starter:publisher-${{ steps.version.outputs.version }}
