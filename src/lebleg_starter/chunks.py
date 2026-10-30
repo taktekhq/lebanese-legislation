@@ -35,6 +35,6 @@ def chunks(text: str):
 
 def reusable(text: str, hashed: str, start: int, end: int, excerpt: str) -> bool:
     """Only accept canonical chunk boundaries, not arbitrary matching substrings."""
-    return (hashed == digest(text) and start >= 0 and start % 780 == 0
+    return (bool(text.strip(GO_WHITESPACE)) and hashed == digest(text) and start >= 0 and start % 780 == 0
             and end == min(start + CHUNK_SIZE, len(text)) and end > start
             and (start == 0 or start + OVERLAP < len(text)) and text[start:end] == excerpt)

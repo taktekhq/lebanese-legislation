@@ -20,3 +20,7 @@ def test_reuse_checks_full_hash_offsets_and_excerpt():
 
 def test_go_trimspace_does_not_treat_ascii_file_separator_as_space():
     assert len(list(chunks('\x1c'))) == 1
+
+
+def test_whitespace_cannot_be_reused_as_a_chunk():
+    assert not reusable('\n', digest('\n'), 0, 1, '\n')

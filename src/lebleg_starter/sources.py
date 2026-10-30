@@ -76,10 +76,11 @@ def derive_documents(conn):
       LEFT JOIN research rs ON c.kind='research' AND rs.id=c.source_id
       LEFT JOIN doctrine_article d ON c.kind='doctrine' AND d.id=c.source_id
       WHERE btrim(coalesce(c.body,''))<>''""")
-    with conn.cursor(name='canonical_documents') as rows, conn.cursor() as writer:
+    with conn.cursor(name='canonical_documents') as rows:
         rows.execute(query)
-        for kind, sid, part, lang, title, text, fields in rows:
-            url, metadata = source_details(kind, sid, part, lang, fields)
-            writer.execute('INSERT INTO source_documents VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)',
-                           (kind, sid, part, lang, title or '', text, digest(text), url, Jsonb(metadata)))
+        while batch := rows.fetchmany(2000):
+            with conn.cursor().copy('COPY source_documents FROM STDIN') as writer:
+                for kind, sid, part, lang, title, text, fields in batch:
+                    url, metadata = source_details(kind, sid, part, lang, fields)
+                    writer.write_row((kind, sid, part, lang, title or '', text, digest(text), url, Jsonb(metadata)))
     return conn.execute('SELECT count(*) FROM source_documents').fetchone()[0]

@@ -12,7 +12,7 @@ import psycopg
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
-from .chunks import DIMENSIONS, MODEL, chunks, reusable
+from .chunks import DIMENSIONS, GO_WHITESPACE, MODEL, chunks, reusable
 from .sources import derive_documents, import_parquet, resource
 
 
@@ -33,6 +33,9 @@ def reuse_vectors(target, source, source_table='public.semantic_chunks'):
     with source.cursor(name='public_vector_reuse') as rows, target.cursor() as writer:
         rows.itersize = 500
         rows.execute(query, (MODEL,))
+        accepted = []
+        insert = '''INSERT INTO semantic_chunks(model,kind,source_id,part,lang,title,text,hash,chunk_start,chunk_end,embedding)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING'''
         for row in rows:
             doc = docs.get(tuple(row[:4]))
             if doc is None:
@@ -41,9 +44,13 @@ def reuse_vectors(target, source, source_table='public.semantic_chunks'):
             excerpt, saved_hash, start, end, vector = row[4:]
             if saved_hash != hashed or not reusable(text, saved_hash, start, end, excerpt):
                 continue
-            writer.execute('''INSERT INTO semantic_chunks(model,kind,source_id,part,lang,title,text,hash,chunk_start,chunk_end,embedding)
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING''',
-                (MODEL, *row[:4], title, excerpt, hashed, start, end, vector))
+            accepted.append((MODEL, *row[:4], title, excerpt, hashed, start, end, vector))
+            if len(accepted) == 500:
+                writer.executemany(insert, accepted)
+                inserted += writer.rowcount
+                accepted = []
+        if accepted:
+            writer.executemany(insert, accepted)
             inserted += writer.rowcount
     return inserted
 
@@ -111,7 +118,7 @@ def validate_chunks(conn):
       OR c.chunk_start%%780<>0 OR c.chunk_end<>least(c.chunk_start+900,length(d.text))
       OR (c.chunk_start<>0 AND c.chunk_start+120>=length(d.text))
       OR c.text<>substring(d.text FROM c.chunk_start+1 FOR c.chunk_end-c.chunk_start)
-      OR c.title<>d.title""", (MODEL,)).fetchone()[0]
+      OR c.title<>d.title OR btrim(d.text,%s)=''""", (MODEL, GO_WHITESPACE)).fetchone()[0]
     if invalid:
         raise ValueError(f'{invalid} chunks failed canonical validation')
 
