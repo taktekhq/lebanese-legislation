@@ -87,8 +87,8 @@ def test_unicode_passage_rechecks_source_hash_and_offsets():
 
 
 def test_explicit_citation_recognized():
-    assert citation_target("law 123 dated 2020-01-02") == ("123", "2020-01-02")
-    assert citation_target("قانون رقم ١٢٣") == ("123", None)
+    assert citation_target("law 123 dated 2020-01-02").date == "2020-01-02"
+    assert citation_target("قانون رقم ١٢٣").number == "123"
     assert citation_target("employment rights") is None
 
 
@@ -185,3 +185,149 @@ def test_interrupted_download_removes_partial_files(monkeypatch, tmp_path):
     with pytest.raises(ManifestError):
         module.download_release(m["source"]["repo_id"], "b" * 40, "manifest.json", tmp_path)
     assert not list(tmp_path.rglob("*.partial"))
+
+
+@pytest.mark.parametrize(
+    "query,kind,number,year,date",
+    [
+        ("What does the law say about decree 123?", "decree", "123", None, None),
+        ("decree 123/2005", "decree", "123", "2005", None),
+        ("المرسوم الإشتراعي رقم ١٢٣ بتاريخ ٢/١/٢٠٠٥", "decree-law", "123", None, "2005-01-02"),
+        ("قرار مجلس الوزراء رقم 123/2005", "cabinet-decision", "123", "2005", None),
+    ],
+)
+def test_citation_binds_instrument_number_and_year_date(query, kind, number, year, date):
+    target = citation_target(query)
+    assert (target.kind, target.number, target.year, target.date) == (kind, number, year, date)
+
+
+def test_query_embedding_cache_and_shared_daily_budget_before_http():
+    import io
+    import json
+
+    from lebleg_starter.embedding import Gemini
+
+    now = [100.0]
+    calls = []
+
+    class Opener:
+        def open(self, request, timeout):
+            calls.append(request.full_url)
+            if "batchEmbedContents" in request.full_url:
+                return io.BytesIO(json.dumps({"embeddings": [{"values": [1.0] * 768}]}).encode())
+            return io.BytesIO(
+                json.dumps(
+                    {"candidates": [{"finishReason": "STOP", "content": {"parts": [{"text": '{"source_ids":[]}'}]}}]}
+                ).encode()
+            )
+
+    provider = Gemini("synthetic", max_calls_per_day=2, cache_size=1, cache_ttl=3600, clock=lambda: now[0])
+    provider._opener = Opener()
+    first = provider.embed(["question"], query=True)
+    first[0][0] = 999
+    assert provider.embed(["question"], query=True)[0][0] != 999
+    assert len(calls) == 1
+    assert provider.select("question", [{"id": "1", "text": "original"}]) == []
+    with pytest.raises(ProviderError, match="daily"):
+        provider.embed(["another"], query=True)
+    assert len(calls) == 2
+    now[0] += 86400
+    provider.embed(["another"], query=True)
+    assert len(calls) == 3
+
+
+def test_query_cache_expiry_and_capacity():
+    import io
+    import json
+
+    from lebleg_starter.embedding import Gemini
+
+    now = [0.0]
+    calls = []
+
+    class Opener:
+        def open(self, request, timeout):
+            calls.append(1)
+            return io.BytesIO(json.dumps({"embeddings": [{"values": [1.0] * 768}]}).encode())
+
+    provider = Gemini("synthetic", max_calls_per_day=10, cache_size=1, cache_ttl=5, clock=lambda: now[0])
+    provider._opener = Opener()
+    provider.embed(["a"], query=True)
+    provider.embed(["b"], query=True)
+    provider.embed(["a"], query=True)
+    assert len(calls) == 3
+    now[0] = 6
+    provider.embed(["a"], query=True)
+    assert len(calls) == 4
+
+
+@pytest.mark.parametrize(
+    "name,value",
+    [
+        ("GEMINI_MAX_CALLS_PER_DAY", "-1"),
+        ("GEMINI_CONCURRENCY", "0"),
+        ("GEMINI_QUERY_CACHE_SIZE", "257"),
+        ("GEMINI_QUERY_CACHE_TTL", "3601"),
+        ("GEMINI_MAX_CALLS_PER_DAY", "unlimited"),
+    ],
+)
+def test_invalid_provider_guard_config_fails_closed(monkeypatch, name, value):
+    from lebleg_starter.embedding import Gemini
+
+    monkeypatch.setenv(name, value)
+    with pytest.raises(ProviderError):
+        Gemini("synthetic")
+
+
+@pytest.mark.parametrize(
+    "query,kind,number,year,date",
+    [
+        ("loi n° 123/2005", "law", "123", "2005", None),
+        ("décret numéro 123 du 2/1/2005", "decree", "123", None, "2005-01-02"),
+        ("arrêt 123/2005", "ruling", "123", "2005", None),
+        ("decree 123 of 2005", "decree", "123", "2005", None),
+    ],
+)
+def test_common_french_citations_and_bound_year(query, kind, number, year, date):
+    target = citation_target(query)
+    assert (target.kind, target.number, target.year, target.date) == (kind, number, year, date)
+
+
+def test_zero_provider_budget_blocks_http(monkeypatch):
+    from lebleg_starter.embedding import Gemini
+
+    provider = Gemini("synthetic", max_calls_per_day=0)
+
+    class NoHTTP:
+        def open(self, *args, **kwargs):
+            pytest.fail("zero budget reached HTTP")
+
+    provider._opener = NoHTTP()
+    with pytest.raises(ProviderError, match="daily"):
+        provider.embed(["question"], query=True)
+
+
+def test_query_cache_model_namespace_and_default_concurrency():
+    import io
+    import json
+
+    from lebleg_starter.embedding import Gemini
+
+    provider = Gemini("synthetic")
+    assert provider._slots.acquire(blocking=False)
+    assert provider._slots.acquire(blocking=False)
+    assert not provider._slots.acquire(blocking=False)
+    provider._slots.release()
+    provider._slots.release()
+    calls = []
+
+    class Opener:
+        def open(self, request, timeout):
+            calls.append(1)
+            return io.BytesIO(json.dumps({"embeddings": [{"values": [1.0] * 768}]}).encode())
+
+    provider._opener = Opener()
+    provider.embed(["query"], query=True)
+    provider.model = "different-model"
+    provider.embed(["query"], query=True)
+    assert len(calls) == 2

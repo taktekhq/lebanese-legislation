@@ -7,6 +7,7 @@ import os
 import re
 import unicodedata
 from contextlib import contextmanager
+from dataclasses import dataclass
 from urllib.parse import urlsplit
 
 import psycopg
@@ -20,23 +21,124 @@ class SearchError(ValueError):
     pass
 
 
+@dataclass(frozen=True)
+class CitationTarget:
+    kind: str | None
+    number: str | None
+    date: str | None = None
+    year: str | None = None
+
+
+def _citation_normalize(value):
+    value = "".join(str(unicodedata.digit(c)) if c.isdigit() else c for c in value)
+    value = value.translate(str.maketrans("أإآٱ", "اااا"))
+    value = re.sub(r"[ًٌٍَُِّْـ]", "", value)
+    return re.sub(r"(?<!\w)ال", "", value).lower()
+
+
+_INSTRUMENT = r"(?:decree[ -]law|d[ée]cret[ -]loi|d[ée]cret législatif|cabinet decision|decision of (?:the )?council of ministers|مرسوم\s+اشتراعي|قرار\s+مجلس\s+وزراء|loi|décret|decret|décision|arrêt|arret|judgment|حكم|law|decree|decision|قانون|مرسوم|قرار)"
+_DATE = r"(?:\d{4}-\d{2}-\d{2}|\d{1,2}[/.-]\d{1,2}[/.-]\d{4})"
+_CITATION = re.compile(
+    r"(?<!\w)(?P<instrument>"
+    + _INSTRUMENT
+    + r")\s*(?:no\.?|number|n[°º]|numéro|رقم)?\s*(?P<number>\d+)(?:\s*/\s*(?P<year>\d{4})(?!\d))?(?:\s+(?:of|du|سنة|لعام|لسنة)\s+(?P<word_year>\d{4})(?![\d/.-]))?(?:\s+(?:dated|of|du|الصادر في|صادر في|بتاريخ|تاريخ|في)?\s*(?P<date>"
+    + _DATE
+    + r"))?",
+    re.IGNORECASE,
+)
+
+
+def _date_value(value):
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        return value
+    day, month, year = re.split(r"[/.-]", value)
+    return f"{year}-{int(month):02d}-{int(day):02d}"
+
+
 def citation_target(query):
-    query = "".join(str(unicodedata.digit(c)) if c.isdigit() else c for c in query)
-    number = re.search(
-        r"(?:law|decree|decision|قانون|مرسوم|قرار)\s*(?:no\.?|number|رقم)?\s*(\d+)", query, re.IGNORECASE
-    )
-    date = re.search(r"\b(\d{4}-\d{2}-\d{2})\b", query)
-    if not date:
-        d = re.search(r"\b(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})\b", query)
-        if d:
-            date_value = f"{d[3]}-{int(d[2]):02d}-{int(d[1]):02d}"
+    query = _citation_normalize(query)
+    match = _CITATION.search(query)
+    if match:
+        name = re.sub(r"\s+", " ", match["instrument"])
+        if name in (
+            "decree-law",
+            "decree law",
+            "décret-loi",
+            "décret loi",
+            "decret-loi",
+            "decret loi",
+            "décret législatif",
+            "decret législatif",
+            "مرسوم اشتراعي",
+        ):
+            kind = "decree-law"
+        elif name in (
+            "cabinet decision",
+            "decision of council of ministers",
+            "decision of the council of ministers",
+            "قرار مجلس وزراء",
+        ):
+            kind = "cabinet-decision"
         else:
-            date_value = None
-    else:
-        date_value = date[1]
-    if number or date_value:
-        return (number[1] if number else None, date_value)
-    return None
+            kind = {
+                "قانون": "law",
+                "مرسوم": "decree",
+                "قرار": "decision",
+                "loi": "law",
+                "décret": "decree",
+                "decret": "decree",
+                "décision": "decision",
+                "arrêt": "ruling",
+                "arret": "ruling",
+                "judgment": "ruling",
+                "حكم": "ruling",
+            }.get(name, name)
+        return CitationTarget(
+            kind,
+            match["number"],
+            _date_value(match["date"]) if match["date"] else None,
+            (match["year"] or match["word_year"]),
+        )
+    date = re.search(_DATE, query)
+    return CitationTarget(None, None, _date_value(date[0])) if date else None
+
+
+# Normalize metadata for matching only. Original published source text is never changed.
+_SOURCE_TYPE = "lower(regexp_replace(translate(regexp_replace(coalesce(metadata->>'source_type',kind),'[ًٌٍَُِّْـ]','','g'),'أإآٱ','اااا'),'(^|[[:space:]])ال','\\1','g'))"
+
+
+def _citation_conditions(target):
+    conditions = []
+    params = []
+    if target.kind:
+        label = {
+            "law": "قانون",
+            "decree": "مرسوم",
+            "decree-law": "مرسوم اشتراعي",
+            "decision": "قرار",
+            "cabinet-decision": "قرار مجلس وزراء",
+            "ruling": "حكم",
+        }[target.kind]
+        if target.kind == "ruling":
+            conditions.append("(kind='ruling' OR " + _SOURCE_TYPE + " LIKE %s)")
+            params.append(label + "%")
+        else:
+            conditions.append("(" + _SOURCE_TYPE + " LIKE %s OR " + _SOURCE_TYPE + "=%s)")
+            params.extend([label + "%", target.kind])
+        if target.kind == "decree":
+            conditions.append(_SOURCE_TYPE + " NOT LIKE 'مرسوم اشتراعي%%'")
+    if target.number:
+        conditions.append("coalesce(metadata->>'identifier',metadata->>'number','')=%s")
+        params.append(target.number)
+    if target.date:
+        conditions.append("coalesce(metadata->>'issued_on',metadata->>'date','')=%s")
+        params.append(target.date)
+    if target.year:
+        conditions.append(
+            "coalesce(metadata->>'year',substring(coalesce(metadata->>'issued_on',metadata->>'date','') from 1 for 4))=%s"
+        )
+        params.append(target.year)
+    return conditions, params
 
 
 def validate_passage(row):
@@ -124,33 +226,7 @@ class SearchService:
             conditions = []
             params = []
             if target:
-                number, date = target
-                instrument = re.search(
-                    r"(?:decree[ -]law|مرسوم اشتراعي|law|decree|decision|قانون|مرسوم|قرار)", query, re.IGNORECASE
-                )
-                if instrument:
-                    name = instrument[0].lower()
-                    label, fallback = (
-                        ("مرسوم اشتراعي", "decree-law")
-                        if name in ("decree-law", "decree law", "مرسوم اشتراعي")
-                        else (
-                            ("قانون", "law")
-                            if name in ("law", "قانون")
-                            else (("مرسوم", "decree") if name in ("decree", "مرسوم") else ("قرار", "decision"))
-                        )
-                    )
-                    conditions.append(
-                        "(metadata->>'source_type' LIKE %s OR metadata->>'source_type'=%s OR (metadata->>'source_type' IS NULL AND kind=%s))"
-                    )
-                    params.extend([label + "%", fallback, fallback])
-                    if fallback == "decree":
-                        conditions.append("coalesce(metadata->>'source_type','') NOT LIKE 'مرسوم اشتراعي%%'")
-                if number:
-                    conditions.append("coalesce(metadata->>'identifier',metadata->>'number','')=%s")
-                    params.append(number)
-                if date:
-                    conditions.append("coalesce(metadata->>'issued_on',metadata->>'date','')=%s")
-                    params.append(date)
+                conditions, params = _citation_conditions(target)
             else:
                 conditions.append("(title ILIKE %s ESCAPE '\\' OR text ILIKE %s ESCAPE '\\')")
                 escaped = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
@@ -206,7 +282,8 @@ class SearchService:
         if select:
             if not self.provider:
                 raise SearchError("Gemini API key is required for source selection")
-            passages = self.provider.select(query, passages)
+            if passages:
+                passages = self.provider.select(query, passages)
         return {
             "label": "Original source passages, not legal conclusions",
             "english_notice": "English titles are unofficial discovery aids. Arabic source text is authoritative.",

@@ -1,6 +1,8 @@
 """Verify and restore a public dump into an empty database. Existing data is never dropped."""
 
 import argparse
+import hashlib
+import json
 import os
 import re
 import subprocess
@@ -45,7 +47,52 @@ def target_state(conn, manifest):
             k: v for k, v in manifest.items() if k != "artifact_revision"
         }:
             return "ready"
+    if "restore_attempt" in tables:
+        attempt = conn.execute("""SELECT a.manifest_sha256,a.owner_oid,c.relowner,current_user::regrole::oid
+            FROM public.restore_attempt a JOIN pg_class c ON c.oid='public.restore_attempt'::regclass
+            WHERE a.singleton""").fetchone()
+        if attempt and attempt[0] == manifest_checksum(manifest) and attempt[1] == attempt[2] == attempt[3]:
+            if set(tables) == {"restore_attempt"}:
+                return "attempt_empty"
+            expected = set(manifest["counts"]["tables"]) | {
+                "restore_attempt",
+                "source_documents",
+                "semantic_chunks",
+                "semantic_documents",
+                "lebleg_release",
+            }
+            if set(tables) <= expected:
+                return "resume"
     raise RestoreError("target database is occupied or belongs to another release; use a new database")
+
+
+def manifest_checksum(manifest):
+    external = {k: v for k, v in manifest.items() if k != "artifact_revision"}
+    return hashlib.sha256(
+        json.dumps(external, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+    ).hexdigest()
+
+
+def _check_reader(conn, reader_role):
+    if not reader_role:
+        return
+    role = conn.execute(
+        "SELECT rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls FROM pg_roles WHERE rolname=%s",
+        (reader_role,),
+    ).fetchone()
+    if not role or any(role):
+        raise RestoreError("a restricted existing reader role is required")
+
+
+def _begin_attempt(conn, manifest):
+    with conn.transaction():
+        conn.execute("""CREATE TABLE restore_attempt(singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton),
+            manifest_sha256 text NOT NULL,manifest jsonb NOT NULL,owner_oid oid NOT NULL,
+            started_at timestamptz NOT NULL DEFAULT now())""")
+        conn.execute(
+            "INSERT INTO restore_attempt(singleton,manifest_sha256,manifest,owner_oid) VALUES(true,%s,%s,current_user::regrole::oid)",
+            (manifest_checksum(manifest), Jsonb(manifest)),
+        )
 
 
 def check_database(conn, manifest, reader_role=None):
@@ -80,6 +127,20 @@ def check_database(conn, manifest, reader_role=None):
     ).fetchone()
     if not index:
         raise RestoreError("restored vector index is missing")
+    stale = conn.execute("""SELECT 1 FROM source_documents
+        WHERE hash IS DISTINCT FROM encode(sha256(convert_to(text,'UTF8')),'hex') LIMIT 1""").fetchone()
+    if stale:
+        raise RestoreError("restored source hash mismatch")
+    stale = conn.execute(
+        """SELECT 1 FROM semantic_chunks c LEFT JOIN source_documents d USING(kind,source_id,part,lang)
+        WHERE d.hash IS NULL OR c.hash IS DISTINCT FROM d.hash OR c.chunk_start<0
+          OR c.chunk_end<=c.chunk_start OR c.chunk_end>char_length(d.text) OR c.chunk_end-c.chunk_start>900
+          OR c.text IS DISTINCT FROM substring(d.text from c.chunk_start+1 for c.chunk_end-c.chunk_start)
+          OR c.model<>%s LIMIT 1""",
+        (manifest["embedding"]["model"],),
+    ).fetchone()
+    if stale:
+        raise RestoreError("restored semantic source mismatch")
     if reader_role:
         role = conn.execute(
             "SELECT rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls FROM pg_roles WHERE rolname=%s",
@@ -94,6 +155,25 @@ def check_database(conn, manifest, reader_role=None):
             ).fetchone()
             if not access[0] or access[1]:
                 raise RestoreError("reader table permissions are not read-only")
+
+
+def _finish_restore(conn, manifest, reader_role):
+    with conn.transaction():
+        # Bootstrap owns grants; restore can apply SELECT only to an already restricted reader.
+        if reader_role:
+            _check_reader(conn, reader_role)
+            conn.execute(sql.SQL("GRANT USAGE ON SCHEMA public TO {}").format(sql.Identifier(reader_role)))
+            conn.execute(
+                sql.SQL("GRANT SELECT ON ALL TABLES IN SCHEMA public TO {}").format(sql.Identifier(reader_role))
+            )
+        check_database(conn, manifest, reader_role)
+        conn.execute("ANALYZE")
+        conn.execute(
+            "CREATE TABLE restore_receipt(singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton),manifest jsonb NOT NULL,restored_at timestamptz NOT NULL DEFAULT now())"
+        )
+        conn.execute("INSERT INTO restore_receipt(singleton,manifest) VALUES(true,%s)", (Jsonb(manifest),))
+        if reader_role:
+            conn.execute(sql.SQL("GRANT SELECT ON restore_receipt TO {}").format(sql.Identifier(reader_role)))
 
 
 def restore(manifest, dump_path, dsn, reader_role="lebleg_reader", pg_restore="pg_restore"):
@@ -113,11 +193,17 @@ def restore(manifest, dump_path, dsn, reader_role="lebleg_reader", pg_restore="p
             server_version = conn.execute("SELECT current_setting('server_version_num')::int").fetchone()[0]
             if server_version != 180006:
                 raise RestoreError("PostgreSQL 18.6 is required")
+            _check_reader(conn, reader_role)
             state = target_state(conn, manifest)
             if state == "ready":
                 with conn.transaction():
                     check_database(conn, manifest, reader_role)
                 return "already restored"
+            if state == "resume":
+                _finish_restore(conn, manifest, reader_role)
+                return "restored"
+            if state == "empty":
+                _begin_attempt(conn, manifest)
             env = os.environ.copy()
             # Keep connection secrets out of the command line and all error output.
             from psycopg.conninfo import conninfo_to_dict
@@ -153,27 +239,7 @@ def restore(manifest, dump_path, dsn, reader_role="lebleg_reader", pg_restore="p
             )
             if result.returncode:
                 raise RestoreError("transactional restore failed; target was not marked ready")
-            with conn.transaction():
-                # Bootstrap owns grants; restore can apply SELECT only to an already restricted reader.
-                if reader_role:
-                    role = conn.execute(
-                        "SELECT rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls FROM pg_roles WHERE rolname=%s",
-                        (reader_role,),
-                    ).fetchone()
-                    if not role or any(role):
-                        raise RestoreError("a restricted existing reader role is required")
-                    conn.execute(sql.SQL("GRANT USAGE ON SCHEMA public TO {}").format(sql.Identifier(reader_role)))
-                    conn.execute(
-                        sql.SQL("GRANT SELECT ON ALL TABLES IN SCHEMA public TO {}").format(sql.Identifier(reader_role))
-                    )
-                check_database(conn, manifest, reader_role)
-                conn.execute("ANALYZE")
-                conn.execute(
-                    "CREATE TABLE restore_receipt(singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton),manifest jsonb NOT NULL,restored_at timestamptz NOT NULL DEFAULT now())"
-                )
-                conn.execute("INSERT INTO restore_receipt(singleton,manifest) VALUES(true,%s)", (Jsonb(manifest),))
-                if reader_role:
-                    conn.execute(sql.SQL("GRANT SELECT ON restore_receipt TO {}").format(sql.Identifier(reader_role)))
+            _finish_restore(conn, manifest, reader_role)
             return "restored"
     except psycopg.Error:
         raise RestoreError("database restore or validation failed; target was not marked ready") from None

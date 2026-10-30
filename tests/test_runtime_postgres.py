@@ -41,9 +41,9 @@ def databases(tmp_path):
             admin.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(reader)))
 
 
-def test_actual_transactional_restore_idempotence_and_readonly_search(databases):
-    dsns, reader, binary, dump_binary, tmp_path = databases
-    source, target, bad = dsns
+def prepare_dump(databases):
+    dsns, _reader, _binary, dump_binary, tmp_path = databases
+    source, _target, _bad = dsns
     m = manifest()
     text = "قانون 🙂 نص"
     digest = hashlib.sha256(text.encode()).hexdigest()
@@ -109,6 +109,13 @@ def test_actual_transactional_restore_idempotence_and_readonly_search(databases)
         )
     m["dump"]["size_bytes"] = dump.stat().st_size
     m["dump"]["sha256"] = hashlib.sha256(dump.read_bytes()).hexdigest()
+    return m, dump, text
+
+
+def test_actual_transactional_restore_idempotence_and_readonly_search(databases):
+    dsns, reader, binary, _, _ = databases
+    _, target, bad = dsns
+    m, dump, text = prepare_dump(databases)
     assert restore(m, dump, target, reader, binary) == "restored"
     assert restore(m, dump, target, reader, binary) == "already restored"
     readonly = make_conninfo(**{**conninfo_to_dict(target), "user": reader, "password": "runtime-test-only"})
@@ -179,3 +186,102 @@ def test_failed_restore_rolls_back_all_imported_tables(databases):
         restore(m, dump, target, reader, binary)
     with psycopg.connect(target) as conn:
         assert conn.execute("SELECT to_regclass('earlier')").fetchone()[0] is None
+        assert conn.execute("SELECT to_regclass('restore_attempt')").fetchone()[0] is not None
+    with pytest.raises(RestoreError, match="transactional restore failed"):
+        restore(m, dump, target, reader, binary)
+
+
+def test_missing_reader_is_rejected_before_import(databases):
+    dsns, reader, binary, _, _ = databases
+    _, target, _ = dsns
+    m, dump, _ = prepare_dump(databases)
+    with pytest.raises(RestoreError, match="reader"):
+        restore(m, dump, target, reader + "_absent", binary)
+    with psycopg.connect(target) as conn:
+        assert conn.execute("SELECT to_regclass('source_documents')").fetchone()[0] is None
+        assert conn.execute("SELECT to_regclass('restore_attempt')").fetchone()[0] is None
+    assert restore(m, dump, target, reader, binary) == "restored"
+
+
+@pytest.mark.parametrize("failure", ["interruption", "validation"])
+def test_post_import_interruption_resumes_without_import(monkeypatch, databases, failure):
+    import lebleg_starter.restore as module
+
+    dsns, reader, binary, _, _ = databases
+    _, target, _ = dsns
+    m, dump, _ = prepare_dump(databases)
+    if failure == "interruption":
+        original = module._finish_restore
+
+        def interrupted(*args, **kwargs):
+            raise KeyboardInterrupt()
+
+        monkeypatch.setattr(module, "_finish_restore", interrupted)
+        with pytest.raises(KeyboardInterrupt):
+            restore(m, dump, target, reader, binary)
+        monkeypatch.setattr(module, "_finish_restore", original)
+    else:
+        original = module.check_database
+
+        def invalid(*args, **kwargs):
+            raise RestoreError("temporary validation failure")
+
+        monkeypatch.setattr(module, "check_database", invalid)
+        with pytest.raises(RestoreError, match="temporary"):
+            restore(m, dump, target, reader, binary)
+        monkeypatch.setattr(module, "check_database", original)
+    with psycopg.connect(target) as conn:
+        assert conn.execute("SELECT count(*) FROM source_documents").fetchone()[0] == 1
+        assert conn.execute("SELECT to_regclass('restore_receipt')").fetchone()[0] is None
+    wrong = {**m, "build_version": "different"}
+    with pytest.raises(RestoreError, match="occupied"):
+        restore(wrong, dump, target, reader, binary)
+    run = module.subprocess.run
+
+    def no_import(args, **kwargs):
+        assert args == [binary, "--version"]
+        return run(args, **kwargs)
+
+    monkeypatch.setattr(module.subprocess, "run", no_import)
+    assert restore(m, dump, target, reader, binary) == "restored"
+
+
+def test_absent_typed_citations_never_call_provider(databases):
+    dsns, reader, binary, _, _ = databases
+    _, target, _ = dsns
+    m, dump, _ = prepare_dump(databases)
+    restore(m, dump, target, reader, binary)
+    readonly = make_conninfo(**{**conninfo_to_dict(target), "user": reader, "password": "runtime-test-only"})
+
+    class NoProviderCalls:
+        model = "gemini-embedding-001"
+
+        def embed(self, *args, **kwargs):
+            pytest.fail("explicit citation reached provider")
+
+        def select(self, *args, **kwargs):
+            pytest.fail("absent citation reached selector")
+
+    service = SearchService(readonly, NoProviderCalls())
+    try:
+        for query in [
+            "What does the law say about decree 123?",
+            "law 123/2005",
+            "المرسوم الاشتراعي رقم ١٢٣",
+            "قرار مجلس الوزراء رقم 123/2005",
+        ]:
+            assert service.search(query, select=True)["passages"] == []
+        with psycopg.connect(target) as conn:
+            conn.execute(
+                "UPDATE source_documents SET metadata=metadata||%s",
+                (Jsonb({"source_type": "المرسوم الإشتراعي", "year": 2020}),),
+            )
+        assert service.search("المرسوم الاشتراعي رقم 123/2020")["passages"]
+        assert service.search("decree-law 123/2005")["passages"] == []
+        with psycopg.connect(target) as conn:
+            conn.execute(
+                "UPDATE source_documents SET metadata=metadata||%s", (Jsonb({"source_type": "قرار مجلس الوزراء"}),)
+            )
+        assert service.search("قرار مجلس الوزراء رقم 123/2020")["passages"]
+    finally:
+        service.close()
