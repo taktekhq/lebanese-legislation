@@ -51,7 +51,7 @@ TOOLS = [
     ),
     _tool(
         "get_article",
-        "Get original article text, versions, source links and recorded uncertainty. Not legal advice.",
+        "Get original article text, versions, source links and recorded uncertainty. Use calculated_current when present for current monetary amounts; it is calculated under its authority, not a verbatim quotation. Not legal advice.",
         {
             "law_id": {"type": "integer", "minimum": 1},
             "number": {"type": "string", "minLength": 1, "maxLength": 100},

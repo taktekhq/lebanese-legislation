@@ -66,6 +66,8 @@ Database data is downloaded separately, not baked into the Docker image. The dum
 
 The release is built only from the pinned public Parquet files. It does not contain private website tables, user queries, analytics, credentials or website-only explanations. Exported views become snapshot tables. `source_documents` is a derived read model for this immutable snapshot; editing raw tables does not automatically update it or its vectors. Article retrieval follows the exported in-force view at the stated date; the raw tables retain the wider historical corpus.
 
+When present, `GET /api/v1/law/{id}/article/{number}/` and MCP `get_article` include the same additive `calculated_current` object as search metadata. It is returned only when the displayed body and current in-force source match its SHA-256 and its statutory authority and eligibility are valid. Original text and versions retain their existing fields. Older snapshots without the derived table omit the object.
+
 ## How retrieval works
 
 1. The server searches original text and explicit citations first.
