@@ -6,6 +6,8 @@ Restore the public [Lebanese Legislation dataset](https://huggingface.co/dataset
 
 The existing Parquet dataset remains the portable data distribution. This project adds a PostgreSQL snapshot and reusable search service. No model training is required.
 
+The database, runtime and publisher images support Linux AMD64 and ARM64. Docker selects the matching architecture. The `-r2` database tag adds both architectures; the original tag remains unchanged.
+
 ## Start locally
 
 Install Docker with Compose. Allow at least 4 GB of available memory and 30 GB of free disk space; 8 GB of memory is recommended. The first start downloads the full release and rebuilds its indexes, which can take a while.
@@ -44,9 +46,9 @@ Stop services with `docker compose down`. This preserves the database and downlo
 | `releases/<release-id>/corpus.dump` | PostgreSQL custom-format snapshot, public tables, normalized documents and saved vectors |
 | `releases/<release-id>/manifest.json` | Source commit, counts, embedding settings, versions, licence and SHA-256 |
 | `releases/latest.json` | Pointer to the latest verified database release |
-| `ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2` | PostgreSQL 18.6 with pgvector 0.8.2 |
-| `ghcr.io/taktekhq/lebanese-legislation-starter:0.1.2` | Restore CLI and search API |
-| `ghcr.io/taktekhq/lebanese-legislation-starter:publisher-0.1.2` | Optional tools for rebuilding and publishing snapshots |
+| `ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2-r2` | PostgreSQL 18.6 with pgvector 0.8.2 |
+| `ghcr.io/taktekhq/lebanese-legislation-starter:0.1.3` | Restore CLI and search API |
+| `ghcr.io/taktekhq/lebanese-legislation-starter:publisher-0.1.3` | Optional tools for rebuilding and publishing snapshots |
 
 Database data is downloaded separately, not baked into the Docker image. The dump stores index definitions; PostgreSQL constructs the HNSW index during restore. It does not contain a portable copy of PostgreSQL's physical index files.
 
