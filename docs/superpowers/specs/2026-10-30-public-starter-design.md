@@ -2,7 +2,7 @@
 
 ## Approved purpose
 
-Keep the existing Hugging Face Parquet dataset. Publish a restorable public PostgreSQL snapshot with saved pgvector embeddings, a public Docker image and a reusable open-source starter. Other developers and our own team should use the same release artifacts. Nizar approved this package in chat on 30 October 2026 after the Parquet/dump/GitHub architecture was explained.
+Keep the existing Hugging Face Parquet dataset. Publish a restorable public PostgreSQL snapshot with saved pgvector embeddings, a public Docker image and a reusable open-source starter. Other developers and our own team should use the same release artifacts.
 
 ## Decisions and scope
 
@@ -35,7 +35,7 @@ Retrieval returns exact source matches first, then semantic passages with origin
 
 ## Publisher flow
 
-Resolve a published Parquet commit, download its29files, build a fresh isolated public database, derive eligible source documents as of the snapshot, and import reusable vectors through a read-only source connection. Validate all retained chunks against public sources. Report missing coverage, optionally embed only missing chunks within an explicit cap, then build indexes and validate full coverage. Export custom PostgreSQL dump without roles, owners or ACLs. Restore it into another empty database using the public image and exercise source/semantic query/reader permissions before publication.
+Resolve a published Parquet commit, download its29files, build a fresh isolated public database, derive eligible source documents as of the snapshot, and import reusable vectors through a read-only source connection. Validate all retained chunks against public sources. Report missing coverage, optionally embed only missing chunks within an explicit cap, then build indexes and validate full coverage. Full coverage is required to publish a ready release: a reuse-only build with missing vectors emits a report and stays unpublished until an explicit fill step or compatible saved vectors complete it. Export custom PostgreSQL dump without roles, owners or ACLs. Restore it into another empty database using the public image and exercise source/semantic query/reader permissions before publication.
 
 Publish immutable artifacts and a latest pointer to HF only after verification. Keep Parquet files unchanged; update the dataset card with download/restore links and dependency/model requirements. Put code, Dockerfiles, tests, instructions and image build workflow on GitHub. Publish a versioned public container and release. No raw production dump or private dataset is published.
 
