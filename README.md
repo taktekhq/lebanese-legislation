@@ -38,12 +38,17 @@ MIT licensed code. Source documents retain their own rights and attribution.
 
 ## Containers
 
-Build either runtime from this source:
+Run the published MCP image, available for Linux AMD64 and ARM64:
+
+```sh
+docker run --rm -p 127.0.0.1:8080:8080 --env DATABASE_URL ghcr.io/taktekhq/lebanese-legislation-mcp:latest
+```
+
+Use `ghcr.io/taktekhq/lebanese-legislation:latest` for the website. Both images are public. To build from source:
 
 ```sh
 docker build --target website -t lebanese-legislation .
 docker build --target mcp -t lebanese-legislation-mcp .
-docker run --rm -p 127.0.0.1:8080:8080 --env DATABASE_URL lebanese-legislation-mcp
 ```
 
 Use a read-only database role. MCP mode exposes `/mcp`, `/mcp/` and `/healthz`. The website image also serves search, HTML and JSON. Both images run without root, contain no data or credentials, and accept `DATABASE_URL`, `PUBLIC_URL` and `LISTEN_ADDR` at runtime. Published images are built by [the image workflow](.github/workflows/images.yml).
