@@ -19,7 +19,7 @@ import os
 import urllib.error
 import urllib.request
 
-base = 'http://127.0.0.1:8000'
+base = 'http://127.0.0.1:8080'
 message = {'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2025-06-18'}}
 request = urllib.request.Request(base+'/mcp', data=json.dumps(message).encode(), headers={'Content-Type':'application/json'})
 try:

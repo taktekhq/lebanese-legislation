@@ -55,6 +55,8 @@ CMD ["serve", "--host", "0.0.0.0", "--port", "8000"]
 
 FROM runtime AS mcp
 ENV APP_MODE=mcp
+EXPOSE 8080
+CMD ["serve", "--host", "0.0.0.0", "--port", "8080"]
 
 # Optional contributor tools retain matching PostgreSQL dump/restore clients.
 FROM backend AS publisher
