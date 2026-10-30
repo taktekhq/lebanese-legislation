@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")"
+image=${API_IMAGE:-${STARTER_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-api:0.1.7}}
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/workspace" -w /workspace "$image" init --env-file .env
+docker compose up -d --wait --wait-timeout "${STARTUP_TIMEOUT:-7200}"
+printf '%s\n' 'Ready. MCP: http://127.0.0.1:8001/mcp (or MCP_PORT). API and documentation: http://127.0.0.1:8000/docs (or your configured API_PORT).'

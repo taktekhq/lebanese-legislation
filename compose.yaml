@@ -1,0 +1,70 @@
+name: ${COMPOSE_PROJECT_NAME:-lebleg-starter}
+services:
+  db:
+    image: ${DB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-db:0.1.7}
+    environment:
+      POSTGRES_USER: lebleg_owner
+      POSTGRES_DB: lebleg
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run ./start to generate local credentials}
+      LEBLEG_READER_PASSWORD: ${READER_PASSWORD:?Run ./start to generate local credentials}
+      DATASET_REPO: ${DATASET_REPO:-taktekhq/lebanese-legislation}
+      DATASET_REVISION: ${DATASET_REVISION:-main}
+      MANIFEST_PATH: ${MANIFEST_PATH:-releases/latest.json}
+    command: ["postgres", "-c", "shared_buffers=256MB", "-c", "maintenance_work_mem=2GB", "-c", "max_parallel_maintenance_workers=2", "-c", "max_connections=30"]
+    shm_size: 3gb
+    mem_limit: ${DB_MEMORY:-3g}
+    restart: unless-stopped
+    volumes: ["db_data:/var/lib/postgresql"]
+    ports: ["127.0.0.1:${DB_PORT:-5433}:5432"]
+    healthcheck:
+      test: ["CMD", "bash", "/opt/starter/docker/db-health.sh"]
+      interval: 5s
+      start_period: ${DB_START_PERIOD:-2h}
+      retries: 30
+  api:
+    image: ${API_IMAGE:-${STARTER_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-api:0.1.7}}
+    command: ["serve", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MAX_CALLS_PER_DAY: ${GEMINI_MAX_CALLS_PER_DAY:-500}
+      GEMINI_CONCURRENCY: ${GEMINI_CONCURRENCY:-2}
+    ports: ["127.0.0.1:${API_PORT:-8000}:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+    restart: unless-stopped
+    user: "65532:65532"
+    mem_limit: 256m
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=5)"]
+      interval: 10s
+      retries: 12
+  mcp:
+    image: ${MCP_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.7}
+    command: ["serve", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      APP_MODE: mcp
+      DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MAX_CALLS_PER_DAY: ${GEMINI_MAX_CALLS_PER_DAY:-500}
+      GEMINI_CONCURRENCY: ${GEMINI_CONCURRENCY:-2}
+    ports: ["127.0.0.1:${MCP_PORT:-8001}:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+    restart: unless-stopped
+    user: "65532:65532"
+    mem_limit: 256m
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=5)"]
+      interval: 10s
+      retries: 12
+volumes:
+  db_data:

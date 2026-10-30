@@ -1,0 +1,40 @@
+"""Exact canonical Unicode chunks, compatible with the deployed Go implementation."""
+from dataclasses import dataclass
+from hashlib import sha256
+
+MODEL = 'gemini-embedding-001'
+DIMENSIONS = 768
+CHUNK_SIZE = 900
+OVERLAP = 120
+# Unicode White_Space property used by Go unicode.IsSpace, excluding Python-only C0 separators.
+GO_WHITESPACE = "\t\n\v\f\r \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000"
+
+
+@dataclass(frozen=True)
+class Chunk:
+    start: int
+    end: int
+    text: str
+    hash: str
+
+
+def digest(text: str) -> str:
+    return sha256(text.encode('utf-8')).hexdigest()
+
+
+def chunks(text: str):
+    if not text.strip(GO_WHITESPACE):
+        return
+    hashed = digest(text)
+    for start in range(0, len(text), CHUNK_SIZE - OVERLAP):
+        end = min(start + CHUNK_SIZE, len(text))
+        yield Chunk(start, end, text[start:end], hashed)
+        if end == len(text):
+            break
+
+
+def reusable(text: str, hashed: str, start: int, end: int, excerpt: str) -> bool:
+    """Only accept canonical chunk boundaries, not arbitrary matching substrings."""
+    return (bool(text.strip(GO_WHITESPACE)) and hashed == digest(text) and start >= 0 and start % 780 == 0
+            and end == min(start + CHUNK_SIZE, len(text)) and end > start
+            and (start == 0 or start + OVERLAP < len(text)) and text[start:end] == excerpt)

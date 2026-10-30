@@ -1,11 +1,19 @@
-# Contributing
+# Contribute
 
-Use an issue or pull request to improve the website, search, JSON API or MCP server. For search problems, include the exact query, the expected source URL and what appeared instead. Use public examples without personal details.
+Improve the website, search, API, MCP or public data tools here. For search or legal-text issues, include a public source URL, the query and the expected result. Keep examples free of personal details.
 
-Keep changes focused. Describe the behavior before and after, and include the checks you ran. Start with `go test ./...`. The README explains the fictional database fixture and serving smoke test.
+Describe the change and the checks you ran:
 
-The [handwriting workspace](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting) is a draft tool for transcribing or reviewing public scans. Keep drafts locally. It has no contributor sign-up or live submission flow.
+```sh
+pip install '.[build,test]'
+pytest -q
+ruff check src tests
+go test ./...
+node --test examples/handwriting/test.mjs cloudflare/runtime.test.mjs
+```
 
-For data reuse, see the [datasets](https://huggingface.co/collections/taktekhq/lebanese-legislation) and [database starter](https://github.com/taktekhq/lebanese-legislation-starter).
+The [website guide](docs/website.md) includes a fictional database fixture. The [service reference](docs/reference.md#rebuild-from-public-parquet) explains snapshot reproduction and publishing forks. Reuse compatible vectors; new paid embeddings need explicit flags and a budget. All three service images publish from this repository with immutable version tags.
 
-Code contributions use the repository's MIT license. Source documents retain their own rights and attribution. Do not include private documents, personal data, credentials or production configuration. Collection, scraping and ingestion code is outside this repository's scope.
+The [handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting) saves local drafts for review. It has no sign-up or live submission flow.
+
+Keep secrets, private documents, queries, infrastructure and source collection machinery out of contributions. Report sensitive issues privately to taktekbot@taktek.io. MIT covers code; preserve document rights and attribution.
