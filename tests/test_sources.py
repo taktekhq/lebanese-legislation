@@ -73,3 +73,8 @@ def test_arrow_contract_rejects_narrowing_float_and_changed_timestamp():
         validate_arrow_type(pa.float64(),'float4')
     with pytest.raises(ValueError,match='type'):
         validate_arrow_type(pa.timestamp('us'),'timestamptz')
+
+
+def test_article_source_url_uses_the_site_unicode_whitespace_slug():
+    url,_ = source_details('article',10,'1 مكرر','ar',{'kind':'قانون'})
+    assert url == 'https://lebaneselegislation.com/law/10/article/1-%D9%85%D9%83%D8%B1%D8%B1/'

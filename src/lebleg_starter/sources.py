@@ -7,7 +7,7 @@ from urllib.parse import quote
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
-from .chunks import digest
+from .chunks import GO_WHITESPACE, digest
 
 
 def resource(name):
@@ -24,7 +24,9 @@ def source_details(kind, source_id, part, lang, fields):
         route = 'doctrine'
     url = f'https://lebaneselegislation.com/{route}/{source_id}/'
     if kind == 'article':
-        url += 'article/' + quote(part, safe='') + '/'
+        spaced = part.translate(str.maketrans({char:' ' for char in GO_WHITESPACE}))
+        slug = '-'.join(word for word in spaced.split(' ') if word)
+        url += 'article/' + quote(slug, safe='') + '/'
     metadata = {'source_type': source_type, 'language': lang, 'english_unofficial': lang == 'en',
                 'authoritative_language': 'ar'}
     for key in ('number', 'issued_on', 'decided_on', 'signed_on', 'published_on', 'date', 'year', 'low_confidence', 'source_url', 'source', 'confidence', 'model', 'read_at'):
@@ -114,3 +116,7 @@ def derive_documents(conn, as_of_date=None):
 def refresh_metadata(conn):
     """Refresh public metadata only, preserving exact source text and hashes."""
     conn.execute(resource('public_metadata.sql'))
+    special = conn.execute("SELECT d.source_id,d.part,d.lang,l.kind FROM source_documents d JOIN legislation l ON l.id=d.source_id WHERE d.kind='article' AND d.part~%s",('['+GO_WHITESPACE+']',)).fetchall()
+    for sid,part,lang,kind in special:
+        url,_ = source_details('article',sid,part,lang,{'kind':kind})
+        conn.execute("UPDATE source_documents SET source_url=%s WHERE kind='article' AND source_id=%s AND part=%s AND lang=%s",(url,sid,part,lang))
