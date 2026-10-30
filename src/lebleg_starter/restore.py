@@ -185,6 +185,9 @@ def check_database(conn, manifest, reader_role=None):
 
 
 def _finish_restore(conn, manifest, reader_role):
+    # Top-level maintenance releases relation locks between tables. Keeping it
+    # with uncommitted GRANT catalog updates can deadlock with autovacuum.
+    conn.execute("ANALYZE")
     with conn.transaction():
         # Bootstrap owns grants; restore can apply SELECT only to an already restricted reader.
         if reader_role:
@@ -194,7 +197,6 @@ def _finish_restore(conn, manifest, reader_role):
                 sql.SQL("GRANT SELECT ON ALL TABLES IN SCHEMA public TO {}").format(sql.Identifier(reader_role))
             )
         check_database(conn, manifest, reader_role)
-        conn.execute("ANALYZE")
         conn.execute(
             "CREATE TABLE restore_receipt(singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton),manifest jsonb NOT NULL,restored_at timestamptz NOT NULL DEFAULT now())"
         )
