@@ -15,3 +15,4 @@
 **/*.jsonl
 **/node_modules
 **/.git
+!THIRD_PARTY_NOTICES.txt
