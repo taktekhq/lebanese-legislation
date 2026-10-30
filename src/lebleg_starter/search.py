@@ -41,7 +41,7 @@ _DATE = r"(?:\d{4}-\d{2}-\d{2}|\d{1,2}[/.-]\d{1,2}[/.-]\d{4})"
 _CITATION = re.compile(
     r"(?<!\w)(?P<instrument>"
     + _INSTRUMENT
-    + r")\s*(?:no\.?|number|n[°º]|numéro|رقم)?\s*(?P<number>\d+)(?:\s*/\s*(?P<year>\d{4})(?!\d))?(?:\s+(?:of|du|سنة|لعام|لسنة)\s+(?P<word_year>\d{4})(?![\d/.-]))?(?:\s+(?:dated|of|du|الصادر في|صادر في|بتاريخ|تاريخ|في)?\s*(?P<date>"
+    + r")\s*(?:no\.?|number|n[°º]|numéro|رقم)?\s*(?P<number>\d+)(?:\s*/\s*(?P<year>\d{4})(?!\d))?(?:\s+(?:of|du|سنة|لعام|لسنة)\s+(?P<word_year>\d{4})(?![\d/.-]))?(?:[\s,;:()\[\]]+(?:(?:issued|on|dated|of|du|صادر|بتاريخ|تاريخ|في)\s+)*(?P<date>"
     + _DATE
     + r"))?",
     re.IGNORECASE,

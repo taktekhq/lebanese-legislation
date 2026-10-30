@@ -266,6 +266,10 @@ def test_absent_typed_citations_never_call_provider(databases):
     try:
         for query in [
             "What does the law say about decree 123?",
+            "law 123 (2021-01-02)",
+            "law 123 issued on 2021-01-02",
+            "قانون رقم 123 الصادر بتاريخ 2021-01-02",
+            "loi 123, du 2/1/2021",
             "law 123/2005",
             "المرسوم الاشتراعي رقم ١٢٣",
             "قرار مجلس الوزراء رقم 123/2005",

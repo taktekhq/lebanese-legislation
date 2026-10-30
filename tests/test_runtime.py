@@ -331,3 +331,22 @@ def test_query_cache_model_namespace_and_default_concurrency():
     provider.model = "different-model"
     provider.embed(["query"], query=True)
     assert len(calls) == 2
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "law 123 (2021-01-02)",
+        "law 123 issued on 2021-01-02",
+        "قانون رقم 123 الصادر بتاريخ 2021-01-02",
+        "loi 123, du 2/1/2021",
+    ],
+)
+def test_explicit_date_survives_citation_punctuation_and_issuance(query):
+    target = citation_target(query)
+    assert (target.kind, target.number, target.date) == ("law", "123", "2021-01-02")
+
+
+def test_date_belongs_to_its_bound_citation():
+    target = citation_target("law 123; decree 456 issued on 2021-01-02")
+    assert (target.kind, target.number, target.date) == ("law", "123", None)
