@@ -353,3 +353,33 @@ def test_ordinary_search_prioritizes_titles_then_unique_body_matches(databases):
             assert hashlib.sha256(passage["text"].encode()).hexdigest() == passage["source_hash"]
     finally:
         service.close()
+
+
+def test_finalize_analyze_runs_without_grant_transaction_or_xid_lock(databases):
+    from psycopg.pq import TransactionStatus
+
+    from lebleg_starter.restore import _finish_restore
+
+    dsns,reader,_binary,_dump_binary,_tmp_path=databases
+    source,_target,_bad=dsns
+    m,_dump,text=prepare_dump(databases)
+    observed=[]
+    with psycopg.connect(source,autocommit=True) as conn, psycopg.connect(source,autocommit=True) as observer:
+        class Connection:
+            def transaction(self):
+                return conn.transaction()
+
+            def execute(self,query,params=None):
+                if query=='ANALYZE':
+                    observed.append(conn.info.transaction_status)
+                    assert conn.info.transaction_status==TransactionStatus.IDLE
+                    assert not observer.execute("""SELECT EXISTS(SELECT 1 FROM pg_locks
+                        WHERE pid=%s AND locktype='transactionid' AND mode='ExclusiveLock' AND granted)""",
+                        (conn.info.backend_pid,)).fetchone()[0]
+                return conn.execute(query,params)
+
+        _finish_restore(Connection(),m,reader)
+        assert observed==[TransactionStatus.IDLE]
+        assert conn.execute('SELECT manifest FROM restore_receipt').fetchone()[0]==m
+        assert conn.execute('SELECT text FROM source_documents').fetchone()[0]==text
+        assert conn.execute("SELECT has_table_privilege(%s,'source_documents','SELECT'),has_table_privilege(%s,'source_documents','INSERT,UPDATE,DELETE')",(reader,reader)).fetchone()==(True,False)
