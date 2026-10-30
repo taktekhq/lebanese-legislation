@@ -284,3 +284,34 @@ def test_seed_canonical_function_cannot_write(databases):
         seed(*databases, canonical_query=query)
     with psycopg.connect(databases[1]) as canonical:
         assert canonical.execute("SELECT text FROM source_documents").fetchone()[0] == "source"
+
+
+@pytest.mark.parametrize("null_vector", [False, True])
+def test_seed_repairs_invalid_target_vector_then_leaves_valid_row_unchanged(databases, null_vector):
+    document(databases, 1, "canonical source")
+    assert seed(*databases)["seeded"] == 1
+    with psycopg.connect(databases[2]) as target:
+        if null_vector:
+            target.execute("ALTER TABLE semantic_chunks ALTER COLUMN embedding DROP NOT NULL")
+            target.execute("UPDATE semantic_chunks SET embedding=NULL,updated_at='2020-01-01' WHERE kind='ruling'")
+        else:
+            target.execute(
+                "UPDATE semantic_chunks SET embedding=%s::halfvec,updated_at='2020-01-01' WHERE kind='ruling'",
+                ("[" + ",".join(["0"] * 768) + "]",),
+            )
+    repaired = seed(*databases)
+    assert repaired["seeded"] == 1 and repaired["skipped"] == 0
+    with psycopg.connect(databases[2]) as target:
+        before = target.execute(
+            "SELECT embedding::text,updated_at,ctid::text FROM semantic_chunks WHERE kind='ruling'"
+        ).fetchone()
+        assert before[0] == vector()
+    repeated = seed(*databases)
+    assert repeated["seeded"] == 0 and repeated["skipped"] == 1
+    with psycopg.connect(databases[2]) as target:
+        assert (
+            target.execute(
+                "SELECT embedding::text,updated_at,ctid::text FROM semantic_chunks WHERE kind='ruling'"
+            ).fetchone()
+            == before
+        )

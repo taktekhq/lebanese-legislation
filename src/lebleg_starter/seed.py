@@ -78,13 +78,14 @@ def _key(ref, chunk):
 
 def _existing(target, items):
     rows = target.execute(
-        """SELECT c.kind,c.source_id,c.part,c.lang,c.hash,c.chunk_start,c.chunk_end,c.text
+        """SELECT c.kind,c.source_id,c.part,c.lang,c.hash,c.chunk_start,c.chunk_end,c.text,
+            coalesce(l2_norm(c.embedding)>0,false)
         FROM public.semantic_chunks c JOIN jsonb_to_recordset(%s::jsonb)
         AS r(kind text,source_id integer,part text,lang text,hash text,chunk_start integer)
         USING(kind,source_id,part,lang,hash,chunk_start) WHERE c.model=%s""",
         (Jsonb(_references(items)), MODEL),
     ).fetchall()
-    return {tuple(row[:6]): (row[6], row[7]) for row in rows}
+    return {tuple(row[:6]): (row[6], row[7], row[8]) for row in rows}
 
 
 def _read_candidates(source, pending):
@@ -122,7 +123,8 @@ def _write_group(target, rows):
             ON CONFLICT(model,kind,source_id,part,lang,hash,chunk_start) DO UPDATE
             SET title=excluded.title,text=excluded.text,chunk_end=excluded.chunk_end,
                 embedding=excluded.embedding,updated_at=now()
-            WHERE existing.text IS DISTINCT FROM excluded.text OR existing.chunk_end IS DISTINCT FROM excluded.chunk_end""",
+            WHERE existing.text IS DISTINCT FROM excluded.text OR existing.chunk_end IS DISTINCT FROM excluded.chunk_end
+                OR existing.embedding IS NULL OR l2_norm(existing.embedding)=0""",
             rows,
         )
         return writer.rowcount
@@ -193,7 +195,7 @@ def seed(
                         existing = _existing(target, items) if items else {}
                         pending = []
                         for ref, chunk in items:
-                            if existing.get(_key(ref, chunk)) == (chunk.end, chunk.text):
+                            if existing.get(_key(ref, chunk)) == (chunk.end, chunk.text, True):
                                 counts["skipped"] += 1
                             else:
                                 pending.append((ref, chunk))
