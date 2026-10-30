@@ -1,0 +1,8 @@
+# Optional offline/local release input. Use with compose.yaml, never on its own.
+# LEBLEG_RELEASE_DIR must contain a valid manifest.json and its referenced dump.
+services:
+  db:
+    environment:
+      LEBLEG_MANIFEST_FILE: /release/manifest.json
+    volumes:
+      - ${LEBLEG_RELEASE_DIR:?Set an absolute local release directory}:/release:ro
