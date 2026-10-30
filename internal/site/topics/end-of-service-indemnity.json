@@ -1,0 +1,456 @@
+{
+  "slug": "end-of-service-indemnity",
+  "order": 1,
+  "published": "2026-10-20",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 190374,
+      "article": "50",
+      "quote": "يجب على كل من صاحب العمل والعامل ان يعلم الآخر برغبته في فسخ العقد, قبل شهر واحد اذا كان قد مضى على تنفيذ عقد الاستخدام مدة ثلاث سنوات فما دون, وقبل شهرين اذا كان قد مضى اكثر من ثلاث سنوات وأقل من ست سنوات , وقبل ثلاثة اشهر اذا كان قد مضى اكثر من ست سنوات واقل من اثنتي عشرة سنة وقبل اربعة اشهر اذا كان قد مضى اثنتا عشرة سنة فأكثر."
+    },
+    {
+      "id": "a2",
+      "law": 190374,
+      "article": "50",
+      "quote": "ويجب ان يكون الانذار خطيا, وان يبلغ الى صاحب العلاقة, ويحق لهذا الاخير ان يطلب توضيح اسباب الفسخ اذا لم تكن واردة في نص الانذار. يتعرض الطرف الذي يخالف احكام الفقرة السابقة لدفع تعويض الى الطرف الآخر يعادل بدل اجر مدة الانذار المفروضة عليه قانونا."
+    },
+    {
+      "id": "a3",
+      "law": 190374,
+      "article": "50",
+      "quote": "خلافا لاحكام هذه الفقرة, اذا كان العامل معينا تحت التجربة, يحق له كما يحق لصاحب العمل, ان يفسخ عقد العمل دون أي انذار او تعويض خلال الاشهر الثلاثة التي تلي استخدامه."
+    },
+    {
+      "id": "a4",
+      "law": 190374,
+      "article": "54",
+      "quote": "الى ان يسن تشريع الضمان الاجتماعي على رب العمل ان يدفع للاجير المصروف من الخدمة لاي سبب من الاسباب غير المذكورة في المادة 74 تعويض صرف يعادل اجرة شهر عن كل سنة خدمة واجرة نصف شهر اذا كانت مدة الخدمة اقل من سنة."
+    },
+    {
+      "id": "a5",
+      "law": 244971,
+      "article": "63",
+      "quote": "تلغى, بقدر ما يطبق نظام الضمان الاجتماعي, كليا ام جزئيا, على المستفيدين منه جميع احكام القوانين المتعلقة بالتعويضات العائلية وبالتقديمات المعطاة في حالات المرض والامومة وطوارىء العمل والامراض المهنية وكذلك الاحكام المتعلقة بتعويض الصرف من الخدمة, بالنسبة للمضمونين الالزاميين والاختياريين في نظام تعويض نهاية الخدمة."
+    },
+    {
+      "id": "a6",
+      "law": 190374,
+      "article": "56",
+      "quote": "يستحق التعويض المشار اليه في المواد السابقة الى الاجراء كافة ايا كانت الفئة التي ينتمون اليها حتى ولو كانوا خارج الملاك, موقتين او مياومين, بشرط ان يكونوا مرتبطين بالمشروع بخدمة مستمرة منذ سنة على الاقل."
+    },
+    {
+      "id": "a7",
+      "law": 190374,
+      "article": "56",
+      "quote": "ان مدة مرور الزمن على الدعاوى المختصة بالتعويض هي سنتان من تاريخ استحقاق التعويض ."
+    },
+    {
+      "id": "a8",
+      "law": 190374,
+      "article": "50",
+      "quote": "اذا كان الفسخ صادرا من قبل صاحب العمل يقدر التعويض على اساس نوع عمل العامل, وسنه, ومدة خدمته, ووضعه العائلي والصحي, ومقدار الضرر, ومدى الاساءة في استعمال الحق, على ان لا ينقص التعويض الذي يحكم به عن بدل اجرة شهرين وان لا يزيد عن بدل اجرة اثني عشرة شهرا, وذلك بالاضافة لما قد يستحقه العامل من تعويضات قانونية نتيجة لفصله من الخدمة."
+    },
+    {
+      "id": "a9",
+      "law": 190374,
+      "article": "50",
+      "quote": "على من يتذرع بأن الفسخ حصل نتيجة لاساءة استعمال الحق او لتجاوزه, ان يقيم الدعوى بذلك امام المجلس التحكيمي خلال مهلة شهر من تاريخ ابلاغه الفسخ"
+    },
+    {
+      "id": "a10",
+      "law": 244971,
+      "article": "49",
+      "quote": "ينشأ نظام للتقاعد، ليحل محل نظام تعويض نهاية الخدمة في جميع حقوقه والتزاماته."
+    },
+    {
+      "id": "a11",
+      "law": 244971,
+      "article": "49-4",
+      "quote": "الأشخاص الذين يدخلون العمل لأول مرة بعد تاريخ وضع النظام موضع التنفيذ."
+    },
+    {
+      "id": "a12",
+      "law": 244971,
+      "article": "49-4",
+      "quote": "سائر الـمضمونين سابقاً الذين لـم يبلغوا سن التاسعة والأربعين بتاريخ وضع النظام موضع التنفيذ."
+    },
+    {
+      "id": "a13",
+      "law": 244971,
+      "article": "49-4",
+      "quote": "أن يبقوا خاضعين لنظام تعويض نهاية الخدمة."
+    },
+    {
+      "id": "a14",
+      "law": 244971,
+      "article": "54-6",
+      "quote": "بعد مرور سنة من تاريخ إصدار الـمرسوم التطبيقي الـمذكور في الفقرة (3) اعلاه، توضع موضع التنفيذ أحكام الـمادة الثالثة منه"
+    }
+  ],
+  "en": {
+    "title": "End-of-service indemnity in Lebanon",
+    "question": "What notice and end-of-service indemnity is a worker owed in Lebanon, and does the new NSSF pension replace it?",
+    "description": "The NSSF end-of-service indemnity, how the Labour Code indemnity is limited, notice periods and the move to the NSSF pension scheme.",
+    "answer": {
+      "text": "A worker insured in the NSSF end-of-service indemnity scheme gets that indemnity under the Social Security Law, whose Article 63 repeals the Labour Code provisions on dismissal indemnity for insured persons. Labour Code Article 54 sets 1 month's wage per year of service only until Social Security legislation is enacted. Ending an open-ended contract also needs written notice of 1 to 4 months, and a pension scheme replaces the NSSF scheme only once an implementing decree we do not hold puts it into effect.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a10",
+        "a11",
+        "a12",
+        "a13",
+        "a14"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Which rule sets the dismissal indemnity?",
+        "paras": [
+          {
+            "text": "Social Security Law Article 63 repeals the Labour Code provisions on dismissal indemnity for persons insured, compulsorily or voluntarily, in the end-of-service indemnity scheme. The repeal applies to the extent the social security scheme applies to them.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "Article 54 of the Labour Code sets 1 month's wage per year of service, or half a month if service is under 1 year. It covers a worker dismissed for any reason not listed in Article 74. Its own text limits it to the period until Social Security legislation is enacted, and Article 63 repeals it for insured persons.",
+            "cites": [
+              "a4",
+              "a5"
+            ]
+          },
+          {
+            "text": "We do not hold the old wording of the Social Security Law articles that set the end-of-service indemnity amount. We do not hold the decree that sets the details of this repeal. This page does not cover fixed-term or task contracts. It does not cover foreign workers, or a worker's right to ask for dismissal at a set age.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "Which workers qualify for the dismissal indemnity?",
+        "paras": [
+          {
+            "text": "Article 56 of the Labour Code extends the indemnity to workers of every category, including those outside the staff roster, temporary workers and day workers. Each must have at least 1 year of continuous service with the enterprise.",
+            "cites": [
+              "a6"
+            ]
+          },
+          {
+            "text": "Article 54 still states half a month's wage for service under 1 year, while Article 56 requires at least 1 year. The texts we hold do not reconcile the two. Article 54 excludes dismissal on the grounds listed in Article 74. For insured persons, Social Security Law Article 63 repeals these Labour Code rules.",
+            "cites": [
+              "a4",
+              "a5",
+              "a6"
+            ]
+          },
+          {
+            "text": "A claim for the indemnity lapses 2 years after the date it becomes due, under Article 56.",
+            "cites": [
+              "a7"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "Does the NSSF pension replace the end-of-service scheme?",
+        "paras": [
+          {
+            "text": "Social Security Law Article 49 creates a pension scheme to replace the end-of-service indemnity scheme in all its rights and obligations. Article 54-6 provides for an implementing decree. It says the provisions of its third article take effect 1 year after that decree is issued.",
+            "cites": [
+              "a10",
+              "a14"
+            ]
+          },
+          {
+            "text": "Once the scheme is put into effect, it is compulsory for people entering work for the first time after that date. It is also compulsory for previously insured persons under 49 on that date. Other insured persons may choose to stay in the end-of-service indemnity scheme.",
+            "cites": [
+              "a11",
+              "a12",
+              "a13"
+            ]
+          },
+          {
+            "text": "We do not hold the implementing decree. The texts we hold do not show whether it has been issued or when the pension scheme started. This page does not cover the optional entry for some older insured persons, the deadline to join, or how existing rights move into the pension account.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "How much notice must a worker or employer give?",
+        "paras": [
+          {
+            "text": "Article 50 of the Labour Code requires the employer and the worker each to tell the other before ending the contract. The notice period runs from 1 to 4 months, by length of service. Article 50 gives no period for service of exactly 6 years.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "The notice must be in writing and served on the other party. That party may ask for the reasons if the notice does not state them. The side that breaks this rule owes the other the wage for the legal notice period.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "During the first 3 months of probation, the worker and the employer may each end the contract without notice or indemnity. Article 50 sets this as an exception to the notice rule.",
+            "cites": [
+              "a3"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Notice by length of service",
+          "head": [
+            "Service",
+            "Notice"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "3 years or less",
+                "1 month"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "More than 3 and less than 6 years",
+                "2 months"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "More than 6 and less than 12 years",
+                "3 months"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "12 years or more",
+                "4 months"
+              ],
+              "cites": [
+                "a1"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "When is a dismissal abusive, and what can the worker claim?",
+        "paras": [
+          {
+            "text": "For an abusive dismissal by the employer, Article 50 sets compensation of at least 2 and at most 12 months' wages. The amount depends on the worker's type of work, age, service, family and health situation, the harm and the extent of the abuse. It comes on top of any legal indemnity owed for the dismissal.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "Whoever claims that a termination was abusive must sue before the arbitral council within 1 month of being notified of the termination. This applies to whichever side makes the claim.",
+            "cites": [
+              "a9"
+            ]
+          },
+          {
+            "text": "This page does not list the grounds that make a dismissal abusive. It does not cover the damages a worker owes for an abusive resignation, or the protection of elected union board members. The Labour Code article on termination sets these out in full.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "تعويض نهاية الخدمة في لبنان",
+    "question": "ما هي مهلة الإنذار وتعويض الصرف أو نهاية الخدمة المستحق للأجير في لبنان، وهل يحل نظام التقاعد الجديد في الضمان الاجتماعي محله؟",
+    "description": "تعويض نهاية الخدمة في الضمان الاجتماعي، وحدود تعويض الصرف في قانون العمل، ومهل الإنذار، والانتقال إلى نظام التقاعد.",
+    "answer": {
+      "text": "الأجير المضمون في نظام تعويض نهاية الخدمة في الضمان الاجتماعي يتقاضى هذا التعويض بموجب قانون الضمان الاجتماعي، وقد ألغت مادته 63 أحكام قانون العمل المتعلقة بتعويض الصرف بالنسبة إلى المضمونين. وتحدد المادة 54 من قانون العمل تعويض الصرف بأجرة شهر عن كل سنة خدمة، لكنها تسري فقط إلى أن يُسنّ تشريع الضمان الاجتماعي. أما فسخ العقد غير المحدد المدة فيتطلب إنذاراً خطياً من شهر إلى 4 أشهر بحسب مدة الخدمة، ولا يحل نظام التقاعد محل نظام تعويض نهاية الخدمة إلا بعد وضعه موضع التنفيذ بمرسوم تطبيقي لا يتوفر لدينا.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a10",
+        "a11",
+        "a12",
+        "a13",
+        "a14"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "أي نص يحدد تعويض الصرف؟",
+        "paras": [
+          {
+            "text": "تلغي المادة 63 من قانون الضمان الاجتماعي أحكام قانون العمل المتعلقة بتعويض الصرف من الخدمة، بالنسبة إلى المضمونين إلزامياً أو اختيارياً في نظام تعويض نهاية الخدمة. ويسري الإلغاء بقدر ما يُطبَّق عليهم نظام الضمان الاجتماعي.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "تحدد المادة 54 من قانون العمل تعويض الصرف بأجرة شهر عن كل سنة خدمة، وبأجرة نصف شهر إذا كانت الخدمة أقل من سنة. ويستحقه الأجير المصروف لأي سبب غير وارد في المادة 74. ويحصر نص المادة نفسه سريانها بالمدة التي تسبق سنّ تشريع الضمان الاجتماعي، وقد ألغتها المادة 63 بالنسبة إلى المضمونين.",
+            "cites": [
+              "a4",
+              "a5"
+            ]
+          },
+          {
+            "text": "لا تتوفر لدينا الصيغة القديمة لمواد قانون الضمان الاجتماعي التي كانت تحدد مقدار تعويض نهاية الخدمة. ولا يتوفر لدينا المرسوم الذي يحدد دقائق تطبيق هذا الإلغاء. ولا تتناول هذه الصفحة العقود المحددة المدة أو المعقودة لعمل معيّن. ولا تتناول الأجراء الأجانب، ولا حق الأجير في طلب صرفه عند بلوغ سن معينة.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "من يستحق تعويض الصرف من الأجراء؟",
+        "paras": [
+          {
+            "text": "تمنح المادة 56 من قانون العمل التعويض للأجراء كافة أياً كانت فئتهم، ومنهم من هم خارج الملاك والموقتون والمياومون. ويشترط أن تكون للأجير خدمة مستمرة في المشروع منذ سنة على الأقل.",
+            "cites": [
+              "a6"
+            ]
+          },
+          {
+            "text": "ما زالت المادة 54 تنص على أجرة نصف شهر لمن خدم أقل من سنة، فيما تشترط المادة 56 خدمة سنة على الأقل. والنصوص المتوفرة لدينا لا توفّق بين الحكمين. وتستثني المادة 54 الصرف لأحد الأسباب الواردة في المادة 74. وبالنسبة إلى المضمونين، ألغت المادة 63 من قانون الضمان الاجتماعي هذه الأحكام.",
+            "cites": [
+              "a4",
+              "a5",
+              "a6"
+            ]
+          },
+          {
+            "text": "تسقط دعوى التعويض بمرور سنتين من تاريخ استحقاقه، وفق المادة 56.",
+            "cites": [
+              "a7"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "هل يحل نظام التقاعد في الضمان محل نظام تعويض نهاية الخدمة؟",
+        "paras": [
+          {
+            "text": "تنشئ المادة 49 من قانون الضمان الاجتماعي نظاماً للتقاعد يحل محل نظام تعويض نهاية الخدمة في جميع حقوقه والتزاماته. وتنص المادة 54-6 على مرسوم تطبيقي، وعلى أن أحكام المادة الثالثة منه توضع موضع التنفيذ بعد سنة من تاريخ إصداره.",
+            "cites": [
+              "a10",
+              "a14"
+            ]
+          },
+          {
+            "text": "عند وضع النظام موضع التنفيذ، يخضع له إلزامياً من يدخل العمل لأول مرة بعد ذلك التاريخ. ويخضع له إلزامياً أيضاً المضمونون سابقاً الذين لم يبلغوا 49 سنة في ذلك التاريخ. وللمضمونين الآخرين أن يبقوا خاضعين لنظام تعويض نهاية الخدمة.",
+            "cites": [
+              "a11",
+              "a12",
+              "a13"
+            ]
+          },
+          {
+            "text": "لا يتوفر لدينا المرسوم التطبيقي. والنصوص المتوفرة لدينا لا تبيّن هل صدر، ولا متى بدأ تطبيق نظام التقاعد. ولا تتناول هذه الصفحة الانتساب الاختياري لبعض المضمونين الأكبر سناً، ولا مهلة الانتساب، ولا كيفية انتقال الحقوق المكتسبة إلى حساب التقاعد.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ما مهلة الإنذار التي على الأجير أو رب العمل توجيهها؟",
+        "paras": [
+          {
+            "text": "توجب المادة 50 من قانون العمل على كل من رب العمل والأجير أن يُعلم الآخر قبل فسخ العقد. وتتراوح مهلة الإنذار بين شهر و4 أشهر بحسب مدة الخدمة. ولا تحدد المادة 50 مهلة لمن أمضى 6 سنوات تماماً.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "يجب أن يكون الإنذار خطياً وأن يُبلَّغ إلى الطرف الآخر، ولهذا الطرف أن يطلب توضيح أسباب الفسخ إذا لم يذكرها الإنذار. ومن يخالف هذه القاعدة يدفع للطرف الآخر تعويضاً يعادل أجر مدة الإنذار المفروضة قانوناً.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "يحق للأجير المعيّن تحت التجربة ولرب العمل فسخ العقد دون إنذار أو تعويض خلال أول 3 أشهر من الاستخدام. وتنص المادة 50 على هذا الحكم استثناءً من قاعدة الإنذار.",
+            "cites": [
+              "a3"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "مهلة الإنذار بحسب مدة الخدمة",
+          "head": [
+            "مدة الخدمة",
+            "المهلة"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "3 سنوات أو أقل",
+                "شهر واحد"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "أكثر من 3 سنوات وأقل من 6 سنوات",
+                "شهران"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "أكثر من 6 سنوات وأقل من 12 سنة",
+                "3 أشهر"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "12 سنة فأكثر",
+                "4 أشهر"
+              ],
+              "cites": [
+                "a1"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "متى يكون الصرف إساءة في استعمال الحق، وبماذا يطالب الأجير؟",
+        "paras": [
+          {
+            "text": "إذا صرف رب العمل الأجير إساءةً في استعمال حقه، تحدد المادة 50 تعويضاً لا يقل عن أجرة شهرين ولا يزيد عن أجرة 12 شهراً. ويُقدَّر على أساس نوع عمل الأجير وسنه ومدة خدمته ووضعه العائلي والصحي ومقدار الضرر ومدى الإساءة. ويضاف إلى التعويضات القانونية المستحقة للأجير عن صرفه.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "على من يدّعي أن الفسخ حصل إساءةً في استعمال الحق أن يقيم دعواه أمام المجلس التحكيمي خلال شهر من تاريخ إبلاغه الفسخ. وتسري هذه المهلة على أي من الطرفين يقدّم الادعاء.",
+            "cites": [
+              "a9"
+            ]
+          },
+          {
+            "text": "لا تعرض هذه الصفحة الحالات التي يُعدّ فيها الصرف إساءة. ولا تتناول التعويض الذي يدفعه الأجير إذا استقال تعسفاً، ولا حماية أعضاء مجالس النقابات المنتخبين. وترد هذه الأحكام كاملة في مادة قانون العمل المتعلقة بالفسخ.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  }
+}

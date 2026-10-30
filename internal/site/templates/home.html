@@ -1,0 +1,55 @@
+{{define "content"}}{{with .Data}}
+<section class="wrap ls-hero">
+  <p class="badge" data-reveal><span class="dot"></span><span>{{t "home.badge" (num .Stats.Laws) (num .Stats.Rulings)}}<span class="badge__date"> &middot; {{t "home.badge_since" (printf "%d" .Stats.Since)}}</span></span></p>
+  <h1 data-reveal style="--d:60ms">{{t "home.h1"}}</h1>
+  <p class="sub" data-reveal style="--d:120ms">{{t "home.sub"}}</p>
+  <div data-reveal style="--d:180ms">{{template "search" ""}}</div>
+</section>
+
+<section class="wrap sec" id="codes">
+  <div class="sec__head" data-reveal>
+    <div><p class="eyebrow">{{t "home.codes_eyebrow"}}</p><h2 class="sec__title">{{t "home.codes_title"}}</h2></div>
+    <a class="sec__more" href="{{u "/codes/"}}">{{t "home.codes_more"}} <span class="arrow" aria-hidden="true">{{fwdArrow}}</span></a>
+  </div>
+  <div class="codes" data-reveal>{{range .Codes}}
+    <a class="code" href="{{lawURL .ID}}" dir="rtl"><b lang="ar">{{.Title}}</b><span>{{if ne (uilang) "ar"}}<bdi>{{.NameEn}}</bdi>{{if .Articles}} &middot; {{end}}{{end}}{{if .Articles}}<bdi>{{plural .Articles "article" "articles"}}</bdi>{{end}}</span></a>{{end}}
+  </div>
+</section>
+
+<section class="wrap sec" id="recent">
+  <div class="sec__head" data-reveal>
+    <div><p class="eyebrow">{{t "home.recent_eyebrow"}}</p><h2 class="sec__title">{{t "home.recent_title"}}</h2></div>
+    <a class="sec__more" href="{{u "/laws/"}}">{{t "home.recent_more" (num .Stats.Laws)}} <span class="arrow" aria-hidden="true">{{fwdArrow}}</span></a>
+  </div>
+  <ul class="doclist">{{range .Recent}}{{template "lawrow" .}}{{end}}</ul>
+</section>
+
+<section class="wrap sec" id="browse">
+  <div class="sec__head" data-reveal>
+    <div><p class="eyebrow">{{t "home.browse_eyebrow"}}</p><h2 class="sec__title">{{t "home.browse_title"}}</h2></div>
+  </div>
+  <div class="codes" data-reveal>
+    <a class="code" href="{{u "/laws/"}}"><b>{{t "home.browse.legislation"}}</b><span>{{t "home.browse.legislation_sub" (num .Stats.Laws)}}</span></a>
+    <a class="code" href="{{u "/topics/"}}"><b>{{t "home.browse.topics"}}</b><span>{{t "home.browse.topics_sub"}}</span></a>
+    <a class="code" href="{{u "/rulings/"}}"><b>{{t "home.browse.rulings"}}</b><span>{{t "home.browse.rulings_sub" (num .Stats.Rulings)}}</span></a>
+    <a class="code" href="{{u "/gazette/"}}"><b>{{t "home.browse.gazette"}}</b><span>{{t "home.browse.gazette_sub" (num .Stats.Gazette)}}</span></a>
+    <a class="code" href="{{u "/opinions/"}}"><b>{{t "home.browse.opinions"}}</b><span>{{t "home.browse.opinions_sub" (num .Stats.Opinions)}}</span></a>
+    <a class="code" href="{{u "/agreements/"}}"><b>{{t "home.browse.agreements"}}</b><span>{{t "home.browse.agreements_sub" (num .Stats.Agreements)}}</span></a>
+    <a class="code" href="{{u "/doctrine/"}}"><b>{{t "home.browse.doctrine"}}</b><span>{{t "home.browse.doctrine_sub" (num .Stats.Doctrine)}}</span></a>
+  </div>
+  <div class="years" data-reveal style="margin-top:16px">
+    <a class="chip" href="{{u "/laws/years/"}}">{{t "home.by_year.legislation"}}</a>
+    <a class="chip" href="{{u "/rulings/years/"}}">{{t "home.by_year.rulings"}}</a>
+    <a class="chip" href="{{u "/gazette/years/"}}">{{t "home.by_year.gazette"}}</a>
+  </div>
+</section>
+
+<section class="wrap sec" id="use">
+  <div class="pitch" data-reveal>
+    <p class="eyebrow">{{t "home.use_eyebrow"}}</p>
+    <h2 class="sec__title">{{t "home.use_title"}}</h2>
+    <p class="sec__sub">{{t "home.use_sub"}}</p>
+    <div class="btn-row"><a class="btn btn--primary" href="{{u "/data/"}}">{{t "home.use.database"}} <span class="arrow" aria-hidden="true">{{fwdArrow}}</span></a><a class="btn btn--ghost" href="{{u "/ai/"}}">{{t "home.use.ai"}}</a></div>
+  </div>
+</section>
+{{end}}{{end}}

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="{{uilang}}" dir="{{dir}}">
+<head>
+<link rel="alternate" type="application/atom+xml" title="Changes to Lebanese law" href="/changes/feed.xml">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{.Title}}</title>
+<meta name="description" content="{{.Desc}}">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/mark.png">
+<link rel="canonical" href="{{absURL .Canon}}">
+{{if .Pair}}<link rel="alternate" hreflang="en" href="{{enURL .Path}}">
+<link rel="alternate" hreflang="ar" href="{{arURL .Path}}">
+<link rel="alternate" hreflang="x-default" href="{{arURL .Path}}">
+{{end}}<meta name="robots" content="{{if .NoIndex}}noindex, follow{{else}}index, follow, max-image-preview:large{{end}}">
+<meta property="og:type" content="{{if .OGType}}{{.OGType}}{{else}}website{{end}}">
+<meta property="og:site_name" content="{{t "brand.name"}}">
+<meta property="og:title" content="{{.Title}}">
+<meta property="og:description" content="{{.Desc}}">
+<meta property="og:url" content="{{absURL .Canon}}">
+<meta property="og:image" content="{{absURL "/assets/og.png"}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Lebanese Legislation: every Lebanese law, one search away">
+<meta property="og:locale" content="{{if eq (uilang) "ar"}}ar_LB{{else}}en_US{{end}}">
+<meta property="og:locale:alternate" content="{{if eq (uilang) "ar"}}en_US{{else}}ar_LB{{end}}">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+
+<script>document.documentElement.classList.add("js");</script>
+<script defer src="/assets/load.js"></script>
+<link rel="stylesheet" href="/styles.css?v=2">
+<link rel="stylesheet" href="/legislation.css?v=4">
+{{range .LD}}<script type="application/ld+json">{{.}}</script>
+{{end}}</head>
+
+<body>
+<a class="skip" href="#top">{{t "skip_link"}}</a>
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="lockup" href="{{u "/"}}" aria-label="{{t "lockup.aria"}}"><span class="lockup__firm"><span>Lebanese</span> Legislation</span><span class="lockup__by">{{t "lockup.by"}} <b>taktek</b></span></a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="{{u "/laws/"}}">{{t "nav.legislation"}}</a>
+      <a href="{{u "/codes/"}}">{{t "nav.codes"}}</a>
+      <a href="{{u "/topics/"}}">{{t "nav.topics"}}</a>
+      <a href="{{u "/rulings/"}}">{{t "nav.rulings"}}</a>
+      <a href="{{u "/gazette/"}}">{{t "nav.gazette"}}</a>
+      <a href="{{u "/data/"}}">{{t "nav.database"}}</a>
+    </nav>
+    <div class="nav__end">
+      {{if eq (uilang) "ar"}}<a class="nav__out lang-switch" dir="ltr" href="{{altURL .Path}}" hreflang="en" lang="en">{{switchLabel}}</a>{{else}}<a class="nav__out lang-switch" href="{{altURL .Path}}" hreflang="ar" lang="ar" dir="rtl">{{switchLabel}}</a>{{end}}
+      <a class="btn btn--primary btn--sm" href="{{u "/ai/"}}">{{t "nav.law_ai"}}</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+{{if eq (uilang) "ar"}}<div class="wrap lang-note"><a class="link" href="{{enPath .Path}}" hreflang="en" lang="en" dir="ltr">Read this page in English</a></div>
+{{end}}{{template "content" .}}
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div>
+        <a class="lockup" href="{{u "/"}}" aria-label="{{t "lockup.aria"}}"><span class="lockup__firm"><span>Lebanese</span> Legislation</span><span class="lockup__by">{{t "lockup.by"}} <b>taktek</b></span></a>
+        <p class="tiny" style="margin-top:16px;max-width:34ch">{{t "footer.tagline"}}</p>
+      </div>
+      <div><h4>{{t "footer.read_heading"}}</h4><ul><li><a href="{{u "/laws/"}}">{{t "footer.read.legislation"}}</a></li><li><a href="{{u "/codes/"}}">{{t "footer.read.codes"}}</a></li><li><a href="{{u "/changes/"}}">{{t "footer.read.changes"}}</a></li><li><a href="{{u "/rulings/"}}">{{t "footer.read.rulings"}}</a></li><li><a href="{{u "/gazette/"}}">{{t "footer.read.gazette"}}</a></li></ul></div>
+      <div><h4>{{t "footer.more_heading"}}</h4><ul><li><a href="{{u "/opinions/"}}">{{t "footer.more.opinions"}}</a></li><li><a href="{{u "/agreements/"}}">{{t "footer.more.agreements"}}</a></li><li><a href="{{u "/doctrine/"}}">{{t "footer.more.doctrine"}}</a></li><li><a href="{{u "/research/"}}">{{t "footer.more.research"}}</a></li></ul></div>
+      <div><h4>{{t "footer.use_heading"}}</h4><ul><li><a href="{{u "/data/"}}">{{t "footer.use.database"}}</a></li><li><a href="{{datasetURL}}" rel="noopener">{{t "footer.use.download"}}</a></li><li><a href="{{u "/ai/"}}">{{t "footer.use.ai"}}</a></li><li><a href="{{u "/about/"}}">{{t "footer.use.about"}}</a></li><li><a href="{{u "/contribute/"}}">{{t "contribute.title"}}</a></li></ul></div>
+    </div>
+    <div class="footer__legal footer__notice">
+      <p class="tiny" lang="ar" dir="rtl">معلومات مأخوذة من نصوص رسمية منشورة، وليست استشارة قانونية. راجع الجريدة الرسمية أو استشر محامياً مؤهلاً في حالتك.</p>
+      <p class="tiny" lang="fr">Informations tirées de textes officiels publiés, pas un avis juridique. Vérifiez le Journal officiel ou consultez un avocat qualifié pour votre cas.</p>
+      <p class="tiny" lang="en">Information from published official texts, not legal advice. Check the Official Gazette or consult a qualified lawyer for your case.</p>
+    </div>
+    <div class="footer__legal"><p class="tiny">{{t "footer.credit" (safe "<a class=\"link\" href=\"https://taktek.io/\">Taktek, LLC</a>")}}</p></div>
+  </div>
+</footer>
+<script defer src="/main.js"></script>
+<script defer src="/legislation.js?v={{assetVersion}}"></script>
+</body>
+</html>
+
+{{/* Rows of Arabic documents read right to left as a whole: title, then the
+     facts under it from the right, the status at the far left. Each fact is
+     a <bdi> so English words and dates keep their own order inside. */}}
+{{define "lawrow"}}<li><a class="docrow" href="{{lawURL .ID}}" dir="rtl">
+	{{if .TitleEn}}<span class="tiny" lang="en" dir="ltr">{{t "seo.title_en_label"}}: {{.TitleEn}}</span>{{end}}
+  <span class="docrow__title" lang="ar">{{.Title}}</span>
+  <span class="kicker seps"><b lang="ar">{{.Kind}}</b>{{if and .KindEn (eq (uilang) "en")}} <span><bdi>{{.KindEn}}</bdi></span>{{end}}{{if .Number}} <span><bdi>{{t "law.no_prefix" (str .Number)}}</bdi></span>{{end}}{{with .IssuedOn}} <span><bdi>{{date .}}</bdi></span>{{end}}{{if .Articles}} <span><bdi>{{plural .Articles "article" "articles"}}</bdi></span>{{end}}</span>
+  {{template "status" .Status}}
+</a></li>{{end}}
+
+{{define "status"}}{{if eq . "repealed"}}<span class="status status--repealed">{{statusText "repealed"}} <span lang="ar">ملغى</span></span>{{else}}<span class="status">{{statusText "in_force"}}</span>{{end}}{{end}}
+
+{{define "docrow"}}<li><a class="docrow" href="{{u .URL}}" dir="rtl">
+  <span class="docrow__title" lang="ar">{{.Title}}</span>
+  <span class="kicker seps">{{with .Kicker}}<span><bdi>{{.}}</bdi></span>{{end}}{{with .Date}} <span><bdi>{{date .}}</bdi></span>{{end}}</span>
+  {{with .Snippet}}<span class="docrow__snip" lang="ar">{{$.Highlight}}</span>{{end}}
+</a></li>{{end}}
+
+{{define "search"}}<form class="search" action="{{u "/search/"}}" role="search">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+  <span class="sr">{{t "search.sr"}}</span>
+  <input name="q" type="search" value="{{.}}" placeholder="{{t "search.placeholder"}}" maxlength="500" autocomplete="off" spellcheck="false" enterkeyhint="search" dir="auto">
+  <button type="submit" class="btn btn--primary btn--sm">{{t "search.button"}}</button>
+</form>
+{{if meaningEnabled}}<p class="tiny" style="margin-top:10px;max-width:70ch">{{if meaningShares}}{{t "search.meaning_shared" (meaningProvider)}}{{else}}{{t "search.meaning_privacy" (meaningProvider)}}{{end}}</p>{{end}}{{end}}
+
+{{define "filters"}}{{$l := .}}{{range $i, $chips := .Filters}}{{$param := index $l.Params $i}}{{$sel := index $l.Selected $param}}
+<div class="scroller filters" role="group" aria-label="{{t "aria.filter"}}">{{range $chips}}<a class="chip" href="{{query $l.Q $param .Value}}" aria-pressed="{{if eq .Value $sel}}true{{else}}false{{end}}"><span dir="auto">{{.Label}}</span>{{if .Count}} <b>{{num .Count}}</b>{{end}}</a>{{end}}</div>
+{{end}}{{end}}
+
+{{define "pager"}}{{if gt .Pages 1}}<nav class="pager" aria-label="{{t "aria.pages"}}">
+  {{if gt .Page 1}}<a class="btn btn--ghost btn--sm" rel="prev" href="{{if .Base}}{{u (.Path (add .Page -1))}}{{else}}{{.Query (add .Page -1)}}{{end}}">{{backArrow}} {{t "pager.previous"}}</a>{{end}}
+  <ul class="pager__nums">{{$l := .}}{{range pageNums .Page .Pages}}{{if eq . 0}}<li class="pager__gap" aria-hidden="true">&hellip;</li>{{else}}<li><a class="chip" href="{{if $l.Base}}{{u ($l.Path .)}}{{else}}{{$l.Query .}}{{end}}"{{if eq . $l.Page}} aria-current="page"{{end}}>{{num .}}</a></li>{{end}}{{end}}</ul>
+  {{if lt .Page .Pages}}<a class="btn btn--ghost btn--sm" rel="next" href="{{if .Base}}{{u (.Path (add .Page 1))}}{{else}}{{.Query (add .Page 1)}}{{end}}">{{t "pager.next"}} {{fwdArrow}}</a>{{end}}
+</nav>{{end}}{{end}}
+
+{{define "article"}}{{$law := .Law}}{{with .A}}{{$cur := .Current}}{{$last := .Latest}}<article class="art{{if or .Repealed .AnnulledWhole}} art--repealed{{end}}" id="a-{{slug .Number}}" data-n="{{.Number}}">
+  <div class="art__head">
+    <h3 class="art__no">المادة {{if $.Standalone}}{{.Number}}{{else}}<a href="{{artURL $law.ID .Number}}">{{.Number}}</a>{{end}}</h3>
+    <div class="art__tools" dir="{{dir}}">{{if $last}}{{with $last.From}}<span class="art__meta">{{if $.A.Repealed}}{{t "art.repealed_word"}}{{else if $.A.Added}}{{t "art.added_word"}}{{else}}{{t "art.amended_word"}}{{end}} {{date .}}</span>{{end}}{{else}}{{with .From}}<span class="art__meta">{{t "art.in_force_since" (date .)}}</span>{{end}}{{end}}<button type="button" data-cite="المادة {{.Number}} من {{$law.CiteName}}" data-href="{{citeArt $law.ID .Number}}">{{t "art.cite"}}</button></div>
+  </div>
+  {{with .Note}}<p class="art__note">{{.}}</p>{{end}}
+  {{with .CentreError}}<p class="art__amend art__amend--check" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.centre_error"}}</strong> {{if eq uilang "ar"}}{{.Ar}}{{else}}{{.En}}{{end}}</p>{{end}}
+  {{range .Council}}<p class="art__amend" lang="{{uilang}}" dir="{{dir}}"><strong>{{t (printf "art.council_%s" .Effect)}}</strong> <a class="link" href="{{.SourceURL}}" rel="noopener">{{t "council.decision" .Decision (date .On)}}</a>. {{if eq uilang "ar"}}{{.Ar}}{{else}}{{.En}}{{end}} {{t "art.council_kept"}}</p>{{end}}
+  {{if .Repealed}}{{if $last}}{{if eq $last.State "repealed"}}{{with $last.Change}}<p class="art__amend" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.repealed_word"}}</strong> {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a>{{with .Effective}}, {{t "art.from" (date .)}}{{end}}. {{t "art.its_last_wording"}}</p>{{end}}{{end}}{{end}}
+  {{else}}
+  {{if .Ahead}}{{with $cur.Change}}<p class="art__amend" lang="{{uilang}}" dir="{{dir}}"><strong>{{changeVerb .}}</strong> {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a>{{with .Effective}}, {{t "art.from" (date .)}}{{end}}. {{t "art.new_wording_note"}}</p>{{end}}{{end}}
+  {{with .Shown}}<div class="art__ar">{{range paras (ptr .)}}<p>{{marks .}}</p>{{end}}</div>{{end}}
+  {{if not .Ahead}}{{range .Images}}<p class="art__img"><a href="{{img .}}" rel="noopener"><img src="{{img .}}" alt="Text of the article as published, an image" loading="lazy"></a></p>{{end}}
+  {{with .TextFr}}<div class="art__fr" lang="fr" dir="ltr">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}{{end}}
+  {{if not .Links}}{{range .Pending}}{{with .Change}}<div class="art__change"><p lang="{{uilang}}" dir="{{dir}}"><strong>{{changeVerb .}}</strong> {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a>{{with .Effective}}, {{t "art.from" (date .)}}{{end}}{{with .PartLabel}}: <bdi lang="ar">{{.}}</bdi>{{end}}. {{t "art.pending_note"}}</p>{{with .TextAr}}<div class="art__ar">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}</div>{{end}}{{end}}
+  {{range .Unsure}}<div class="art__change art__change--unsure"><p lang="{{uilang}}" dir="{{dir}}"><strong>{{changeVerb .}}</strong> {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a>{{with .Effective}}, {{t "art.from" (date .)}}{{end}} {{if .TextAr}}{{t "art.unsure_note_with"}}{{else}}{{t "art.unsure_note_without"}}{{end}}</p>{{with .TextAr}}<div class="art__ar">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}</div>{{end}}{{end}}
+  {{range .Affected}}<p class="art__amend art__amend--check" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "law.possibly_affected"}}:</strong> <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a> {{t "art.affected_full"}}</p>{{end}}
+  {{end}}
+  {{if .Versions}}<details class="art__history"{{if .Repealed}} open{{end}}><summary dir="{{dir}}">{{t "art.history"}} &middot; {{t "art.n_versions" (num (len .Versions))}}</summary>
+    <ol class="hist">{{range .Versions}}<li class="hist__v">
+      <p class="hist__meta" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.version" .Label}}</strong> &middot; {{with .From}}{{t "art.from" (date .)}}{{else}}{{if and (eq .Major 1) (not .Change)}}{{t "art.earliest_wording"}}{{else}}{{t "art.date_not_known"}}{{end}}{{end}}{{with .To}}, {{t "art.until" (date .)}}{{end}}{{if eq .Minor 0}}{{with .Change}} &middot; {{changeVerb .}} {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.art_abbr" .ByArticle}}</a>{{end}}{{end}}{{if eq .Source "centre"}} &middot; {{t "art.src_centre"}}{{else if eq .Source "amendment"}} &middot; {{t "art.src_amendment"}}{{else if and (eq .Source "editorial") (gt .Minor 0)}} &middot; {{t "art.src_printed"}}{{else if eq .Source "editorial"}} &middot; {{t "art.src_editorial"}}{{end}}{{if and (eq .Source "centre") (not .Change) (gt .Major 1)}} &middot; {{t "art.src_later"}}{{end}}</p>
+      {{if eq .State "repealed"}}<p class="hist__none" lang="{{uilang}}" dir="{{dir}}">{{t "art.repealed_full_stop"}}</p>{{else}}{{with .TextAr}}<div class="art__ar">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{else}}<p class="hist__none" lang="{{uilang}}" dir="{{dir}}">{{t "art.no_source_note"}}{{with .Change}}{{with .TextAr}} {{t "art.change_reads" ""}}<bdi lang="ar">{{.}}</bdi>{{end}}{{end}}</p>{{end}}{{end}}
+    </li>{{end}}</ol>
+  </details>{{end}}
+  {{if .Links}}<section class="art__links" aria-label="{{t "art.changes_to_article"}}"><p class="art__links-head" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.changes_to_article"}}</strong> &middot; {{t "art.changes_meta" (num (len .Links))}}</p>
+  {{range .Links}}<div class="art__change"><p lang="{{uilang}}" dir="{{dir}}"><strong>{{linkVerb .}}</strong>{{with .Part}} (<bdi lang="ar">{{.}}</bdi>){{end}} {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>{{with .ByArticle}}, {{t "art.article_label" .}}{{end}}</a>{{with .Effective}}, {{date .}}{{end}}</p>{{with .Text}}<div class="art__ar">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}</div>{{end}}
+  </section>{{end}}
+  {{if .RulingCount}}{{if $.Standalone}}{{$extra := ""}}{{if gt .RulingCount (len .Rulings)}}{{$extra = t "art.most_recent" (num (len .Rulings))}}{{end}}<section class="art__rulings" aria-label="{{t "art.rulings_applied"}}"><p class="art__links-head" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.rulings_applied"}}</strong> &middot; {{t "art.rulings_meta" (num .RulingCount) $extra}}</p>
+  <ul class="art__rulings-list">{{range .Rulings}}<li><a class="link" href="{{u (printf "/ruling/%d/" .ID)}}"><bdi lang="ar">{{.Court}}</bdi>{{with .Number}} <bdi>{{.}}</bdi>{{end}}{{with .Year}}<bdi>/{{.}}</bdi>{{end}}</a>{{with .On}} <span class="art__meta">{{date .}}</span>{{end}}</li>{{end}}</ul><p class="art__meta-line"><a class="link" href="{{rulingsURL $law.ID .Number}}">{{t "art.rulings_full_list"}}</a></p></section>
+  {{else}}<p class="art__meta-line" lang="{{uilang}}" dir="{{dir}}"><a class="link" href="{{artURL $law.ID .Number}}">{{if gt .RulingCount 1}}{{t "art.applied_in_plural" (num .RulingCount)}}{{else}}{{t "art.applied_in" (num .RulingCount)}}{{end}}</a></p>{{end}}{{end}}
+</article>{{end}}{{end}}

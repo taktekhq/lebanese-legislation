@@ -1,0 +1,88 @@
+{{define "content"}}{{with .Data}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <p class="eyebrow" data-reveal>{{t "ai.eyebrow"}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{t "ai.h1"}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{t "ai.lead"}}</p>
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <article class="doc">
+    <h2>{{t "ai.what_h2"}}</h2>
+    <p>{{t "ai.what_p1"}}</p>
+    <p>{{t "ai.what_p2"}}</p>
+
+    <h2>{{t "ai.server_h2"}}</h2>
+    <p>{{t "ai.server_p1"}}</p>
+    <pre><code>{{absURL "/mcp"}}</code></pre>
+    <p>{{t "ai.server_p2"}}</p>
+
+    <h3>{{t "ai.claude_h3"}}</h3>
+    <p>{{t "ai.claude_p"}}</p>
+
+    <h3>{{t "ai.claude_code_h3"}}</h3>
+    <pre><code>claude mcp add --transport http lebanese-legislation {{absURL "/mcp"}}</code></pre>
+
+    <h3>{{t "ai.chatgpt_h3"}}</h3>
+    <p>{{t "ai.chatgpt_p"}}</p>
+
+    <h3>{{t "ai.cursor_h3"}}</h3>
+    <pre><code>{
+  "mcpServers": {
+    "lebanese-legislation": {
+      "url": "{{absURL "/mcp"}}"
+    }
+  }
+}</code></pre>
+
+    <h3>{{t "ai.gemini_h3"}}</h3>
+    <pre><code>{
+  "mcpServers": {
+    "lebanese-legislation": {
+      "httpUrl": "{{absURL "/mcp"}}"
+    }
+  }
+}</code></pre>
+
+    <h2>{{t "ai.can_do_h2"}}</h2>
+    <ul>
+      <li><strong>{{t "ai.tool_search"}}</strong>: {{t "ai.tool_search_desc"}}</li>
+      <li><strong>{{t "ai.tool_law"}}</strong>: {{t "ai.tool_law_desc"}}</li>
+      <li><strong>{{t "ai.tool_article"}}</strong>: {{t "ai.tool_article_desc"}}</li>
+      <li><strong>{{t "ai.tool_texts"}}</strong>: {{t "ai.tool_texts_desc"}}</li>
+      <li><strong>{{t "ai.tool_ruling"}}</strong>: {{t "ai.tool_ruling_desc"}}</li>
+      <li><strong>{{t "ai.tool_gazette"}}</strong>: {{t "ai.tool_gazette_desc"}}</li>
+      <li><strong>{{t "ai.tool_list"}}</strong>: {{t "ai.tool_list_desc"}}</li>
+      <li><strong>{{t "ai.tool_list_gazette"}}</strong>: {{t "ai.tool_list_gazette_desc"}}</li>
+      <li><strong>{{t "ai.tool_links"}}</strong>: {{t "ai.tool_links_desc"}}</li>
+      <li><strong>{{t "ai.tool_affected"}}</strong>: {{t "ai.tool_affected_desc"}}</li>
+    </ul>
+    <p>{{t "ai.every_result"}}</p>
+
+    <h2>{{t "ai.json_api_h2"}}</h2>
+    <p>{{t "ai.json_api_p"}}</p>
+    <pre><code>GET /api/v1/search/?q=&amp;type=laws|rulings|gazette|articles&amp;year=&amp;limit=&amp;offset=
+GET /api/v1/law/{id}/
+GET /api/v1/law/{id}/article/{n}/
+GET /api/v1/ruling/{id}/
+GET /api/v1/gazette/{id}/
+GET /api/v1/laws/?since=&amp;until=&amp;kind=&amp;order=newest|oldest&amp;limit=&amp;offset=
+GET /api/v1/gazette/?since=&amp;until=&amp;order=newest|oldest&amp;limit=&amp;offset=</code></pre>
+    <pre><code>curl "{{absURL "/api/v1/search/"}}?q=%D9%85%D9%88%D8%AC%D8%A8%D8%A7%D8%AA&limit=5"</code></pre>
+    <p>{{t "ai.list_p"}}</p>
+    <pre><code>curl "{{absURL "/api/v1/laws/"}}?since=2025-01"</code></pre>
+    <p>{{t "ai.links_p"}}</p>
+    <p>{{t "ai.amended_p"}}</p>
+
+    <h2>{{t "ai.limits_h2"}}</h2>
+    <ul>
+      <li>{{t "ai.limit_1"}}</li>
+      <li>{{t "ai.limit_2"}}</li>
+      <li>{{t "ai.limit_3"}}</li>
+      <li>{{t "ai.limit_4"}}</li>
+      <li>{{t "ai.limit_5"}}</li>
+    </ul>
+
+
+  </article>
+</section>
+{{end}}{{end}}

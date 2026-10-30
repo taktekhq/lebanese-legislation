@@ -1,0 +1,564 @@
+{
+  "slug": "code-of-obligations",
+  "order": 20,
+  "published": "2026-10-20",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 244226,
+      "article": "221",
+      "quote": "ان العقود المنشأة على الوجه القانوني تلزم المتعاقدين. ويجب ان تفهم وتفسر وتنفذ وفاقا لحسن النية والانصاف والعرف ."
+    },
+    {
+      "id": "a2",
+      "law": 244226,
+      "article": "182",
+      "quote": "لا يكون القبول فعليا منشئا للعقد الا اذا كان مطابقا كل المطابقة للعرض اذ أنه جواب له. اما الجواب المعلق بشرط او بقيد فيعد بمثابة رفض للعرض مع اقتراح عرض جديد."
+    },
+    {
+      "id": "a3",
+      "law": 244226,
+      "article": "215",
+      "quote": "كل شخص أتم الثامنة عشرة من عمره هو اهل للالتزام, ما لم يصرح بعدم اهليته في نص قانوني."
+    },
+    {
+      "id": "a4",
+      "law": 244226,
+      "article": "216",
+      "quote": "اما تصرفات الاشخاص الذين لا اهلية لهم لكنهم من ذوي التمييز, فهي قابلة للابطال (كالقاصر المميز). ولا يجوز لمن تعاقد مع فاقد الاهلية ان يدلي بحجة الابطال فهي من حقوق فاقد الاهلية نفسه او وكيله او ورثته. واذا كان العقد الذي انشأه القاصر المميز غير خاضع لصيغة خاصة فان القاصر لا يمكنه الحصول على إبطاله الا اذا أقام البرهان على وقوعه تحت الغبن."
+    },
+    {
+      "id": "a5",
+      "law": 244226,
+      "article": "241",
+      "quote": "يقدر وجود شرط الالغاء في جميع العقود المتبادلة اذا لم يقم احد المتعاقدين بايفاء ما يجب عليه ولم يكن في وسعه ان يحتج باستحالة التنفيذ ما لم يكن ثمة استثناء منصوص عليه في القانون. على ان العقد لا يلغى حتما في هذه الحالة. فان الفريق الذي لم تنفذ حقوقه يكون مخيرا بين التنفيذ الاجباري على وجه من الوجوه, والغاء العقد مع طلب التعويض . وفي الاساس لا يكون هذا الالغاء الا بحكم من القاضي"
+    },
+    {
+      "id": "a6",
+      "law": 244226,
+      "article": "241",
+      "quote": "ويحق للمتعاقدين ان يتفقوا فيما بينهم على ان العقد, عند عدم التنفيذ, يلغى حتما بدون واسطة القضاء. وهذا الشرط لا يعني عن انذار يقصد به اثبات عدم التنفيذ على وجه رسمي. ويمكن ايضا الاتفاق على عدم وجوب تلك المعاملة وحينئذ يتحتم ان يكون البند الذي يعفي من التدخل القضائي ومن الانذار مصوغا بعبارة جازمة صريحة."
+    },
+    {
+      "id": "a7",
+      "law": 244226,
+      "article": "122",
+      "quote": "كل عمل من احد الناس ينجم عنه ضرر غير مشروع بمصلحة الغير, يجبر فاعله اذا كان مميزا, على التعويض . وفاقد الاهلية مسؤول عن الاعمال غير المباحة التي يأتيها عن ادراك واذا صدرت الاضرار عن شخص غير مميز ولم يستطيع المتضرر ان يحصل على التعويض ممن أنيط به امر المحافظة على ذلك الشخص , فيحق للقاضي مع مراعاة حالة الفريقين, ان يحكم على فاعل الضرر بتعويض عادل."
+    },
+    {
+      "id": "a8",
+      "law": 244226,
+      "article": "349",
+      "quote": "ان مرور الزمن يتم في الاساس بعد انقضاء عشر سنوات ."
+    },
+    {
+      "id": "a9",
+      "law": 244226,
+      "article": "350",
+      "quote": "تكون مدة مرور الزمن خمس سنوات في المستحقات المتأخرة والفوائد وحصص الاسهم من الارباح واجور المباني والاراضي الزراعية, وبوجه عام في الموجبات التي تستحق الاداء كل سنة او اقل. وتكون مدة مرور الزمن خمس سنوات ايضا في الدعاوى بين الشركاء او بين هؤلاء واشخاص آخرين من اجل الموجبات الناشئة عن عقد الشركة. وتبتديء هذه المدة من يوم اعلان حل الشركة او اعلان خروج احد الشركاء."
+    },
+    {
+      "id": "a10",
+      "law": 244226,
+      "article": "351",
+      "quote": "يسقط بحكم مرور الزمن بعد سنتين:\n\n1- حق دعوى الباعة وملتزمي تقديم البضائع واصحاب المعامل فيما يختص بالاشياء التي يقدمونها.\n\n2- حق دعوى المزارعين ومنتجي المواد الاولية فيما يختص بالاشياء التي يقدمونها اذا استعملت في حاجات المديون البيتية. وتبتديء مدة مرور الزمن من يوم تقديم هذه الاشياء."
+    },
+    {
+      "id": "a11",
+      "law": 244226,
+      "article": "352",
+      "quote": "يسقط ايضا بمرور الزمن بعد سنتين:\n\n1- حق دعوى الاطباء والجراحين والمولدين واطباء الاسنان والاطباء البيطريين من اجل عياداتهم والعمليات التي اجروها واللوازم والمسلفات التي قدموها. وتبتديء مدة مرور الزمن من تاريخ العيادة او العملية الاخيرة.\n\n2- حق دعوى الصيدليين من اجل الادوية التي قدموها. وتبتدىء مدة مرور الزمن من تاريخ تقديمها."
+    },
+    {
+      "id": "a12",
+      "law": 244226,
+      "article": "346",
+      "quote": "لا يجوز للدائن ان يعدل مقدما عن حكم مرور الزمن ولا أن يطيل او يقصر مدته وانما يجوز له أن يعدل عنه بعد الحصول عليه."
+    },
+    {
+      "id": "a13",
+      "law": 244226,
+      "article": "272",
+      "quote": "اي حيث يكون التلازم موجودا بين الموجب المطلوب , والدين المختص بمن يستعمل حق الحبس من اجل الموجب فهو اي حق الحبس يعود مثلا الى واضع اليد او الى المستثمر او محرز الشيء المرهون بدون ان يكون ثمة تمييز بين الاموال المنقولة وغير المنقولة ولا بين الحابس النية وسيئها وانما يحرم حق الحبس محرز الاشياء المفقودة او المسروقة ومحرز الاشياء التي انتزعت بالعنف من صاحبها الحقيقي."
+    },
+    {
+      "id": "a14",
+      "law": 244226,
+      "article": "677",
+      "quote": "يحق للصانع ان يحبس المنشأ وسائر الاشياء التي استلمها من صاحب الامر للقيام بالعمل, الى ان يدفع له البدل او الاجر وما يكون قد اسلفه عند الاقتضاء, ما لم يكن العقد يقضي بالدفع في اجل معين. وفي هذه الحال يكون الصانع مسؤولا عن الشيء الذي يحبسه, وفاقا للقواعد المختصة بالمرتهن."
+    }
+  ],
+  "en": {
+    "title": "Code of Obligations and Contracts: the articles to know first",
+    "question": "What does the Lebanese Code of Obligations and Contracts say about forming a contract, consent, capacity, cancellation, damages, liability, limitation and the right of retention?",
+    "description": "Key rules of the Code of Obligations and Contracts on forming and cancelling contracts, capacity, liability, limitation periods and retention.",
+    "answer": {
+      "text": "Anyone aged 18 can contract, and a contract forms when an acceptance matches the offer exactly, then binds both parties in good faith. If the other side fails to perform, you may demand performance or ask a court to cancel with damages, unless the contract expressly cancels automatically. Claims expire after 10 years unless a 5 or 2-year period applies, and a creditor may keep a thing linked to the debt until paid.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a5",
+        "a6",
+        "a8",
+        "a9",
+        "a10",
+        "a13"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "When does a contract form and bind the parties?",
+        "paras": [
+          {
+            "text": "A contract forms only when the acceptance matches the offer exactly. Under Article 182, a conditional or qualified reply is a rejection and a new offer.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "Under Article 221, a lawfully formed contract binds the parties. It must be understood, interpreted and performed according to good faith, equity and custom.",
+            "cites": [
+              "a1"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "Who can make a contract?",
+        "paras": [
+          {
+            "text": "A person who has completed 18 years can take on obligations, unless a legal text declares that person incapable (Article 215).",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "Under Article 216, a contract made by a minor with discernment can be annulled. Only the incapable person, his representative or his heirs may claim this. If the contract needed no special form, the minor must prove lesion to annul it.",
+            "cites": [
+              "a4"
+            ]
+          },
+          {
+            "text": "This page does not cover minors authorised to trade, legal interdiction, or defects of consent such as deceit and fear.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "What can you do if the other side does not perform?",
+        "paras": [
+          {
+            "text": "Article 241 implies a cancellation clause in every contract with obligations on both sides. It applies when a party fails to perform and cannot plead impossibility, unless the law makes an exception. Cancellation is still not automatic. The other party chooses forced performance or cancellation with damages, and only a court cancels in principle.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "The parties may agree that the contract cancels automatically on non-performance, without a court (Article 241). A formal notice recording the failure is still needed, unless an express, unequivocal clause waives it.",
+            "cites": [
+              "a6"
+            ]
+          },
+          {
+            "text": "This page does not cover grace periods, ending a contract for the future only, or the amount of contractual damages.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "When must you pay for harm you cause?",
+        "paras": [
+          {
+            "text": "Under Article 122, a person with discernment who causes unlawful harm to another's interest must compensate. A person without capacity is liable for unlawful acts done with awareness.",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "If a person without discernment causes harm and the victim cannot recover from the guardian, the judge may award fair compensation against that person.",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "This page does not cover negligence, abuse of a right, or liability for others.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "How long do you have to bring a claim?",
+        "paras": [
+          {
+            "text": "Article 349 sets 10 years as the limitation period in principle. The shorter periods in the table displace it for the claims listed.",
+            "cites": [
+              "a8",
+              "a9",
+              "a10"
+            ]
+          },
+          {
+            "text": "Under Article 346, a creditor cannot waive limitation in advance, or lengthen or shorten the period. A waiver is valid only after the period has run.",
+            "cites": [
+              "a12"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Limitation periods in the Code of Obligations and Contracts",
+          "head": [
+            "Claim",
+            "Period"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Any claim without a shorter period (Article 349)",
+                "10 years"
+              ],
+              "cites": [
+                "a8"
+              ]
+            },
+            {
+              "cells": [
+                "Arrears, interest, dividends, building and farmland rent, sums due yearly or more often",
+                "5 years"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "Claims between partners, or with others, under a partnership contract",
+                "5 years from the published dissolution or a partner's withdrawal"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "Sellers, suppliers and factory owners, and farmers for household goods",
+                "2 years"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "Teachers and schools, servants and workers, for fees, wages and advances",
+                "2 years"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "Hotels, restaurants and lessors of movables",
+                "2 years"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "Clinics and care institutions",
+                "2 years"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "Wage-earners' indemnities under Articles 652 and 656",
+                "2 years"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "Doctors, dentists, vets and pharmacists",
+                "2 years"
+              ],
+              "cites": [
+                "a11"
+              ]
+            },
+            {
+              "cells": [
+                "Lawyers, engineers, experts and brokers",
+                "2 years"
+              ],
+              "cites": [
+                "a11"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "When can you keep a thing until you are paid?",
+        "paras": [
+          {
+            "text": "Article 272 gives a right of retention wherever the holder's claim is connected to the obligation he withholds. Examples are a possessor, an exploiter and a pledgee. It covers movables and immovables, whatever the holder's good or bad faith. It never covers lost or stolen things, or things taken by force from their owner.",
+            "cites": [
+              "a13"
+            ]
+          },
+          {
+            "text": "Article 677 lets a craftsman keep the work and materials until paid his price or fee and any advances. This does not apply if the contract sets payment at a fixed term. While keeping them, he is liable under the rules on pledgees.",
+            "cites": [
+              "a14"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "قانون الموجبات والعقود: المواد التي ينبغي معرفتها أولا",
+    "question": "ماذا يقول قانون الموجبات والعقود اللبناني عن انعقاد العقد والرضى والأهلية وإلغاء العقد والتعويض والمسؤولية ومرور الزمن وحق الحبس؟",
+    "description": "أهم أحكام قانون الموجبات والعقود في انعقاد العقد وإلغائه والأهلية والمسؤولية ومرور الزمن وحق الحبس.",
+    "answer": {
+      "text": "يحق لكل من أتم 18 سنة أن يتعاقد، وينعقد العقد متى طابق القبول الإيجاب تماما، فيُلزم الفريقين ويُنفَّذ بحسن نية. وإذا لم ينفذ الفريق الآخر موجبه، فلك أن تطلب التنفيذ أو أن تطلب من القاضي إلغاء العقد مع التعويض، إلا إذا نص العقد صراحة على إلغائه حتما. وتسقط الدعاوى بمرور 10 سنوات ما لم تنطبق مدة 5 سنوات أو سنتين، ويحق للدائن أن يحبس شيئا متصلا بدينه حتى يستوفيه.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a5",
+        "a6",
+        "a8",
+        "a9",
+        "a10",
+        "a13"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "متى ينعقد العقد ومتى يُلزم الفريقين؟",
+        "paras": [
+          {
+            "text": "لا ينعقد العقد إلا إذا طابق القبول الإيجاب تماما. وتعدّ المادة 182 الجواب المعلق على شرط أو قيد رفضا للعرض واقتراحا لعرض جديد.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "تنص المادة 221 على أن العقد المنشأ على الوجه القانوني يُلزم المتعاقدين. ويجب أن يُفهم ويُفسَّر ويُنفَّذ وفقا لحسن النية والإنصاف والعرف.",
+            "cites": [
+              "a1"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "من يحق له أن يتعاقد؟",
+        "paras": [
+          {
+            "text": "كل شخص أتم 18 سنة من عمره أهل للالتزام، ما لم يصرّح نص قانوني بعدم أهليته (المادة 215).",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "بموجب المادة 216، يكون العقد الذي ينشئه القاصر المميز قابلا للإبطال. ولا يحق التذرع بالإبطال إلا لفاقد الأهلية أو وكيله أو ورثته. وإذا لم يخضع العقد لصيغة خاصة، فعلى القاصر أن يثبت وقوعه تحت الغبن ليحصل على إبطاله.",
+            "cites": [
+              "a4"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة القاصر المأذون له في التجارة، ولا المحجور عليهم قانونا، ولا عيوب الرضى كالخداع والإكراه.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يحق لك إذا لم ينفذ الفريق الآخر موجبه؟",
+        "paras": [
+          {
+            "text": "تفترض المادة 241 وجود شرط الإلغاء في كل عقد متبادل. ويُعمل به إذا لم يقم أحد الفريقين بموجبه ولم يكن في وسعه الاحتجاج باستحالة التنفيذ، ما لم ينص القانون على استثناء. ومع ذلك لا يُلغى العقد حتما. فالفريق الآخر يختار بين التنفيذ الإجباري وإلغاء العقد مع التعويض، ولا يكون الإلغاء في الأساس إلا بحكم من القاضي.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "يجوز للفريقين أن يتفقا على أن يُلغى العقد حتما عند عدم التنفيذ، من دون اللجوء إلى القضاء (المادة 241). ويبقى الإنذار الرسمي الذي يثبت عدم التنفيذ واجبا، إلا إذا أعفى منه بند مصوغ بعبارة جازمة صريحة.",
+            "cites": [
+              "a6"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة المهل التي يمنحها القاضي للمديون، ولا فسخ العقد للمستقبل فقط، ولا مقدار التعويض في العقود.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "متى تُلزم بالتعويض عن ضرر سببته؟",
+        "paras": [
+          {
+            "text": "تنص المادة 122 على أن من يُلحق ضررا غير مشروع بمصلحة الغير يُلزم بالتعويض إذا كان مميزا. ويُسأل فاقد الأهلية عن الأعمال غير المباحة التي يأتيها عن إدراك.",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "إذا سبّب شخص غير مميز ضررا ولم يستطع المتضرر أن يحصل على التعويض ممن يتولى المحافظة عليه، جاز للقاضي أن يحكم على فاعل الضرر بتعويض عادل.",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة الضرر الناتج عن الإهمال، ولا التعسف في استعمال الحق، ولا المسؤولية عن فعل الغير.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ما المهلة المتاحة لإقامة الدعوى؟",
+        "paras": [
+          {
+            "text": "تحدد المادة 349 مدة مرور الزمن في الأساس، وهي 10 سنوات. وتحل المدد الأقصر الواردة في الجدول محل هذه المدة في الدعاوى التي تذكرها.",
+            "cites": [
+              "a8",
+              "a9",
+              "a10"
+            ]
+          },
+          {
+            "text": "تمنع المادة 346 الدائن من التنازل مقدما عن مرور الزمن، ومن إطالة مدته أو تقصيرها. ولا يصح تنازله عنه إلا بعد اكتسابه.",
+            "cites": [
+              "a12"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "مدد مرور الزمن في قانون الموجبات والعقود",
+          "head": [
+            "الدعوى",
+            "المدة"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "كل دعوى ليس لها مدة أقصر (المادة 349)",
+                "10 سنوات"
+              ],
+              "cites": [
+                "a8"
+              ]
+            },
+            {
+              "cells": [
+                "المستحقات المتأخرة والفوائد وحصص الأرباح وأجور المباني والأراضي الزراعية، وكل موجب يستحق الأداء كل سنة أو أقل",
+                "5 سنوات"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "الدعاوى الناشئة عن عقد الشركة، بين الشركاء أو بينهم وبين غيرهم",
+                "5 سنوات من إعلان حل الشركة أو خروج أحد الشركاء"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "الباعة والمورّدون وأصحاب المعامل، والمزارعون عن حاجات المديون البيتية",
+                "سنتان"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "المعلمون ومعاهد التعليم، والخدم والعمال، عن المرتبات والأجور والمسلفات",
+                "سنتان"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "أصحاب الفنادق والمطاعم، ومؤجرو الأشياء المنقولة",
+                "سنتان"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "المعاهد المختصة بمعالجة المرضى والعناية بهم",
+                "سنتان"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "تعويضات الأجراء بموجب المادتين 652 و656",
+                "سنتان"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "الأطباء وأطباء الأسنان والأطباء البيطريون والصيادلة",
+                "سنتان"
+              ],
+              "cites": [
+                "a11"
+              ]
+            },
+            {
+              "cells": [
+                "المحامون والمهندسون والخبراء والوسطاء",
+                "سنتان"
+              ],
+              "cites": [
+                "a11"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "متى يحق لك أن تحبس شيئا حتى تستوفي حقك؟",
+        "paras": [
+          {
+            "text": "تمنح المادة 272 حق الحبس في كل حالة يقوم فيها تلازم بين الموجب المطلوب من الحابس والدين المستحق له. ومن أمثلة ذلك واضع اليد والمستثمر ومحرز الشيء المرهون. ويشمل هذا الحق الأموال المنقولة وغير المنقولة، أكان الحابس حسن النية أم سيئها. ولا يثبت أبدا لمحرز الأشياء المفقودة أو المسروقة أو المنتزعة بالعنف من صاحبها.",
+            "cites": [
+              "a13"
+            ]
+          },
+          {
+            "text": "تجيز المادة 677 للصانع أن يحبس المنشأ والأشياء التي استلمها للعمل حتى يُدفع له البدل أو الأجر وما أسلفه. ولا يثبت هذا الحق إذا كان العقد يقضي بالدفع في أجل معين. وما دام الصانع حابسا للشيء، فهو مسؤول عنه وفقا للقواعد الخاصة بالمرتهن.",
+            "cites": [
+              "a14"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

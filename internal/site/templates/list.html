@@ -1,0 +1,15 @@
+{{define "content"}}{{with .Data}}{{$k := .Kind}}{{with .List}}
+<section class="wrap page">
+  {{with index $k "Back"}}<a class="back" href="{{.}}"><span aria-hidden="true">{{backArrow}}</span> {{index $k "BackLabel"}}</a>{{else}}<a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>{{end}}
+  <p class="eyebrow" data-reveal>{{index $k "Eyebrow"}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{safe (index $k "H1")}}</h1>
+</section>
+<section class="wrap">
+  {{with .Updated}}<p class="updated"><time datetime="{{.ISO}}">{{.Label}}</time></p>{{end}}
+  {{if .Filters}}<h2 class="sr-only">{{t "seo.h2_filters"}}</h2>{{template "filters" .}}{{end}}
+  <div class="listhead"><h2 class="finder__count">{{plural .Total (index $k "Noun") (index $k "Many")}}, {{t "list.newest_first"}}</h2>{{with index $k "Years"}}<a class="sec__more" href="{{u .}}">{{t "list.browse_by_year"}} <span class="arrow" aria-hidden="true">{{fwdArrow}}</span></a>{{end}}</div>
+  <ul class="doclist">{{range .Rows}}{{template "docrow" .}}{{end}}</ul>
+  {{template "pager" .}}
+</section>
+<div style="height:var(--section-y)"></div>
+{{end}}{{end}}{{end}}

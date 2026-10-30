@@ -1,0 +1,628 @@
+{
+  "slug": "notaries-law",
+  "order": 27,
+  "published": "2026-10-21",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 183490,
+      "article": "2",
+      "quote": "الكاتب العدل هو ضابط عمومي يناط به في حدود اختصاصه القيام بالاعمال المبينة في هذا القانون وفي غيره من القوانين والاعمال التي يطلب اصحاب العلاقة اثباتها وهو مرتبط بوزارة العدل ولا يتقاضى من الدولة اي راتب او تعويض ويتقاضى اتعابه من اصحاب العلاقة وفقا لاحكام هذا القانون ."
+    },
+    {
+      "id": "a2",
+      "law": 183490,
+      "article": "5",
+      "quote": "يشترط في المرشح ان يكون:\n\n1- لبنانيا منذ عشر سنوات على الاقل\n\n2- اتم الخامسة والعشرين من عمره ولم يتجاوز الرابعة والاربعين بتاريخ بدء المباراة ويجب ان يذكر سنه في مرسوم تعيينه ولا يعمل باي تعديل لاحق لهذا السن مهما كانت اسبابه."
+    },
+    {
+      "id": "a3",
+      "law": 183490,
+      "article": "5",
+      "quote": "3- سليم من الامراض والعاهات التي تحول دون قيامه باعباء كتابة العدل وعليه ان يبرز شهادة من اللجنة الطبية الرسمية تثبت ذلك.\n\n4- متمتعا بحقوقه المدنية وغير محكوم عليه بجناية او محاولة جناية من اي نوع كانت او بجنحة شائنة او محاولة جنحة شائنة."
+    },
+    {
+      "id": "a4",
+      "law": 183490,
+      "article": "5",
+      "quote": "وتعتبر شائنة جرائم السرقة والاحتيال واساءة الامانة واصدار شك بدون رصيد والاختلاس والرشوة والتزوير واستعمال المزور والشهادة الكاذبة والجرائم المخلة بالاخلاق المنصوص عليها في الباب السابع من قانون العقوبات وجرائم المخدرات.\n\n5- حائزا الاجازة اللبنانية في الحقوق."
+    },
+    {
+      "id": "a5",
+      "law": 183490,
+      "article": "7",
+      "quote": "يعين الناجح في المباراة كاتب عدل متدرجا بموجب مرسوم بناء على اقتراح وزير العدل يخضع الكاتب العدل المتدرج لدورة تدريبية مدتها ستة اشهر يلحق خلالها باحدى دوائر كتابة عدل اصيلا دونما حاجة لاصدار اي نص ."
+    },
+    {
+      "id": "a6",
+      "law": 183490,
+      "article": "9",
+      "quote": "تنتهي مهام الكاتب العدل حكما لدى اكماله الرابعة والستين من عمره."
+    },
+    {
+      "id": "a7",
+      "law": 183490,
+      "article": "22",
+      "quote": "1- بتنظيم والتصديق على الاسناد المنصوص عليها في قانون الموجبات والعقود وبصورة عامة على كل سند لا يمنعه القانون او لا يكون حصرا بموجب نص خاص من صلاحية موظف عام اخر وحفظ اصلها واعطاء ذوي العلاقة صورا عنها."
+    },
+    {
+      "id": "a8",
+      "law": 183490,
+      "article": "22",
+      "quote": "2- قبول وحفظ الاسناد والوثائق والودائع العينية وتسليم المودعين صورة مصدقة عن البيان المنظم من قبله والمتضمن شروط الايداع ووصف الوديعة.\n\n3- تنظيم الاحتجاج وتبليغه بواسطة مباشر لاثبات التمنع عن قبول او دفع السفاتج وسندات السحب والسندات لامر وفقا للقوانين المرعية الاجراء."
+    },
+    {
+      "id": "a9",
+      "law": 183490,
+      "article": "22",
+      "quote": "4- وضع تاريخ صحيح على الصكوك التي تعرض عليه.\n\n5- تبليغ جميع الاخطارات والانذارات بواسطة المباشر وقبول العرض الفعلي والايداع وفقا لاحكام المواد /822/ وما يليها من قانون اصول المحاكمات المدنية."
+    },
+    {
+      "id": "a10",
+      "law": 183490,
+      "article": "22",
+      "quote": "6- تنظيم وتصديق الوصايا وفقا لاحكام قانون الارث لغير المحمديين الصادر بتاريخ 23/06/1959.\n\n7- التصديق على توقيع مترجم الصكوك من لغة الى اخرى.\n\n8- ترقيم صفحات دفاتر وسجلات التجار واصحاب المهن الحرة وفقا للاصول المنصوص عليها في قانون التجارة.\n\n9- اخذ البصمات وحفظها والتصديق على هوية صاحبها."
+    },
+    {
+      "id": "a11",
+      "law": 183490,
+      "article": "37",
+      "quote": "1- تنظيم الاسناد الداخلة حصرا في اختصاص مرجع اخر بموجب نص قانوني خاص او المصادقة عليها."
+    },
+    {
+      "id": "a12",
+      "law": 183490,
+      "article": "38",
+      "quote": "1- اللجوء الى الاضراب تحت طائلة المسؤولية المسلكية والجزائية المتعلقة بالموظفين\n\n2- الجمع بين كتابة العدل وبين:\n\n- الوظائف العامة\n\n- جميع المهن والاعمال الماجورة والاعمال التجارية والصناعية والصحفية باستثناء التدريس خارج اوقات الدوام الرسمي"
+    },
+    {
+      "id": "a13",
+      "law": 183490,
+      "article": "38",
+      "quote": "- عضوية او رئاسة مجلس ادارة احدى الشركات\n\n- النيابة والوزارة في حال تولى الكاتب العدل احدى الوظائف او الاعمال او المهن المبينة انفا يعتبر منقطعا حكما بصورة نهائية عن مهام كتابة العدل ويصبح مركزه شاغرا ويعلن عن ذلك بمرسوم يصدر بناء لاقتراح وزير العدل"
+    },
+    {
+      "id": "a14",
+      "law": 183490,
+      "article": "38",
+      "quote": "3- مغادرة الاراضي اللبنانية او اقفال مكتبه او التغيب او الامتناع عن استقبال الزبائن الا بعد الحصول على موافقة خطية من وزارة العدل اما في الحالات التي يستحيل فيها الحصول على تلك الموافقة الخطية المسبقة كحالات المرض او وفاة احد الاقارب فعلى الكاتب العدل ان يعلم وزارة العدل بالامر في اليوم التالي لتغيبه وان يحدد مدة غيابه ."
+    },
+    {
+      "id": "a15",
+      "law": 183490,
+      "article": "8",
+      "quote": "أ- ان يقسموا امام محكمة الاستئناف في بيروت اليمين الاتية:\n\n\"اقسم بالله العظيم ان احفظ سر واداب مهنة كتاب العدل وان اقوم باعمالها بامانة وان اتقيد بقوانينها وانظمتها وان اتصرف في جميع اعمالي تصرفا يوحي الثقة والاحترام\".\n\nب - ان يودعوا نماذج عن تواقيعهم وعناوينهم لدى المديرية العامة لوزارة العدل التي بدورها تودعها جميع المراجع المختصة."
+    },
+    {
+      "id": "a16",
+      "law": 183490,
+      "article": "8",
+      "quote": "ج - ان يقدموا لوزارة العدل ضمانة تحدد شروطها بقرار يصدر عن وزيري العدل والمالية.\n\nد - ان يتخذ كل منهم مركزا لدائرته ضمن نطاق صلاحيته المناطقية المحددة في مرسوم تعيينه"
+    },
+    {
+      "id": "a17",
+      "law": 183490,
+      "article": "24",
+      "quote": "على الكاتب العدل ان لا ينظم او يصدق على اي سند قبل التثبت من هوية المتعاقدين .\n\n- اذا كان الكاتب العدل يعرف المتعاقدين شخصيا فيذكر ذلك على مسؤوليته في السند والا عليه ان يتثبت من هويتهم:"
+    },
+    {
+      "id": "a18",
+      "law": 183490,
+      "article": "24",
+      "quote": "يتحقق الكاتب العدل اهلية المتعاقدين وقبولهم التعاقد بمحض ارادتهم كما يتحقق من صفة وصلاحية الوصي والوكيل والشريك وممثل الشخص المعنوي وكذلك كل شخص يحل محل صاح العلاقة ويذكر محل اقامة كل منهم ويدون كل هذه الامور في متن السند ."
+    },
+    {
+      "id": "a19",
+      "law": 183490,
+      "article": "26",
+      "quote": "على الكاتب العدل ان يتلو على المتعاقدين والشهود والمترجم عند الاقتضاء السند الذي نظمه وان يذكر ذلك في عبارة التصديق وعلى جميع الحاضرين ان يوقعوا في اسفل العبارة ثم يمهر الكاتب العدل السند بخاتمه ويورخه ويوقعه.\n\nاذا كان الكاتب العدل يجهل لغة المتعاقدين فانه يتلقى تصريحاتهم بواسطة مترجم محلف ويوقع المترجم السند الذي اشترك فيه بهذه الصفة ."
+    },
+    {
+      "id": "a20",
+      "law": 183490,
+      "article": "29",
+      "quote": "يحرر السند المعد للتوقيع والتصديق باللغة العربية بخط واضح او مطبوع يذكر فيه اسم ذي العلاقة واسمي والديه وجنسيته ومحل وتاريخ ولادته ومحل اقامته ورقم سجل نفوسه والسنة والشهر واليوم التي نظم فيها السند او جرت المصادقة عليه واسم الكاتب العدل ومكان اتمام العمل واسم المترجم والشهود وقيمة الرسوم المستوفاة"
+    },
+    {
+      "id": "a21",
+      "law": 183490,
+      "article": "29",
+      "quote": "على ان تكتب مع التاريخ والارقام بالحروف بصورة واضحة كل شطب او اضافة او تحشية يشار اليه بعبارة على الهامش يوقعها الكاتب العدل والمتعاقدون والشهود والمترجم وذلك تحت طائلة اعتبار الشطب والاضافة او التحشية لغوا ترقم صفحات السند ويذكر عدد الاوراق المربوطة ببعضها بالحروف في ذيل الصفحة الاخيرة ويوقع تحت هذه العبارة المتعاقدون والشهود والمترجم والكاتب العدل على مسؤولية هذا الاخير ."
+    },
+    {
+      "id": "a22",
+      "law": 183490,
+      "article": "27",
+      "quote": "اذا صرح احد المتعاقدين انه لا يعرف توقيع امضائه فان الكاتب العدل يكلفه وضع بصمة احد اصابعه على السند ويشير الى ذلك في عبارة التصديق اما اذا كان ذو العلاقة مصابا بعاهة تحول دون قدرته على التعبير عن ارادته بصورة طبيعية فيتلقى الكاتب العدل تصريحه بحضور شاهدين ومختار المحلة او يسمي ذو العاهة شخصا للكاتب العدل بحضور الشاهدين ومختار المحلة يكلفه التوقيع عنه على السند على ان يذكر الكاتب العدل ذلك في عبارة التصديق ."
+    },
+    {
+      "id": "a23",
+      "law": 183490,
+      "article": "39",
+      "quote": "لا يجوز للكاتب العدل ان يعطي صورا طبق الاصل او يسلم مضمون الاسناد الا لاصحاب العلاقة او لورثتهم او لمن تلقوا الحق عنهم, واذا سلم اصحاب العلاقة صورة اولى طبق الاصل وفقا للشروط المنصوص عليها في قانون اصول المحاكمات المدنية فلا يمكنه ان يعطيهم فيما بعد الا صورا مضاعفة ."
+    },
+    {
+      "id": "a24",
+      "law": 183490,
+      "article": "28",
+      "quote": "ان القوة الثبوتية للاسناد التي ينظمها الكاتب العدل هي ذات القوة الملازمة للاسناد الرسمية ضمن الشروط المنصوص عليها في قانون اصول المحاكمات المدنية ."
+    },
+    {
+      "id": "a25",
+      "law": 183490,
+      "article": "33",
+      "quote": "2- يستوفى الكاتب العدل علاوة على الرسوم المذكورة في الجدول \"أ\" الملحق بهذا القانون اتعابه بنسبة (30 %) ثلاثين بالماية من مبلغ الرسوم المستوفاة وفقا للبند /1/ كما يستوفى عن تنظيم وتحرير كل صفحة ومهما تعددت نسخها مبلغ /7000/ ل.ل. سبعة الاف ليرة لبنانية وكذلك /1500/ ل.ل. الف وخمسماية ليرة لبنانية عن طباعة كل صفحة اصلية مهما تعددت النسخ"
+    },
+    {
+      "id": "a26",
+      "law": 183490,
+      "article": "33",
+      "quote": "وتعتبر الصفحة مؤلفة من عشرين سطرا والسطر من خمس عشرة كلمة كحد ادنى والصفحة الناقصة الوحيدة او الاخيرة تعتبر بمثابة صفحة كاملة ويستوفى ايضا نسبة 001/0 واحد بالالف عن العقود المسجلة لديه المعدة للتسجيل في الدوائر العقارية وفي السجل التجاري."
+    },
+    {
+      "id": "a27",
+      "law": 183490,
+      "article": "33",
+      "quote": "3- في حال انتقال الكاتب العدل بناء على طلب من احد اصحاب المصلحة يستوفى تعويضا مقداره عشرون الف ليرة لبنانية اذا انتقل في نطاق مركزه ومبلغا قدره خمس وثلاثون الف ليرة لبنانية اذا انتقل خارج نطاق مركزه."
+    },
+    {
+      "id": "a28",
+      "law": 183490,
+      "article": "33",
+      "quote": "4- يلزم الكاتب العدل بوضع لائحة مفصلة بالرسوم المتوجبة للخزينة والاتعاب التي يتقضاها عن كل معاملة تدخل ضمن صلاحيته في مكان بارز في دائرته يسهل رؤيتها وقراءتها.\n\n5- على الكاتب العدل ان يدون على كل معاملة بيانا مفصلا وواضحا بالرسوم والاتعاب المستوفاة وان يعطي ايصالا مفصلا بالمبالغ المستوفاة وفقا لاحكام المادة 191 من قانون المحاسبة العامة على ان تحدد اصول الاستيفاء بقرار من وزير المالية"
+    },
+    {
+      "id": "a29",
+      "law": 183490,
+      "article": "12",
+      "quote": "يخضع الكتاب العدل للتفتيش الاداري والمالي من قبل قاض او اكثر على الا يزيد عددهم عن ثلاثة ينتدبهم لهذه الغاية وزير العدل من بين القضاة الملحقين بوزراة العدل"
+    },
+    {
+      "id": "a30",
+      "law": 183490,
+      "article": "14",
+      "quote": "يقرر وزير العدل بعد اطلاعه على تقارير التفتيش , وبالاستناد الى اهمية المخالفات الواردة فيها, اما فرض احدى العقوبات الثلاث الاولى المنصوص عليها في المادة الخامسة عشرة من هذا القانون, واما احالة الكاتب العدل على المجلس التاديبي للموظفين وفي الحالة الاخيرة يمكن ان يقرر وزير العدل توقيف الكاتب العدل عن ممارسة عمله لمدة لا تزيد عن ستة اشهر."
+    },
+    {
+      "id": "a31",
+      "law": 183490,
+      "article": "15",
+      "quote": "العقوبات التاديبية هي الاتية:\n\n1- التنبيه.\n\n2- اللوم.\n\n3- التوقيف عن العمل لمدة لا تتجاوز الستة اشهر.\n\n4- التوقيف عن العمل لمدة تترواح بين سنة وثلاث سنوات.\n\n5- المنع النهائي من مزاولة مهنة كتابة العدل ."
+    },
+    {
+      "id": "a32",
+      "law": 183490,
+      "article": "16",
+      "quote": "ويعاقب في هذه الحالات بالغرامة من ماية الف ليرة لبنانية الى خمسماية الف ليرة لبنانية اما اذا ارتكب الكاتب العدل المخالفة عن قصد فيعاقب بالحبس من شهرين الى سنتين وبالغرامة من خمسماية الف ليرة لبنانية الى مليوني ليرة لبنانية او باحدى هاتين العقوبتين."
+    },
+    {
+      "id": "a33",
+      "law": 183490,
+      "article": "16",
+      "quote": "ولا يحول ذلك دون ملاحقة الكاتب العدل بطلب التعويض من قبل المتضرر عن الاضرار الناتجة عن الغش او الغلط كما لا يحول ذلك دون ملاحقة الكاتب العدل تاديبيا تخضع ملاحقة الكاتب العدل جزائيا بالنسبة للاعمال الناشئة عن ممارسته مهامه لترخيص من وزير العدل ."
+    },
+    {
+      "id": "a34",
+      "law": 183490,
+      "article": "45",
+      "quote": "1 - ينشأ مجلس للكتاب العدل في لبنان (يُسمى فيما يلي ب «المجلس»)، طابعه مهني ويتمتع بالشخصية المعنوية.\n\n2 - يتألف المجلس من هيئتين: الجمعية العامة ومكتب المجلس (يُسمَّى فيما يلي ب «المكتب»)."
+    },
+    {
+      "id": "a35",
+      "law": 183490,
+      "article": "45",
+      "quote": "3 - يعتبر منتسباً حُكماً الى «المجلس» جميع الكتاب العدل الأصيليين في الجمهورية اللبنانية.\n\n4 - كما يمكن أن ينتسب الى المجلس من يشاء من الكتاب العدل المتقاعدين.\n\nيقدم طلب انتساب الكتاب العدل المتقاعدين الى المكتب."
+    },
+    {
+      "id": "a36",
+      "law": 183490,
+      "article": "50",
+      "quote": "- إبداء الرأي، في مهلة أقصاها عشرة أيام، في الشكاوى والملاحقات القضائية ضدّ الكتاب العدل والناشئة عن مزاولتهم مهامهم والتي قد يحيلها اليه وزير العدل."
+    }
+  ],
+  "en": {
+    "title": "Notaries in Lebanon: the notary law (Law 337 of 1994)",
+    "question": "What does a notary do in Lebanon, and what does the notary law (Law 337 of 1994) provide?",
+    "description": "A guide to the role, work, fees, oversight and Council of Notaries under Law 337 of 1994.",
+    "answer": {
+      "text": "Law 337 of 1994 makes a notary a public officer attached to the Ministry of Justice and paid by interested parties, not the state. Article 22 covers deeds under the Code of Obligations and Contracts and any deed not forbidden or reserved by special law to another public officer, along with the acts it lists, including putting a certified date on instruments.",
+      "cites": [
+        "a1",
+        "a7",
+        "a9"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Who can become a notary, and when does service end?",
+        "paras": [
+          {
+            "text": "A candidate must be Lebanese for at least 10 years and aged 25 to 44 when the competition begins. The age must appear in the appointment decree, and no later change to that age is acted on, whatever the reason. The candidate must be medically fit, retain civil rights, hold a Lebanese law degree and have no conviction for a felony or attempted felony, or a dishonourable misdemeanour or attempted misdemeanour. The listed dishonourable offences include theft, fraud, breach of trust, issuing a cheque without funds, embezzlement, bribery, forgery, using forged documents, false testimony, offences against morals and drug offences.",
+            "cites": [
+              "a2",
+              "a3",
+              "a4"
+            ]
+          },
+          {
+            "text": "The successful candidate is appointed a trainee notary by decree on the Justice Minister's proposal and completes a 6-month course at a titular notary's office. Before starting, a notary takes an oath before the Beirut Court of Appeal, deposits specimen signatures and addresses, provides a guarantee, and sets up an office within the territorial area in the appointment decree. Service ends automatically at age 64.",
+            "cites": [
+              "a5",
+              "a6",
+              "a15",
+              "a16"
+            ]
+          },
+          {
+            "text": "The text held here does not cover leave or how an absent or vacant notary post is covered.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "What acts can a notary handle, and what is forbidden?",
+        "paras": [
+          {
+            "text": "Article 22 covers deeds under the Code of Obligations and Contracts and any deed the law does not forbid or reserve by special provision to another public officer. The notary keeps originals and gives copies, accepts and keeps documents and physical deposits, records protests over refusal to accept or pay bills, puts a certified date on instruments presented to him, serves notices and warnings by bailiff and accepts actual tender and deposit under the Code of Civil Procedure. The notary also certifies non-Muslim wills under the 1959 inheritance law, translator signatures and the identity of fingerprint owners, numbers traders' and professionals' books, and takes and keeps fingerprints.",
+            "cites": [
+              "a7",
+              "a8",
+              "a9",
+              "a10"
+            ]
+          },
+          {
+            "text": "Article 37 forbids deeds reserved exclusively by law to another authority, deeds for the notary's relatives up to the 4th degree, keeping more than 1 register for the same type of transaction at the same time, disclosing professional secrets and moving the office or its registers without Ministry approval. Article 38 bars strikes and combining notarial work with public office, paid work, business, industry, journalism, company board membership, parliament or ministry; teaching outside working hours is excepted. Taking one of those roles ends notarial duties automatically. The notary may not leave Lebanon, close the office, be absent or refuse clients without written Ministry approval; illness or a relative's death requires notice to the Ministry the next day and the absence period.",
+            "cites": [
+              "a11",
+              "a12",
+              "a13",
+              "a14"
+            ]
+          },
+          {
+            "text": "Copies or the content of deeds may be given only to the parties, their heirs or those who received rights from them. After a first true copy is given under the stated conditions, only duplicate copies may be issued.",
+            "cites": [
+              "a23"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What steps apply when a deed is made?",
+        "paras": [
+          {
+            "text": "Before drawing up or certifying a deed, the notary verifies the parties' identity, either from personal knowledge stated on the notary's responsibility, the listed identity documents, or adult Lebanese witnesses known to the notary or holding photo IDs. Witnesses must not be related to the parties up to the 4th degree or be deaf-mute. The notary checks capacity, free consent and representatives' authority, and records the required details in the deed.",
+            "cites": [
+              "a17",
+              "a18"
+            ]
+          },
+          {
+            "text": "The deed is written or printed clearly in Arabic. The notary reads it to the parties, witnesses and, when relevant, the interpreter; all present sign, then the notary stamps, dates and signs it. If the notary does not know the parties' language, a sworn interpreter conveys their statements and signs the deed. Deletions, additions and interlineations must be noted in the margin and signed by the notary, parties, witnesses and interpreter, or they are void. The deed names the party and parents, nationality, birthplace and birth date, residence, civil registry number, date, notary and place, interpreter and witnesses, and fees collected; the date and figures are written in words. Pages are numbered, and the number of sheets bound together is written in words at the foot of the last page and signed by the parties, witnesses, interpreter and notary. A party who cannot sign puts a fingerprint. If a disability prevents a party from expressing a will normally, the notary receives the statement before witnesses and the mukhtar, or the party names someone to sign on their behalf before them.",
+            "cites": [
+              "a19",
+              "a20",
+              "a21",
+              "a22"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What evidence value and fees does a deed have?",
+        "paras": [
+          {
+            "text": "A notarial deed has the evidentiary force of an official deed, subject to the conditions in the Code of Civil Procedure.",
+            "cites": [
+              "a24"
+            ]
+          },
+          {
+            "text": "Article 33 sets state fees by an attached table. Besides those fees, the notary takes 30% of collected state fees, 7,000 LBP for preparing each page however many copies are made, and 1,500 LBP for typing each original page however many copies are made. A page is at least 20 lines of 15 words, and a single short or final page counts as full. The rate on contracts registered with the notary for registration in the land registry or commercial register is one per thousand. At a party's request, a visit costs 20,000 LBP within the notary's area or 35,000 LBP outside it. These amounts are printed in the 1994 law and may not reflect current values.",
+            "cites": [
+              "a25",
+              "a26",
+              "a27"
+            ]
+          },
+          {
+            "text": "The attached fee table and current fees in today's lira are not held in this database. Later Ministry of Finance decisions on collection are also not included here.",
+            "note": true
+          },
+          {
+            "text": "The notary must display a detailed fee list, record fees and charges collected for each transaction, and issue a detailed receipt under Article 191 of the Public Accounting Law. Collection rules are set by a Finance Minister decision. A notary who breaches any paragraph of Article 33 is exposed to the penalties in paragraph 1 of Article 15.",
+            "cites": [
+              "a28"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Charges stated in Article 33",
+          "head": [
+            "Charge",
+            "Amount or rate"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Notary's fee: share of state fees collected",
+                "30%"
+              ],
+              "cites": [
+                "a25"
+              ]
+            },
+            {
+              "cells": [
+                "Preparing each page, however many copies",
+                "7,000 LBP"
+              ],
+              "cites": [
+                "a25"
+              ]
+            },
+            {
+              "cells": [
+                "Typing each original page, however many copies",
+                "1,500 LBP"
+              ],
+              "cites": [
+                "a25"
+              ]
+            },
+            {
+              "cells": [
+                "Contracts for land or commercial registers",
+                "One per thousand"
+              ],
+              "cites": [
+                "a26"
+              ]
+            },
+            {
+              "cells": [
+                "Visit within the notary's area / outside it",
+                "20,000 LBP / 35,000 LBP"
+              ],
+              "cites": [
+                "a27"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "How are notaries inspected and disciplined, and what is the Council?",
+        "paras": [
+          {
+            "text": "The Justice Minister appoints up to 3 judges attached to the Ministry of Justice for administrative and financial inspections. Ministry employees of at least the 3rd category may inspect under the Director General, and the Minister may ask the Central Inspection Authority to appoint financial inspectors. Reports go to the Ministry. After reviewing them and considering the seriousness of violations, the Minister imposes 1 of the first 3 penalties or refers the notary to the disciplinary council for civil servants; in that case, the Minister may suspend the notary for up to 6 months. Penalties are a warning, reprimand, suspension for up to 6 months, suspension for 1 to 3 years, or a permanent ban on notarial work.",
+            "cites": [
+              "a29",
+              "a30",
+              "a31"
+            ]
+          },
+          {
+            "text": "Law 337 establishes the Council of Notaries, a professional body with legal personality made up of a General Assembly and an Office. All titular notaries are members; retired notaries may join by applying to the Office. The Office gives an opinion within 10 days on complaints and prosecutions referred by the Justice Minister.",
+            "cites": [
+              "a34",
+              "a35",
+              "a36"
+            ]
+          },
+          {
+            "text": "A notary may be fined 100,000 to 500,000 LBP for a breach of official duties, including negligence in deeds, accounts or fee collection. An intentional breach carries imprisonment for 2 months to 2 years and a fine of 500,000 to 2,000,000 LBP, or either penalty. A harmed person may seek compensation for damage caused by fraud or error, and criminal prosecution for acts arising from notarial duties requires the Justice Minister's permission. These amounts are printed in the 1994 law and may not reflect current values.",
+            "cites": [
+              "a32",
+              "a33"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "الكتّاب العدل في لبنان: قانون 337 لعام 1994",
+    "question": "ماذا يفعل الكاتب العدل في لبنان وماذا ينص قانون الكتاب العدل رقم 337 لعام 1994؟",
+    "description": "دليل إلى دور الكاتب العدل وأعماله ورسومه والتفتيش عليه ومجلس الكتاب العدل بموجب القانون 337 لعام 1994.",
+    "answer": {
+      "text": "يجعل القانون 337 لعام 1994 الكاتب العدل ضابطا عموميا مرتبطا بوزارة العدل ويتقاضى أتعابه من أصحاب العلاقة لا من الدولة. وتشمل المادة 22 الأسناد المنصوص عليها في قانون الموجبات والعقود وكل سند لا يمنعه القانون أو يحصره بنص خاص بموظف عام آخر، إضافة إلى الأعمال التي تعددها، ومنها وضع تاريخ صحيح على الصكوك.",
+      "cites": [
+        "a1",
+        "a7",
+        "a9"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "من يمكن تعيينه كاتبا للعدل ومتى تنتهي مهامه؟",
+        "paras": [
+          {
+            "text": "يشترط أن يكون المرشح لبنانيا منذ 10 سنوات على الأقل، وأن يكون عمره بين 25 و44 سنة عند بدء المباراة. ويجب ذكر عمره في مرسوم التعيين ولا يعمل بأي تعديل لاحق عليه مهما كانت أسبابه. كما يجب أن يكون سليما صحيا، متمتعا بحقوقه المدنية، حائزا إجازة لبنانية في الحقوق، وألا يكون محكوما بجناية أو محاولة جناية أو بجنحة شائنة أو محاولة جنحة شائنة. وتشمل الجرائم الشائنة السرقة والاحتيال وإساءة الأمانة وإصدار شيك بلا رصيد والاختلاس والرشوة والتزوير واستعمال المزور والشهادة الكاذبة والجرائم المخلة بالأخلاق وجرائم المخدرات.",
+            "cites": [
+              "a2",
+              "a3",
+              "a4"
+            ]
+          },
+          {
+            "text": "يعيّن الناجح في المباراة كاتب عدل متدرجا بمرسوم بناء على اقتراح وزير العدل، ويتبع دورة تدريبية مدتها 6 أشهر في دائرة كاتب عدل أصيل. وقبل مباشرة العمل، يؤدي الكاتب العدل اليمين أمام محكمة الاستئناف في بيروت، ويودع نماذج تواقيعه وعناوينه، ويقدم ضمانة، ويتخذ مركزا لدائرته ضمن النطاق المحدد في مرسوم تعيينه. وتنتهي مهامه حكما عند إكماله 64 سنة.",
+            "cites": [
+              "a5",
+              "a6",
+              "a15",
+              "a16"
+            ]
+          },
+          {
+            "text": "لا يتناول النص المتاح الإجازات أو كيفية تغطية غياب الكاتب العدل أو شغور مركزه.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ما الأعمال التي يقوم بها الكاتب العدل وما المحظور عليه؟",
+        "paras": [
+          {
+            "text": "تشمل المادة 22 الأسناد المنصوص عليها في قانون الموجبات والعقود وكل سند لا يمنعه القانون أو يحصره بنص خاص بموظف عام آخر. ويحفظ الكاتب العدل الأصول ويعطي الصور، ويحفظ الوثائق والودائع العينية، وينظم احتجاجات الامتناع عن قبول أو دفع الأوراق التجارية، ويضع تاريخا صحيحا على الصكوك، ويبلغ الإخطارات والإنذارات بواسطة مباشر ويقبل العرض الفعلي والإيداع وفقا لقانون أصول المحاكمات المدنية. كما ينظم ويصدق وصايا غير المحمديين وفقا لقانون الإرث لعام 1959، ويصدق توقيع المترجم، ويرقم دفاتر التجار وأصحاب المهن الحرة، ويأخذ البصمات ويحفظها ويصدق على هوية أصحابها.",
+            "cites": [
+              "a7",
+              "a8",
+              "a9",
+              "a10"
+            ]
+          },
+          {
+            "text": "تحظر المادة 37 تنظيم الأسناد المحصورة قانونا بمرجع آخر، وتنظيم أسناد الأصول والفروع والأقارب حتى الدرجة الرابعة، ومسك أكثر من سجل للنوع نفسه من المعاملات في الوقت عينه، وإفشاء سر المهنة ونقل الدائرة أو سجلاتها دون موافقة الوزارة. وتحظر المادة 38 الإضراب والجمع بين كتابة العدل والوظائف العامة أو المهن والأعمال المأجورة والتجارة والصناعة والصحافة وعضوية مجلس إدارة شركة والنيابة والوزارة، مع استثناء التدريس خارج أوقات الدوام. وتؤدي هذه الوظائف إلى الانقطاع النهائي عن المهام. ولا يجوز مغادرة لبنان أو إقفال المكتب أو التغيب أو الامتناع عن استقبال الزبائن دون موافقة خطية من الوزارة؛ وفي المرض أو وفاة قريب، يبلغ الكاتب العدل الوزارة في اليوم التالي ويحدد مدة غيابه.",
+            "cites": [
+              "a11",
+              "a12",
+              "a13",
+              "a14"
+            ]
+          },
+          {
+            "text": "لا يجوز إعطاء الصور أو مضمون الأسناد إلا لأصحاب العلاقة أو ورثتهم أو من تلقوا الحق عنهم. وبعد إعطاء صورة أولى طبق الأصل وفق الشروط المحددة، لا تعطى لهم لاحقا إلا صور مضاعفة.",
+            "cites": [
+              "a23"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما الخطوات المتبعة عند تنظيم السند؟",
+        "paras": [
+          {
+            "text": "يتثبت الكاتب العدل من هوية المتعاقدين قبل تنظيم السند أو التصديق عليه، إما بمعرفته الشخصية التي يذكرها على مسؤوليته، أو بوثائق الهوية المحددة، أو بشهود لبنانيين راشدين يعرفهم أو يحملون بطاقات هوية عليها رسومهم الشخصية. ولا يجوز أن يكون الشهود من أقارب المتعاقدين حتى الدرجة الرابعة أو مصابين بالبكم والصمم. ويتحقق الكاتب العدل من الأهلية والرضا وصفة الوصي أو الوكيل أو الشريك أو ممثل الشخص المعنوي وصلاحياتهم، ويدون البيانات المطلوبة في السند.",
+            "cites": [
+              "a17",
+              "a18"
+            ]
+          },
+          {
+            "text": "يحرر السند باللغة العربية بخط واضح أو مطبوع. ويتلوه الكاتب العدل على المتعاقدين والشهود والمترجم عند الاقتضاء، ثم يوقع الحاضرون ويختم الكاتب العدل السند ويؤرخه ويوقعه. وإذا جهل لغة المتعاقدين، يتلقى تصريحاتهم بواسطة مترجم محلف يوقع السند. ويشار إلى الشطب أو الإضافة أو التحشية على الهامش ويوقعها الكاتب العدل والمتعاقدون والشهود والمترجم، وإلا اعتبرت لغوا. يذكر السند اسم صاحب العلاقة واسمَي والديه وجنسيته ومحل وتاريخ ولادته وإقامته ورقم سجل نفوسه وتاريخ تنظيمه واسم الكاتب العدل ومكان العمل واسم المترجم والشهود والرسوم المستوفاة؛ ويكتب التاريخ والأرقام بالحروف. ترقم الصفحات ويكتب عدد الأوراق المربوطة بالحروف أسفل الصفحة الأخيرة ويوقع العبارة المتعاقدون والشهود والمترجم والكاتب العدل. ومن لا يعرف توقيع إمضائه يضع بصمة أحد أصابعه. وإذا حالت عاهة دون التعبير الطبيعي عن الإرادة، يتلقى الكاتب العدل التصريح بحضور شهود ومختار المحلة، أو يسمي صاحب العلاقة شخصا يوقع عنه بحضورهم.",
+            "cites": [
+              "a19",
+              "a20",
+              "a21",
+              "a22"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما قيمة السند في الإثبات وكيف تحدد الرسوم؟",
+        "paras": [
+          {
+            "text": "للأسناد التي ينظمها الكاتب العدل القوة الثبوتية الملازمة للأسناد الرسمية ضمن الشروط المنصوص عليها في قانون أصول المحاكمات المدنية.",
+            "cites": [
+              "a24"
+            ]
+          },
+          {
+            "text": "تحدد المادة 33 رسوم الدولة في جدول مرفق. ويستوفي الكاتب العدل إضافة إليها 30% من الرسوم المحصلة، و7,000 ليرة لبنانية عن تنظيم كل صفحة مهما تعددت النسخ، و1,500 ليرة لبنانية عن طباعة كل صفحة أصلية مهما تعددت النسخ. وتتألف الصفحة من 20 سطرا على الأقل، والسطر من 15 كلمة على الأقل، وتعد الصفحة الوحيدة الناقصة أو الأخيرة كاملة. والنسبة على العقود المسجلة لديه المعدة للتسجيل في الدوائر العقارية والسجل التجاري هي واحد بالألف. ويستوفي عند الانتقال بطلب صاحب مصلحة 20,000 ليرة لبنانية ضمن نطاق مركزه أو 35,000 ليرة لبنانية خارجه. هذه المبالغ مطبوعة في قانون 1994 وقد لا تعكس القيم الحالية.",
+            "cites": [
+              "a25",
+              "a26",
+              "a27"
+            ]
+          },
+          {
+            "text": "جدول الرسوم المرفق والرسوم الحالية بالليرة اليوم غير واردين في قاعدة البيانات. كما أن قرارات وزارة المالية اللاحقة بشأن الاستيفاء غير مرفقة هنا.",
+            "note": true
+          },
+          {
+            "text": "يضع الكاتب العدل لائحة مفصلة بالرسوم والأتعاب في مكان بارز، ويدون المبالغ المستوفاة عن كل معاملة ويعطي إيصالا مفصلا وفقا للمادة 191 من قانون المحاسبة العامة. ويحدد وزير المالية أصول الاستيفاء بقرار. ويتعرض الكاتب العدل الذي يخالف أي فقرة من المادة 33 للعقوبات الواردة في الفقرة 1 من المادة 15.",
+            "cites": [
+              "a28"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "المبالغ والرسوم الواردة في المادة 33",
+          "head": [
+            "الرسم",
+            "المبلغ أو النسبة"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "أتعاب الكاتب العدل من رسوم الدولة المحصلة",
+                "30%"
+              ],
+              "cites": [
+                "a25"
+              ]
+            },
+            {
+              "cells": [
+                "تنظيم كل صفحة مهما تعددت النسخ",
+                "7,000 ليرة لبنانية"
+              ],
+              "cites": [
+                "a25"
+              ]
+            },
+            {
+              "cells": [
+                "طباعة كل صفحة أصلية مهما تعددت النسخ",
+                "1,500 ليرة لبنانية"
+              ],
+              "cites": [
+                "a25"
+              ]
+            },
+            {
+              "cells": [
+                "العقود المعدة للتسجيل في الدوائر العقارية والسجل التجاري",
+                "واحد بالألف"
+              ],
+              "cites": [
+                "a26"
+              ]
+            },
+            {
+              "cells": [
+                "الانتقال ضمن نطاق المركز أو خارجه",
+                "20,000 ليرة لبنانية أو 35,000 ليرة لبنانية"
+              ],
+              "cites": [
+                "a27"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "كيف يجري التفتيش والتأديب وما هو مجلس الكتاب العدل؟",
+        "paras": [
+          {
+            "text": "ينتدب وزير العدل ما لا يزيد على 3 قضاة ملحقين بالوزارة للتفتيش الإداري والمالي. ويجوز أن يجريه موظفون من الفئة الثالثة على الأقل بإشراف المدير العام، كما يجوز للوزير طلب تكليف مفتشين ماليين من هيئة التفتيش المركزي. وترفع التقارير إلى وزارة العدل. وبعد الاطلاع عليها ومراعاة أهمية المخالفات، يفرض الوزير إحدى العقوبات الثلاث الأولى أو يحيل الكاتب العدل إلى المجلس التأديبي للموظفين؛ وله في هذه الحالة توقيفه عن العمل مدة لا تزيد على 6 أشهر. والعقوبات هي التنبيه واللوم والتوقيف مدة لا تتجاوز 6 أشهر والتوقيف من سنة إلى 3 سنوات والمنع النهائي من المهنة.",
+            "cites": [
+              "a29",
+              "a30",
+              "a31"
+            ]
+          },
+          {
+            "text": "ينشئ القانون 337 مجلس الكتاب العدل، وهو هيئة مهنية تتمتع بالشخصية المعنوية وتتألف من الجمعية العامة ومكتب المجلس. ينتسب إليه حكما جميع الكتاب العدل الأصيلين، ويجوز للمتقاعدين الانتساب بطلب يقدم إلى المكتب. ويبدي المكتب رأيه خلال 10 أيام في الشكاوى والملاحقات التي يحيلها إليه وزير العدل.",
+            "cites": [
+              "a34",
+              "a35",
+              "a36"
+            ]
+          },
+          {
+            "text": "يعاقب الكاتب العدل على مخالفة أصول الوظيفة، ومنها الإهمال في تنظيم الأسناد أو مسك الحسابات أو استيفاء الرسوم، بغرامة من 100,000 إلى 500,000 ليرة لبنانية. وإذا ارتكب المخالفة قصدا، يعاقب بالحبس من شهرين إلى سنتين وبغرامة من 500,000 إلى 2,000,000 ليرة لبنانية أو بإحدى العقوبتين. ويجوز للمتضرر طلب التعويض عن ضرر الغش أو الغلط، وتتطلب الملاحقة الجزائية عن أعمال الوظيفة ترخيص وزير العدل. هذه المبالغ مطبوعة في قانون 1994 وقد لا تعكس القيم الحالية.",
+            "cites": [
+              "a32",
+              "a33"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

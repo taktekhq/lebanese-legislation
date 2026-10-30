@@ -1,0 +1,96 @@
+{{define "content"}}{{with .Data}}{{$law := .}}
+<section class="wrap dochead" dir="{{if and .TitleEn (eq (uilang) "en")}}ltr{{else}}rtl{{end}}">
+  <a class="back" href="{{u "/laws/"}}" dir="ltr"><span aria-hidden="true">{{backArrow}}</span> {{t "law.back"}}</a>
+  <p class="kicker seps" data-reveal><b lang="ar">{{.Kind}}</b>{{if and .KindEn (eq (uilang) "en")}} <span><bdi>{{.KindEn}}</bdi></span>{{end}}{{if .Number}} <span><bdi>{{t "law.no_prefix" (str .Number)}}</bdi></span>{{end}}{{with .IssuedOn}} <span><bdi>{{date .}}</bdi></span>{{end}}{{with .Code}} <span><bdi>{{.}}</bdi></span>{{end}}</p>
+  {{if and .TitleEn (eq (uilang) "en")}}<div class="subject">
+    <p class="subject__label">{{t "seo.title_en_label"}}</p>
+    <h1 lang="en" data-reveal style="--d:60ms">{{.TitleEn}}</h1>
+    <p class="subject__ar" dir="rtl"><span class="subject__label">{{t "seo.title_ar_label"}}</span> <span lang="ar">{{.Title}}</span></p>
+    <p class="tiny subject__note">{{t "seo.title_en_note"}}</p>
+  </div>{{else}}<h1 lang="ar" data-reveal style="--d:60ms">{{.Title}}</h1>{{end}}
+  {{with .Answer}}<p class="answer" lang="{{uilang}}" dir="{{dir}}">{{.}}</p>{{end}}
+  <div class="btn-row" data-reveal style="--d:120ms">
+    <button class="btn btn--primary btn--sm" type="button" data-cite="{{.Ident}}: {{.Title}}" data-href="{{citeLaw .ID}}">{{t "law.copy_citation"}}</button>
+    {{if .HasFr}}<button class="btn btn--ghost btn--sm" type="button" data-fr-toggle aria-pressed="true">{{t "law.hide_french"}}</button>{{end}}
+  </div>
+  <dl class="facts">
+    <div><dt>{{t "law.type"}}</dt><dd><span lang="ar">{{.Kind}}</span>{{if and .KindEn (eq (uilang) "en")}} &middot; <bdi>{{.KindEn}}</bdi>{{end}}</dd></div>
+    {{if .Number}}<div><dt>{{t "law.number"}}</dt><dd><bdi>{{str .Number}}</bdi></dd></div>{{end}}
+    {{$df := .DateFix "issued_on"}}{{if or .IssuedOn $df}}<div><dt>{{t "law.date"}}</dt><dd>{{with .IssuedOn}}<bdi>{{date .}}</bdi>{{else}}{{t "law.date_unknown"}}{{end}}{{with $df}} <span class="datefix">({{if ne .Method "issue-earlier"}}{{t "law.date_printed" (date .Printed)}}: {{end}}{{t (printf "datefix.%s" .Method)}})</span>{{end}}</dd></div>{{end}}
+    {{if or .GazetteNumber .GazetteDate}}<div><dt>{{t "law.gazette"}}</dt><dd><bdi>{{if .GazetteIssue}}<a class="link" href="{{u (printf "/gazette/%d/" (deref .GazetteIssue))}}">{{end}}{{t "law.gazette_issue" (str .GazetteNumber)}}{{with .GazetteDate}}, {{date .}}{{end}}{{with $law.DateFix "gazette_date"}} <span class="datefix">({{t "law.date_printed" (date .Printed)}}: {{t (printf "datefix.%s" .Method)}})</span>{{end}}{{if .GazettePages}}, {{t "law.page_abbr" (str .GazettePages)}}{{end}}{{if .GazetteIssue}}</a>{{end}}</bdi></dd></div>{{end}}
+    <div><dt>{{t "law.status"}}</dt><dd>{{if .Annulled}}<span class="status status--repealed">{{t "council.status_annulled"}}</span>{{else if .NotInForce}}<span class="status status--repealed">{{t "council.status_not_in_force"}}</span>{{else}}{{template "status" .Status}}{{end}}{{range .RepealedBy}} <bdi>{{t "law.by"}}</bdi> <a class="link" href="{{lawURL .ID}}" lang="ar">{{.Ident}}</a>{{end}}{{range .RepealedByChange}} <bdi>{{t "law.by"}}</bdi> <a class="link" href="{{artURL .By.ID .ByArticle}}" lang="ar">{{.By.Ident}}</a>{{with .Effective}} <bdi>{{t "art.from" (date .)}}</bdi>{{end}}{{end}}</dd></div>
+    {{with .Council}}<div><dt>{{t "law.council"}}</dt><dd>{{range $i, $d := .}}{{if $i}}<br>{{end}}<strong>{{t (printf "council.%s" $d.Effect)}}</strong>, <bdi>{{t "council.decision" $d.Decision (date $d.On)}}</bdi>{{with $d.Articles}}: {{range $j, $a := .}}{{if $j}}, {{end}}<a class="link" href="{{artURL $law.ID $a.Number}}">{{t "art.article_label" $a.Number}}</a>{{if eq $a.Effect "annulled_in_part"}} ({{t "council.in_part"}}){{end}}{{end}}{{end}}. <span lang="{{uilang}}">{{if eq uilang "ar"}}{{$d.Ar}}{{else}}{{$d.En}}{{end}}</span> <a class="link" href="{{$d.SourceURL}}" rel="noopener">{{t "council.source"}} <span aria-hidden="true">&nearr;</span></a>{{end}}</dd></div>{{end}}
+    {{with .LinkGroups}}<div><dt>{{t "law.amended_by"}}</dt><dd>{{range $i, $g := .}}{{if lt $i 8}}{{if $i}}<br>{{end}}<a class="link" href="{{lawURL $g.By.ID}}" lang="ar">{{$g.By.Ident}}</a> <bdi>({{$g.Arts}})</bdi>{{end}}{{end}}{{if gt (len .) 8}}<br><bdi>{{t "law.and_n_more" (num (add (len .) -8))}}</bdi>{{end}}</dd></div>{{else}}    {{with .AmendedBy}}<div><dt>{{t "law.amended_by"}}</dt><dd>{{range $i, $g := .}}{{if lt $i 8}}{{if $i}}<br>{{end}}<a class="link" href="{{lawURL $g.By.ID}}" lang="ar">{{$g.By.Ident}}</a> <bdi>({{$g.Arts}})</bdi>{{end}}{{end}}{{if gt (len .) 8}}<br><bdi>{{t "law.and_n_more" (num (add (len .) -8))}}</bdi>{{end}}</dd></div>{{end}}{{end}}
+    {{with .Affected}}<div><dt>{{t "law.possibly_affected"}}</dt><dd>{{range $i, $f := .}}{{if lt $i 8}}{{if $i}}<br>{{end}}<a class="link" href="{{artURL $f.By.ID $f.ByArticle}}" lang="ar">{{$f.By.Ident}}</a> <bdi>{{t "law.possibly_affected_note" $f.ByArticle}}</bdi>{{end}}{{end}}{{if gt (len .) 8}}<br><bdi>{{t "law.and_n_more" (num (add (len .) -8))}}</bdi>{{end}}</dd></div>{{end}}
+    {{with .AmendsGroups}}<div><dt>{{t "law.amends"}}</dt><dd>{{range $i, $g := .}}{{if $i}}<br>{{end}}<a class="link" href="{{lawURL $g.By.ID}}" lang="ar">{{$g.By.Ident}}</a>{{with $g.By.Code}} <bdi>{{.}}</bdi>{{end}} <bdi>({{$g.Arts}})</bdi>{{end}}</dd></div>{{end}}
+    <div><dt>{{t "law.follow"}}</dt><dd><a class="link" href="{{u (printf "/law/%d/feed.xml" .ID)}}">{{t "law.follow_feed"}}</a></dd></div>
+    {{if .Articles}}<div><dt>{{t "law.articles"}}</dt><dd><bdi>{{num .Articles}}</bdi></dd></div>{{end}}
+    <div><dt>{{t "law.cite_as"}}</dt><dd lang="ar">{{.Ident}}{{if ne .CiteName .Ident}} ({{.CiteName}}){{end}}</dd></div>
+    {{if .Scan}}<div><dt>{{t "law.source"}}</dt><dd><a class="link" href="#pages">{{t "law.scan_source_link"}}</a></dd></div>{{else}}{{with .Source}}<div><dt>{{t "law.source"}}</dt><dd><a class="link" href="{{.}}" rel="noopener" dir="ltr">{{t "law.source_link"}} <span aria-hidden="true">&nearr;</span></a></dd></div>{{end}}{{end}}
+  </dl>
+  {{if .Scan}}<p class="scannote" lang="{{uilang}}" dir="{{dir}}"><b>{{t "law.scan_title"}}</b> {{t "law.scan_body"}}</p>{{end}}
+</section>
+
+{{if .Parts}}
+<section class="wrap">
+  <nav class="lawparts" aria-label="{{t "law.parts"}}" lang="{{uilang}}" dir="{{dir}}">
+    <p class="tiny">{{t "law.parts_intro" (num (len .Parts))}}</p>
+    <ul>{{range .Parts}}<li>{{if .Current $law.Part}}<b aria-current="page">{{t "law.part_label" (num .N) (str .First) (str .Last)}}</b>{{else}}<a class="link" href="{{u .Path}}">{{t "law.part_label" (num .N) (str .First) (str .Last)}}</a>{{end}}</li>{{end}}</ul>
+  </nav>
+</section>
+{{end}}
+{{if .Items}}
+<section class="wrap">
+<div class="lawbody" dir="rtl">
+  <aside class="lawside">
+    <form class="goto" data-goto{{if .Parts}} data-split{{end}} action="{{u (printf "/law/%d/go/" .ID)}}" role="search" dir="rtl">{{if .Parts}}<input type="hidden" name="s" value="1">{{end}}
+      <label for="goto-n">{{t "law.goto_label"}}</label>
+      <div class="goto__row">
+        <input id="goto-n" name="n" placeholder="رقم المادة" autocomplete="off" enterkeyhint="go" dir="auto">
+        <button class="btn btn--primary btn--sm" type="submit">{{t "law.goto_button"}}</button>
+      </div>
+      <p class="goto__msg" data-goto-msg role="status" hidden></p>
+    </form>
+    {{if .Sections}}<nav class="lawtoc" aria-label="{{t "law.contents"}}" lang="ar">
+    <h2>{{t "law.contents"}}</h2>
+    <ol>{{range .Sections}}<li data-depth="{{depth .Depth}}"><a href="{{with $law.SectionPartPath .ID}}{{u .}}{{end}}#s-{{.ID}}">{{heading .Heading}}</a></li>{{end}}</ol>
+  </nav>{{end}}
+  </aside>
+  <div class="lawtext" data-lawtext lang="ar">
+    {{with .Preamble}}<div class="lawend" style="margin:0 0 28px">{{range paras .}}<p>{{marks .}}</p>{{end}}</div>{{end}}
+    {{range .Items}}{{if .Chapter}}<h2 class="chapter" id="s-{{.Chapter.ID}}" data-depth="{{depth .Chapter.Depth}}">{{heading .Chapter.Heading}}</h2>{{with .Chapter.Note}}<p class="art__note chapter__note">{{.}}</p>{{end}}{{else}}{{template "article" (dict2 $law .Article false)}}{{end}}{{end}}
+    {{with .Closing}}<div class="lawend lawend--closing">{{range paras .}}<p>{{marks .}}</p>{{end}}</div>{{end}}
+  </div>
+</div>
+</section>
+{{else}}
+<section class="wrap" style="padding-block:40px 0">
+  {{if or .Preamble .ExplanatoryNote}}
+  <div class="longtext" lang="ar" dir="rtl" style="padding-top:0">{{with .Preamble}}{{range paras .}}<p>{{marks .}}</p>{{end}}{{end}}{{with .ExplanatoryNote}}{{range paras .}}<p>{{marks .}}</p>{{end}}{{end}}</div>
+  {{else}}
+  <p class="nottext"><b>{{t "law.text_coming"}}</b> {{if .Source}}{{t "law.text_coming_body" (safe (printf "<a class=\"link\" href=\"%s\" rel=\"noopener\">%s</a>" .Source (t "law.text_coming_link")))}}{{else}}{{t "law.text_coming_body" (t "law.text_coming_link")}}{{end}}</p>
+  {{end}}
+</section>
+{{end}}
+
+{{with .Scan}}
+<section class="wrap sec" id="pages">
+  <div class="sec__head"><div><p class="eyebrow">{{t "law.scan_pages_eyebrow"}}</p><h2 class="sec__title">{{t "law.scan_pages_title"}}</h2></div><a class="sec__more" href="/scan/{{$law.ID}}/source.pdf" rel="noopener">PDF</a></div>
+  <div class="scanpages">{{range .PageNumbers}}<a href="/scan/{{$law.ID}}/page-{{.}}.png" rel="noopener"><img src="/scan/{{$law.ID}}/page-{{.}}.png" alt="{{t "law.scan_page_alt" (num .)}}" loading="lazy"></a>{{end}}</div>
+  <p class="scancredit" lang="{{uilang}}" dir="{{dir}}">{{t "law.scan_credit" .SourceName .AgreementPct}}</p>
+</section>
+{{end}}
+{{if .CitedBy}}
+<section class="wrap sec">
+  <div class="sec__head"><div><p class="eyebrow">{{t "law.case_law_eyebrow"}}</p><h2 class="sec__title">{{t "law.case_law_title"}}</h2></div>{{if gt .CitedCount (len .CitedBy)}}<span class="sec__more">{{t "law.case_law_count" (num .CitedCount)}}</span>{{end}}</div>
+  <ul class="doclist">{{range .CitedBy}}{{template "docrow" .}}{{end}}</ul>
+</section>
+{{end}}
+{{if .Related}}
+<section class="wrap sec">
+  <div class="sec__head"><div><p class="eyebrow">{{t "law.related_eyebrow"}}</p><h2 class="sec__title">{{t "law.related_title"}}</h2></div>{{with .IssuedOn}}<a class="sec__more" href="{{u (printf "/laws/year/%d/" .Year)}}">{{.Year}}</a>{{end}}</div>
+  <ul class="doclist">{{range .Related}}<li><a class="link" href="{{lawURL .ID}}" lang="ar">{{.Ident}}</a> <span lang="ar">{{.Title}}</span></li>{{end}}</ul>
+</section>
+{{end}}
+<div style="height:var(--section-y)"></div>
+{{end}}{{end}}

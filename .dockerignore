@@ -1,0 +1,17 @@
+**
+!go.mod
+!go.sum
+!cmd/
+!cmd/**
+!internal/
+!internal/**
+!Dockerfile
+**/.env
+**/.env.*
+**/.dev.vars*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.jsonl
+**/node_modules
+**/.git

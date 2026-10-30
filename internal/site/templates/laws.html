@@ -1,0 +1,16 @@
+{{define "content"}}{{with .Data}}
+<section class="wrap page">
+  {{if .Back}}<a class="back" href="{{u .Back}}"><span aria-hidden="true">{{backArrow}}</span> {{.BackLabel}}</a>{{else}}<a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>{{end}}
+  <p class="eyebrow" data-reveal>{{if .Eyebrow}}{{.Eyebrow}}{{else}}{{t "laws.eyebrow"}} &middot; <span lang="ar">التشريعات</span>{{end}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{if .Heading}}{{.Heading}}{{else}}{{t "laws.h1"}}{{end}}</h1>
+</section>
+<section class="wrap">
+  {{with .Updated}}<p class="updated"><time datetime="{{.ISO}}">{{.Label}}</time></p>{{end}}
+  <h2 class="sr-only">{{t "seo.h2_filters"}}</h2>
+  {{template "filters" .}}
+  <div class="listhead"><h2 class="finder__count">{{plural .Total "text" "texts"}}, {{t "laws.newest_first"}}</h2>{{if not .Heading}}<a class="sec__more" href="{{u "/laws/years/"}}">{{t "laws.browse_by_year"}} <span class="arrow" aria-hidden="true">{{fwdArrow}}</span></a>{{end}}</div>
+  <ul class="doclist">{{range .Rows}}{{template "lawrow" .}}{{end}}</ul>
+  {{template "pager" .}}
+</section>
+<div style="height:var(--section-y)"></div>
+{{end}}{{end}}

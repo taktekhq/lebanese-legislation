@@ -1,0 +1,13 @@
+{{define "content"}}{{with .Data}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <p class="eyebrow" data-reveal>{{t "topics.eyebrow"}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{t "topics.title"}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{t "topics.lead"}}</p>
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <div class="codes topiclist" data-reveal>{{range .}}
+    <a class="code" href="{{u (printf "/topic/%s/" .Slug)}}"><b>{{.Title}}</b><span>{{.Question}}</span></a>{{end}}
+  </div>
+</section>
+{{end}}{{end}}

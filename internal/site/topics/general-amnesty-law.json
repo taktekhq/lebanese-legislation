@@ -1,0 +1,430 @@
+{
+  "slug": "general-amnesty-law",
+  "order": 23,
+  "published": "2026-10-21",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 2000200481,
+      "article": "1",
+      "quote": "يمنح عفو عام عن الجرائم المرتكبة قبل تاريخ ١ آذار ٢٠٢٦، ويستفيد منه جميع من ساهموا في ارتكابها، سواء بصفتهم فاعلين أم شركاء أم متدخلين أم محرّضين أم مخبّئين، وفقاً للتعريفات الواردة في قانون العقوبات."
+    },
+    {
+      "id": "a2",
+      "law": 2000200481,
+      "article": "1",
+      "quote": "ويؤدي العفو العام إلى سقوط الدعوى العامة وإلى محو العقوبات الأصلية المحكوم بها، كما تسقط جميع الملاحقات والأحكام والقرارات بما فيها الإدارية التي صدرت بحق موظفين بغير تُهم الفساد المالي، سواء كانت وجاهية أم غيابية أم بمثابة الوجاهية."
+    },
+    {
+      "id": "a3",
+      "law": 2000200481,
+      "article": "2",
+      "quote": "يُستثنى من العفو العام الجرائم التالية سواء صدرت الأحكام أم لم تصدر:\n\n١ - الجرائم التي أحيلت على المجلس العدلي.\n\n٢ - القتل عمداً أو قصداً والجرائم الواردة في قانون الإرهاب الصادر في تاريخ ١٩٥٨/١/١١ بحق المدنيين أو العسكريين وجميع عناصر القوى الأمنية."
+    },
+    {
+      "id": "a4",
+      "law": 2000200481,
+      "article": "2",
+      "quote": "٣ - الجرائم العسكرية المنصوص عنها في الباب الثاني الكتاب الثالث والجرائم الشائنة المنصوص عليها في المادة ١٠٥ من قانون القضاء العسكري رقم ٢٤ تاريخ ١٩٦٨/٤/١٣.\n\n٤ - جرائم الخيانة والتجسس والجرائم المتعلقة بالصلات غير المشروعة بالعدو باستثناء المشمولين بالفقرة ٢ من المادة الوحيدة من القانون رقم ١٩٤ تاريخ ٢٠١١/١١/١٨ الذين يعتبرون مستفيدين حكماً من قانون العفو العام الحالي."
+    },
+    {
+      "id": "a5",
+      "law": 2000200481,
+      "article": "2",
+      "quote": "٥ - لا يستفيد من قانون العفو مرتكبو جنايات التكرار بالمخدرات التي تزيد عن المرة الثانية، والمرتكبة قبل صدور هذا القانون، سواء صدرت ام لم تصدر بها أحكام قضائية.\n\n- جميع جرائم المخدرات المرتكبة من قبل العسكريين وعناصر المؤسسات الأمنية.\n\n- تعتبر جرائم زراعة المواد المخدرة مشمولة بهذا العفو في حال كانت مرتكبة قبل صدور هذا القانون."
+    },
+    {
+      "id": "a6",
+      "law": 2000200481,
+      "article": "2",
+      "quote": "٦ - الجرائم المتعلقة بجميع أنواع التعدي الخاضعة للملاحقة والتي لا تزال مستمرة بتاريخ صدور هذا القانون والواقعة على:\n\n- الأملاك العامة للدولة على أنواعها.\n\n- الأملاك العامة للبلديات.\n\n- المشاعات البلدية والأهلية والأميرية.\n\n- الأملاك العامة التابعة لمؤسسات عامة.\n\n- الأملاك والمنشآت الخاصة بالدولة.\n\nلا يشمل العفو الغرامات المقررة على المخالفات السابقة على هذا القانون."
+    },
+    {
+      "id": "a7",
+      "law": 2000200481,
+      "article": "2",
+      "quote": "٧ - الجرائم الواقعة على المال العام.\n\n٨ - جرائم التزوير وتقليد النقد الوطني والاجنبي وترويجه والنيل من مكانة الدولة المالية، وجرائم الإفلاس الاحتيالي، والجرائم المنصوص عليها في قانون النقد والتسليف، وسائر القوانين والأنظمة المتعلقة بالمصارف."
+    },
+    {
+      "id": "a8",
+      "law": 2000200481,
+      "article": "2",
+      "quote": "٩ - جرائم الإثراء غير المشروع الواردة بالقانون رقم ١٨٩ تاريخ ٢٠٢٠/١٠/١٦، المتعلقة باختلاس الأموال العمومية أو بإساءة الأمانة بها أو سرقتها أو بالأموال العائدة إلى المؤسسات المالية والمصرفية، والتهرب الضريبي.\n\n١٠ - الجرائم المنصوص عنها في قانون مكافحة تبييض الأموال وتمويل الإرهاب رقم ٢٠١٥/٤٤، والجرائم المخالفة لقانون النقد والتسليف أيّاً كان مرتكبوها لا سيّما الجرائم المرتبطة بأموال المودعين والجرائم المتعلقة بالجرائم المصرفية على أنواعها."
+    },
+    {
+      "id": "a9",
+      "law": 2000200481,
+      "article": "2",
+      "quote": "١١ - الجرائم المنصوص عنها في القوانين المتعلقة بالآثار.\n\n١٢ - جرائم الاغتصاب وسفاح القربى والاتجار بالبشر والعنف الأسري والاعتداء الجنسي على القُصّر وأحكام قانون معاقبة التعذيب وغيره من ضروب المعاملة أو العقوبة القاسية أو اللاانسانية أو المهينة رقم ٦٥ / ٢٠١٧٢٠١٧/٦٥ وقانون المفقودين والمخفيين قسراً رقم ١٠٥ / ٢٠١٨.٢٠١٨/١٠٥."
+    },
+    {
+      "id": "a10",
+      "law": 2000200481,
+      "article": "2",
+      "quote": "١٣ - جرائم السرقة وفقاً للآتي:\n\n• الجنايات في حال تكرار المُلاحقات أو الأحكام أكثر من مرتين\n\n• الجنح في حال تكرار المُلاحقات أو الأحكام أكثر من ثلاث مرات\n\n١٤ - الجرائم البيئية المنصوص عنها في قانون حماية البيئة رقم ٤٤٤ تاريخ ٢٠٠٢/٧/٢٩ والنصوص ذات الصلة."
+    },
+    {
+      "id": "a11",
+      "law": 2000200481,
+      "article": "3",
+      "quote": "خلافاً لأي نص آخر وفي الجرائم التي صدرت أو لم يصدر فيها أحكام التي حصلت قبل تاريخ نفاذ هذا القانون، ولم يشملها العفو تستبدل مدة العقوبات على الشكل الآتي:\n\n١ - عقوبة الإعدام تصبح ٢٨ سنة سجنية.\n\n٢ - الأشغال الشاقة المؤبدة تصبح ١٧ سنة سجنية.\n\n٣ - سائر العقوبات المتبقية يُخفض ثلثها."
+    },
+    {
+      "id": "a12",
+      "law": 2000200481,
+      "article": "3",
+      "quote": "وفي جرائم القتل العمدي أو القصدي المقترنة أو المصاحبة بالظروف المشددة الآتية:\n\n- الاغتصاب أو الاعتداء الجنسي.\n\n- إذا ارتكبها أحد الاصول أو الفروع أو من له سلطة أو ولاية أو وصاية على الضحية.\n\n- إذا اقترنت بالتعذيب أو الوحشية أو التشويه أو الخطف.\n\n- إذا ارتكبت في إطار الاغتيال السياسي.\n\nوكان المتضرر قد اتخذ صفة الادعاء الشخصي قبل ٢٠٢٦/٣/١، فلا يستفيد المحكوم من التخفيض إلا بعد اسقاط الحق الشخصي."
+    },
+    {
+      "id": "a13",
+      "law": 2000200481,
+      "article": "4",
+      "quote": "يبقى حق النظر بالحقوق الشخصية الناجمة عن جرم شمله العفو الكامل أو مرور الزمن أو تخفيض العقوبات، من اختصاص المحاكم الجزائية إذا كانت الدعوى العامة قدمت مباشرة إلى المراجع الجزائية أو أحيلت إليها قبل العمل بهذا القانون.\n\nأما دعاوى الحق الشخصي الأخرى الناجمة عن جرم جزائي شمله العفو الكامل أو مرور الزمن، فتفصل فيها المحاكم المدنية أو الإدارية المختصة وتطبق بشأنها قوانين الرسوم المعمول بها في الدعاوى المدنية أمام القضاء الجزائي.\n\nيحق للمدعي عند تنفيذ الحكم بالتعويض الصادر عن المحاكم الجزائية أو العادية أن يطلب حبس المحكوم عليه إكراهاً، وفقاً لأحكام قانون أصول المحاكمات الجزائية وقانون العقوبات."
+    },
+    {
+      "id": "a14",
+      "law": 2000200481,
+      "article": "5",
+      "quote": "استثنائياً وفي كل الجرائم المرتكبة قبل تاريخ ٢٠٢٦/٣/١ والتي لم يصدر أي حكم فيها، وفي حال تجاوزت مدة التوقيف ١٢ سنة سجنية، يخلى سبيل المدعى عليه حكماً وتستمر محاكمته وفقاً للأصول القانونية."
+    },
+    {
+      "id": "a15",
+      "law": 2000200481,
+      "article": "6",
+      "quote": "في حال إرتكب المستفيد من هذا القانون جنحة بعد تاريخ نشر القانون، تُشدد عقوبته في الجرم الجديد وفقاً لأحكام المادة ٢٥٧ من قانون العقوبات.\n\nأما في حال ارتكابه جنايةً بعد تاريخ نشر هذا القانون، يسقط عنه العفو وتستأنف عقوبته أو محاكمته من المرحلة التي كان فيها قبل صدور هذا القانون بالإضافة إلى محاكمته بالجرم الجديد المُرتكب."
+    },
+    {
+      "id": "a16",
+      "law": 244611,
+      "article": "257",
+      "quote": "اذا لم يعين القانون مفعول سبب مشدد, اوجب السبب المذكور تشديد العقوبة على الوجه التالي:\n\nيبدل الاعدام من الاشغال الشاقة المؤبدة وتزاد كل عقوبة موقتة من الثلث الى النصف وتضاعف الغرامة."
+    },
+    {
+      "id": "a17",
+      "law": 2000200481,
+      "article": "7",
+      "quote": "بالنسبة إلى غير اللبنانيين، أي شخص يستفيد من أحكام هذا القانون يُسلّم فور إخراجه من السجن إلى المديرية العامة للأمن العام لإجراء المقتضى وفق الأصول القانونية."
+    },
+    {
+      "id": "a18",
+      "law": 2000200481,
+      "article": "8",
+      "quote": "لا تُرد الرسوم والتأمينات والغرامات التي تم استيفاؤها والأشياء الممنوعة قانوناً التي تمت مصادرتها أو ضبطها في كل الدعاوى التي شملها العفو."
+    },
+    {
+      "id": "a19",
+      "law": 2000200481,
+      "article": "9",
+      "quote": "بصورة استثنائية، يُعفى جميع المحكومين الذين أمضوا مدة عقوبتهم قبل تاريخ نشر هذا القانون وما زالوا مسجونين لعدم تسديد الغرامات المالية التي حُكموا بها، من جميع الغرامات والرسوم من أي نوع كانت ليصار إلى إخراجهم من السجن."
+    },
+    {
+      "id": "a20",
+      "law": 2000200481,
+      "article": "10",
+      "quote": "لمرة واحدة وحصراً ولدواعي تطبيق هذا القانون تُعدل المادة ٢٠٥ من قانون العقوبات لتصبح\n\nعلى النحو التالي:\n\nباستثناء المحكومين بعقوبة الإعدام أو المؤبد التي لا تخضع للجمع، إذا ثبتت عدة جنايات أو جنح قضي بعقوبة لكل جريمة ونفذت العقوبة الأشد دون سواها.\n\nعلى أنه يمكن الجمع بين العقوبات المحكوم بها بحيث لا تزيد مجموع العقوبات المؤقتة على أقصى العقوبة المعينة للجريمة الأشد إلا بمقدار ربعها."
+    },
+    {
+      "id": "a21",
+      "law": 2000200481,
+      "article": "11",
+      "quote": "يُعمل بهذا القانون فور نشره في الجريدة الرسمية."
+    },
+    {
+      "id": "a22",
+      "law": 231386,
+      "article": "1",
+      "quote": "اما اذا كانت العقوبة المقضي بها هي الحبس سنة فأكثر فإن هذه السنة تحتسب تسعة اشهر من يوم الى مثله وفقاً للتقويم الغربي.\n\nلا يستفيد من احكام هذا النص المحكومون بعقوبات غير محددة المدة، كما لا يستفيد من احكام هذا النص بعد نفاذ القانون، معتادو الاجرام والمكررون المعرّفون وفقاً لأحكام المادة 258 وما يليها من قانون العقوبات على ان ينص الحكم او القرار الجاري تنفيذه على هذا الوصف"
+    },
+    {
+      "id": "a23",
+      "law": 2000200346,
+      "article": "1",
+      "quote": "تلغى عقوبة الإعدام أينما ورد النص عليها في القوانين اللبنانية."
+    },
+    {
+      "id": "a24",
+      "law": 2000200346,
+      "article": "3",
+      "quote": "أما الجرائم المرتكبة قبل نفاذ هذا القانون فتستبدل فيها عقوبة الإعدام بالعقوبة التي تليها مباشرة، وهي عقوبة الأشغال الشاقة المؤبدة."
+    },
+    {
+      "id": "a25",
+      "law": 2000200346,
+      "article": "5",
+      "quote": "أ - يشمل إلغاء عقوبة الإعدام جميع القرارات القضائية التي سبق وصدرت بحق المحكوم عليهم بها قبل تاريخ صدور هذا القانون الذين لم يتم تنفيذ أحكام الإعدام بهم، وتستبدل عقوبتهم بعقوبة الأشغال الشاقة المؤبدة."
+    }
+  ],
+  "en": {
+    "title": "The general amnesty law of 2026 (Law 70): what it covers and what it excludes",
+    "question": "What does Lebanon's general amnesty law (Law 70 of 2026) cover, which crimes does it exclude, and what happens to sentences it does not erase?",
+    "description": "A guide to the crimes covered and excluded by Law 70, sentence reductions, claims, release and other effects.",
+    "answer": {
+      "text": "Law 70 grants amnesty for crimes committed before 1 March 2026, ending public prosecutions and erasing original sentences, subject to Article 2's exclusions whether or not judged. For crimes not amnestied, Article 3 sets death sentences at 28 prison years, life hard labour at 17, and reduces other sentences by one third; Law 68 of 2026 had already abolished the death penalty and replaced earlier and unexecuted death sentences with life hard labour. This is a guide to the published text; a lawyer should read the law and judgment for a specific case, and this page does not say how a court combines Law 68 with Article 3 of Law 70.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a11",
+        "a23",
+        "a24",
+        "a25"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "What does the amnesty cover?",
+        "paras": [
+          {
+            "text": "Law 70 covers crimes committed before 1 March 2026 and extends to everyone who took part as a perpetrator, partner, participant, instigator or concealer. It ends the public prosecution and erases original sentences, subject to Article 2's exclusions.",
+            "cites": [
+              "a1",
+              "a2"
+            ]
+          },
+          {
+            "text": "The law also cancels prosecutions, judgments and decisions, including administrative decisions against employees, except those for financial corruption charges.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "Law 70 took effect when published in the Official Gazette. Article 3 uses that effective date for sentence reductions.",
+            "cites": [
+              "a21",
+              "a11"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "Which crimes are excluded?",
+        "paras": [
+          {
+            "text": "Article 2 excludes the following whether or not judgments were issued: crimes referred to the Justice Council; intentional or deliberate killing and crimes under the Terrorism Law of 11 January 1958 against civilians, military personnel or any security-force members; military crimes in Part Two, Book Three, and dishonourable crimes under Article 105 of Military Justice Law 24 of 1968; treason, espionage and unlawful links to the enemy. Persons covered by paragraph 2 of the sole article of Law 194 of 2011 are deemed beneficiaries of this amnesty by operation of law.",
+            "cites": [
+              "a3",
+              "a4"
+            ]
+          },
+          {
+            "text": "It excludes repeat drug felonies beyond the second time and all drug crimes by military and security personnel. Drug cultivation before the law is covered. It also excludes actionable encroachment still continuing when the law was issued on state public property of all kinds, municipal public property, municipal, communal and amiri commons, public property of public institutions, and the state's private property and facilities. The amnesty does not cover fines for earlier violations.",
+            "cites": [
+              "a5",
+              "a6"
+            ]
+          },
+          {
+            "text": "Other exclusions are crimes against public funds; forgery; counterfeiting and circulating national and foreign currency; harming the state's financial standing; fraudulent bankruptcy; crimes under monetary and banking laws; illicit enrichment under Law 189 of 2020 concerning embezzlement, breach of trust or theft of public funds or funds belonging to financial and banking institutions, and tax evasion; crimes under Anti-Money Laundering and Terrorist Financing Law 44 of 2015 and Monetary and Credit Law violations by anyone, especially crimes linked to depositors' funds and banking crimes of all kinds; antiquities crimes; rape, incest, human trafficking, domestic violence, sexual assault on minors, torture and enforced disappearance; repeated theft, meaning felonies with more than 2 repeated prosecutions or judgments and misdemeanours with more than 3; and environmental crimes under Law 444 of 2002 and related texts.",
+            "cites": [
+              "a7",
+              "a8",
+              "a9",
+              "a10"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "How are sentences reduced?",
+        "paras": [
+          {
+            "text": "For crimes committed before Law 70 took effect and not covered by the amnesty, Article 3 sets a death sentence at 28 prison years, life hard labour at 17 prison years, and reduces other remaining sentences by one third. Law 68 of 2026 abolishes the death penalty and replaces death sentences for earlier crimes and unexecuted death sentences already passed with life hard labour. Law 216 of 2012 counts a prison year as 9 months for imprisonment of one year or more, but not for indefinite sentences or habitual offenders and recidivists under Penal Code Article 258 and following where the judgment or decision being executed states that status. This page does not say how a court combines Law 68 with Article 3 of Law 70.",
+            "cites": [
+              "a11",
+              "a22",
+              "a23",
+              "a24",
+              "a25"
+            ]
+          },
+          {
+            "text": "For intentional or deliberate killing with rape or sexual assault, commission by an ascendant, descendant or person with authority or guardianship over the victim, torture, brutality, mutilation, kidnapping or political assassination, a convicted person receives no reduction until the injured party waives the personal right, if that party filed a personal claim before 1 March 2026.",
+            "cites": [
+              "a12"
+            ]
+          },
+          {
+            "text": "For this one time only and for applying Law 70, where several felonies or misdemeanours are proved, a sentence is pronounced for each and only the heaviest is executed, except death or life sentences, which are not aggregated. Sentences may be aggregated, but total temporary sentences cannot exceed the maximum for the most serious crime by more than one quarter.",
+            "cites": [
+              "a20"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What happens to personal claims?",
+        "paras": [
+          {
+            "text": "A personal claim arising from a crime covered by full amnesty, prescription or sentence reduction remains with the criminal courts if the public case was filed directly there or referred there before Law 70 took effect. Other personal claims arising from a crime covered by full amnesty or prescription go to the competent civil or administrative courts, applying the fee rules for civil claims before criminal courts. A claimant may seek coercive imprisonment when enforcing compensation awarded by criminal or ordinary courts.",
+            "cites": [
+              "a13"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What about detention, later crimes, foreigners and payments?",
+        "paras": [
+          {
+            "text": "For a crime committed before 1 March 2026 with no judgment, a defendant detained for more than 12 prison years must be released by operation of law, while the trial continues.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "A beneficiary who commits a misdemeanour after publication receives an aggravated sentence for the new crime under Penal Code Article 257: temporary sentences increase by one third to one half and fines double. A beneficiary who commits a felony after publication loses the amnesty; the earlier sentence or trial resumes from its previous stage, alongside trial for the new crime. A non-Lebanese beneficiary is handed to General Security on release.",
+            "cites": [
+              "a15",
+              "a16",
+              "a17"
+            ]
+          },
+          {
+            "text": "Law 70 provides that collected fees, deposits and fines, and confiscated or seized prohibited objects, are not returned in amnestied cases. It exempts people who completed their sentences before publication but remain imprisoned because of unpaid fines from all fines and fees, so they can be released.",
+            "cites": [
+              "a18",
+              "a19"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "قانون العفو العام لعام 2026 (القانون 70): ما يشمله وما يستثنيه",
+    "question": "ماذا يشمل قانون العفو العام في لبنان (القانون 70 لعام 2026) وما الجرائم المستثناة منه وماذا يحدث للعقوبات التي لا يمحوها؟",
+    "description": "دليل إلى الجرائم المشمولة والمستثناة في القانون 70 وتخفيض العقوبات والحقوق الشخصية وآثار أخرى.",
+    "answer": {
+      "text": "يمنح القانون 70 عفواً عن الجرائم المرتكبة قبل 1 آذار 2026، فيسقط الدعوى العامة ويمحو العقوبات الأصلية، مع استثناءات المادة 2 سواء صدرت أحكام أم لم تصدر. وفي الجرائم غير المشمولة، تحدد المادة 3 عقوبة الإعدام بـ28 سنة سجنية والأشغال الشاقة المؤبدة بـ17 سنة وتخفض سائر العقوبات بمقدار الثلث؛ وكان القانون 68 لعام 2026 قد ألغى عقوبة الإعدام واستبدل أحكام الإعدام للجرائم السابقة والأحكام الصادرة غير المنفذة بالأشغال الشاقة المؤبدة. هذا دليل إلى النص المنشور؛ وعلى المحامي قراءة القانون والحكم في الحالة المحددة، ولا توضح الصفحة كيف تجمع المحكمة بين القانون 68 والمادة 3 من القانون 70.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a11",
+        "a23",
+        "a24",
+        "a25"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "ما الجرائم التي يشملها العفو؟",
+        "paras": [
+          {
+            "text": "يشمل القانون 70 الجرائم المرتكبة قبل 1 آذار 2026، ويستفيد منه كل من ساهم فيها بصفته فاعلاً أو شريكاً أو متدخلاً أو محرّضاً أو مخبّئاً. يسقط العفو الدعوى العامة ويمحو العقوبات الأصلية، مع مراعاة استثناءات المادة 2.",
+            "cites": [
+              "a1",
+              "a2"
+            ]
+          },
+          {
+            "text": "كما يسقط الملاحقات والأحكام والقرارات، بما فيها الإدارية، الصادرة بحق موظفين ما لم تكن متعلقة بتهم الفساد المالي.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "يُعمل بالقانون 70 فور نشره في الجريدة الرسمية، ويستخدم هذا التاريخ لنفاذ تخفيضات المادة 3.",
+            "cites": [
+              "a21",
+              "a11"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما الجرائم المستثناة؟",
+        "paras": [
+          {
+            "text": "تُستثنى الجرائم التالية سواء صدرت أحكام أم لم تصدر: الجرائم المحالة إلى المجلس العدلي؛ والقتل عمداً أو قصداً وجرائم قانون الإرهاب الصادر في 11 كانون الثاني 1958 المرتكبة بحق المدنيين أو العسكريين أو أي من عناصر القوى الأمنية؛ والجرائم العسكرية في الباب الثاني من الكتاب الثالث والجرائم الشائنة بموجب المادة 105 من قانون القضاء العسكري 24 لعام 1968؛ والخيانة والتجسس والصلات غير المشروعة بالعدو. ويُعد المشمولون بالفقرة 2 من المادة الوحيدة للقانون 194 لعام 2011 مستفيدين حكماً من هذا العفو.",
+            "cites": [
+              "a3",
+              "a4"
+            ]
+          },
+          {
+            "text": "وتُستثنى جنايات تكرار المخدرات التي تزيد على المرة الثانية، وكل جرائم المخدرات التي يرتكبها العسكريون وعناصر المؤسسات الأمنية. أما زراعة المخدرات المرتكبة قبل صدور القانون فهي مشمولة. ويُستثنى التعدي الخاضع للملاحقة والمستمر بتاريخ صدور القانون على الأملاك العامة للدولة على أنواعها، والأملاك العامة للبلديات، والمشاعات البلدية والأهلية والأميرية، والأملاك العامة للمؤسسات العامة، والأملاك والمنشآت الخاصة بالدولة. ولا يشمل العفو غرامات المخالفات السابقة.",
+            "cites": [
+              "a5",
+              "a6"
+            ]
+          },
+          {
+            "text": "وتشمل بقية الاستثناءات الجرائم الواقعة على المال العام؛ والتزوير؛ وتقليد العملة الوطنية أو الأجنبية وترويجها؛ والنيل من مكانة الدولة المالية؛ والإفلاس الاحتيالي؛ وجرائم النقد والتسليف والمصارف؛ والإثراء غير المشروع بموجب القانون 189 لعام 2020 المتعلق باختلاس الأموال العامة أو إساءة الأمانة بها أو سرقتها أو بأموال المؤسسات المالية والمصرفية والتهرب الضريبي؛ وجرائم قانون مكافحة تبييض الأموال وتمويل الإرهاب 44 لعام 2015 والجرائم المخالفة لقانون النقد والتسليف أياً كان مرتكبوها، ولا سيما المرتبطة بأموال المودعين والجرائم المصرفية على أنواعها؛ وجرائم الآثار؛ والاغتصاب وسفاح القربى والاتجار بالبشر والعنف الأسري والاعتداء الجنسي على القصر والتعذيب والإخفاء القسري؛ والسرقة المتكررة، أي الجنايات التي تكررت ملاحقاتها أو أحكامها أكثر من مرتين والجنح أكثر من 3 مرات؛ والجرائم البيئية بموجب القانون 444 لعام 2002 والنصوص ذات الصلة.",
+            "cites": [
+              "a7",
+              "a8",
+              "a9",
+              "a10"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "كيف تُخفّض العقوبات؟",
+        "paras": [
+          {
+            "text": "في الجرائم التي ارتُكبت قبل نفاذ القانون 70 ولم يشملها العفو، تحدد المادة 3 عقوبة الإعدام بـ28 سنة سجنية، والأشغال الشاقة المؤبدة بـ17 سنة سجنية، ويُخفض ثلث سائر العقوبات المتبقية. ألغى القانون 68 لعام 2026 عقوبة الإعدام واستبدل بها الأشغال الشاقة المؤبدة للجرائم السابقة عليه ولأحكام الإعدام الصادرة التي لم تنفذ. ويحتسب القانون 216 لعام 2012 سنة السجن بتسعة أشهر إذا كانت العقوبة الحبس سنة فأكثر، ولا يسري ذلك على العقوبات غير المحددة المدة أو معتادي الإجرام والمكررين المعرّفين وفق المادة 258 وما يليها إذا نص الحكم أو القرار الجاري تنفيذه على هذا الوصف. لا توضح الصفحة كيف تجمع المحكمة بين القانون 68 والمادة 3 من القانون 70.",
+            "cites": [
+              "a11",
+              "a22",
+              "a23",
+              "a24",
+              "a25"
+            ]
+          },
+          {
+            "text": "في القتل العمد أو القصدي المقترن بالاغتصاب أو الاعتداء الجنسي، أو المرتكب من أحد الأصول أو الفروع أو صاحب سلطة أو ولاية أو وصاية على الضحية، أو المقترن بالتعذيب أو الوحشية أو التشويه أو الخطف، أو الواقع في إطار اغتيال سياسي، لا يستفيد المحكوم من التخفيض حتى إسقاط الحق الشخصي إذا كان المتضرر قد ادعى شخصياً قبل 1 آذار 2026.",
+            "cites": [
+              "a12"
+            ]
+          },
+          {
+            "text": "لمرة واحدة وحصراً ولغايات تطبيق القانون 70، إذا ثبتت عدة جنايات أو جنح يُحكم بعقوبة عن كل جريمة وتُنفذ العقوبة الأشد وحدها، ولا تخضع عقوبتا الإعدام والأشغال الشاقة المؤبدة للجمع. ويجوز جمع العقوبات، شرط ألا يزيد مجموع العقوبات المؤقتة على الحد الأقصى للعقوبة المحددة للجريمة الأشد بأكثر من الربع.",
+            "cites": [
+              "a20"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يحدث للحقوق الشخصية؟",
+        "paras": [
+          {
+            "text": "يبقى الحق الشخصي الناشئ عن جرم شمله العفو الكامل أو مرور الزمن أو تخفيض العقوبة من اختصاص المحاكم الجزائية إذا قُدمت الدعوى العامة مباشرة إليها أو أُحيلت إليها قبل نفاذ القانون 70. أما دعاوى الحق الشخصي الأخرى الناشئة عن جرم شمله العفو الكامل أو مرور الزمن فتفصل فيها المحاكم المدنية أو الإدارية المختصة، وتطبق رسوم الدعاوى المدنية أمام القضاء الجزائي. ويجوز للمدعي طلب الحبس الإكراهي عند تنفيذ حكم تعويض صادر عن المحاكم الجزائية أو العادية.",
+            "cites": [
+              "a13"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا عن التوقيف والجرائم الجديدة والأجانب والمبالغ؟",
+        "paras": [
+          {
+            "text": "في الجرائم المرتكبة قبل 1 آذار 2026 التي لم يصدر فيها حكم، يُخلى سبيل المدعى عليه حكماً إذا تجاوز توقيفه 12 سنة سجنية، وتستمر محاكمته.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "إذا ارتكب المستفيد جنحة بعد نشر القانون، تُشدد عقوبته عن الجرم الجديد وفق المادة 257 من قانون العقوبات: تزداد العقوبات المؤقتة من الثلث إلى النصف وتضاعف الغرامة. وإذا ارتكب جناية بعد النشر، يسقط عنه العفو وتُستأنف عقوبته أو محاكمته من المرحلة السابقة، إضافة إلى محاكمته بالجرم الجديد. ويُسلّم المستفيد غير اللبناني إلى المديرية العامة للأمن العام عند إخراجه من السجن.",
+            "cites": [
+              "a15",
+              "a16",
+              "a17"
+            ]
+          },
+          {
+            "text": "لا تُرد الرسوم والتأمينات والغرامات المستوفاة أو الأشياء الممنوعة المصادرة أو المضبوطة في الدعاوى المشمولة بالعفو. ويُعفى من أمضوا مدة عقوبتهم قبل نشر القانون وبقوا في السجن لعدم دفع الغرامات من جميع الغرامات والرسوم لإخراجهم.",
+            "cites": [
+              "a18",
+              "a19"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

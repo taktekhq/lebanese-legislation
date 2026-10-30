@@ -1,0 +1,14 @@
+{{define "content"}}{{with .Data}}
+<section class="wrap dochead" dir="rtl">
+  <h1 data-reveal>{{.L.title}}</h1>
+  <p class="nottext" dir="auto" style="margin:18px 0">{{.L.intro}}</p>
+</section>
+<section class="wrap">
+  {{with .Updated}}<p class="updated"><time datetime="{{.ISO}}">{{.Label}}</time></p>{{end}}
+  <h2 class="sr-only">{{t "seo.h2_texts"}}</h2>
+  <ul class="doclist">{{range .Rows}}<li><a class="docrow" dir="rtl" href="{{u (printf "/official/%d/" .ID)}}">
+    <span class="docrow__title" lang="ar">{{.Kind}}{{if .Number}} {{.Number}}{{end}}: {{.Title}}</span>
+    <span class="kicker seps">{{with .IssuedOn}}<span><bdi>{{date .}}</bdi></span>{{end}}{{if .Issue}} <span><bdi>{{.Issue}}</bdi></span>{{end}}</span></a></li>{{end}}</ul>
+</section>
+<div style="height:var(--section-y)"></div>
+{{end}}{{end}}

@@ -1,0 +1,33 @@
+{{define "content"}}{{with .Data}}
+<section class="wrap dochead" dir="rtl">
+  <a class="back" href="{{u .CrumbURL}}" dir="ltr"><span aria-hidden="true">{{backArrow}}</span> {{.Crumb}}</a>
+  <p class="kicker seps" data-reveal>{{range $i, $k := .Kicker}}{{if $k}}<span><bdi>{{$k}}</bdi></span> {{end}}{{end}}</p>
+  <h1 lang="ar" data-reveal style="--d:60ms">{{.Title}}</h1>
+  {{if or .Cite .File}}<div class="btn-row" data-reveal style="--d:120ms">
+    {{with .Cite}}<button class="btn btn--primary btn--sm" type="button" data-cite="{{.}}">{{t "doc.copy_citation"}}</button>{{end}}
+    {{with .File}}<a class="btn btn--ghost btn--sm" href="{{.URL}}" rel="noopener" target="_blank" dir="auto">{{.Label}} <span class="muted" dir="ltr">{{.Size}}</span></a>{{end}}
+  </div>{{end}}
+  <dl class="facts">
+    {{range .Facts}}{{$v := index . 1}}{{if $v}}<div><dt>{{index . 0}}</dt><dd><bdi>{{$v}}</bdi></dd></div>{{end}}{{end}}
+    {{with .Source}}<div><dt>{{t "doc.source"}}</dt><dd><a class="link" href="{{.}}" rel="noopener" dir="ltr">{{t "doc.source_link"}} <span aria-hidden="true">&nearr;</span></a></dd></div>{{end}}
+  </dl>
+</section>
+<section class="wrap">
+  {{with .Note}}<p class="nottext" dir="auto" style="margin-top:32px">{{.}}</p>{{end}}
+  {{if .Paras}}<div class="longtext" lang="ar" dir="rtl">{{range .Paras}}<p>{{.}}</p>{{end}}</div>{{end}}
+  {{with .Reading}}<div class="sec__head" style="margin-top:40px"><div><h2 class="sec__title" style="font-size:1.375rem" dir="auto">{{.Heading}}</h2></div></div>
+  <p class="nottext" dir="auto" style="margin-top:16px">{{.Notice}}</p>
+  {{with .MarksHelp}}<p class="nottext" dir="auto" style="margin-top:8px">{{.}}</p>{{end}}
+  <div class="reading" lang="ar" dir="rtl">{{range .Pages}}<section class="reading__page" id="page-{{.N}}"><h3 class="reading__n" dir="auto">{{.Label}}</h3>{{with .Warn}}<p class="nottext reading__warn" lang="{{uilang}}" dir="{{dir}}">{{.}}</p>{{end}}{{range .Paras}}<p>{{marks .}}</p>{{end}}</section>{{end}}</div>{{end}}
+  {{if .Laws}}<div class="sec__head" style="margin-top:40px"><div><h2 class="sec__title" style="font-size:1.375rem">{{t "doc.published_in_issue"}}</h2></div></div>
+  <ul class="doclist">{{range .Laws}}{{template "lawrow" .}}{{end}}</ul>{{end}}
+  {{if .Articles}}<div class="sec__head" style="margin-top:40px"><div><p class="eyebrow">{{t "art.ruling_cites_eyebrow"}}</p><h2 class="sec__title" style="font-size:1.375rem">{{t "art.ruling_cites_title"}}</h2></div></div>
+  <ul class="doclist">{{range .Articles}}<li><a class="docrow" dir="rtl" href="{{artURL .LawID .Number}}"><span class="docrow__title" lang="ar">{{.LawName}}، {{t "art.article_label" .Number}}</span></a></li>{{end}}</ul>{{end}}
+  {{if .Cites}}<div class="sec__head" style="margin-top:40px"><div><p class="eyebrow">{{t "doc.cited_eyebrow"}}</p><h2 class="sec__title" style="font-size:1.375rem">{{t "doc.cited_title"}}</h2></div></div>
+  <ul class="doclist">{{range .Cites}}<li>{{if .LawID}}<a class="docrow" dir="rtl" href="{{if .Art}}{{artURL (deref .LawID) (str .Art)}}{{else}}{{lawURL (deref .LawID)}}{{end}}">{{else}}<span class="docrow" dir="rtl">{{end}}
+    <span class="docrow__title" lang="ar">{{.Label}}</span>
+    <span class="kicker">{{with .Title}}<span lang="ar">{{.}}</span>{{else}}<bdi>{{t "doc.not_in_library"}}</bdi>{{end}}</span>
+  {{if .LawID}}</a>{{else}}</span>{{end}}</li>{{end}}</ul>{{end}}
+</section>
+<div style="height:var(--section-y)"></div>
+{{end}}{{end}}

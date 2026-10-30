@@ -1,0 +1,476 @@
+{
+  "slug": "inheritance",
+  "order": 5,
+  "published": "2026-10-20",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 244354,
+      "article": "128",
+      "quote": "مادة 128: لا يطبق هذا القانون على تركات ابناء الطوائف المحمدية"
+    },
+    {
+      "id": "a2",
+      "law": 244354,
+      "article": "15",
+      "quote": "مادة 15: اولاد المتوفي وفروعهم يرثون اباءهم واصولهم دون تمييز بين الذكور والاناث واذا كان الفروع جميعهم من الدرجة الاولى تقاسموا التركة بينهم بالتساوي واذا كان بين اولاد المورث من توفي قبله حلت فروعه محله في تركة المورث وآلت اليهم الحصة التي كانت تؤول لوالدهم لو كان حيا."
+    },
+    {
+      "id": "a3",
+      "law": 244354,
+      "article": "19",
+      "quote": "مادة 19: يؤول سدس التركة لابوي المورث , او لاحدهما الباقي على قيد الحياة اذا كان للمورث فروع"
+    },
+    {
+      "id": "a4",
+      "law": 244354,
+      "article": "20",
+      "quote": "مادة 20: يؤول لزوج المورث او زوجته ربع التركة في حالة اجتماعه مع ورثة من الطبقة الاولى ونصفها في حال اجتماعه مع الاب او الام او الاخ او الاخت وخمسة اسداس في حال اجتماعه مع الجد او الجدة واذا لم يوجد وارث مما ذكر اعلاه فيستحق زوج المتوفي او زوجته كامل التركة"
+    },
+    {
+      "id": "a5",
+      "law": 244354,
+      "article": "58",
+      "quote": "مادة 58: تخفض الوصية فيما يجاوز الحصة المحفوظة لكل من الفروع والوالدين واحد الزوجين"
+    },
+    {
+      "id": "a6",
+      "law": 244354,
+      "article": "59",
+      "quote": "مادة 59: تحدد الحصة المحفوظة للفروع بخمسين بالمئة من مجموع الاموال المنقولة وغير المنقولة اذا كان جميع الاولاد على قيد الحياة فانهم يتقاسمون هذه الحصة بالتساوي ايا كان عددهم ودون تمييز بين الذكور والاناث . واذا كان احدهم قد توفي فان فروعه يحلون محله في الحصة التي كانت تؤول له لو كان حيا ويتقاسمونها بالتساوي"
+    },
+    {
+      "id": "a7",
+      "law": 244354,
+      "article": "62",
+      "quote": "مادة 62: عند اجتماع الفروع مع احد الزوجين والوالدين او احدهما تحدد الحصة المحفوظة للفروع بثلاثين بالمئة ولاحد الزوجين بعشرة بالمئة وللابوين او احدهما بعشرة بالمئة"
+    },
+    {
+      "id": "a8",
+      "law": 258041,
+      "article": "5",
+      "quote": "الحالة الاولى: ان يرث نصف جميع التركة اذا لم يكن لزوجته المتوفاة فرع وارث اصلا,كالابن وابن الابن والبنت وبنت الابن. اما اذا كان لها فرع غير وارث كبنت البنت وبنت ابن البنت فان وجود هذا الفرع وعدمه سواء.\n\nالحالة الثانية: ان يرث ربع جميع التركة اذا كان لزوجته المتوفاة فرع وارث كالابن او ابن الابن او البنت او بنت الابن سواء اكان فرعها الوارث من زوجها الذي يرثها او من غيره."
+    },
+    {
+      "id": "a9",
+      "law": 258041,
+      "article": "13",
+      "quote": "الحالة الاولى- ان يكون فرضها الربع اذا لم يكن لزوجها المتوفي ولد ولا ولد ابن وان نزل والولد يشمل الابن والبنت وولد الابن.\n\nالحالة الثانية- ان يكون فرضها الثمن اذا كان لزوجها المتوفي ولد, اي ابن او بنت او ولد ابن سواء اكان ولده من زوجته ام من غيرها ولكن بشرط ان يكون وارثا. واذا كان للزوج المتوفي زوجتان او ثلاث او اربع اشترك جميعهن في فرض زوجة واحدة."
+    },
+    {
+      "id": "a10",
+      "law": 258041,
+      "article": "8",
+      "quote": "الحالة الاولى - ترث فيها بالفرض وحده ولها النصف اذا انفردت واذا وجد بنتان فأكثر فلهن الثلثان يقتسمنه بالسوية بينهن.\n\nالحالة الثانية - ترث فيها بالعصوبة وحدها عندما يكون معها اخ لها هو ابن الميت ايضا سواء اكان شقيقها ام كان اخاها من الاب, فتقسم التركة كلها او الباقي منها بعد سهام اصحاب القروض غير المحجوبين, للذكر مثل حظ الانثيين"
+    },
+    {
+      "id": "a11",
+      "law": 258041,
+      "article": "25",
+      "quote": "تطبق على المحمدين احكام الشريعة الاسلامية فيما يتعلق بالوصية وجميع الدعاوى المنبثقة عنها هي من اختصاص المحاكم الشرعية او المذهبية ويطبق بشأنها المذهب الحنفي ما عدا الاستثناءات الواردة في المذهب الجعفري وفي قانون الاحوال الشخصية للطائفة الدرزية الصادر في 24 شباط سنة 1948."
+    },
+    {
+      "id": "a12",
+      "law": 258042,
+      "article": "537",
+      "quote": "مادة 537:\n\nتجوز الوصية بالثلث للاجنبي عند عدم المانع من غير اجازة الورثة ولا تجوز بما زاد على الثلث الا اذا اجازها الورثة بعد موت الموصي وهم من اهل التبرع ولا عبرة باجازتهم في حال حياته."
+    },
+    {
+      "id": "a13",
+      "law": 258042,
+      "article": "536",
+      "quote": "مادة 536:\n\nلا تجوز الوصية لوارث الا اذا اجازها الورثة الاخر بعد موت الموصي وهم من اهل التبرغ ويعتبر كونه وارثا او غير وارث وقت موت الموصي لا وقت الوصية وليس للمجيز ان يرجع في اجازته ويجبر على التسليم اذا امتنع واذا اجازها بعض الورثة وردها البعض جازت على المجيز بقدر حصته وبطلت في حق غيره."
+    },
+    {
+      "id": "a14",
+      "law": 258043,
+      "article": "1734",
+      "quote": "مسالة 1734:\n\nللابن المنفرد تمام المال وللبنت المنفردة ايضا تمام المال النصف بالفرض والباقي يرد عليها وللابنين المنفردين فما زاد تمام المال يقسم بينهم بالسوية وللبنتين المنفردتين فما زاد الثلثان ويقسم بينهن بالسوية والباقي يرد عليهن كذلك"
+    }
+  ],
+  "en": {
+    "title": "Inheritance in Lebanon",
+    "question": "Who inherits and how much under Lebanese law, for non-Muslims and for Sunni and Jaafari Muslims, and how much can a person leave by will?",
+    "description": "Who inherits and how much under Lebanese law for non-Muslims and Muslims, and how much a person can leave by will.",
+    "answer": {
+      "text": "For non-Muslims, the 1959 inheritance law applies: children inherit equally whatever their sex, the parents take one sixth beside them, the spouse takes one quarter, and a will cannot cut into the reserved shares, which are 50% for descendants alone. For Muslims, the inheritance text for Muslims gives a husband one half or one quarter and a wife one quarter or one eighth, a son inheriting with his sister takes twice her share, and a will may leave a non-heir one third without the heirs' approval. The Jaafari book differs: a lone daughter takes the whole estate.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a8",
+        "a9",
+        "a10",
+        "a12",
+        "a14"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Which inheritance law applies?",
+        "paras": [
+          {
+            "text": "Article 128 of the 1959 inheritance law for non-Muslims says the law does not apply to the estates of members of the Muslim communities.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "Article 25 of the inheritance text for Muslims applies Islamic sharia to Muslim wills, and will disputes go to the sharia or madhhabi courts. The Hanafi school applies, except for the exceptions in the Jaafari school and in the Druze personal status law of 24 February 1948.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "The texts we hold do not say which text governs Sunni estates and which governs Jaafari estates. This page does not cover estates opened before the non-Muslim law took effect.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "Who inherits from a non-Muslim, and how much?",
+        "paras": [
+          {
+            "text": "Under Article 15 of the 1959 law, children and their descendants inherit without distinction between males and females. Descendants of the first degree share the estate equally. If a child died before the deceased, that child's descendants take the share the child would have received.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "Article 19 gives the parents, or the surviving parent, one sixth when the deceased left descendants. Under Article 20, a spouse takes one quarter beside first-class heirs, and one half beside the father, mother, brother or sister. Beside a grandparent the spouse takes five sixths, and with none of these heirs the whole estate.",
+            "cites": [
+              "a3",
+              "a4"
+            ]
+          },
+          {
+            "text": "This page does not cover who inherits when a non-Muslim leaves no descendants.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "How much can a non-Muslim leave by will?",
+        "paras": [
+          {
+            "text": "Article 58 of the 1959 law reduces a will to the extent it exceeds the reserved share of the descendants, the parents and a spouse.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "Article 59 sets the descendants' reserved share at 50% of all movable and immovable property, shared equally between the children without distinction of sex. A predeceased child's descendants take that child's part. Article 62 lowers this share to 30% when a spouse and one or both parents also survive.",
+            "cites": [
+              "a6",
+              "a7"
+            ]
+          },
+          {
+            "text": "This page does not give the reserved shares for other mixes of heirs.",
+            "note": true
+          }
+        ],
+        "table": {
+          "caption": "Reserved shares in the non-Muslim inheritance law",
+          "head": [
+            "Heir and situation",
+            "Reserved share"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Descendants, general rule",
+                "50% of movable and immovable property"
+              ],
+              "cites": [
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "Descendants, with a spouse and one or both parents",
+                "30%"
+              ],
+              "cites": [
+                "a7"
+              ]
+            },
+            {
+              "cells": [
+                "Spouse, with descendants and one or both parents",
+                "10%"
+              ],
+              "cites": [
+                "a7"
+              ]
+            },
+            {
+              "cells": [
+                "One or both parents, with descendants and a spouse",
+                "10%"
+              ],
+              "cites": [
+                "a7"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "What do a husband, a wife and daughters receive under the inheritance text for Muslims?",
+        "paras": [
+          {
+            "text": "A husband takes one half if his deceased wife left no inheriting descendant, and one quarter if she did. A wife takes one quarter if her husband left no child or son's child, and one eighth if he left an inheriting one. Several wives share one wife's portion.",
+            "cites": [
+              "a8",
+              "a9"
+            ]
+          },
+          {
+            "text": "A daughter alone takes one half, and 2 or more daughters share two thirds equally. A daughter whose brother is also the deceased's son inherits with him as a residuary heir, and the male takes twice the female's share.",
+            "cites": [
+              "a10"
+            ]
+          },
+          {
+            "text": "This page does not cover the father, the mother or other relatives in this text.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "What do children receive under the Jaafari inheritance book?",
+        "paras": [
+          {
+            "text": "Under mas'ala 1734 of the Jaafari inheritance book, a lone son takes the whole estate. A lone daughter also takes the whole estate, one half as a fixed share and the rest returned to her. Where there are 2 or more sons, they share the whole estate equally. Where there are 2 or more daughters, they share two thirds equally, and the rest returns to them equally.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "This page does not cover other Jaafari cases, such as sons with daughters, parents or spouses.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "How much can a Muslim leave by will?",
+        "paras": [
+          {
+            "text": "Article 25 applies the Hanafi school to Muslim wills, subject to the Jaafari and Druze exceptions. Under Article 537 of the Hanafi will text, a person may leave a non-heir one third, when no impediment exists, without the heirs' approval. More than one third needs their approval after the testator's death. Approval during his life does not count.",
+            "cites": [
+              "a11",
+              "a12"
+            ]
+          },
+          {
+            "text": "Under Article 536, a bequest to an heir is valid only if the other heirs approve it after the testator's death. Heir status is judged at the time of death. An approving heir cannot withdraw the approval. If only some heirs approve, the bequest binds each approving heir to the extent of his share.",
+            "cites": [
+              "a13"
+            ]
+          },
+          {
+            "text": "The texts we hold for this page do not include the Jaafari will book or the Druze will articles.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "الإرث في لبنان",
+    "question": "من يرث وكم يبلغ نصيبه في القانون اللبناني لغير المحمديين وللمسلمين السنة والجعفريين، وكم يجوز الإيصاء به؟",
+    "description": "من يرث وكم نصيبه في القانون اللبناني لغير المحمديين وللمحمديين، وكم يجوز الإيصاء به.",
+    "answer": {
+      "text": "عند غير المحمديين يطبق قانون الإرث لسنة 1959: يرث الأولاد دون تمييز بين الذكور والإناث، ويأخذ الأبوان السدس معهم، ويأخذ الزوج الباقي الربع، ولا تمسّ الوصية الحصص المحفوظة، وهي 50% للفروع وحدهم. وعند المحمديين يأخذ الزوج النصف أو الربع، وتأخذ الزوجة الربع أو الثمن، وللابن الذي يرث مع أخته مثل حظ الأنثيين، وتجوز الوصية لغير الوارث بالثلث دون إجازة الورثة. ويختلف الكتاب الجعفري، فتأخذ البنت المنفردة التركة كلها.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a8",
+        "a9",
+        "a10",
+        "a12",
+        "a14"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "أي قانون يطبَّق على الإرث؟",
+        "paras": [
+          {
+            "text": "تنص المادة 128 من قانون الإرث لغير المحمديين الصادر سنة 1959 على أن هذا القانون لا يطبق على تركات أبناء الطوائف المحمدية.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "تخضع وصايا المحمديين، بموجب المادة 25 من نص الإرث عند المحمديين، لأحكام الشريعة الإسلامية، وتنظر في دعاواها المحاكم الشرعية أو المذهبية. ويطبَّق المذهب الحنفي، ما عدا الاستثناءات الواردة في المذهب الجعفري وفي قانون الأحوال الشخصية للطائفة الدرزية الصادر في 24 شباط 1948.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "النصوص المتوفرة لدينا لا تبيّن النص الذي يحكم تركات السنّة ولا النص الذي يحكم تركات الجعفريين. ولا تتناول هذه الصفحة التركات التي افتتحت قبل العمل بقانون غير المحمديين.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "من يرث غير المحمدي وكم يأخذ؟",
+        "paras": [
+          {
+            "text": "بموجب المادة 15 من قانون 1959، يرث أولاد المتوفى وفروعهم دون تمييز بين الذكور والإناث. ويتقاسم الفروع من الدرجة الأولى التركة بالتساوي. وإذا توفي أحد الأولاد قبل المورث، حلّ فروعه محله وأخذوا الحصة التي كانت ستؤول إليه لو بقي حياً.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "تعطي المادة 19 الأبوين، أو من بقي منهما حياً، سدس التركة إذا كان للمورث فروع. وبموجب المادة 20، يأخذ الزوج أو الزوجة الربع مع ورثة الطبقة الأولى، والنصف مع الأب أو الأم أو الأخ أو الأخت. ويأخذ خمسة أسداس التركة مع الجد أو الجدة، وكامل التركة إذا لم يوجد أحد من هؤلاء.",
+            "cites": [
+              "a3",
+              "a4"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة من يرث غير المحمدي إذا لم يترك فروعاً.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "كم يجوز لغير المحمدي أن يوصي؟",
+        "paras": [
+          {
+            "text": "تخفّض المادة 58 من قانون 1959 الوصية بقدر ما تتجاوز الحصة المحفوظة للفروع والوالدين وأحد الزوجين.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "تحدد المادة 59 الحصة المحفوظة للفروع بـ50% من مجموع الأموال المنقولة وغير المنقولة، يتقاسمها الأولاد بالتساوي دون تمييز بين الذكور والإناث. ويحل فروع الولد المتوفى محله في حصته. وتخفض المادة 62 هذه الحصة إلى 30% إذا اجتمع الفروع مع أحد الزوجين والوالدين أو أحدهما.",
+            "cites": [
+              "a6",
+              "a7"
+            ]
+          },
+          {
+            "text": "لا تعرض هذه الصفحة الحصص المحفوظة في سائر حالات اجتماع الورثة.",
+            "note": true
+          }
+        ],
+        "table": {
+          "caption": "الحصص المحفوظة في قانون الإرث لغير المحمديين",
+          "head": [
+            "الوارث والحالة",
+            "الحصة المحفوظة"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "الفروع، القاعدة العامة",
+                "50% من الأموال المنقولة وغير المنقولة"
+              ],
+              "cites": [
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "الفروع مع أحد الزوجين والوالدين أو أحدهما",
+                "30%"
+              ],
+              "cites": [
+                "a7"
+              ]
+            },
+            {
+              "cells": [
+                "أحد الزوجين مع الفروع والوالدين أو أحدهما",
+                "10%"
+              ],
+              "cites": [
+                "a7"
+              ]
+            },
+            {
+              "cells": [
+                "الوالدان أو أحدهما مع الفروع وأحد الزوجين",
+                "10%"
+              ],
+              "cites": [
+                "a7"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "ماذا يأخذ الزوج والزوجة والبنات في نص الإرث عند المحمديين؟",
+        "paras": [
+          {
+            "text": "يأخذ الزوج نصف التركة إذا لم يكن لزوجته المتوفاة فرع وارث، وربعها إذا كان لها فرع وارث. وتأخذ الزوجة الربع إذا لم يكن لزوجها المتوفى ولد ولا ولد ابن، والثمن إذا كان له ولد وارث. وإذا تعددت الزوجات اشتركن في فرض زوجة واحدة.",
+            "cites": [
+              "a8",
+              "a9"
+            ]
+          },
+          {
+            "text": "للبنت المنفردة النصف، وللبنتين فأكثر الثلثان يقتسمنه بالسوية. وإذا كان مع البنت أخ لها هو ابن المتوفى أيضاً، ورثت معه بالعصوبة، ويأخذ الذكر مثل حظ الأنثيين.",
+            "cites": [
+              "a10"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة نصيب الأب والأم وسائر الأقارب في هذا النص.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يأخذ الأولاد في كتاب الميراث على المذهب الجعفري؟",
+        "paras": [
+          {
+            "text": "بموجب المسألة 1734 من كتاب الميراث على المذهب الجعفري، يأخذ الابن المنفرد المال كله. وتأخذ البنت المنفردة المال كله أيضاً، النصف بالفرض والباقي يرد عليها. ويقتسم الابنان فأكثر المال كله بالسوية. وتأخذ البنتان فأكثر الثلثين بالسوية، ويرد عليهن الباقي بالسوية كذلك.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة سائر الحالات في المذهب الجعفري، كاجتماع الأبناء والبنات أو الأبوين أو أحد الزوجين.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "كم يجوز للمحمدي أن يوصي؟",
+        "paras": [
+          {
+            "text": "تجعل المادة 25 المذهب الحنفي هو المطبق على وصايا المحمديين، مع مراعاة الاستثناءات الجعفرية والدرزية. وبموجب المادة 537 من نص الوصية على مذهب أبي حنيفة، تجوز الوصية للأجنبي بالثلث عند عدم المانع، من دون إجازة الورثة. وما زاد على الثلث يحتاج إلى إجازتهم بعد موت الموصي، ولا عبرة بإجازتهم في حياته.",
+            "cites": [
+              "a11",
+              "a12"
+            ]
+          },
+          {
+            "text": "بموجب المادة 536، لا تجوز الوصية لوارث إلا إذا أجازها سائر الورثة بعد موت الموصي. ويُعتدّ بصفة الوارث وقت الموت. ولا يجوز للمجيز أن يرجع في إجازته. وإذا أجازها بعض الورثة دون بعض، نفذت في حق المجيز بقدر حصته.",
+            "cites": [
+              "a13"
+            ]
+          },
+          {
+            "text": "النصوص المتوفرة لدينا لهذه الصفحة لا تشمل كتاب الوصية على المذهب الجعفري ولا أحكام الوصية عند الدروز.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  }
+}

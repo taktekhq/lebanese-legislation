@@ -1,0 +1,35 @@
+/* Topic pages: a plain answer first, then one short section per question,
+   each paragraph followed by the words of the article it rests on.
+   Logical properties only, so the Arabic page mirrors itself. */
+.topic { max-width: 72ch; }
+.topic__date { margin-top: 10px; }
+.topic__answer { padding-block: 4px 8px; }
+.topic__answer .lead { color: var(--ink); font-size: 1.1875rem; line-height: 1.6; }
+.topic__sec { margin-top: 12px; }
+.topic__para { margin-top: 14px; }
+.topic__para > p { color: var(--ink-soft); }
+.topic__para--note > p { color: var(--muted); font-style: normal; }
+.topic__refs { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 8px; }
+.topic__ref { color: var(--accent); text-decoration: none; }
+.topic__ref + .topic__ref::before { content: "\00b7"; color: var(--muted); margin-inline-end: 8px; display: inline-block; text-decoration: none; }
+.topic__ref:hover { text-decoration: underline; }
+.topic__ref bdi { color: var(--muted); margin-inline-start: 4px; }
+.topic__quote {
+  margin: 12px 0 0; padding: 14px 18px; background: var(--panel); border-radius: var(--radius);
+  border-inline-start: 3px solid var(--accent);
+}
+.topic__quote blockquote {
+  margin: 0; font-family: "Noto Naskh Arabic", "IBM Plex Sans Arabic", serif; font-size: 1.125rem;
+  line-height: 1.9; color: var(--ink); white-space: pre-line; text-align: start;
+}
+.topic__quote figcaption { margin-top: 8px; font-size: 0.8125rem; color: var(--muted); }
+.topic__quote figcaption a { color: var(--accent); }
+.topic .tablewrap { margin-top: 18px; }
+.topic table.ref caption { text-align: start; padding: 12px clamp(14px, 2vw, 20px) 0; color: var(--muted); font-size: 0.875rem; }
+.topic table.ref td, .topic table.ref th { white-space: normal; }
+.topic__notice { margin-top: 56px; padding: 18px 20px; border-radius: var(--radius); background: var(--surface); }
+.topic__notice p { color: var(--ink-soft); }
+.topic__more ul { margin-top: 14px; }
+.explained { margin-top: 14px; }
+.explained a { color: var(--accent); }
+.topiclist .code span { display: block; margin-top: 4px; }

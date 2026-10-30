@@ -1,0 +1,22 @@
+{{define "content"}}
+<section class="wrap page">
+  <a class="back" href="{{u "/changes/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "review.back"}}</a>
+  <p class="eyebrow" data-reveal>{{t "review.eyebrow"}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{t "review.h1"}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{t "review.lead"}}</p>
+</section>
+<section class="wrap">
+  <h2 class="sec__title">{{t "review.heading"}} &middot; {{len .Data.Open}}</h2>
+  <ol class="changes">{{range .Data.Open}}
+    <li class="chg">
+      <p class="chg__date"><code class="rv__key">{{.Key}}</code></p>
+      <div class="chg__body" dir="rtl">
+        <a class="chg__by" href="{{artURL .Law.ID .Article}}" lang="ar"><b>المادة {{.Article}} من {{.Law.CiteName}}</b></a>
+        <p class="chg__targets" lang="ar">بموجب <a class="link" href="{{artURL .By.ID .ByArticle}}">{{.By.Ident}}، المادة {{.ByArticle}}</a>{{with .Date}} <bdi lang="en">from {{date .}}</bdi>{{end}}</p>
+        <p class="rv__why" lang="en" dir="ltr">{{.Reason}}{{with .Judgement}} &middot; {{t "review.model"}}: {{.}}{{end}}</p>
+      </div>
+    </li>{{else}}<li class="chg"><p>{{t "review.nothing_open"}}</p></li>{{end}}
+  </ol>
+</section>
+<div style="height:var(--section-y)"></div>
+{{end}}

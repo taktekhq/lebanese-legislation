@@ -1,0 +1,402 @@
+{
+  "slug": "pre-emption-right",
+  "order": 22,
+  "published": "2026-10-21",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 177709,
+      "article": "238",
+      "quote": "الشفعة حق يجيز لصاحبه ان ينتزع العقار المبيع من المشتري في الاحوال وبالشروط المنصوص عليها في المواد التالية:"
+    },
+    {
+      "id": "a2",
+      "law": 177709,
+      "article": "238",
+      "quote": "يسرى حق الشفعة على العقارات الملك وعلى العقارات الاميرية."
+    },
+    {
+      "id": "a3",
+      "law": 177709,
+      "article": "239",
+      "quote": "يثبت الحق في الشفعة:\n\n1- لمالك الرقبة إذا بيع حق الانتفاع سواء تناول البيع كل الحق أو بعضه.\n\n2- للشريك في الشيوع, إذا بيعت حصة أو أكثر في العقار الشائع من غير الشركاء في الشيوع.\n\n3- لصاحب حق الانتفاع إذا بيعت الرقبة سواء تناول البيع كل الرقبة أو بعضها."
+    },
+    {
+      "id": "a4",
+      "law": 177709,
+      "article": "239",
+      "quote": "يسقط كل حق اخر بالشفعة نشأ قبل نفاذ هذا القانون ولم يستعمل بعد."
+    },
+    {
+      "id": "a5",
+      "law": 177709,
+      "article": "240",
+      "quote": "اذا تزاحم الشفعاء من فئات مختلفة يكون استعمال حق الشفعة بحسب الترتيب المنصوص عليه في المادة 239 السابقة. واذا تزاحم الشفعاء من فئة واحدة يكون حق كل منهم على قدر نصيبه، واذا تخلى أحدهم أو بعضهم عن حقه استعمل الباقون هذا الحق وعلى قدر نصيبهم."
+    },
+    {
+      "id": "a6",
+      "law": 177709,
+      "article": "243",
+      "quote": "ينتقل حق الشفعة عند وفاة صاحبه الى ورثته ولا يجوز التفرغ عنه لشخص آخر."
+    },
+    {
+      "id": "a7",
+      "law": 177709,
+      "article": "244",
+      "quote": "لا يستعمل حق الشفعة الا بوجه المشترى او بوجه الموهوب له بعوض . وفي الحالة الاخيرة يكون حق الشفعة معرضا لاسباب البطلان والابطال والالغاء نفسها الجارية على الهبة ذاتها."
+    },
+    {
+      "id": "a8",
+      "law": 177709,
+      "article": "244",
+      "quote": "لا تسمع دعوى الشفعة في المقايضة العقارية وفي البيع الحاصل بين الزوجين او الاصول والفروع او الاخوة والاخوات ."
+    },
+    {
+      "id": "a9",
+      "law": 177709,
+      "article": "254",
+      "quote": "لا شفعة للوقف , ولا في البيع الحاصل بالمزاد العلني عن طريق الادارة او القضاء."
+    },
+    {
+      "id": "a10",
+      "law": 177709,
+      "article": "245",
+      "quote": "حق الشفعة لا يتجزأ فلا يجوز استعماله او اسقاطه الا بكامله. فاذا تعدد الشفعاء المتساوون في الفئة واسقط احدهم او بعضهم حقه في الشفعة, وجب على الباقين طلب الشفعة او اسقاطها بكاملها. اما اذا تعدد المشترون فللشفيع ان يأخذ نصيب احدهم فقط."
+    },
+    {
+      "id": "a11",
+      "law": 177709,
+      "article": "246",
+      "quote": "2- اذا اسقطه الشفيع قبل تسجيل المشفوع صراحة في وثيقة خطية ذات تاريخ صحيح تحتوي على بيان اسم المشتري والثمن والشروط ولا يعود تاريخها- الى اكثر من ستة اشهر قبل التسجيل."
+    },
+    {
+      "id": "a12",
+      "law": 177709,
+      "article": "246",
+      "quote": "3- اذا كان الشفيع وكيل البائع بالبيع او شاهدا على العقد ووقع امضائه بلا تحفظ."
+    },
+    {
+      "id": "a13",
+      "law": 177709,
+      "article": "246",
+      "quote": "4- اذا اسقط الشفيع حقه بعد التسجيل صراحة او ضمنا. ولكن هذا الاسقاط لا يجوز بعد تقديم الدعوى بالشفعة الا برضى المشترى."
+    },
+    {
+      "id": "a14",
+      "law": 177709,
+      "article": "246",
+      "quote": "يسقط حق الشفعة:\n\n1- اذا لم يستعمله الشفيع خلال المدة القانونية المبينة في المادتين الاتيتين."
+    },
+    {
+      "id": "a15",
+      "law": 177709,
+      "article": "247",
+      "quote": "للمشترى بعد تسجيل العقد ان يعلم الشفعاء بالتسجيل بواسطة الكاتب العدل للمقيمين في لبنان, ووفاقا للمادة 362 من قانون اصول المحاكمات المدنية للمقيمين في بلاد اجنبية على ان يبين في التبليغ العقار المبع واوصافه وتاريخ التسجيل واسم العاقدين ومحل اقامتهما والثمن وملحقاته وشروط العقد. وعلى الشفيع ان يطالب بحق الشفعة اثناء الايام العشرة التي تلي التبليغ بعد اضافة مهلة المسافة تحت طائلة السقوط."
+    },
+    {
+      "id": "a16",
+      "law": 177709,
+      "article": "248",
+      "quote": "اذا لم يحصل التبليغ المبين في المادة السابقة يسقط حق الشفعة بعد مضي سنة من تاريخ تسجيل العقد في السجل العقاري. وتسرى هذه المدة بحق فاقدي الاهلية والغائبين. وان المدة المذكورة في هذه المادة وفي المادة السابقة لا تنقطع الا باقامة الدعوى بطلب الشفعة امام محكمة محل وجرد العقار الصالحة بحسب الثمن المذكور في العقد."
+    },
+    {
+      "id": "a17",
+      "law": 177709,
+      "article": "249",
+      "quote": "لا يمكن استعمال حق الشفعة الا بشرط ان يقوم صاحبه بتعويض المشتري تعويضا تاما.\n\nوهذا التعويض يشمل:\n\n1- ثمن المبيع الذي يجب عرضه وايداعه فعليا يوم تقديم دعوى الشفعة على الاكثر الا اذا كان العقد المسجل ينص على تأجيل الدفع.\n\nيتم العرض والايداع الفعلي في صندوق مال المحكمة الصالحة للنظر بدعوى الشفعة."
+    },
+    {
+      "id": "a18",
+      "law": 177709,
+      "article": "249",
+      "quote": "2 - نفقات العقد, التي تشمل رسوم التسجيل الرسمية وبدل السمسرة على ان لا يزيد هذا البدل على البدل المعين بالتعرفة القانونية.\n\n3 - بدل التحسين الطارىء على العقار بفعل المشتري, دون الالتفات الى التحسين الاقتصادي الناتج عن تقلب الاسعار."
+    },
+    {
+      "id": "a19",
+      "law": 177709,
+      "article": "250",
+      "quote": "اذا تم التفرغ عن المشفوع لشخص ثالث يقيده في السجل العقاري قبل تقديم دعوى الشفعة فلا يجوز الاخذ بالشفعة الا من المشتري الثاني وبالشروط التي اشترى بها."
+    },
+    {
+      "id": "a20",
+      "law": 177709,
+      "article": "251",
+      "quote": "اذا وقع خلاف على مقدار ثمن المشفوع بين المشتري وصاحب حق الشفعة فتعين المحكمة الثمن الحقيقي بصرف النظر عن قيمة المشفوع. ولا يسمع الادعاء من المشترى بان هذا الثمن يزيد على الثمن المذكور في العقد المسجل."
+    },
+    {
+      "id": "a21",
+      "law": 177709,
+      "article": "252",
+      "quote": "يثبت حق الشفعة ويكتسب الشفيع حق التسجيل, اما بتسلمه العقار المشفوع برضى المشتري بعد دفع الثمن وتوابعه المعينة بالمادة 249, واما بحكم صادر لمصلحة الشفيع."
+    },
+    {
+      "id": "a22",
+      "law": 177709,
+      "article": "253",
+      "quote": "يعتبر الشفيع انه قد اشترى من المشتري ويكون للشفعة بينهما مفاعيل البيع نفسه ولا يحق للشفيع الاستفادة من الاجل المنصوص عليه في العقد لمصلحة المشترى في دفع الثمن, الا اذا رأت المحكمة ذلك لقاء الضمانات التي تراها لازمة. وفيما عدا حالة الاجل المنصوص عليه في العقد, لا يجوز للمحكمة ان تمنح الشفيع مهلة للدفع."
+    },
+    {
+      "id": "a23",
+      "law": 202269,
+      "article": "2",
+      "quote": "مادة 2: تخضع دعوى الشفعة لرسم مقطوع."
+    },
+    {
+      "id": "a24",
+      "law": 177709,
+      "article": "242",
+      "quote": "يعود حق الشفعة الى الاشخاص المذكورين في المادة مايتان والتاسعة والثلاثون من هذاالقرار الذين يكون سندهم سابقا تاريخيا سند المشتري."
+    },
+    {
+      "id": "a25",
+      "law": 244440,
+      "article": "5",
+      "quote": "2 ـ كما يجوز ان يحكم للمشتري المشفوع منه بتعويض يضاف إلى تعويض الشفعة لا يتجاوز خمسة عشر بالماية (15%) من قيمة العقار المشفوع كما تقدره المحكمة بتاريخ نفاذ هذا القانون."
+    },
+    {
+      "id": "a26",
+      "law": 244440,
+      "article": "5",
+      "quote": "4 ـ لا يطبق البند (2) من هذه المادة على دعاوى الشفعة التي تقام بعد نفاذ هذا القانون."
+    }
+  ],
+  "en": {
+    "title": "Pre-emption right (shufaa) in Lebanon",
+    "question": "Who has the right of pre-emption (shufaa) in Lebanon, and how is it exercised?",
+    "description": "Who may claim shufaa, the deadlines and payments, and how a claim succeeds or is lost.",
+    "answer": {
+      "text": "Shufaa lets an eligible person take purchased property from the buyer. It applies to ملك and amiri land and belongs, in order, to the bare owner when usufruct is sold, a co-owner when a share is sold to a non-co-owner, and the usufructuary when bare title is sold, provided the claimant’s title predates the buyer’s. The claim is subject to deadlines and payment, and does not lie for specified sales, waqf property or public auctions.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a8",
+        "a9",
+        "a24"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Who holds shufaa, and how are claimants ranked?",
+        "paras": [
+          {
+            "text": "The right covers ملك and amiri land. It belongs to the bare owner if usufruct is sold, a co-owner if a share is sold to a non-co-owner, and the usufructuary if bare title is sold. Only persons in these categories whose title predates the buyer’s title may claim. When categories compete, that is their order; claimants in the same category share according to their shares, and if some give up, the others exercise the right in proportion to their shares. Any other pre-emption right that arose before this law took effect and was not used lapses.",
+            "cites": [
+              "a2",
+              "a3",
+              "a5",
+              "a4",
+              "a24"
+            ]
+          },
+          {
+            "text": "The right passes to the holder’s heirs on death and cannot be assigned to another person.",
+            "cites": [
+              "a6"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "When is shufaa unavailable?",
+        "paras": [
+          {
+            "text": "Shufaa is exercised against the buyer or a donee under a gift for consideration. In the gift case, it is subject to the same grounds of nullity, annulment and cancellation as the gift. No shufaa claim is heard for an exchange of immovable property, or a sale between spouses, ascendants and descendants, or siblings. There is no shufaa for waqf property or in a public auction sale through the administration or courts.",
+            "cites": [
+              "a7",
+              "a8",
+              "a9"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What are the deadlines and how is a claim filed?",
+        "paras": [
+          {
+            "text": "For residents in Lebanon, the buyer may give notice of registration through a notary public. For residents abroad, notice follows Article 362 of the Code of Civil Procedure, which is not included in this database. Notice must state the property and its description, registration date, parties’ names and residences, price and accessories, and contract terms. The claimant must demand shufaa within 10 days after notice, plus travel time.",
+            "cites": [
+              "a15"
+            ]
+          },
+          {
+            "text": "If notice is not given, the right expires 1 year after registration, including for persons lacking capacity and absentees. Both periods are interrupted only by filing a shufaa suit before the court where the property is located that is competent according to the price stated in the contract.",
+            "cites": [
+              "a16"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What must the claimant pay?",
+        "paras": [
+          {
+            "text": "Full compensation covers the sale price, contract costs including official registration fees and brokerage capped at the legal tariff, and improvements made by the buyer, excluding economic gains from price fluctuations. The price must be offered and actually deposited in the competent court’s treasury no later than the day the suit is filed, unless the registered contract provides for deferred payment. A price dispute is decided by the court fixing the real price regardless of the property’s value; the buyer cannot claim it exceeds the registered price.",
+            "cites": [
+              "a17",
+              "a18",
+              "a20"
+            ]
+          },
+          {
+            "text": "The claimant cannot use the contract’s payment term unless the court allows it against guarantees it requires. Otherwise, the court cannot grant time to pay. A shufaa suit is subject to a fixed fee.",
+            "cites": [
+              "a22",
+              "a23"
+            ]
+          },
+          {
+            "text": "For suits pending when Law 461 took effect, the court may award additional compensation of up to 15% of the property’s value as assessed at that time. This additional compensation does not apply to suits filed after the law took effect.",
+            "cites": [
+              "a25",
+              "a26"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "How is the right lost, waived or completed?",
+        "paras": [
+          {
+            "text": "The right is lost if the claimant misses the legal period, acts as the seller’s agent in the sale or signs as a witness without reservation, or waives it. Before registration, waiver must be express and in a written document with a certain date stating the buyer’s name, price and terms, dated no more than 6 months before registration. After registration, waiver may be express or implied; after suit is filed it requires the buyer’s consent.",
+            "cites": [
+              "a11",
+              "a12",
+              "a13",
+              "a14"
+            ]
+          },
+          {
+            "text": "The right cannot be split. If claimants in the same category include some who waive, the rest must claim or waive the whole; if there are several buyers, the claimant may take only one buyer’s share. If the property is transferred to a third person who registers it before suit, shufaa may be taken only from the second buyer on that buyer’s terms. The right is established and the claimant acquires the right to registration either by taking delivery with the buyer’s consent after paying the price and its accessories under Article 249, or by a judgment in the claimant’s favour. The claimant is treated as having bought it from the buyer, subject to the payment-term rule above.",
+            "cites": [
+              "a10",
+              "a19",
+              "a21",
+              "a22"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "حق الشفعة في لبنان",
+    "question": "من له حق الشفعة في لبنان وكيف يُمارس؟",
+    "description": "توضح الصفحة أصحاب حق الشفعة ومهل المطالبة ومبالغها وكيف يثبت الحق أو يسقط.",
+    "answer": {
+      "text": "الشفعة حق يجيز لصاحبه انتزاع العقار المبيع من المشتري، وتسري على العقارات الملك والأميرية. ويثبت الحق بالترتيب لمالك الرقبة عند بيع الانتفاع، والشريك عند بيع حصة لغير الشركاء، وصاحب الانتفاع عند بيع الرقبة، شرط أن يسبق سند صاحب الحق سند المشتري. وتخضع المطالبة لمهل ودفع التعويض، ولا تجوز في بيوع محددة أو في الوقف أو المزاد العلني.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a8",
+        "a9",
+        "a24"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "من له حق الشفعة، وكيف يكون ترتيب المطالبين؟",
+        "paras": [
+          {
+            "text": "تسري الشفعة على العقارات الملك والعقارات الأميرية. ويثبت الحق لمالك الرقبة إذا بيع حق الانتفاع، وللشريك في الشيوع إذا بيعت حصة لغير الشركاء، ولصاحب حق الانتفاع إذا بيعت الرقبة. ولا يثبت إلا لأصحاب هذه الفئات الذين يسبق سندهم سند المشتري. وعند التزاحم بين الفئات يكون الترتيب وفق ذلك، وبين أفراد الفئة الواحدة يكون الحق بقدر النصيب، وإذا تخلى بعضهم استعمل الباقون الحق بقدر أنصبتهم. ويسقط كل حق آخر بالشفعة نشأ قبل نفاذ هذا القانون ولم يستعمل بعد.",
+            "cites": [
+              "a2",
+              "a3",
+              "a5",
+              "a4",
+              "a24"
+            ]
+          },
+          {
+            "text": "ينتقل حق الشفعة عند وفاة صاحبه إلى ورثته، ولا يجوز التفرغ عنه لشخص آخر.",
+            "cites": [
+              "a6"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "متى لا تجوز الشفعة؟",
+        "paras": [
+          {
+            "text": "لا تستعمل الشفعة إلا بوجه المشتري أو الموهوب له بعوض، وتخضع في هذه الحالة لأسباب البطلان والإبطال والإلغاء التي تسري على الهبة. ولا تسمع دعوى الشفعة في المقايضة العقارية أو البيع بين الزوجين أو الأصول والفروع أو الإخوة والأخوات. ولا شفعة للوقف ولا في البيع بالمزاد العلني عن طريق الإدارة أو القضاء.",
+            "cites": [
+              "a7",
+              "a8",
+              "a9"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما المهل وكيف تُقام الدعوى؟",
+        "paras": [
+          {
+            "text": "يكون التبليغ للمقيمين في لبنان بواسطة الكاتب العدل، وللمقيمين في الخارج وفق المادة 362 من قانون أصول المحاكمات المدنية، وهي غير واردة في قاعدة البيانات. ويذكر التبليغ العقار وأوصافه وتاريخ تسجيله وأسماء المتعاقدين ومحل إقامتهما والثمن وملحقاته وشروط العقد. على الشفيع المطالبة خلال الأيام العشرة التالية للتبليغ مضافاً إليها مهلة المسافة.",
+            "cites": [
+              "a15"
+            ]
+          },
+          {
+            "text": "إذا لم يحصل التبليغ، يسقط الحق بعد سنة من تسجيل العقد، وتسري هذه المدة على فاقدي الأهلية والغائبين أيضاً. ولا تنقطع أي من المدتين إلا بإقامة دعوى الشفعة أمام محكمة محل العقار المختصة بحسب الثمن المذكور في العقد.",
+            "cites": [
+              "a16"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يدفع الشفيع؟",
+        "paras": [
+          {
+            "text": "يشمل التعويض التام ثمن المبيع ونفقات العقد، ومنها رسوم التسجيل الرسمية وبدل السمسرة المحدد بالتعرفة القانونية، وبدل التحسين الذي أحدثه المشتري، دون التحسين الاقتصادي الناتج عن تقلب الأسعار. يجب عرض الثمن وإيداعه فعلياً في صندوق المحكمة المختصة في يوم تقديم الدعوى على الأكثر، إلا إذا نص العقد المسجل على تأجيل الدفع. وعند الخلاف على الثمن، تعين المحكمة الثمن الحقيقي بصرف النظر عن قيمة العقار، ولا يقبل ادعاء المشتري بأن الثمن يزيد على المسجل.",
+            "cites": [
+              "a17",
+              "a18",
+              "a20"
+            ]
+          },
+          {
+            "text": "لا يستفيد الشفيع من أجل الدفع الوارد في العقد إلا إذا سمحت المحكمة بذلك لقاء الضمانات التي تراها لازمة، ولا تمنحه مهلة أخرى للدفع. وتخضع دعوى الشفعة لرسم مقطوع.",
+            "cites": [
+              "a22",
+              "a23"
+            ]
+          },
+          {
+            "text": "في الدعاوى العالقة عند نفاذ القانون 461، يجوز للمحكمة الحكم بتعويض إضافي لا يتجاوز 15% من قيمة العقار كما تقدّرها في ذلك التاريخ. ولا يطبق هذا التعويض الإضافي على دعاوى الشفعة التي تقام بعد نفاذ القانون.",
+            "cites": [
+              "a25",
+              "a26"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "كيف يسقط الحق أو يثبت؟",
+        "paras": [
+          {
+            "text": "يسقط الحق إذا لم يستعمل ضمن المهلة، أو كان الشفيع وكيلاً للبائع في البيع أو شاهداً على العقد ووقع بلا تحفظ، أو أسقطه. ويكون الإسقاط قبل التسجيل صريحاً في وثيقة خطية ذات تاريخ صحيح تذكر اسم المشتري والثمن والشروط، وألا يعود تاريخها إلى أكثر من 6 أشهر قبل التسجيل. وبعد التسجيل يجوز الإسقاط صراحة أو ضمناً، ولا يصح بعد إقامة الدعوى إلا برضى المشتري.",
+            "cites": [
+              "a11",
+              "a12",
+              "a13",
+              "a14"
+            ]
+          },
+          {
+            "text": "حق الشفعة لا يتجزأ. وإذا تعدد الشفعاء من الفئة نفسها وأسقط بعضهم حقه، فعلى الباقين طلب الشفعة كلها أو إسقاطها كلها؛ وإذا تعدد المشترون جاز للشفيع أخذ حصة أحدهم فقط. وإذا سجل شخص ثالث العقار قبل إقامة الدعوى، فلا تؤخذ الشفعة إلا من المشتري الثاني وبالشروط التي اشترى بها. ويثبت الحق ويكتسب الشفيع حق التسجيل إما بتسلم العقار برضى المشتري بعد دفع الثمن وتوابعه المحددة في المادة 249، وإما بحكم لمصلحة الشفيع. ويعامل الشفيع كمشترٍ من المشتري مع مراعاة حكم أجل الدفع.",
+            "cites": [
+              "a10",
+              "a19",
+              "a21",
+              "a22"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

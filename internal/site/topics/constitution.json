@@ -1,0 +1,380 @@
+{
+  "slug": "constitution",
+  "order": 14,
+  "published": "2026-10-20",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 244058,
+      "article": "7",
+      "quote": "كل اللبنانيين سواء لدى القانون وهم يتمعتون بالسواء بالحقوق المدنية والسياسية ويتحملون الفرائض والواجبات العامة دون ما فرق بينهم."
+    },
+    {
+      "id": "a2",
+      "law": 244058,
+      "article": "9",
+      "quote": "حرية الاعتقاد مطلقة. والدولة بتأديتها فروض الاجلال لله تعالى تحترم جميع الاديان والمذاهب وتكفل حرية اقامة الشعائر الدينية تحت حمايتها على ان لا يكون في ذلك اخلال في النظام العام وهي تضمن ايضا للاهلين اختلاف مللهم احترام نظام الاحوال الشخصية والمصالح الدينية."
+    },
+    {
+      "id": "a3",
+      "law": 244058,
+      "article": "13",
+      "quote": "حرية ابداء الرأي قولا وكتابة وحرية الطباعة وحرية الاجتماع وحرية تأليف الجمعيات كلها مكفولة ضمن دائرة القانون."
+    },
+    {
+      "id": "a4",
+      "law": 244058,
+      "article": "24",
+      "quote": "والى ان يضع مجلس النواب قانون انتخاب خارج القيد الطائفي, توزع المقاعد النيابية وفقا للقواعد الاتية:\n\nأ - بالتساوي بين المسيحيين والمسلمين.\n\nب - نسبيا بين طوائف كل من الفئتين.\n\nج - نسبيا بين المناطق."
+    },
+    {
+      "id": "a5",
+      "law": 244058,
+      "article": "95",
+      "quote": "ب - تلغى قاعدة التمثيل الطائفي ويعتمد الاختصاص والكفاءة في الوظائف العامة والقضاء والمؤسسات العسكرية والامنية والمؤسسات العامة والمختلطة وفقا لمقتضيات الوفاق الوطني باستثناء وظائف الفئة الاولى فيها وفي ما يعادل الفئة الاولى فيها وتكون هذه الوظائف مناصفة بين المسيحيين والمسلمين دون تخصيص اية وظيفة لاية طائفة مع التقيد بمبدأي الاختصاص والكفاءة."
+    },
+    {
+      "id": "a6",
+      "law": 244058,
+      "article": "16",
+      "quote": "تتولى السلطة المشترعة هيئة واحدة هي مجلس النواب."
+    },
+    {
+      "id": "a7",
+      "law": 244058,
+      "article": "65",
+      "quote": "تناط السلطة الاجرائية بمجلس الوزراء.\n\nوهو السلطة التي تخضع لها القوات المسلحة"
+    },
+    {
+      "id": "a8",
+      "law": 244058,
+      "article": "49",
+      "quote": "يرئس المجلس الاعلى للدفاع, وهو القائد الاعلى للقوات المسلحة التي تخضع لسلطة مجلس الوزراء.\n\nينتخب رئيس الجمهورية بالاقتراع السري بغالبية الثلثين من مجلس النواب في الدورة الاولى, ويكتفي بالغالبية المطلقة في دورات الاقتراع التي تلي.\n\nوتدوم رئاسته ست سنوات ولا تجوز اعادة انتخابه الا بعد ست سنوات لانتهاء ولايته."
+    },
+    {
+      "id": "a9",
+      "law": 244058,
+      "article": "49",
+      "quote": "كما انه لا يجوز انتخاب القضاة وموظفي الفئة الاولى, وما يعادلها في جميع الادارات العامة والمؤسسات العامة وسائر الاشخاص المعنويين في القانون العام مدة قيامهم بوظيفتهم وخلال السنتين اللتين تليان تاريخ استقالتهم وانقطاعهم فعليا عن وظيفتهم او تاريخ احالتهم على التقاعد."
+    },
+    {
+      "id": "a10",
+      "law": 244058,
+      "article": "49",
+      "quote": "خلافا لأحكام الفقرتين الثانية والثالثة من هذه المادة يجوز لمرة واحدة انتخاب رئيس الجمهورية من القضاة أو موظفي الفئة الأولى، وما يعادلها في جميع الإدارات العامة والمؤسسات العامة وسائر الأشخاص المعنويين في القانون العام."
+    },
+    {
+      "id": "a11",
+      "law": 244058,
+      "article": "54",
+      "quote": "مقررات رئيس الجمهورية يجب ان يشترك معه في التوقيع عليها رئيس الحكومة والوزير او الوزراء المختصون ما خلا مرسوم تسمية رئيس الحكومة ومرسوم قبول استقالة الحكومة او اعتبارها مستقيلة.\n\nاما مرسوم اصدار القوانين فيشترك معه في التوقيع عليه رئيس الحكومة."
+    },
+    {
+      "id": "a12",
+      "law": 244058,
+      "article": "76",
+      "quote": "يمكن اعادة النظر في الدستور بناء على اقتراح رئيس الجمهورية فتقدم الحكومة مشروع القانون الى مجلس النواب."
+    },
+    {
+      "id": "a13",
+      "law": 244058,
+      "article": "77",
+      "quote": "يحق لمجلس النواب في خلال عقد عادي وبناء على اقتراح عشرة من اعضائه على الاقل ان يبدي اقتراحه باكثرية الثلثين من مجموع الاعضاء الذين يتألف منهم المجلس قانونا باعادة النظر في الدستور."
+    },
+    {
+      "id": "a14",
+      "law": 244058,
+      "article": "79",
+      "quote": "عندما يطرح على المجلس مشروع يتعلق بتعديل الدستور لا يمكنه ان يبحث فيه او ان يصوت عليه ما لم تلتئم اكثرية مؤلفة من ثلثي الاعضاء الذين يؤلفون المجلس قانونا ويجب ان يكون التصويت بالغالبية نفسها."
+    }
+  ],
+  "en": {
+    "title": "The Lebanese Constitution: structure, rights, institutions and amendment",
+    "question": "What does the Lebanese Constitution say about rights, the president, parliament, the government and how it is amended?",
+    "description": "What the Lebanese Constitution says on equality, freedoms, sectarian sharing, the President, parliament, government and amendment.",
+    "answer": {
+      "text": "The Constitution makes all Lebanese equal before the law, yet parliamentary seats and first-category posts are split equally between Christians and Muslims. Parliament alone makes laws and elects the President for 6 years, and the Council of Ministers holds executive power. Most presidential decisions need the Prime Minister's co-signature, and an amendment needs a two-thirds quorum and vote of all deputies.",
+      "cites": [
+        "a1",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "a11",
+        "a13",
+        "a14"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "What rights does the Constitution guarantee?",
+        "paras": [
+          {
+            "text": "Article 7 makes all Lebanese equal before the law, with the same civil and political rights and the same public duties. The rule names Lebanese only. Article 13 guarantees freedom of opinion in speech and writing, of the press, of assembly and of association, within the limits of the law.",
+            "cites": [
+              "a1",
+              "a3"
+            ]
+          },
+          {
+            "text": "Article 9 makes freedom of belief absolute. The state respects all religions and sects and protects religious rites, provided public order is not disturbed. It also guarantees each community respect for its personal-status system and religious interests.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "This page does not cover the rules on personal liberty, the home, property, education or the official language.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "Does equality apply to parliamentary seats and senior posts?",
+        "paras": [
+          {
+            "text": "Article 24 limits the equality in Article 7 for parliament. Until the Chamber passes an electoral law outside sectarian restriction, seats are split equally between Christians and Muslims. They are also shared proportionally among the sects of each group and among the regions.",
+            "cites": [
+              "a4",
+              "a1"
+            ]
+          },
+          {
+            "text": "Article 95 drops the sectarian quota in public posts, the judiciary, military and security bodies, and public and mixed institutions. Specialisation and competence apply there. First-category posts and their equivalents are excluded from that rule. They are split equally between Christians and Muslims, and no post is reserved for any sect.",
+            "cites": [
+              "a5"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "Who makes laws and who holds executive power?",
+        "paras": [
+          {
+            "text": "Article 16 gives legislative power to one body, the Chamber of Deputies. Article 65 vests executive power in the Council of Ministers, and the armed forces are subject to the Council.",
+            "cites": [
+              "a6",
+              "a7"
+            ]
+          },
+          {
+            "text": "This page does not cover the Council's voting rules, confidence votes, caretaker government or the Constitutional Council.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "How is the President elected, and who may run?",
+        "paras": [
+          {
+            "text": "Under Article 49, the Chamber of Deputies elects the President by secret ballot. The first round needs a two-thirds majority. Later rounds need an absolute majority. The term lasts 6 years, and a President can be re-elected only 6 years after the term ends.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "Article 49 bars judges and first-category officials from election while in office and for 2 years after they resign and actually leave office, or retire. The bar also covers their equivalents in public administrations, public institutions and other public-law bodies. The same article allows, once and by way of exception, the election of a judge or first-category official.",
+            "cites": [
+              "a9",
+              "a10"
+            ]
+          },
+          {
+            "text": "The texts we hold do not show whether that one-off exception has been used.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "Can the President act alone?",
+        "paras": [
+          {
+            "text": "Article 54 requires the Prime Minister and the competent minister or ministers to co-sign the President's decisions. Only the decree naming the Prime Minister and the decree accepting the government's resignation, or deeming it resigned, are exempt. The Prime Minister co-signs decrees promulgating laws.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "The President commands the armed forces, which Article 49 and Article 65 place under the authority of the Council of Ministers.",
+            "cites": [
+              "a8",
+              "a7"
+            ]
+          },
+          {
+            "text": "This page does not list the President's other powers or cover a vacancy in the presidency.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "How can the Constitution be amended?",
+        "paras": [
+          {
+            "text": "Article 76 lets the President propose an amendment, and the government then submits the draft law to the Chamber. Under Article 77, at least 10 deputies may propose an amendment during an ordinary session. The Chamber adopts their proposal by two-thirds of its statutory membership.",
+            "cites": [
+              "a12",
+              "a13"
+            ]
+          },
+          {
+            "text": "Article 79 sets the decisive vote. The Chamber may debate or vote on an amendment draft only with two-thirds of its statutory members present, and it passes the draft by that majority. Article 77 uses the same measure for the initial proposal.",
+            "cites": [
+              "a14",
+              "a13"
+            ]
+          },
+          {
+            "text": "This page does not cover the government's response to a Chamber proposal, the Chamber's insistence and possible dissolution, or the President's request for a new debate.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "الدستور اللبناني: بنيته وحقوقه ومؤسساته وتعديله",
+    "question": "ماذا يقول الدستور اللبناني عن الحقوق ورئيس الجمهورية ومجلس النواب والحكومة وتعديل الدستور؟",
+    "description": "ما يقوله الدستور اللبناني في المساواة والحريات والمناصفة ورئيس الجمهورية ومجلس النواب والحكومة والتعديل.",
+    "answer": {
+      "text": "يجعل الدستور اللبنانيين جميعًا سواء لدى القانون، لكنه يوزّع المقاعد النيابية ووظائف الفئة الأولى مناصفةً بين المسيحيين والمسلمين. ويتولى مجلس النواب وحده التشريع وينتخب رئيس الجمهورية لمدة 6 سنوات، فيما تُناط السلطة الإجرائية بمجلس الوزراء. ويحتاج معظم مقررات الرئيس إلى توقيع رئيس الحكومة، ولا يُعدَّل الدستور إلا بنصاب ثلثي أعضاء المجلس قانونًا وبالأكثرية نفسها.",
+      "cites": [
+        "a1",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "a11",
+        "a13",
+        "a14"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "ما الحقوق التي يكفلها الدستور؟",
+        "paras": [
+          {
+            "text": "تجعل المادة 7 اللبنانيين جميعًا سواء لدى القانون، فيتمتعون بالحقوق المدنية والسياسية نفسها ويتحملون الواجبات العامة نفسها. والنص يذكر اللبنانيين وحدهم. وتكفل المادة 13 حرية إبداء الرأي قولًا وكتابة، وحرية الطباعة والاجتماع وتأليف الجمعيات، ضمن دائرة القانون.",
+            "cites": [
+              "a1",
+              "a3"
+            ]
+          },
+          {
+            "text": "تنص المادة 9 على أن حرية الاعتقاد مطلقة. وتحترم الدولة جميع الأديان والمذاهب، وتكفل حرية إقامة الشعائر الدينية شرط ألا تُخلّ بالنظام العام. وتضمن أيضًا لأبناء الطوائف المختلفة احترام نظام الأحوال الشخصية والمصالح الدينية.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة أحكام الحرية الشخصية والمنزل والملكية والتعليم واللغة الرسمية.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "هل تشمل المساواة المقاعد النيابية والوظائف العليا؟",
+        "paras": [
+          {
+            "text": "تقيّد المادة 24 المساواة الواردة في المادة 7 في ما يخص مجلس النواب. فإلى أن يضع المجلس قانون انتخاب خارج القيد الطائفي، توزَّع المقاعد بالتساوي بين المسيحيين والمسلمين. وتوزَّع كذلك نسبيًا بين طوائف كل من الفئتين وبين المناطق.",
+            "cites": [
+              "a4",
+              "a1"
+            ]
+          },
+          {
+            "text": "تلغي المادة 95 قاعدة التمثيل الطائفي في الوظائف العامة والقضاء والمؤسسات العسكرية والأمنية والمؤسسات العامة والمختلطة، وتعتمد فيها الاختصاص والكفاءة. وتُستثنى من ذلك وظائف الفئة الأولى وما يعادلها. فهي مناصفة بين المسيحيين والمسلمين، من دون تخصيص أي وظيفة لأي طائفة.",
+            "cites": [
+              "a5"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "من يشرّع ومن يتولى السلطة الإجرائية؟",
+        "paras": [
+          {
+            "text": "تجعل المادة 16 السلطة المشترعة في يد هيئة واحدة هي مجلس النواب. وتنيط المادة 65 السلطة الإجرائية بمجلس الوزراء، وتُخضع له القوات المسلحة.",
+            "cites": [
+              "a6",
+              "a7"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة قواعد التصويت في مجلس الوزراء، ولا نيل الثقة، ولا تصريف الأعمال، ولا المجلس الدستوري.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "كيف يُنتخب رئيس الجمهورية ومن يحق له الترشح؟",
+        "paras": [
+          {
+            "text": "بموجب المادة 49، ينتخب مجلس النواب رئيس الجمهورية بالاقتراع السري. ويحتاج الفوز في الدورة الأولى إلى غالبية الثلثين. وتكفي الغالبية المطلقة في الدورات التالية. وتدوم الولاية 6 سنوات، ولا يجوز إعادة انتخاب الرئيس إلا بعد 6 سنوات على انتهاء ولايته.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "تمنع المادة 49 انتخاب القضاة وموظفي الفئة الأولى أثناء توليهم وظائفهم، وخلال السنتين التاليتين لاستقالتهم وانقطاعهم فعليًا عن العمل أو إحالتهم على التقاعد. ويشمل المنع من يعادلهم في الإدارات العامة والمؤسسات العامة وسائر أشخاص القانون العام. وتجيز المادة نفسها، لمرة واحدة واستثناءً، انتخاب الرئيس من القضاة أو موظفي الفئة الأولى.",
+            "cites": [
+              "a9",
+              "a10"
+            ]
+          },
+          {
+            "text": "النصوص المتوفرة لدينا لا تبيّن هل استُعمل هذا الاستثناء.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "هل يتصرف رئيس الجمهورية منفردًا؟",
+        "paras": [
+          {
+            "text": "توجب المادة 54 أن يوقّع رئيس الحكومة والوزير أو الوزراء المختصون مع رئيس الجمهورية على مقرراته. ويُستثنى من ذلك مرسوم تسمية رئيس الحكومة، ومرسوم قبول استقالة الحكومة أو اعتبارها مستقيلة. ويوقّع رئيس الحكومة مع الرئيس على مرسوم إصدار القوانين.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "الرئيس هو القائد الأعلى للقوات المسلحة، وتُخضع المادتان 49 و65 هذه القوات لسلطة مجلس الوزراء.",
+            "cites": [
+              "a8",
+              "a7"
+            ]
+          },
+          {
+            "text": "لا تعدّد هذه الصفحة سائر صلاحيات الرئيس، ولا تتناول خلوّ سدة الرئاسة.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "كيف يُعدَّل الدستور؟",
+        "paras": [
+          {
+            "text": "تجيز المادة 76 لرئيس الجمهورية اقتراح إعادة النظر في الدستور، فتقدّم الحكومة مشروع القانون إلى مجلس النواب. وبموجب المادة 77، يجوز أن يقترح 10 نواب على الأقل التعديل خلال عقد عادي. ويُقرّ المجلس هذا الاقتراح بأكثرية الثلثين من مجموع أعضائه قانونًا.",
+            "cites": [
+              "a12",
+              "a13"
+            ]
+          },
+          {
+            "text": "تحدد المادة 79 التصويت الحاسم. فلا يجوز للمجلس أن يبحث مشروع التعديل أو يصوّت عليه ما لم يحضر ثلثا أعضائه قانونًا، ويُقرّ المشروع بالأكثرية نفسها. وهي النسبة ذاتها التي تشترطها المادة 77 للاقتراح الأول.",
+            "cites": [
+              "a14",
+              "a13"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة ردّ الحكومة على اقتراح المجلس، ولا إصرار المجلس واحتمال حلّه، ولا طلب الرئيس إعادة المناقشة.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  }
+}

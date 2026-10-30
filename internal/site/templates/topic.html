@@ -1,0 +1,63 @@
+{{define "content"}}{{with .Data}}
+<link rel="stylesheet" href="/assets/topics.css?v=2">
+<section class="wrap page">
+  <a class="back" href="{{u "/topics/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "topic.all"}}</a>
+  <p class="eyebrow" data-reveal>{{t "topic.eyebrow"}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{.C.Question}}</h1>
+  <p class="tiny topic__date" data-reveal style="--d:90ms">{{t "topic.updated" .Updated}}</p>
+  {{if eq (uilang) "en"}}<p class="tiny topic__en-note">{{t "topic.en_note"}}</p>{{end}}
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <article class="doc topic">
+    <div class="topic__answer" data-reveal>
+      <p class="lead">{{.Answer.Text}}</p>
+      {{template "topicrefs" .Answer}}
+    </div>
+    {{template "topicquotes" .Answer.Quotes}}
+
+    {{range .Sections}}
+    <section class="topic__sec" id="{{.ID}}">
+      <h2>{{.Heading}}</h2>
+      {{range .Paras}}
+      <div class="topic__para{{if .Note}} topic__para--note{{end}}">
+        <p>{{.Text}}</p>
+        {{template "topicrefs" .}}
+        {{template "topicquotes" .Quotes}}
+      </div>
+      {{end}}
+      {{with .Table}}
+      <div class="tablewrap"><table class="ref">
+        {{with .Caption}}<caption>{{.}}</caption>{{end}}
+        <thead><tr>{{range .Head}}<th scope="col">{{.}}</th>{{end}}</tr></thead>
+        <tbody>{{range .Rows}}<tr>{{range $i, $c := .Cells}}{{if eq $i 0}}<th scope="row">{{$c}}</th>{{else}}<td>{{$c}}</td>{{end}}{{end}}</tr>
+        {{end}}</tbody>
+      </table></div>
+      {{template "topicquotes" .Quotes}}
+      {{end}}
+    </section>
+    {{end}}
+
+    <aside class="topic__notice" lang="{{uilang}}">
+      <p>{{t "topic.notice"}}</p>
+      <p class="tiny">{{t "topic.method"}}</p>
+    </aside>
+
+    {{if .Other}}
+    <section class="topic__more">
+      <h2>{{t "topic.other"}}</h2>
+      <ul>{{range .Other}}<li><a href="{{u (printf "/topic/%s/" .Slug)}}">{{.Title}}</a></li>{{end}}</ul>
+    </section>
+    {{end}}
+  </article>
+</section>
+{{end}}{{end}}
+
+{{/* The articles a paragraph rests on, as links. */}}
+{{define "topicrefs"}}{{if .Refs}}<p class="topic__refs tiny">{{range .Refs}}<a href="{{u .Path}}" class="topic__ref"><span>{{t "topic.art" .Number}}</span> <bdi lang="ar" dir="rtl">{{.Law}}</bdi></a>{{end}}</p>{{end}}{{end}}
+
+{{/* The words of articles, as they are printed. */}}
+{{define "topicquotes"}}{{range .}}
+<figure class="topic__quote">
+  <blockquote lang="ar" dir="rtl">{{.Quote}}</blockquote>
+  <figcaption><a href="{{u .Path}}">{{t "topic.art" .Number}}</a> <bdi lang="ar" dir="rtl">{{.Law}}</bdi>{{if and .LawEn (ne (uilang) "ar")}} <span>({{.LawEn}})</span>{{end}}</figcaption>
+</figure>{{end}}{{end}}

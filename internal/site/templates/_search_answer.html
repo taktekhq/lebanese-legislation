@@ -1,0 +1,12 @@
+{{define "answer"}}
+{{if .Unavailable}}<p class="tiny">{{t "search.answer_unavailable"}}</p>
+{{else if .Missing}}<p class="tiny">{{t "search.answer_missing"}}</p>
+{{else if .Quotes}}<p class="tiny">{{t "search.answer_note"}}</p>
+{{range .Quotes}}<figure style="margin:24px 0" data-evidence-quote>
+<blockquote lang="{{.Source.Lang}}" dir="auto" style="white-space:pre-line">{{.Quote}}</blockquote>
+<figcaption><a class="link" href="{{.Source.Path}}" dir="auto">{{.Source.Title}}</a>
+{{if .Source.Unofficial}}<span class="tiny"> · {{t "search.unofficial"}}</span>{{end}}
+{{if .Source.Status}}{{template "status" .Source.Status}}{{end}}
+</figcaption></figure>{{end}}
+{{else}}<p class="tiny">{{t "search.answer_insufficient"}}</p>{{end}}
+{{end}}

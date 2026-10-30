@@ -1,0 +1,372 @@
+{
+  "slug": "founding-an-association",
+  "order": 17,
+  "published": "2026-10-20",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 257670,
+      "article": "1",
+      "quote": "الجمعية هي مجموع مؤلف من عدة اشخاص لتوحيد معلوماتهم او مساعيهم بصورة دائمة ولغرض لا يقصد به اقتسام الربح."
+    },
+    {
+      "id": "a2",
+      "law": 257670,
+      "article": "2",
+      "quote": "ان تأليف الجمعية لا يحتاج الى الرخصة في اول الامر ولكنه يلزم في كل حال بمقتضى المادة السادسة اعلام الحكومة بها بعد تأسيسها."
+    },
+    {
+      "id": "a3",
+      "law": 257670,
+      "article": "3",
+      "quote": "(المكملة بقانون 26 ايار سنة 1928) لا يجوز تأليف جمعيات مستندة على اساس غير مشروع مخالف لاحكام القوانين والاداب العمومية او على قصد الاخلال براحة الملكية وبكمال ملكية الدولة او تغيير شكل الحكومة الحاضرة او التفريق سياسة بين العناصر العثمانية المختلفة ويرفض اعطاء العلم وخبر لها وتحل بمرسوم يصدر في مجلس الوزراء."
+    },
+    {
+      "id": "a4",
+      "law": 257670,
+      "article": "4",
+      "quote": "من الممنوع تأليف جمعيات سياسية اساسها او عنوانها القومية والجنسية."
+    },
+    {
+      "id": "a5",
+      "law": 257670,
+      "article": "5",
+      "quote": "ان عضو الجمعية يشترط فيه ان لا يكون سنة دون العشرين وان لا يكون محكوما عليه بجناية او محروما من الحقوق المدنية."
+    },
+    {
+      "id": "a6",
+      "law": 257670,
+      "article": "6",
+      "quote": "يمنع منعا قطعيا تأليف الجمعيات السرية فبناء عليه يجب حالا عند تأليف الجمعية ان يعطي مؤسسوها الى نظارة الداخلية اذا كان مركزها في دار السعادة والى اكبر مأموري الملكية في المحل اذا كان مركزها في الخارج بيانا ممضيا ومختوما منهم يحتوى على عنوان الجمعية وبيان مقصدها ومركز ادارتها واسماء المكلفين بأمور الادارة وصفتهم ومقامهم ويعطى لهم مقابلة لذلك علم وخبر"
+    },
+    {
+      "id": "a7",
+      "law": 257670,
+      "article": "6",
+      "quote": "ويربط بهذا البنان نسختان من نظام الجمعية الاساسي مصادق عليهما بخاتم الجمعية الرسمي. وبعد اخذ العلم والخبر تعلن الكيفية من قبل المؤسسين."
+    },
+    {
+      "id": "a8",
+      "law": 257670,
+      "article": "6",
+      "quote": "ويتحتم على الجمعيات ان تعلم الحكومة في الحال بما يقع من التعديل والتبديل في نظامها الاساسي او في هيئة ادارتها ومقامها. وهذا التعديل والتبديل انما ينفذ حكمه على شخص ثالث من يوم اعلام الحكومة به."
+    },
+    {
+      "id": "a9",
+      "law": 257670,
+      "article": "7",
+      "quote": "يشترط ان يوجد في مركز كل جمعية هيئة ادارية تؤلف من شخصين على الاقل وان كان لها شعب فيكون ايضا لكل شعبة هيئة ادارية مربوطة بالهيئة المركزية ويشترط على هذه الهيئات اولا ان تمسك ثلاثة دفاتر تسطر في الاول منها هوية اعضاء الجمعية وتاريخ دخولهم وفي الثاني مقررات الهيئة الادارية ومخابراتها وتبليغاتها وفي الثالث ما يعود للجمعية من الواردات ومفردات المصارفات ونوعها ومقدارها وان تبرز هذه الدفاتر الى الحكومة العدلية والملكية في اي وقت طلبتها."
+    },
+    {
+      "id": "a10",
+      "law": 257670,
+      "article": "8",
+      "quote": "كل جمعية اعطت بيانا وفقا للمادة 6 يمكنها ان تتقدم الى المحاكم بالواسطة بصفة مدع او مدعى عليه على ما سيأتي في المادة 9 وان تدير وتتصرف فيما عدا الاعانات التي تقع من قبل الدولة لدى الايجاب."
+    },
+    {
+      "id": "a11",
+      "law": 257670,
+      "article": "12",
+      "quote": "ان الجمعيات التي لا تعلن امرها وتنبىء الحكومة باعطائها البيان وفقا للمادتين 2 و6 فكما انه بعد منعها من قبل الحكومة يجازي مؤسسوها وهيئة ادارتها وصاحب محل اجتماعها او مستأجره بالجزاء النقدي من خمسة ذهبات الى خمسة وعشرين ذهبا فكذا اذا كانت هذه الجمعية قد تألفت لغرض من الاغراض المضرة والممنوعة المبينة في المادة 3 او في قانون الجزاء يحكم ايضا على حدة بالجزاء المعين في القانون المذكور."
+    },
+    {
+      "id": "a12",
+      "law": 187904,
+      "article": "1",
+      "quote": "لا يجوز ان تنشأ اية جمعية اجنبية ولا ان تقوم بعملها في لبنان او سوريا ما لم تحصل على ترخيص مسبق من مندوب المفوض السامي لا يجوز ان يكون لها مؤسسات في لبنان او سوريا الا بمقتضى ترخيص خاص لكل مؤسسة من هذه المؤسسات."
+    },
+    {
+      "id": "a13",
+      "law": 187904,
+      "article": "4",
+      "quote": "تعتبر ايضا جمعيات اجنبية الجمعيات التي لها ميزات الجمعيات ومركزها في لبنان او سوريا وهي تنتمي لجمعيات او جماعات اجنبية او يديرها بالفعل اجانب او يكون لها اما اعضاء ادارة اجانب او يكون ربع اعضائها على الاقل من الاجانب"
+    },
+    {
+      "id": "a14",
+      "law": 187904,
+      "article": "15",
+      "quote": "لا يطبق هذا القرار لا على الجمعيات الاجنبية التي تكون غايتها الوحيدة القيام باعمال الدين ولا على الجمعيات الدينية تطبق احكام قانون 3 آب 1325/1909 المتعلق بالجمعيات على الجمعيات الاجنبية عندما لا تكون مخالفة لهذا القرار."
+    }
+  ],
+  "en": {
+    "title": "Founding an association in Lebanon",
+    "question": "How do you found an association in Lebanon, and what is the notice of establishment (علم وخبر)?",
+    "description": "What Lebanese law says about founding an ordinary association, the notice of establishment, and the licence a foreign association needs.",
+    "answer": {
+      "text": "Founding an ordinary association in Lebanon needs no licence, and the founders must notify the government as soon as it is formed, under Articles 2 and 6 of the 1909 Associations Law. They file a signed and sealed statement and get the notice of establishment in return, unless the purpose is unlawful under Article 3, which means refusal and dissolution by decree. A foreign association needs a prior licence under Decision 369 of 1939 instead.",
+      "cites": [
+        "a2",
+        "a6",
+        "a3",
+        "a12"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Do you need a licence, or only a notice?",
+        "paras": [
+          {
+            "text": "Article 1 defines an association as a group of several people who join their knowledge or efforts on a lasting basis, for a purpose other than sharing profit. Article 2 of the 1909 Associations Law says founding an association needs no licence at the outset. The government must be informed after founding, as Article 6 requires, and Article 6 bans secret associations outright. This notice regime does not cover foreign associations. Decision 369 of 1939 requires them to hold a prior licence.",
+            "cites": [
+              "a1",
+              "a2",
+              "a6",
+              "a12"
+            ]
+          },
+          {
+            "text": "Article 3, as supplemented in 1928, bars associations with an unlawful basis contrary to the laws or public morals. It also bars those aiming to disturb public order or the State's territorial integrity, change the form of government, or divide the Ottoman elements politically. The government refuses such an association the notice and dissolves it by Council of Ministers decree.",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "Article 4 forbids political associations whose basis or name is national identity and nationality.",
+            "cites": [
+              "a4"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What must the founders file to get the notice of establishment?",
+        "paras": [
+          {
+            "text": "Article 6 requires the founders to file a signed and sealed statement as soon as the association is formed. The statement gives the association's name, purpose and administrative seat, and the names, capacity and residence of its managers. In exchange, the founders receive the notice of establishment.",
+            "cites": [
+              "a6"
+            ]
+          },
+          {
+            "text": "Article 6 names Ottoman bodies as the place of filing. The statement goes to the Interior Ministry if the seat is in the capital, or to the chief local civil official elsewhere. The founders attach 2 copies of the statutes, certified with the association's official seal. After receiving the notice, they make the formation public.",
+            "cites": [
+              "a6",
+              "a7"
+            ]
+          },
+          {
+            "text": "The texts we hold do not name the Lebanese authority that now receives the statement and issues the notice. They also set no deadline for issuing it.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "What follows once the statement is filed?",
+        "paras": [
+          {
+            "text": "Article 6 requires the association to inform the government at once of any change to its statutes, its board or its seat. A change binds third parties only from the day the government is informed.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "Article 8 lets an association that has filed the Article 6 statement go to court as claimant or defendant. It acts through the representatives that Article 9 describes.",
+            "cites": [
+              "a10"
+            ]
+          },
+          {
+            "text": "This page does not cover the limits on dues and property, a member's right to leave, weapons at meetings, property after a ban or dissolution, public-interest status, or police inspection. Other articles of the Associations Law deal with them. Cooperatives are also outside this page.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "Who may be a member, and what must the board keep?",
+        "paras": [
+          {
+            "text": "Article 5 says a member must be at least 20, must not have been convicted of a felony, and must not be deprived of civil rights.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "Article 7 requires a board of at least 2 people at the association's seat. Each branch needs its own board linked to the central board. The boards keep 3 registers: member identities and joining dates; board decisions, correspondence and notices; and income with itemised expenses, their type and amount. They show them to the judicial and civil authorities on request.",
+            "cites": [
+              "a9"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What is the penalty for not giving notice?",
+        "paras": [
+          {
+            "text": "Article 12 applies once the government bans an association that did not declare itself under Articles 2 and 6. Its founders, its board and the owner or tenant of its meeting place are fined 5 to 25 gold pieces. If it was formed for a purpose barred by Article 3 or the Penal Code, the Penal Code penalty is added separately.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "The texts we hold do not give today's value of fines set in gold pieces. This page does not cover the other penalties in the Associations Law.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "What rules apply to a foreign association?",
+        "paras": [
+          {
+            "text": "For foreign associations, Decision 369 of 1939 sets a licence regime. Under Article 1, a foreign association may not be founded or operate in Lebanon or Syria without a prior licence from the High Commissioner's delegate. Each of its institutions needs its own special licence. The texts we hold do not name the Lebanese authority that replaced the delegate.",
+            "cites": [
+              "a12"
+            ]
+          },
+          {
+            "text": "Article 4 also treats as foreign an association based in Lebanon or Syria that belongs to foreign groups or is run in fact by foreigners. The same holds if it has foreign board members, or if at least a quarter of its members are foreign.",
+            "cites": [
+              "a13"
+            ]
+          },
+          {
+            "text": "Article 15 exempts foreign associations whose sole purpose is religious work, and religious associations. The 1909 Associations Law applies to foreign associations only where it does not conflict with the decision. This page does not cover the decision's licence conditions, rules on changes, penalties, or foreign youth sports associations.",
+            "cites": [
+              "a14"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "تأسيس جمعية في لبنان (العلم والخبر)",
+    "question": "كيف تؤسس جمعية في لبنان، وما هو العلم والخبر؟",
+    "description": "ما يقوله القانون اللبناني عن تأسيس جمعية عادية والعلم والخبر، والترخيص الذي تحتاجه الجمعية الأجنبية.",
+    "answer": {
+      "text": "لا يحتاج تأسيس جمعية عادية في لبنان إلى رخصة، وعلى المؤسسين إعلام الحكومة بها فور تأليفها، وفق المادتين 2 و6 من قانون الجمعيات لسنة 1909. يقدّم المؤسسون بياناً ممضى ومختوماً ويتسلمون في مقابله العلم والخبر، إلا إذا قامت الجمعية على غرض غير مشروع وفق المادة 3، فيُرفض العلم والخبر وتُحل بمرسوم. أما الجمعية الأجنبية فتحتاج إلى ترخيص مسبق بموجب القرار 369 لسنة 1939.",
+      "cites": [
+        "a2",
+        "a6",
+        "a3",
+        "a12"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "هل يلزم ترخيص أم يكفي إعلام الحكومة؟",
+        "paras": [
+          {
+            "text": "تعرّف المادة 1 الجمعية بأنها مجموع مؤلف من عدة أشخاص يوحّدون معلوماتهم أو مساعيهم بصورة دائمة، لغرض لا يقصد به اقتسام الربح. تنص المادة 2 من قانون الجمعيات لسنة 1909 على أن تأليف الجمعية لا يحتاج إلى رخصة في أول الأمر. لكن يجب إعلام الحكومة بها بعد تأسيسها وفق المادة 6، وهي تمنع الجمعيات السرية منعاً قطعياً. ولا يشمل نظام الإعلام هذا الجمعيات الأجنبية، إذ يفرض عليها القرار 369 لسنة 1939 ترخيصاً مسبقاً.",
+            "cites": [
+              "a1",
+              "a2",
+              "a6",
+              "a12"
+            ]
+          },
+          {
+            "text": "تمنع المادة 3، بصيغتها المكملة سنة 1928، تأليف جمعيات على أساس غير مشروع مخالف للقوانين والآداب العامة. وتمنع أيضاً الجمعيات التي تقصد الإخلال بالأمن الداخلي أو بوحدة أراضي الدولة، أو تغيير شكل الحكومة، أو التفريق السياسي بين العناصر العثمانية. ويُرفض إعطاؤها العلم والخبر وتُحل بمرسوم يصدر في مجلس الوزراء.",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "تمنع المادة 4 تأليف جمعيات سياسية يكون أساسها أو عنوانها القومية والجنسية.",
+            "cites": [
+              "a4"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يقدّم المؤسسون للحصول على العلم والخبر؟",
+        "paras": [
+          {
+            "text": "توجب المادة 6 على المؤسسين أن يقدّموا فور تأليف الجمعية بياناً ممضى ومختوماً منهم. يذكر البيان عنوان الجمعية ومقصدها ومركز إدارتها، وأسماء المكلفين بإدارتها وصفتهم ومقامهم. ويُعطى المؤسسون في مقابله العلم والخبر.",
+            "cites": [
+              "a6"
+            ]
+          },
+          {
+            "text": "تسمّي المادة 6 جهات عثمانية لتقديم البيان. فيُقدَّم إلى نظارة الداخلية إذا كان مركز الجمعية في دار السعادة، وإلى أكبر مأموري الملكية في المحل إذا كان مركزها خارجها. ويُرفق به المؤسسون نسختان من النظام الأساسي مصادق عليهما بخاتم الجمعية الرسمي. وبعد أخذ العلم والخبر، يعلنون تأليف الجمعية.",
+            "cites": [
+              "a6",
+              "a7"
+            ]
+          },
+          {
+            "text": "النصوص المتوفرة لدينا لا تسمّي الجهة اللبنانية التي تتسلم البيان اليوم وتعطي العلم والخبر. ولا تحدد مهلة لإعطائه.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ما الذي يترتب بعد تقديم البيان؟",
+        "paras": [
+          {
+            "text": "توجب المادة 6 على الجمعية أن تُعلم الحكومة في الحال بكل تعديل في نظامها الأساسي أو في هيئة إدارتها أو مقامها. ولا يسري التعديل على الغير إلا من يوم إعلام الحكومة به.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "تجيز المادة 8 للجمعية التي قدّمت البيان وفق المادة 6 أن تتقدم إلى المحاكم مدعيةً أو مدعى عليها. وتفعل ذلك بواسطة من تحددهم المادة 9.",
+            "cites": [
+              "a10"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة سقف الاشتراكات والأموال التي يحق للجمعية التصرف بها، ولا حق العضو في الانفصال، ولا الأسلحة في أماكن الاجتماع، ولا مصير الأموال بعد المنع أو الحل، ولا صفة المنفعة العامة، ولا تفتيش الضابطة. تعالجها مواد أخرى من قانون الجمعيات. ولا تتناول الصفحة التعاونيات.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "من يحق له العضوية، وما الدفاتر التي تمسكها الهيئة الإدارية؟",
+        "paras": [
+          {
+            "text": "تشترط المادة 5 ألا يقل عمر العضو عن 20 سنة، وألا يكون محكوماً عليه بجناية أو محروماً من الحقوق المدنية.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "توجب المادة 7 وجود هيئة إدارية من شخصين على الأقل في مركز الجمعية، ولكل شعبة هيئة إدارية مربوطة بالهيئة المركزية. وتمسك هذه الهيئات 3 دفاتر: الأول لهوية الأعضاء وتاريخ دخولهم، والثاني لمقررات الهيئة الإدارية ومخابراتها وتبليغاتها، والثالث للواردات ومفردات المصروفات ونوعها ومقدارها. وتبرزها للحكومة العدلية والملكية متى طلبتها.",
+            "cites": [
+              "a9"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما عقوبة عدم إعلام الحكومة؟",
+        "paras": [
+          {
+            "text": "تُطبق المادة 12 بعد أن تمنع الحكومة جمعية لم تعلن أمرها ولم تقدم البيان وفق المادتين 2 و6. يُعاقب مؤسسوها وهيئة إدارتها وصاحب محل اجتماعها أو مستأجره بغرامة من 5 إلى 25 ذهباً. وإذا تألفت الجمعية لغرض ممنوع في المادة 3 أو في قانون الجزاء، يُحكم أيضاً على حدة بالعقوبة التي يعيّنها ذلك القانون.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "النصوص المتوفرة لدينا لا تبيّن قيمة الغرامات المحددة بالذهب اليوم. ولا تتناول هذه الصفحة العقوبات الأخرى في قانون الجمعيات.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ما الأحكام التي تُطبق على الجمعية الأجنبية؟",
+        "paras": [
+          {
+            "text": "يفرض القرار 369 لسنة 1939 على الجمعيات الأجنبية نظام ترخيص. فبموجب المادة 1، لا يجوز إنشاء جمعية أجنبية أو قيامها بعملها في لبنان أو سوريا قبل الحصول على ترخيص مسبق من مندوب المفوض السامي. وتحتاج كل مؤسسة من مؤسساتها إلى ترخيص خاص. والنصوص المتوفرة لدينا لا تسمّي الجهة اللبنانية التي حلّت محل المندوب.",
+            "cites": [
+              "a12"
+            ]
+          },
+          {
+            "text": "وتعدّ المادة 4 أيضاً جمعية أجنبية كل جمعية مركزها في لبنان أو سوريا تنتمي إلى جمعيات أو جماعات أجنبية، أو يديرها أجانب فعلياً. وكذلك إذا كان فيها أعضاء إدارة أجانب، أو كان ربع أعضائها على الأقل من الأجانب.",
+            "cites": [
+              "a13"
+            ]
+          },
+          {
+            "text": "تستثني المادة 15 الجمعيات الأجنبية التي غايتها الوحيدة القيام بأعمال الدين، والجمعيات الدينية. ويُطبق قانون الجمعيات لسنة 1909 على الجمعيات الأجنبية فيما لا يخالف القرار. ولا تتناول هذه الصفحة شروط الترخيص وأحكام التعديل والعقوبات الواردة في القرار، ولا جمعيات الشبان الأجنبية الرياضية.",
+            "cites": [
+              "a14"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

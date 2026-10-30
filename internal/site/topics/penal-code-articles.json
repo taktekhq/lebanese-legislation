@@ -1,0 +1,388 @@
+{
+  "slug": "penal-code-articles",
+  "order": 19,
+  "published": "2026-10-20",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 244611,
+      "article": "547",
+      "quote": "من قتل إنساناً قصداً عوقب بالأشغال الشاقة من خمس عشرة سنة الى عشرين سنة.\n\nتكون العقوبة من عشرين سنة الى خمسة وعشرين سنة إذا ارتكب فعل القتل أحد الزوجين ضد الآخر."
+    },
+    {
+      "id": "a2",
+      "law": 244611,
+      "article": "548",
+      "quote": "يعاقب بالاشغال الشاقة المؤبدة على القتل قصدا اذا ارتكب :\n\n1- لسبب سافل.\n\n2- للحصول على المنفعة الناتجة عن الجنحة.\n\n3 - باقدام المجرم على التمثيل بالجثة بعد القتل.\n\n4- على حدث دون الخامسة عشرة من العمر.\n\n5- على شخصين او اكثر."
+    },
+    {
+      "id": "a3",
+      "law": 244611,
+      "article": "549",
+      "quote": "يعاقب بالاعدام على القتل قصدا اذا ارتكب :\n\n1- عمدا\n\n2- تمهيدا لجناية او لجنحة, او تسهيلا او تنفيذا لها, او تسهيلا لفرار المحرضين على تلك الجناية او فاعليها او المتدخلين فيها او الحيلولة بينهم وبين العقاب .\n\n3- على احد اصول المجرم او فروعه.\n\n4 - في حالة اقدام المجرم على اعمال التعذيب أو الشراسة نحو الاشخاص."
+    },
+    {
+      "id": "a4",
+      "law": 244611,
+      "article": "554",
+      "quote": "من أقدم قصداً على ضرب شخص أو جرحه أو إيذائه ولم ينجم عن هذه الأفعال مرض أو تعطيل شخص عن العمل لمدة تزيد عن عشرة أيام عوقب بناء على شكوى المتضرر بالحبس ستة أشهر على الأكثر أو بالتوقيف التكديري وبالغرامة من عشرة آلاف الى خمسين ألف ليرة أو بإحدى هاتين العقوبتين."
+    },
+    {
+      "id": "a5",
+      "law": 244611,
+      "article": "636",
+      "quote": "السرقة, التي لم تحدد لها عقوبة خاصة بموجب احد نصوص هذا القانون الاخرى, يعاقب عليها بالحبس من شهرين الى ثلاث سنوات وبالغرامة من مئة الف الى اربعماية الف ليرة.\n\nوتشدد هذه العقوبة وفقا للمادة 257 اذا ارتكبت السرقة في احدى الحالات التالية:\n\n1- في المعابد والابنية المأهولة."
+    },
+    {
+      "id": "a6",
+      "law": 244611,
+      "article": "638",
+      "quote": "يعاقب بالاشغال الشاقة من ثلاث سنوات الى عشرة سنوات على السرقة في احدى الحالات التالية:\n\n1- اذا وقعت السرقة على اموال او موجودات مؤسسة حكومية او اي مركز او مكتب لادارة رسمية او هيئة عامة.\n\n2- اذا وقعت السرقة على اموال او موجودات مصرف او محل للصياغة او للصيرفة."
+    },
+    {
+      "id": "a7",
+      "law": 244611,
+      "article": "655",
+      "quote": "كل من حمل الغير بالمناورات الاحتيالية على تسليمه مالا منقولا او غير منقول او اسنادا تتضمن تعهدا او ابراء او منفعة واستولى عليها يعاقب بالحبس من ستة اشهر الى ثلاث سنوات وبالغرامة من مئة الف الى مليون ليرة."
+    },
+    {
+      "id": "a8",
+      "law": 244611,
+      "article": "582",
+      "quote": "يعاقب على الذم باحد الناس المقترف باحدى الوسائل المذكورة في المادة ال 209 بالحبس حتى ثلاثة اشهر وبالغرامة حتى المايتي الف ليرة او باحدى هاتين العقوبتين.\n\nويقضى بالغرامة وحدها اذا لم يقع الذم علانية."
+    },
+    {
+      "id": "a9",
+      "law": 244611,
+      "article": "586",
+      "quote": "تتوقف الدعوى على اتخاذ المعتدى عليه صفة المدعي الشخصي.\n\nاذا وجه الذم او القدح الى ميت جاز لاقربائه حتى الدرجة الرابعة دون سواهم استعمال حق الملاحقة, هذا مع الاحتفاظ بحق كل قريب او وريث تضرر شخصيا من الجريمة."
+    },
+    {
+      "id": "a10",
+      "law": 244611,
+      "article": "487",
+      "quote": "يعاقب على الزنا الذي يرتكبه أي من الزوجين بالحبس من ثلاثة أشهر الى سنتين. ويُقضى بالعقوبة نفسها على شريك الزنا إذا كان متزوجاً وإلا فبالحبس من شهر الى سنة.\n\nفيما خلا الإقرار القضائي والجنحة الـمشهودة لا يقبل من أدلة الثبوت على الشريك إلا ما نشأ منها عن الرسائل والوثائق الخطية التي كتبها.\n\nتُضاعف العقوبة على الزوج الـمرتكب إذا وقع جرم الزنا في البيت الزوجي."
+    },
+    {
+      "id": "a11",
+      "law": 244611,
+      "article": "489",
+      "quote": "لا يجوز ملاحقة فعل الزنا إلا بشكوى أحد الزوجين واتخاذ مقدم الشكوى صفة الـمدعي الشخصي."
+    },
+    {
+      "id": "a12",
+      "law": 244611,
+      "article": "489",
+      "quote": "لا تقبل الشكوى بانقضاء ثلاثة أشهر على اليوم الذي اتصل فيه الجرم بعلـم الشاكي."
+    },
+    {
+      "id": "a13",
+      "law": 244611,
+      "article": "541",
+      "quote": "كل امرأة طرحت نفسها بما استعملته من الوسائل او استعمله غيرها برضاها تعاقب بالحبس من ستة اشهر الى ثلاث سنوات ."
+    },
+    {
+      "id": "a14",
+      "law": 244611,
+      "article": "184",
+      "quote": "بعد ممارسة حق كل فعل قضت به ضرورة حالية لدفع تعرض غير محق ولا مثار عن النفس او الملك او نفس الغير او ملكه, ويستوى في الحماية الشخص الطبيعي والشخص المعنوي. اذا وقع تجاوز في الدفاع امكن اعفاء فاعل الجريمة من العقوبة في الشروط المذكورة في المادة ال 228."
+    }
+  ],
+  "en": {
+    "title": "Lebanese Penal Code: the most searched articles",
+    "question": "What do the most cited articles of the Lebanese Penal Code say (homicide, assault, theft, fraud, defamation, adultery, abortion, self-defence)?",
+    "description": "Penalties in the Lebanese Penal Code for killing, assault, theft, fraud, defamation, adultery, abortion, and the self-defence rule.",
+    "answer": {
+      "text": "Intentional killing carries 15 to 20 years of hard labour under Article 547, or 20 to 25 years between spouses, but Articles 548 and 549 set life hard labour and, in the text, death in the cases they list. Ordinary theft carries 2 months to 3 years, theft from a bank or state body 3 to 10 years of hard labour, and minor assault up to 6 months. Adultery carries 3 months to 2 years and needs a spouse's complaint within 3 months.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a10",
+        "a11",
+        "a12"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "What is the penalty for intentional killing?",
+        "paras": [
+          {
+            "text": "Article 547 sets hard labour from 15 to 20 years for intentional killing, and 20 to 25 years when a spouse kills the other spouse. Articles 548 and 549 displace this penalty in the cases they list.",
+            "cites": [
+              "a1",
+              "a2",
+              "a3"
+            ]
+          },
+          {
+            "text": "Article 548 sets life hard labour for killing with a base motive, to obtain the benefit of a misdemeanour, or with mutilation of the body afterwards. It also covers killing a minor under 15 and killing 2 or more people.",
+            "cites": [
+              "a1",
+              "a2"
+            ]
+          },
+          {
+            "text": "The text of Article 549 sets death for intentional killing in listed cases. They include premeditation, killing to prepare or carry out a crime or shield its authors, killing an ascendant or descendant, and killing with torture or savagery. Our record shows a later partial amendment to this article, and we do not hold its wording.",
+            "cites": [
+              "a3"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What is the penalty for assault?",
+        "paras": [
+          {
+            "text": "Article 554 covers intentional beating, wounding or harm that causes no illness or work incapacity over 10 days. On the victim's complaint, it sets up to 6 months in prison or minor detention, and a fine of 10,000 to 50,000 LBP, or either penalty.",
+            "cites": [
+              "a4"
+            ]
+          },
+          {
+            "text": "This page does not set out more serious or longer harm, or the effect of withdrawing a complaint. The articles that follow in the Penal Code deal with these.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "What is the penalty for theft and fraud?",
+        "paras": [
+          {
+            "text": "Article 636 covers only theft with no special penalty elsewhere in the Code, and Article 638 is one such text. It sets 2 months to 3 years in prison and a fine of 100,000 to 400,000 LBP. The penalty rises under Article 257 in listed cases, such as theft in places of worship and inhabited buildings.",
+            "cites": [
+              "a5",
+              "a6"
+            ]
+          },
+          {
+            "text": "Article 638 displaces Article 636 in the cases it lists and sets 3 to 10 years of hard labour. These include theft from a government body, an official office or a public body, and from a bank, a jeweller or a money changer. The article lists further cases not set out here.",
+            "cites": [
+              "a5",
+              "a6"
+            ]
+          },
+          {
+            "text": "Article 655 sets 6 months to 3 years in prison and a fine of 100,000 to 1,000,000 LBP for fraud. It covers using fraudulent schemes to get someone to hand over property, or papers carrying an undertaking, release or benefit, and taking them.",
+            "cites": [
+              "a7"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What is the penalty for defamation, and who can start the case?",
+        "paras": [
+          {
+            "text": "Article 582 sets up to 3 months in prison and a fine of up to 200,000 LBP, or either penalty, for defamation by a means listed in Article 209. Defamation that is not public carries a fine only.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "Under Article 586, a defamation or insult case depends on the victim joining as a civil party. For a dead person, only relatives within the degree the article sets may prosecute, besides any relative or heir personally harmed.",
+            "cites": [
+              "a9"
+            ]
+          },
+          {
+            "text": "This page does not set out the penalty for insult or the means of publicity the Code refers to.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "What do the articles say about adultery and abortion?",
+        "paras": [
+          {
+            "text": "Article 487 sets 3 months to 2 years in prison for adultery by either spouse. A married partner gets the same, an unmarried one a month to a year. Proof against the partner is limited to a judicial confession, being caught in the act, or the partner's own written papers. The spouse's penalty doubles for adultery in the marital home.",
+            "cites": [
+              "a10"
+            ]
+          },
+          {
+            "text": "Article 489 limits prosecution under Article 487. Adultery is prosecuted only on a spouse's complaint, with the complainant joining as a civil party. No complaint is accepted once 3 months pass from the day the complainant learned of the offence.",
+            "cites": [
+              "a10",
+              "a11",
+              "a12"
+            ]
+          },
+          {
+            "text": "Article 541 sets 6 months to 3 years in prison for a woman who aborts herself, by means she used or another person used with her consent. The other abortion articles are not set out here.",
+            "cites": [
+              "a13"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "When does an act count as self-defence?",
+        "paras": [
+          {
+            "text": "Article 184 treats as the exercise of a right an act that a present necessity requires to repel an unjust, unprovoked attack on your person or property, or on another person or their property. Natural and legal persons are protected equally. If the defence goes too far, the offender may be exempted under the conditions of Article 228.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "This page does not cover forgery, drug offences or breaches of administrative regulations. Fines here are in pounds (LBP) as printed in the texts, and we hold no later law revaluing them.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "قانون العقوبات اللبناني: أكثر المواد بحثاً",
+    "question": "ماذا تنص أكثر مواد قانون العقوبات اللبناني تداولاً (القتل، الإيذاء، السرقة، الاحتيال، الذم والقدح، الزنا، الإجهاض، الدفاع المشروع)؟",
+    "description": "عقوبات القتل والإيذاء والسرقة والاحتيال والذم والزنا والإجهاض، وقاعدة الدفاع المشروع، في قانون العقوبات اللبناني.",
+    "answer": {
+      "text": "يعاقَب على القتل قصداً بالأشغال الشاقة من 15 إلى 20 سنة وفق المادة 547، ومن 20 إلى 25 سنة إذا وقع بين الزوجين، غير أن المادتين 548 و549 تفرضان الأشغال الشاقة المؤبدة، والإعدام بحسب النص، في الحالات التي تعددانها. ويعاقَب على السرقة العادية بالحبس من شهرين إلى 3 سنوات، وعلى سرقة المصارف والمؤسسات الحكومية بالأشغال الشاقة من 3 إلى 10 سنوات، وعلى الإيذاء البسيط بالحبس حتى 6 أشهر. ويعاقَب على الزنا بالحبس من 3 أشهر إلى سنتين، ولا يلاحَق إلا بشكوى أحد الزوجين خلال 3 أشهر.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a10",
+        "a11",
+        "a12"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "ما عقوبة القتل قصداً؟",
+        "paras": [
+          {
+            "text": "تعاقب المادة 547 على القتل قصداً بالأشغال الشاقة من 15 إلى 20 سنة، ومن 20 إلى 25 سنة إذا قتل أحد الزوجين الآخر. وتحلّ المادتان 548 و549 محل هذه العقوبة في الحالات التي تعددانها.",
+            "cites": [
+              "a1",
+              "a2",
+              "a3"
+            ]
+          },
+          {
+            "text": "تفرض المادة 548 الأشغال الشاقة المؤبدة على القتل قصداً إذا ارتُكب لسبب سافل، أو للحصول على منفعة ناتجة عن جنحة، أو أقدم المجرم بعده على التمثيل بالجثة. وتشمل كذلك قتل حدث دون 15 سنة، وقتل شخصين أو أكثر.",
+            "cites": [
+              "a1",
+              "a2"
+            ]
+          },
+          {
+            "text": "يفرض نص المادة 549 الإعدام على القتل قصداً في حالات معددة، منها العمد، والقتل تمهيداً لجناية أو جنحة أو تنفيذاً لها أو لحماية فاعليها من العقاب، وقتل أحد أصول المجرم أو فروعه، واقتران القتل بالتعذيب أو الشراسة. ويظهر في سجلاتنا تعديل جزئي لاحق لهذه المادة، ولا نملك نصه.",
+            "cites": [
+              "a3"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما عقوبة الإيذاء؟",
+        "paras": [
+          {
+            "text": "تشمل المادة 554 ضرب شخص أو جرحه أو إيذاءه قصداً إذا لم ينجم عن الفعل مرض أو تعطيل عن العمل لأكثر من 10 أيام. ويعاقَب الفاعل، بناءً على شكوى المتضرر، بالحبس حتى 6 أشهر أو بالتوقيف التكديري، وبغرامة من 10,000 إلى 50,000 ليرة لبنانية، أو بإحدى هاتين العقوبتين.",
+            "cites": [
+              "a4"
+            ]
+          },
+          {
+            "text": "لا تعرض هذه الصفحة الإيذاء الأشد أو الأطول مدة، ولا أثر تنازل الشاكي. وتتناول هذه المسائل المواد التالية في قانون العقوبات.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ما عقوبة السرقة والاحتيال؟",
+        "paras": [
+          {
+            "text": "لا تطبَّق المادة 636 إلا على السرقة التي لا يحدد لها نص آخر في قانون العقوبات عقوبة خاصة، والمادة 638 من هذه النصوص. وتعاقب عليها بالحبس من شهرين إلى 3 سنوات وبغرامة من 100,000 إلى 400,000 ليرة لبنانية. وتشدَّد العقوبة وفق المادة 257 في حالات معددة، منها السرقة في المعابد والأبنية المأهولة.",
+            "cites": [
+              "a5",
+              "a6"
+            ]
+          },
+          {
+            "text": "تحلّ المادة 638 محل المادة 636 في الحالات التي تعددها، فتعاقب بالأشغال الشاقة من 3 إلى 10 سنوات. ومن هذه الحالات سرقة أموال مؤسسة حكومية أو مكتب إدارة رسمية أو هيئة عامة، وسرقة أموال مصرف أو محل صياغة أو صيرفة. وتذكر المادة حالات أخرى لا تعرضها هذه الصفحة.",
+            "cites": [
+              "a5",
+              "a6"
+            ]
+          },
+          {
+            "text": "تعاقب المادة 655 على الاحتيال بالحبس من 6 أشهر إلى 3 سنوات وبغرامة من 100,000 إلى 1,000,000 ليرة لبنانية. والاحتيال أن يحمل الفاعل غيره بمناورات احتيالية على تسليمه مالاً أو سنداً يتضمن تعهداً أو إبراءً أو منفعة، ثم يستولي عليه.",
+            "cites": [
+              "a7"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما عقوبة الذم، ومن يحق له تحريك الدعوى؟",
+        "paras": [
+          {
+            "text": "تعاقب المادة 582 على الذم بإحدى الوسائل المذكورة في المادة 209 بالحبس حتى 3 أشهر وبغرامة حتى 200,000 ليرة لبنانية، أو بإحدى هاتين العقوبتين. وإذا لم يقع الذم علانية، فالعقوبة الغرامة وحدها.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "وبحسب المادة 586، تتوقف دعوى الذم أو القدح على اتخاذ المعتدى عليه صفة المدعي الشخصي. وإذا وُجّه الذم أو القدح إلى ميت، فلا يلاحق إلا أقرباؤه ضمن الدرجة التي تحددها المادة، مع بقاء حق كل قريب أو وريث تضرر شخصياً.",
+            "cites": [
+              "a9"
+            ]
+          },
+          {
+            "text": "لا تعرض هذه الصفحة عقوبة القدح، ولا وسائل العلنية التي يحيل إليها القانون.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ماذا تقول المواد عن الزنا والإجهاض؟",
+        "paras": [
+          {
+            "text": "تعاقب المادة 487 على الزنا الذي يرتكبه أي من الزوجين بالحبس من 3 أشهر إلى سنتين. ويعاقَب الشريك بالعقوبة نفسها إن كان متزوجاً، وإلا فبالحبس من شهر إلى سنة. ولا يُقبل دليلاً على الشريك إلا الإقرار القضائي أو الجرم المشهود أو ما كتبه من رسائل ووثائق. وتضاعَف عقوبة الزوج المرتكب إذا وقع الزنا في البيت الزوجي.",
+            "cites": [
+              "a10"
+            ]
+          },
+          {
+            "text": "تقيّد المادة 489 الملاحقة بموجب المادة 487، فلا يلاحَق الزنا إلا بشكوى أحد الزوجين الذي يتخذ صفة المدعي الشخصي. ولا تُقبل الشكوى بعد مرور 3 أشهر على اليوم الذي علم فيه الشاكي بالجرم.",
+            "cites": [
+              "a10",
+              "a11",
+              "a12"
+            ]
+          },
+          {
+            "text": "تعاقب المادة 541 المرأة التي تطرح نفسها، بوسائل استعملتها هي أو استعملها غيرها برضاها، بالحبس من 6 أشهر إلى 3 سنوات. ولا تعرض هذه الصفحة سائر مواد الإجهاض.",
+            "cites": [
+              "a13"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "متى يُعدّ الفعل دفاعاً مشروعاً؟",
+        "paras": [
+          {
+            "text": "تعدّ المادة 184 ممارسةً لحق كل فعل تقضي به ضرورة حالية لدفع تعرض غير محق ولا مثار عن النفس أو الملك، أو عن نفس الغير أو ملكه. ويتساوى في الحماية الشخص الطبيعي والشخص المعنوي. وإذا وقع تجاوز في الدفاع، جاز إعفاء الفاعل من العقوبة بالشروط المذكورة في المادة 228.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة التزوير ولا جرائم المخدرات ولا مخالفة الأنظمة الإدارية. والغرامات فيها بالليرة اللبنانية كما وردت في النصوص، ولا نملك قانوناً لاحقاً يعدّل قيمتها.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  }
+}

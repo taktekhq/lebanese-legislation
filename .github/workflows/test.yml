@@ -1,0 +1,32 @@
+name: test
+on:
+  push:
+  pull_request:
+jobs:
+  serving:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: legislation
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d legislation"
+          --health-interval 2s --health-timeout 2s --health-retries 30
+    env:
+      DEMO_DATABASE_URL: postgres://postgres@localhost:5432/legislation?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Load fictional fixture
+        run: |
+          for schema in db/schema.sql db/graph.sql db/amendments.sql db/official.sql db/indexes.sql testdata/synthetic.sql; do
+            psql "$DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -q -f "$schema"
+          done
+      - run: go test ./...
+      - run: go build ./cmd/website

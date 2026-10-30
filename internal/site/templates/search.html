@@ -1,0 +1,44 @@
+{{define "content"}}{{with .Data}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <p class="eyebrow">{{t "search.eyebrow"}}</p>
+  <h1 class="page__title" style="margin-bottom:22px">{{if .Q}}&ldquo;<bdi>{{.Q}}</bdi>&rdquo;{{else}}{{t "search.title_main"}}{{end}}</h1>
+  {{template "search" .Q}}
+  {{if .Q}}<span hidden id="search-meta" data-q="{{.Q}}" data-n="{{add (add (add .LawCount .ArtCount) .RulCount) (len .Topics)}}"></span>{{end}}
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+{{if .MeaningUnavailable}}<p role="status" class="notice" style="margin-top:24px">{{t "search.meaning_unavailable"}}</p>{{end}}
+{{if .Download}}<div class="notice" style="max-width:70ch;margin-top:28px"><p>{{t "search.download"}}</p><div class="btn-row" style="margin-top:14px"><a class="btn btn--primary" href="{{datasetURL}}" rel="noopener">{{t "data.download_btn"}}</a><a class="btn btn--ghost" href="{{u "/data/"}}">{{t "search.download_tables"}}</a></div></div>{{end}}
+{{if not .Q}}
+  <p class="lead" style="margin-top:28px">{{t "search.hint"}}</p>
+{{else if and (not .Laws) (not .Articles) (not .Rulings) (not .Topics)}}
+  {{if .Missing}}<div class="empty" style="margin-top:28px"><h3>{{if .MissingRuling}}{{t "search.missing_ruling" .Missing}}{{else}}{{t "search.missing" .Missing}}{{end}}</h3><p>{{t "search.missing_hint"}}</p>
+  {{else}}<div class="empty" style="margin-top:28px"><h3>{{t "search.nothing" .Q}}</h3><p>{{t "search.nothing_hint"}}</p>{{end}}</div>
+  {{if .SameNum}}<div class="sec__head" style="margin-top:40px"><div><h2 class="sec__title" style="font-size:1.375rem">{{t "search.same_number"}}</h2></div></div>
+  <ul class="doclist">{{range .SameNum}}{{template "lawrow" .}}{{end}}</ul>{{end}}
+  {{if .Near}}<div class="sec__head" style="margin-top:40px"><div><h2 class="sec__title" style="font-size:1.375rem">{{t "search.near"}}</h2></div></div>
+  <ul class="doclist">{{range .Near}}{{template "lawrow" .}}{{end}}</ul>{{end}}
+  <div class="sec__head" style="margin-top:40px"><div><h2 class="sec__title" style="font-size:1.375rem">{{t "search.next"}}</h2></div></div>
+  <div class="scroller filters"><a class="chip" href="{{u "/codes/"}}">{{t "nav.codes"}}</a><a class="chip" href="{{u "/laws/years/"}}">{{t "search.by_year"}}</a><a class="chip" href="{{u "/laws/"}}">{{t "nav.legislation"}}</a><a class="chip" href="{{u "/rulings/"}}">{{t "nav.rulings"}}</a><a class="chip" href="{{u "/gazette/"}}">{{t "nav.gazette"}}</a></div>
+{{else}}
+  {{if .Via}}<p class="tiny" style="margin-top:28px">{{if eq .ViaKind "meaning"}}{{t "search.meaning_via" .Via}}{{else if eq .ViaKind "adjusted"}}{{t "search.via_fixed" .Via}}{{else}}{{t "search.via" .Via}}{{end}}</p>{{end}}
+  {{if .Laws}}<div class="sec__head" style="margin-top:40px"><div><h2 class="sec__title" style="font-size:1.375rem">{{t "search.texts"}} <span class="muted">{{num .LawCount}}</span></h2></div>{{if gt .LawCount (len .Laws)}}<a class="sec__more" href="{{u "/laws/"}}">{{t "search.browse_all"}}</a>{{end}}</div>
+  <ul class="doclist">{{range .Laws}}{{template "lawrow" .}}{{end}}</ul>{{end}}
+  {{if and (not .Laws) .Near}}<div class="sec__head" style="margin-top:40px"><div><h2 class="sec__title" style="font-size:1.375rem">{{t "search.near"}}</h2></div></div>
+  <ul class="doclist">{{range .Near}}{{template "lawrow" .}}{{end}}</ul>{{end}}
+  {{if .Articles}}<div class="sec__head" style="margin-top:40px"><div><h2 class="sec__title" style="font-size:1.375rem">{{t "search.articles"}} <span class="muted">{{if ge .ArtCount 1000}}1,000+{{else}}{{num .ArtCount}}{{end}}</span></h2></div></div>
+  <ul class="doclist">{{range .Articles}}<li><a class="docrow" href="{{artURL .ID .Article}}" dir="rtl">
+    <span class="docrow__title" lang="ar">المادة {{.Article}} من {{.CiteName}}</span>
+    <span class="kicker seps"><b lang="ar">{{.Kind}}</b>{{with .IssuedOn}} <span><bdi>{{date .}}</bdi></span>{{end}}</span>
+    {{template "status" .Status}}
+    <span class="docrow__snip" lang="ar">{{.Highlight}}</span></a></li>{{end}}</ul>{{end}}
+  {{if .Rulings}}<div class="sec__head" style="margin-top:40px"><div><h2 class="sec__title" style="font-size:1.375rem">{{t "search.rulings"}} <span class="muted">{{if ge .RulCount 1000}}1,000+{{else}}{{num .RulCount}}{{end}}</span></h2></div></div>
+  <ul class="doclist">{{range .Rulings}}{{template "docrow" .}}{{end}}</ul>{{end}}
+{{end}}
+{{if .Topics}}<div class="sec__head" style="margin-top:40px"><h2 class="sec__title">{{t "search.explanations"}}</h2></div>
+<ul class="doclist">{{range .Topics}}<li><a class="docrow" href="{{.Path}}" lang="{{.Lang}}" dir="auto"><span class="docrow__title">{{.Title}}</span><span class="tiny">{{t "search.unofficial"}}</span><span class="docrow__snip">{{.Snippet}}</span></a></li>{{end}}</ul>{{end}}
+</section>
+{{if and meaningEnabled .Q}}<section class="wrap" style="padding-bottom:var(--section-y)" data-grounded-answer data-question="{{.Q}}" data-answer-url="{{u "/search/answer/"}}" data-error="{{t "search.answer_unavailable"}}">
+<h2>{{t "search.answer_title" (meaningProvider)}}</h2><div data-answer-content role="status" aria-live="polite"><p class="tiny">{{t "search.answer_loading"}}</p></div>
+</section>{{end}}
+{{end}}{{end}}

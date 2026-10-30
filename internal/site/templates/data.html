@@ -1,0 +1,49 @@
+{{define "content"}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <p class="eyebrow" data-reveal>{{t "data.eyebrow"}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{t "data.h1"}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{t "data.lead"}}</p>
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <div class="notice" style="max-width:70ch;margin-bottom:28px"><p>{{t "data.download_notice" (safe "<a class=\"link\" href=\"https://huggingface.co/datasets/taktekhq/lebanese-legislation\" rel=\"noopener\">taktekhq/lebanese-legislation</a>") (safe "<a class=\"link\" href=\"mailto:taktekbot@taktek.io\">taktekbot@taktek.io</a>")}}</p><div class="btn-row" style="margin-top:14px"><a class="btn btn--primary" href="{{datasetURL}}" rel="noopener">{{t "data.download_btn"}}</a></div></div>
+  <article class="doc">
+    <h2>{{t "data.how_kept_h2"}}</h2>
+    <ul>
+      <li>{{t "data.how_kept_1"}}</li>
+      <li>{{t "data.how_kept_2"}}</li>
+    </ul>
+    <h2>{{t "data.tables_h2"}}</h2>
+  </article>
+  <div class="tablewrap" style="margin-top:14px;max-width:880px">
+    <dl class="facts" style="max-width:none">{{range .Data}}
+      <div><dt><code>{{.Name}}</code></dt><dd>{{.Comment}}{{if .Rows}} <span class="muted">({{num .Rows}} {{t "data.rows_suffix"}})</span>{{end}}</dd></div>{{end}}
+    </dl>
+  </div>
+  <article class="doc" style="margin-top:36px">
+    <h2>{{t "data.examples_h2"}}</h2>
+    <p>{{t "data.example_1"}}</p>
+    <pre class="snippet">SELECT number, citation, text_ar
+FROM article_cited
+WHERE law_id = 244226
+  AND search_stem @@ websearch_to_tsquery('arabic', 'التضامن')
+ORDER BY position;</pre>
+    <p>{{t "data.example_2"}}</p>
+    <pre class="snippet">SELECT l.title, count(DISTINCT r.from_id) AS rulings
+FROM reference r JOIN legislation l ON l.id = r.law_id
+JOIN ruling x ON x.id = r.from_id AND r.from_type = 'ruling'
+WHERE x.court LIKE 'تمييز%'
+GROUP BY l.title ORDER BY rulings DESC LIMIT 20;</pre>
+    <p>{{t "data.example_3"}}</p>
+    <pre class="snippet">SELECT a.title AS repealing, b.title AS repealed
+FROM reference r
+JOIN legislation a ON a.id = r.from_id
+JOIN legislation b ON b.id = r.law_id
+WHERE r.from_type = 'legislation' AND r.relation = 'repeals';</pre>
+    <h2>{{t "data.where_h2"}}</h2>
+    <p>{{t "data.where_body"}}</p>
+    <h2 id="license">{{t "data.license_h2"}}</h2>
+    <p>{{t "data.license_body" (safe "<a href=\"https://legallaw.ul.edu.lb/\" rel=\"noopener\">مركز الدراسات والأبحاث في المعلوماتية القانونية</a>") (safe (printf "<q>%s</q>" (t "data.license_credit_quote")))}}</p>
+  </article>
+</section>
+{{end}}

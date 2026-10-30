@@ -1,0 +1,33 @@
+{{define "content"}}{{with .Data}}{{$o := .}}
+<section class="wrap dochead" dir="rtl">
+  <a class="back" href="{{u "/official/"}}" dir="ltr"><span aria-hidden="true">{{backArrow}}</span> {{.L.back}}</a>
+  <p class="kicker seps" data-reveal><b lang="ar">{{.Kind}}</b>{{if .Number}} <span><bdi>{{.Number}}</bdi></span>{{end}}{{with .IssuedOn}} <span><bdi>{{date .}}</bdi></span>{{end}}</p>
+  <h1 lang="ar" data-reveal style="--d:60ms">{{.Title}}</h1>
+  <p class="nottext" dir="auto" style="margin:18px 0">{{.L.notice}}</p>
+  <dl class="facts">
+    <div><dt>{{.L.kind}}</dt><dd><span lang="ar">{{.Kind}}</span></dd></div>
+    {{if .Number}}<div><dt>{{.L.number}}</dt><dd><bdi>{{.Number}}</bdi></dd></div>{{end}}
+    {{with .IssuedOn}}<div><dt>{{$o.L.date}}</dt><dd><bdi>{{date .}}</bdi></dd></div>{{end}}
+    {{if .Issue}}<div><dt>{{.L.issue}}</dt><dd><bdi>{{.Issue}}{{with .IssueDate}}, {{date .}}{{end}}{{if .PageFrom}}, {{$o.L.page}} {{.PageFrom}}{{if and .PageTo (ne .PageTo .PageFrom)}}-{{.PageTo}}{{end}}{{end}}</bdi></dd></div>{{end}}
+    <div><dt>{{.L.from}}</dt><dd>{{.L.source}} {{if .SourceURL}}<a class="link" href="{{.SourceURL}}" rel="noopener" dir="ltr">{{.SourceName}} <span aria-hidden="true">&nearr;</span></a>{{else}}{{.SourceName}}{{end}}</dd></div>
+    {{if .PDF}}<div><dt>PDF</dt><dd><a class="link" href="{{.PDF}}" dir="ltr">{{.L.pdf}}</a></dd></div>{{end}}
+    {{if .PCMURL}}<div><dt>PCM</dt><dd><a class="link" href="{{.PCMURL}}" rel="noopener" dir="ltr">{{.L.pcm}} <span aria-hidden="true">&nearr;</span></a></dd></div>{{end}}
+    <div><dt>{{.L.reading}}</dt><dd><bdi>{{printf "%.1f" (mul100 .Agreement)}}%{{if .Flagged}} &middot; {{.Flagged}} &#9873;{{end}}</bdi></dd></div>
+  </dl>
+</section>
+<section class="wrap">
+  {{if .Flagged}}<p class="nottext" dir="auto" style="margin-top:8px">{{.L.flagged}}</p>{{end}}
+  {{range .Pages}}
+  <div class="opage" id="p{{.N}}">
+    <h2 class="opage__n" dir="ltr">{{$o.L.pageword}} {{.N}}</h2>
+    <div class="opage__grid">
+      {{if .Img}}<figure class="opage__img"><a href="{{.Img}}" target="_blank" rel="noopener"><img src="{{.Img}}" alt="{{$o.L.pageword}} {{.N}}: {{$o.Title}}" loading="lazy" width="992" height="1403"></a></figure>{{end}}
+      <div class="opage__text longtext" lang="ar" dir="rtl">
+        {{range .Cols}}{{range .}}<p>{{range .}}{{if .Flag}}<mark class="flag" title="{{.Alt}}">{{if .Text}}{{.Text}}{{else}}&#8230;{{end}}</mark>{{else}}{{.Text}}{{end}}{{end}}</p>{{end}}{{end}}
+      </div>
+    </div>
+  </div>
+  {{end}}
+</section>
+<div style="height:var(--section-y)"></div>
+{{end}}{{end}}

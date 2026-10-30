@@ -1,0 +1,460 @@
+{
+  "slug": "code-of-commerce",
+  "order": 15,
+  "published": "2026-10-20",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 244586,
+      "article": "9",
+      "quote": "التجار هم:\n\nاولا: الاشخاص الذين تكون مهنتهم القيام باعمال تجارية.\n\nثانيا : الشركات التي يكون موضوعها تجاريا.\n\nاما الشركات التي يكون موضوعها مدنيا ولكنها اتخذت صفة الشركات المغفلة او شركات التوصية المساهة فتخضع لجميع موجبات التجار المعينة في الفصلين الثاني والثالث الآتيين ولاحكام الصلح الاحتياطي والافلاس المقررة في الكتاب الخامس من هذا القانون."
+    },
+    {
+      "id": "a2",
+      "law": 244586,
+      "article": "10",
+      "quote": "ان الافراد الذين يتعاطون تجارة صغيرة او حرفة بسيطة ذات نفقات عامة زهيدة كالبائع الطواف او البائع بالمياومة او الذين يقومون بنقليات صغيرة على البر او سطح الماء لا يخضعون للواجبات المختصة بالدفاتر التجارية ولا لقواعد النشر التي يوجبها هذا القانون."
+    },
+    {
+      "id": "a3",
+      "law": 244586,
+      "article": "24",
+      "quote": "يجب على كل تاجر ان يطلب من كاتب المحكمة التي يكون محله الرئيسي موجودا في منطقتها ان يسجل اسمه في سجل التجارة في خلال شهر من تاريخ فتح المحل او شرائه"
+    },
+    {
+      "id": "a4",
+      "law": 244586,
+      "article": "16",
+      "quote": "وعليه ايضا ان يجري جردة سنوية لجميع عناصر مؤسسته وان يوقف جميع الحسابات بغية وضع الميزانية ووضع \"حساب النتيجة\" ويجب ان تنظم الوثائق المتعلقة بها وان تحفظ طوال المدة المنصوص عليها في المادة 19 من قانون التجارة.\n\n- يصبح مسك الدفاتر التجارية بواسطة التطبيق الرقمي المقررة في هذه المادة الزاميا بعد سنتين من تاريخ صدور هذا القانون."
+    },
+    {
+      "id": "a5",
+      "law": 244586,
+      "article": "19",
+      "quote": "يجب على التاجر ان يحفظ الدفاتر بعد اختتامها سحابة عشر سنوات ."
+    },
+    {
+      "id": "a6",
+      "law": 244586,
+      "article": "26",
+      "quote": "ان الشركات التي لها مركز رئيسي في لبنان يجب تسجيلها في سجل التجارة المختص بمنطقة مركزها ويجب على ممثل الشركة القانوني ان يطلب التسجيل في خلال الشهر الذي يلي تأسيسها:"
+    },
+    {
+      "id": "a7",
+      "law": 244586,
+      "article": "53",
+      "quote": "كل شريك في شركة تضامن من يعد كأنه يتعاطى بنفسه التجارة تحت عنوان شركة- فكل منهم يكتسب صفة التاجر القانونية. وافلاس الشركة يؤدي الى الافلاس الشخصي لكل من الشركاء."
+    },
+    {
+      "id": "a8",
+      "law": 244586,
+      "article": "425",
+      "quote": "ان الشك قابل للايفاء لدى الاطلاع. وكل شرط مخالف يعد لغوا. والشك الذي يقدم للايفاء قبل اليوم المعين كتاريخ للاصدار هو قابل الايفاء في يوم العرض ."
+    },
+    {
+      "id": "a9",
+      "law": 244586,
+      "article": "426",
+      "quote": "ان الشك الذي يصدر في لبنان ويكون قابل الايفاء فيه يجب ان يعرض للايفاء في مهلة ثمانية ايام.\n\nاما الشك الذي يصدر في خارج لبنان ويكون قابلا للايفاء فيه فيجب عرضه في مهلة عشرين يوما اذا كان محل اصداره في بلاد متاخمة للبنان او لسوريا او في اوربا او في بلاد واقعة على شاطيء البحر المتوسط.\n\nوتكون المهلة سبعين يوما اذا كان الشك صادرا عن اي بلد آخر."
+    },
+    {
+      "id": "a10",
+      "law": 244586,
+      "article": "442",
+      "quote": "ان حق حامل الشك قي اقامة الدعوى على المظهرين والساحب وسائر الموجب عليهم يسقط بمرور ستة اشهر تبتدىء من نهاية مهلة العرض .\n\nاما حق الملزمين بايفاء الشك في مداعاة بعضهم لبعض فيسقط بمرور ستة اشهر تبتدىء من يوم دفع الموجب عليه مبلغ الشك او من يوم اقامة الدعوى عليه.\n\nعلى انه في حالة السقوط او مرور الزمن يبقى الحق في اقامة الدعوى على الساحب الذي لم يؤد المؤونة او على سائر الموجب عليهم الذين احرزوا كسبا غير مشروع.\n\nان حق حامل الشك ففي اقامة الدعوى على المسحوب عليه يسقط بمرور ثلاث سنوات تبتدىء من نهاية مهلة العرض ."
+    },
+    {
+      "id": "a11",
+      "law": 244586,
+      "article": "398",
+      "quote": "كل ما ينشأ عن سند السحب من حقوق الادعاء على قابل السند يسقط بمرورثلاث سنوات ابتداء من تاريخ الاستحقاق .\n\nان حقوق حامل السند في الادعاء على المظهرين وعلى الساحب تسقط بمرور سنة ابتداء من تاريخ الاحتجاج المقام في المدة القانونية او ابتداء من تاريخ الاستحقاق اذا وجدت عبارة \"الاعادة بدون نفقة\".\n\nاما حقوق المظهرين في الادعاء بعضهم على بعض وعلى الساحب فتسقط بمرور ستة اشهر ابتداء من اليوم الذي دفع فيه المظهر مبلغ السند او من يوم اقامة الدعوى عليه."
+    },
+    {
+      "id": "a12",
+      "law": 244586,
+      "article": "489",
+      "quote": "مع الاحتفاظ بتطبيق احكام الباب السابق يعتبر في حالة الافلاس كل تاجر ينقطع عن دفع ديونه التجارية, وكل تاجر لا يدعم الثقة المالية به الا بوسائل يظهر بجلاء انها غير مشروعة."
+    },
+    {
+      "id": "a13",
+      "law": 244586,
+      "article": "490",
+      "quote": "يعلن الافلاس بمقتضى حكم من المحكمة الابتدائية الموجودة في منطقتها المؤسسة التجارية الاصلية. ويكون هذا الحكم معجل التنفيذ."
+    },
+    {
+      "id": "a14",
+      "law": 244586,
+      "article": "491",
+      "quote": "يجوز ان ترفع القضية الى المحكمة بتصريح من التاجر نفسه, ويجب عليه ان يقوم بهذا التصريح في خلال عشرين يوما من تاريخ انقطاعه عن الدفع والا استهدف لارتكاب جنحة الافلاس التقصيري وعليه ان يودع في الوقت نفسه موازنة مفصلة ومصدق على كونها مطابقة لحالة موجوداته والديون المطلوبة منه."
+    }
+  ],
+  "en": {
+    "title": "Lebanese Code of Commerce: merchants, companies, cheques and bankruptcy",
+    "question": "What does the Lebanese Code of Commerce say about who is a merchant, registration, companies, cheques and bills of exchange, and bankruptcy?",
+    "description": "What the Lebanese Code of Commerce says about merchants, registration, books, companies, cheques, bills of exchange and bankruptcy.",
+    "answer": {
+      "text": "A merchant is a person whose profession is commercial acts or a company with a commercial object; petty traders are exempt from book duties. A merchant registers within 1 month and keeps books for 10 years; digital book-keeping becomes compulsory 2 years after Law 126 of 2019. A cheque is payable on sight and, if issued in Lebanon, presented within 8 days; a merchant who stops paying commercial debts is bankrupt.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a8",
+        "a9",
+        "a12"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Who counts as a merchant?",
+        "paras": [
+          {
+            "text": "Under Article 9, merchants are people whose profession is commercial acts and companies with a commercial object. A civil-object company formed as a joint-stock company or a partnership limited by shares has the merchant obligations in the chapters that follow. The Code's preventive composition and bankruptcy rules also apply to it.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "Article 10 exempts small traders and simple crafts with low overheads, such as peddlers, day sellers and small carriers, from book duties and publicity rules.",
+            "cites": [
+              "a2"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "How does a merchant register and keep books?",
+        "paras": [
+          {
+            "text": "A merchant registers within 1 month of opening or buying the establishment, under Article 24. He applies to the clerk of the court where it lies.",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "Article 16 requires an annual inventory, closed accounts, a balance sheet and an income statement. Since Law 126 of 2019, it makes digital book-keeping compulsory 2 years after that law's issue. Article 19 requires books to be kept for 10 years after closing. Article 10 exempts petty traders from these book duties.",
+            "cites": [
+              "a4",
+              "a5",
+              "a2"
+            ]
+          },
+          {
+            "text": "We do not hold the decree on digital standards or the date digital books became compulsory.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "How does a company register, and are partners merchants?",
+        "paras": [
+          {
+            "text": "Under Article 26, a company with its head office in Lebanon registers in that area's commercial register. Its legal representative applies within the month after formation.",
+            "cites": [
+              "a6"
+            ]
+          },
+          {
+            "text": "Under Article 53, each partner in a general partnership is a merchant. The partnership's bankruptcy entails each partner's personal bankruptcy.",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "This page does not cover company capital. The Code articles we hold do not regulate limited liability companies (SARL).",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "When is a cheque paid, and how long do you have to present it?",
+        "paras": [
+          {
+            "text": "Article 425 makes a cheque payable on sight, and any contrary clause is void. A cheque presented before its stated issue date is payable on the day of presentation.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "Article 426 sets the presentation period for a cheque payable in Lebanon by its place of issue.",
+            "cites": [
+              "a9"
+            ]
+          },
+          {
+            "text": "We do not hold the Penal Code rules on a cheque without funds.",
+            "note": true
+          }
+        ],
+        "table": {
+          "caption": "Cheque presentation periods (Article 426)",
+          "head": [
+            "Where the cheque was issued",
+            "Period"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Lebanon",
+                "8 days"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "A country bordering Lebanon or Syria, Europe, or a country on the Mediterranean coast",
+                "20 days"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "Any other country",
+                "70 days"
+              ],
+              "cites": [
+                "a9"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "When do claims on a cheque or a bill of exchange lapse?",
+        "paras": [
+          {
+            "text": "A cheque holder's claims against endorsers, the drawer and other obligors lapse 6 months after the presentation period. Claims between obligors lapse 6 months from payment or suit. A claim still survives against a drawer who did not provide funds, or obligors unjustly enriched.",
+            "cites": [
+              "a10"
+            ]
+          },
+          {
+            "text": "A cheque holder's claim against the drawee lapses 3 years after the presentation period. Article 398 bars claims on a bill of exchange against the acceptor 3 years from maturity.",
+            "cites": [
+              "a10",
+              "a11"
+            ]
+          },
+          {
+            "text": "A bill holder's claims against endorsers and the drawer lapse 1 year from a timely protest. Under a “return without expenses” clause, that year runs from maturity. Endorsers' claims against each other and the drawer lapse 6 months from payment or suit.",
+            "cites": [
+              "a11"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "When is a merchant bankrupt, and who declares it?",
+        "paras": [
+          {
+            "text": "Under Article 489, a merchant who stops paying commercial debts is bankrupt. So is a merchant who supports his credit only by plainly illegitimate means. The article applies subject to the preceding chapter of the Code, which the texts we hold do not include.",
+            "cites": [
+              "a12"
+            ]
+          },
+          {
+            "text": "Under Article 490, the court of first instance for the main establishment declares bankruptcy by a provisionally enforceable judgment. Under Article 491, a merchant must declare stopping payment within 20 days, or face the misdemeanour of simple bankruptcy. He files a detailed, certified balance sheet.",
+            "cites": [
+              "a13",
+              "a14"
+            ]
+          },
+          {
+            "text": "This page does not cover creditor petitions, the judgment's effects or acts void against creditors.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "قانون التجارة البرية اللبناني: التاجر والشركات والشيك والإفلاس",
+    "question": "ماذا يقول قانون التجارة البرية اللبناني عن صفة التاجر والسجل التجاري والشركات والشيك وسند السحب والإفلاس؟",
+    "description": "ما يقوله قانون التجارة البرية عن التاجر والتسجيل والدفاتر والشركات والشيك وسند السحب والإفلاس.",
+    "answer": {
+      "text": "التاجر هو من تكون مهنته القيام بأعمال تجارية، أو الشركة التي يكون موضوعها تجاريا، ولا يخضع صغار التجار لموجبات الدفاتر. ويسجل التاجر اسمه خلال شهر ويحفظ دفاتره 10 سنوات، ويصبح مسك الدفاتر بالتطبيق الرقمي إلزاميا بعد سنتين من صدور القانون رقم 126 لعام 2019. والشيك قابل للإيفاء لدى الاطلاع، ويعرض خلال 8 أيام إذا صدر في لبنان، ويعد مفلسا التاجر الذي ينقطع عن دفع ديونه التجارية.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a8",
+        "a9",
+        "a12"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "من هو التاجر؟",
+        "paras": [
+          {
+            "text": "تنص المادة 9 على أن التجار هم الأشخاص الذين تكون مهنتهم القيام بأعمال تجارية، والشركات التي يكون موضوعها تجاريا. والشركة ذات الموضوع المدني التي تتخذ شكل الشركة المغفلة أو شركة التوصية المساهمة تخضع لموجبات التجار الواردة في الفصلين التاليين. وتسري عليها كذلك أحكام الصلح الاحتياطي والإفلاس في هذا القانون.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "تعفي المادة 10 من يتعاطى تجارة صغيرة أو حرفة بسيطة ذات نفقات عامة زهيدة، كالبائع الطواف والبائع بالمياومة وأصحاب النقليات الصغيرة، من موجبات الدفاتر التجارية وقواعد النشر.",
+            "cites": [
+              "a2"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "كيف يسجل التاجر اسمه ويمسك دفاتره؟",
+        "paras": [
+          {
+            "text": "يسجل التاجر اسمه في سجل التجارة خلال شهر من فتح المحل أو شرائه، وفق المادة 24. ويقدم الطلب إلى كاتب المحكمة التي يقع المحل الرئيسي في منطقتها.",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "توجب المادة 16 إجراء جردة سنوية وإيقاف الحسابات ووضع الميزانية وحساب النتيجة. ومنذ تعديلها بالقانون رقم 126 لعام 2019، يصبح مسك الدفاتر بالتطبيق الرقمي إلزاميا بعد سنتين من صدور هذا القانون. وتوجب المادة 19 حفظ الدفاتر 10 سنوات بعد اختتامها. ولا تسري موجبات الدفاتر هذه على صغار التجار المذكورين في المادة 10.",
+            "cites": [
+              "a4",
+              "a5",
+              "a2"
+            ]
+          },
+          {
+            "text": "لا نملك المرسوم الذي يحدد معايير التطبيق الرقمي، والنصوص المتوفرة لدينا لا تبيّن تاريخ بدء إلزامية الدفاتر الرقمية.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "كيف تسجل الشركة، وهل الشريك تاجر؟",
+        "paras": [
+          {
+            "text": "توجب المادة 26 تسجيل الشركة التي لها مركز رئيسي في لبنان في سجل التجارة لمنطقة مركزها. ويطلب ممثلها القانوني التسجيل خلال الشهر الذي يلي تأسيسها.",
+            "cites": [
+              "a6"
+            ]
+          },
+          {
+            "text": "تنص المادة 53 على أن كل شريك في شركة التضامن يكتسب صفة التاجر. وإفلاس الشركة يؤدي إلى الإفلاس الشخصي لكل من الشركاء.",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة رأسمال الشركات. ومواد القانون المتوفرة لدينا لا تنظم الشركة المحدودة المسؤولية.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "متى يدفع الشيك، وما مهلة عرضه؟",
+        "paras": [
+          {
+            "text": "تنص المادة 425 على أن الشيك، ويسميه القانون «الشك»، قابل للإيفاء لدى الاطلاع، وكل شرط مخالف يعد لغوا. والشيك الذي يقدم قبل التاريخ المكتوب فيه للإصدار يدفع في يوم عرضه.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "تحدد المادة 426 مهلة عرض الشيك القابل للإيفاء في لبنان بحسب مكان إصداره.",
+            "cites": [
+              "a9"
+            ]
+          },
+          {
+            "text": "لا نملك نصوص قانون العقوبات المتعلقة بالشيك بلا مؤونة.",
+            "note": true
+          }
+        ],
+        "table": {
+          "caption": "مهل عرض الشيك (المادة 426)",
+          "head": [
+            "مكان إصدار الشيك",
+            "المهلة"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "لبنان",
+                "8 أيام"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "بلد متاخم للبنان أو لسوريا، أو أوروبا، أو بلد على شاطئ البحر المتوسط",
+                "20 يوما"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "أي بلد آخر",
+                "70 يوما"
+              ],
+              "cites": [
+                "a9"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "متى تسقط الدعاوى الناشئة عن الشيك وسند السحب؟",
+        "paras": [
+          {
+            "text": "يسقط حق حامل الشيك في الدعوى على المظهرين والساحب وسائر الموجب عليهم بمرور 6 أشهر من نهاية مهلة العرض. ويسقط حق الملزمين بعضهم تجاه بعض بمرور 6 أشهر من يوم الدفع أو من يوم إقامة الدعوى. ويبقى الحق قائما على الساحب الذي لم يؤد المؤونة، وعلى من أحرز كسبا غير مشروع.",
+            "cites": [
+              "a10"
+            ]
+          },
+          {
+            "text": "يسقط حق حامل الشيك في الدعوى على المسحوب عليه بمرور 3 سنوات من نهاية مهلة العرض. وتسقط بموجب المادة 398 حقوق الادعاء على قابل سند السحب بمرور 3 سنوات من تاريخ الاستحقاق.",
+            "cites": [
+              "a10",
+              "a11"
+            ]
+          },
+          {
+            "text": "يسقط حق حامل سند السحب في الادعاء على المظهرين والساحب بمرور سنة من الاحتجاج المقام في المدة القانونية. وإذا تضمن السند عبارة «الإعادة بدون نفقة» تبدأ السنة من تاريخ الاستحقاق. وتسقط حقوق المظهرين بعضهم على بعض وعلى الساحب بمرور 6 أشهر من يوم الدفع أو من يوم إقامة الدعوى.",
+            "cites": [
+              "a11"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "متى يكون التاجر مفلسا، ومن يعلن إفلاسه؟",
+        "paras": [
+          {
+            "text": "تعد المادة 489 في حالة الإفلاس كل تاجر ينقطع عن دفع ديونه التجارية. وكذلك التاجر الذي لا يدعم الثقة المالية به إلا بوسائل يظهر بجلاء أنها غير مشروعة. ويطبق ذلك مع الاحتفاظ بأحكام الباب السابق من القانون، والنصوص المتوفرة لدينا لا تتضمنه.",
+            "cites": [
+              "a12"
+            ]
+          },
+          {
+            "text": "تعلن الإفلاس، وفق المادة 490، المحكمة الابتدائية التي تقع المؤسسة التجارية الأصلية في منطقتها، بحكم معجل التنفيذ. وتوجب المادة 491 على التاجر أن يصرح بانقطاعه عن الدفع خلال 20 يوما، وإلا استهدف لجنحة الإفلاس التقصيري. ويودع معه موازنة مفصلة ومصدقة.",
+            "cites": [
+              "a13",
+              "a14"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة طلب الدائنين إعلان الإفلاس، ولا آثار حكم الإفلاس، ولا الأعمال الباطلة تجاه جماعة الدائنين.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{{define "content"}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <p class="eyebrow">{{t "search.eyebrow"}}</p>
+  <h1 class="page__title" style="margin-bottom:22px" data-search-title>{{t "search.title_main"}}</h1>
+  {{template "search" ""}}
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <p class="lead" style="margin-top:28px" data-search-hint>{{t "search_static.hint"}}</p>
+  <div data-static-search data-index="/search-index.json" data-base="{{u "/"}}"></div>
+</section>
+<script src="/search.js"></script>
+{{end}}

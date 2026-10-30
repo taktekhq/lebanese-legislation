@@ -1,0 +1,16 @@
+{{define "content"}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <p class="eyebrow" data-reveal>{{t "codes.eyebrow"}} &middot; <span lang="ar">القوانين الأساسية</span></p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{t "codes.h1"}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{t "codes.lead"}}</p>
+</section>
+<section class="wrap">
+  {{with .Data.Updated}}<p class="updated"><time datetime="{{.ISO}}">{{.Label}}</time></p>{{end}}
+  <h2 class="sr-only">{{t "seo.h2_codes"}}</h2>
+  <div class="codes">{{range .Data.Codes}}
+    <a class="code" href="{{lawURL .ID}}" dir="rtl"><h3 lang="ar">{{.Title}}</h3><span>{{if ne (uilang) "ar"}}<bdi>{{.NameEn}}</bdi>{{with .NameFr}} &middot; <bdi>{{.}}</bdi>{{end}}{{else}}{{with .NameFr}}<bdi lang="fr" dir="ltr">{{.}}</bdi>{{end}}{{end}}</span><span><bdi>{{if .Articles}}{{plural .Articles "article" "articles"}}{{else}}{{t "codes.text_coming"}}{{end}}</bdi>{{with .IssuedOn}} &middot; <bdi>{{date .}}</bdi>{{end}}</span></a>{{end}}
+  </div>
+</section>
+<div style="height:var(--section-y)"></div>
+{{end}}

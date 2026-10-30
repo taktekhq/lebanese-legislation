@@ -1,0 +1,572 @@
+{
+  "slug": "weapons-law",
+  "order": 18,
+  "published": "2026-10-20",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 180890,
+      "article": "2",
+      "quote": "ج - الاسلحة التي يمكن ان تستعمل فيها ذخائر الاسلحة الحربية المبينة في الفئات السابقة والاسلحة النارية المضلعة من جميع القياسات والعيارات."
+    },
+    {
+      "id": "a2",
+      "law": 180890,
+      "article": "2",
+      "quote": "الفئة الخامسة - الاسحلة والذخائر النارية المعدة للصيد من جميع العيارات غير المذكورة في الفئات السابقة, وغير الداخلة ضمن الاسلحة او الذخائر المشار اليها في النبذتين ج ود من الفئة الرابعة. والبنادق ذات الماسورات الملساء ."
+    },
+    {
+      "id": "a3",
+      "law": 180890,
+      "article": "24",
+      "quote": "يحظر على اي شخص نقل الاسلحة والذخائر, او حيازتها, المنصوص عليها في الفئة الرابعة في الاراضي اللبنانية ما لم يكن حائزا رخصة من قيادة الجيش , ويحق للقائمقام اعطاء الرخص المتعلقة باسلحة الصيد.\n\nان الرخصة بحيازة السلاح من الفئة الخامسة ونقله هي شخصية وتعطى مرة واحدة ولا يبطل مفعولها الا بالوفاة او بفقدان صاحبها شروط القابلية المنصوص عليها في هذا المرسوم الاشتراعي.\n\nاما الرخصة بحيازة ونقل السلاح والذخيرة من الفئة الرابعة فتعطى لسنة واحدة ويجوز تجديدها."
+    },
+    {
+      "id": "a4",
+      "law": 180890,
+      "article": "25",
+      "quote": "لا يرخص لاحد باقتناء او حيازة او نقل المعدات والاسلحة والذخائر الداخلة في الفئتين الاول والثانية الا في حال اضطراب الامن او في الحالات المنصوص عليها في الفصل الثاني المتعلق بصناعة هذه المعدات وتجارتها وذلك ضمن الشروط المعينة فيه. وتعطى الرخصة بناء على قرار من وزير الدفاع الوطني."
+    },
+    {
+      "id": "a5",
+      "law": 180890,
+      "article": "27",
+      "quote": "لا يحق لاحد من حاملي اجازات نقل الاسلحة والذخائر او حيازتها ان يبيع او يتخلى عنها بعوض او بغير عوض الا اذا كان لدى المشتري اجازة تخوله ذلك يمكن حيازة اسلحة الفئة السادسة ونقلها, وتقوم فيها اوراق الهوية مقام الاجازة اما اسلحة الفئة السابعة والثامنة فتجوز حيازتها انما يحظر حملها. ويحظر اعطاء ترخيص بحملها في اي حال من الاحوال."
+    },
+    {
+      "id": "a6",
+      "law": 180890,
+      "article": "28",
+      "quote": "لا تعطى الرخصة لاقتناء ونقل اكثر من سلاحين من الفئة الرابعة.\n\nاما اسلحة الفئة الخامسة وذخائرها فلا تخضع لهذا الحصر.\n\nولا تعطى رخصة الصيد الا من كان حائزا رخصة حمل السلاح."
+    },
+    {
+      "id": "a7",
+      "law": 180890,
+      "article": "3",
+      "quote": "لا يجوز لاي شخص طبيعي او معنوي ان يقوم في الاراضي اللبنانية باعمال صناعية او تجارية من اي نوع كانت تتعلق بالمعدات والاسلحة والذخائر من اي فئة كانت قبل الاستحصال على رخصة قانونية تعطى بمرسوم بناء على اقتراح وزيري الداخلية والدفاع الوطني."
+    },
+    {
+      "id": "a8",
+      "law": 180890,
+      "article": "72",
+      "quote": "يعاقب بالسجن من ستة اشهر الى ثلاث سنوات وبالغرامة من الف الى خمسة الالف ليرة او باحدى هاتين العقوبتين كل من يقدم بدون رخصة, على صنع معدات او اسلحة او ذخائر حربية او قطعها المنفصلة من الفئات الاربع الاولى المنصوص عليها في المادة الثانية من هذا المرسوم الاشتراعي."
+    },
+    {
+      "id": "a9",
+      "law": 180890,
+      "article": "72",
+      "quote": "وتطبق العقوبة نفسها في حالات التصرف بهذه المعدات والاسلحة والذخائر او شرائها او استيرادها او سرقتها. ويعاقب بالسجن من ستة اشهر الى سنتين كل من يقدم بدون رخصة, على نقل الاسلحة من الفئات الاربع المبينة اعلاه, او نقل الذخيرة او قطع الاسلحة المنفصلة اذا كانت هذه الذخيرة والقطع صالحة للاستعمال."
+    },
+    {
+      "id": "a10",
+      "law": 180890,
+      "article": "73",
+      "quote": "اذا كان الفعل يتعلق بالاعتدة او الاسلحة والذخائر غير الحربية المعينة في الفئة الخامسة فيعاقب الفاعل بالحبس مدة لا تتجاوز الستة اشهر وبغرامة اقصاها مئة ليرة او باحدى هاتين العقوبتين.\n\nوفيما خلا حالة الحيازة تطبق العقوبة نفسها اذا كان الفعل يتعلق باسلحة الفئتين السابعة والثامنة."
+    },
+    {
+      "id": "a11",
+      "law": 180890,
+      "article": "74",
+      "quote": "تصادر في جميع الحالات المعدات والاسلحة والذخائر المشار اليها في المواد السابقة وتصادر الالات والادوات ووسائل النقل المستعملة لصناعتها والتجارة بها."
+    },
+    {
+      "id": "a12",
+      "law": 180890,
+      "article": "75",
+      "quote": "كل من اقدم على اطلاق النار في الاماكن الاهلة او في حشد من الناس , من سلاح مرخص او غير مرخص به, يعاقب بالحبس من ستة اشهر الى ثلاث سنوات وبالغرامة من خمسماية ليرة الى الف ليرة لبنانية او باحدى هاتين العقوبتين.\n\nويصادر السلاح في جميع الاحوال."
+    },
+    {
+      "id": "a13",
+      "law": 180890,
+      "article": "79",
+      "quote": "يحال على المحكمة العسكرية:\n\nاولا - كل من ارتكب جرما نصت عليه المادة 72.\n\nثانيا - كل من ارتكب في آن واحد جرمين واقعين تحت طائلة المادتين 72 و73 ."
+    },
+    {
+      "id": "a14",
+      "law": 207339,
+      "article": "6",
+      "quote": "ويجب أن يكون الصياد حائزا على رخصة صيد من وزارة البيئة مستندة إلى:\n\nأ ـ رخصة قانونية بحمل السلاح من وزارة الدفاع الوطني لأسلحة الفئة الرابعة (لصيد الطرائد الموبرة)، ومن وزارة الداخلية والبلديات لأسلحة الفئة الخامسة (لصيد الطيور البرية).\n\nب ـ بوليصة تأمين ضد الغير أي خاصة بضمان الأضرار التي قد تلحق بالغير من جراء ممارسة الصيد، تحدد بمرسوم يتخذ في مجلس الوزراء."
+    }
+  ],
+  "en": {
+    "title": "Weapons and ammunition law in Lebanon",
+    "question": "What does Lebanese law say about owning, carrying and selling weapons and ammunition, and what are the penalties (Article 72)?",
+    "description": "What Lebanese law says on weapon licences, selling weapons, hunters' licences and the penalties for weapons offences.",
+    "answer": {
+      "text": "Under Legislative Decree 137 of 1959, category 4 weapons (including all rifled firearms) and category 5 hunting guns need a licence, categories 1 and 2 get none outside the cases in Article 25, and a weapon may be sold only to a buyer whose licence allows it. Making, disposing of, buying, importing or stealing category 1 to 4 weapons without a licence carries 6 months to 3 years in prison and a fine of 1,000 to 5,000 LBP, or either. Unlicensed transport carries 6 months to 2 years, and these cases go to the military court.",
+      "cites": [
+        "a1",
+        "a3",
+        "a4",
+        "a5",
+        "a8",
+        "a9",
+        "a13"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Which category is my weapon in?",
+        "paras": [
+          {
+            "text": "Category 4 includes all rifled firearms of any size and calibre, and any weapon that can use war ammunition, under point c of Article 2. Category 5 covers hunting firearms and ammunition that fall outside points c and d of category 4, plus smooth-bore guns. A rifled firearm stays in category 4 even when used for hunting.",
+            "cites": [
+              "a1",
+              "a2"
+            ]
+          },
+          {
+            "text": "This page does not describe the other categories in the decree.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "Who issues a weapon licence, and for which weapons?",
+        "paras": [
+          {
+            "text": "Article 24 bans possessing or transporting category 4 weapons and ammunition in Lebanon without a licence from Army Command. It lets the qaimmaqam issue hunting-weapon licences. A category 5 licence lapses only on the holder's death or loss of eligibility.",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "For hunting weapons, Law 580 of 2004 names the Defence Ministry as issuer for category 4 and the Interior Ministry for category 5. The texts we hold do not show whether this replaced Article 24.",
+            "cites": [
+              "a14",
+              "a3"
+            ]
+          },
+          {
+            "text": "This page does not cover the age and personal conditions for a licence, or the duties of heirs and of people who lose or find a weapon. The same decree sets them.",
+            "note": true
+          }
+        ],
+        "table": {
+          "caption": "Licence rules by category",
+          "head": [
+            "Category",
+            "Rule"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "1 and 2",
+                "No licence, except in a security disturbance or in the manufacturing and trade cases, by decision of the Defence Minister"
+              ],
+              "cites": [
+                "a4"
+              ]
+            },
+            {
+              "cells": [
+                "4",
+                "Army Command licence for 1 year, which may be renewed; a pair of weapons at most per licence"
+              ],
+              "cites": [
+                "a3",
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "5",
+                "Personal licence issued once; no cap on the number of weapons"
+              ],
+              "cites": [
+                "a3",
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "6",
+                "May be possessed and transported; identity papers serve as the licence"
+              ],
+              "cites": [
+                "a5"
+              ]
+            },
+            {
+              "cells": [
+                "7 and 8",
+                "May be possessed but never carried; no carrying licence in any case"
+              ],
+              "cites": [
+                "a5"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "Can I sell a weapon or trade in weapons?",
+        "paras": [
+          {
+            "text": "A licence holder may not sell or give away a weapon or ammunition, for payment or for free, unless the buyer holds a licence that allows it. Article 27 sets this rule.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "Any industrial or commercial work in weapons and ammunition of any category, by a person or a company, needs a licence granted by decree under Article 3. The Interior and Defence Ministers propose that decree.",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "We do not hold the decree that sets how trade licences are issued, or the rules on import and export.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "What penalties apply, including under Article 72?",
+        "paras": [
+          {
+            "text": "Article 72 offences go to the military court, as do cases joining Article 72 and Article 73 offences. Under Article 74, the weapons and ammunition are confiscated in all cases, with the tools and vehicles used to make or trade them.",
+            "cites": [
+              "a13",
+              "a11"
+            ]
+          },
+          {
+            "text": "The fines appear as printed in the decree. We do not hold any later law that adjusts them.",
+            "note": true
+          },
+          {
+            "text": "In our copy, the last paragraph of the article on war-weapon penalties appears to miss a word, so this page does not describe it.",
+            "note": true
+          }
+        ],
+        "table": {
+          "caption": "Penalties in the weapons decree",
+          "head": [
+            "Act",
+            "Penalty"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Making category 1 to 4 war equipment, weapons, ammunition or parts without a licence",
+                "6 months to 3 years in prison and a fine of 1,000 to 5,000 LBP, or either"
+              ],
+              "cites": [
+                "a8"
+              ]
+            },
+            {
+              "cells": [
+                "Disposing of, buying, importing or stealing those war items",
+                "The same penalty as for making them"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "Transporting category 1 to 4 weapons, or usable ammunition or parts, without a licence",
+                "6 months to 2 years in prison"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "Acts involving category 5 non-war weapons and ammunition",
+                "Detention up to 6 months and a fine up to 100 LBP, or either"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "Acts involving category 7 and 8 weapons, other than possession",
+                "The same penalty as for category 5"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "Firing in a populated place or in a crowd, from a licensed or unlicensed weapon",
+                "Detention of 6 months to 3 years and a fine of 500 to 1,000 LBP, or either; the weapon is confiscated in all cases"
+              ],
+              "cites": [
+                "a12"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "What does a hunter need?",
+        "paras": [
+          {
+            "text": "Law 580 of 2004 requires a hunter to hold a hunting licence from the Environment Ministry. It rests on a weapon-carrying licence, from the Defence Ministry for category 4 and the Interior Ministry for category 5, and on third-party insurance set by a Council of Ministers decree.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "The 1959 decree names other bodies. Article 24 requires an Army Command licence for category 4 and lets the qaimmaqam issue hunting-weapon licences. Article 28 gives a hunting licence only to a holder of a weapon-carrying licence. The texts we hold do not show whether Law 580 replaced Article 24 for hunters.",
+            "cites": [
+              "a3",
+              "a6",
+              "a14"
+            ]
+          },
+          {
+            "text": "This page does not cover hunting seasons, places where hunting is banned, hunting licence fees or hunting penalties. We do not hold the insurance decree.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "قانون الأسلحة والذخائر في لبنان",
+    "question": "ماذا يقول القانون اللبناني عن حيازة الأسلحة والذخائر وحملها وبيعها، وما هي العقوبات (المادة 72)؟",
+    "description": "ما يقوله القانون اللبناني في رخص الأسلحة وبيعها ورخص الصيادين وعقوبات جرائم الأسلحة.",
+    "answer": {
+      "text": "بموجب المرسوم الاشتراعي رقم 137 لسنة 1959، تحتاج أسلحة الفئة الرابعة، ومنها كل الأسلحة النارية المضلعة، وأسلحة الصيد من الفئة الخامسة إلى رخصة، ولا يرخص بمعدات الفئتين الأولى والثانية إلا في الحالات الواردة في المادة 25، ولا يجوز بيع السلاح إلا لمشترٍ يحمل إجازة تخوله ذلك. ويعاقب صنع أسلحة الفئات من 1 إلى 4 أو التصرف بها أو شراؤها أو استيرادها أو سرقتها بلا رخصة بالسجن من 6 أشهر إلى 3 سنوات وبغرامة من 1,000 إلى 5,000 ليرة لبنانية أو بإحدى العقوبتين. ويعاقب نقلها بلا رخصة بالسجن من 6 أشهر إلى سنتين، وتحال هذه الجرائم إلى المحكمة العسكرية.",
+      "cites": [
+        "a1",
+        "a3",
+        "a4",
+        "a5",
+        "a8",
+        "a9",
+        "a13"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "في أي فئة يقع سلاحي؟",
+        "paras": [
+          {
+            "text": "تشمل الفئة الرابعة كل الأسلحة النارية المضلعة من جميع القياسات والعيارات، وكل سلاح يمكن أن تستعمل فيه ذخائر الأسلحة الحربية، بحسب النبذة (ج) من المادة 2. وتضم الفئة الخامسة أسلحة الصيد النارية وذخائرها غير الداخلة في النبذتين (ج) و(د) من الفئة الرابعة، والبنادق ذات الماسورات الملساء. فالسلاح المضلع يبقى من الفئة الرابعة ولو استعمل للصيد.",
+            "cites": [
+              "a1",
+              "a2"
+            ]
+          },
+          {
+            "text": "لا تعرض هذه الصفحة سائر الفئات الواردة في المرسوم.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "من يمنح رخصة السلاح، ولأي فئة؟",
+        "paras": [
+          {
+            "text": "تحظر المادة 24 حيازة أسلحة الفئة الرابعة وذخائرها أو نقلها في الأراضي اللبنانية من دون رخصة من قيادة الجيش، ويحق للقائمقام بموجبها إعطاء رخص أسلحة الصيد. ولا يبطل مفعول رخصة الفئة الخامسة إلا بوفاة صاحبها أو بفقدانه شروط القابلية.",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "وفي أسلحة الصيد، يسمّي القانون رقم 580 لسنة 2004 وزارة الدفاع الوطني لمنح رخصة الفئة الرابعة، ووزارة الداخلية والبلديات لرخصة الفئة الخامسة. والنصوص المتوفرة لدينا لا تبيّن هل حلّ هذا الحكم محل المادة 24.",
+            "cites": [
+              "a14",
+              "a3"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة شروط العمر والشروط الشخصية لنيل الرخصة، ولا موجبات الورثة ومن يفقد سلاحا أو يجده. وهي واردة في المرسوم نفسه.",
+            "note": true
+          }
+        ],
+        "table": {
+          "caption": "قواعد الرخص بحسب الفئة",
+          "head": [
+            "الفئة",
+            "القاعدة"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "الأولى والثانية",
+                "لا ترخيص إلا عند اضطراب الأمن أو في حالات الصناعة والتجارة، وبقرار من وزير الدفاع الوطني"
+              ],
+              "cites": [
+                "a4"
+              ]
+            },
+            {
+              "cells": [
+                "الرابعة",
+                "رخصة من قيادة الجيش لسنة واحدة ويجوز تجديدها، ولا تشمل أكثر من سلاحين"
+              ],
+              "cites": [
+                "a3",
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "الخامسة",
+                "رخصة شخصية تعطى مرة واحدة، ولا حصر لعدد الأسلحة"
+              ],
+              "cites": [
+                "a3",
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "السادسة",
+                "تجوز حيازتها ونقلها، وتقوم أوراق الهوية مقام الإجازة"
+              ],
+              "cites": [
+                "a5"
+              ]
+            },
+            {
+              "cells": [
+                "السابعة والثامنة",
+                "تجوز حيازتها ويحظر حملها، ولا يعطى ترخيص بحملها في أي حال"
+              ],
+              "cites": [
+                "a5"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "هل يجوز لي بيع سلاح أو الاتجار بالأسلحة؟",
+        "paras": [
+          {
+            "text": "لا يحق لحامل الإجازة أن يبيع السلاح أو الذخائر أو يتخلى عنها، بعوض أو بغير عوض، إلا إذا كان لدى المشتري إجازة تخوله ذلك. وهذا ما تنص عليه المادة 27.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "تشترط المادة 3 على كل شخص طبيعي أو معنوي يمارس عملا صناعيا أو تجاريا يتعلق بالأسلحة والذخائر، من أي فئة كانت، رخصة تعطى بمرسوم. ويصدر المرسوم بناء على اقتراح وزيري الداخلية والدفاع الوطني.",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "لا نملك المرسوم الذي يحدد طريقة إعطاء رخص التجارة، ولا قواعد الاستيراد والتصدير.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ما العقوبات، ومنها عقوبات المادة 72؟",
+        "paras": [
+          {
+            "text": "تحال على المحكمة العسكرية جرائم المادة 72، وكذلك من ارتكب في آن واحد جرمين يقعان تحت المادتين 72 و73. وبموجب المادة 74، تصادر في جميع الحالات المعدات والأسلحة والذخائر، ومعها الآلات والأدوات ووسائل النقل المستعملة لصناعتها والتجارة بها.",
+            "cites": [
+              "a13",
+              "a11"
+            ]
+          },
+          {
+            "text": "ترد الغرامات كما طبعت في المرسوم. ولا نملك أي قانون لاحق يعدّلها.",
+            "note": true
+          },
+          {
+            "text": "تبدو الفقرة الأخيرة من المادة الخاصة بعقوبات الأسلحة الحربية ناقصة كلمة في النسخة المتوفرة لدينا، لذلك لا تعرضها هذه الصفحة.",
+            "note": true
+          }
+        ],
+        "table": {
+          "caption": "العقوبات في مرسوم الأسلحة",
+          "head": [
+            "الفعل",
+            "العقوبة"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "صنع معدات أو أسلحة أو ذخائر حربية أو قطعها من الفئات 1 إلى 4 بلا رخصة",
+                "السجن من 6 أشهر إلى 3 سنوات وغرامة من 1,000 إلى 5,000 ليرة لبنانية، أو إحدى العقوبتين"
+              ],
+              "cites": [
+                "a8"
+              ]
+            },
+            {
+              "cells": [
+                "التصرف بهذه المعدات والأسلحة والذخائر الحربية أو شراؤها أو استيرادها أو سرقتها",
+                "العقوبة نفسها المقررة للصنع"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "نقل أسلحة الفئات 1 إلى 4، أو ذخيرتها أو قطعها الصالحة للاستعمال، بلا رخصة",
+                "السجن من 6 أشهر إلى سنتين"
+              ],
+              "cites": [
+                "a9"
+              ]
+            },
+            {
+              "cells": [
+                "فعل يتعلق بالأسلحة والذخائر غير الحربية من الفئة الخامسة",
+                "الحبس مدة لا تتجاوز 6 أشهر وغرامة أقصاها 100 ليرة، أو إحدى العقوبتين"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "فعل يتعلق بأسلحة الفئتين السابعة والثامنة، عدا الحيازة",
+                "عقوبة الفئة الخامسة نفسها"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "إطلاق النار في الأماكن الآهلة أو في حشد من الناس، من سلاح مرخص أو غير مرخص",
+                "الحبس من 6 أشهر إلى 3 سنوات وغرامة من 500 إلى 1,000 ليرة لبنانية، أو إحدى العقوبتين، ويصادر السلاح في جميع الأحوال"
+              ],
+              "cites": [
+                "a12"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "ماذا يحتاج الصياد؟",
+        "paras": [
+          {
+            "text": "يوجب القانون رقم 580 لسنة 2004 على الصياد أن يحوز رخصة صيد من وزارة البيئة. وتستند هذه الرخصة إلى رخصة بحمل السلاح، تمنحها وزارة الدفاع الوطني للفئة الرابعة ووزارة الداخلية والبلديات للفئة الخامسة، وإلى بوليصة تأمين ضد الغير تحدد بمرسوم يتخذ في مجلس الوزراء.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "ويسمّي مرسوم 1959 جهات أخرى. فالمادة 24 تشترط رخصة من قيادة الجيش للفئة الرابعة، وتعطي القائمقام حق منح رخص أسلحة الصيد. والمادة 28 لا تعطي رخصة الصيد إلا لمن يحوز رخصة حمل السلاح. والنصوص المتوفرة لدينا لا تبيّن هل حلّ القانون 580 محل المادة 24 بالنسبة إلى الصيادين.",
+            "cites": [
+              "a3",
+              "a6",
+              "a14"
+            ]
+          },
+          {
+            "text": "لا تتناول هذه الصفحة مواسم الصيد، ولا الأماكن التي يمنع فيها، ولا رسوم رخص الصيد أو عقوباته. ولا نملك مرسوم التأمين.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  }
+}

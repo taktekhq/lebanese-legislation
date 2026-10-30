@@ -1,0 +1,352 @@
+{
+  "slug": "official-gazette",
+  "order": 16,
+  "published": "2026-10-20",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 244058,
+      "article": "51",
+      "quote": "يصدر رئيس الجمهورية القوانين وفق المهل المحددة في الدستور بعد ان يكون وافق عليها المجلس , ويطلب نشرها, وليس له ان يدخل تعديلا عليها او ان يعفي احدا من التقيد بأحكامها."
+    },
+    {
+      "id": "a2",
+      "law": 244058,
+      "article": "56",
+      "quote": "يصدر رئيس الجمهورية القوانين التي تمت عليها الموافقة النهائية في خلال شهر بعد احالتها الى الحكومة ويطلب نشرها.\n\nاما القوانين التي يتخذ المجلس قرارا بوجوب استعجال اصدارها, فيجب عليه ان يصدرها في خلال خمسة ايام ويطلب نشرها."
+    },
+    {
+      "id": "a3",
+      "law": 244058,
+      "article": "56",
+      "quote": "وهو يصدر المراسيم ويطلب نشرها, وله حق الطلب الى مجلس الوزراء اعادة النظر في اي قرار من القرارات التي يتخذها المجلس خلال خمسة عشر يوما من تاريخ ايداعه رئاسة الجمهورية.\n\nواذا اصر مجلس الوزراء على القرار المتخذ او انقضت المهلة دون اصدار المرسوم او اعادته يعتبر القرار او المرسوم نافذا حكما ووجب نشره."
+    },
+    {
+      "id": "a4",
+      "law": 244058,
+      "article": "57",
+      "quote": "لرئيس الجمهورية, بعد اطلاع مجلس الوزراء, حق طلب اعادة النظر في القانون مرة واحدة ضمن المهلة المحددة لاصداره ولا يجوز ان يرفض طلبه.\n\nوعندما يستعمل الرئيس حقه هذا يصبح في حل من اصدار القانون الى ان يوافق عليه المجلس بعد مناقشة اخرى في شأنه, واقراراه بالغالبية المطلقة من مجموع الاعضاء الذين يؤلفون المجلس قانونا."
+    },
+    {
+      "id": "a5",
+      "law": 244058,
+      "article": "57",
+      "quote": "وفي حال انقضاء المهلة دون اصدار القانون او اعادته يعتبر القانون نافذا حكما ووجب نشره."
+    },
+    {
+      "id": "a6",
+      "law": 244058,
+      "article": "58",
+      "quote": "كل مشروع قانون تقرر الحكومة كونه مستعجلا بموافقة مجلس الوزراء مشيرة الى ذلك في مرسوم الاحالة يمكن لرئيس الجمهورية بعد مضي اربعين يوما من طرحه على المجلس , وبعد ادراجه في جدول اعمال جلسة عامة وتلاوته فيها ومضي هذه المهلة دون ان يبت به, ان يصدر مرسوما قاضيا بتنفيذه بعد موافقة مجلس الوزراء."
+    },
+    {
+      "id": "a7",
+      "law": 244058,
+      "article": "54",
+      "quote": "اما مرسوم اصدار القوانين فيشترك معه في التوقيع عليه رئيس الحكومة."
+    },
+    {
+      "id": "a8",
+      "law": 179822,
+      "article": "1",
+      "quote": "مادة 1: 1- تطبيقا لاحكام المادة 51 ولاحكام الفقرة الاولى من المادة 56 والمادة 57 من الدستور تنشر جميع القوانين في الجريدة الرسمية خلال مهلة اقصاها خمسة عشر يوما من تاريخ اصدارها 2- تطبيقا لاحكام الفقرة الثانية من المادة 56 من الدستور تنشر المراسيم في الجريدة الرسمية خلال مهلة اقصاها خمسة عشر يوما من تاريخ اصدارها"
+    },
+    {
+      "id": "a9",
+      "law": 179822,
+      "article": "1",
+      "quote": "3- عندما ينشر قانون او مرسوم او قرار في ملحق لعدد من اعداد الجريدة الرسمية يتوجب ذكر تاريخ صدور الملحق على الملحق نفسه"
+    },
+    {
+      "id": "a10",
+      "law": 179822,
+      "article": "2",
+      "quote": "مادة 2: يعمل بهذا القانون فور نشره في الجريدة الرسمية"
+    },
+    {
+      "id": "a11",
+      "law": 187847,
+      "article": "1",
+      "quote": "ان القوانين والمراسيم تصبح من الان فصاعدا مرعية الاجراء في جميع انحاء الجمهورية اللبنانية في اليوم الثامن الذي يلي نشرها في الجريدة الرسمية ما لم يكن هناك نص مخالف.\n\nعلى ان المراسيم التي لا تختص بجمهور الرعية تصبح نافذة من تاريخ تبليغها."
+    },
+    {
+      "id": "a12",
+      "law": 187847,
+      "article": "1",
+      "quote": "في حالة الضرورة الناتجة عن ظروف خاصة يمكن تقصير المهلة المحددة في الفقرة الاولى بشرط ان يؤمن نشر القوانين والمراسيم والقرارات بوسيلة من وسائل الاعلان غير الوسيلة المبينة الفقرة المذكورة."
+    },
+    {
+      "id": "a13",
+      "law": 269965,
+      "article": "6",
+      "quote": "تنشر الأسباب الموجبة مع القوانين والمراسيم على مختلف أنواعها في الجريدة الرسمية، وذلك بواسطة الجهة المناط بها صلاحية النشر أو صلاحية الاصدار."
+    },
+    {
+      "id": "a14",
+      "law": 269965,
+      "article": "7",
+      "quote": "الـمراسيم والقرارات والتعليمات والتعاميم والـمذكرات التي تتضمن تفسيراً للقوانين والأنظمة او تكون ذات صفة تنظيمية وذلك خلال خمسة عشر يوماً من تاريخ صدورها.\n\nيكون النشر في الجريدة الرسمية اضافةً الى الـموقع الالكتروني التابع للإدارة. كما تُنشر جميع هذه الـمواد التشريعية والتنظيمية في الجريدة الرسمية بصيغة الكترونية متاحة، ضمن مهلة سنة من تاريخ صدور هذا القانون كحدٍّ أقصى."
+    }
+  ],
+  "en": {
+    "title": "Publication of laws in the Official Gazette and when they take effect",
+    "question": "How do Lebanese laws become binding, and when must they be published in the Official Gazette?",
+    "description": "Explains who issues Lebanese laws, the deadlines to issue and publish them, and the day they become binding.",
+    "answer": {
+      "text": "After Parliament passes a law, the President must issue it within 1 month of its transmission to the government, or within 5 days if Parliament declared it urgent, unless he returns it once for reconsideration. If he does neither in time, the law is enforceable by operation of law, and every law must be published in the Official Gazette within 15 days of issue. The law's own text sets the day it binds, such as on publication; otherwise it binds on the 8th day after publication, and decrees that do not concern the public take effect on notification.",
+      "cites": [
+        "a2",
+        "a4",
+        "a5",
+        "a8",
+        "a11"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Who issues a law, and by when?",
+        "paras": [
+          {
+            "text": "The President issues every law that Parliament approves and requests its publication. Article 51 of the Constitution bars him from amending a law or exempting anyone from it.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "A law with final approval must be issued within 1 month after it is sent to the government. A law that Parliament declares urgent must be issued within 5 days. The Prime Minister co-signs the decree that issues a law.",
+            "cites": [
+              "a2",
+              "a7"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What happens if the President returns a law or does nothing?",
+        "paras": [
+          {
+            "text": "The President may ask Parliament once to reconsider a law, within the deadline for issuing it, after informing the Council of Ministers. The request cannot be refused. The President then need not issue the law until Parliament approves it after a new debate. Re-passage needs an absolute majority of all members who legally make up Parliament.",
+            "cites": [
+              "a4"
+            ]
+          },
+          {
+            "text": "If the deadline passes and the law is neither issued nor returned, the law is enforceable by operation of law. It must then be published.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "Article 58 covers a bill the government declares urgent, with Cabinet approval, in its transmittal decree. After 40 days before Parliament, the bill must also have been placed on a plenary agenda and read there. If Parliament still has not decided, the President may issue a decree putting it into force, after Cabinet approval.",
+            "cites": [
+              "a6"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What happens to a Council of Ministers decision the President does not sign?",
+        "paras": [
+          {
+            "text": "The President issues decrees and requests their publication. He may ask the Council of Ministers to reconsider any decision within 15 days of its deposit with the Presidency. If the Council insists, or the period passes without the decree being issued or returned, the decision or decree is enforceable by operation of law. It must then be published.",
+            "cites": [
+              "a3"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "How soon must laws and decrees appear in the Official Gazette?",
+        "paras": [
+          {
+            "text": "Law 646 of 1997 sets a maximum of 15 days from issue for publishing all laws in the Official Gazette. Decrees face the same 15-day maximum from their issue. The law applies Articles 51, 56 and 57 of the Constitution and adds this deadline to them.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "When a law, decree or decision is published in a supplement to a Gazette issue, the supplement itself must show its date of issue.",
+            "cites": [
+              "a9"
+            ]
+          },
+          {
+            "text": "The texts we hold do not say when the publication deadline starts for a law that becomes enforceable without being issued.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "On what day does a published law become binding?",
+        "paras": [
+          {
+            "text": "A law's own entry-into-force clause comes first. Legislative Decree 9 of 1939 makes laws and decrees binding throughout Lebanon on the 8th day after Gazette publication, unless a text provides otherwise. Law 646 of 1997, for example, took effect as soon as it was published.",
+            "cites": [
+              "a11",
+              "a10"
+            ]
+          },
+          {
+            "text": "Decrees that do not concern the general public take effect from the date they are notified. Where special circumstances make it necessary, the period ending on the 8th day may be shortened. The laws, decrees or decisions must then be made public by a means other than the Gazette.",
+            "cites": [
+              "a11",
+              "a12"
+            ]
+          },
+          {
+            "text": "We do not hold a later legislative decree recorded as an addition to the decree that sets this rule. This page cannot say whether it changes the rule.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "What must be published alongside laws, and online?",
+        "paras": [
+          {
+            "text": "The reasons for laws and decrees of every kind are published with them in the Official Gazette. Article 6 of Law 28 of 2017 gives this task to the authority with power to publish or to issue them.",
+            "cites": [
+              "a13"
+            ]
+          },
+          {
+            "text": "Article 7 of Law 28 requires an administration to publish its interpretive or regulatory decrees, decisions, instructions, circulars and memoranda within 15 days of issue. They go in the Official Gazette as well as on the administration's website. The article also set a maximum of a year from the issue of Law 28 for putting all these texts in the Gazette in accessible electronic form.",
+            "cites": [
+              "a14"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "نشر القوانين في الجريدة الرسمية ومتى تصبح نافذة",
+    "question": "كيف تصبح القوانين اللبنانية نافذة، ومتى يجب نشرها في الجريدة الرسمية؟",
+    "description": "توضح الصفحة من يصدر القوانين اللبنانية، ومهل إصدارها ونشرها، واليوم الذي تصبح فيه نافذة.",
+    "answer": {
+      "text": "بعد أن يقرّ مجلس النواب القانون، على رئيس الجمهورية أن يصدره خلال شهر من إحالته إلى الحكومة، أو خلال 5 أيام إذا قرر المجلس استعجال إصداره، ما لم يطلب إعادة النظر فيه مرة واحدة. فإذا لم يصدره ولم يعده في المهلة، يصبح القانون نافذاً حكماً، ويجب نشر كل قانون في الجريدة الرسمية خلال 15 يوماً من صدوره. ويبدأ العمل بالقانون في التاريخ الذي يحدده نصه، كأن يكون فور نشره، وإلا ففي اليوم الثامن الذي يلي النشر، أما المراسيم التي لا تختص بعامة الناس فتنفذ من تاريخ تبليغها.",
+      "cites": [
+        "a2",
+        "a4",
+        "a5",
+        "a8",
+        "a11"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "من يصدر القانون، وفي أي مهلة؟",
+        "paras": [
+          {
+            "text": "يصدر رئيس الجمهورية كل قانون يوافق عليه مجلس النواب، ويطلب نشره. وتمنعه المادة 51 من الدستور من تعديل القانون أو إعفاء أحد من التقيد بأحكامه.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "يُصدر القانون الذي نال الموافقة النهائية خلال شهر بعد إحالته إلى الحكومة. أما القانون الذي يقرر مجلس النواب استعجال إصداره فيصدر خلال 5 أيام. ويوقّع رئيس الحكومة مع رئيس الجمهورية مرسوم إصدار القانون.",
+            "cites": [
+              "a2",
+              "a7"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يحدث إذا ردّ الرئيس القانون أو لم يصدره؟",
+        "paras": [
+          {
+            "text": "لرئيس الجمهورية، بعد اطلاع مجلس الوزراء، أن يطلب من مجلس النواب إعادة النظر في القانون مرة واحدة ضمن مهلة إصداره. ولا يجوز رفض طلبه. وعندها لا يلزمه إصدار القانون حتى يوافق عليه المجلس بعد مناقشة جديدة، ويقرّه بالغالبية المطلقة من مجموع أعضائه القانونيين.",
+            "cites": [
+              "a4"
+            ]
+          },
+          {
+            "text": "إذا انقضت المهلة ولم يُصدر القانون ولم يُعد، يُعتبر نافذاً حكماً. ويجب عندئذ نشره.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "تتناول المادة 58 مشروع القانون الذي تقرر الحكومة، بموافقة مجلس الوزراء، أنه مستعجل وتذكر ذلك في مرسوم الإحالة. فإذا مضى 40 يوماً على طرحه على مجلس النواب، وأُدرج في جدول أعمال جلسة عامة وتُلي فيها، ولم يُبت به، يمكن لرئيس الجمهورية أن يصدر مرسوماً بتنفيذه بعد موافقة مجلس الوزراء.",
+            "cites": [
+              "a6"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما مصير قرار مجلس الوزراء إذا لم يصدر الرئيس مرسومه؟",
+        "paras": [
+          {
+            "text": "يصدر رئيس الجمهورية المراسيم ويطلب نشرها. وله أن يطلب من مجلس الوزراء إعادة النظر في أي قرار خلال 15 يوماً من إيداعه رئاسة الجمهورية. فإذا أصرّ مجلس الوزراء على قراره، أو انقضت المهلة دون إصدار المرسوم أو إعادته، يُعتبر القرار أو المرسوم نافذاً حكماً. ويجب عندئذ نشره.",
+            "cites": [
+              "a3"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "متى يجب أن تُنشر القوانين والمراسيم في الجريدة الرسمية؟",
+        "paras": [
+          {
+            "text": "يحدد القانون رقم 646 لسنة 1997 مهلة أقصاها 15 يوماً من تاريخ الإصدار لنشر جميع القوانين في الجريدة الرسمية. وتسري المهلة القصوى نفسها على نشر المراسيم من تاريخ إصدارها. ويطبّق هذا القانون أحكام المواد 51 و56 و57 من الدستور، ويضيف إليها هذه المهلة.",
+            "cites": [
+              "a8"
+            ]
+          },
+          {
+            "text": "إذا نُشر قانون أو مرسوم أو قرار في ملحق لعدد من أعداد الجريدة الرسمية، وجب ذكر تاريخ صدور الملحق على الملحق نفسه.",
+            "cites": [
+              "a9"
+            ]
+          },
+          {
+            "text": "النصوص المتوفرة لدينا لا تبيّن متى تبدأ مهلة النشر للقانون الذي يصبح نافذاً حكماً دون أن يُصدر.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "في أي يوم يصبح القانون المنشور نافذاً؟",
+        "paras": [
+          {
+            "text": "يتقدّم ما ينص عليه القانون نفسه بشأن بدء العمل به. فالمرسوم الاشتراعي رقم 9 لسنة 1939 يجعل القوانين والمراسيم مرعية الإجراء في جميع أنحاء لبنان في اليوم الثامن الذي يلي نشرها في الجريدة الرسمية، ما لم يرد نص مخالف. ومثال ذلك أن القانون رقم 646 لسنة 1997 عُمل به فور نشره.",
+            "cites": [
+              "a11",
+              "a10"
+            ]
+          },
+          {
+            "text": "المراسيم التي لا تختص بعامة الناس تصبح نافذة من تاريخ تبليغها. وفي حالة الضرورة الناتجة عن ظروف خاصة، يمكن تقصير المهلة التي تنتهي في اليوم الثامن. ويُشترط عندئذ نشر القوانين والمراسيم والقرارات بوسيلة إعلان غير الجريدة الرسمية.",
+            "cites": [
+              "a11",
+              "a12"
+            ]
+          },
+          {
+            "text": "لا نملك نص مرسوم اشتراعي لاحق مسجّل إضافةً إلى المرسوم الذي يضع هذه القاعدة. ولا تستطيع هذه الصفحة أن تبيّن إن كان يغيّرها.",
+            "note": true
+          }
+        ]
+      },
+      {
+        "heading": "ما الذي يُنشر مع القوانين وعلى المواقع الإلكترونية؟",
+        "paras": [
+          {
+            "text": "تُنشر الأسباب الموجبة مع القوانين والمراسيم على اختلاف أنواعها في الجريدة الرسمية. وتتولى ذلك، بحسب المادة 6 من القانون رقم 28 لسنة 2017، الجهة التي تملك صلاحية النشر أو الإصدار.",
+            "cites": [
+              "a13"
+            ]
+          },
+          {
+            "text": "تُلزم المادة 7 من القانون رقم 28 الإدارة بنشر المراسيم والقرارات والتعليمات والتعاميم والمذكرات التي تفسّر القوانين والأنظمة أو تكون ذات صفة تنظيمية، خلال 15 يوماً من صدورها. ويكون النشر في الجريدة الرسمية إضافةً إلى موقع الإدارة الإلكتروني. وحددت المادة مهلة أقصاها سنة من تاريخ صدور القانون رقم 28 لنشر هذه المواد كلها في الجريدة الرسمية بصيغة إلكترونية متاحة.",
+            "cites": [
+              "a14"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

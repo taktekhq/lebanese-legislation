@@ -1,0 +1,24 @@
+{{define "content"}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <h1 class="page__title">{{t "contribute.title"}}</h1>
+  <p class="lead">{{t "contribute.lead"}}</p>
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <article class="prose">
+    <h2>{{t "contribute.code_h2"}}</h2>
+    <p>{{t "contribute.code_p"}}</p>
+    <p><a class="link" href="https://github.com/taktekhq/lebanese-legislation" rel="noopener">{{t "contribute.code_link"}}</a></p>
+    <h2>{{t "contribute.scans_h2"}}</h2>
+    <p>{{t "contribute.scans_p"}}</p>
+    <p><a class="link" href="https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting" rel="noopener">{{t "contribute.scans_link"}}</a></p>
+    <h2>{{t "contribute.reuse_h2"}}</h2>
+    <p>{{t "contribute.reuse_p"}}</p>
+    <ul>
+      <li><a class="link" href="https://huggingface.co/collections/taktekhq/lebanese-legislation" rel="noopener">{{t "contribute.collection_link"}}</a></li>
+      <li><a class="link" href="https://github.com/taktekhq/lebanese-legislation-starter" rel="noopener">{{t "contribute.starter_link"}}</a></li>
+      <li><a class="link" href="{{u "/data/"}}">{{t "contribute.data_link"}}</a></li>
+    </ul>
+  </article>
+</section>
+{{end}}

@@ -1,0 +1,25 @@
+{{define "content"}}{{with .Data}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <p class="eyebrow" data-reveal>{{t "about.eyebrow"}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{t "about.h1"}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{t "about.lead"}}</p>
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <article class="prose">
+    <h2>{{t "about.sources_h2"}}</h2>
+    <p>{{t "about.sources_p" (safe "<span lang=\"ar\">مركز الدراسات والأبحاث في المعلوماتية القانونية</span>")}}</p>
+    <h2>{{t "about.what_h2"}}</h2>
+    <p>{{t "about.what_p" (num .Laws) (num .WithText) (num .Articles) (num .Rulings) (num .Gazette) (num .Opinions) (num .Agreements) (num .Doctrine)}}</p>
+    <h2>{{t "about.not_h2"}}</h2>
+    <p>{{t "about.not_p"}}</p>
+    <p lang="ar" dir="rtl">معلومات مأخوذة من نصوص رسمية منشورة، وليست استشارة قانونية. الجريدة الرسمية هي المرجع: راجعها أو استشر محامياً مؤهلاً في حالتك.</p>
+    <p lang="fr">Informations tirées de textes officiels publiés, pas un avis juridique. Le Journal officiel fait foi : vérifiez-le ou consultez un avocat qualifié pour votre cas.</p>
+    <h2>{{t "about.privacy_h2"}}</h2>
+    <p>{{t "about.privacy_p1"}}</p>
+    <p>{{t "about.privacy_p2" (safe (printf "<a class=\"link\" href=\"%s\">%s</a>" (u "/ai/") (t "ai.title_suffix"))) (safe "<a class=\"link\" href=\"mailto:taktekbot@taktek.io\">taktekbot@taktek.io</a>")}}</p>
+    <h2>{{t "about.who_h2"}}</h2>
+    <p>{{t "about.who_p"}}</p>
+  </article>
+</section>
+{{end}}{{end}}

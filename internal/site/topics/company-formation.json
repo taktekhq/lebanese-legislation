@@ -1,0 +1,432 @@
+{
+  "slug": "company-formation",
+  "order": 12,
+  "published": "2026-10-20",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 244904,
+      "article": "5",
+      "quote": "تؤلف هذه الشركة من شخص واحد، يطلق عليه تسمية الشريك الوحيد، او اكثر على ان لا يتجاوز عدد الشركاء العشرين الا في حالة انتقال الحصص بالإرث."
+    },
+    {
+      "id": "a2",
+      "law": 244904,
+      "article": "5",
+      "quote": "لا يجوز للشركة المحدودة المسؤولية المؤلفة من شريك وحيد ان تكون الشريك الوحيد في شركة اخرى محدودة المسؤولية."
+    },
+    {
+      "id": "a3",
+      "law": 244904,
+      "article": "7",
+      "quote": "لا يجوز ان يقل رأس مال الشركة المحدودة المسؤولية عن خمسة ملايين ليرة لبنانية ويوزع رأس المال مهما كان مقداره الى حصص متساوية."
+    },
+    {
+      "id": "a4",
+      "law": 244904,
+      "article": "8",
+      "quote": "لا تعتبر الشركة مؤسسة بصورة نهائية إلا بعد صدور توزيع الحصص بين الشركاء وتعيين عدد حصص كل منهم او حصرها في الشريك الوحيد وتحرير قيمتها بكاملها وايداع المبالغ المدفوعة في احد المصارف."
+    },
+    {
+      "id": "a5",
+      "law": 244904,
+      "article": "2",
+      "quote": "وتثبت هذه الشركة بسند رسمي او سند عادي وتسجل في السجل التجاري."
+    },
+    {
+      "id": "a6",
+      "law": 244586,
+      "article": "79",
+      "quote": "لا يجوز ان يقل عدد المؤسسين عن ثلاثة, ويمنع على اي شخص ان يشترك في تأسيس شركة مغفلة اذا كان قد اعلن افلاسه ولم يستعد اعتباره منذ عشر سنوات على الاقل او اذا كان محكوما عليه في لبنان او في الخارج منذ اقل من عشر سنوات لارتكابه او لمحاولة ارتكابه جناية او جنحة تطبق عليها عقوبات الاحتيال"
+    },
+    {
+      "id": "a7",
+      "law": 244586,
+      "article": "83",
+      "quote": "لا يجوز ان يكون رأس مال الشركة المغفلة اقل من ثلاثين مليون ليرة لبنانية ويجب الاكتتاب به كاملا."
+    },
+    {
+      "id": "a8",
+      "law": 244586,
+      "article": "84",
+      "quote": "ان الثمن الادنى للسهم الواحد هو الف ليرة لبنانية، وعلى كل مكتتب ان يعجل مبلغ الربع على الاقل من القيمة الاسمية لكل سهم يكتتب به."
+    },
+    {
+      "id": "a9",
+      "law": 244586,
+      "article": "85",
+      "quote": "على المؤسسين ان يودعوا المبالغ المدفوعة من المكتتبين قبل تأسيس الشركة بوجه نهائي في احد المصارف العاملة في لبنان بشكل حساب مفتوح باسم الشركة قيد التأسيس مع جدول المكتتبين والمبلغ المدفوع من كل منهم."
+    },
+    {
+      "id": "a10",
+      "law": 244586,
+      "article": "80",
+      "quote": "ويجب ان يودع ويسجل نظام الشركة المغفلة وكل تعديل لاحق له لدى اي كاتب عدل على الاراضي اللبنانية."
+    },
+    {
+      "id": "a11",
+      "law": 244586,
+      "article": "93",
+      "quote": "تعين الجمعية المشار اليها اعضاء مجلس الادارة الاول اذا كانوا لم يعينوا بمقتضى نظام الشركة وتعين ايضا مفوضي المراقبة الاولين. وتصبح الشركة مؤسسة منذ قبولهم."
+    },
+    {
+      "id": "a12",
+      "law": 244586,
+      "article": "98",
+      "quote": "على اعضاء مجلس الادارة، بعد تأسيس الشركة، ان يجروا المعاملات الاولية المتعلقة بالنشر عن طريق الايداع والتسجيل لدى امانة السجل التجاري المختصة، وذلك خلال الشهر الذي يلي التأسيس، تحت طائلة غرامة يقررها القاضي المشرف على السجل التجاري، تفرض على الشركة وتتراوح بين خمسمئة الف ومليون ليرة لبنانية."
+    },
+    {
+      "id": "a13",
+      "law": 178917,
+      "article": "5",
+      "quote": "تنشأ شركات الهولدنغ بشكل شركات مغفلة وتخضع للاحكام التي تخضع لها الشركات المغفلة في كل ما لا يتعارض واحكام هذا المرسوم الاشتراعي والاستثناءات التالية"
+    },
+    {
+      "id": "a14",
+      "law": 178916,
+      "article": "1",
+      "quote": "تخضع لهذا القانون الشركات المغفلة اللبنانية التي تتعاطى، على سبيل الحصر، النشاطات التالية"
+    }
+  ],
+  "en": {
+    "title": "Forming a company in Lebanon (SARL and SAL)",
+    "question": "What does Lebanese law require to form a limited liability company (SARL) or a joint-stock company (SAL)?",
+    "description": "What Lebanese law requires to form a SARL or a SAL, with notes on holding and offshore companies.",
+    "answer": {
+      "text": "A SARL needs 1 to 20 partners and at least 5,000,000 LBP of capital, fully paid into a bank, plus a deed and commercial registration. A SAL needs at least 3 founders who are not barred, and 30,000,000 LBP fully subscribed, with a quarter of each share paid in. Its statutes go to a notary, and it is registered within the month after formation. A holding company is a SAL, but SAL rules apply to it only where its own decree does not conflict.",
+      "cites": [
+        "a1",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "a10",
+        "a12",
+        "a13"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "How many partners or founders are needed?",
+        "paras": [
+          {
+            "text": "A SARL may have 1 person, called the sole partner, or more. Partners may not exceed 20, except when shares pass by inheritance. This is Article 5 of Decree-Law 35 of 1967.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "A SARL with a sole partner may not itself be the sole partner of another SARL.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "A SAL must have at least 3 founders, under Article 79 of the Code of Commerce. A bankrupt who has not been rehabilitated for at least 10 years may not be a founder. Neither may a person convicted in Lebanon or abroad, within the last 10 years, of a fraud offence or another offence that Article 79 lists.",
+            "cites": [
+              "a6"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What is the minimum capital, and how much is paid in?",
+        "paras": [
+          {
+            "text": "A SARL needs at least 5,000,000 LBP of capital, divided into equal shares. It is finally formed only once the shares are allocated and fully paid. The sums paid must be deposited in a bank.",
+            "cites": [
+              "a3",
+              "a4"
+            ]
+          },
+          {
+            "text": "A SAL needs at least 30,000,000 LBP of capital, fully subscribed. A share costs at least 1,000 LBP. Each subscriber pays at least a quarter of each share's nominal value. Founders deposit these payments in a bank operating in Lebanon, in an account in the name of the company in formation.",
+            "cites": [
+              "a7",
+              "a8",
+              "a9"
+            ]
+          },
+          {
+            "text": "These are the amounts as printed in the articles. The texts we hold do not show a later law that changes them.",
+            "note": true
+          }
+        ],
+        "table": {
+          "caption": "Capital figures for a SARL and a SAL, as printed in the articles",
+          "head": [
+            "Item",
+            "Figure"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "SARL minimum capital",
+                "5,000,000 LBP"
+              ],
+              "cites": [
+                "a3"
+              ]
+            },
+            {
+              "cells": [
+                "SAL minimum capital",
+                "30,000,000 LBP"
+              ],
+              "cites": [
+                "a7"
+              ]
+            },
+            {
+              "cells": [
+                "SAL minimum price of 1 share",
+                "1,000 LBP"
+              ],
+              "cites": [
+                "a8"
+              ]
+            },
+            {
+              "cells": [
+                "SAL amount paid on each share",
+                "At least a quarter of its nominal value"
+              ],
+              "cites": [
+                "a8"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "How is each company set up and registered?",
+        "paras": [
+          {
+            "text": "A SARL is set out in an official or ordinary deed and registered in the commercial register. This is Article 2 of Decree-Law 35 of 1967.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "A SAL's statutes, and every later amendment, are deposited and registered with any notary in Lebanon. The founding assembly appoints the first board, unless the statutes name it, and the first auditors. The SAL is formed once they accept.",
+            "cites": [
+              "a10",
+              "a11"
+            ]
+          },
+          {
+            "text": "Within the month after formation, the SAL board must file the initial publicity documents with the commercial register. If it does not, the supervising judge fines the company between 500,000 and 1,000,000 LBP.",
+            "cites": [
+              "a12"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "Do holding and offshore companies follow the same rules?",
+        "paras": [
+          {
+            "text": "A holding company is formed as a SAL. Article 5 of Decree-Law 45 of 1983 applies SAL rules to it only where they do not conflict with that decree. The same article then lists exceptions to the SAL rules.",
+            "cites": [
+              "a13"
+            ]
+          },
+          {
+            "text": "An offshore company is a Lebanese SAL that carries on only the activities listed in Article 1 of Decree-Law 46 of 1983.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "Law 85 of 2018 is recorded as replacing the opening of that Article 1, to cover SALs with several partners or a single partner. The text we hold still shows the earlier opening. This page cannot confirm that a single-partner offshore SAL departs from the founder minimum in Article 79.",
+            "cites": [
+              "a14"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What does this page leave out?",
+        "paras": [
+          {
+            "text": "This page does not cover commercial register procedures or fees, SARL management, naming and auditors, activities barred to a SARL, contributions in kind, public offers of SAL shares, or the exceptions for holding companies. We do not hold the full offshore regime.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "تأسيس الشركات في لبنان (الشركة المحدودة المسؤولية والشركة المغفلة)",
+    "question": "ما هي شروط تأسيس الشركة المحدودة المسؤولية والشركة المغفلة في القانون اللبناني؟",
+    "description": "ما يشترطه القانون اللبناني لتأسيس الشركة المحدودة المسؤولية والشركة المغفلة، مع ملاحظات عن شركات الهولدنغ والأوف شور.",
+    "answer": {
+      "text": "تتألف الشركة المحدودة المسؤولية من شريك واحد حتى 20 شريكاً، ولا يقل رأس مالها عن 5,000,000 ليرة لبنانية تُدفع كاملة وتودع في مصرف، وتثبت بسند وتسجل في السجل التجاري. ولا يجوز أن يقل عدد مؤسسي الشركة المغفلة عن 3 لا يشملهم المنع، ولا يقل رأس مالها عن 30,000,000 ليرة لبنانية يُكتتب به كاملاً ويعجَّل ربع كل سهم على الأقل. ويودع نظامها لدى كاتب عدل، وتسجل في السجل التجاري خلال الشهر الذي يلي تأسيسها. أما شركة الهولدنغ (القابضة) فتنشأ شركةً مغفلة، لكنها لا تخضع لأحكام الشركات المغفلة إلا في ما لا يتعارض مع مرسومها الخاص.",
+      "cites": [
+        "a1",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "a10",
+        "a12",
+        "a13"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "كم شريكاً أو مؤسساً يلزم؟",
+        "paras": [
+          {
+            "text": "تتألف الشركة المحدودة المسؤولية من شخص واحد يسمى الشريك الوحيد، أو من أكثر. ولا يجوز أن يتجاوز عدد الشركاء 20 إلا إذا انتقلت الحصص بالإرث. هذا ما تنص عليه المادة 5 من المرسوم الاشتراعي رقم 35 لعام 1967.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "لا يجوز للشركة المحدودة المسؤولية المؤلفة من شريك وحيد أن تكون هي الشريك الوحيد في شركة محدودة المسؤولية أخرى.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "لا يجوز أن يقل عدد مؤسسي الشركة المغفلة عن 3، بحسب المادة 79 من قانون التجارة البرية. ويُمنع من التأسيس من أُعلن إفلاسه ولم يستعد اعتباره منذ 10 سنوات على الأقل. ويُمنع كذلك من حُكم عليه في لبنان أو في الخارج منذ أقل من 10 سنوات بجرم احتيال أو بجرم آخر تعدده المادة 79.",
+            "cites": [
+              "a6"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما الحد الأدنى لرأس المال، وكم يُدفع منه؟",
+        "paras": [
+          {
+            "text": "لا يقل رأس مال الشركة المحدودة المسؤولية عن 5,000,000 ليرة لبنانية، ويوزع على حصص متساوية. ولا تُعدّ الشركة مؤسسة نهائياً إلا بعد توزيع الحصص وتسديد قيمتها كاملة، وإيداع المبالغ المدفوعة في مصرف.",
+            "cites": [
+              "a3",
+              "a4"
+            ]
+          },
+          {
+            "text": "لا يقل رأس مال الشركة المغفلة عن 30,000,000 ليرة لبنانية، ويجب الاكتتاب به كاملاً. ولا يقل ثمن السهم عن 1,000 ليرة لبنانية، ويعجّل كل مكتتب ربع القيمة الاسمية لكل سهم على الأقل. ويودع المؤسسون هذه المبالغ في مصرف عامل في لبنان، في حساب باسم الشركة قيد التأسيس.",
+            "cites": [
+              "a7",
+              "a8",
+              "a9"
+            ]
+          },
+          {
+            "text": "هذه المبالغ كما وردت في نصوص المواد. والنصوص المتوفرة لدينا لا تبيّن قانوناً لاحقاً عدّلها.",
+            "note": true
+          }
+        ],
+        "table": {
+          "caption": "أرقام رأس المال في الشركة المحدودة المسؤولية والشركة المغفلة كما وردت في المواد",
+          "head": [
+            "البند",
+            "الرقم"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "الحد الأدنى لرأس مال الشركة المحدودة المسؤولية",
+                "5,000,000 ليرة لبنانية"
+              ],
+              "cites": [
+                "a3"
+              ]
+            },
+            {
+              "cells": [
+                "الحد الأدنى لرأس مال الشركة المغفلة",
+                "30,000,000 ليرة لبنانية"
+              ],
+              "cites": [
+                "a7"
+              ]
+            },
+            {
+              "cells": [
+                "الثمن الأدنى للسهم الواحد في الشركة المغفلة",
+                "1,000 ليرة لبنانية"
+              ],
+              "cites": [
+                "a8"
+              ]
+            },
+            {
+              "cells": [
+                "المبلغ المعجّل عن كل سهم في الشركة المغفلة",
+                "ربع القيمة الاسمية على الأقل"
+              ],
+              "cites": [
+                "a8"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "كيف تُؤسَّس كل شركة وتُسجَّل؟",
+        "paras": [
+          {
+            "text": "تثبت الشركة المحدودة المسؤولية بسند رسمي أو عادي، وتسجل في السجل التجاري. هذا ما تنص عليه المادة 2 من المرسوم الاشتراعي رقم 35 لعام 1967.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "يودع نظام الشركة المغفلة ويسجل، مع كل تعديل لاحق له، لدى أي كاتب عدل في لبنان. وتعيّن الجمعية التأسيسية أعضاء مجلس الإدارة الأول إذا لم يعيّنهم النظام، كما تعيّن مفوضي المراقبة الأولين. وتصبح الشركة مؤسسة منذ قبولهم.",
+            "cites": [
+              "a10",
+              "a11"
+            ]
+          },
+          {
+            "text": "على مجلس إدارة الشركة المغفلة أن يودع معاملات النشر الأولية لدى أمانة السجل التجاري المختصة خلال الشهر الذي يلي التأسيس. وإلا فرض القاضي المشرف على السجل التجاري على الشركة غرامة بين 500,000 و1,000,000 ليرة لبنانية.",
+            "cites": [
+              "a12"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "هل تخضع شركات الهولدنغ والأوف شور للقواعد نفسها؟",
+        "paras": [
+          {
+            "text": "تنشأ شركة الهولدنغ (القابضة) بشكل شركة مغفلة. ولا تطبق عليها المادة 5 من المرسوم الاشتراعي رقم 45 لعام 1983 أحكام الشركات المغفلة إلا في ما لا يتعارض مع هذا المرسوم. ثم تعدد المادة نفسها استثناءات من تلك الأحكام.",
+            "cites": [
+              "a13"
+            ]
+          },
+          {
+            "text": "شركة الأوف شور شركة مغفلة لبنانية تمارس حصراً النشاطات التي تعددها المادة 1 من المرسوم الاشتراعي رقم 46 لعام 1983.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "يرد في السجل أن القانون رقم 85 لعام 2018 استبدل مطلع هذه المادة 1 ليشمل الشركات المغفلة المتعددة الشركاء أو المؤلفة من شريك واحد. لكن النص المتوفر لدينا ما زال يعرض المطلع السابق. لذلك لا تستطيع هذه الصفحة أن تؤكد أن شركة الأوف شور ذات الشريك الواحد مستثناة من الحد الأدنى للمؤسسين في المادة 79.",
+            "cites": [
+              "a14"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما الذي لا تتناوله هذه الصفحة؟",
+        "paras": [
+          {
+            "text": "لا تتناول هذه الصفحة إجراءات السجل التجاري ورسومه، ولا إدارة الشركة المحدودة المسؤولية وتسميتها ومفوض مراقبتها، ولا النشاطات الممنوعة عليها، ولا المقدمات العينية، ولا دعوة الجمهور إلى الاكتتاب بأسهم الشركة المغفلة، ولا استثناءات شركات الهولدنغ. ولا نملك النظام الكامل لشركات الأوف شور.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  }
+}

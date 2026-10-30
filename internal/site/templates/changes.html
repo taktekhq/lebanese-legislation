@@ -1,0 +1,22 @@
+{{define "content"}}
+<section class="wrap page">
+  <a class="back" href="{{u "/laws/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "changes.back"}}</a>
+  <p class="eyebrow" data-reveal>{{t "changes.eyebrow"}} &middot; <span lang="ar">التعديلات</span></p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{t "changes.h1"}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{t "changes.lead" (safe (printf "<a class=\"link\" href=\"%s\">%s</a>" (u "/changes/feed.xml") (t "changes.follow_feed")))}}</p>
+</section>
+<section class="wrap">
+  <ol class="changes">{{range .Data}}
+    <li class="chg">
+      <p class="chg__date"><bdi>{{with .Date}}{{date .}}{{else}}{{t "changes.undated"}}{{end}}</bdi></p>
+      <div class="chg__body" dir="rtl">
+        <a class="chg__by" href="{{lawURL .By.ID}}" lang="ar"><b>{{.By.Ident}}</b> <span>{{.By.Title}}</span></a>
+        <ul class="chg__targets">{{range .Targets}}
+          <li lang="ar">{{if eq (len .Articles) 1}}{{$a := index .Articles 0}}{{if $a}}<a class="link" href="{{artURL .Law.ID $a}}">المادة {{$a}}</a> من {{end}}{{end}}<a class="link" href="{{lawURL .Law.ID}}">{{with .Law.Code}}<bdi lang="en">{{.}}</bdi>{{else}}{{.Law.Ident}}{{end}}</a>{{if gt (len .Articles) 1}} <bdi lang="en">({{.Arts}})</bdi>{{end}}</li>{{end}}
+        </ul>
+      </div>
+    </li>{{end}}
+  </ol>
+</section>
+<div style="height:var(--section-y)"></div>
+{{end}}

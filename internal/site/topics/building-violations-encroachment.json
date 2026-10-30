@@ -1,0 +1,588 @@
+{
+  "slug": "building-violations-encroachment",
+  "order": 21,
+  "published": "2026-10-21",
+  "updated": "2026-10-21",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 210543,
+      "article": "1",
+      "quote": "يخضع تشييد وتحويل وترميم وتجديد الأبنية على اختلاف أنواعها للحصول على رخصة مسبقة"
+    },
+    {
+      "id": "a2",
+      "law": 210543,
+      "article": "1",
+      "quote": "الرخصة المسبقة إلزامية لجميع الأبنية حتى تلك العائدة للإدارات والمؤسسات العامة والبلديات باستثناء الأبنية العامة العسكرية والتي تحدد بقرار من مجلس الوزراء"
+    },
+    {
+      "id": "a3",
+      "law": 210543,
+      "article": "1",
+      "quote": "ـ رئيس السلطة التنفيذية في البلدية المختصة للأبنية المنوي تشييدها داخل النطاق البلدي."
+    },
+    {
+      "id": "a4",
+      "law": 210543,
+      "article": "1",
+      "quote": "ـ المحافظ أو القائمقام للأبنية المنوي تشييدها خارج النطاق البلدي."
+    },
+    {
+      "id": "a5",
+      "law": 210543,
+      "article": "2",
+      "quote": "يستعاض عن طلب الرخصة المسبقة بتصريح خطي موقع من مهندس مسؤول ومصدق من إحدى نقابتي المهندسين في الأشغال التالية:"
+    },
+    {
+      "id": "a6",
+      "law": 210543,
+      "article": "2",
+      "quote": "إن أشغال التقوية التي تتناول الهيكل الأساسي للبناء أو إبدال السقوف والشرفات لا يسمح بها إلا في الأبنية أو أجزاء الأبنية الموجودة قانونا أو التي تم تسويتها."
+    },
+    {
+      "id": "a7",
+      "law": 210543,
+      "article": "2",
+      "quote": "يعمل بالتصريح للأشغال المستثناة من الرخصة لمدة سنة واحدة."
+    },
+    {
+      "id": "a8",
+      "law": 210543,
+      "article": "4",
+      "quote": "لا يجوز المباشرة بأعمال البناء أو بأعمال الهدم أو التسويات الترابية الممهدة للبناء أو الأعمال المستثناة من الرخصة إلا بعد الحصول على الرخصة أو التصريح حسب الأصول القانونية ودفع كامل الرسوم المتوجبة."
+    },
+    {
+      "id": "a9",
+      "law": 210543,
+      "article": "26",
+      "quote": "يلغى قانون البناء الصادر بالمرسوم الاشتراعي رقم 148تاريخ 16/9/1983 والمرسوم اشتراعي رقم 45 تاريخ 23 /3/1985, كما تلغى النصوص العامة والخاصة والتي تتعارض وأحكام هذا القانون."
+    },
+    {
+      "id": "a10",
+      "law": 210543,
+      "article": "26",
+      "quote": "تظل المراسيم والقرارات التطبيقية الملحقة بقانون البناء رقم 148/83 تاريخ 16/9/83, الملغى بموجب هذه المادة معمولا بها حتى صدور المراسيم والقرارات التطبيقية الملحقة بهذا القانون, وذلك في كل ما لا يتعارض مع مضمون هذا القانون."
+    },
+    {
+      "id": "a11",
+      "law": 210543,
+      "article": "23",
+      "quote": "كل حفر أساسات أو بناء أو ترميم أو تحوير يباشر به دون ترخيص أو تصريح حسبما يكون العمل خاضعا لرخصة أو\n\nلتصريح أو يجري خلافا للرخصة أو للوصل بالتصريح يوقف حتما وينظم بحق المالك والمسؤول عن التنفيذ محضر ضبط بالمخالفة وعلى صاحب الشأن أن يتقدم بدون إبطاء بطلب رخصة أو بالتصريح حسب الاقتضاء."
+    },
+    {
+      "id": "a12",
+      "law": 210543,
+      "article": "23",
+      "quote": "إذا ظهر أن الإنشاءات لا تتنافى مع التخطيط ولا مع الشروط القانونية, تعطى الرخصة أو الوصل بالتصريح مع فرض غرامة تعادل ضعفي قيمة جميع الرسوم المتوجبة عن القسم الذي يكون قد تم. يعتبر تاما كل بناء صب سقفه."
+    },
+    {
+      "id": "a13",
+      "law": 210543,
+      "article": "23",
+      "quote": "تعتبر الغرامة والرسوم دينا ممتازا على العقار ولا تعطى براءة ذمة من البلدية إلا بعد استيفائها وتسوية وضع المخالفة."
+    },
+    {
+      "id": "a14",
+      "law": 210543,
+      "article": "23",
+      "quote": "يجب على مالك الإنشاءات التي تتنافى مع التخطيط أو التي تخالف قوانين وأنظمة البناء النافذة هدمها, وإذا لم يفعل تولت الإدارة الهدم على نفقته ومسؤوليته واستوفيت منه الأكلاف بطريقة جباية رسوم الدولة والبلديات."
+    },
+    {
+      "id": "a15",
+      "law": 210543,
+      "article": "23",
+      "quote": "تسجل المخالفة, بناء على طلب البلدية أو الإدارة الفنية المختصة, على الصحيفة العينية للعقار ولا تشطب إلا بعد تسوية أوضاعها أو إزالتها."
+    },
+    {
+      "id": "a16",
+      "law": 210543,
+      "article": "24",
+      "quote": "يعاقب المسؤول الذي يخالف أحكام هذا القانون والنصوص التي تتخذ لتطبيقه بغرامة من /2000000/ (مليوني ليرة لبنانية) إلى /100000000/(مئة مليون ليرة لبنانية)."
+    },
+    {
+      "id": "a17",
+      "law": 210543,
+      "article": "24",
+      "quote": "إن المخالف الذي يواصل العمل بعد أن يكون قد أوقف يعاقب بغرامة من /4000000/(أربعة ملايين ليرة لبنانية) إلى /200000000/ (مئتي مليون ليرة لبنانية) وبالسجن من أسبوع إلى 15 يوما أو بإحدى هاتين العقوبتين على ألا يحول ذلك دون إزالة المخالفة عند الاقتضاء."
+    },
+    {
+      "id": "a18",
+      "law": 210543,
+      "article": "22",
+      "quote": "إذا حصلت مخالفات في البناء تستوجب الإزالة خلال الفترة الواقعة بين تاريخ الترخيص وتاريخ الحصول على رخصة الأشغال (السكن), يقوم المهندس المسؤول بسحب تعهده فور حصول المخالفة وإبلاغ ذلك إلى مالكي العقار أو من ينوب عنهم قانونيا ونقابة المهندسين, على أن ينذر المالك بهدم المخالفة في حال التمنع."
+    },
+    {
+      "id": "a19",
+      "law": 210543,
+      "article": "22",
+      "quote": "يتعرض متعهد التنفيذ (المقاول) لمصادرة العدة وللعقوبات التي يتعرض لها المالك المخالف, كما يقصى مؤقتا أو نهائيا\n"
+    },
+    {
+      "id": "a20",
+      "law": 282243,
+      "article": "1",
+      "quote": "تطبق أحكام هذا القانون على جميع الأبنية وأجزاء الأبنية المنشأة في الأملاك الخاصة بمالكيها خلافاً لقوانين وأنظمة البناء بين تاريخ 13/9/1971 وتاريخ 31/12/2018 ضمناً."
+    },
+    {
+      "id": "a21",
+      "law": 282243,
+      "article": "3",
+      "quote": "على مالكي الأبنية وأجزاء الأبنية المنشأة في ملكهم الخاص خلافاً لقوانين وأنظمة البناء أن يختاروا، خلال فترة سنتين من صدور هذا القانون، إما إزالة المخالفة على نفقتهم ومسؤوليتهم وإما تسوية المخالفة مقابل دفع الرسوم والغرامات الآتية:"
+    },
+    {
+      "id": "a22",
+      "law": 282243,
+      "article": "7",
+      "quote": "إذا انقضت مهلة السنة ولم يتقدم المخالف بالتصريح المطلوب، أو إذا لم ينجز إتمام ملف طلب إجراء التسوية ضمن المهلة المحددة له وفقاً للأصول، أو إذا اختار الهدم دون أن ينفذه، يصبح ملزماً بأداء الرسوم والغرامات المتوجبة."
+    },
+    {
+      "id": "a23",
+      "law": 282243,
+      "article": "16",
+      "quote": "لا تسري مهلة مرور الزمن المحددة في القوانين النافذة وخاصة في قانون المحاسبة العمومية وقانون تحديد أصول المحاسبة في البلديات لتدارك الكتمان والنقص في التكاليف أو الجباية على الرسوم والغرامات المنصوص عليها في المادة العاشرة من هذا القانون."
+    },
+    {
+      "id": "a24",
+      "law": 282243,
+      "article": "9",
+      "quote": "إذا لم يقم المخالف بتسديد المبالغ المترتبة عليه بموجب هذا القانون (بعد إصدار الكشف الفني من قبل الجهات المختصة وتحديد المبالغ المتوجبة عليه) تُسجل ديناً ممتازاً على الصحائف العينية العائدة للعقار مع ترتيب فائدة قانونية بمعدل إثني عشر بالمئة سنوياً، وذلك من تاريخ إنتهاء المهلة المحددة في الفقرة (1) من المادة السابعة من هذا القانون."
+    },
+    {
+      "id": "a25",
+      "law": 282243,
+      "article": "14",
+      "quote": "تُهدم حكماً المخالفات التي تحصل بعد تاريخ 1/1/2019 ."
+    },
+    {
+      "id": "a26",
+      "law": 282243,
+      "article": "2",
+      "quote": "1 - مع احتفاظ الإدارة بحق الهدم، يدفع المخالف غرامة تساوي أربع مرات مجموع الرسوم التي تُدفع عند الترخيص القانوني للبناء بالإضافة إلى (1.5) واحد ونصف من قيمة الأرض الوهمية."
+    },
+    {
+      "id": "a27",
+      "law": 282243,
+      "article": "4",
+      "quote": "2 - تعتبر مخالفة غير قابلة للتسوية كل تحوير في وجهة استعمال المرآب أو الملجأ أو إلغائهما في جميع الأبنية."
+    },
+    {
+      "id": "a28",
+      "law": 282243,
+      "article": "20",
+      "quote": "لا تطبق أحكام هذا القانون على المخالفات الحاصلة:"
+    },
+    {
+      "id": "a29",
+      "law": 282243,
+      "article": "15",
+      "quote": "في حال عدم وجود شبكة صرف صحي، أو في حال عدم الربط عليها لأي سببٍ كان، لا تسوى أية مخالفة بناء إلا بعد تجهيز البناء بمحطة تكرير الصرف الصحي وفقاً للمواصفات الفنية المطلوبة وتسكير الآبار ذات الغور المفقود لتصريف المياه المبتذلة وفقاً للأصول الفنية وعملاً بالقانون المنفذ بالمرسوم رقم 8735 تاريخ 23/5/1974 (المحافظة على النظافة العامة)، وبعد تقديم خريطة وإفادة مهندس تثبت ذلك على مسؤوليته الجزائية وبعد كشف المراجع المختصة للتثبت من ذلك."
+    },
+    {
+      "id": "a30",
+      "law": 282243,
+      "article": "19",
+      "quote": "لا تخضع لأحكام هذا القانون المخالفات التي أقيمت الدعاوى بشأنها قبل تاريخ نفاذه أو تلك الصادرة بموجبها أحكاماً قضائية مبرمة قبل تاريخ نفاذ هذا القانون."
+    },
+    {
+      "id": "a33",
+      "law": 282243,
+      "article": "14",
+      "quote": "في جميع التسويات الحاصلة جراء تطبيق أحكام هذا القانون، تبقى مسؤولية المخالف قائمة تجاه الغير، وتحفظ حقوق هؤلاء بموجب القوانين المرعية الإجراء عن الضرر اللاحق بهم بسبب ذلك."
+    },
+    {
+      "id": "a34",
+      "law": 2000200481,
+      "article": "1",
+      "quote": "يمنح عفو عام عن الجرائم المرتكبة قبل تاريخ ١ آذار ٢٠٢٦، ويستفيد منه جميع من ساهموا في ارتكابها، سواء بصفتهم فاعلين أم شركاء أم متدخلين أم محرّضين أم مخبّئين، وفقاً للتعريفات الواردة في قانون العقوبات."
+    },
+    {
+      "id": "a35",
+      "law": 2000200481,
+      "article": "2",
+      "quote": "٦ - الجرائم المتعلقة بجميع أنواع التعدي الخاضعة للملاحقة والتي لا تزال مستمرة بتاريخ صدور هذا القانون والواقعة على:\n\n- الأملاك العامة للدولة على أنواعها.\n\n- الأملاك العامة للبلديات.\n\n- المشاعات البلدية والأهلية والأميرية.\n\n- الأملاك العامة التابعة لمؤسسات عامة.\n\n- الأملاك والمنشآت الخاصة بالدولة."
+    },
+    {
+      "id": "a36",
+      "law": 2000200481,
+      "article": "2",
+      "quote": "لا يشمل العفو الغرامات المقررة على المخالفات السابقة على هذا القانون."
+    },
+    {
+      "id": "a37",
+      "law": 177709,
+      "article": "65",
+      "quote": "على كل صاحب عقار يريد ان يجري على ارضه اعمالا من شأنها ان تضر بالاراضي المجاورة كالنقب والسبر والحفريات وانشاء مستودعات خطرة مقفلة للراحة ومضرة بالصحة ان يعمل بموجب الانظمة المحلية التي تحدد المسافة الواجب حفظها بينه وبين الارض المجاورة او الانشاآت المتوسطة الواجب اقامتها بينهما."
+    },
+    {
+      "id": "a38",
+      "law": 177709,
+      "article": "64",
+      "quote": "على كل صاحب عقار ان يبني سطوح بنائه بطريقة تسيل معها مياه المطر على ارضه او على الطريق العمومي ما لم تطبق عليه في هذا الصدد الانظمة الخاصة المتعلقة بالطرقات ولا يجوز ان يسيل هذه المياه على الارض المجاورة له."
+    },
+    {
+      "id": "a39",
+      "law": 177709,
+      "article": "66",
+      "quote": "لا يجوز لصاحب عقار ان يكون له طاقات تطل توا على جاره او نوافذ او شرفات او غيرها من اشياء ناتئة مشابهة لها تطل على ارض مسورة او غير مسورة لصاحب العقار المجاور ما لم يكن متران من المسافة فيما بين الحائط الذي تكون فيه تلك النواتيء وبين الارض المذكورة واذا لم تكن هذه المسافة فلا يجوز له فتح النوافذ او الشبابيك الا على علو مترين ونصف متر من ارض الغرفة المراد اضاءتها اذا كان الطابق ارضيا وعلو متر وتسعين سنتيمترا من ارض البيت اذا كان الطابق علويا."
+    },
+    {
+      "id": "a40",
+      "law": 177709,
+      "article": "67",
+      "quote": "لا يجوز لصاحب عقار ان يكون له نوافذ جانبية او منحرفة على ارض مسورة او غير مسورة لجاره ما لم يكن بين الحائط التي تكون فيه النوافذ والارض المذكورة مسافة خمسين سنتيمترا."
+    },
+    {
+      "id": "a41",
+      "law": 177709,
+      "article": "69",
+      "quote": "تحسب المسافة المعينة في المادتين 66 و67 ابتداء من ظاهر الحائط الخارجي حيث النوافذ وفيما يختص بالشرفات والنواتيء الشبيهة بها ابتداء من خطها الخارجي حتى الخط الفاصل فيما بين العقارين."
+    },
+    {
+      "id": "a42",
+      "law": 177709,
+      "article": "68",
+      "quote": "لا يطبق هذا المنع المتولد عن المادتين 66 و67 اعلاه على السطوح وعلى النوافذ المفتوحة على الطريق العمومية."
+    }
+  ],
+  "en": {
+    "title": "Building violations and encroachment in Lebanon: licence, fines, demolition and settlement",
+    "question": "What happens when someone builds without a licence or beyond it in Lebanon, and can the violation be settled?",
+    "description": "What the published laws say about building licences, violations, penalties, settlement and neighbours’ rights.",
+    "answer": {
+      "text": "Law 646 requires a prior licence for building, conversion, restoration and renewal, subject to specified works using a written declaration. Unlicensed or non-compliant works are stopped by law and reported; compliant works may be licensed with a fine of twice all fees for the completed part, while the owner must demolish non-compliant works or the administration demolishes at the owner’s expense. The responsible person faces fines of 2,000,000 to 100,000,000 LBP; continuing after a stop brings 4,000,000 to 200,000,000 LBP and 1 week to 15 days in prison, or either penalty. Law 139 covered private-property violations built from 13/9/1971 through 31/12/2018 and gave owners 2 years from its issuance on 9/7/2019 to choose removal or settlement; the texts held show that period has ended and record no extension, a violator who did not declare or complete the file remains bound to pay fees and fines, and violations after 1/1/2019 are demolished by operation of law.",
+      "cites": [
+        "a1",
+        "a5",
+        "a11",
+        "a12",
+        "a14",
+        "a16",
+        "a17",
+        "a20",
+        "a21",
+        "a22",
+        "a25"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "When is a building licence required?",
+        "paras": [
+          {
+            "text": "A prior licence is required for building, converting, restoring and renewing buildings. It is required even for administrations, public institutions and municipalities, except military public buildings designated by Council of Ministers decision. Inside a municipal area, the municipal executive head issues it; outside, the governor or qaimaqam does. A written declaration signed by a responsible engineer and certified by an Order of Engineers replaces the licence for external maintenance, fences, restoration in lawfully existing or settled buildings, cladding, support walls and demolition, levelling natural ground according to licence plans, and internal changes that do not affect structural elements, common parts or the unit’s legality. Strengthening the main structure and replacing roofs or balconies are allowed only in lawfully existing or settled buildings. The declaration is valid for 1 year.",
+            "cites": [
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6",
+              "a7"
+            ]
+          },
+          {
+            "text": "Works may not begin before the required licence or declaration and payment of all fees. Law 646 repeals Legislative Decree 148 of 16/9/1983, Legislative Decree 45 of 23/3/1985 and conflicting texts. The implementing decrees and decisions attached to Building Law 148/83 remain applicable, so far as they do not conflict with Law 646, until Law 646’s implementing decrees and decisions are issued.",
+            "cites": [
+              "a8",
+              "a9",
+              "a10"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What happens to unauthorised or non-compliant works?",
+        "paras": [
+          {
+            "text": "Works started without the required licence or declaration, or contrary to it, are stopped by law. A violation report is made against the owner and person responsible for execution, and the interested party must apply for a licence or declaration without delay.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "If works do not conflict with the plan or legal conditions, a licence or declaration is issued with a fine equal to twice all fees due for the completed part; a building whose roof has been poured is considered complete. The fine and fees are a preferential debt on the property, and the municipality gives no clearance until they are paid and the violation is settled. If works conflict with the plan or building rules, the owner must demolish them; otherwise the administration demolishes at the owner’s expense and responsibility, collecting costs like state and municipal fees. The violation is registered on the property record until settled or removed.",
+            "cites": [
+              "a12",
+              "a13",
+              "a14",
+              "a15"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What are the fines and prison term?",
+        "paras": [
+          {
+            "text": "The Building Law sets these penalties for the responsible person. A contractor also faces confiscation of equipment, the same penalties as the violating owner, and temporary or permanent exclusion from public contracts. For a removable violation during the period between the building licence and occupancy permit, the responsible engineer must withdraw his undertaking, notify the owner and Engineers’ Order, and warn the owner to demolish.",
+            "cites": [
+              "a16",
+              "a17",
+              "a18",
+              "a19"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Penalties stated in Article 24",
+          "head": [
+            "Conduct",
+            "Penalty"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Violation of the law or its implementing rules",
+                "Fine of 2,000,000 to 100,000,000 LBP"
+              ],
+              "cites": [
+                "a16"
+              ]
+            },
+            {
+              "cells": [
+                "Continuing work after it has been stopped",
+                "Fine of 4,000,000 to 200,000,000 LBP, and prison for 1 week to 15 days, or either penalty alone, without preventing removal where required"
+              ],
+              "cites": [
+                "a17"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "Can a past violation be settled, and what is excluded?",
+        "paras": [
+          {
+            "text": "Law 139 of 2019 covered violations on owners’ private property built from 13/9/1971 through 31/12/2018. It gave owners 2 years from issuance to choose removal at their expense or settlement by paying fees and fines. The texts held show that period has ended and record no extension. A violator who did not declare or complete the file remains bound to pay the fees and fines. The limitation period set in laws in force for remedying concealment or shortfall in assessment or collection does not run on the fees and fines under Article 10. Unpaid amounts are registered as a preferential debt on the property record with legal interest of 12% a year from the end of the Article 7(1) period. Violations occurring after 1/1/2019 are demolished by operation of law.",
+            "cites": [
+              "a20",
+              "a21",
+              "a22",
+              "a23",
+              "a24",
+              "a25"
+            ]
+          },
+          {
+            "text": "Cases sued or subject to final judgments before the law took effect are outside its settlement. Aviation easements, nature reserves, antiquities protection zones, and private land next to public maritime or river property without the required certificate are also excluded. Road, planned-road and public-property setback violations may be settled with a fine of 4 times the licence fees plus 1.5 times the virtual land value, while the administration keeps its right to demolish. Changing the use of or removing a garage or shelter cannot be settled. Without a sewer network or connection, settlement requires a treatment station meeting technical specifications, closure of absorbing wells, an engineer’s map and certificate on his criminal responsibility, and inspection by the competent authorities.",
+            "cites": [
+              "a26",
+              "a27",
+              "a28",
+              "a29",
+              "a30"
+            ]
+          },
+          {
+            "text": "Law 70 of 4/9/2026 grants general amnesty for crimes committed before 1/3/2026. Article 2 item 6 excludes from that amnesty, whether or not judgments have issued, prosecutable encroachment still continuing at the law’s issuance on state or municipal public property, municipal, communal, or princely common lands, public property of public institutions, and state private property. The amnesty does not cover fines for violations before the law.",
+            "cites": [
+              "a34",
+              "a35",
+              "a36"
+            ]
+          },
+          {
+            "text": "Settlement does not remove the violator’s liability to third parties for resulting damage.",
+            "cites": [
+              "a33"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What can a neighbour do about damage or overlooking?",
+        "paras": [
+          {
+            "text": "A landowner whose works may harm neighbouring land, including excavation, must follow local rules on separation distances or protective structures. Roofs must direct rainwater onto the owner’s land or the public road, not neighbouring land.",
+            "cites": [
+              "a37",
+              "a38"
+            ]
+          },
+          {
+            "text": "Direct-facing windows or balconies need the gap that article 66 sets between the wall and the neighbour’s land; where that gap is absent, windows may be opened only at the heights article 66 sets above the room floor, one for a ground floor and one for an upper floor. The quoted article gives the figures. Side or oblique windows need 50 centimetres. These restrictions do not apply to roofs or windows opening onto a public road. Distance is measured from the outer face of the wall, or the outer line of a balcony, to the property boundary. This page does not set out a procedure for bringing a neighbour’s claim.",
+            "cites": [
+              "a39",
+              "a40",
+              "a41",
+              "a42"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "مخالفات البناء والتعدي في لبنان: الرخصة والغرامات والهدم والتسوية",
+    "question": "ماذا يحدث عند البناء دون رخصة أو خلافاً لها في لبنان، وهل يمكن تسوية المخالفة؟",
+    "description": "ما تقوله القوانين المنشورة عن رخص البناء والمخالفات والعقوبات والتسوية وحقوق الجيران.",
+    "answer": {
+      "text": "يفرض القانون رقم 646 رخصة مسبقة للتشييد والتحويل والترميم والتجديد، مع أعمال محددة يكفي فيها تصريح خطي. توقف الأعمال غير المرخصة أو المخالفة حكماً وينظم بها محضر ضبط؛ وإذا وافقت التخطيط والشروط القانونية تعطى رخصة أو تصريح مع غرامة تعادل ضعفي الرسوم عن القسم المنفذ، وإلا وجب الهدم على المالك أو على الإدارة نفقته. يعاقب المسؤول بغرامة من 2,000,000 إلى 100,000,000 ليرة لبنانية، وتبلغ غرامة متابعة العمل بعد وقفه من 4,000,000 إلى 200,000,000 ليرة مع الحبس من أسبوع إلى 15 يوماً أو إحدى العقوبتين. شمل القانون 139 مخالفات الأملاك الخاصة بين 13/9/1971 و31/12/2018، وأعطى المالكين سنتين من صدوره في 9/7/2019 لاختيار الإزالة أو التسوية، وتظهر النصوص المتاحة أن المهلة انتهت ولا تسجل تمديداً؛ ويلزم المخالف الذي لم يصرح أو يستكمل الملف بدفع الرسوم والغرامات، وتهدم حكماً مخالفات ما بعد 1/1/2019.",
+      "cites": [
+        "a1",
+        "a5",
+        "a11",
+        "a12",
+        "a14",
+        "a16",
+        "a17",
+        "a20",
+        "a21",
+        "a22",
+        "a25"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "متى تلزم رخصة البناء؟",
+        "paras": [
+          {
+            "text": "تلزم رخصة مسبقة لتشييد الأبنية وتحويلها وترميمها وتجديدها، حتى للأبنية العائدة للإدارات والمؤسسات العامة والبلديات، باستثناء الأبنية العامة العسكرية التي يحددها قرار من مجلس الوزراء. يعطيها رئيس السلطة التنفيذية في البلدية داخل النطاق البلدي، والمحافظ أو القائمقام خارجه. ويحل تصريح خطي يوقعه مهندس مسؤول وتصدّق عليه إحدى نقابتي المهندسين محل الرخصة في الصيانة الخارجية والتصاوين وترميم الأبنية القائمة قانوناً أو المسوّاة والتلبيس وجدران الدعم والهدم وتسوية الأرض الطبيعية وفق خرائط الترخيص، وكذلك التعديلات الداخلية التي لا تمس العناصر الإنشائية أو الأقسام المشتركة أو قانونية الوحدة. ولا يسمح بتقوية الهيكل الأساسي أو إبدال السقوف والشرفات إلا في أبنية قائمة قانوناً أو مسوّاة. مدة التصريح سنة واحدة.",
+            "cites": [
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6",
+              "a7"
+            ]
+          },
+          {
+            "text": "لا يجوز بدء الأعمال قبل الرخصة أو التصريح المطلوب ودفع الرسوم كاملة. ألغى القانون رقم 646 المرسومين الاشتراعيين 148 تاريخ 16/9/1983 و45 تاريخ 23/3/1985 والنصوص المخالفة. وتظل المراسيم والقرارات التطبيقية الملحقة بقانون البناء 148/83 نافذة فيما لا يتعارض مع القانون 646 إلى حين صدور مراسيمه وقراراته التطبيقية.",
+            "cites": [
+              "a8",
+              "a9",
+              "a10"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يحدث للأعمال غير المرخصة أو المخالفة؟",
+        "paras": [
+          {
+            "text": "توقف حكماً الأعمال التي تبدأ دون الرخصة أو التصريح المطلوب، أو خلافاً لهما. وينظم محضر ضبط بحق المالك والمسؤول عن التنفيذ، وعلى صاحب الشأن تقديم طلب الرخصة أو التصريح دون إبطاء.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "إذا لم تخالف الإنشاءات التخطيط والشروط القانونية، تعطى الرخصة أو التصريح مع غرامة تعادل ضعفي الرسوم عن القسم المنفذ؛ ويعتبر البناء تاماً عند صب سقفه. تكون الغرامة والرسوم ديناً ممتازاً على العقار، ولا تعطى البلدية براءة ذمة قبل استيفائهما وتسوية المخالفة. وإذا خالفت الإنشاءات التخطيط أو أنظمة البناء، فعلى المالك هدمها، وإلا هدمتها الإدارة على نفقته ومسؤوليته وتحصّل الأكلاف كرسوم الدولة والبلديات. وتسجل المخالفة على الصحيفة العينية حتى تسويتها أو إزالتها.",
+            "cites": [
+              "a12",
+              "a13",
+              "a14",
+              "a15"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما الغرامات والحبس؟",
+        "paras": [
+          {
+            "text": "يحدد قانون البناء العقوبات الآتية على المسؤول. ويتعرض المقاول لمصادرة العدة ولعقوبات المالك المخالف، ويمكن إقصاؤه مؤقتاً أو نهائياً عن الصفقات العامة. وإذا وقعت مخالفة تستوجب الإزالة بين رخصة البناء ورخصة الأشغال، يسحب المهندس المسؤول تعهده ويبلغ المالك ونقابة المهندسين وينذر المالك بهدمها.",
+            "cites": [
+              "a16",
+              "a17",
+              "a18",
+              "a19"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "العقوبات الواردة في المادة 24",
+          "head": [
+            "الفعل",
+            "العقوبة"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "مخالفة القانون أو النصوص التطبيقية",
+                "غرامة من 2,000,000 إلى 100,000,000 ليرة لبنانية"
+              ],
+              "cites": [
+                "a16"
+              ]
+            },
+            {
+              "cells": [
+                "متابعة العمل بعد وقفه",
+                "غرامة من 4,000,000 إلى 200,000,000 ليرة لبنانية، وحبس من أسبوع إلى 15 يوماً أو إحدى العقوبتين، دون أن يمنع ذلك إزالة المخالفة عند الاقتضاء"
+              ],
+              "cites": [
+                "a17"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "هل يمكن تسوية مخالفة سابقة، وما المستثنى؟",
+        "paras": [
+          {
+            "text": "شمل القانون رقم 139/2019 المخالفات على الأملاك الخاصة المقامة بين 13/9/1971 و31/12/2018 ضمناً. وأعطى المالكين سنتين من صدوره لاختيار إزالة المخالفة على نفقتهم أو تسويتها لقاء الرسوم والغرامات. وتظهر النصوص المتاحة أن المهلة انتهت ولا تسجل تمديداً. ويلزم المخالف بالرسوم والغرامات إذا لم يصرح أو يستكمل الملف أو اختار الهدم ولم ينفذه. ولا تسري مهلة مرور الزمن المحددة في القوانين لتدارك الكتمان أو النقص في التكليف أو الجباية على رسوم وغرامات المادة 10. وتسجل المبالغ غير المدفوعة ديناً ممتازاً على الصحيفة العينية مع فائدة قانونية 12% سنوياً من نهاية مهلة المادة 7 الفقرة 1. وتهدم حكماً المخالفات الحاصلة بعد 1/1/2019.",
+            "cites": [
+              "a20",
+              "a21",
+              "a22",
+              "a23",
+              "a24",
+              "a25"
+            ]
+          },
+          {
+            "text": "لا تشمل التسوية الدعاوى المقامة أو الأحكام المبرمة قبل نفاذ القانون، أو المخالفات ضمن ارتفاقات الطيران المدني والمحميات ومناطق حماية الآثار، أو العقارات الخاصة المتاخمة للأملاك البحرية أو النهرية من دون الإفادة المطلوبة. ويمكن تسوية مخالفات التراجعات عن الطرق والتخطيطات والأملاك العامة بغرامة تساوي 4 أضعاف رسوم الترخيص مضافاً إليها 1.5 من قيمة الأرض الوهمية، مع احتفاظ الإدارة بحق الهدم. ولا تسوى مخالفة تغيير وجهة استعمال المرآب أو الملجأ أو إلغائهما. وفي غياب شبكة الصرف الصحي أو عدم الربط عليها، لا تتم التسوية إلا بعد تجهيز محطة تكرير وفق المواصفات الفنية، وتسكير الآبار ذات الغور المفقود، وتقديم خريطة وإفادة مهندس على مسؤوليته الجزائية، وكشف المراجع المختصة.",
+            "cites": [
+              "a26",
+              "a27",
+              "a28",
+              "a29",
+              "a30"
+            ]
+          },
+          {
+            "text": "يمنح القانون رقم 70 تاريخ 4/9/2026 عفواً عاماً عن الجرائم المرتكبة قبل 1/3/2026. وتستثني المادة 2 الفقرة 6 من العفو، سواء صدرت أحكام أم لا، التعديات الخاضعة للملاحقة والمستمرة عند صدور القانون على الأملاك العامة للدولة والبلديات والمؤسسات العامة، والمشاعات البلدية والأهلية والأميرية، والأملاك والمنشآت الخاصة بالدولة. ولا يشمل العفو الغرامات المقررة على المخالفات السابقة.",
+            "cites": [
+              "a34",
+              "a35",
+              "a36"
+            ]
+          },
+          {
+            "text": "تبقى مسؤولية المخالف تجاه الغير عن الضرر الناتج عن المخالفة قائمة بعد التسوية.",
+            "cites": [
+              "a33"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يستطيع الجار بشأن الضرر أو الإطلالة؟",
+        "paras": [
+          {
+            "text": "على من يجري أعمالاً قد تضر بالأرض المجاورة، ومنها الحفريات، التقيد بالأنظمة المحلية التي تحدد المسافة أو المنشآت الوقائية. ويجب أن تسيل مياه المطر من السطح إلى أرض صاحب العقار أو الطريق العام، لا إلى أرض الجار.",
+            "cites": [
+              "a37",
+              "a38"
+            ]
+          },
+          {
+            "text": "تحتاج النوافذ أو الشرفات المطلة مباشرة إلى مسافة مترين بين الحائط وأرض الجار؛ وإذا لم تتوفر، فلا تفتح النوافذ إلا على علو مترين ونصف متر من أرض الغرفة في الطابق الأرضي أو متر وتسعين سنتيمتراً في الطابق العلوي. وتحتاج النوافذ الجانبية أو المنحرفة إلى مسافة خمسين سنتيمتراً. لا تطبق هذه القيود على السطوح أو النوافذ المفتوحة على الطريق العام. وتحسب المسافة من ظاهر الحائط الخارجي أو من الخط الخارجي للشرفة إلى الحد الفاصل بين العقارين. لا تعرض هذه الصفحة إجراءات إقامة دعوى الجار.",
+            "cites": [
+              "a39",
+              "a40",
+              "a41",
+              "a42"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

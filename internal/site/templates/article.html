@@ -1,0 +1,18 @@
+{{define "content"}}{{with .Data}}{{$law := .Law}}
+<section class="wrap dochead" dir="rtl">
+  <a class="back" href="{{lawURL $law.ID}}#a-{{slug .A.Number}}" dir="ltr"><span aria-hidden="true">{{backArrow}}</span> {{t "art.whole_text"}}</a>
+  <p class="kicker" data-reveal><b lang="ar">{{$law.CiteName}}</b> {{template "status" $law.Status}}</p>
+  <h1 lang="ar" data-reveal style="--d:60ms">المادة {{.A.Number}}</h1>
+  {{with .Answer}}<p class="answer" lang="{{uilang}}" dir="{{dir}}">{{.}}</p>{{end}}
+</section>
+<section class="wrap">
+  <div class="lawtext" data-lawtext lang="ar" dir="rtl" style="padding-block:24px 8px">{{template "article" (dict2 $law .A true)}}</div>
+  <p class="citeas" dir="rtl"><span lang="ar">المادة {{.A.Number}} من {{$law.CiteName}}</span> <bdi class="tiny">{{absURL (citeArt $law.ID .A.Number)}}</bdi></p>
+  {{template "explained" .Topics}}
+  <div class="btn-row" style="padding-bottom:var(--section-y)" dir="rtl">
+    {{with .Prev}}<a class="btn btn--ghost btn--sm" href="{{artURL $law.ID .Number}}">{{fwdArrow}} المادة {{.Number}}</a>{{end}}
+    <a class="btn btn--ghost btn--sm" href="{{lawURL $law.ID}}#a-{{slug .A.Number}}">{{t "art.whole_text"}}</a>
+    {{with .Next}}<a class="btn btn--ghost btn--sm" href="{{artURL $law.ID .Number}}">المادة {{.Number}} {{backArrow}}</a>{{end}}
+  </div>
+</section>
+{{end}}{{end}}

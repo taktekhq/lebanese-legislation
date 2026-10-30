@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "lebanese-legislation-mcp",
+  "main": "index.mjs",
+  "compatibility_date": "2026-10-30",
+  "containers": [{
+    "class_name": "MCPContainer",
+    "scheduling_policy": "durable_object",
+    "images": { "base": { "dockerfile": "../Dockerfile", "build_context": ".." } }
+  }],
+  "durable_objects": { "bindings": [{ "name": "MCP_CONTAINER", "class_name": "MCPContainer" }] },
+  "exports": { "MCPContainer": { "type": "durable-object", "storage": "sqlite" } }
+}

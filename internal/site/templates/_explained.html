@@ -1,0 +1,2 @@
+{{/* "Explained in: <topic>" on an article page; the argument is the list of topics that quote the article. */}}
+{{define "explained"}}{{if .}}<p class="explained tiny" dir="{{dir}}" lang="{{uilang}}">{{t "topics.explained_in"}} {{range $i, $t := .}}{{if $i}}, {{end}}<a href="{{u (printf "/topic/%s/" $t.Slug)}}">{{$t.Title}}</a>{{end}}</p>{{end}}{{end}}

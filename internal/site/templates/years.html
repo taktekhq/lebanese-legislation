@@ -1,0 +1,14 @@
+{{define "content"}}{{with .Data}}{{$k := .Kind}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <p class="eyebrow" data-reveal>{{.Eyebrow}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{safe .H1}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{.Lead}} {{num .Total}} {{.Many}}.</p>
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  {{range .Decades}}<div class="decade">
+    <h2 class="decade__label">{{.Label}}</h2>
+    <div class="years">{{range .Years}}<a class="chip" href="{{u (printf "/%s/year/%d/" $k .Year)}}">{{if .Year}}{{.Year}}{{else}}{{t "years.undated"}}{{end}} <b>{{num .Count}}</b></a>{{end}}</div>
+  </div>{{end}}
+</section>
+{{end}}{{end}}
