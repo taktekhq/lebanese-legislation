@@ -19,20 +19,25 @@ def db():
     with psycopg.connect(dsn,autocommit=True) as admin:
         admin.execute(sql.SQL('CREATE DATABASE {}').format(sql.Identifier(name)))
     conn = psycopg.connect(dsn,dbname=name)
+    older_reader = psycopg.connect(dsn,dbname=name)
     try:
         conn.execute('''CREATE TABLE source_documents(
           kind text,source_id integer,part text,lang text,title text,text text,metadata jsonb,
           PRIMARY KEY(kind,source_id,part,lang))''')
-        conn.execute('''INSERT INTO source_documents
-          SELECT 'law',i,'title','ar','Entry '||i||' '||md5(i::text),
-          repeat(md5(i::text)||' ',20),
-          jsonb_build_object('identifier',i::text,'issued_on','2020-01-02')
-          FROM generate_series(1,30000) i''')
-        conn.execute("UPDATE source_documents SET text='A rareNeedle inside original text' WHERE source_id=25000")
-        conn.execute("UPDATE source_documents SET title='rareNeedle title' WHERE source_id=29000")
-        conn.execute("UPDATE source_documents SET metadata=jsonb_build_object('number','fallback-number','date','2021-02-03') WHERE source_id=29000")
+        # An unrelated older snapshot must not make the new fixture indexes
+        # unusable. Insert final values directly rather than creating HOT chains
+        # that legitimately set pg_index.indcheckxmin until old readers finish.
+        older_reader.execute('SELECT pg_current_snapshot()')
+        conn.execute("""INSERT INTO source_documents
+          SELECT 'law',i,'title','ar',
+          CASE WHEN i=29000 THEN 'rareNeedle title' ELSE 'Entry '||i||' '||md5(i::text) END,
+          CASE WHEN i=25000 THEN 'A rareNeedle inside original text' ELSE repeat(md5(i::text)||' ',20) END,
+          CASE WHEN i=29000 THEN jsonb_build_object('number','fallback-number','date','2021-02-03')
+          ELSE jsonb_build_object('identifier',i::text,'issued_on','2020-01-02') END
+          FROM generate_series(1,30000) i""")
         yield conn
     finally:
+        older_reader.close()
         conn.close()
         with psycopg.connect(dsn,autocommit=True) as admin:
             admin.execute(sql.SQL('DROP DATABASE {} WITH (FORCE)').format(sql.Identifier(name)))
@@ -70,4 +75,4 @@ def test_identifier_and_date_fallback_queries_use_expression_indexes(db):
         query='SELECT source_id FROM source_documents WHERE '+expression+'=%s'
         assert db.execute(query,(value,)).fetchall()==[(29000,)]
         plan=db.execute('EXPLAIN (FORMAT JSON) '+query,(value,)).fetchone()[0][0]['Plan']
-        assert index in {n.get('Index Name') for n in nodes(plan)}, (plan,db.execute("SELECT indexname,indexdef FROM pg_indexes WHERE tablename='source_documents'").fetchall())
+        assert index in {n.get('Index Name') for n in nodes(plan)}, (plan,db.execute("SELECT c.relname,i.indcheckxmin,i.xmin::text,pg_snapshot_xmin(pg_current_snapshot())::text FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid WHERE i.indrelid='source_documents'::regclass").fetchall())
