@@ -1,5 +1,7 @@
 # Lebanese Legislation Starter
 
+> The first database release is being validated. Parquet and initial container images are available. The setup below depends on the pending database manifest.
+
 Restore the public [Lebanese Legislation dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation) into PostgreSQL with a precomputed pgvector index. Run an API that returns exact matches first and related source passages underneath.
 
 The existing Parquet dataset remains the portable data distribution. This project adds a PostgreSQL snapshot and reusable search service. No model training is required.
