@@ -11,3 +11,13 @@ def test_subcommand_help_is_delegated(monkeypatch):
     )
     assert main(["restore", "--help"]) == 0
     assert seen == ["--help"]
+
+
+def test_release_version_matches_package_metadata():
+    import tomllib
+    from pathlib import Path
+
+    from lebleg_starter import __version__
+
+    project = tomllib.loads((Path(__file__).parents[1] / "pyproject.toml").read_text())
+    assert __version__ == project["project"]["version"]

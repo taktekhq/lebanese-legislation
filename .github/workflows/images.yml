@@ -5,7 +5,7 @@ on:
       version:
         description: Package version to publish from this ref
         required: true
-        default: 0.1.3
+        default: 0.1.4
   push:
     tags: ['v*']
 permissions:
@@ -41,55 +41,78 @@ jobs:
           export VERSION
           python3 - <<'PYCODE'
           import json, os, urllib.request, urllib.error
-          tags = set()
-          for page in range(1, 101):
-              url = f'https://api.github.com/orgs/taktekhq/packages/container/lebanese-legislation-starter/versions?per_page=100&page={page}'
-              request = urllib.request.Request(url, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'], 'Accept':'application/vnd.github+json'})
-              try:
-                  with urllib.request.urlopen(request, timeout=30) as response:
-                      versions = json.load(response)
-              except urllib.error.HTTPError as error:
-                  if error.code == 404 and page == 1:
-                      break
-                  raise
-              tags.update(tag for version in versions for tag in version['metadata']['container']['tags'])
-              if len(versions) < 100:
-                  break
-          else:
-              raise SystemExit('Package version listing exceeded safety bound')
           version = os.environ['VERSION']
-          if tags.intersection({version, 'publisher-'+version}):
-              raise SystemExit('Refusing to replace published version tags')
+          source_tag = 'source-' + os.environ['GITHUB_SHA']
+          builds = {}
+          for service in ('db', 'api'):
+              package = 'lebanese-legislation-' + service
+              builds[service] = True
+              for page in range(1, 101):
+                  url = f'https://api.github.com/orgs/taktekhq/packages/container/{package}/versions?per_page=100&page={page}'
+                  request = urllib.request.Request(url, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'], 'Accept':'application/vnd.github+json'})
+                  try:
+                      with urllib.request.urlopen(request, timeout=30) as response:
+                          versions = json.load(response)
+                  except urllib.error.HTTPError as error:
+                      if error.code == 404 and page == 1:
+                          break
+                      raise
+                  occupied = [item for item in versions if version in item['metadata']['container']['tags']]
+                  if occupied:
+                      if len(occupied) != 1 or source_tag not in occupied[0]['metadata']['container']['tags']:
+                          raise SystemExit(f'Refusing to replace published {package}:{version} from another source')
+                      builds[service] = False
+                      break
+                  if len(versions) < 100:
+                      break
+              else:
+                  raise SystemExit('Package version listing exceeded safety bound')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               out.write('version='+version+'\n')
-              out.write('build_postgres='+str('postgres-18.6-vector0.8.2-r2' not in tags).lower()+'\n')
+              for service, build in builds.items():
+                  out.write('build_'+service+'='+str(build).lower()+'\n')
           PYCODE
-      - uses: docker/build-push-action@v6
-        if: steps.version.outputs.build_postgres == 'true'
+      - name: Build database candidate
+        if: steps.version.outputs.build_db == 'true'
+        uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/postgres.Dockerfile
+          target: db
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2-r2
-      - uses: docker/build-push-action@v6
+          tags: ghcr.io/taktekhq/lebanese-legislation-db:source-${{ github.sha }}
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+      - name: Build API candidate
+        if: steps.version.outputs.build_api == 'true'
+        uses: docker/build-push-action@v6
         with:
           context: .
-          target: runtime
+          target: api
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/taktekhq/lebanese-legislation-starter:${{ steps.version.outputs.version }}
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          target: publisher
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/taktekhq/lebanese-legislation-starter:publisher-${{ steps.version.outputs.version }}
-
-      - name: Smoke test both published architectures
+          tags: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+      - name: Check both candidate architectures before release tags
         env:
-          POSTGRES_IMAGE: ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2-r2
-          STARTER_IMAGE: ghcr.io/taktekhq/lebanese-legislation-starter:${{ steps.version.outputs.version }}
-          PUBLISHER_IMAGE: ghcr.io/taktekhq/lebanese-legislation-starter:publisher-${{ steps.version.outputs.version }}
+          DB_IMAGE: ghcr.io/taktekhq/lebanese-legislation-db:source-${{ github.sha }}
+          API_IMAGE: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
         run: bash docker/smoke-images.sh
+
+      - name: Promote verified immutable versions
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          SOURCE_SHA: ${{ github.sha }}
+          BUILD_DB: ${{ steps.version.outputs.build_db }}
+          BUILD_API: ${{ steps.version.outputs.build_api }}
+        run: |
+          for service in db api; do
+            image="ghcr.io/taktekhq/lebanese-legislation-$service"
+            build_var="BUILD_${service^^}"
+            if [ "${!build_var}" = true ]; then
+              docker buildx imagetools create --tag "$image:$VERSION" "$image:source-$SOURCE_SHA"
+            fi
+          done
+          for service in db api; do
+            image="ghcr.io/taktekhq/lebanese-legislation-$service"
+            docker buildx imagetools create --tag "$image:latest" "$image:$VERSION"
+          done
