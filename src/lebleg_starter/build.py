@@ -13,6 +13,7 @@ import psycopg
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
+from . import __version__
 from .chunks import DIMENSIONS, GO_WHITESPACE, MODEL, chunks, reusable
 from .sources import derive_documents, import_parquet, resource
 
@@ -76,13 +77,22 @@ def reuse_vectors(target, source, source_table='public.semantic_chunks'):
 
 
 def _canonical_chunks(conn, checkpoint=False):
-    # Generate canonical expected boundaries rather than counting unchecked rows.
+    # Bounded reference batches avoid one round trip per document and do not
+    # depend on database collation matching Python's string ordering.
     with conn.cursor(name='missing_documents', withhold=checkpoint) as rows:
         rows.execute('SELECT kind,source_id,part,lang,title,text,hash FROM source_documents ORDER BY kind,source_id,part,lang')
-        for row in rows:
-            saved = {r[0]: r[1:] for r in conn.execute('SELECT chunk_start,chunk_end,text,hash FROM semantic_chunks WHERE model=%s AND kind=%s AND source_id=%s AND part=%s AND lang=%s', (MODEL, *row[:4]))}
-            for chunk in chunks(row[5]):
-                yield row[:5], chunk, saved.get(chunk.start) == (chunk.end, chunk.text, chunk.hash)
+        while batch := rows.fetchmany(500):
+            references = [tuple(row[:4]) for row in batch]
+            values = sql.SQL(',').join(sql.SQL('(%s,%s,%s,%s)') for _ in references)
+            query = sql.SQL("""SELECT c.kind,c.source_id,c.part,c.lang,c.chunk_start,c.chunk_end,c.text,c.hash
+              FROM semantic_chunks c JOIN (VALUES {}) AS r(kind,source_id,part,lang)
+              USING(kind,source_id,part,lang) WHERE c.model=%s""").format(values)
+            parameters = tuple(value for ref in references for value in ref) + (MODEL,)
+            saved = set(conn.execute(query,parameters).fetchall())
+            for row in batch:
+                for chunk in chunks(row[5]):
+                    key = (*row[:4],chunk.start,chunk.end,chunk.text,chunk.hash)
+                    yield row[:5], chunk, key in saved
 
 
 def missing_chunks(conn, checkpoint=False):
@@ -268,7 +278,7 @@ def main(argv=None):
           'postgres':{'version':'18.6','vector_version':'0.8.2'},
           'embedding':{'model':MODEL,'dimensions':DIMENSIONS,'task_type':'RETRIEVAL_DOCUMENT','chunk_size':900,'chunk_overlap':120,'storage':'halfvec(768)'},
           'counts':{'tables':tables,'source_documents':documents,'semantic_chunks':report['indexed']},
-          'dataset':{'license':args.dataset_license,'attribution':'Texts: Centre for Research and Studies in Legal Informatics, Lebanese University. Dataset structure: Taktek, LLC.'},'build_version':'0.1.0'}
+          'dataset':{'license':args.dataset_license,'attribution':'Texts: Centre for Research and Studies in Legal Informatics, Lebanese University. Dataset structure: Taktek, LLC.'},'build_version':__version__}
         conn.execute('CREATE TABLE lebleg_release(release_id text PRIMARY KEY,manifest jsonb NOT NULL)')
         conn.execute('INSERT INTO lebleg_release VALUES(%s,%s)', (args.release_id,Jsonb(manifest)))
         conn.execute('ANALYZE')

@@ -162,3 +162,28 @@ def test_finalized_release_can_resume_after_dump_failure_without_reloading(db, t
     assert not list(tmp_path.glob('*.partial'))
     assert main(argv+['--pg-dump',dump_bin]) == 0
     assert json.loads((tmp_path/'manifest.json').read_text())['dump']['size_bytes'] > 0
+
+
+def test_batched_coverage_keeps_reference_boundaries_and_ignores_extra_rows(db):
+    ensure_semantic(db)
+    db.execute('CREATE TABLE source_documents(kind text,source_id int,part text,lang text,title text,text text,hash text)')
+    docs = [('law',i,'مادة','ar','title','نص'+str(i),digest('نص'+str(i))) for i in range(503)]
+    with db.cursor() as cur:
+        cur.executemany('INSERT INTO source_documents VALUES(%s,%s,%s,%s,%s,%s,%s)',docs)
+    vector='['+','.join(['0.1']*768)+']'
+    rows=[]
+    for sid,model,hashed,excerpt,start in [
+        (0,'gemini-embedding-001',digest('نص0'),'نص0',0),
+        (499,'gemini-embedding-001',digest('نص499'),'نص499',0),
+        (499,'gemini-embedding-001','stale','نص499',0),
+        (500,'gemini-embedding-001',digest('نص500'),'wrong',0),
+        (501,'gemini-embedding-001',digest('نص501'),'نص501',1),
+        (1,'other-model',digest('نص1'),'نص1',0),
+        (9999,'gemini-embedding-001',digest('نص0'),'نص0',0)]:
+        rows.append((model,'law',sid,'مادة','ar','title',excerpt,hashed,start,start+len(excerpt),vector))
+    with db.cursor() as cur:
+        cur.executemany('INSERT INTO semantic_chunks(model,kind,source_id,part,lang,title,text,hash,chunk_start,chunk_end,embedding) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',rows)
+    assert coverage(db)=={'expected':503,'indexed':2,'missing':501}
+    from lebleg_starter.build import validate_chunks
+    with pytest.raises(ValueError,match='canonical'):
+        validate_chunks(db)
