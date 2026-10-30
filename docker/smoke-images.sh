@@ -15,7 +15,7 @@ for architecture in amd64 arm64; do
     -e POSTGRES_HOST_AUTH_METHOD=trust "$POSTGRES_IMAGE" >/dev/null
   ready=false
   for attempt in $(seq 1 60); do
-    if docker exec "$container" pg_isready -U postgres >/dev/null 2>&1; then
+    if docker exec "$container" pg_isready -h 127.0.0.1 -U postgres >/dev/null 2>&1; then
       ready=true
       break
     fi
@@ -25,7 +25,7 @@ for architecture in amd64 arm64; do
     echo "PostgreSQL did not become ready on $platform" >&2
     exit 1
   fi
-  result=$(docker exec "$container" psql -U postgres -At -v ON_ERROR_STOP=1 \
+  result=$(docker exec "$container" psql -h 127.0.0.1 -U postgres -At -v ON_ERROR_STOP=1 \
     -c "CREATE EXTENSION vector; SELECT '[1,2,3]'::vector <-> '[1,2,4]'::vector;")
   [[ "${result##*$'\n'}" == 1 ]]
   docker run --rm --platform "$platform" "$STARTER_IMAGE" --help >/dev/null
