@@ -8,7 +8,7 @@ Run a local Lebanese legal database, HTTP API and MCP server from the public [da
 | `ghcr.io/taktekhq/lebanese-legislation-api:0.1.4` | General resources and keyword, citation and optional semantic search |
 | `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.4` | The same retrieval and resources as MCP tools |
 
-**The first database manifest is still pending.** Default startup needs the other release process to publish it. The images can also consume a prepared local snapshot; see [setup details](docs/reference.md#start-locally).
+The [database snapshot](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases/2026-10-30.1) includes 1,093,730 source records and 1,546,886 indexed passages. Default startup downloads the latest verified release.
 
 ## DB only
 
