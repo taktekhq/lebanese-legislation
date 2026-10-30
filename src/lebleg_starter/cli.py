@@ -10,7 +10,7 @@ from . import __version__
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="lebleg", description="Restore and search published Lebanese legal data")
     parser.add_argument("--version", action="version", version=__version__)
-    parser.add_argument("command", choices=["init", "restore", "search", "serve", "build", "publish"])
+    parser.add_argument("command", choices=["init", "restore", "search", "serve", "build", "publish", "seed"])
     values = list(sys.argv[1:] if argv is None else argv)
     args = parser.parse_args(values[:1])
     rest = values[1:]
