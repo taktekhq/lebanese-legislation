@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG POSTGRES_IMAGE=ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2
+ARG POSTGRES_IMAGE=ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2-r2
 FROM ${POSTGRES_IMAGE} AS runtime
 RUN apt-get update \
  && apt-get install -y --no-install-recommends python3 python3-venv ca-certificates \
