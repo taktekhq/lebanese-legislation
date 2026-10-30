@@ -1,21 +1,29 @@
-# Lebanese Legislation
+# Lebanese Legislation website
 
-The Go website, search, JSON API and MCP server behind [Lebanese Legislation](https://lebaneselegislation.com). It reads an existing PostgreSQL database. Arabic and English interfaces share the same source texts and citations.
+The Go website behind [Lebanese Legislation](https://lebaneselegislation.com), with Arabic and English pages. Build it from this repository for local or offline hosting.
 
-## Run
+For the public DB, general/search API and MCP images, use the [service repository](https://github.com/taktekhq/lebanese-legislation-starter). API and MCP share its retrieval backend. This repository does not rebuild the database distribution.
 
-Use Go 1.27.1 or newer. Point `DATABASE_URL` at a compatible database, then start the server:
+## Run the website
+
+Use Go 1.27.1 or newer and a compatible PostgreSQL database:
 
 ```sh
 export DATABASE_URL='postgres://USER:PASSWORD@HOST/DATABASE?sslmode=require'
 go run ./cmd/website
 ```
 
-Open http://localhost:8080. `LISTEN_ADDR` defaults to `127.0.0.1:8080`. Set `PUBLIC_URL` to your public origin for canonical links. Use the existing database release and database image from [lebanese-legislation-starter](https://github.com/taktekhq/lebanese-legislation-starter) for the published dataset. This repository does not rebuild that distribution.
+Open http://localhost:8080. `LISTEN_ADDR` defaults to `127.0.0.1:8080`; `PUBLIC_URL` sets canonical links. The source website keeps its existing SQL browsing and keyword-search behavior. Optional provider-backed meaning search is disabled in this standalone build.
+
+Build an image locally when useful:
+
+```sh
+docker build --target website -t lebanese-legislation-website .
+```
+
+The website image is not published. Earlier published tags remain available.
 
 ## Synthetic demo
-
-Docker Compose starts stock PostgreSQL with one fictional law and article:
 
 ```sh
 docker compose -f compose.demo.yml up -d --wait
@@ -23,36 +31,17 @@ export DATABASE_URL='postgres://postgres@localhost:55439/legislation?sslmode=dis
 go run ./cmd/website
 ```
 
-Search for `المكتبة`, open `/law/1/`, query `/api/v1/search/?q=المكتبة`, or connect an MCP client to `/mcp`. The fixture is not legal material. Remove it with `docker compose -f compose.demo.yml down -v`.
-
-## Check
+The fixture contains one fictional law and article. Search for `المكتبة`, open `/law/1/`, or query `/api/v1/search/?q=المكتبة`. Stop with `docker compose -f compose.demo.yml down -v`.
 
 ```sh
 go test ./...
 DEMO_DATABASE_URL="$DATABASE_URL" go test ./internal/site -run TestSyntheticServing
 ```
 
-The smoke test requires the synthetic demo. Additional corpus checks opt in through `LEBLEG_DSN`. Optional provider-backed meaning search is disabled. Scan files are optional local assets. Bundled fonts are omitted; browsers use installed fallbacks.
+## Services and contributions
 
-MIT licensed code. Source documents retain their own rights and attribution.
+Canonical images are `ghcr.io/taktekhq/lebanese-legislation-db:0.1.4`, `ghcr.io/taktekhq/lebanese-legislation-api:0.1.4` and `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.4`. The MCP target here wraps the matching API image and limits it to MCP/health routes. [Cloudflare Containers](cloudflare/README.md) can run it.
 
-## Containers
+Try the [handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting), or run its [source](examples/handwriting/README.md). Drafts stay local and download for review. See [CONTRIBUTING.md](CONTRIBUTING.md) for code and search reports.
 
-Run the published MCP image, available for Linux AMD64 and ARM64:
-
-```sh
-docker run --rm -p 127.0.0.1:8080:8080 --env DATABASE_URL ghcr.io/taktekhq/lebanese-legislation-mcp:latest
-```
-
-Use `ghcr.io/taktekhq/lebanese-legislation:latest` for the website. Both images are public. To build from source:
-
-```sh
-docker build --target website -t lebanese-legislation .
-docker build --target mcp -t lebanese-legislation-mcp .
-```
-
-Use a read-only database role. MCP mode exposes `/mcp`, `/mcp/` and `/healthz`. The website image also serves search, HTML and JSON. Both images run without root, contain no data or credentials, and accept `DATABASE_URL`, `PUBLIC_URL` and `LISTEN_ADDR` at runtime. Published images are built by [the image workflow](.github/workflows/images.yml).
-
-For Cloudflare, use the [Containers example](cloudflare/README.md). To help with search, code or transcriptions, see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-Try the [handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting), or run its [source](examples/handwriting/README.md) locally. It downloads drafts for review; it does not submit annotations.
+MIT licensed code. Source documents retain their own rights and attribution. Scan files are optional local assets; system font fallbacks are used.

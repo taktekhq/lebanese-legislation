@@ -16,10 +16,14 @@ Supply a compatible, network-accessible PostgreSQL database with TLS. Use a read
 
 Connect clients to the returned Worker URL at `/mcp`. `/healthz` checks process readiness. The container sleeps after 60 seconds idle; the first request can take longer. One named container serves all requests. This example has no authentication or rate limiting; add those at the edge for a private or busy deployment.
 
-The image is built from this repository. `DATABASE_URL` is a Worker secret passed at process startup. After changing it, restart or redeploy the container. `PUBLIC_URL` is optional for canonical links. No account IDs or production endpoints are included.
+The MCP target wraps the versioned API image from the service repository. `DATABASE_URL` is a Worker secret passed at process startup. After changing it, restart or redeploy the container. `PUBLIC_URL` is optional for canonical links. No account IDs or production endpoints are included.
 
 ```sh
 npm test
 ```
 
 Configuration follows Cloudflare's [runtime environment example](https://developers.cloudflare.com/containers/examples/env-vars-and-secrets/). A dry run validates the Worker bundle and configuration, not remote database connectivity or Cloudflare provisioning.
+
+For browser MCP clients, set `MCP_ALLOWED_ORIGINS` to a comma-separated list of exact allowed origins. Clients without an Origin header need no extra setting.
+
+Optional semantic search uses your own `GEMINI_API_KEY` Worker secret. Query budgets are per process and reset when a container restarts; use provider billing limits for a durable cap.

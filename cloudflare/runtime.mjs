@@ -14,6 +14,10 @@ export async function ready(container, env, wait) {
         PUBLIC_URL: env.PUBLIC_URL || '',
         LISTEN_ADDR: '0.0.0.0:8080',
         APP_MODE: 'mcp',
+        MCP_ALLOWED_ORIGINS: env.MCP_ALLOWED_ORIGINS || '',
+        GEMINI_API_KEY: env.GEMINI_API_KEY || '',
+        GEMINI_MAX_CALLS_PER_DAY: env.GEMINI_MAX_CALLS_PER_DAY || '500',
+        GEMINI_CONCURRENCY: env.GEMINI_CONCURRENCY || '2',
       },
     });
   }
