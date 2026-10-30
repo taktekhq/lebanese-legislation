@@ -3,11 +3,13 @@ import hashlib
 import json
 import os
 import sys
+import uuid
 from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from psycopg import sql
 from test_build import db as db  # noqa: PLC0414
 from test_pipeline_publish import Hub
 
@@ -39,6 +41,9 @@ def test_real_pipeline_resumes_after_public_check_failure_without_reembedding(db
     schemas={}
     for table,column,typ in definitions:schemas.setdefault(table,[]).append(pa.field(column,types[typ]))
     db.rollback()
+    reader_role='pipeline_reader_'+uuid.uuid4().hex
+    db.execute(sql.SQL('CREATE ROLE {} LOGIN PASSWORD {}').format(sql.Identifier(reader_role),sql.Literal('fixture-reader')))
+    db.commit()
     samples={
         'legislation_kind':[{'name_ar':'قانون','name_en':'Law'}],
         'legislation':[{'id':1,'kind':'قانون','title':'قانون اختبار','number':'10','status':'in_force','issued_on':date(2020,1,1)}],
@@ -77,13 +82,14 @@ def test_real_pipeline_resumes_after_public_check_failure_without_reembedding(db
     monkeypatch.setenv('PIPELINE_ADMIN_DSN',os.environ['LEBLEG_TEST_ADMIN_DSN'])
     monkeypatch.delenv('PIPELINE_REUSE_DSN',raising=False)
     monkeypatch.setenv('PIPELINE_READER_PASSWORD','fixture-reader')
+    monkeypatch.setenv('PIPELINE_READER_ROLE',reader_role)
     monkeypatch.setenv('PIPELINE_SMOKE_SEMANTIC','0')
     monkeypatch.setenv('PG_CLIENT_MOUNT','/tmp')
     monkeypatch.setenv('PYTHONPATH',str(Path(__file__).parents[1]/'src'))
     for kind in ('API','MCP'):
         monkeypatch.setenv('PIPELINE_'+kind+'_IMAGE',os.getenv('LEBLEG_TEST_'+kind+'_IMAGE',f'ghcr.io/taktekhq/lebanese-legislation-{kind.lower()}:0.1.4'))
     settings={'state_dir':str(tmp_path/'state'),'sources':[{'repo':'org/data','kind':'corpus'}],
-        'minimum_free_bytes':0,'pg_dump':dump_bin,'pg_restore':restore_bin,
+        'minimum_free_bytes':0,'pg_dump':dump_bin,'pg_restore':restore_bin,'reader_role':reader_role,
         'smoke_command':[sys.executable,'-m','lebleg_starter.pipeline_smoke']}
     co=Coordinator(settings,hub=hub);co.detect();job=co.ledger.status()['jobs'][0]
     co.approve(job['repo'],job['revision'],job['fingerprint']);steps=ReleaseSteps(co)
@@ -110,3 +116,4 @@ def test_real_pipeline_resumes_after_public_check_failure_without_reembedding(db
         assert b'Credit the source.' in hub.files['README.md']
     finally:
         steps.drop_owned_database(job,verify=True);steps.drop_owned_database(job)
+        db.execute(sql.SQL('DROP ROLE {}').format(sql.Identifier(reader_role)));db.commit()
