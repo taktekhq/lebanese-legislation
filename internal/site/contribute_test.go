@@ -28,7 +28,7 @@ func TestContributeRoutes(t *testing.T) {
 				`href="https://github.com/taktekhq/lebanese-legislation"`,
 				`href="https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting"`,
 				`href="https://huggingface.co/collections/taktekhq/lebanese-legislation"`,
-				`href="https://github.com/taktekhq/lebanese-legislation-starter"`,
+				`href="https://github.com/taktekhq/lebanese-legislation"`,
 				`hreflang="en"`, `hreflang="ar"`,
 			} {
 				if !strings.Contains(body, want) {

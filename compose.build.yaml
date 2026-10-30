@@ -1,0 +1,13 @@
+services:
+  db:
+    build:
+      context: .
+      target: db
+  api:
+    build:
+      context: .
+      target: api
+  mcp:
+    build:
+      context: .
+      target: mcp

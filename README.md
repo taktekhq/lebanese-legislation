@@ -1,49 +1,29 @@
-# Lebanese Legislation website
+# Lebanese Legislation
 
-The Go website behind [Lebanese Legislation](https://lebaneselegislation.com), with Arabic and English pages. Build it from this repository for local or offline hosting.
+The website, PostgreSQL database, API, MCP server and public-data tools in one repository.
 
-For the public DB, general/search API and MCP images, use the [service repository](https://github.com/taktekhq/lebanese-legislation-starter). API and MCP share its retrieval backend. This repository does not rebuild the database distribution.
-
-## Run the website
-
-Use Go 1.27.1 or newer and a compatible PostgreSQL database:
+Read the [website](https://lebaneselegislation.com), use the [datasets](https://huggingface.co/collections/taktekhq/lebanese-legislation), or run the services locally:
 
 ```sh
-export DATABASE_URL='postgres://USER:PASSWORD@HOST/DATABASE?sslmode=require'
-go run ./cmd/website
+git clone https://github.com/taktekhq/lebanese-legislation.git
+cd lebanese-legislation
+./start
 ```
 
-Open http://localhost:8080. `LISTEN_ADDR` defaults to `127.0.0.1:8080`; `PUBLIC_URL` sets canonical links. The source website keeps its existing SQL browsing and keyword-search behavior. Optional provider-backed meaning search is disabled in this standalone build.
+Requires Docker Compose, 4 GB of available memory and 30 GB of free disk. First startup downloads and verifies the public snapshot, then restores it into an empty volume. Existing volumes are reused.
 
-Build an image locally when useful:
+| Image | Purpose |
+| --- | --- |
+| `ghcr.io/taktekhq/lebanese-legislation-db:0.1.7` | PostgreSQL 18.6, pgvector and first-start restore |
+| `ghcr.io/taktekhq/lebanese-legislation-api:0.1.7` | General resources, exact search and optional semantic search |
+| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.7` | The same retrieval backend through MCP |
 
-```sh
-docker build --target website -t lebanese-legislation-website .
-```
+API and docs: http://localhost:8000/docs. MCP: http://localhost:8001/mcp. Exact search needs no AI key. Semantic search uses your own `GEMINI_API_KEY` against saved embeddings.
 
-The website image is not published. Earlier published tags remain available.
+[Service reference](docs/reference.md) · [Build the website](docs/website.md) · [Cloudflare](cloudflare/README.md) · [Contribute](CONTRIBUTING.md)
 
-## Synthetic demo
+The website stays buildable from source for local or offline hosting. Try the [handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting) or its [source](examples/handwriting/README.md). Drafts stay local.
 
-```sh
-docker compose -f compose.demo.yml up -d --wait
-export DATABASE_URL='postgres://postgres@localhost:55439/legislation?sslmode=disable'
-go run ./cmd/website
-```
+Contributor tools reproduce snapshots from public Parquet. See [data updates](docs/pipeline.md) for the resumable release pipeline. Source collection and private operations stay separate.
 
-The fixture contains one fictional law and article. Search for `المكتبة`, open `/law/1/`, or query `/api/v1/search/?q=المكتبة`. Stop with `docker compose -f compose.demo.yml down -v`.
-
-```sh
-go test ./...
-DEMO_DATABASE_URL="$DATABASE_URL" go test ./internal/site -run TestSyntheticServing
-```
-
-## Services and contributions
-
-Canonical images are `ghcr.io/taktekhq/lebanese-legislation-db:0.1.5`, `ghcr.io/taktekhq/lebanese-legislation-api:0.1.5` and `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.5`. The MCP target here wraps the matching API image and limits it to MCP/health routes. [Cloudflare Containers](cloudflare/README.md) can run it.
-
-Try the [handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting), or run its [source](examples/handwriting/README.md). Drafts stay local and download for review. See [CONTRIBUTING.md](CONTRIBUTING.md) for code and search reports.
-
-MIT licensed code. Source documents retain their own rights and attribution. Scan files are optional local assets; system font fallbacks are used.
-
-The MCP image follows verified API releases automatically. A wrapper is built only when the API version advances; dataset updates reuse the existing images.
+Code is MIT licensed. Source documents retain their own rights and attribution. Previous image tags and dataset releases remain available.
