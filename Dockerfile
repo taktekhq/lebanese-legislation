@@ -1,4 +1,4 @@
-ARG API_IMAGE=ghcr.io/taktekhq/lebanese-legislation-api:0.1.4
+ARG API_IMAGE=ghcr.io/taktekhq/lebanese-legislation-api:0.1.5
 FROM --platform=$BUILDPLATFORM golang:1.27.1-bookworm AS build
 WORKDIR /src
 COPY go.mod go.sum ./

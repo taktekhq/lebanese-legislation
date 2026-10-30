@@ -20,6 +20,7 @@ jobs:
       DEMO_DATABASE_URL: postgres://postgres@localhost:5432/legislation?sslmode=disable
     steps:
       - uses: actions/checkout@v4
+      - run: python3 -m unittest discover -s scripts -p 'test_*.py'
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod

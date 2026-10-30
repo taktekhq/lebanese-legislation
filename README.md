@@ -40,8 +40,10 @@ DEMO_DATABASE_URL="$DATABASE_URL" go test ./internal/site -run TestSyntheticServ
 
 ## Services and contributions
 
-Canonical images are `ghcr.io/taktekhq/lebanese-legislation-db:0.1.4`, `ghcr.io/taktekhq/lebanese-legislation-api:0.1.4` and `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.4`. The MCP target here wraps the matching API image and limits it to MCP/health routes. [Cloudflare Containers](cloudflare/README.md) can run it.
+Canonical images are `ghcr.io/taktekhq/lebanese-legislation-db:0.1.5`, `ghcr.io/taktekhq/lebanese-legislation-api:0.1.5` and `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.5`. The MCP target here wraps the matching API image and limits it to MCP/health routes. [Cloudflare Containers](cloudflare/README.md) can run it.
 
 Try the [handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting), or run its [source](examples/handwriting/README.md). Drafts stay local and download for review. See [CONTRIBUTING.md](CONTRIBUTING.md) for code and search reports.
 
 MIT licensed code. Source documents retain their own rights and attribution. Scan files are optional local assets; system font fallbacks are used.
+
+The MCP image follows verified API releases automatically. A wrapper is built only when the API version advances; dataset updates reuse the existing images.
