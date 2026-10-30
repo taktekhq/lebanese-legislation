@@ -124,6 +124,20 @@ lebleg publish --directory ./artifacts/release --repo your-account/your-dataset
 
 Publishing adds an immutable versioned directory and updates the latest pointer in one Hub commit. It preserves Parquet files and refuses to overwrite an existing release ID. Keep the token in the environment. Code release tags and dataset source/artifact commits are distinct identifiers.
 
+## Reuse vectors in an existing serving index
+
+`lebleg seed` copies only missing or invalid compatible vector rows from a released starter database into an existing independent `semantic_chunks` index. It reads the current canonical documents separately and checks their reference, full-text SHA-256, exact passage text and Unicode boundaries before copying anything. It makes no model requests, imports no generation markers and does no pruning.
+
+Set `SEED_SOURCE_DATABASE_URL`, `SEED_CANONICAL_DATABASE_URL` and `SEED_TARGET_DATABASE_URL` privately. Source and canonical connections are read-only. All three databases must use the same stable document references and compatible vector schema. Start with a bounded pilot:
+
+```sh
+lebleg seed --group-size 100 --limit 25
+```
+
+By default canonical documents come from `source_documents`. `--canonical-query-file ./canonical.sql` accepts an operator-controlled SELECT returning `kind, source_id, part, lang, title, text`. `--limit` and `--offset` count canonical documents; zero limit means the whole supplied query. Existing valid vectors and unrelated sources are preserved, and batches are committed so a retry can skip completed work. Unavailable or mismatched source vectors are reported, without API fallback.
+
+Use this for an independent serving index. A versioned restored snapshot remains immutable. The serving application must validate hits against the same canonical source or refresh its own read model; seeding does not update `source_documents`. Serialize it with your corpus replacement process. It takes the model advisory lock used by the compatible indexer, but filesystem or deployment locks remain the operator's responsibility.
+
 ## Build images and develop
 
 ```sh
