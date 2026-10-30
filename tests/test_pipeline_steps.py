@@ -41,3 +41,23 @@ def test_export_recovery_never_replaces_an_existing_dump(tmp_path):
     finish_export('unused',tmp_path,m,'/bin/false')
     assert json.loads((tmp_path/'manifest.json').read_text())['dump']['size_bytes']==8
     assert (tmp_path/'corpus.dump').read_bytes()==b'complete'
+
+
+def test_cleanup_keeps_current_previous_and_unfinished_jobs():
+    from lebleg_starter.pipeline_steps import retired_jobs
+    def row(i,status='complete',repo='org/data'):
+        return {'id':i,'repo':repo,'status':status,'release_id':'auto-'+str(i)}
+    current=row(5,'pending')
+    jobs=[row(1),row(2),row(3,'retry'),row(4),current,row(6,repo='org/other')]
+    assert [r['id'] for r in retired_jobs(current,jobs)]==[1,2]
+
+
+def test_scan_counts_are_checked_against_parquet_rows(tmp_path):
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    from lebleg_starter.pipeline_steps import check_scan_counts
+    documents=tmp_path/'documents.parquet';pages=tmp_path/'pages.parquet'
+    pq.write_table(pa.table({'id':[1,2]}),documents);pq.write_table(pa.table({'id':[1,2,3]}),pages)
+    check_scan_counts({'documents':documents,'pages':pages},{'documents':2,'pages':3})
+    with pytest.raises(ValueError):check_scan_counts({'documents':documents,'pages':pages},{'documents':3,'pages':3})

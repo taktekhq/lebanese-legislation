@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import re
 import signal
 import subprocess
 from datetime import datetime, timedelta
@@ -28,7 +29,40 @@ def load_config(path):
             if not key.isidentifier():
                 raise ValueError('invalid environment variable')
             os.environ[key] = value
+    for key, value in config.get('secret_files', {}).items():
+        source = Path(value).expanduser()
+        if not key.isidentifier() or source.is_symlink() or not source.is_file() or source.stat().st_mode & 0o077:
+            raise ValueError('secret files must be restricted regular files')
+        os.environ[key] = source.read_text().rstrip('\n')
     return config
+
+
+def safe_receipt(value, job=None):
+    patterns = {'repo':r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', 'revision':r'[0-9a-f]{40}',
+                'artifact_revision':r'[0-9a-f]{40}', 'fingerprint':r'[0-9a-f]{64}',
+                'digest':r'[0-9a-f]{64}', 'dump_sha256':r'[0-9a-f]{64}', 'manifest_sha256':r'[0-9a-f]{64}',
+                'release_id':r'[A-Za-z0-9][A-Za-z0-9._-]{0,127}'}
+    enums = {'status':{'pending','complete','failed','partial','skipped','retry','current','unconfigured'},
+             'kind':{'corpus','scans'}, 'stage':{'prepare','index','validate','export','upload','check','promote','metadata','complete'}}
+    def numbers(item):
+        return (type(item) is int and item >= 0) or (isinstance(item,dict) and all(isinstance(k,str) and re.fullmatch('[a-z][a-z0-9_]{0,63}',k) and numbers(v) for k,v in item.items()))
+    if not isinstance(value,dict) or not (value.get('ok') is True or value.get('public') is True) or len(json.dumps(value,allow_nan=False)) > 65536:
+        raise ValueError('invalid stage receipt')
+    for key, item in value.items():
+        valid = False
+        if key in patterns:
+            valid = isinstance(item,str) and re.fullmatch(patterns[key],item)
+            if job and key in ('repo','revision','fingerprint','release_id'):
+                valid = valid and item == job[key]
+        elif key in enums:
+            valid = isinstance(item,str) and item in enums[key]
+        elif key in ('ok','public'):
+            valid = type(item) is bool and item
+        elif key in ('count','counts'):
+            valid = numbers(item)
+        if not valid:
+            raise ValueError('invalid stage receipt field')
+    return value
 
 
 def run_adapter(command, environment, timeout=3600):
@@ -53,8 +87,7 @@ def run_adapter(command, environment, timeout=3600):
                    'stage', 'kind', 'status', 'artifact_revision', 'public'}
         if set(value) - allowed or value.get('ok') is False:
             raise ValueError()
-        json.dumps(value, allow_nan=False)
-        return value
+        return safe_receipt(value)
     except (ValueError, TypeError):
         raise ValueError('invalid adapter receipt') from None
 
@@ -111,7 +144,7 @@ class Coordinator:
     def run(self, handler=None):
         with worker_lock(self.root / 'worker.lock') as held:
             if not held:
-                return False
+                return True
             job = self.ledger.next_job()
             if not job:
                 return True
@@ -121,7 +154,7 @@ class Coordinator:
             while job['stage'] != 'complete':
                 stage = job['stage']
                 try:
-                    receipt = handler(stage, job)
+                    receipt = safe_receipt(handler(stage, job), job)
                     self.ledger.complete_stage(job['id'], stage, receipt)
                 except Exception as error:  # noqa: BLE001 - never persist credential-bearing exception text
                     code, delay = 'stage_failed', None
@@ -142,7 +175,7 @@ class Coordinator:
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', required=True)
-    parser.add_argument('action', choices=['detect', 'approve', 'seed', 'run', 'tick', 'status', 'lane', 'retry'])
+    parser.add_argument('action', choices=['detect', 'approve', 'seed', 'run', 'tick', 'status', 'lane', 'retry', 'cleanup'])
     parser.add_argument('--repo')
     parser.add_argument('--revision')
     parser.add_argument('--fingerprint')
@@ -159,7 +192,12 @@ def main(argv=None):
             success = co.run()
             print(json.dumps({'ok': success}))
             return 0 if success else 1
-        if args.action == 'approve':
+        if args.action == 'cleanup':
+            import hashlib
+
+            from .pipeline_smoke import cleanup_smoke
+            cleanup_smoke(hashlib.sha256(str(co.root).encode()).hexdigest())
+        elif args.action == 'approve':
             co.approve(args.repo, args.revision, args.fingerprint)
         elif args.action == 'seed':
             co.seed(args.repo, args.revision, args.release_id)

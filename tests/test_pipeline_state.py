@@ -75,3 +75,17 @@ def test_worker_lock_excludes_another_run_and_releases(tmp_path):
         assert held
         with worker_lock(tmp_path/'lock') as other:assert not other
     with worker_lock(tmp_path/'lock') as held:assert held
+
+
+def test_waiting_budget_does_not_block_another_dataset(tmp_path):
+    db=Ledger(tmp_path/'state.sqlite')
+    first=db.observe('org/one','a'*40,'1'*64,approved=True)
+    second=db.observe('org/two','b'*40,'2'*64,approved=True)
+    db.fail(first,'budget_exhausted',now=100,retry_after=86400)
+    assert db.next_job(now=101)['id']==second
+
+
+def test_daily_exhaustion_is_not_a_permanent_failure(tmp_path):
+    db=Ledger(tmp_path/'state.sqlite');job=db.observe('org/one','a'*40,'1'*64,approved=True)
+    for day in range(20):db.fail(job,'budget_exhausted',now=day*86400,retry_after=86400)
+    assert db.job(job)['status']=='retry'

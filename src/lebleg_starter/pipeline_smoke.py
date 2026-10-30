@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import socket
 import subprocess
 import time
@@ -17,6 +18,24 @@ def free_port():
     with socket.socket() as sock:
         sock.bind(('127.0.0.1',0))
         return sock.getsockname()[1]
+
+
+def cleanup_smoke(owner):
+    if not re.fullmatch('[0-9a-f]{64}',owner):
+        raise ValueError('invalid smoke owner')
+    listed=subprocess.run(['docker','ps','-aq','--filter','label=org.lebleg.pipeline.owner='+owner],
+        capture_output=True,text=True,check=False)
+    if listed.returncode:
+        return
+    for identifier in listed.stdout.splitlines():
+        if not re.fullmatch('[0-9a-f]{12,64}',identifier):
+            continue
+        inspected=subprocess.run(['docker','inspect',identifier],capture_output=True,text=True,check=False)
+        if inspected.returncode:
+            continue
+        item=json.loads(inspected.stdout)[0]
+        if item.get('Name','').startswith('/lebleg-pipeline-smoke-') and item['Config'].get('Labels',{}).get('org.lebleg.pipeline.owner')==owner:
+            subprocess.run(['docker','rm','-f',identifier],capture_output=True,check=False)
 
 
 def main(argv=None):
@@ -41,7 +60,7 @@ def main(argv=None):
             env = {**os.environ, 'DATABASE_URL':reader, 'APP_MODE':mode, 'GEMINI_MAX_CALLS_PER_DAY':'1'}
             image = os.getenv('PIPELINE_' + mode.upper() + '_IMAGE', 'ghcr.io/taktekhq/lebanese-legislation-' + mode + ':0.1.4')
             subprocess.run(['docker','run','-d','--name',name,'--network','host','--memory','256m','--read-only',
-                '--tmpfs','/tmp','--cap-drop','ALL','--security-opt','no-new-privileges:true',
+                '--tmpfs','/tmp','--label','org.lebleg.pipeline.owner='+os.getenv('PIPELINE_OWNER_ID',uuid.uuid4().hex*2),'--cap-drop','ALL','--security-opt','no-new-privileges:true',
                 '-e','DATABASE_URL','-e','APP_MODE','-e','GEMINI_API_KEY','-e','GEMINI_MAX_CALLS_PER_DAY',
                 image,'serve','--host','127.0.0.1','--port',str(ports[mode])], env=env,check=True,
                 stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)

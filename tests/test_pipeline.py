@@ -80,3 +80,37 @@ def test_approval_cannot_rewind_current_content(tmp_path):
     job=co.ledger.status()['jobs'][0]
     hub.oid='2'*40;hub.revision='b'*40;co.detect()
     with pytest.raises(ValueError):co.approve('org/data',job['revision'],job['fingerprint'])
+
+
+def test_secret_files_are_restricted_and_read_without_shell(tmp_path,monkeypatch):
+    secret=tmp_path/'secret';secret.write_text('not-for-logs\n');secret.chmod(0o600)
+    path=tmp_path/'config.json';path.write_text(json.dumps({**config(tmp_path),'secret_files':{'PIPELINE_TEST_TOKEN':str(secret)}}))
+    load_config(path)
+    import os
+    assert os.environ['PIPELINE_TEST_TOKEN']=='not-for-logs'
+    secret.chmod(0o644)
+    with pytest.raises(ValueError):load_config(path)
+    monkeypatch.delenv('PIPELINE_TEST_TOKEN')
+
+
+def test_adapter_receipt_cannot_persist_arbitrary_error_or_secret_text():
+    command=['python3','-c','print(\'{"ok":true,"status":"password=secret"}\')']
+    with pytest.raises(ValueError):run_adapter(command,{},timeout=5)
+
+
+def test_cleanup_only_removes_labeled_pipeline_smoke_containers(monkeypatch):
+    from types import SimpleNamespace
+
+    from lebleg_starter.pipeline_smoke import cleanup_smoke
+    owner='a'*64;calls=[]
+    def docker(command,**kwargs):
+        calls.append(command)
+        if command[1:3]==['ps','-aq']:return SimpleNamespace(returncode=0,stdout='1'*64+'\n'+'2'*64+'\n')
+        if command[1]=='inspect':
+            name='/lebleg-pipeline-smoke-fixture' if command[-1].startswith('1') else '/another-session'
+            return SimpleNamespace(returncode=0,stdout=json.dumps([{'Name':name,'Config':{'Labels':{'org.lebleg.pipeline.owner':owner}}}]))
+        return SimpleNamespace(returncode=0,stdout='')
+    monkeypatch.setattr('subprocess.run',docker)
+    cleanup_smoke(owner)
+    removals=[c for c in calls if c[1:3]==['rm','-f']]
+    assert removals==[['docker','rm','-f','1'*64]]

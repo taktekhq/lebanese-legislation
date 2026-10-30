@@ -255,7 +255,7 @@ def dump_database(dsn, destination, pg_dump="pg_dump"):
                 "--extension=pg_trgm",
             ]
             command += ["--table=public." + name for name in tables]
-            subprocess.run(command, env=env, stdout=stream, check=True)
+            subprocess.run(command, env=env, stdout=stream, stderr=subprocess.PIPE, check=True)
             stream.flush()
             os.fsync(stream.fileno())
         os.link(temporary, destination)  # Atomic and refuses an unrelated existing destination.

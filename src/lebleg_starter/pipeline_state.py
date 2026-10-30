@@ -11,7 +11,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 STAGES = ('prepare', 'index', 'validate', 'export', 'upload', 'check', 'promote', 'metadata')
-_DATA = re.compile(r'^(?:(?:data|metadata|annotations)/[^/]+\.(?:parquet|jsonl)|pdfs/[^/]+\.tar|schema/[^/]+\.(?:sql|json)|schema\.json)$')
+_DATA = re.compile(r'^(?:(?:data|metadata|annotations)/.+\.(?:parquet|jsonl)|pdfs/.+\.(?:tar|pdf)|schema/.+\.(?:sql|json)|schema\.json)$')
 
 
 def content_fingerprint(files):
@@ -56,6 +56,8 @@ class Ledger:
             raise ValueError('invalid ledger path')
         self.path = path
         with self.connect() as db:
+            if db.execute('PRAGMA user_version').fetchone()[0] not in (0, 1):
+                raise ValueError('unsupported pipeline state version')
             db.executescript('''
                 CREATE TABLE IF NOT EXISTS sources(repo TEXT PRIMARY KEY,revision TEXT NOT NULL,fingerprint TEXT NOT NULL,job INTEGER);
                 CREATE TABLE IF NOT EXISTS jobs(id INTEGER PRIMARY KEY,repo TEXT NOT NULL,revision TEXT NOT NULL,
@@ -69,10 +71,15 @@ class Ledger:
             ''')
         path.chmod(0o600)
 
+    @contextmanager
     def connect(self):
         db = sqlite3.connect(self.path, timeout=10)
         db.row_factory = sqlite3.Row
-        return db
+        try:
+            with db:
+                yield db
+        finally:
+            db.close()
 
     @staticmethod
     def _identity(repo, revision, fingerprint):
@@ -85,6 +92,7 @@ class Ledger:
             db.execute('BEGIN IMMEDIATE')
             source = db.execute('SELECT * FROM sources WHERE repo=?', (repo,)).fetchone()
             if source and source['fingerprint'] == fingerprint:
+                db.execute('UPDATE sources SET revision=? WHERE repo=?', (revision, repo))
                 if approved and source['job']:
                     changed = db.execute("UPDATE jobs SET status='pending' WHERE id=? AND status='reconcile'", (source['job'],)).rowcount
                     return source['job'] if changed else None
@@ -130,8 +138,11 @@ class Ledger:
 
     def next_job(self, now=None):
         with self.connect() as db:
-            # A retried older job stays ahead of newer work, even during backoff.
-            row = db.execute("SELECT * FROM jobs WHERE status IN ('pending','retry') ORDER BY id LIMIT 1").fetchone()
+            # Preserve order within a source without holding independent datasets behind its budget.
+            row = db.execute("""SELECT j.* FROM jobs j WHERE j.status IN ('pending','retry') AND j.retry_at<=?
+                AND NOT EXISTS(SELECT 1 FROM jobs old WHERE old.repo=j.repo AND old.id<j.id
+                    AND old.status IN ('pending','retry')) ORDER BY j.id LIMIT 1""",
+                (time.time() if now is None else now,)).fetchone()
             if row and row['retry_at'] <= (time.time() if now is None else now):
                 return self._job(row)
         return None
@@ -161,7 +172,7 @@ class Ledger:
         reason = reason if reason in allowed else 'stage_failed'
         with self.connect() as db:
             row = db.execute('SELECT attempts FROM jobs WHERE id=?', (job,)).fetchone()
-            attempts = row[0] + 1
+            attempts = row[0] if reason == 'budget_exhausted' else row[0] + 1
             delay = retry_after if retry_after is not None else min(3600, 60 * 2 ** min(attempts - 1, 6))
             db.execute('UPDATE jobs SET status=?,attempts=?,retry_at=?,error=? WHERE id=?',
                        ('failed' if attempts >= 10 else 'retry', attempts, (time.time() if now is None else now) + delay, reason, job))
@@ -180,7 +191,8 @@ class Ledger:
             jobs = [self._job(row) for row in db.execute('SELECT * FROM jobs ORDER BY id')]
             sources = {row['repo']: dict(row) for row in db.execute('SELECT * FROM sources')}
             lanes = [dict(row) for row in db.execute('SELECT * FROM lanes')]
-        current = all(j['status'] in ('complete', 'superseded') for j in jobs)
+        by_id = {j['id']: j for j in jobs}
+        current = all(by_id[source['job']]['status'] == 'complete' for source in sources.values())
         for lane in lanes:
             lane['current'] = bool(lane['ok'] and lane['repo'] in sources and lane['fingerprint'] == sources[lane['repo']]['fingerprint'])
             if lane['required'] and not lane['current']:

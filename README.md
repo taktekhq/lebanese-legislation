@@ -51,3 +51,5 @@ Exact search needs no AI key. Optional semantic search uses `GEMINI_API_KEY` to 
 [API and deployment reference](docs/reference.md) · [Contributor tools](CONTRIBUTING.md) · [Website source](https://github.com/taktekhq/lebanese-legislation)
 
 The website stays buildable from source for offline hosting. It is not a published service image. Existing image tags remain available. Code is MIT licensed; source documents retain their own rights.
+
+Data publishers can use the [automatic update pipeline](docs/pipeline.md) to reconcile approved changes and publish verified snapshots.
