@@ -14,7 +14,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 
-from .embedding import MODEL, Gemini, ProviderError
+from .embedding import MODEL, Gemini, ProviderError, validate_selection
 
 
 class SearchError(ValueError):
@@ -213,6 +213,8 @@ class SearchService:
     def search(self, query, limit=8, semantic=True, select=False):
         if not isinstance(query, str) or not query.strip() or len(query) > 500 or not 1 <= limit <= 16:
             raise SearchError("query must contain 1 to 500 characters and limit 1 to 16")
+        semantic_status = "not_requested"
+        selection_status = "not_requested"
         with self.connection() as conn:
             release = conn.execute(
                 "SELECT r.manifest FROM lebleg_release r JOIN restore_receipt t ON t.manifest->>'release_id'=r.release_id WHERE t.singleton LIMIT 1"
@@ -259,35 +261,53 @@ class SearchService:
                 }
                 passages.append(_public_passage(chunk, True))
             # An explicit citation never falls back to a different source.
+            if semantic:
+                semantic_status = "not_needed" if target or len(passages) >= limit else "unavailable"
             if not target and semantic and self.provider and len(passages) < limit:
                 if self.provider.model != embedding["model"]:
                     raise SearchError("incompatible embedding model")
-                vector = self.provider.embed([query], query=True)[0]
-                literal = "[" + ",".join(str(x) for x in vector) + "]"
-                candidates = conn.execute(
-                    """SELECT c.*,d.text AS source_text,d.hash AS source_hash,d.source_url,d.metadata
-                    FROM semantic_chunks c JOIN source_documents d USING(kind,source_id,part,lang)
-                    WHERE c.model=%s ORDER BY c.embedding <=> %s::halfvec LIMIT %s""",
-                    (MODEL, literal, limit * 4),
-                ).fetchall()
-                refs = {(p["kind"], p["source_id"], p["part"], p["lang"]) for p in passages}
-                for row in candidates:
-                    ref = tuple(row[k] for k in ("kind", "source_id", "part", "lang"))
-                    if ref in refs or not validate_passage(row):
-                        continue
-                    passages.append(_public_passage(row))
-                    refs.add(ref)
-                    if len(passages) >= limit:
-                        break
+                try:
+                    vector = self.provider.embed([query], query=True)[0]
+                except Exception:  # noqa: BLE001 - optional provider failures must preserve ordinary results without leaking details.
+                    vector = None
+                if vector is not None:
+                    semantic_status = "complete"
+                    literal = "[" + ",".join(str(x) for x in vector) + "]"
+                    candidates = conn.execute(
+                        """SELECT c.*,d.text AS source_text,d.hash AS source_hash,d.source_url,d.metadata
+                        FROM semantic_chunks c JOIN source_documents d USING(kind,source_id,part,lang)
+                        WHERE c.model=%s ORDER BY c.embedding <=> %s::halfvec LIMIT %s""",
+                        (MODEL, literal, limit * 4),
+                    ).fetchall()
+                    refs = {(p["kind"], p["source_id"], p["part"], p["lang"]) for p in passages}
+                    for row in candidates:
+                        ref = tuple(row[k] for k in ("kind", "source_id", "part", "lang"))
+                        if ref in refs or not validate_passage(row):
+                            continue
+                        passages.append(_public_passage(row))
+                        refs.add(ref)
+                        if len(passages) >= limit:
+                            break
         if select:
-            if not self.provider:
-                raise SearchError("Gemini API key is required for source selection")
-            if passages:
-                passages = self.provider.select(query, passages)
+            exact_passages = [p for p in passages if p["exact"]]
+            semantic_passages = [p for p in passages if not p["exact"]]
+            selection_status = "not_needed" if self.provider else "unavailable"
+            if self.provider and semantic_passages:
+                try:
+                    selected = self.provider.select(query, semantic_passages)
+                    chosen = validate_selection({"source_ids": [p["id"] for p in selected]}, semantic_passages)
+                except Exception:  # noqa: BLE001 - keep all original passages when optional selection fails.
+                    selection_status = "unavailable"
+                else:
+                    passages = exact_passages + chosen
+                    selection_status = "complete"
         return {
             "label": "Original source passages, not legal conclusions",
             "english_notice": "English titles are unofficial discovery aids. Arabic source text is authoritative.",
             "passages": passages,
+            "evidence_status": "passages_found" if passages else "insufficient_evidence",
+            "semantic_status": semantic_status,
+            "selection_status": selection_status,
         }
 
 
