@@ -11,6 +11,9 @@ on:
 permissions:
   contents: read
   packages: write
+concurrency:
+  group: publish-container-package
+  cancel-in-progress: false
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -26,6 +29,7 @@ jobs:
         id: version
         env:
           REQUESTED_VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')
           if [ "$GITHUB_EVENT_NAME" = push ]; then
@@ -33,18 +37,32 @@ jobs:
           else
             test "$REQUESTED_VERSION" = "$VERSION"
           fi
-          for TAG in "$VERSION" "publisher-$VERSION"; do
-            if docker manifest inspect "ghcr.io/taktekhq/lebanese-legislation-starter:$TAG" >/dev/null 2>&1; then
-              echo "Refusing to replace published image $TAG" >&2
-              exit 1
-            fi
-          done
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          if docker manifest inspect ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2 >/dev/null 2>&1; then
-            echo 'build_postgres=false' >> "$GITHUB_OUTPUT"
-          else
-            echo 'build_postgres=true' >> "$GITHUB_OUTPUT"
-          fi
+          export VERSION
+          python3 - <<'PYCODE'
+          import json, os, urllib.request, urllib.error
+          tags = set()
+          for page in range(1, 101):
+              url = f'https://api.github.com/orgs/taktekhq/packages/container/lebanese-legislation-starter/versions?per_page=100&page={page}'
+              request = urllib.request.Request(url, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'], 'Accept':'application/vnd.github+json'})
+              try:
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      versions = json.load(response)
+              except urllib.error.HTTPError as error:
+                  if error.code == 404 and page == 1:
+                      break
+                  raise
+              tags.update(tag for version in versions for tag in version['metadata']['container']['tags'])
+              if len(versions) < 100:
+                  break
+          else:
+              raise SystemExit('Package version listing exceeded safety bound')
+          version = os.environ['VERSION']
+          if tags.intersection({version, 'publisher-'+version}):
+              raise SystemExit('Refusing to replace published version tags')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('version='+version+'\n')
+              out.write('build_postgres='+str('postgres-18.6-vector0.8.2' not in tags).lower()+'\n')
+          PYCODE
       - uses: docker/build-push-action@v6
         if: steps.version.outputs.build_postgres == 'true'
         with:
