@@ -74,7 +74,7 @@ The release is built only from the pinned public Parquet files. It does not cont
 
 A missing explicit citation is not silently replaced with a nearby semantic match. An absent or failed provider leaves ordinary search available. Retrieval can miss relevant material or return irrelevant passages. Source links and exact quotations make checking possible; they do not establish legal correctness or current legal status. Scanned ruling pages retain extraction provenance and confidence fields. OCR can contain errors; consult the linked originals.
 
-The API key stays in the server container. It is never sent to the browser or stored in the public release. Semantic search sends the query to Google; optional selection also sends candidate excerpts. No MCP server or database login is given to the model. Do not send confidential queries without considering your provider's terms.
+The API key stays in the server container. It is never sent to the browser or stored in the public release. Semantic search sends the query to Google; optional selection also sends candidate excerpts. Gemini receives query text and optional candidate excerpts, not database credentials or MCP access. Do not send confidential queries without considering your provider's terms.
 
 Precomputed vectors save the cost of embedding the whole corpus. Query embeddings still require a compatible Gemini model. Another embedding model needs a separately rebuilt document index, even if it also has 768 dimensions.
 
@@ -112,7 +112,7 @@ lebleg restore --repo taktekhq/lebanese-legislation --revision main \
 lebleg serve
 ```
 
-The supplied image includes the required clients. `lebleg restore --help` also supports local manifest/dump inputs. The restorer verifies versions, checksum, counts, source/chunk integrity, HNSW index and reader privileges before recording a restore receipt. Interrupted imports and post-import checks can be retried with the same manifest. It never drops unrelated tables. Direct `pg_restore` is possible, but bypasses those checks and does not create the receipt required by this API.
+The DB and publisher images include PostgreSQL clients. The lightweight API and MCP images do not. For a standalone restore, run the DB image with `--entrypoint lebleg`, or install matching PostgreSQL clients alongside the CLI. `lebleg restore --help` also supports local manifest/dump inputs. The restorer verifies versions, checksum, counts, source/chunk integrity, HNSW index and reader privileges before recording a restore receipt. Interrupted imports and post-import checks can be retried with the same manifest. It never drops unrelated tables. Direct `pg_restore` is possible, but bypasses those checks and does not create the receipt required by this API.
 
 ## Rebuild from public Parquet
 
