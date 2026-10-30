@@ -1,6 +1,6 @@
 # Service reference
 
-> The first database release is being validated. Parquet and initial container images are available. The setup below depends on the pending database manifest.
+Release `2026-10-30.1` contains 1,093,730 source records and 1,546,886 passages with precomputed embeddings. The 6.42 GB dump is tied to its source commit and checksum.
 
 Restore the public [Lebanese Legislation dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation) into PostgreSQL with a precomputed pgvector index. Run an API that returns exact matches first and related source passages underneath.
 
@@ -20,7 +20,7 @@ cd lebanese-legislation-starter
 
 `./start` generates separate random owner and reader passwords in a private `.env` file. On an empty volume the DB image resolves the selected release, verifies its checksum and restores through the existing verified importer. API and MCP start only after the DB has a compatible restore receipt. Existing credentials are preserved.
 
-The first public database manifest is still pending. The default startup currently fails until `releases/latest.json` is published. To use an already prepared local release, place its valid `manifest.json` and referenced dump in a directory, generate credentials with `lebleg init` (or the API image's `init` command), then run:
+Default startup follows the published `releases/latest.json` pointer. To use a prepared local release, place its valid `manifest.json` and referenced dump in a directory, generate credentials with `lebleg init` (or the API image's `init` command), then run:
 
 ```sh
 LEBLEG_RELEASE_DIR=/absolute/path/to/release docker compose -f compose.yaml -f compose.local.yaml up -d --wait --wait-timeout 7200
