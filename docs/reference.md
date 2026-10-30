@@ -56,11 +56,11 @@ A failed first import never creates a readiness receipt. Restarting an initializ
 | `releases/<release-id>/corpus.dump` | PostgreSQL custom-format snapshot, public tables, normalized documents and saved vectors |
 | `releases/<release-id>/manifest.json` | Source commit, counts, embedding settings, versions, licence and SHA-256 |
 | `releases/latest.json` | Pointer to the latest verified database release |
-| `ghcr.io/taktekhq/lebanese-legislation-db:0.1.5` | PostgreSQL 18.6, pgvector 0.8.2 and first-boot restore |
-| `ghcr.io/taktekhq/lebanese-legislation-api:0.1.5` | Shared backend exposing REST API and MCP |
-| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.5` | Shared backend exposing MCP and health only |
+| `ghcr.io/taktekhq/lebanese-legislation-db:0.1.6` | PostgreSQL 18.6, pgvector 0.8.2 and first-boot restore |
+| `ghcr.io/taktekhq/lebanese-legislation-api:0.1.6` | Shared backend exposing REST API and MCP |
+| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.6` | Shared backend exposing MCP and health only |
 
-Version 0.1.5 image names describe this source release; publication is separate. Legacy `lebanese-legislation-starter` version and `publisher-*` tags remain unchanged. The pinned baseline `postgres-18.6-vector0.8.2-r2` is reused.
+Version 0.1.6 image names describe this source release; publication is separate. Legacy `lebanese-legislation-starter` version and `publisher-*` tags remain unchanged. The pinned baseline `postgres-18.6-vector0.8.2-r2` is reused.
 
 Database data is downloaded separately, not baked into the Docker image. The dump stores index definitions; PostgreSQL constructs the HNSW index during restore. It does not contain a portable copy of PostgreSQL's physical index files.
 
@@ -191,3 +191,9 @@ The MCP `latest` alias moves to the consolidated backend. Earlier Go image diges
 Release workflows first build source-tagged candidates and check both CPU architectures. They then promote immutable version tags and update `latest`. A retry from the same source commit skips an already-promoted image and retains its digest; a different source commit cannot replace that version.
 
 The initial restore can take longer than a normal database boot. DB health has a two-hour startup grace period and becomes healthy as soon as the verified restore finishes. Set `DB_START_PERIOD` and `STARTUP_TIMEOUT` for a slower machine. This does not change or refresh an existing volume.
+
+## Version 0.1.6 search and image release
+
+Calculated-text lookup is restricted to original Arabic articles of Civil Procedure law 244565. Other sources still match their original titles and text. This bound lets PostgreSQL use the existing source key and trigram indexes for literal amount searches. No dataset or embedding change is required.
+
+The image workflow builds, checks both architectures and promotes all three immutable DB/API/MCP version tags. It refuses to replace an existing tag from a different source commit. Release 2026-10-30.2 retains its truthful builder version 0.1.5; runtime 0.1.6 consumes that same verified dump.

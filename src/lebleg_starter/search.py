@@ -270,7 +270,7 @@ class SearchService:
             else:
                 escaped = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
                 pattern = "%" + escaped + "%"
-                where = "(title ILIKE %s ESCAPE '\\' OR text ILIKE %s ESCAPE '\\' OR metadata->'calculated_current'->>'text_ar' ILIKE %s ESCAPE '\\')" + extra
+                where = "(title ILIKE %s ESCAPE '\\' OR text ILIKE %s ESCAPE '\\' OR (kind='article' AND source_id=244565 AND lang='ar' AND metadata->'calculated_current'->>'text_ar' ILIKE %s ESCAPE '\\'))" + extra
                 count_params = [pattern, pattern, pattern] + filter_params
                 if include_counts:
                     rows = conn.execute(
@@ -300,7 +300,7 @@ class SearchService:
                     if remaining:
                         rows.extend(
                             conn.execute(
-                                "SELECT * FROM source_documents WHERE (text ILIKE %s ESCAPE '\\' OR metadata->'calculated_current'->>'text_ar' ILIKE %s ESCAPE '\\') AND NOT (title ILIKE %s ESCAPE '\\')"
+                                "SELECT * FROM source_documents WHERE (text ILIKE %s ESCAPE '\\' OR (kind='article' AND source_id=244565 AND lang='ar' AND metadata->'calculated_current'->>'text_ar' ILIKE %s ESCAPE '\\')) AND NOT (title ILIKE %s ESCAPE '\\')"
                                 + extra
                                 + order,
                                 [pattern, pattern, pattern] + filter_params + [remaining, max(0, offset - title_count)],

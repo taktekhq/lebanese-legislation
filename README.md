@@ -4,11 +4,11 @@ Run a local Lebanese legal database, HTTP API and MCP server from the public [da
 
 | Image | Purpose |
 | --- | --- |
-| `ghcr.io/taktekhq/lebanese-legislation-db:0.1.5` | PostgreSQL 18.6, pgvector 0.8.2 and verified first-run restore |
-| `ghcr.io/taktekhq/lebanese-legislation-api:0.1.5` | General resources and keyword, citation and optional semantic search |
-| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.5` | The same retrieval and resources as MCP tools |
+| `ghcr.io/taktekhq/lebanese-legislation-db:0.1.6` | PostgreSQL 18.6, pgvector 0.8.2 and verified first-run restore |
+| `ghcr.io/taktekhq/lebanese-legislation-api:0.1.6` | General resources and keyword, citation and optional semantic search |
+| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.6` | The same retrieval and resources as MCP tools |
 
-The [database snapshot](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases/2026-10-30.1) includes 1,093,730 source records and 1,546,886 indexed passages. Default startup downloads the latest verified release.
+The [database releases](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases) include source records, indexed passages and optional calculated-current metadata. Default startup downloads the latest verified snapshot.
 
 ## DB only
 
@@ -17,7 +17,7 @@ Use the DB image as a normal Compose service. Set your own password:
 ```yaml
 services:
   db:
-    image: ghcr.io/taktekhq/lebanese-legislation-db:0.1.5
+    image: ghcr.io/taktekhq/lebanese-legislation-db:0.1.6
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a password}
     volumes:
