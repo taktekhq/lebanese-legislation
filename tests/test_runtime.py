@@ -350,3 +350,73 @@ def test_explicit_date_survives_citation_punctuation_and_issuance(query):
 def test_date_belongs_to_its_bound_citation():
     target = citation_target("law 123; decree 456 issued on 2021-01-02")
     assert (target.kind, target.number, target.date) == ("law", "123", None)
+
+
+def test_count_tokens_uses_grouped_parts_and_validated_total():
+    import io
+    import json
+
+    from lebleg_starter.embedding import Gemini
+
+    calls = []
+
+    class Opener:
+        def open(self, request, timeout):
+            calls.append(request)
+            return io.BytesIO(b'{"totalTokens":15}')
+
+    provider = Gemini("synthetic")
+    provider._opener = Opener()
+    assert provider.count_tokens(["one", "two"]) == 15
+    assert calls[0].full_url.endswith("/gemini-embedding-001:countTokens")
+    assert json.loads(calls[0].data) == {"contents": [{"parts": [{"text": "one"}, {"text": "two"}]}]}
+
+
+@pytest.mark.parametrize("value", [0, -1, True, "15", None])
+def test_count_tokens_rejects_invalid_total(value):
+    import io
+    import json
+
+    from lebleg_starter.embedding import Gemini
+
+    class Opener:
+        def open(self, request, timeout):
+            return io.BytesIO(json.dumps({"totalTokens": value}).encode())
+
+    provider = Gemini("synthetic")
+    provider._opener = Opener()
+    with pytest.raises(ProviderError):
+        provider.count_tokens(["one"])
+
+
+@pytest.mark.parametrize("texts", [[], [""], [" "], [None], ["one"] * 101, "one"])
+def test_count_tokens_rejects_invalid_input_before_http(texts):
+    from lebleg_starter.embedding import Gemini
+
+    provider = Gemini("synthetic")
+
+    class NoHTTP:
+        def open(self, *args, **kwargs):
+            pytest.fail("invalid token input reached HTTP")
+
+    provider._opener = NoHTTP()
+    with pytest.raises(ProviderError):
+        provider.count_tokens(texts)
+
+
+def test_optional_text_search_manifest_contract():
+    m = manifest()
+    m["text_search"] = {
+        "extension": "pg_trgm",
+        "version": "1.6",
+        "indexes": [
+            "source_documents_title_trgm",
+            "source_documents_text_trgm",
+            "source_documents_identifier",
+            "source_documents_issued_on",
+        ],
+    }
+    assert validate_manifest(m) == m
+    m["text_search"]["version"] = "unsupported"
+    with pytest.raises(ManifestError):
+        validate_manifest(m)

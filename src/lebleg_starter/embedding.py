@@ -181,6 +181,21 @@ class Gemini:
         except (KeyError, TypeError, ValueError):
             raise ProviderError("invalid embedding response") from None
 
+    def count_tokens(self, texts):
+        """Count one bounded group without making an embedding request."""
+        if (
+            not isinstance(texts, (list, tuple))
+            or not texts
+            or len(texts) > 100
+            or any(not isinstance(text, str) or not text.strip() for text in texts)
+        ):
+            raise ProviderError("invalid token count input")
+        result = self._post(self.model, "countTokens", {"contents": [{"parts": [{"text": text} for text in texts]}]})
+        total = result.get("totalTokens") if isinstance(result, dict) else None
+        if type(total) is not int or total <= 0:
+            raise ProviderError("invalid token count response")
+        return total
+
     def select(self, query, passages):
         if not passages:
             return []

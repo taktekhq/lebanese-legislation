@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lebanese-legislation-starter"
-version = "0.1.1"
+version = "0.1.2"
 description = "Restore and search published Lebanese legal data with PostgreSQL and pgvector"
 requires-python = ">=3.11"
 license = {text = "MIT"}

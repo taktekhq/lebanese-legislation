@@ -41,7 +41,7 @@ def databases(tmp_path):
             admin.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(reader)))
 
 
-def prepare_dump(databases):
+def prepare_dump(databases, text_search=False):
     dsns, _reader, _binary, dump_binary, tmp_path = databases
     source, _target, _bad = dsns
     m = manifest()
@@ -84,6 +84,10 @@ def prepare_dump(databases):
                 "[" + ",".join(["1"] * 768) + "]",
             ),
         )
+        if text_search:
+            from lebleg_starter.indexes import ensure_search_indexes
+
+            m["text_search"] = ensure_search_indexes(conn)
         conn.execute("INSERT INTO lebleg_release VALUES(%s,%s)", (m["release_id"], Jsonb(m)))
     dump = tmp_path / "fixture.dump"
     env = os.environ.copy()
@@ -289,3 +293,14 @@ def test_absent_typed_citations_never_call_provider(databases):
         assert service.search("قرار مجلس الوزراء رقم 123/2020")["passages"]
     finally:
         service.close()
+
+
+def test_restore_checks_declared_text_search_extension_and_indexes(databases):
+    dsns, reader, binary, _, _ = databases
+    _, target, _ = dsns
+    m, dump, _ = prepare_dump(databases, text_search=True)
+    assert restore(m, dump, target, reader, binary) == "restored"
+    with psycopg.connect(target) as conn:
+        conn.execute("DROP INDEX source_documents_title_trgm")
+    with pytest.raises(RestoreError, match="text search index"):
+        restore(m, dump, target, reader, binary)

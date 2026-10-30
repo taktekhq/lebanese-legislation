@@ -95,6 +95,31 @@ def _begin_attempt(conn, manifest):
         )
 
 
+def _check_search_indexes(conn, spec):
+    extension = conn.execute("SELECT extversion FROM pg_extension WHERE extname=%s", (spec["extension"],)).fetchone()
+    if not extension or extension[0] != spec["version"]:
+        raise RestoreError("restored text search extension mismatch")
+    rows = conn.execute("""SELECT c.relname,i.indisvalid,i.indisready,a.amname,pg_get_indexdef(c.oid)
+        FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid JOIN pg_namespace n ON n.oid=c.relnamespace
+        JOIN pg_am a ON a.oid=c.relam WHERE i.indrelid='public.source_documents'::regclass AND n.nspname='public'""").fetchall()
+    indexes = {row[0]: row[1:] for row in rows}
+    for name in spec["indexes"]:
+        row = indexes.get(name)
+        if not row or not row[0] or not row[1]:
+            raise RestoreError("restored text search index is missing or invalid")
+        method, definition = row[2], row[3].lower()
+        if name.endswith("_trgm"):
+            column = "title" if name == "source_documents_title_trgm" else "text"
+            valid = method == "gin" and f"({column} gin_trgm_ops)" in definition
+        else:
+            keys = ("identifier", "number") if name.endswith("_identifier") else ("issued_on", "date")
+            valid = (
+                method == "btree" and "coalesce" in definition and all("'" + key + "'" in definition for key in keys)
+            )
+        if not valid:
+            raise RestoreError("restored text search index definition mismatch")
+
+
 def check_database(conn, manifest, reader_role=None):
     version = conn.execute("SELECT current_setting('server_version_num')::int").fetchone()[0]
     if version != 180006:
@@ -114,9 +139,11 @@ def check_database(conn, manifest, reader_role=None):
     if len(identity) != 1 or identity[0][0] != manifest["release_id"]:
         raise RestoreError("restored release identity mismatch")
     internal = identity[0][1]
-    for key in ("source", "embedding", "counts"):
+    for key in ("source", "embedding", "counts") + (("text_search",) if "text_search" in manifest else ()):
         if internal.get(key) != manifest[key]:
             raise RestoreError("restored release metadata mismatch")
+    if "text_search" in manifest:
+        _check_search_indexes(conn, manifest["text_search"])
     vector_type = conn.execute(
         "SELECT format_type(atttypid,atttypmod) FROM pg_attribute WHERE attrelid='semantic_chunks'::regclass AND attname='embedding'"
     ).fetchone()

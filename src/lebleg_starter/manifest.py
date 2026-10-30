@@ -35,6 +35,21 @@ def validate_manifest(m):
         _require(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*", m["source"]["repo_id"]))
         _require(re.fullmatch(r"[0-9a-f]{40}", m["source"]["revision"]))
         _require(m["postgres"] == {"version": "18.6", "vector_version": "0.8.2"})
+        if "text_search" in m:
+            _require(
+                m["text_search"]
+                == {
+                    "extension": "pg_trgm",
+                    "version": "1.6",
+                    "indexes": [
+                        "source_documents_title_trgm",
+                        "source_documents_text_trgm",
+                        "source_documents_identifier",
+                        "source_documents_issued_on",
+                    ],
+                }
+            )
+
         _require(
             {k: v for k, v in m["embedding"].items() if k not in ("storage", "provider")}
             == {
