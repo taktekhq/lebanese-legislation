@@ -1,4 +1,5 @@
 """Import the public Parquet contract and derive eligible canonical documents."""
+import json
 from datetime import date
 from importlib.resources import files
 from pathlib import Path
@@ -42,22 +43,23 @@ def source_details(kind, source_id, part, lang, fields):
 
 def validate_arrow_type(arrow_type, pg_type):
     import pyarrow as pa
-    expected = {'text':pa.string(),'int2':pa.int16(),'int4':pa.int32(),'int8':pa.int64(),
+    expected = {'text':pa.string(),'jsonb':pa.string(),'int2':pa.int16(),'int4':pa.int32(),'int8':pa.int64(),
                 'float4':pa.float32(),'date':pa.date32(),'timestamptz':pa.timestamp('us',tz='UTC'),
                 'bool':pa.bool_(),'_text':pa.list_(pa.string()),'_int4':pa.list_(pa.int32())}
     if pg_type not in expected or arrow_type != expected[pg_type]:
         raise ValueError(f'Arrow type {arrow_type} differs from PostgreSQL public type {pg_type}')
 
 
-def import_parquet(conn, directory):
-    """Create all 29 typed snapshot tables, COPY batches, then public constraints."""
+def import_parquet(conn, directory, as_of_date=None):
+    """Create typed snapshot tables, COPY batches, then public constraints."""
     import pyarrow.parquet as pq
     schema = resource('public_schema.sql')
     ddl, constraints = schema.split('ALTER TABLE', 1)
     conn.execute(ddl)
     expected = {r[0] for r in conn.execute("SELECT tablename FROM pg_tables WHERE schemaname='public'")}
     paths = {p.stem: p for p in Path(directory).glob('*.parquet')}
-    if set(paths) != expected:
+    optional = {'article_calculated_current'}
+    if set(paths) - expected or expected - set(paths) - optional:
         raise ValueError('snapshot table inventory differs from public contract')
     counts = {}
     # Validate every file before writing any source row. No implicit narrowing.
@@ -75,8 +77,15 @@ def import_parquet(conn, directory):
         with conn.cursor().copy(sql.SQL('COPY {} ({}) FROM STDIN').format(sql.Identifier(name), sql.SQL(',').join(map(sql.Identifier, declared)))) as cp:
             for batch in pf.iter_batches(batch_size=2000):
                 for row in batch.to_pylist():
+                    if name == 'article_calculated_current':
+                        try:
+                            row['calculated_current'] = Jsonb(json.loads(row['calculated_current']))
+                        except (TypeError, ValueError) as error:
+                            raise ValueError('invalid calculated_current JSON') from error
                     cp.write_row(tuple(row[c] for c in declared))
         counts[name] = pf.metadata.num_rows
+    counts.setdefault('article_calculated_current', 0)
+    validate_calculated_rows(conn, as_of_date or date.today())
     statements = ('ALTER TABLE' + constraints).split(';')
     for foreign in (False, True):
         for statement in statements:
@@ -115,6 +124,7 @@ def derive_documents(conn, as_of_date=None):
                     url, metadata = source_details(kind, sid, part, lang, fields)
                     writer.write_row((kind, sid, part, lang, title or '', text, digest(text), url, Jsonb(metadata)))
     refresh_metadata(conn)
+    refresh_calculated_metadata(conn, as_of_date)
     return conn.execute('SELECT count(*) FROM source_documents').fetchone()[0]
 
 
@@ -125,3 +135,59 @@ def refresh_metadata(conn):
     for sid,part,lang,kind in special:
         url,_ = source_details('article',sid,part,lang,{'kind':kind})
         conn.execute("UPDATE source_documents SET source_url=%s WHERE kind='article' AND source_id=%s AND part=%s AND lang=%s AND source_url IS DISTINCT FROM %s",(url,sid,part,lang,url))
+
+
+def validate_calculated_current(row, source_text, as_of_date):
+    """Validate a canonical export; arithmetic remains owned by the Go exporter."""
+    obj = row.get('calculated_current')
+    authority = {'law_id':330819, 'article':'1',
+                 'url':'https://lebaneselegislation.com/decree/330819/article/1/', 'effective_on':'2024-09-19'}
+    if (type(row.get('law_id')) is not int or row['law_id'] != 244565
+        or not isinstance(row.get('number'), str) or not row['number']
+        or type(row.get('position')) is not int
+        or not isinstance(obj, dict)
+        or obj.get('kind') != 'statutory_monetary_adjustment'
+        or obj.get('is_published_wording') is not False
+        or type(obj.get('multiplier')) is not int or obj['multiplier'] != 50
+        or obj.get('authority') != authority
+        or type(obj['authority'].get('law_id')) is not int
+        or as_of_date < date(2024,9,19)
+        or not isinstance(source_text,str) or not source_text
+        or obj.get('source_text_ar') != source_text
+        or row.get('source_sha256') != digest(source_text)
+        or obj.get('source_sha256') != row['source_sha256']
+        or not isinstance(obj.get('text_ar'),str) or not obj['text_ar'].strip()
+        or obj['text_ar'] == source_text):
+        raise ValueError('invalid calculated_current source, scope or authority')
+    return obj
+
+
+def validate_calculated_rows(conn, as_of_date):
+    rows = conn.execute("""SELECT c.law_id,c.number,c.position,c.source_sha256,c.calculated_current,
+        f.text_ar,f.state,f.pending,f.valid_from,l.status,l.issued_on
+        FROM article_calculated_current c
+        LEFT JOIN article_in_force f ON (f.law_id,f.number,f.position)=(c.law_id,c.number,c.position)
+        LEFT JOIN legislation l ON l.id=c.law_id""").fetchall()
+    seen = set()
+    for law_id,number,position,hashed,obj,text,state,pending,valid_from,status,issued_on in rows:
+        key = (law_id,number)
+        if (key in seen or state != 'in_force' or pending is not False
+            or status is None or status in ('repealed','annulled')
+            or valid_from is not None and valid_from > as_of_date
+            or issued_on is not None and issued_on > as_of_date):
+            raise ValueError('invalid calculated_current article eligibility or duplicate')
+        seen.add(key)
+        validate_calculated_current({'law_id': law_id,'number': number,'position': position,
+            'source_sha256': hashed,'calculated_current': obj},text,as_of_date)
+
+
+def refresh_calculated_metadata(conn, as_of_date=None):
+    # Restored older snapshots can refresh metadata without the optional table.
+    if not conn.execute("SELECT to_regclass('public.article_calculated_current')").fetchone()[0]:
+        return
+    validate_calculated_rows(conn, as_of_date or date.today())
+    conn.execute("""UPDATE source_documents d SET metadata=d.metadata || jsonb_build_object('calculated_current',c.calculated_current)
+        FROM article_calculated_current c WHERE d.kind='article' AND d.lang='ar'
+        AND d.source_id=c.law_id AND d.part=c.number AND d.hash=c.source_sha256
+        AND d.text=c.calculated_current->>'source_text_ar'
+        AND d.metadata->'calculated_current' IS DISTINCT FROM c.calculated_current""")

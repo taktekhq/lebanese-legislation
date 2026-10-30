@@ -50,6 +50,8 @@ Stop services with `docker compose down`. This preserves the database and downlo
 
 Database data is downloaded separately, not baked into the Docker image. The dump stores index definitions; PostgreSQL constructs the HNSW index during restore. It does not contain a portable copy of PostgreSQL's physical index files.
 
+Calculated current monetary wording, when exported by the canonical dataset, is available as `source_documents.metadata.calculated_current` and the `article_calculated_current` table. Literal search also matches calculated text and amounts. Returned passage text stays verbatim. Use the labelled object for current monetary answers and cite its authority. Older snapshots without the optional sidecar make no calculated claims. See [the release and compatibility guide](docs/calculated-current-release.md).
+
 The release is built only from the pinned public Parquet files. It does not contain private website tables, user queries, analytics, credentials or website-only explanations. Exported views become snapshot tables. `source_documents` is a derived read model for this immutable snapshot; editing raw tables does not automatically update it or its vectors. Article retrieval follows the exported in-force view at the stated date; the raw tables retain the wider historical corpus.
 
 ## How retrieval works

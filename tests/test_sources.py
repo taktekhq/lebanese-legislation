@@ -24,7 +24,7 @@ def test_real_typed_parquet_and_source_eligibility(db, tmp_path):
     # Generate a wholly synthetic public snapshot using the frozen typed contract.
     db.execute(resource('public_schema.sql').split('ALTER TABLE', 1)[0])
     definitions = db.execute("SELECT table_name,column_name,udt_name FROM information_schema.columns WHERE table_schema='public' ORDER BY table_name,ordinal_position").fetchall()
-    type_map = {'text':pa.string(),'int2':pa.int16(),'int4':pa.int32(),'int8':pa.int64(),
+    type_map = {'text':pa.string(),'jsonb':pa.string(),'int2':pa.int16(),'int4':pa.int32(),'int8':pa.int64(),
                 'float4':pa.float32(),'date':pa.date32(),'timestamptz':pa.timestamp('us',tz='UTC'),
                 'bool':pa.bool_(),'_text':pa.list_(pa.string()),'_int4':pa.list_(pa.int32())}
     schemas = {}
@@ -48,7 +48,7 @@ def test_real_typed_parquet_and_source_eligibility(db, tmp_path):
     for table, fields in schemas.items():
         pq.write_table(pa.Table.from_pylist(samples.get(table, []),schema=pa.schema(fields)),tmp_path / (table+'.parquet'))
     counts = import_parquet(db,tmp_path)
-    assert len(counts) == 29
+    assert len(counts) == 30
     assert db.execute('SELECT issued_on FROM legislation WHERE id=1').fetchone()[0] == date(2020,1,2)
     assert db.execute('SELECT authors FROM doctrine_article').fetchone()[0] == ['أ','B']
     assert db.execute('SELECT first_seen FROM source_page').fetchone()[0] == now

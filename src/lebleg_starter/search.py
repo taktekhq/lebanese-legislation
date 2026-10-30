@@ -241,9 +241,9 @@ class SearchService:
                 if remaining:
                     rows.extend(
                         conn.execute(
-                            "SELECT * FROM source_documents WHERE text ILIKE %s ESCAPE '\\' AND NOT (title ILIKE %s ESCAPE '\\')"
+                            "SELECT * FROM source_documents WHERE (text ILIKE %s ESCAPE '\\' OR metadata->'calculated_current'->>'text_ar' ILIKE %s ESCAPE '\\') AND NOT (title ILIKE %s ESCAPE '\\')"
                             + order,
-                            (pattern, pattern, remaining),
+                            (pattern, pattern, pattern, remaining),
                         ).fetchall()
                     )
             passages = []
