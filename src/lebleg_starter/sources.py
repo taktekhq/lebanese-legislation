@@ -27,9 +27,9 @@ def source_details(kind, source_id, part, lang, fields):
         url += 'article/' + quote(part, safe='') + '/'
     metadata = {'source_type': source_type, 'language': lang, 'english_unofficial': lang == 'en',
                 'authoritative_language': 'ar'}
-    for key in ('number', 'issued_on', 'date', 'year', 'low_confidence', 'source_url', 'source', 'confidence'):
+    for key in ('number', 'issued_on', 'decided_on', 'signed_on', 'published_on', 'date', 'year', 'low_confidence', 'source_url', 'source', 'confidence', 'model', 'read_at'):
         if fields.get(key) is not None:
-            metadata['identifier' if key == 'number' else key] = str(fields[key]) if key in ('issued_on', 'date') else fields[key]
+            metadata['identifier' if key == 'number' else key] = str(fields[key]) if key in ('issued_on', 'decided_on', 'signed_on', 'published_on', 'date', 'read_at') else fields[key]
     return url, metadata
 
 
@@ -86,14 +86,19 @@ def derive_documents(conn, as_of_date=None):
       title text NOT NULL,text text NOT NULL,hash text NOT NULL,source_url text NOT NULL,metadata jsonb NOT NULL,
       PRIMARY KEY(kind,source_id,part,lang))''')
     query = resource('corpus.sql').replace('CURRENT_DATE', "current_setting('lebleg.as_of_date')::date")
-    query = ("SELECT c.*,coalesce(to_jsonb(l),to_jsonb(rp),to_jsonb(r),to_jsonb(o),to_jsonb(a),to_jsonb(rs),to_jsonb(d),'{}'::jsonb) FROM (" + query + """) c
+    query = ("""SELECT c.*,CASE WHEN l.id IS NOT NULL THEN jsonb_build_object('kind',l.kind,'number',l.number,'issued_on',l.issued_on)
+      WHEN r.id IS NOT NULL THEN jsonb_build_object('number',r.number,'year',r.year,'decided_on',r.decided_on,
+        'model',rp.model,'read_at',rp.read_at,'low_confidence',rp.low_confidence)
+      WHEN o.id IS NOT NULL THEN jsonb_build_object('number',o.number,'year',o.year,'issued_on',o.issued_on)
+      WHEN a.id IS NOT NULL THEN jsonb_build_object('signed_on',a.signed_on)
+      WHEN rs.id IS NOT NULL THEN jsonb_build_object('published_on',rs.published_on)
+      ELSE '{}'::jsonb END FROM (""" + query + """) c
       LEFT JOIN legislation l ON c.kind IN ('law','article') AND l.id=c.source_id
       LEFT JOIN ruling r ON c.kind='ruling' AND r.id=c.source_id
       LEFT JOIN ruling_page rp ON c.kind='ruling' AND rp.ruling_id=c.source_id AND rp.n::text=c.part
       LEFT JOIN opinion o ON c.kind='opinion' AND o.id=c.source_id
       LEFT JOIN agreement a ON c.kind='agreement' AND a.id=c.source_id
       LEFT JOIN research rs ON c.kind='research' AND rs.id=c.source_id
-      LEFT JOIN doctrine_article d ON c.kind='doctrine' AND d.id=c.source_id
       WHERE btrim(coalesce(c.body,''))<>''""")
     with conn.cursor(name='canonical_documents') as rows:
         rows.execute(query)
