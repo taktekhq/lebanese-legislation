@@ -34,7 +34,7 @@ def test_real_pipeline_resumes_after_public_check_failure_without_reembedding(db
 
     db.execute(resource('public_schema.sql').split('ALTER TABLE',1)[0])
     definitions=db.execute("SELECT table_name,column_name,udt_name FROM information_schema.columns WHERE table_schema='public' ORDER BY table_name,ordinal_position").fetchall()
-    types={'text':pa.string(),'int2':pa.int16(),'int4':pa.int32(),'int8':pa.int64(),'float4':pa.float32(),
+    types={'text':pa.string(),'jsonb':pa.string(),'int2':pa.int16(),'int4':pa.int32(),'int8':pa.int64(),'float4':pa.float32(),
            'date':pa.date32(),'timestamptz':pa.timestamp('us',tz='UTC'),'bool':pa.bool_(),'_text':pa.list_(pa.string()),'_int4':pa.list_(pa.int32())}
     schemas={}
     for table,column,typ in definitions:schemas.setdefault(table,[]).append(pa.field(column,types[typ]))

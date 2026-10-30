@@ -13,6 +13,8 @@ import httpx
 import psycopg
 from psycopg.conninfo import make_conninfo
 
+from . import __version__
+
 
 def free_port():
     with socket.socket() as sock:
@@ -58,7 +60,7 @@ def main(argv=None):
             names.append(name)
             ports[mode] = free_port()
             env = {**os.environ, 'DATABASE_URL':reader, 'APP_MODE':mode, 'GEMINI_MAX_CALLS_PER_DAY':'1'}
-            image = os.getenv('PIPELINE_' + mode.upper() + '_IMAGE', 'ghcr.io/taktekhq/lebanese-legislation-' + mode + ':0.1.4')
+            image = os.getenv('PIPELINE_' + mode.upper() + '_IMAGE', 'ghcr.io/taktekhq/lebanese-legislation-' + mode + ':' + __version__)
             subprocess.run(['docker','run','-d','--name',name,'--network','host','--memory','256m','--read-only',
                 '--tmpfs','/tmp','--label','org.lebleg.pipeline.owner='+os.getenv('PIPELINE_OWNER_ID',uuid.uuid4().hex*2),'--cap-drop','ALL','--security-opt','no-new-privileges:true',
                 '-e','DATABASE_URL','-e','APP_MODE','-e','GEMINI_API_KEY','-e','GEMINI_MAX_CALLS_PER_DAY',
