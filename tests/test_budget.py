@@ -69,3 +69,44 @@ def test_invalid_ledger_or_changed_cap_refused(tmp_path):
     BudgetedEmbedder(Provider(), 26, path).embed(["one"])
     with pytest.raises(BudgetError, match="identity"):
         BudgetedEmbedder(Provider(), 52, path).embed(["one"])
+
+
+def test_daily_cap_is_shared_by_jobs_and_resets_in_beirut(tmp_path):
+    from datetime import UTC, datetime
+
+    from lebleg_starter.budget import DailyBudgetedEmbedder
+
+    provider = Provider()
+    now = [datetime(2026, 10, 30, 21, 59, tzinfo=UTC)]
+    # 26 reserved tokens cost exactly the deliberately tiny test cap.
+    kwargs = {'daily_usd':'0.0000039', 'usd_per_million':'0.15', 'clock':lambda: now[0]}
+    DailyBudgetedEmbedder(provider, tmp_path, **kwargs).embed(['one'])
+    with pytest.raises(BudgetError, match='exhausted'):
+        DailyBudgetedEmbedder(provider, tmp_path, **kwargs).embed(['two'])
+    now[0] = datetime(2026, 10, 30, 22, 1, tzinfo=UTC)
+    DailyBudgetedEmbedder(provider, tmp_path, **kwargs).embed(['next day'])
+    assert provider.calls == 2
+    assert len(list(tmp_path.glob('*.json'))) == 2
+
+
+def test_daily_budget_refuses_invalid_prices(tmp_path):
+    from lebleg_starter.budget import DailyBudgetedEmbedder
+
+    for price in ['0', '-1', 'NaN', 'Infinity']:
+        with pytest.raises(BudgetError):
+            DailyBudgetedEmbedder(Provider(), tmp_path, usd_per_million=price)
+
+
+def test_daily_reservation_uses_day_after_token_count(tmp_path):
+    from datetime import UTC, datetime
+
+    from lebleg_starter.budget import DailyBudgetedEmbedder
+
+    now=[datetime(2026,10,30,21,59,tzinfo=UTC)]
+    class SlowCount(Provider):
+        def count_tokens(self,texts):
+            now[0]=datetime(2026,10,30,22,1,tzinfo=UTC)
+            return super().count_tokens(texts)
+    DailyBudgetedEmbedder(SlowCount(),tmp_path,clock=lambda:now[0]).embed(['one'])
+    assert (tmp_path/'2026-10-31.json').exists()
+    assert not (tmp_path/'2026-10-30.json').exists()

@@ -294,6 +294,10 @@ def main(argv=None):
     parser.add_argument("--embedding-batch-size", type=int, choices=range(1, 101), default=32)
     parser.add_argument("--max-input-tokens", type=int)
     parser.add_argument("--embedding-budget-ledger")
+    parser.add_argument("--daily-embedding-budget-dir")
+    parser.add_argument("--daily-embedding-usd", default="1")
+    parser.add_argument("--embedding-usd-per-million", default="0.15")
+    parser.add_argument("--budget-timezone", default="Asia/Beirut")
     parser.add_argument("--pg-dump", default=os.getenv("PG_DUMP_BIN", "pg_dump"))
     parser.add_argument(
         "--resume", action="store_true", help="Continue this exact local staging build after a coverage report"
@@ -373,6 +377,11 @@ def main(argv=None):
 
             conn.commit()
             provider = GeminiEmbedder(os.environ["GEMINI_API_KEY"])
+            if args.daily_embedding_budget_dir:
+                from .budget import DailyBudgetedEmbedder
+
+                provider = DailyBudgetedEmbedder(provider, args.daily_embedding_budget_dir,
+                    args.daily_embedding_usd, args.embedding_usd_per_million, args.budget_timezone)
             if args.max_input_tokens is not None:
                 from .budget import BudgetedEmbedder
 
