@@ -19,6 +19,7 @@ services:
     healthcheck:
       test: ["CMD", "bash", "/opt/starter/docker/db-health.sh"]
       interval: 5s
+      start_period: ${DB_START_PERIOD:-2h}
       retries: 30
   api:
     image: ${API_IMAGE:-${STARTER_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-api:0.1.4}}

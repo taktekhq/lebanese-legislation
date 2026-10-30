@@ -93,6 +93,8 @@ def test_db_image_first_boot_and_restart(db_fixture, valid, with_reader):  # noq
     pause.chmod(0o755)
     name = "lebleg-init-test-" + uuid.uuid4().hex[:10]
     try:
+        config = json.loads(docker("image", "inspect", image).stdout)[0]
+        assert config["Config"]["Healthcheck"]["StartPeriod"] >= 7200 * 1_000_000_000
         reader_env = ["-e", "LEBLEG_READER_PASSWORD=test-reader"] if with_reader else []
         docker(
             "run",

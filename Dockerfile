@@ -17,7 +17,7 @@ FROM backend AS db
 COPY docker/db-release.py docker/db-health.sh ./docker/
 COPY docker/init-reader.sh /docker-entrypoint-initdb.d/20-lebleg-reader.sh
 COPY docker/init-release.sh /docker-entrypoint-initdb.d/30-lebleg-release.sh
-HEALTHCHECK --interval=10s --timeout=10s --start-period=30s --retries=3 CMD ["bash", "/opt/starter/docker/db-health.sh"]
+HEALTHCHECK --interval=10s --timeout=10s --start-period=2h --retries=3 CMD ["bash", "/opt/starter/docker/db-health.sh"]
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["postgres"]
 
