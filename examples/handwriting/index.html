@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Lebanese Legal Handwriting</title>
+<link rel="stylesheet" href="style.css">
+<script type="module" src="app.mjs"></script>
+</head>
+<body>
+<a class="skip" href="#transcription">Skip to transcription</a>
+<header>
+  <a class="project" href="https://lebaneselegislation.com">Lebanese Legislation <span>by taktek</span></a>
+  <a href="https://huggingface.co/collections/taktekhq/lebanese-legislation">Dataset collection</a>
+</header>
+<main>
+  <h1>Read a page. Draft a transcription.</h1>
+  <p class="intro">Three original court scans to try. Copy what you can read. Your draft stays in this browser until you download it.</p>
+  <noscript><p>JavaScript is needed for page selection and draft export. You can still <a href="https://huggingface.co/datasets/taktekhq/lebanese-court-scans">browse the scans dataset</a>.</p></noscript>
+  <div class="workspace">
+    <section class="scan" aria-label="Original scan">
+      <div class="page-control"><label for="page">Selected page</label><select id="page" disabled><option>Loading pages…</option></select></div>
+      <p id="page-meta" class="small"></p>
+      <p id="image-status" role="status">Loading scan…</p>
+      <a id="full-image" href="assets/59270-p7.png" target="_blank" rel="noopener" aria-label="Open original preview at full size"><img id="scan-image" alt="Court scan preview" hidden></a>
+      <div class="source-links"><a id="pdf-link" href="https://huggingface.co/datasets/taktekhq/lebanese-court-scans">Original PDF</a><span>Physical PDF page, not the written page number.</span></div>
+    </section>
+    <section class="editor" aria-labelledby="draft-heading">
+      <h2 id="draft-heading">Your transcription draft</h2>
+      <p id="instructions">Keep spelling and line breaks. Use <bdi>[illegible]</bdi> for unreadable text and <bdi>[uncertain: reading]</bdi> for a guess.</p>
+      <label for="transcription">Page text <span lang="ar" dir="rtl">نص الصفحة</span></label>
+      <textarea id="transcription" dir="rtl" lang="ar" rows="15" maxlength="100000" aria-describedby="instructions storage-status" spellcheck="false" disabled></textarea>
+      <label for="origin">How did you draft this?</label>
+      <select id="origin" disabled>
+        <option value="unspecified">Not specified</option>
+        <option value="human-reading">I read the scan myself</option>
+        <option value="machine-assisted">I used a machine draft</option>
+      </select>
+      <p id="storage-status" class="small" role="status">Opening local drafts…</p>
+      <button id="download" type="button" disabled>Download draft</button>
+      <p id="export-status" class="small" role="status"></p>
+      <p class="small">Nothing is submitted. The JSON is unreviewed and has no agreed annotation licence. Review the <a href="https://huggingface.co/datasets/taktekhq/lebanese-court-scans/blob/main/CONTRIBUTING.md">contribution steps</a> before sharing.</p>
+    </section>
+  </div>
+  <footer>
+    <p>Source: <a href="https://legallaw.ul.edu.lb/">Centre for Research and Studies in Legal Informatics, Lebanese University</a>. Independent project. No institutional endorsement.</p>
+    <p>Mixed handwriting and print. No reference transcriptions. Court records may contain sensitive personal information. Check the <a href="https://huggingface.co/datasets/taktekhq/lebanese-court-scans/blob/main/RIGHTS.md">source rights and privacy limits</a> before reuse.</p>
+    <p><a href="https://github.com/taktekhq/lebanese-legislation">Project source</a> · <a href="https://huggingface.co/datasets/taktekhq/lebanese-court-scans">44,766 PDFs, 274,936 pages</a></p>
+  </footer>
+</main>
+</body>
+</html>

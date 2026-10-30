@@ -49,3 +49,5 @@ docker run --rm -p 127.0.0.1:8080:8080 --env DATABASE_URL lebanese-legislation-m
 Use a read-only database role. MCP mode exposes `/mcp`, `/mcp/` and `/healthz`. The website image also serves search, HTML and JSON. Both images run without root, contain no data or credentials, and accept `DATABASE_URL`, `PUBLIC_URL` and `LISTEN_ADDR` at runtime. Published images are built by [the image workflow](.github/workflows/images.yml).
 
 For Cloudflare, use the [Containers example](cloudflare/README.md). To help with search, code or transcriptions, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Try the [handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting), or run its [source](examples/handwriting/README.md) locally. It downloads drafts for review; it does not submit annotations.

@@ -30,3 +30,8 @@ jobs:
           done
       - run: go test ./...
       - run: go build ./cmd/website
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test examples/handwriting/test.mjs cloudflare/runtime.test.mjs
