@@ -357,7 +357,7 @@ def main(argv=None):
             tables = state[2]
             documents = conn.execute("SELECT count(*) FROM source_documents").fetchone()[0]
         else:
-            tables = import_parquet(conn, args.snapshot_dir)
+            tables = import_parquet(conn, args.snapshot_dir, args.as_of_date)
             documents = derive_documents(conn, args.as_of_date)
             ensure_semantic(conn)
             conn.execute("CREATE TABLE lebleg_build_state(release_id text,revision text,tables jsonb,as_of_date date)")

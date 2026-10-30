@@ -1,4 +1,11 @@
 -- Public snapshot schema. Views are materialized tables; search and private provenance omitted.
+CREATE TABLE article_calculated_current (
+ "law_id" integer NOT NULL,
+ "number" text NOT NULL,
+ "position" integer NOT NULL,
+ "source_sha256" text NOT NULL,
+ "calculated_current" jsonb NOT NULL
+);
 CREATE TABLE agreement (
  "id" integer,
  "title" text,
@@ -264,6 +271,8 @@ CREATE TABLE source_page (
  "first_seen" timestamp with time zone,
  "last_changed" timestamp with time zone
 );
+ALTER TABLE article_calculated_current ADD PRIMARY KEY (law_id, number);
+ALTER TABLE article_calculated_current ADD FOREIGN KEY (law_id) REFERENCES legislation(id);
 ALTER TABLE agreement ADD PRIMARY KEY (id);
 ALTER TABLE agreement ADD FOREIGN KEY (ratifying_law_id) REFERENCES legislation(id);
 ALTER TABLE amendment ADD PRIMARY KEY (id);

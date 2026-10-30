@@ -1,7 +1,7 @@
 name: ${COMPOSE_PROJECT_NAME:-lebleg-starter}
 services:
   db:
-    image: ${DB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-db:0.1.4}
+    image: ${DB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-db:0.1.5}
     environment:
       POSTGRES_USER: lebleg_owner
       POSTGRES_DB: lebleg
@@ -22,7 +22,7 @@ services:
       start_period: ${DB_START_PERIOD:-2h}
       retries: 30
   api:
-    image: ${API_IMAGE:-${STARTER_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-api:0.1.4}}
+    image: ${API_IMAGE:-${STARTER_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-api:0.1.5}}
     command: ["serve", "--host", "0.0.0.0", "--port", "8000"]
     environment:
       DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"
@@ -44,7 +44,7 @@ services:
       interval: 10s
       retries: 12
   mcp:
-    image: ${MCP_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.4}
+    image: ${MCP_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.5}
     command: ["serve", "--host", "0.0.0.0", "--port", "8000"]
     environment:
       APP_MODE: mcp
