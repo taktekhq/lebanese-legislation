@@ -225,20 +225,27 @@ class SearchService:
             if embedding["model"] != MODEL or embedding["dimensions"] != 768:
                 raise SearchError("incompatible embedding model")
             target = citation_target(query)
-            conditions = []
-            params = []
+            order = " ORDER BY kind,source_id,part,lang LIMIT %s"
             if target:
                 conditions, params = _citation_conditions(target)
+                rows = conn.execute(
+                    "SELECT * FROM source_documents WHERE " + " AND ".join(conditions) + order, params + [limit]
+                ).fetchall()
             else:
-                conditions.append("(title ILIKE %s ESCAPE '\\' OR text ILIKE %s ESCAPE '\\')")
                 escaped = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-                params.extend(["%" + escaped + "%"] * 2)
-            rows = conn.execute(
-                "SELECT * FROM source_documents WHERE "
-                + " AND ".join(conditions)
-                + " ORDER BY kind,source_id,part,lang LIMIT %s",
-                params + [limit],
-            ).fetchall()
+                pattern = "%" + escaped + "%"
+                rows = conn.execute(
+                    "SELECT * FROM source_documents WHERE title ILIKE %s ESCAPE '\\'" + order, (pattern, limit)
+                ).fetchall()
+                remaining = limit - len(rows)
+                if remaining:
+                    rows.extend(
+                        conn.execute(
+                            "SELECT * FROM source_documents WHERE text ILIKE %s ESCAPE '\\' AND NOT (title ILIKE %s ESCAPE '\\')"
+                            + order,
+                            (pattern, pattern, remaining),
+                        ).fetchall()
+                    )
             passages = []
             for row in rows:
                 full = row["text"]

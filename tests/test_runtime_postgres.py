@@ -41,7 +41,7 @@ def databases(tmp_path):
             admin.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(reader)))
 
 
-def prepare_dump(databases, text_search=False):
+def prepare_dump(databases, text_search=False, extra_documents=()):
     dsns, _reader, _binary, dump_binary, tmp_path = databases
     source, _target, _bad = dsns
     m = manifest()
@@ -84,6 +84,13 @@ def prepare_dump(databases, text_search=False):
                 "[" + ",".join(["1"] * 768) + "]",
             ),
         )
+        for source_id, title, body in extra_documents:
+            conn.execute(
+                "INSERT INTO source_documents VALUES('law',%s,'body','ar',%s,%s,%s,'https://example.org/source','{}')",
+                (source_id, title, body, hashlib.sha256(body.encode()).hexdigest()),
+            )
+        m["counts"]["source_documents"] += len(extra_documents)
+        m["counts"]["tables"]["source_documents"] += len(extra_documents)
         if text_search:
             from lebleg_starter.indexes import ensure_search_indexes
 
@@ -304,3 +311,45 @@ def test_restore_checks_declared_text_search_extension_and_indexes(databases):
         conn.execute("DROP INDEX source_documents_title_trgm")
     with pytest.raises(RestoreError, match="text search index"):
         restore(m, dump, target, reader, binary)
+
+
+def test_ordinary_search_prioritizes_titles_then_unique_body_matches(databases):
+    from lebleg_starter.embedding import ProviderError
+
+    dsns, reader, binary, _, _ = databases
+    _, target, _ = dsns
+    documents = [
+        (2, "ordinary title", "original needle body"),
+        (3, "needle title", "original source text"),
+        (4, "NEEDLE title and body", "another needle body"),
+        (5, "another ordinary title", "final needle body"),
+    ]
+    m, dump, _ = prepare_dump(databases, extra_documents=documents)
+    restore(m, dump, target, reader, binary)
+    readonly = make_conninfo(**{**conninfo_to_dict(target), "user": reader, "password": "runtime-test-only"})
+
+    class BrokenProvider:
+        model = "gemini-embedding-001"
+        calls = 0
+
+        def embed(self, *args, **kwargs):
+            self.calls += 1
+            raise ProviderError("SECRET provider failure")
+
+    provider = BrokenProvider()
+    service = SearchService(readonly, provider)
+    try:
+        result = service.search("needle", limit=3)
+        assert [p["source_id"] for p in result["passages"]] == [3, 4, 2]
+        assert provider.calls == 0
+        result = service.search("needle", limit=8)
+        assert [p["source_id"] for p in result["passages"]] == [3, 4, 2, 5]
+        assert len({p["id"] for p in result["passages"]}) == 4
+        assert all(p["exact"] for p in result["passages"])
+        assert provider.calls == 1
+        assert result["semantic_status"] == "unavailable"
+        assert "SECRET" not in str(result)
+        for passage in result["passages"]:
+            assert hashlib.sha256(passage["text"].encode()).hexdigest() == passage["source_hash"]
+    finally:
+        service.close()

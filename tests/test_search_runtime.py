@@ -47,7 +47,7 @@ def service_with_rows(provider, exact=None, semantic=None):
             if "SELECT r.manifest" in query:
                 return Result([{"manifest": manifest()}])
             if "FROM source_documents WHERE" in query:
-                return Result(exact or [])
+                return Result([] if "AND NOT (title ILIKE" in query else exact or [])
             if "FROM semantic_chunks" in query:
                 return Result(semantic or [])
             pytest.fail("unexpected database statement")
