@@ -6,7 +6,7 @@ The existing Parquet dataset remains the portable data distribution. This projec
 
 ## Start locally
 
-Install Docker with Compose. Allow at least 4 GB of available memory and 20 GB of free disk space; 8 GB of memory is recommended. The first start downloads the full release and rebuilds its indexes, which can take a while.
+Install Docker with Compose. Allow at least 4 GB of available memory and 30 GB of free disk space; 8 GB of memory is recommended. The first start downloads the full release and rebuilds its indexes, which can take a while.
 
 ```sh
 git clone https://github.com/taktekhq/lebanese-legislation-starter.git
@@ -43,8 +43,8 @@ Stop services with `docker compose down`. This preserves the database and downlo
 | `releases/<release-id>/manifest.json` | Source commit, counts, embedding settings, versions, licence and SHA-256 |
 | `releases/latest.json` | Pointer to the latest verified database release |
 | `ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2` | PostgreSQL 18.6 with pgvector 0.8.2 |
-| `ghcr.io/taktekhq/lebanese-legislation-starter:0.1.1` | Restore CLI and search API |
-| `ghcr.io/taktekhq/lebanese-legislation-starter:publisher-0.1.1` | Optional tools for rebuilding and publishing snapshots |
+| `ghcr.io/taktekhq/lebanese-legislation-starter:0.1.2` | Restore CLI and search API |
+| `ghcr.io/taktekhq/lebanese-legislation-starter:publisher-0.1.2` | Optional tools for rebuilding and publishing snapshots |
 
 Database data is downloaded separately, not baked into the Docker image. The dump stores index definitions; PostgreSQL constructs the HNSW index during restore. It does not contain a portable copy of PostgreSQL's physical index files.
 
@@ -56,7 +56,7 @@ The release is built only from the pinned public Parquet files. It does not cont
 2. If enabled, Gemini embeds the query using `gemini-embedding-001`, with 768 dimensions and `RETRIEVAL_QUERY`. PostgreSQL compares it with saved document vectors, stored as `halfvec(768)`.
 3. Returned passages are copied from validated source text and carry source links. Optional `select=true` lets Gemini choose passage IDs; it cannot supply replacement legal wording.
 
-A missing explicit citation is not silently replaced with a nearby semantic match. An absent or failed provider leaves ordinary search available. Retrieval can miss relevant material or return irrelevant passages. Source links and exact quotations make checking possible; they do not establish legal correctness or current legal status.
+A missing explicit citation is not silently replaced with a nearby semantic match. An absent or failed provider leaves ordinary search available. Retrieval can miss relevant material or return irrelevant passages. Source links and exact quotations make checking possible; they do not establish legal correctness or current legal status. Scanned ruling pages retain extraction provenance and confidence fields. OCR can contain errors; consult the linked originals.
 
 The API key stays in the server container. It is never sent to the browser or stored in the public release. Semantic search sends the query to Google; optional selection also sends candidate excerpts. No MCP server or database login is given to the model. Do not send confidential queries without considering your provider's terms.
 
@@ -109,6 +109,10 @@ lebleg build --snapshot-dir ./snapshot/data --revision <40-character-source-comm
 `DATABASE_URL` identifies the empty target. Optional `REUSE_DATABASE_URL` identifies a read-only source of compatible `semantic_chunks`; only vectors whose hashes and passage boundaries match the public source text are reused. Without complete coverage the command writes a coverage report and exits with status 2, without publishing a release.
 
 Explicitly opt in to paid document embeddings with `--embed-missing --max-new-embeddings 10000` and your own `GEMINI_API_KEY`. The cap is checked before calls; progress is committed in batches, and `--resume` continues the same build. No automatic unrestricted embedding job runs. Use `--as-of-date YYYY-MM-DD` for reproducible date-dependent source selection.
+
+For a larger explicitly budgeted build, optional `--embedding-workers` (1 to 8) and `--embedding-batch-size` (1 to 100) provide bounded concurrency; defaults are 1 and 32. Database writes stay in one thread. Completed batches are retained after a failure, and a retry skips validated saved vectors. Set the provider's daily call limit and concurrency explicitly for such jobs.
+
+`--max-input-tokens` adds a durable input-token reservation budget. It calls Gemini's token counter before each paid batch and reserves that count plus 16 tokens per document for task overhead. The default ledger is `embedding-budget.json` inside the output directory; override it with `--embedding-budget-ledger`. Preserve it when resuming. Failed or interrupted requests retain reservations, and changing its model or ceiling is refused. This guard is separate from the provider invoice and account-wide billing controls.
 
 Publish a completed, checksum-verified release with your own authorized `HF_TOKEN`:
 
