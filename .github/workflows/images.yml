@@ -1,21 +1,22 @@
-name: Runtime images
+name: MCP runtime image
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      version:
+        description: Matching API service version
+        required: true
+        default: 0.1.4
 permissions:
   contents: read
   packages: write
+concurrency:
+  group: publish-mcp-image
+  cancel-in-progress: false
 jobs:
   publish:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - target: website
-            image: lebanese-legislation
-          - target: mcp
-            image: lebanese-legislation-mcp
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -25,21 +26,67 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/metadata-action@v5
-        id: meta
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=sha
-            type=semver,pattern={{version}}
+      - name: Validate immutable release version
+        id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PYCODE'
+          import json, os, re, urllib.request
+          version = re.search(r'ARG API_IMAGE=ghcr.io/taktekhq/lebanese-legislation-api:([0-9]+\.[0-9]+\.[0-9]+)', open('Dockerfile').read())[1]
+          requested = os.environ['GITHUB_REF_NAME'].removeprefix('v') if os.environ['GITHUB_EVENT_NAME'] == 'push' else os.environ['REQUESTED_VERSION']
+          if requested != version:
+              raise SystemExit('API version and release version differ')
+          source_tag = 'source-' + os.environ['GITHUB_SHA']
+          build = True
+          for page in range(1, 101):
+              url = f'https://api.github.com/orgs/taktekhq/packages/container/lebanese-legislation-mcp/versions?per_page=100&page={page}'
+              request = urllib.request.Request(url, headers={'Authorization': 'Bearer '+os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json'})
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  versions = json.load(response)
+              occupied = [item for item in versions if version in item['metadata']['container']['tags']]
+              if occupied:
+                  if len(occupied) != 1 or source_tag not in occupied[0]['metadata']['container']['tags']:
+                      raise SystemExit('Refusing to replace an MCP version from another source')
+                  build = False
+                  break
+              if len(versions) < 100:
+                  break
+          else:
+              raise SystemExit('Package version listing exceeded safety bound')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('version='+version+'\n')
+              out.write('build='+str(build).lower()+'\n')
+          PYCODE
       - uses: docker/build-push-action@v6
+        if: steps.version.outputs.build == 'true'
         with:
           context: .
-          target: ${{ matrix.target }}
+          target: mcp
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.target }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.target }}
+          tags: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/taktekhq/lebanese-legislation
+            org.opencontainers.image.version=${{ steps.version.outputs.version }}
+      - name: Verify both MCP variants
+        env:
+          MCP_IMAGE: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
+        run: |
+          for platform in linux/amd64 linux/arm64; do
+            docker run --rm --platform "$platform" "$MCP_IMAGE" --help
+            docker run --rm --platform "$platform" --entrypoint python "$MCP_IMAGE" -c 'from lebleg_starter.server import create_app; app=create_app(mode="mcp"); assert all(not r.path.startswith("/api/") for r in app.routes)'
+          done
+
+      - name: Promote verified MCP version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          SOURCE_SHA: ${{ github.sha }}
+          BUILD_IMAGE: ${{ steps.version.outputs.build }}
+        run: |
+          image=ghcr.io/taktekhq/lebanese-legislation-mcp
+          if [ "$BUILD_IMAGE" = true ]; then
+            docker buildx imagetools create --tag "$image:$VERSION" "$image:source-$SOURCE_SHA"
+          fi
+          docker buildx imagetools create --tag "$image:latest" "$image:$VERSION"
