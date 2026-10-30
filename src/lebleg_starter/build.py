@@ -281,6 +281,7 @@ def export_release(dsn, out, manifest, pg_dump):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--database-url", default=os.getenv("DATABASE_URL"))
+    parser.add_argument("--no-export", action="store_true", help="Finalize staging without writing a dump")
     parser.add_argument("--snapshot-dir", required=True, help="Directory containing the pinned data/*.parquet files")
     parser.add_argument("--revision", required=True)
     parser.add_argument("--as-of-date", type=date.fromisoformat, default=date.today())
@@ -342,7 +343,7 @@ def main(argv=None):
                 ):
                     raise ValueError("finalized release count mismatch")
             validate_chunks(conn)
-            return export_release(args.database_url, out, manifest, args.pg_dump)
+            return 0 if args.no_export else export_release(args.database_url, out, manifest, args.pg_dump)
         if args.resume:
             state = conn.execute(
                 "SELECT release_id,revision,tables,to_jsonb(s)->>'as_of_date' FROM lebleg_build_state s"
@@ -444,4 +445,4 @@ def main(argv=None):
         conn.execute("CREATE TABLE lebleg_release(release_id text PRIMARY KEY,manifest jsonb NOT NULL)")
         conn.execute("INSERT INTO lebleg_release VALUES(%s,%s)", (args.release_id, Jsonb(manifest)))
         conn.execute("ANALYZE")
-    return export_release(args.database_url, out, manifest, args.pg_dump)
+    return 0 if args.no_export else export_release(args.database_url, out, manifest, args.pg_dump)

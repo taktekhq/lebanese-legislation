@@ -86,8 +86,8 @@ class Ledger:
             source = db.execute('SELECT * FROM sources WHERE repo=?', (repo,)).fetchone()
             if source and source['fingerprint'] == fingerprint:
                 if approved and source['job']:
-                    db.execute("UPDATE jobs SET status='pending' WHERE id=? AND status='reconcile'", (source['job'],))
-                    return source['job']
+                    changed = db.execute("UPDATE jobs SET status='pending' WHERE id=? AND status='reconcile'", (source['job'],)).rowcount
+                    return source['job'] if changed else None
                 return None
             # Only coalesce jobs that have not started. Never supersede trusted work with an unapproved edit.
             db.execute("UPDATE jobs SET status='superseded' WHERE repo=? AND cursor=0 AND status=?",
