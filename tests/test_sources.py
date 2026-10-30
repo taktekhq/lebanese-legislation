@@ -37,11 +37,13 @@ def test_real_typed_parquet_and_source_eligibility(db, tmp_path):
         'legislation':[{'id':1,'kind':'قانون','title':'عنوان','status':'in_force','issued_on':date(2020,1,2)},
                        {'id':2,'kind':'قانون','title':'ملغى','status':'repealed'},
                        {'id':3,'kind':'قانون','title':'لاحق','status':'in_force','issued_on':date(2099,1,1)}],
-        'legislation_title_en':[{'law_id':1,'title_en':'Unofficial title'}],
+        'legislation_title_en':[{'law_id':1,'title_en':'Unofficial title','model':'public-title-model'}],
         'legislation_article':[{'law_id':1,'position':1,'number':'1','text_ar':'أصلي','text_fr':'original français'}],
         'article_in_force':[{'law_id':1,'position':1,'number':'1','text_ar':'معدّل','state':'in_force','pending':False}],
         'doctrine_article':[{'id':9,'title':'بحث','authors':['أ','B']}],
         'source_page':[{'doc_type':'law','centre_id':1,'first_seen':now}],
+        'ruling':[{'id':8,'title':'حكم','number':'7','year':2020,'decided_on':date(2020,1,2)}],
+        'ruling_page':[{'ruling_id':8,'n':1,'text_ar':'نص','model':'public-extractor','read_at':now,'low_confidence':True}],
     }
     for table, fields in schemas.items():
         pq.write_table(pa.Table.from_pylist(samples.get(table, []),schema=pa.schema(fields)),tmp_path / (table+'.parquet'))
@@ -50,10 +52,14 @@ def test_real_typed_parquet_and_source_eligibility(db, tmp_path):
     assert db.execute('SELECT issued_on FROM legislation WHERE id=1').fetchone()[0] == date(2020,1,2)
     assert db.execute('SELECT authors FROM doctrine_article').fetchone()[0] == ['أ','B']
     assert db.execute('SELECT first_seen FROM source_page').fetchone()[0] == now
-    assert derive_documents(db) == 4  # Arabic title, English aid, Arabic article, doctrine.
+    assert derive_documents(db) == 6  # Titles, article, doctrine, ruling and its public machine-read page.
     rows = db.execute('SELECT kind,source_id,part,lang,text,metadata FROM source_documents ORDER BY kind,lang').fetchall()
     assert not any(r[3]=='fr' or r[1] in (2,3) for r in rows)
     assert next(r for r in rows if r[3]=='en')[5]['english_unofficial'] is True
+    assert next(r for r in rows if r[3]=='en')[5]['model'] == 'public-title-model'
+    page = next(r for r in rows if r[0]=='ruling' and r[2]=='1')[5]
+    assert page['identifier']=='7' and page['decided_on']=='2020-01-02'
+    assert page['low_confidence'] is True and page['model']=='public-extractor'
 
 
 def test_arrow_contract_rejects_narrowing_float_and_changed_timestamp():

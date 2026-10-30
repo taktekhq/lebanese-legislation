@@ -107,4 +107,10 @@ def derive_documents(conn, as_of_date=None):
                 for kind, sid, part, lang, title, text, fields in batch:
                     url, metadata = source_details(kind, sid, part, lang, fields)
                     writer.write_row((kind, sid, part, lang, title or '', text, digest(text), url, Jsonb(metadata)))
+    refresh_metadata(conn)
     return conn.execute('SELECT count(*) FROM source_documents').fetchone()[0]
+
+
+def refresh_metadata(conn):
+    """Refresh public metadata only, preserving exact source text and hashes."""
+    conn.execute(resource('public_metadata.sql'))
