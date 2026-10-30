@@ -270,8 +270,8 @@ class SearchService:
             else:
                 escaped = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
                 pattern = "%" + escaped + "%"
-                where = "(title ILIKE %s ESCAPE '\\' OR text ILIKE %s ESCAPE '\\')" + extra
-                count_params = [pattern, pattern] + filter_params
+                where = "(title ILIKE %s ESCAPE '\\' OR text ILIKE %s ESCAPE '\\' OR metadata->'calculated_current'->>'text_ar' ILIKE %s ESCAPE '\\')" + extra
+                count_params = [pattern, pattern, pattern] + filter_params
                 if include_counts:
                     rows = conn.execute(
                         "SELECT * FROM (SELECT DISTINCT ON ("
@@ -300,10 +300,10 @@ class SearchService:
                     if remaining:
                         rows.extend(
                             conn.execute(
-                                "SELECT * FROM source_documents WHERE text ILIKE %s ESCAPE '\\' AND NOT (title ILIKE %s ESCAPE '\\')"
+                                "SELECT * FROM source_documents WHERE (text ILIKE %s ESCAPE '\\' OR metadata->'calculated_current'->>'text_ar' ILIKE %s ESCAPE '\\') AND NOT (title ILIKE %s ESCAPE '\\')"
                                 + extra
                                 + order,
-                                [pattern, pattern] + filter_params + [remaining, max(0, offset - title_count)],
+                                [pattern, pattern, pattern] + filter_params + [remaining, max(0, offset - title_count)],
                             ).fetchall()
                         )
             if include_counts:

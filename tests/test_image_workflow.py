@@ -13,7 +13,7 @@ def test_image_release_guard_retries_same_source_but_refuses_replacement(monkeyp
     block = workflow.split("python3 - <<'PYCODE'", 1)[1].split("          PYCODE", 1)[0]
     block = textwrap.dedent(block)
     output = tmp_path / "output"
-    monkeypatch.setenv("VERSION", "0.1.4")
+    monkeypatch.setenv("VERSION", "0.1.5")
     monkeypatch.setenv("GITHUB_SHA", "a" * 40)
     monkeypatch.setenv("GH_TOKEN", "test-only")
     monkeypatch.setenv("GITHUB_OUTPUT", str(output))
@@ -26,10 +26,10 @@ def test_image_release_guard_retries_same_source_but_refuses_replacement(monkeyp
     monkeypatch.setattr("urllib.request.urlopen", request)
     exec(compile(block, "<release guard>", "exec"), {})  # noqa: S102 - trusted checked-in workflow, mocked network
     assert "build_db=true" in output.read_text() and "build_api=true" in output.read_text()
-    occupied.append({"metadata": {"container": {"tags": ["0.1.4", "source-" + "a" * 40]}}})
+    occupied.append({"metadata": {"container": {"tags": ["0.1.5", "source-" + "a" * 40]}}})
     output.unlink()
     exec(compile(block, "<release guard>", "exec"), {})  # noqa: S102 - trusted checked-in workflow, mocked network
     assert "build_db=false" in output.read_text() and "build_api=true" in output.read_text()
-    occupied[0]["metadata"]["container"]["tags"] = ["0.1.4", "source-" + "b" * 40]
+    occupied[0]["metadata"]["container"]["tags"] = ["0.1.5", "source-" + "b" * 40]
     with pytest.raises(SystemExit, match="another source"):
         exec(compile(block, "<release guard>", "exec"), {})  # noqa: S102 - trusted checked-in workflow, mocked network

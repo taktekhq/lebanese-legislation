@@ -11,6 +11,8 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from psycopg_pool import PoolTimeout
 
+from .sources import validate_calculated_current
+
 NOT_ADVICE = "Not legal advice. Official texts from the Lebanese University's Centre for Research and Studies in Legal Informatics."
 TITLE_EN_NOTE = "English titles are machine-generated discovery aids, not authoritative translations. Original source text remains the reference."
 CACHE_CONTROL = "public, max-age=60, stale-while-revalidate=300"
@@ -360,8 +362,43 @@ class GeneralService:
                 out["centre_error"] = _clean(error)
             if re.match(r"^\s*مادة ملغا", article["note"] or ""):
                 out["repealed"] = True
+            calculated = self._calculated_article(conn, ident, number, law, out)
+            if calculated is not None:
+                out['calculated_current'] = calculated
             self._article_links(conn, ident, number, out)
             return out
+
+    def _calculated_article(self, conn, ident, number, law, out):
+        # Raw resource bodies may select a different recorded version than the
+        # snapshot's in-force corpus. Attach only an exact eligible source match.
+        if ident != 244565 or out.get('repealed') or law.get('status') in ('repealed', 'annulled'):
+            return None
+        if out.get('in_force_from') and out['in_force_from'] > date.today().isoformat():
+            return None
+        versions = out.get('versions') or []
+        if versions:
+            latest = versions[-1]
+            if (latest.get('state') != 'in_force'
+                or latest.get('valid_from') and latest['valid_from'] > date.today().isoformat()):
+                return None
+        if not conn.execute("SELECT to_regclass('public.article_calculated_current') AS present").fetchone()['present']:
+            return None
+        rows = conn.execute("""SELECT c.* FROM article_calculated_current c
+            JOIN article_in_force f ON (f.law_id,f.number,f.position)=(c.law_id,c.number,c.position)
+            JOIN legislation l ON l.id=c.law_id
+            WHERE c.law_id=%s AND c.number=%s AND f.text_ar=%s
+            AND f.state='in_force' AND f.pending IS FALSE
+            AND (f.valid_from IS NULL OR f.valid_from<=CURRENT_DATE)
+            AND l.status NOT IN ('repealed','annulled')
+            AND (l.issued_on IS NULL OR l.issued_on<=CURRENT_DATE)""",
+            (ident, number, out.get('text_ar'))).fetchall()
+        if len(rows) != 1:
+            return None
+        try:
+            return validate_calculated_current(rows[0], out.get('text_ar'), date.today())
+        except ValueError:
+            # Inconsistent optional exports never change the original resource.
+            return None
 
     def _article_links(self, conn, ident, number, out):
         rows = conn.execute(
