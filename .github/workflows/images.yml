@@ -73,11 +73,8 @@ jobs:
       - name: Verify both MCP variants
         env:
           MCP_IMAGE: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
-        run: |
-          for platform in linux/amd64 linux/arm64; do
-            docker run --rm --platform "$platform" "$MCP_IMAGE" --help
-            docker run --rm --platform "$platform" --entrypoint python "$MCP_IMAGE" -c 'from lebleg_starter.server import create_app; app=create_app(mode="mcp"); assert all(not r.path.startswith("/api/") for r in app.routes)'
-          done
+          MCP_EXPECTED_VERSION: ${{ steps.version.outputs.version }}
+        run: bash scripts/smoke-mcp.sh
 
       - name: Promote verified MCP version
         env:
