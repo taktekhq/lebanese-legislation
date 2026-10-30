@@ -89,3 +89,76 @@ def test_coverage_whitespace_has_no_expected_chunks(db):
     db.execute('CREATE TABLE source_documents(kind text,source_id int,part text,lang text,title text,text text,hash text)')
     db.execute("INSERT INTO source_documents VALUES('law',1,'','ar','title',%s,%s)", ('\t\n',digest('\t\n')))
     assert coverage(db) == {'expected':0,'indexed':0,'missing':0}
+
+
+def test_build_refuses_data_or_functions_outside_public(db):
+    from lebleg_starter.build import assert_empty_target
+    db.execute('CREATE SCHEMA unrelated')
+    db.execute('CREATE TABLE unrelated.private_data(secret text)')
+    with pytest.raises(ValueError, match='occupied'):
+        assert_empty_target(db)
+    db.rollback()
+    db.execute("CREATE FUNCTION public.private_function() RETURNS text LANGUAGE sql AS $$SELECT 'private'$$")
+    with pytest.raises(ValueError, match='occupied'):
+        assert_empty_target(db)
+
+
+def test_real_dump_contains_only_public_whitelist_and_vector_extension(db, tmp_path):
+    import subprocess
+
+    from lebleg_starter.build import dump_database
+    from lebleg_starter.sources import resource
+
+    dump_bin = os.getenv('LEBLEG_TEST_PGDUMP')
+    restore_bin = os.getenv('LEBLEG_TEST_PGRESTORE')
+    if not dump_bin or not restore_bin:
+        pytest.skip('set LEBLEG_TEST_PGDUMP and LEBLEG_TEST_PGRESTORE to PG18 clients')
+    db.execute(resource('public_schema.sql').split('ALTER TABLE',1)[0])
+    ensure_semantic(db)
+    db.execute('CREATE TABLE source_documents(kind text)')
+    db.execute('CREATE TABLE lebleg_release(release_id text)')
+    db.execute('CREATE SCHEMA private')
+    db.execute('CREATE TABLE private.secret(value text)')
+    db.execute("INSERT INTO private.secret VALUES('must never appear')")
+    db.commit()
+    destination = tmp_path/'public.dump'
+    from psycopg.conninfo import make_conninfo
+    dump_database(make_conninfo(os.environ['LEBLEG_TEST_ADMIN_DSN'],dbname=db.info.dbname), destination, dump_bin)
+    with destination.open('rb') as stream:
+        listing = subprocess.run([restore_bin,'--list'],stdin=stream,capture_output=True,check=True,text=True).stdout
+    assert 'EXTENSION - vector' in listing
+    assert 'TABLE public legislation ' in listing
+    assert 'TABLE public semantic_chunks ' in listing
+    assert 'private' not in listing
+
+
+def test_finalized_release_can_resume_after_dump_failure_without_reloading(db, tmp_path):
+    import json
+    import subprocess
+
+    from psycopg.conninfo import make_conninfo
+    from psycopg.types.json import Jsonb
+
+    from lebleg_starter.build import main
+    from lebleg_starter.sources import derive_documents, resource
+
+    dump_bin = os.getenv('LEBLEG_TEST_PGDUMP')
+    if not dump_bin:
+        pytest.skip('set LEBLEG_TEST_PGDUMP to the PG18 client')
+    db.execute(resource('public_schema.sql').split('ALTER TABLE',1)[0])
+    derive_documents(db)
+    ensure_semantic(db)
+    manifest = {'release_id':'test-release','source':{'revision':'a'*40,'repo_id':'taktekhq/lebanese-legislation'},'as_of_date':'2026-10-30',
+                'counts':{'source_documents':0,'semantic_chunks':0,'tables':{}}}
+    db.execute('CREATE TABLE lebleg_release(release_id text PRIMARY KEY,manifest jsonb NOT NULL)')
+    db.execute('INSERT INTO lebleg_release VALUES(%s,%s)',('test-release',Jsonb(manifest)))
+    db.commit()
+    dsn = make_conninfo(os.environ['LEBLEG_TEST_ADMIN_DSN'],dbname=db.info.dbname)
+    argv = ['--database-url',dsn,'--snapshot-dir','does-not-exist','--revision','a'*40,'--release-id','test-release',
+            '--as-of-date','2026-10-30','--output-dir',str(tmp_path),'--resume','--embed-missing']
+    with pytest.raises(subprocess.CalledProcessError):
+        main(argv+['--pg-dump','/bin/false'])
+    assert not (tmp_path/'corpus.dump').exists()
+    assert not list(tmp_path.glob('*.partial'))
+    assert main(argv+['--pg-dump',dump_bin]) == 0
+    assert json.loads((tmp_path/'manifest.json').read_text())['dump']['size_bytes'] > 0

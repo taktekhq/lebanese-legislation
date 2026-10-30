@@ -1,4 +1,5 @@
 """Import the public Parquet contract and derive eligible canonical documents."""
+from datetime import date
 from importlib.resources import files
 from pathlib import Path
 from urllib.parse import quote
@@ -32,6 +33,15 @@ def source_details(kind, source_id, part, lang, fields):
     return url, metadata
 
 
+def validate_arrow_type(arrow_type, pg_type):
+    import pyarrow as pa
+    expected = {'text':pa.string(),'int2':pa.int16(),'int4':pa.int32(),'int8':pa.int64(),
+                'float4':pa.float32(),'date':pa.date32(),'timestamptz':pa.timestamp('us',tz='UTC'),
+                'bool':pa.bool_(),'_text':pa.list_(pa.string()),'_int4':pa.list_(pa.int32())}
+    if pg_type not in expected or arrow_type != expected[pg_type]:
+        raise ValueError(f'Arrow type {arrow_type} differs from PostgreSQL public type {pg_type}')
+
+
 def import_parquet(conn, directory):
     """Create all 29 typed snapshot tables, COPY batches, then public constraints."""
     import pyarrow.parquet as pq
@@ -43,11 +53,18 @@ def import_parquet(conn, directory):
     if set(paths) != expected:
         raise ValueError('snapshot table inventory differs from public contract')
     counts = {}
+    # Validate every file before writing any source row. No implicit narrowing.
+    parquet_files = {}
     for name, path in sorted(paths.items()):
         pf = pq.ParquetFile(path)
-        declared = [r[0] for r in conn.execute("SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name=%s ORDER BY ordinal_position", (name,))]
+        declared_types = conn.execute("SELECT column_name,udt_name FROM information_schema.columns WHERE table_schema='public' AND table_name=%s ORDER BY ordinal_position", (name,)).fetchall()
+        declared = [r[0] for r in declared_types]
         if pf.schema_arrow.names != declared:
             raise ValueError(f'{name}: column contract differs')
+        for field, (_, pg_type) in zip(pf.schema_arrow, declared_types):
+            validate_arrow_type(field.type, pg_type)
+        parquet_files[name] = (pf,declared)
+    for name,(pf,declared) in parquet_files.items():
         with conn.cursor().copy(sql.SQL('COPY {} ({}) FROM STDIN').format(sql.Identifier(name), sql.SQL(',').join(map(sql.Identifier, declared)))) as cp:
             for batch in pf.iter_batches(batch_size=2000):
                 for row in batch.to_pylist():
@@ -61,12 +78,14 @@ def import_parquet(conn, directory):
     return counts
 
 
-def derive_documents(conn):
+def derive_documents(conn, as_of_date=None):
+    as_of_date = as_of_date or date.today()
+    conn.execute("SELECT set_config('lebleg.as_of_date',%s,true)",(as_of_date.isoformat(),))
     conn.execute('''CREATE TABLE source_documents (
       kind text NOT NULL,source_id integer NOT NULL,part text NOT NULL,lang text NOT NULL,
       title text NOT NULL,text text NOT NULL,hash text NOT NULL,source_url text NOT NULL,metadata jsonb NOT NULL,
       PRIMARY KEY(kind,source_id,part,lang))''')
-    query = resource('corpus.sql')
+    query = resource('corpus.sql').replace('CURRENT_DATE', "current_setting('lebleg.as_of_date')::date")
     query = ("SELECT c.*,coalesce(to_jsonb(l),to_jsonb(rp),to_jsonb(r),to_jsonb(o),to_jsonb(a),to_jsonb(rs),to_jsonb(d),'{}'::jsonb) FROM (" + query + """) c
       LEFT JOIN legislation l ON c.kind IN ('law','article') AND l.id=c.source_id
       LEFT JOIN ruling r ON c.kind='ruling' AND r.id=c.source_id

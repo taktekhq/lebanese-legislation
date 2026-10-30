@@ -4,7 +4,8 @@ import json
 import os
 import re
 import subprocess
-from datetime import UTC, datetime
+import tempfile
+from datetime import UTC, date, datetime
 from hashlib import sha256
 from pathlib import Path
 
@@ -14,6 +15,24 @@ from psycopg.types.json import Jsonb
 
 from .chunks import DIMENSIONS, GO_WHITESPACE, MODEL, chunks, reusable
 from .sources import derive_documents, import_parquet, resource
+
+
+def assert_empty_target(conn):
+    occupied = conn.execute("""SELECT
+      EXISTS(SELECT 1 FROM pg_namespace WHERE nspname NOT IN ('public','information_schema') AND nspname !~ '^pg_')
+      OR EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+        WHERE n.nspname='public' AND c.relkind IN ('r','v','m','p','S','f'))
+      OR EXISTS(SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+        WHERE n.nspname='public' AND NOT EXISTS(SELECT 1 FROM pg_depend d WHERE d.classid='pg_proc'::regclass AND d.objid=p.oid AND d.deptype='e'))
+      OR EXISTS(SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid=t.typnamespace
+        WHERE n.nspname='public' AND t.typcategory<>'A' AND NOT EXISTS(SELECT 1 FROM pg_depend d WHERE d.classid='pg_type'::regclass AND d.objid=t.oid AND d.deptype='e'))
+      OR EXISTS(SELECT 1 FROM pg_extension WHERE extname NOT IN ('plpgsql','vector'))
+      OR EXISTS(SELECT 1 FROM pg_largeobject_metadata)
+      OR EXISTS(SELECT 1 FROM pg_foreign_server)
+      OR EXISTS(SELECT 1 FROM pg_subscription WHERE subdbid=(SELECT oid FROM pg_database WHERE datname=current_database()))
+      """).fetchone()[0]
+    if occupied:
+        raise ValueError('refusing occupied target database')
 
 
 def ensure_semantic(conn):
@@ -26,8 +45,9 @@ def reuse_vectors(target, source, source_table='public.semantic_chunks'):
     The production caller opens source with default_transaction_read_only=on.
     No private title, timestamps, run identifiers or other metadata is selected.
     """
-    docs = {tuple(row[:4]): row[4:] for row in target.execute(
-        'SELECT kind,source_id,part,lang,title,text,hash FROM source_documents')}
+    with target.cursor(name='public_documents_for_reuse') as public_rows:
+        public_rows.execute('SELECT kind,source_id,part,lang,title,text,hash FROM source_documents')
+        docs = {tuple(row[:4]): row[4:] for row in public_rows}
     inserted = 0
     query = sql.SQL('SELECT kind,source_id,part,lang,text,hash,chunk_start,chunk_end,embedding::text FROM {} WHERE model=%s').format(sql.Identifier(*source_table.split('.')))
     with source.cursor(name='public_vector_reuse') as rows, target.cursor() as writer:
@@ -131,8 +151,38 @@ def dump_database(dsn, destination, pg_dump='pg_dump'):
     for key, value in conninfo_to_dict(dsn).items():
         if key in mapping:
             env[mapping[key]] = value
-    with destination.open('xb') as stream:
-        subprocess.run([pg_dump, '--format=custom', '--no-owner', '--no-acl'], env=env, stdout=stream, check=True)
+    destination = Path(destination)
+    if destination.exists():
+        raise FileExistsError('refusing to overwrite existing dump')
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=destination.parent, suffix='.partial', delete=False) as stream:
+            temporary = Path(stream.name)
+            tables = re.findall(r'^CREATE TABLE ([a-z_]+)', resource('public_schema.sql'), re.MULTILINE)
+            tables += ['source_documents','semantic_chunks','semantic_documents','lebleg_release']
+            command = [pg_dump, '--format=custom', '--no-owner', '--no-acl', '--no-comments', '--extension=vector']
+            command += ['--table=public.' + name for name in tables]
+            subprocess.run(command, env=env, stdout=stream, check=True)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(temporary,destination)  # Atomic and refuses an unrelated existing destination.
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def export_release(dsn, out, manifest, pg_dump):
+    dump = out / 'corpus.dump'
+    dump_database(dsn, dump, pg_dump)
+    h = sha256()
+    with dump.open('rb') as stream:
+        for data in iter(lambda:stream.read(1024*1024), b''):
+            h.update(data)
+    external = dict(manifest)
+    external['dump'] = {'path':dump.name,'size_bytes':dump.stat().st_size,'sha256':h.hexdigest()}
+    # A manifest is written only after a complete successful dump.
+    (out / 'manifest.json').write_text(json.dumps(external, ensure_ascii=False, indent=2) + '\n')
+    return 0
 
 
 def main(argv=None):
@@ -140,6 +190,7 @@ def main(argv=None):
     parser.add_argument('--database-url', default=os.getenv('DATABASE_URL'))
     parser.add_argument('--snapshot-dir', required=True, help='Directory containing the pinned data/*.parquet files')
     parser.add_argument('--revision', required=True)
+    parser.add_argument('--as-of-date',type=date.fromisoformat,default=date.today())
     parser.add_argument('--release-id', required=True)
     parser.add_argument('--output-dir', required=True)
     parser.add_argument('--repo-id', default='taktekhq/lebanese-legislation')
@@ -158,25 +209,37 @@ def main(argv=None):
     if dump.exists() or (out / 'manifest.json').exists():
         raise ValueError('release artifacts already exist')
     with psycopg.connect(args.database_url) as conn:
-        occupied = conn.execute("SELECT EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind IN ('r','v','m','p','S'))").fetchone()[0]
-        if occupied and not args.resume:
-            raise ValueError('refusing occupied target database')
+        if not args.resume:
+            assert_empty_target(conn)
         if conn.execute('SHOW server_version').fetchone()[0].split()[0] != '18.6':
             raise ValueError('build requires PostgreSQL 18.6')
+        if args.resume and conn.execute("SELECT to_regclass('public.lebleg_release')").fetchone()[0]:
+            finalized = conn.execute('SELECT manifest FROM lebleg_release WHERE release_id=%s',(args.release_id,)).fetchone()
+            if (not finalized or finalized[0]['source']!={'repo_id':args.repo_id,'revision':args.revision}
+                or finalized[0].get('as_of_date')!=args.as_of_date.isoformat()):
+                raise ValueError('finalized release identity mismatch')
+            manifest = finalized[0]
+            for table in ('source_documents','semantic_chunks'):
+                if conn.execute(sql.SQL('SELECT count(*) FROM {}').format(sql.Identifier(table))).fetchone()[0] != manifest['counts'][table]:
+                    raise ValueError('finalized release count mismatch')
+            validate_chunks(conn)
+            return export_release(args.database_url,out,manifest,args.pg_dump)
         if args.resume:
-            state = conn.execute('SELECT release_id,revision,tables FROM lebleg_build_state').fetchone()
+            state = conn.execute("SELECT release_id,revision,tables,to_jsonb(s)->>'as_of_date' FROM lebleg_build_state s").fetchone()
             if not state or state[:2] != (args.release_id,args.revision):
                 raise ValueError('staging release identity mismatch')
             if conn.execute("SELECT to_regclass('public.lebleg_release')").fetchone()[0]:
                 raise ValueError('release already finalized')
+            if state[3] is not None and state[3]!=args.as_of_date.isoformat():
+                raise ValueError('staging as_of_date mismatch')
             tables = state[2]
             documents = conn.execute('SELECT count(*) FROM source_documents').fetchone()[0]
         else:
             tables = import_parquet(conn, args.snapshot_dir)
-            documents = derive_documents(conn)
+            documents = derive_documents(conn,args.as_of_date)
             ensure_semantic(conn)
-            conn.execute('CREATE TABLE lebleg_build_state(release_id text,revision text,tables jsonb)')
-            conn.execute('INSERT INTO lebleg_build_state VALUES(%s,%s,%s)',(args.release_id,args.revision,Jsonb(tables)))
+            conn.execute('CREATE TABLE lebleg_build_state(release_id text,revision text,tables jsonb,as_of_date date)')
+            conn.execute('INSERT INTO lebleg_build_state VALUES(%s,%s,%s,%s)',(args.release_id,args.revision,Jsonb(tables),args.as_of_date))
         if conn.execute("SELECT extversion FROM pg_extension WHERE extname='vector'").fetchone()[0] != '0.8.2':
             raise ValueError('build requires pgvector 0.8.2')
         if args.reuse_database_url:
@@ -200,7 +263,7 @@ def main(argv=None):
         conn.execute("INSERT INTO semantic_documents SELECT %s,kind,source_id,part,lang,hash,%s FROM source_documents", (MODEL, 'public-release:' + args.release_id))
         conn.execute('CREATE INDEX semantic_chunks_embedding ON semantic_chunks USING hnsw(embedding halfvec_cosine_ops)')
         generated = datetime.now(UTC).isoformat().replace('+00:00','Z')
-        manifest = {'format_version':1,'release_id':args.release_id,'generated_at':generated,
+        manifest = {'format_version':1,'release_id':args.release_id,'generated_at':generated,'as_of_date':args.as_of_date.isoformat(),
           'source':{'repo_id':args.repo_id,'revision':args.revision},
           'postgres':{'version':'18.6','vector_version':'0.8.2'},
           'embedding':{'model':MODEL,'dimensions':DIMENSIONS,'task_type':'RETRIEVAL_DOCUMENT','chunk_size':900,'chunk_overlap':120,'storage':'halfvec(768)'},
@@ -209,11 +272,4 @@ def main(argv=None):
         conn.execute('CREATE TABLE lebleg_release(release_id text PRIMARY KEY,manifest jsonb NOT NULL)')
         conn.execute('INSERT INTO lebleg_release VALUES(%s,%s)', (args.release_id,Jsonb(manifest)))
         conn.execute('ANALYZE')
-    dump_database(args.database_url, dump, args.pg_dump)
-    h = sha256()
-    with dump.open('rb') as stream:
-        for data in iter(lambda:stream.read(1024*1024), b''):
-            h.update(data)
-    manifest['dump'] = {'path':dump.name,'size_bytes':dump.stat().st_size,'sha256':h.hexdigest()}
-    (out / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
-    return 0
+    return export_release(args.database_url,out,manifest,args.pg_dump)

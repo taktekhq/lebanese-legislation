@@ -54,3 +54,16 @@ def test_real_typed_parquet_and_source_eligibility(db, tmp_path):
     rows = db.execute('SELECT kind,source_id,part,lang,text,metadata FROM source_documents ORDER BY kind,lang').fetchall()
     assert not any(r[3]=='fr' or r[1] in (2,3) for r in rows)
     assert next(r for r in rows if r[3]=='en')[5]['english_unofficial'] is True
+
+
+def test_arrow_contract_rejects_narrowing_float_and_changed_timestamp():
+    import pyarrow as pa
+    import pytest
+
+    from lebleg_starter.sources import validate_arrow_type
+    validate_arrow_type(pa.float32(),'float4')
+    validate_arrow_type(pa.list_(pa.int32()),'_int4')
+    with pytest.raises(ValueError,match='type'):
+        validate_arrow_type(pa.float64(),'float4')
+    with pytest.raises(ValueError,match='type'):
+        validate_arrow_type(pa.timestamp('us'),'timestamptz')
