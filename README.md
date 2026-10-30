@@ -8,6 +8,8 @@ Run a local Lebanese legal database, HTTP API and MCP server from the public [da
 | `ghcr.io/taktekhq/lebanese-legislation-api:0.1.6` | General resources and keyword, citation and optional semantic search |
 | `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.6` | The same retrieval and resources as MCP tools |
 
+Image releases run in two steps: this repository publishes DB/API, then the [MCP publisher](https://github.com/taktekhq/lebanese-legislation/actions/workflows/images.yml) pins the published API digest and publishes the matching MCP tag. Both publishers check AMD64 and ARM64.
+
 The [database releases](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases) include source records, indexed passages and optional calculated-current metadata. Default startup downloads the latest verified snapshot.
 
 ## DB only

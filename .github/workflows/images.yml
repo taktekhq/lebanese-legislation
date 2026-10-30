@@ -44,7 +44,7 @@ jobs:
           version = os.environ['VERSION']
           source_tag = 'source-' + os.environ['GITHUB_SHA']
           builds = {}
-          for service in ('db', 'api', 'mcp'):
+          for service in ('db', 'api'):
               package = 'lebanese-legislation-' + service
               builds[service] = True
               for page in range(1, 101):
@@ -92,21 +92,10 @@ jobs:
           push: true
           tags: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
-      - name: Build MCP candidate
-        if: steps.version.outputs.build_mcp == 'true'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          target: mcp
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
-          labels: org.opencontainers.image.revision=${{ github.sha }}
       - name: Check both candidate architectures before release tags
         env:
           DB_IMAGE: ghcr.io/taktekhq/lebanese-legislation-db:source-${{ github.sha }}
           API_IMAGE: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
-          MCP_IMAGE: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
         run: bash docker/smoke-images.sh
 
       - name: Promote verified immutable versions
@@ -115,16 +104,15 @@ jobs:
           SOURCE_SHA: ${{ github.sha }}
           BUILD_DB: ${{ steps.version.outputs.build_db }}
           BUILD_API: ${{ steps.version.outputs.build_api }}
-          BUILD_MCP: ${{ steps.version.outputs.build_mcp }}
         run: |
-          for service in db api mcp; do
+          for service in db api; do
             image="ghcr.io/taktekhq/lebanese-legislation-$service"
             build_var="BUILD_${service^^}"
             if [ "${!build_var}" = true ]; then
               docker buildx imagetools create --tag "$image:$VERSION" "$image:source-$SOURCE_SHA"
             fi
           done
-          for service in db api mcp; do
+          for service in db api; do
             image="ghcr.io/taktekhq/lebanese-legislation-$service"
             docker buildx imagetools create --tag "$image:latest" "$image:$VERSION"
           done
