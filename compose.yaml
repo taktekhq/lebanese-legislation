@@ -1,8 +1,8 @@
-# The database, API and MCP server. Run ./start, or see README.md.
+# The database, API, MCP server and website. Run ./start, or see README.md.
 name: ${COMPOSE_PROJECT_NAME:-lebanese-legislation}
 services:
   db:
-    image: ${DB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-db:0.2.0}
+    image: ${DB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-db:0.3.0}
     environment:
       POSTGRES_USER: lebleg_owner
       POSTGRES_DB: lebleg
@@ -23,7 +23,7 @@ services:
       start_period: ${DB_START_PERIOD:-2h}
       retries: 30
   api:
-    image: ${API_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-api:0.2.0}
+    image: ${API_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-api:0.3.0}
     command: ["serve", "--host", "0.0.0.0", "--port", "8000"]
     environment:
       DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"
@@ -45,7 +45,7 @@ services:
       interval: 10s
       retries: 12
   mcp:
-    image: ${MCP_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-mcp:0.2.0}
+    image: ${MCP_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-mcp:0.3.0}
     command: ["serve", "--host", "0.0.0.0", "--port", "8000"]
     environment:
       APP_MODE: mcp
@@ -67,5 +67,21 @@ services:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=5)"]
       interval: 10s
       retries: 12
+  # The website in web/, read-only on the same database.
+  web:
+    image: ${WEB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-web:0.3.0}
+    environment:
+      DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"
+      # Absolute links (canonical, language switcher, sitemap). Set it when you host the site publicly.
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:${WEB_PORT:-8080}}
+    ports: ["127.0.0.1:${WEB_PORT:-8080}:8080"]
+    depends_on:
+      db: {condition: service_healthy}
+    restart: unless-stopped
+    user: "65532:65532"
+    mem_limit: 256m
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
 volumes:
   db_data:

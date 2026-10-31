@@ -7,3 +7,5 @@ services:
     build: {context: ., dockerfile: server/Dockerfile, target: api}
   mcp:
     build: {context: ., dockerfile: server/Dockerfile, target: mcp}
+  web:
+    build: {context: ., dockerfile: web/Dockerfile}

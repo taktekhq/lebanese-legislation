@@ -6,7 +6,7 @@ Restore the public [Lebanese Legislation dataset](https://huggingface.co/dataset
 
 The existing Parquet dataset remains the portable data distribution. This project adds a PostgreSQL snapshot and reusable search service. No model training is required.
 
-Three service images target Linux AMD64 and ARM64: `lebanese-legislation-db`, `lebanese-legislation-api` and `lebanese-legislation-mcp`. API and MCP use the same Python backend from [`server/`](../server/). The website in [`web/`](../web/) is built from source.
+Four images target Linux AMD64 and ARM64: `lebanese-legislation-db`, `lebanese-legislation-api`, `lebanese-legislation-mcp` and `lebanese-legislation-web`. API and MCP use the same Python backend from [`server/`](../server/). The website is [`web/`](../web/).
 
 ## Public downloads and related resources
 
@@ -62,9 +62,10 @@ A failed first import never creates a readiness receipt. Restarting an initializ
 | `releases/<release-id>/corpus.dump` | PostgreSQL custom-format snapshot, public tables, normalized documents and saved vectors |
 | `releases/<release-id>/manifest.json` | Source commit, counts, embedding settings, versions, licence and SHA-256 |
 | `releases/latest.json` | Pointer to the latest verified database release |
-| `ghcr.io/taktekhq/lebanese-legislation-db:0.2.0` | PostgreSQL 18.6, pgvector 0.8.2 and first-boot restore |
-| `ghcr.io/taktekhq/lebanese-legislation-api:0.2.0` | Shared backend exposing REST API and MCP |
-| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.2.0` | Shared backend exposing MCP and health only |
+| `ghcr.io/taktekhq/lebanese-legislation-db:0.3.0` | PostgreSQL 18.6, pgvector 0.8.2, first-boot restore and the website's search columns |
+| `ghcr.io/taktekhq/lebanese-legislation-api:0.3.0` | Shared backend exposing REST API and MCP |
+| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.3.0` | Shared backend exposing MCP and health only |
+| `ghcr.io/taktekhq/lebanese-legislation-web:0.3.0` | The website, read-only on the same database |
 
 Older version tags stay published. See [changes](changes.md).
 

@@ -5,7 +5,7 @@ on:
       version:
         description: Package version to publish from this ref
         required: true
-        default: 0.2.0
+        default: 0.3.0
   push:
     tags: ['v*']
 permissions:
@@ -44,7 +44,7 @@ jobs:
           version = os.environ['VERSION']
           source_tag = 'source-' + os.environ['GITHUB_SHA']
           builds = {}
-          for service in ('db', 'api', 'mcp'):
+          for service in ('db', 'api', 'mcp', 'web'):
               package = 'lebanese-legislation-' + service
               builds[service] = True
               for page in range(1, 101):
@@ -105,11 +105,22 @@ jobs:
           push: true
           tags: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
+      - name: Build website candidate
+        if: steps.version.outputs.build_web == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: web/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/taktekhq/lebanese-legislation-web:source-${{ github.sha }}
+          labels: org.opencontainers.image.revision=${{ github.sha }}
       - name: Check both candidate architectures before release tags
         env:
           DB_IMAGE: ghcr.io/taktekhq/lebanese-legislation-db:source-${{ github.sha }}
           API_IMAGE: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
           MCP_IMAGE: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
+          WEB_IMAGE: ghcr.io/taktekhq/lebanese-legislation-web:source-${{ github.sha }}
         run: bash .github/scripts/smoke-images.sh
 
       - name: Check default MCP transport on both architectures
@@ -125,15 +136,16 @@ jobs:
           BUILD_DB: ${{ steps.version.outputs.build_db }}
           BUILD_API: ${{ steps.version.outputs.build_api }}
           BUILD_MCP: ${{ steps.version.outputs.build_mcp }}
+          BUILD_WEB: ${{ steps.version.outputs.build_web }}
         run: |
-          for service in db api mcp; do
+          for service in db api mcp web; do
             image="ghcr.io/taktekhq/lebanese-legislation-$service"
             build_var="BUILD_${service^^}"
             if [ "${!build_var}" = true ]; then
               docker buildx imagetools create --tag "$image:$VERSION" "$image:source-$SOURCE_SHA"
             fi
           done
-          for service in db api mcp; do
+          for service in db api mcp web; do
             image="ghcr.io/taktekhq/lebanese-legislation-$service"
             docker buildx imagetools create --tag "$image:latest" "$image:$VERSION"
           done
