@@ -1,7 +1,18 @@
 #!/bin/sh
 set -eu
 cd "$(dirname "$0")"
-image=${API_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-api:0.3.0}
-docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/workspace" -w /workspace "$image" init --env-file .env
+# Separate random owner and reader passwords in a private .env, kept if it exists.
+if [ -L .env ]; then
+  echo 'Refusing a symbolic link for .env' >&2
+  exit 1
+fi
+if [ ! -e .env ]; then
+  password() { LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 40; }
+  (umask 077 && printf 'POSTGRES_PASSWORD=%s\nREADER_PASSWORD=%s\nGEMINI_API_KEY=\n' "$(password)" "$(password)" > .env)
+  echo 'Created private environment file'
+else
+  chmod 600 .env
+  echo 'Kept existing environment values'
+fi
 docker compose up -d --wait --wait-timeout "${STARTUP_TIMEOUT:-7200}"
-printf '%s\n' 'Ready. Website: http://127.0.0.1:8080 (or WEB_PORT). API and documentation: http://127.0.0.1:8000/docs (or API_PORT). MCP: http://127.0.0.1:8001/mcp (or MCP_PORT).'
+printf '%s\n' 'Ready. Website: http://127.0.0.1:8080 (or WEB_PORT). API: http://127.0.0.1:8000/api/v1/ (or API_PORT). MCP: http://127.0.0.1:8001/mcp (or MCP_PORT).'

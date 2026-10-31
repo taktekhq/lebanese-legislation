@@ -4,8 +4,8 @@ services:
   db:
     build: {context: ., dockerfile: db/Dockerfile, target: db}
   api:
-    build: {context: ., dockerfile: server/Dockerfile, target: api}
+    build: {context: ., dockerfile: api/Dockerfile}
   mcp:
-    build: {context: ., dockerfile: server/Dockerfile, target: mcp}
+    build: {context: ., dockerfile: mcp/Dockerfile}
   web:
     build: {context: ., dockerfile: web/Dockerfile}

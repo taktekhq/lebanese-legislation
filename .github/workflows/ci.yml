@@ -3,7 +3,7 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
-  # server/ (API, MCP, restore and publisher) and the db/ image.
+  # tools/ (restore, build, publish, pipeline), the db/ image, and the four images in Compose.
   test:
     runs-on: ubuntu-latest
     steps:
@@ -11,8 +11,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install './server[build,test]'
-      - run: ruff check server/src server/tests
+      - run: pip install './tools[build,test]'
+      - run: ruff check tools/src tools/tests
       - run: docker build -f db/Dockerfile --target postgres -t lebleg-test-postgres .
       - name: Start disposable PostgreSQL
         run: |
@@ -25,11 +25,11 @@ jobs:
           done
           echo '/tmp/pg18-bin' >> "$GITHUB_PATH"
       - run: docker build -f db/Dockerfile --target db -t lebleg-test-db .
-      - run: docker build -f server/Dockerfile --target api -t lebleg-test-api .
-      - run: docker build -f server/Dockerfile --target mcp -t lebleg-test-mcp .
+      - run: docker build -f api/Dockerfile -t lebleg-test-api .
+      - run: docker build -f mcp/Dockerfile -t lebleg-test-mcp .
       - run: docker build -f web/Dockerfile -t lebleg-test-web .
       - run: pytest -q
-        working-directory: server
+        working-directory: tools
         env:
           LEBLEG_PIPELINE_IMAGE_TEST: "1"
           LEBLEG_TEST_ADMIN_DSN: host=127.0.0.1 port=55433 user=lebleg password=test dbname=lebleg
