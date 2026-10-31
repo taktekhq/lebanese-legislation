@@ -6,7 +6,7 @@ Restore the public [Lebanese Legislation dataset](https://huggingface.co/dataset
 
 The existing Parquet dataset remains the portable data distribution. This project adds a PostgreSQL snapshot and reusable search service. No model training is required.
 
-Four images target Linux AMD64 and ARM64: `lebanese-legislation-db`, `lebanese-legislation-api`, `lebanese-legislation-mcp` and `lebanese-legislation-web`. API and MCP use the same Python backend from [`server/`](../server/). The website is [`web/`](../web/).
+Four images target Linux AMD64 and ARM64: `lebanese-legislation-db`, `lebanese-legislation-api`, `lebanese-legislation-mcp` and `lebanese-legislation-web`. The website, API and MCP are one Go codebase ([`internal/`](../internal/)) built as three binaries ([`web/`](../web/), [`api/`](../api/), [`mcp/`](../mcp/)). The Python [`tools/`](../tools/) restore, rebuild and publish the database.
 
 ## Public downloads and related resources
 
@@ -26,7 +26,7 @@ cd lebanese-legislation
 
 `./start` generates separate random owner and reader passwords in a private `.env` file. On an empty volume the DB image resolves the selected release, verifies its checksum and restores through the existing verified importer. API and MCP start only after the DB has a compatible restore receipt. Existing credentials are preserved.
 
-Default startup follows the published `releases/latest.json` pointer. To use a prepared local release, place its valid `manifest.json` and referenced dump in a directory, generate credentials with `lebleg init` (or the API image's `init` command), then run:
+Default startup follows the published `releases/latest.json` pointer. To use a prepared local release, place its valid `manifest.json` and referenced dump in a directory, create `.env` with `POSTGRES_PASSWORD` and `READER_PASSWORD` (or run `./start` once), then run:
 
 ```sh
 LEBLEG_RELEASE_DIR=/absolute/path/to/release docker compose -f compose.yaml -f compose.local.yaml up -d --wait --wait-timeout 7200
@@ -34,16 +34,16 @@ LEBLEG_RELEASE_DIR=/absolute/path/to/release docker compose -f compose.yaml -f c
 
 For a published release, set `DATASET_REVISION=<artifact-commit>` and `MANIFEST_PATH=releases/<release-id>/manifest.json` in `.env` before startup. No data, embeddings or dump is baked into these images.
 
-Open <http://localhost:8000/docs>, connect an MCP client to <http://localhost:8001/mcp>, or search:
+Open the website at <http://localhost:8080>, the API at <http://localhost:8000/api/v1/>, connect an MCP client to <http://localhost:8001/mcp>, or search:
 
 ```sh
-curl --get 'http://localhost:8000/search' --data-urlencode 'q=قانون العمل'
+curl --get 'http://localhost:8000/api/v1/search/' --data-urlencode 'q=قانون العمل'
 ```
 
-Exact text and citation searches work without an AI key. To enable semantic retrieval, add your own `GEMINI_API_KEY` to `.env`, then run:
+Exact text and citation searches work without an AI key. To turn on search by meaning, add your own `GEMINI_API_KEY` to `.env`, then run:
 
 ```sh
-docker compose up -d --force-recreate api
+docker compose up -d --force-recreate api mcp web
 ```
 
 Arabic, English and French queries can retrieve multilingual source passages. English discovery titles are unofficial aids, not authoritative translations. Availability of a language depends on the source material.
@@ -62,10 +62,10 @@ A failed first import never creates a readiness receipt. Restarting an initializ
 | `releases/<release-id>/corpus.dump` | PostgreSQL custom-format snapshot, public tables, normalized documents and saved vectors |
 | `releases/<release-id>/manifest.json` | Source commit, counts, embedding settings, versions, licence and SHA-256 |
 | `releases/latest.json` | Pointer to the latest verified database release |
-| `ghcr.io/taktekhq/lebanese-legislation-db:0.3.0` | PostgreSQL 18.6, pgvector 0.8.2, first-boot restore and the website's search columns |
-| `ghcr.io/taktekhq/lebanese-legislation-api:0.3.0` | Shared backend exposing REST API and MCP |
-| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.3.0` | Shared backend exposing MCP and health only |
-| `ghcr.io/taktekhq/lebanese-legislation-web:0.3.0` | The website, read-only on the same database |
+| `ghcr.io/taktekhq/lebanese-legislation-db:0.4.0` | PostgreSQL 18.6, pgvector 0.8.2 and first-boot restore |
+| `ghcr.io/taktekhq/lebanese-legislation-api:0.4.0` | The REST API (`/api/v1/`) |
+| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.4.0` | The MCP server (`/mcp`) |
+| `ghcr.io/taktekhq/lebanese-legislation-web:0.4.0` | The website |
 
 Older version tags stay published. See [changes](changes.md).
 
@@ -73,19 +73,19 @@ Database data is downloaded separately, not baked into the Docker image. The dum
 
 The release is built only from the pinned public Parquet files. It does not contain private website tables, user queries, analytics, credentials or website-only explanations. Exported views become snapshot tables. `source_documents` is a derived read model for this immutable snapshot; editing raw tables does not automatically update it or its vectors. Article retrieval follows the exported in-force view at the stated date; the raw tables retain the wider historical corpus.
 
-When present, `GET /api/v1/law/{id}/article/{number}/` and MCP `get_article` include the same additive `calculated_current` object as search metadata. It is returned only when the displayed body and current in-force source match its SHA-256 and its statutory authority and eligibility are valid. Original text and versions retain their existing fields. Older snapshots without the derived table omit the object.
+When present, `GET /api/v1/law/{id}/article/{number}/` and MCP `get_article` include the additive `calculated_current` object for Civil Procedure (law 244565) amounts updated by decree 330819. It is returned only when the shown text is exactly the in-force source, its SHA-256 matches and its authority and multiplier are valid. Original text and versions keep their fields. Older snapshots without the derived table omit the object.
 
 ## How retrieval works
 
-1. The server searches original text and explicit citations first.
-2. If enabled, Gemini embeds the query using `gemini-embedding-001`, with 768 dimensions and `RETRIEVAL_QUERY`. PostgreSQL compares it with saved document vectors, stored as `halfvec(768)`.
-3. Returned passages are copied from validated source text and carry source links. Optional `select=true` lets Gemini choose passage IDs; it cannot supply replacement legal wording.
+1. Search matches original text, titles and explicit citations in PostgreSQL first: `GET /api/v1/search/` and MCP `search_legislation`.
+2. With `semantic=true` (API) or `semantic: true` (MCP), and a `GEMINI_API_KEY` on the server, Gemini embeds the question with `gemini-embedding-001` (768 dimensions) and PostgreSQL compares it with the saved passage vectors in `semantic_chunks` (`halfvec(768)`). Found passages come back as `related`. Without a key the result says `"semantic": "unavailable"`.
+3. Every passage is reloaded from the source text and hash-checked before it is returned, with a link to its source. The website's search page also uses Gemini to rewrite a question into Arabic search terms.
 
-A missing explicit citation is not silently replaced with a nearby semantic match. An absent or failed provider leaves ordinary search available. Retrieval can miss relevant material or return irrelevant passages. Source links and exact quotations make checking possible; they do not establish legal correctness or current legal status. Scanned ruling pages retain extraction provenance and confidence fields. OCR can contain errors; consult the linked originals.
+A missing explicit citation is not silently replaced with a nearby semantic match. An absent or failed provider leaves ordinary search available. Retrieval can miss relevant material or return irrelevant passages. Source links and exact quotations make checking possible; they do not establish legal correctness or current legal status. Scanned ruling pages keep their extraction provenance and confidence fields. OCR can contain errors; consult the linked originals.
 
-The API key stays in the server container. It is never sent to the browser or stored in the public release. Semantic search sends the query to Google; optional selection also sends candidate excerpts. Gemini receives query text and optional candidate excerpts, not database credentials or MCP access. Do not send confidential queries without considering your provider's terms.
+The API key stays in the server container. It is never sent to the browser or stored in the public release. Search by meaning sends the question to Google, not database credentials. Do not send confidential queries without considering your provider's terms.
 
-Precomputed vectors save the cost of embedding the whole corpus. Query embeddings still require a compatible Gemini model. Another embedding model needs a separately rebuilt document index, even if it also has 768 dimensions.
+Precomputed vectors save the cost of embedding the whole corpus. Query embeddings still need a compatible Gemini model. Another embedding model needs a separately rebuilt document index, even if it also has 768 dimensions.
 
 ## Configuration
 
@@ -96,36 +96,41 @@ Copy the optional settings from `.env.example`. `./start` creates required passw
 | `DB_PORT` | `5433` | Loopback PostgreSQL port |
 | `API_PORT` | `8000` | Loopback API port |
 | `MCP_PORT` | `8001` | Loopback MCP port |
+| `WEB_PORT` | `8080` | Loopback website port |
+| `PUBLIC_URL` | `http://localhost:$WEB_PORT` | The website's absolute links; set it when you host the site publicly |
 | `DB_MEMORY` | `3g` | Database container cap; index construction needs headroom |
 | `DATASET_REPO` | `taktekhq/lebanese-legislation` | Public Hub dataset repository |
 | `DATASET_REVISION` | `main` | Resolved once to an immutable artifact commit |
 | `MANIFEST_PATH` | `releases/latest.json` | Pointer or versioned manifest path |
-| `GEMINI_MAX_CALLS_PER_DAY` | `500` | Attempted provider HTTP calls per UTC day; `0` disables them |
-| `GEMINI_CONCURRENCY` | `2` | Simultaneous provider requests, range 1 to 16 |
+| `GEMINI_API_KEY` | empty | Your key; turns on search by meaning |
+| `GEMINI_MAX_CALLS_PER_DAY` | `500` | Provider calls per UTC day for each service; `0` turns search by meaning off |
+| `GEMINI_SEARCH_MODEL` | `gemini-3.8-flash` | The model that rewrites questions on the website's search page |
+| `GEMINI_EMBEDDING_MODEL` | `gemini-embedding-001` | Must match the saved vectors |
 
-The provider budget and cache are process-local. API and MCP each run one worker and have separate allowances. Restarting resets the counter; replicas each have their own allowance. Use provider billing limits for a durable spending ceiling. Failed provider calls count toward the daily cap. Query embedding cache defaults to 256 entries for one hour, bounded to these maxima; configure `GEMINI_QUERY_CACHE_SIZE` and `GEMINI_QUERY_CACHE_TTL` on a custom deployment. Set either to zero to disable caching.
+The daily cap, a one-hour cache per question and at most two simultaneous provider calls live in each service process. Restarting resets the counter, and API, MCP and website each have their own. Use provider billing limits for a durable spending ceiling.
 
 To pin a release, set `MANIFEST_PATH=releases/<release-id>/manifest.json` and `DATASET_REVISION=<artifact-commit>` before the first start. Updating those settings does not replace an already restored database. Use a separate Compose project and fresh volumes for a new snapshot.
 
 ## Use your own PostgreSQL
 
-Use PostgreSQL 18.6 and pgvector 0.8.2 with a PostgreSQL 18 client. Create a fresh database and a nonprivileged login role named `lebleg_reader`; keep its password separate from the owner. Restore with the owner, then connect the API as the reader:
+Use PostgreSQL 18.6 and pgvector 0.8.2 with a PostgreSQL 18 client. Create a fresh database and a nonprivileged login role named `lebleg_reader`; keep its password separate from the owner. Restore with the owner, then run the services as the reader:
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-pip install ./server
+pip install ./tools
 # Set DATABASE_URL privately in your environment, without putting passwords in shell history.
 lebleg restore --repo taktekhq/lebanese-legislation --revision main \
   --manifest-path releases/latest.json --cache-dir ./downloads
-lebleg serve
+# Then, as lebleg_reader:
+go run ./api    # or ./mcp, ./web
 ```
 
-The DB and publisher images include PostgreSQL clients. The lightweight API and MCP images do not. For a standalone restore, run the DB image with `--entrypoint lebleg`, or install matching PostgreSQL clients alongside the CLI. `lebleg restore --help` also supports local manifest/dump inputs. The restorer verifies versions, checksum, counts, source/chunk integrity, HNSW index and reader privileges before recording a restore receipt. Interrupted imports and post-import checks can be retried with the same manifest. It never drops unrelated tables. Direct `pg_restore` is possible, but bypasses those checks and does not create the receipt required by this API.
+The DB and publisher images include PostgreSQL clients; the API, MCP and website images do not. For a standalone restore, run the DB image with `--entrypoint lebleg`, or install matching PostgreSQL clients alongside the CLI. `lebleg restore --help` also supports local manifest/dump inputs. The restorer verifies versions, checksum, counts, source/chunk integrity, HNSW index and reader privileges, adds what the services read ([`web.sql`](../tools/src/lebleg/sql/web.sql)) and records a restore receipt. Interrupted imports and post-import checks can be retried with the same manifest. It never drops unrelated tables. Direct `pg_restore` is possible, but skips those checks and the service tables.
 
 ## Rebuild from public Parquet
 
-Publisher work needs more memory and disk than consuming a release. Use a separate empty build database. Do not point this command at a production database. Install `pip install './server[build]'`, download `data/*.parquet` from a pinned Hub commit, then:
+Publisher work needs more memory and disk than consuming a release. Use a separate empty build database. Do not point this command at a production database. Install `pip install './tools[build]'`, download `data/*.parquet` from a pinned Hub commit, then:
 
 ```sh
 lebleg build --snapshot-dir ./snapshot/data --revision <40-character-source-commit> \
@@ -168,19 +173,18 @@ Every image builds from the repository root:
 
 ```sh
 docker build -f db/Dockerfile -t lebleg-db-local .
-docker build -f server/Dockerfile --target api -t lebleg-api-local .
-docker build -f server/Dockerfile --target mcp -t lebleg-mcp-local .
+docker build -f api/Dockerfile -t lebleg-api-local .
+docker build -f mcp/Dockerfile -t lebleg-mcp-local .
+docker build -f web/Dockerfile -t lebleg-web-local .
 # Maintainers and contributors only: optional snapshot publisher dependencies.
 docker build -f db/Dockerfile --target publisher -t lebleg-publisher-local .
-cd server
-pip install '.[build,test]'
-pytest -q
-ruff check src tests
+go vet ./... && go test ./...
+cd tools && pip install '.[build,test]' && pytest -q && ruff check src tests
 ```
 
-Tests that need PostgreSQL create and remove uniquely named databases when `LEBLEG_TEST_ADMIN_DSN` is set. Container tests run when `LEBLEG_TEST_IMAGE` is set. They do not use your existing database as a test target. See the [checks workflow](../.github/workflows/ci.yml) for a disposable setup. `docker build -f db/Dockerfile --target postgres` gives a plain PostgreSQL with pgvector for those tests.
+Go tests that need a database use the fictional fixture in [`web/`](../web/README.md). Python tests that need PostgreSQL create and remove uniquely named databases when `LEBLEG_TEST_ADMIN_DSN` is set. Container tests run when `LEBLEG_TEST_IMAGE` is set, and the Compose test when the four `LEBLEG_TEST_*_IMAGE` variables are set. They never use your existing database. See the [checks workflow](../.github/workflows/ci.yml) for a disposable setup. `docker build -f db/Dockerfile --target postgres` gives a plain PostgreSQL with pgvector for those tests.
 
-The DB image pins the official `postgres:18.6` base by digest and verifies the pgvector source checksum. The image publication workflow builds the three services for `linux/amd64,linux/arm64` and refuses to overwrite version tags. The optional publisher stays separate from the consumer services. The `runtime` target in `server/Dockerfile` is the API.
+The DB image pins the official `postgres:18.6` base by digest and verifies the pgvector source checksum. The image publication workflow builds the four images for `linux/amd64,linux/arm64`, checks each one on both platforms against a fictional database, and refuses to overwrite version tags. The optional publisher stays separate.
 
 Set `LEBLEG_TEST_DB_IMAGE` to a locally built DB target to run the synthetic first-boot, restart and failure integration checks. These use tiny fixture dumps and disposable volumes, never the real dataset.
 

@@ -47,7 +47,7 @@ CMD ["--help"]
 
 # Default target, published as ghcr.io/taktekhq/lebanese-legislation-db.
 FROM backend AS db
-COPY db/release.py db/health.sh db/web-schema.sh db/web.sql ./db/
+COPY db/release.py db/health.sh db/web-schema.sh tools/src/lebleg/sql/web.sql ./db/
 COPY db/init-release.sh /docker-entrypoint-initdb.d/30-lebleg-release.sh
 HEALTHCHECK --interval=10s --timeout=10s --start-period=2h --retries=3 CMD ["bash", "/opt/lebleg/db/health.sh"]
 ENTRYPOINT ["docker-entrypoint.sh"]

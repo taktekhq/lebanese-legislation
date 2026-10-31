@@ -52,7 +52,7 @@ def test_real_pipeline_resumes_after_public_check_failure_without_reembedding(db
         'court':[{'name_ar':'محكمة','name_en':'Court'}],
         'ruling':[{'id':8,'court':'محكمة','title':'حكم اختبار','number':'7','year':2020}],
         'ruling_page':[{'ruling_id':8,'n':1,'text_ar':'قراءة آلية للاختبار','model':'fixture','low_confidence':True}],
-        'ruling_file':[{'ruling_id':8,'pages':1}],
+        'ruling_file':[{'ruling_id':8,'pages':1,'bytes':1234}],
         'gazette_issue':[{'id':1,'number':'2','published_on':date(2020,1,2)}],
         'gazette_entry':[{'issue_id':1,'law_id':1}],
     }

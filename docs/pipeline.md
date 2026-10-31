@@ -1,8 +1,8 @@
 # Automatic data updates
 
-Install the publisher from this repository with `pip install './server[build]'`. The pipeline reuses the existing builder, embeddings and restore checks. Serving images need no data-only rebuild.
+Install the publisher from this repository with `pip install './tools[build]'`. The pipeline reuses the existing builder, embeddings and restore checks. Serving images need no data-only rebuild.
 
-Copy [the example config](../server/pipeline.example.json) outside Git. Set your dataset, private runtime paths and a dedicated PostgreSQL staging administrator. Provision restricted secret files and a `0600` environment file containing `PIPELINE_ADMIN_DSN`, `PIPELINE_REUSE_DSN` and `PIPELINE_READER_PASSWORD`. Never commit them. The staging cluster must already have the restricted `lebleg_reader` login.
+Copy [the example config](../tools/pipeline.example.json) outside Git. Set your dataset, private runtime paths and a dedicated PostgreSQL staging administrator. Provision restricted secret files and a `0600` environment file containing `PIPELINE_ADMIN_DSN`, `PIPELINE_REUSE_DSN` and `PIPELINE_READER_PASSWORD`. Never commit them. The staging cluster must already have the restricted `lebleg_reader` login.
 
 ```sh
 lebleg pipeline --config /path/pipeline.json seed --repo owner/dataset --revision SOURCE_COMMIT --release-id EXISTING_RELEASE
@@ -27,4 +27,4 @@ Runtime files stay under the private state directory. Managed dataset-card block
 
 Retention removes only marked pipeline-owned scratch databases and workspaces, keeping the current and previous successful staging builds. It never replaces users' existing volumes. Allow at least 40 GB of free workspace; larger datasets need more.
 
-If PostgreSQL 18.6 clients are unavailable, link [pg-client.sh](../server/scripts/pg-client.sh) as `pg_dump` and `pg_restore`, set their paths in the config and set `PG_CLIENT_MOUNT` to the state directory. The helper uses the DB image's clients, with credentials passed through environment variables.
+If PostgreSQL 18.6 clients are unavailable, link [pg-client.sh](../tools/scripts/pg-client.sh) as `pg_dump` and `pg_restore`, set their paths in the config and set `PG_CLIENT_MOUNT` to the state directory. The helper uses the DB image's clients, with credentials passed through environment variables.

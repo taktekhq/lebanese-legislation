@@ -92,7 +92,11 @@ func TestSemanticSearchNeedsAKeyOnly(t *testing.T) {
 	}
 	t.Setenv("GEMINI_API_KEY", "test-only")
 	t.Setenv("GEMINI_MAX_CALLS_PER_DAY", "0")
+	if err := enableSemanticSearch(nil, nil); err != nil {
+		t.Fatal("a zero daily cap must turn search by meaning off, not fail")
+	}
+	t.Setenv("GEMINI_MAX_CALLS_PER_DAY", "-1")
 	if err := enableSemanticSearch(nil, nil); err == nil {
-		t.Fatal("a zero daily cap must be refused")
+		t.Fatal("a negative daily cap must be refused")
 	}
 }

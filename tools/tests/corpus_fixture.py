@@ -53,7 +53,7 @@ def build_corpus(dsn):
             "INSERT INTO source_page(doc_type,centre_id,url) VALUES('law',1,'https://example.org/law/1'),('journal',1,'https://example.org/gazette/1'),('ruling',1,'https://example.org/ruling/1')"
         )
         conn.execute("INSERT INTO ruling(id,court,number,year,title) VALUES(1,'محكمة','4',2020,'حكم أصلي')")
-        conn.execute("INSERT INTO ruling_file(ruling_id,pages) VALUES(1,2)")
+        conn.execute("INSERT INTO ruling_file(ruling_id,pages,bytes) VALUES(1,2,1234)")
         conn.execute(
             "INSERT INTO ruling_page(ruling_id,n,text_ar,model,low_confidence) VALUES(1,1,'قراءة أصلية {كذا}','fixture',true)"
         )

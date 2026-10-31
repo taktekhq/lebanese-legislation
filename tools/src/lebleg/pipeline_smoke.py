@@ -93,7 +93,11 @@ def main(argv=None):
                 return json.loads(result['content'][0]['text'])['result']
             law_id, number, text = article
             law = get(f'/api/v1/law/{law_id}/')
-            if len(law['articles']) != law['article_count'] or tool('get_law',{'id':law_id}) != law:
+            # MCP keeps a long law's outline short; everything else must match the API.
+            mcp_law = tool('get_law',{'id':law_id})
+            listed = mcp_law.get('articles') or []
+            if (not law.get('articles') or {k:v for k,v in mcp_law.items() if k != 'articles'} != {k:v for k,v in law.items() if k != 'articles'}
+                    or law['articles'][:len(listed)] != listed):
                 raise ValueError('API/MCP law parity failed')
             path = f"/api/v1/law/{law_id}/article/{quote('-'.join(number.split()), safe='')}/"
             resource = get(path)
@@ -133,6 +137,10 @@ def main(argv=None):
 if __name__ == '__main__':
     try:
         raise SystemExit(main())
-    except Exception:  # noqa: BLE001 - smoke errors must never expose credentials
+    except ValueError as error:
+        # The smoke's own checks raise fixed messages, which name the failed check and carry no credentials.
+        print(json.dumps({'ok':False,'status':'failed','check':str(error)}))
+        raise SystemExit(1) from None
+    except Exception:  # noqa: BLE001 - other errors must never expose credentials
         print(json.dumps({'ok':False,'status':'failed'}))
         raise SystemExit(1) from None

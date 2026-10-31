@@ -1,8 +1,8 @@
--- What the website in web/ reads that the public dump does not carry: its text
--- functions, generated search columns, two views, four tables and their
--- indexes. Definitions match web/schema/. One transaction, safe to rerun.
--- web-schema.sh applies it after the first restore.
-BEGIN;
+-- What the Go services (web/, api/, mcp/) read that the public dump does not
+-- carry: text functions, generated search columns, two views, four tables and
+-- their indexes. Definitions match web/schema/. Safe to rerun. restore.py runs
+-- it inside the restore's final transaction, before grants and the receipt;
+-- db/web-schema.sh runs it on a database restored by 0.2.0 or older.
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
@@ -125,7 +125,7 @@ CREATE INDEX IF NOT EXISTS graph_edge_from_id ON graph_edge (from_type, from_id)
 CREATE INDEX IF NOT EXISTS official_text_kind_number ON official_text (kind, number_int, year);
 CREATE INDEX IF NOT EXISTS official_text_date ON official_text (issued_on DESC);
 
--- health.sh reports the database unhealthy until this row exists.
+-- db/health.sh reports a restored corpus unhealthy until this row exists.
 CREATE TABLE IF NOT EXISTS web_schema (
   singleton  boolean PRIMARY KEY DEFAULT true CHECK (singleton),
   version    integer NOT NULL,
@@ -134,13 +134,5 @@ CREATE TABLE IF NOT EXISTS web_schema (
 INSERT INTO web_schema (version) VALUES (1)
 ON CONFLICT (singleton) DO UPDATE SET version = EXCLUDED.version, applied_at = now();
 
-DO $$
-BEGIN
-  IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'lebleg_reader') THEN
-    GRANT SELECT ON council_ruling, noindex_page, page_state, official_text,
-                    legislation_summary, article_cited, web_schema TO lebleg_reader;
-  END IF;
-END $$;
 
 ANALYZE legislation, legislation_article, ruling, ruling_page;
-COMMIT;

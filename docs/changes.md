@@ -1,5 +1,19 @@
 # Changes
 
+## 0.4.0
+
+The API and MCP images now run the same Go code as the website, which is the code behind LebaneseLegislation.com and its public MCP server. Python stays for the data tools only.
+
+- Layout: `web/`, `api/` and `mcp/` each hold a `main.go` and a Dockerfile; their shared code is `internal/`. The Python package moved from `server/` to `tools/` and keeps `restore`, `build`, `publish`, `seed` and `pipeline`.
+- Search is faster: on the full 2026-10-30.2 database a keyword search answers in well under a second, where the Python API took about 5.5 seconds per query and could hit the reader's 10 second limit on a fresh restore.
+- The API serves `/api/v1/` (the same routes as before) and `/healthz`. The Python-only `/search`, `/api/search` and the `/docs` page are gone: use `/api/v1/search/`. Search by meaning is `semantic=true` on `/api/v1/search/` and `semantic: true` on MCP `search_legislation`; its passages come back in `related`.
+- `calculated_current` on Civil Procedure articles is unchanged. Searching for a calculated amount (for example `5,000,000,000`) no longer finds the article, as on LebaneseLegislation.com.
+- The MCP image listens on 8080 inside the container, as before; Compose maps it to 8001. It answers browser clients from any origin; `MCP_ALLOWED_ORIGINS` is gone.
+- Service settings: `GEMINI_CONCURRENCY` and the query cache settings no longer apply to the API, MCP and website (`lebleg build` still uses `GEMINI_CONCURRENCY`). New: `GEMINI_SEARCH_MODEL` and `GEMINI_EMBEDDING_MODEL`.
+- `lebleg restore` now adds what the services read (`tools/src/lebleg/sql/web.sql`) itself, so the update pipeline and your own PostgreSQL get it too.
+- `./start` writes `.env` itself; `lebleg init` and `lebleg serve` are gone. Each Go image has a built-in health check (`/server healthcheck`).
+- The handwriting demo left this repository. Its source is the [Hugging Face Space](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting).
+
 ## 0.3.0
 
 - New image: `ghcr.io/taktekhq/lebanese-legislation-web`, the website from `web/`. `./start` runs it at http://localhost:8080 next to the API and MCP.

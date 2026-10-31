@@ -6,6 +6,7 @@ import json
 import os
 import re
 import subprocess
+from importlib.resources import files
 from pathlib import Path
 
 import psycopg
@@ -184,7 +185,15 @@ def check_database(conn, manifest, reader_role=None):
                 raise RestoreError("reader table permissions are not read-only")
 
 
+def apply_web_schema(conn):
+    """Add what the Go services read and the dump lacks (sql/web.sql), when the corpus tables exist."""
+    if conn.execute("SELECT to_regclass('public.legislation_article') IS NOT NULL").fetchone()[0]:
+        with conn.transaction():
+            conn.execute(files("lebleg").joinpath("sql/web.sql").read_text())
+
+
 def _finish_restore(conn, manifest, reader_role):
+    apply_web_schema(conn)
     # Top-level maintenance releases relation locks between tables. Keeping it
     # with uncommitted GRANT catalog updates can deadlock with autovacuum.
     conn.execute("ANALYZE")

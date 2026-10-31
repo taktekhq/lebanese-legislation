@@ -112,8 +112,12 @@ func enableSemanticSearch(s *site.Server, pool *pgxpool.Pool) error {
 	daily := defaultDailyCalls
 	if raw := os.Getenv("GEMINI_MAX_CALLS_PER_DAY"); raw != "" {
 		n, err := strconv.Atoi(raw)
-		if err != nil || n < 1 || n > 10000 {
-			return errors.New("GEMINI_MAX_CALLS_PER_DAY must be 1-10000")
+		if err != nil || n < 0 || n > 10000 {
+			return errors.New("GEMINI_MAX_CALLS_PER_DAY must be 0-10000")
+		}
+		if n == 0 {
+			log.Print("search by meaning off: GEMINI_MAX_CALLS_PER_DAY is 0")
+			return nil
 		}
 		daily = n
 	}
