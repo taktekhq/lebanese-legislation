@@ -1,6 +1,6 @@
 # Website
 
-The Go website behind [LebaneseLegislation.com](https://lebaneselegislation.com/), with Arabic and English pages. It is here for local or offline hosting and is not published as an image. It has keyword search over SQL; semantic search lives in the [server](../server/).
+The Go website behind [LebaneseLegislation.com](https://lebaneselegislation.com/), with Arabic and English pages and keyword search. It is published as `ghcr.io/taktekhq/lebanese-legislation-web`, and `./start` at the repository root runs it on port 8080 against the public database. Semantic search lives in the [server](../server/).
 
 The live site runs a newer private build. This copy was exported on 30 October 2026.
 
@@ -13,7 +13,7 @@ go run ./cmd/website
 
 Open http://localhost:8080. `LISTEN_ADDR` defaults to `127.0.0.1:8080`. `PUBLIC_URL` sets canonical links.
 
-The database needs the tables in [`schema/`](schema/). The public dump from the [db image](../db/) has them, except the `search_exact` columns: pages and law lists work against it, keyword search does not yet.
+The database needs the tables in [`schema/`](schema/). The [db image](../db/) adds what the public dump lacks ([`db/web.sql`](../db/web.sql)). Four tables stay empty there because their data is not public: Constitutional Council rulings, noindex marks, page change dates and official Gazette texts.
 
 Build an image from the repository root:
 

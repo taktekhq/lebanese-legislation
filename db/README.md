@@ -10,7 +10,8 @@ On first start with an empty volume it reads `releases/latest.json` from the [Hu
 | `init-reader.sh` | Creates the read-only `lebleg_reader` role when `LEBLEG_READER_PASSWORD` is set |
 | `init-release.sh` | Runs the restore once, when PostgreSQL initialises an empty volume |
 | `release.py` | Downloads, verifies and restores the release, using the [`server/`](../server/) package |
-| `health.sh` | Healthy only when PostgreSQL answers over TCP and the restore receipt is valid |
+| `health.sh` | Healthy only when PostgreSQL answers over TCP, the restore receipt is valid and `web.sql` has run |
+| `web.sql`, `web-schema.sh` | Adds what the website reads and the dump lacks: search columns, views, empty tables, indexes. Runs once after the restore |
 
 Build from the repository root:
 
