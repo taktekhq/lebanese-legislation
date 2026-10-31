@@ -1,12 +1,18 @@
 # Service reference
 
-Release `2026-10-30.1` contains 1,093,730 source records and 1,546,886 passages with precomputed embeddings. The 6.42 GB dump is tied to its source commit and checksum.
+Release `2026-10-30.2` contains 1,094,080 source records and 1,547,568 passages with precomputed embeddings. The 6,399,925,385-byte dump is tied to its source commit and checksum.
 
 Restore the public [Lebanese Legislation dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation) into PostgreSQL with a precomputed pgvector index. Run an API that returns exact matches first and related source passages underneath.
 
 The existing Parquet dataset remains the portable data distribution. This project adds a PostgreSQL snapshot and reusable search service. No model training is required.
 
 Three service images target Linux AMD64 and ARM64: `lebanese-legislation-db`, `lebanese-legislation-api` and `lebanese-legislation-mcp`. API and MCP use the same Python backend. The website remains source-build only. Existing starter and PostgreSQL tags remain available unchanged.
+
+## Public downloads and related resources
+
+The [GitHub data release for 2026-10-30.2](https://github.com/taktekhq/lebanese-legislation/releases/tag/data-2026-10-30.2) provides the manifest, checksums and a pinned Hugging Face download for the PostgreSQL dump. GitHub hosts the small metadata assets; Hugging Face hosts the 6.4 GB dump. Dataset versions and `0.1.7` software/container versions are separate.
+
+Use [LebaneseLegislation.com](https://lebaneselegislation.com/) for the public library, the [Parquet dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation) for portable tables, and the [collection](https://huggingface.co/collections/taktekhq/lebanese-legislation) for related scans and the handwriting demo. The code is MIT licensed; source texts retain their separate dataset terms, rights and attribution.
 
 ## Start locally
 
@@ -177,7 +183,7 @@ Set `LEBLEG_TEST_DB_IMAGE` to a locally built DB target to run the synthetic fir
 
 ## Licence and attribution
 
-Code: [MIT](LICENSE), copyright Taktek and Nizar Mahmoud.
+Code: [MIT](../LICENSE), copyright Taktek and Nizar Mahmoud.
 
 The dataset has its own licence, `other: public-texts-credit-the-centre`. Credit the **Centre for Research and Studies in Legal Informatics, Lebanese University** for the legal texts. Dataset structure: Taktek, LLC. The code's MIT licence does not replace the dataset's terms. Preserve source provenance and the distinction between Arabic legal texts and unofficial discovery aids.
 

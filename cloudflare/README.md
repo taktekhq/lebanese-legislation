@@ -1,5 +1,7 @@
 # MCP on Cloudflare
 
+Part of [LebaneseLegislation.com](https://lebaneselegislation.com/). See the [canonical source and local service setup](https://github.com/taktekhq/lebanese-legislation), [PostgreSQL data release](https://github.com/taktekhq/lebanese-legislation/releases/tag/data-2026-10-30.2) and [Parquet dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation).
+
 This Worker starts the MCP service in [Cloudflare Containers](https://developers.cloudflare.com/containers/). Containers require a Workers Paid plan. Docker images run in Containers; native Workers route requests to them.
 
 Use Node 22 or newer, Docker, and your own Cloudflare account:
