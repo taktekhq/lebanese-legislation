@@ -10,6 +10,12 @@ A free public service of [lebaneselegislation.com](https://lebaneselegislation.c
 
 The texts come from the Lebanese University's Centre for Research and Studies in Legal Informatics, copied exactly. Nothing a tool returns is written by a model. Arabic is the official text; English titles are an unofficial aid. Not legal advice.
 
+## Source, data and related services
+
+The consolidated [Lebanese Legislation repository](https://github.com/taktekhq/lebanese-legislation) contains the current website, PostgreSQL, API, MCP and public-data tools. For self-hosted services and Docker images, use its [setup and image links](https://github.com/taktekhq/lebanese-legislation#run-the-services-locally).
+
+The [PostgreSQL dataset release](https://github.com/taktekhq/lebanese-legislation/releases/tag/data-2026-10-30.2) provides metadata, checksums and a pinned Hugging Face dump download. The [Parquet dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation) and [dataset collection](https://huggingface.co/collections/taktekhq/lebanese-legislation) remain available separately. Code is MIT licensed; the legal texts and scans retain their own rights and attribution.
+
 ## Connect
 
 Claude Code:
