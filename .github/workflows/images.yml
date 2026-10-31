@@ -5,7 +5,7 @@ on:
       version:
         description: Package version to publish from this ref
         required: true
-        default: 0.1.7
+        default: 0.2.0
   push:
     tags: ['v*']
 permissions:
@@ -32,7 +32,7 @@ jobs:
           REQUESTED_VERSION: ${{ inputs.version }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')
+          VERSION=$(python3 -c 'import tomllib; print(tomllib.load(open("server/pyproject.toml","rb"))["project"]["version"])')
           if [ "$GITHUB_EVENT_NAME" = push ]; then
             test "$GITHUB_REF_NAME" = "v$VERSION"
           else
@@ -77,6 +77,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: db/Dockerfile
           target: db
           platforms: linux/amd64,linux/arm64
           push: true
@@ -87,6 +88,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: server/Dockerfile
           target: api
           platforms: linux/amd64,linux/arm64
           push: true
@@ -97,6 +99,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: server/Dockerfile
           target: mcp
           platforms: linux/amd64,linux/arm64
           push: true
@@ -107,13 +110,13 @@ jobs:
           DB_IMAGE: ghcr.io/taktekhq/lebanese-legislation-db:source-${{ github.sha }}
           API_IMAGE: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
           MCP_IMAGE: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
-        run: bash docker/smoke-images.sh
+        run: bash .github/scripts/smoke-images.sh
 
       - name: Check default MCP transport on both architectures
         env:
           MCP_IMAGE: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
           MCP_EXPECTED_VERSION: ${{ steps.version.outputs.version }}
-        run: bash scripts/smoke-mcp.sh
+        run: bash .github/scripts/smoke-mcp.sh
 
       - name: Promote verified immutable versions
         env:

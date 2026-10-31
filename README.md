@@ -1,16 +1,19 @@
 # Lebanese Legislation
 
-The website, PostgreSQL database, API, MCP server and public-data tools in one repository.
+The code and data behind [LebaneseLegislation.com](https://lebaneselegislation.com/): 103,118 laws, 389,078 articles, 47,657 court rulings and 6,851 Official Gazette issues, with search, a REST API and an MCP server.
 
-Read the [website](https://lebaneselegislation.com), use the [datasets](https://huggingface.co/collections/taktekhq/lebanese-legislation), or run the services locally.
+## Where everything is
 
-## Choose a resource
+| You want | Go to |
+| --- | --- |
+| Read the laws | [LebaneseLegislation.com](https://lebaneselegislation.com/) |
+| Connect an AI assistant | The free MCP server at `https://lebaneselegislation.com/mcp`. [Setup](docs/mcp.md) |
+| The data as tables | [Parquet files on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation) |
+| The data as a PostgreSQL database | The [6.4 GB dump on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases), with search vectors. The `-db` image below loads it for you. |
+| The original court scans | [Court scans on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-court-scans) |
+| Everything on your own machine | [Run the services locally](#run-the-services-locally) |
 
-- [Browse LebaneseLegislation.com](https://lebaneselegislation.com/): the public legal library.
-- [Download PostgreSQL dataset 2026-10-30.2](https://github.com/taktekhq/lebanese-legislation/releases/tag/data-2026-10-30.2): a GitHub release record with the manifest and checksums. The 6.4 GB dump is hosted on Hugging Face and linked from that release.
-- [Use the Parquet tables](https://huggingface.co/datasets/taktekhq/lebanese-legislation): portable structured data, schema and provenance.
-- [Inspect court scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans): original PDFs and page indexes, with separate source rights.
-- [Explore the dataset collection](https://huggingface.co/collections/taktekhq/lebanese-legislation): related datasets and the local handwriting demo.
+Data lives on Hugging Face. Code and Docker images live here. Each GitHub release is a code version, never a data download.
 
 ## Run the services locally
 
@@ -20,20 +23,43 @@ cd lebanese-legislation
 ./start
 ```
 
-Requires Docker Compose, 4 GB of available memory and 30 GB of free disk. First startup downloads and verifies the public snapshot, then restores it into an empty volume. Existing volumes are reused.
+You need Docker Compose, 4 GB of free memory and 30 GB of free disk. The first start downloads the latest dump from Hugging Face, checks its SHA-256 and restores it. That can take up to two hours. Later starts reuse the volume.
 
-| Image | Purpose |
+Then open the API at http://localhost:8000/docs, or point an MCP client at http://localhost:8001/mcp. Exact and citation search need no AI key. For semantic search, add your own `GEMINI_API_KEY` to `.env`.
+
+| Image | What it is |
 | --- | --- |
-| [`ghcr.io/taktekhq/lebanese-legislation-db:0.1.7`](https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db) | PostgreSQL 18.6, pgvector and first-start restore |
-| [`ghcr.io/taktekhq/lebanese-legislation-api:0.1.7`](https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-api) | General resources, exact search and optional semantic search |
-| [`ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.7`](https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-mcp) | The same retrieval backend through MCP |
+| [`ghcr.io/taktekhq/lebanese-legislation-db:0.2.0`](https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db) | PostgreSQL 18.6 with pgvector. Restores the dump into an empty volume on first start. |
+| [`ghcr.io/taktekhq/lebanese-legislation-api:0.2.0`](https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-api) | REST API: laws, articles, rulings, Gazette, exact and semantic search. |
+| [`ghcr.io/taktekhq/lebanese-legislation-mcp:0.2.0`](https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-mcp) | The same backend as the API, served over MCP. |
 
-API and docs: http://localhost:8000/docs. MCP: http://localhost:8001/mcp. Exact search needs no AI key. Semantic search uses your own `GEMINI_API_KEY` against saved embeddings.
+All three run on Linux AMD64 and ARM64. Nothing is baked into the images: the data comes from Hugging Face.
 
-[Public MCP setup](docs/mcp.md) · [Service reference](docs/reference.md) · [Build the website](docs/website.md) · [Cloudflare](cloudflare/README.md) · [Contribute](CONTRIBUTING.md)
+```
+Hugging Face releases/latest.json --> db  (restores once into a volume)
+                                      ^
+                       api :8000 -----+
+                       mcp :8001 -----+
+```
 
-The website stays buildable from source for local or offline hosting. Try the [handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting) or its [source](examples/handwriting/README.md). Drafts stay local.
+[Service reference](docs/reference.md): configuration, using your own PostgreSQL, rebuilding the dump.
 
-Contributor tools reproduce snapshots from public Parquet. See [data updates](docs/pipeline.md) for the resumable release pipeline. Source collection and private operations stay separate.
+## What is in this repository
 
-Code is [MIT licensed](LICENSE). The dataset has separate [source rights and attribution](https://huggingface.co/datasets/taktekhq/lebanese-legislation#what-to-check); the code licence does not relicense the legal texts or court scans. Previous image tags and dataset releases remain available.
+| Folder | What it is |
+| --- | --- |
+| [`db/`](db/) | The PostgreSQL image. Builds pgvector from source on the official `postgres:18.6` image. |
+| [`server/`](server/) | The Python package `lebleg`: one backend for the API and the MCP server, plus the restore, build and publish tools. |
+| [`web/`](web/) | The Go website. Build it yourself for local or offline hosting. |
+| [`examples/`](examples/) | The MCP image on Cloudflare Containers, and the [handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting). |
+| [`docs/`](docs/) | Service reference, MCP setup and the data update pipeline. |
+
+`compose.yaml` runs the three images. `compose.build.yaml` builds them from this checkout instead. `compose.local.yaml` loads a dump you already downloaded. `server.json` is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry and `.mcp.json` the client configuration for the hosted server.
+
+Collecting the source texts stays in a separate private repository.
+
+## Contribute and licence
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Code is [MIT licensed](LICENSE), by Taktek and Nizar Mahmoud. The data has its own [terms and attribution](https://huggingface.co/datasets/taktekhq/lebanese-legislation#what-to-check): credit the Centre for Research and Studies in Legal Informatics, Lebanese University, for the texts. The code licence does not cover the legal texts or court scans. This is not legal advice or an official publication.

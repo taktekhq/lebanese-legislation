@@ -24,7 +24,7 @@ old release only through `REUSE_DATABASE_URL`. Pin the dataset revision after
 uploading the sidecar, rather than downloading from a moving branch.
 
 ```sh
-python -m pip install '.[build,test]'
+python -m pip install './server[build,test]'
 export DATASET_REVISION='<immutable 40-character Hub commit>'
 export SNAPSHOT_DIR='./snapshot/data'
 export RELEASE_ID='<unused release ID>'
@@ -47,10 +47,8 @@ Build and restore both require PostgreSQL 18.6, pgvector 0.8.2 and
 `halfvec(768)`. The model is `gemini-embedding-001`, dimension 768,
 `RETRIEVAL_DOCUMENT`, 900 character chunks and 120 character overlap.
 Text search uses pg_trgm 1.6. Use matching PostgreSQL 18 client utilities.
-The pinned database image is
-`ghcr.io/taktekhq/lebanese-legislation-starter:postgres-18.6-vector0.8.2-r2`.
-The previous image may have the same database contract; check its actual server
-and extension versions. Build a runtime/publisher from this source commit so
+Build the database from [`db/Dockerfile`](../db/Dockerfile), which pins
+PostgreSQL 18.6 and pgvector 0.8.2. Build a runtime/publisher from this source commit so
 retrieval includes calculated-text matching. An older runtime can restore the
 additive table but its literal lookup cannot search the calculated wording.
 
