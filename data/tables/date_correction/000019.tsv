@@ -1,0 +1,33 @@
+171394	gazette_date	1923-01-29	1924-01-29	gazette-issue	the text's own signing line confirms the date; Gazette issue 1734 of that year
+171566	issued_on	1944-05-04	1944-05-04	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+171698	issued_on	2007-05-24	\N	guard	printed as signed after its publication on 10/04/2003; signing date not known
+172012	issued_on	1984-06-22	1984-06-22	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+172437	issued_on	1951-05-28	1951-04-28	signature	the text's own signing line
+172473	issued_on	1950-05-18	1950-05-08	signature	the text's own signing line
+172554	issued_on	1999-12-15	\N	guard	printed as signed after its publication on 15/04/1999; signing date not known
+172565	issued_on	1999-10-27	1998-10-27	model	The signature block explicitly gives the signing date as 27 October 1998, showing a one-year typo in printed_signed.
+173092	issued_on	1926-07-16	1926-07-16	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 3 day(s) earlier
+173093	issued_on	1926-07-15	1926-07-15	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 2 day(s) earlier
+173531	issued_on	1996-12-15	1995-12-15	signature	the text's own signing line
+173581	issued_on	1995-12-06	1995-01-06	signature	the text's own signing line
+173589	issued_on	1995-10-04	1995-01-04	signature	the text's own signing line
+174259	issued_on	1999-11-23	1998-11-23	model	The signature block explicitly gives the signing date as 23 November 1998, which is also confirmed by neighbouring decision 489 signed on 1998-11-23.
+174307	issued_on	2003-05-15	2003-04-15	model	The signature_block explicitly states the signing date as 15 April 2003 (15 نيسان 2003), confirming printed_signed has a month typo and fits before printed_gazette_date (2003-04-24).
+174605	issued_on	2003-05-15	2003-04-15	signature	the text's own signing line
+174979	issued_on	1996-12-08	1995-12-08	model	The signature block explicitly gives the signing date as 8 December 1995, showing printed_signed has a one-year typo.
+175461	issued_on	1948-12-29	1948-01-29	model	The signature_block explicitly dates the decision to 29 Kanoun al-Thani (January) 1948, showing printed_signed confused January with December (Kanoun al-Awwal).
+175632	issued_on	2003-05-21	\N	guard	printed as signed after its publication on 08/05/2003; signing date not known
+176129	gazette_date	1922-05-31	1929-05-31	gazette-issue	the texts numbered around it are dated 1929; Gazette issue 2240 of that year
+176627	issued_on	2002-10-19	\N	guard	printed as signed after its publication on 18/04/2002; signing date not known
+177003	issued_on	1959-06-15	1959-06-05	signature	the text's own signing line
+177004	issued_on	1959-06-13	1959-06-03	signature	the text's own signing line
+177288	issued_on	1999-11-23	1998-11-23	model	The signature_block explicitly dates the signing to 23 November 1998, showing printed_signed has a one-year typo.
+177289	issued_on	1999-11-23	1998-11-23	model	The signature_block explicitly dates the signing to 23 November 1998 (showing a one-year typo in printed_signed), which precedes the 1999-05-20 publication in Gazette issue 24.
+178059	issued_on	1994-09-16	1994-06-16	signature	the text's own signing line
+178338	issued_on	2003-07-16	\N	guard	printed as signed after its publication on 29/05/2003; signing date not known
+178826	issued_on	1973-03-31	1973-03-31	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 2 day(s) earlier
+178834	issued_on	2002-05-29	2002-04-29	signature	the text's own signing line
+179310	issued_on	1955-07-27	1955-06-27	signature	the text's own signing line
+179672	issued_on	1932-09-28	\N	guard	printed as signed after its publication on 03/01/1932; signing date not known
+179682	issued_on	1932-11-18	\N	guard	printed as signed after its publication on 24/10/1932; signing date not known
+179709	issued_on	1932-11-08	1931-11-08	year-typo	a year typo: the texts numbered around it are dated 1931

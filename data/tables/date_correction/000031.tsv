@@ -1,0 +1,14 @@
+280565	gazette_date	1986-01-01	\N	placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+280569	gazette_date	1962-01-01	\N	placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+280753	issued_on	2019-07-12	2019-03-12	model	The signature block explicitly gives the signing date as 12 March 2019 (12 آذار 2019), which matches neighbouring numbers 3032 (2019-03-11) and 3034 (2019-03-15) and precedes Gazette issue 20 on 2019-04-11.
+280790	issued_on	2019-05-11	2019-03-11	signature	the text's own signing line
+284765	issued_on	2019-11-29	2019-10-29	signature	the text's own signing line
+284919	issued_on	2019-12-16	2019-12-16	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 4 day(s) earlier
+285076	issued_on	2020-02-17	2020-01-17	signature	the text's own signing line
+285109	gazette_date	2020-01-16	2021-01-21	gazette-issue	the text's own signing line confirms the date; Gazette issue 3 of that year
+285145	issued_on	2020-01-26	2020-01-26	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 3 day(s) earlier
+285418	issued_on	2020-06-05	2020-06-05	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+286014	issued_on	2020-10-26	\N	guard	printed as signed after its publication on 11/09/2020; signing date not known
+286015	issued_on	2020-10-26	\N	guard	printed as signed after its publication on 11/09/2020; signing date not known
+286683	issued_on	2020-12-19	2020-12-09	signature	the text's own signing line
+287010	issued_on	2021-12-25	2021-01-25	signature	the text's own signing line
