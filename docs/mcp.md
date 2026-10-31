@@ -59,4 +59,3 @@ Clients that only run local servers can bridge with `mcp-remote`:
 ## Limits
 
 60 requests a minute per client IP.
-
