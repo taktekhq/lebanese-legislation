@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "lebaneselegislation": {
+      "type": "http",
+      "url": "https://lebaneselegislation.com/mcp"
+    }
+  }
+}
