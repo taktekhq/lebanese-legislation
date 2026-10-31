@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: legislation
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "127.0.0.1:${DEMO_DB_PORT:-55439}:5432"
+    volumes:
+      - ./schema/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./schema/graph.sql:/docker-entrypoint-initdb.d/02-graph.sql:ro
+      - ./schema/amendments.sql:/docker-entrypoint-initdb.d/03-amendments.sql:ro
+      - ./schema/official.sql:/docker-entrypoint-initdb.d/04-official.sql:ro
+      - ./schema/indexes.sql:/docker-entrypoint-initdb.d/05-indexes.sql:ro
+      - ./testdata/synthetic.sql:/docker-entrypoint-initdb.d/06-synthetic.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d legislation"]
+      interval: 2s
+      timeout: 2s
+      retries: 30

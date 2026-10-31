@@ -1,13 +1,9 @@
+# Build the images from this checkout instead of pulling them:
+#   docker compose -f compose.yaml -f compose.build.yaml up -d --build
 services:
   db:
-    build:
-      context: .
-      target: db
+    build: {context: ., dockerfile: db/Dockerfile, target: db}
   api:
-    build:
-      context: .
-      target: api
+    build: {context: ., dockerfile: server/Dockerfile, target: api}
   mcp:
-    build:
-      context: .
-      target: mcp
+    build: {context: ., dockerfile: server/Dockerfile, target: mcp}

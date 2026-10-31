@@ -6,11 +6,11 @@ Restore the public [Lebanese Legislation dataset](https://huggingface.co/dataset
 
 The existing Parquet dataset remains the portable data distribution. This project adds a PostgreSQL snapshot and reusable search service. No model training is required.
 
-Three service images target Linux AMD64 and ARM64: `lebanese-legislation-db`, `lebanese-legislation-api` and `lebanese-legislation-mcp`. API and MCP use the same Python backend. The website remains source-build only. Existing starter and PostgreSQL tags remain available unchanged.
+Three service images target Linux AMD64 and ARM64: `lebanese-legislation-db`, `lebanese-legislation-api` and `lebanese-legislation-mcp`. API and MCP use the same Python backend from [`server/`](../server/). The website in [`web/`](../web/) is built from source.
 
 ## Public downloads and related resources
 
-The [GitHub data release for 2026-10-30.2](https://github.com/taktekhq/lebanese-legislation/releases/tag/data-2026-10-30.2) provides the manifest, checksums and a pinned Hugging Face download for the PostgreSQL dump. GitHub hosts the small metadata assets; Hugging Face hosts the 6.4 GB dump. Dataset versions and `0.1.7` software/container versions are separate.
+The PostgreSQL dump lives only on Hugging Face, in the dataset's [`releases/` folder](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases). Each release is `releases/<release-id>/corpus.dump` with its `manifest.json`, which records the SHA-256, counts and versions. `releases/latest.json` points to the newest verified release. Dataset release IDs such as `2026-10-30.2` and software versions such as `0.2.0` are separate.
 
 Use [LebaneseLegislation.com](https://lebaneselegislation.com/) for the public library, the [Parquet dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation) for portable tables, and the [collection](https://huggingface.co/collections/taktekhq/lebanese-legislation) for related scans and the handwriting demo. The code is MIT licensed; source texts retain their separate dataset terms, rights and attribution.
 
@@ -48,11 +48,11 @@ docker compose up -d --force-recreate api
 
 Arabic, English and French queries can retrieve multilingual source passages. English discovery titles are unofficial aids, not authoritative translations. Availability of a language depends on the source material.
 
-All published ports bind to your own computer. The API has no user authentication and is intended as a local starter. Before exposing it publicly, add authentication or rate limiting, HTTPS and an appropriate cost limit at your reverse proxy.
+All published ports bind to your own computer. The API has no user authentication and is meant for local use. Before exposing it publicly, add authentication or rate limiting, HTTPS and an appropriate cost limit at your reverse proxy.
 
 Stop services with `docker compose down`. This preserves the database and its release cache. Volume lifecycle belongs to the operator. There is no automatic refresh. Use a different Compose project and fresh volumes to select a new snapshot.
 
-A failed first import never creates a readiness receipt. Restarting an initialized volume does not rerun init scripts or make a partial import healthy. After correcting a missing artifact or other restore error, an operator can explicitly retry the same selected release with `docker compose exec --user postgres db /opt/venv/bin/python /opt/starter/docker/db-release.py init`. The importer refuses unrelated occupied databases. Never delete a volume containing data you need.
+A failed first import never creates a readiness receipt. Restarting an initialized volume does not rerun init scripts or make a partial import healthy. After correcting a missing artifact or other restore error, an operator can explicitly retry the same selected release with `docker compose exec --user postgres db /opt/venv/bin/python /opt/lebleg/db/release.py init`. The importer refuses unrelated occupied databases. Never delete a volume containing data you need.
 
 ## What you get
 
@@ -62,11 +62,11 @@ A failed first import never creates a readiness receipt. Restarting an initializ
 | `releases/<release-id>/corpus.dump` | PostgreSQL custom-format snapshot, public tables, normalized documents and saved vectors |
 | `releases/<release-id>/manifest.json` | Source commit, counts, embedding settings, versions, licence and SHA-256 |
 | `releases/latest.json` | Pointer to the latest verified database release |
-| `ghcr.io/taktekhq/lebanese-legislation-db:0.1.7` | PostgreSQL 18.6, pgvector 0.8.2 and first-boot restore |
-| `ghcr.io/taktekhq/lebanese-legislation-api:0.1.7` | Shared backend exposing REST API and MCP |
-| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.1.7` | Shared backend exposing MCP and health only |
+| `ghcr.io/taktekhq/lebanese-legislation-db:0.2.0` | PostgreSQL 18.6, pgvector 0.8.2 and first-boot restore |
+| `ghcr.io/taktekhq/lebanese-legislation-api:0.2.0` | Shared backend exposing REST API and MCP |
+| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.2.0` | Shared backend exposing MCP and health only |
 
-Current service image examples use 0.1.7. Legacy `lebanese-legislation-starter` version and `publisher-*` tags remain unchanged. The pinned baseline `postgres-18.6-vector0.8.2-r2` is reused.
+Older version tags stay published. See [changes](changes.md).
 
 Database data is downloaded separately, not baked into the Docker image. The dump stores index definitions; PostgreSQL constructs the HNSW index during restore. It does not contain a portable copy of PostgreSQL's physical index files.
 
@@ -113,7 +113,7 @@ Use PostgreSQL 18.6 and pgvector 0.8.2 with a PostgreSQL 18 client. Create a fre
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-pip install .
+pip install ./server
 # Set DATABASE_URL privately in your environment, without putting passwords in shell history.
 lebleg restore --repo taktekhq/lebanese-legislation --revision main \
   --manifest-path releases/latest.json --cache-dir ./downloads
@@ -124,7 +124,7 @@ The DB and publisher images include PostgreSQL clients. The lightweight API and 
 
 ## Rebuild from public Parquet
 
-Publisher work needs more memory and disk than consuming a release. Use a separate empty build database. Do not point this command at a production database. Install `pip install '.[build]'`, download `data/*.parquet` from a pinned Hub commit, then:
+Publisher work needs more memory and disk than consuming a release. Use a separate empty build database. Do not point this command at a production database. Install `pip install './server[build]'`, download `data/*.parquet` from a pinned Hub commit, then:
 
 ```sh
 lebleg build --snapshot-dir ./snapshot/data --revision <40-character-source-commit> \
@@ -149,7 +149,7 @@ Publishing adds an immutable versioned directory and updates the latest pointer 
 
 ## Reuse vectors in an existing serving index
 
-`lebleg seed` copies only missing or invalid compatible vector rows from a released starter database into an existing independent `semantic_chunks` index. It reads the current canonical documents separately and checks their reference, full-text SHA-256, exact passage text and Unicode boundaries before copying anything. It makes no model requests, imports no generation markers and does no pruning.
+`lebleg seed` copies only missing or invalid compatible vector rows from a released database into an existing independent `semantic_chunks` index. It reads the current canonical documents separately and checks their reference, full-text SHA-256, exact passage text and Unicode boundaries before copying anything. It makes no model requests, imports no generation markers and does no pruning.
 
 Set `SEED_SOURCE_DATABASE_URL`, `SEED_CANONICAL_DATABASE_URL` and `SEED_TARGET_DATABASE_URL` privately. Source and canonical connections are read-only. All three databases must use the same stable document references and compatible vector schema. Start with a bounded pilot:
 
@@ -163,21 +163,23 @@ Use this for an independent serving index. A versioned restored snapshot remains
 
 ## Build images and develop
 
+Every image builds from the repository root:
+
 ```sh
-# Reuse the pinned PostgreSQL baseline.
-docker build --target db -t lebleg-db-local .
-docker build --target api -t lebleg-api-local .
-docker build --target mcp -t lebleg-mcp-local .
+docker build -f db/Dockerfile -t lebleg-db-local .
+docker build -f server/Dockerfile --target api -t lebleg-api-local .
+docker build -f server/Dockerfile --target mcp -t lebleg-mcp-local .
 # Maintainers and contributors only: optional snapshot publisher dependencies.
-docker build --target publisher -t lebleg-publisher-local .
+docker build -f db/Dockerfile --target publisher -t lebleg-publisher-local .
+cd server
 pip install '.[build,test]'
 pytest -q
 ruff check src tests
 ```
 
-Tests that need PostgreSQL create and remove uniquely named databases when `LEBLEG_TEST_ADMIN_DSN` is set. Container tests run when `LEBLEG_TEST_IMAGE` is set. They do not use your existing database as a test target. See the CI workflow for a disposable setup.
+Tests that need PostgreSQL create and remove uniquely named databases when `LEBLEG_TEST_ADMIN_DSN` is set. Container tests run when `LEBLEG_TEST_IMAGE` is set. They do not use your existing database as a test target. See the [checks workflow](../.github/workflows/ci.yml) for a disposable setup. `docker build -f db/Dockerfile --target postgres` gives a plain PostgreSQL with pgvector for those tests.
 
-The PostgreSQL baseline pins its base digest and verifies the pgvector source checksum. `docker/postgres.Dockerfile` remains available to rebuild that baseline. The image publication workflow builds only the three canonical services for `linux/amd64,linux/arm64` and refuses to overwrite version tags. The optional publisher stays separate from the consumer services. The `runtime` Docker target remains an API compatibility target.
+The DB image pins the official `postgres:18.6` base by digest and verifies the pgvector source checksum. The image publication workflow builds the three services for `linux/amd64,linux/arm64` and refuses to overwrite version tags. The optional publisher stays separate from the consumer services. The `runtime` target in `server/Dockerfile` is the API.
 
 Set `LEBLEG_TEST_DB_IMAGE` to a locally built DB target to run the synthetic first-boot, restart and failure integration checks. These use tiny fixture dumps and disposable volumes, never the real dataset.
 
@@ -186,20 +188,3 @@ Set `LEBLEG_TEST_DB_IMAGE` to a locally built DB target to run the synthetic fir
 Code: [MIT](../LICENSE), copyright Taktek and Nizar Mahmoud.
 
 The dataset has its own licence, `other: public-texts-credit-the-centre`. Credit the **Centre for Research and Studies in Legal Informatics, Lebanese University** for the legal texts. Dataset structure: Taktek, LLC. The code's MIT licence does not replace the dataset's terms. Preserve source provenance and the distinction between Arabic legal texts and unofficial discovery aids.
-
-
-## Version 0.1.4 migration
-
-General resource routes retain the v1 response fields. Search uses the published snapshot's derived corpus, including its release-date/in-force article selection; raw resource routes retain historical records. `/api/v1/search/` defaults to exact matches and reports exact category counts. `semantic=true` adds related passages and reports returned-item counts; semantic pagination is first-page only. MCP uses that same implementation. Source scan markup and headings are returned unchanged.
-
-The MCP `latest` alias moves to the consolidated backend. Earlier Go image digests and `sha-*` tags remain available. DB/API/MCP version 0.1.4 and later expect the verified public snapshot schema and restore receipt. The older standalone website remains buildable with its existing SQL search behavior.
-
-Release workflows first build source-tagged candidates and check both CPU architectures. They then promote immutable version tags and update `latest`. A retry from the same source commit skips an already-promoted image and retains its digest; a different source commit cannot replace that version.
-
-The initial restore can take longer than a normal database boot. DB health has a two-hour startup grace period and becomes healthy as soon as the verified restore finishes. Set `DB_START_PERIOD` and `STARTUP_TIMEOUT` for a slower machine. This does not change or refresh an existing volume.
-
-## Version 0.1.6 search and image release
-
-Calculated-text lookup is restricted to original Arabic articles of Civil Procedure law 244565. Other sources still match their original titles and text. This bound lets PostgreSQL use the existing source key and trigram indexes for literal amount searches. No dataset or embedding change is required.
-
-The [image workflow](https://github.com/taktekhq/lebanese-legislation/actions/workflows/images.yml) builds and checks DB, API and MCP for AMD64 and ARM64 before promoting their immutable version tags. A retry reuses a version only when it belongs to the same source commit. Existing versions are never replaced. Release 2026-10-30.2 retains its truthful builder version 0.1.5; runtime 0.1.6 consumes that same verified dump.
