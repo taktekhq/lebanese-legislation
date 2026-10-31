@@ -50,6 +50,7 @@ Hugging Face releases/latest.json --> db  (restores once into a volume)
 
 | Folder | What it is |
 | --- | --- |
+| [`data/`](data/) | The database as text: one folder per table, rows sorted by key, so `git log -p` shows what changed. `data/load.sh` builds it in PostgreSQL. |
 | [`db/`](db/) | The PostgreSQL image. Builds pgvector from source on the official `postgres:18.6` image. |
 | [`web/`](web/) | The website: its `main.go`, Dockerfile, SQL schema and a fictional test database. |
 | [`api/`](api/) | The REST API: its `main.go` and Dockerfile. |
