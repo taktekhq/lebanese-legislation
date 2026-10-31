@@ -25,7 +25,7 @@ COPY db/init-reader.sh /docker-entrypoint-initdb.d/20-lebleg-reader.sh
 LABEL org.opencontainers.image.source="https://github.com/taktekhq/lebanese-legislation"
 LABEL org.opencontainers.image.licenses="PostgreSQL"
 
-# The restore code is the server package, installed with matching PostgreSQL clients.
+# The restore code is the tools/ package, installed with matching PostgreSQL clients.
 FROM postgres AS backend
 RUN apt-get update \
  && apt-get install -y --no-install-recommends python3 python3-venv ca-certificates \
@@ -33,21 +33,21 @@ RUN apt-get update \
  && python3 -m venv /opt/venv
 WORKDIR /opt/lebleg
 COPY LICENSE ./
-COPY server/pyproject.toml ./server/
-COPY server/src/ ./server/src/
-RUN /opt/venv/bin/pip install --no-cache-dir ./server
+COPY tools/pyproject.toml ./tools/
+COPY tools/src/ ./tools/src/
+RUN /opt/venv/bin/pip install --no-cache-dir ./tools
 LABEL org.opencontainers.image.licenses="MIT"
 ENV PATH="/opt/venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 
 # Optional contributor tools: rebuild and publish snapshots from public Parquet.
 FROM backend AS publisher
-RUN /opt/venv/bin/pip install --no-cache-dir './server[build]'
+RUN /opt/venv/bin/pip install --no-cache-dir './tools[build]'
 ENTRYPOINT ["lebleg"]
 CMD ["--help"]
 
 # Default target, published as ghcr.io/taktekhq/lebanese-legislation-db.
 FROM backend AS db
-COPY db/release.py db/health.sh db/web-schema.sh db/web.sql ./db/
+COPY db/release.py db/health.sh db/web-schema.sh tools/src/lebleg/sql/web.sql ./db/
 COPY db/init-release.sh /docker-entrypoint-initdb.d/30-lebleg-release.sh
 HEALTHCHECK --interval=10s --timeout=10s --start-period=2h --retries=3 CMD ["bash", "/opt/lebleg/db/health.sh"]
 ENTRYPOINT ["docker-entrypoint.sh"]

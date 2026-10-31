@@ -24,7 +24,7 @@ old release only through `REUSE_DATABASE_URL`. Pin the dataset revision after
 uploading the sidecar, rather than downloading from a moving branch.
 
 ```sh
-python -m pip install './server[build,test]'
+python -m pip install './tools[build,test]'
 export DATASET_REVISION='<immutable 40-character Hub commit>'
 export SNAPSHOT_DIR='./snapshot/data'
 export RELEASE_ID='<unused release ID>'
