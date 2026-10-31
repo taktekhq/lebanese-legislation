@@ -1,0 +1,57 @@
+name: data
+# The database in data/: load it into PostgreSQL from the text files, export the
+# Hugging Face Parquet tables, check the row counts, and compare with the dataset
+# on Hugging Face. Nothing is published yet; the Parquet tables are kept as an
+# artifact for a week.
+on:
+  pull_request:
+    paths: ["data/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
+  push:
+    branches: [main]
+    paths: ["data/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: data-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      DATABASE_URL: postgresql://postgres:ci@127.0.0.1:5432/lebleg
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start PostgreSQL 18.6
+        run: |
+          docker run -d --name pg -e POSTGRES_PASSWORD=ci -e POSTGRES_DB=lebleg -p 127.0.0.1:5432:5432 \
+            --shm-size=1g postgres:18.6 -c fsync=off -c synchronous_commit=off -c full_page_writes=off \
+            -c max_wal_size=8GB -c maintenance_work_mem=1GB
+          for i in $(seq 60); do docker exec pg pg_isready -U postgres -d lebleg -q && break; sleep 1; done
+          psql --version
+      - name: Install DuckDB 1.5.6
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" https://github.com/duckdb/duckdb/releases/download/v1.5.6/duckdb_cli-linux-amd64.zip
+          unzip -q "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/bin"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      - name: Load the database
+        run: time data/load.sh "$DATABASE_URL"
+      - name: Export Parquet
+        run: .github/scripts/data-parquet.sh "$DATABASE_URL" "$RUNNER_TEMP/parquet"
+      - name: Download the dataset's current Parquet
+        run: |
+          pip install --quiet "huggingface_hub==1.33.0"
+          python3 - <<'PY'
+          import os
+          from huggingface_hub import snapshot_download
+          snapshot_download("taktekhq/lebanese-legislation", repo_type="dataset", allow_patterns=["data/*.parquet"],
+                            local_dir=os.path.join(os.environ["RUNNER_TEMP"], "hf"))
+          PY
+      - name: Check
+        run: .github/scripts/data-check.sh "$RUNNER_TEMP/parquet" "$RUNNER_TEMP/hf/data" | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parquet
+          path: ${{ runner.temp }}/parquet
+          retention-days: 7

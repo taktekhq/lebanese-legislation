@@ -1,0 +1,5 @@
+333092	issued_on	2025-03-22	2025-03-12	model	The signature_block explicitly states the signing date as 12 March 2025 (a one-digit typo in printed_signed 2025-03-22), which aligns with neighbouring decision 335 signed on 2025-03-11 and precedes the 2025-03-20 Gazette publication.
+333096	issued_on	2025-03-22	2025-03-12	model	The signature block explicitly gives the signing date as 12 March 2025 (2025-03-12), showing a one-digit typo in printed_signed (2025-03-22) and placing signing after the preamble date 2025-03-06 and before the 2025-03-20 Gazette issue.
+333188	issued_on	2025-09-11	2025-04-11	signature	the text's own signing line
+333556	issued_on	2025-05-23	2025-05-13	model	The signature block explicitly gives the signing date as 13 May 2025 (2025-05-13), showing a one-digit typo in printed_signed (2025-05-23) while confirming the Gazette issue 23 date of 2025-05-22.
+335716	issued_on	2026-12-31	2025-12-31	signature	the text's own signing line
