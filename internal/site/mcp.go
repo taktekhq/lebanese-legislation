@@ -444,6 +444,9 @@ func (s *Server) toolSearch(ctx context.Context, raw json.RawMessage) (any, bool
 	}
 	if a.Semantic {
 		s.addRelated(ctx, q, a.Select, &out)
+		if len(out.Related) > limit {
+			out.Related = out.Related[:limit]
+		}
 	}
 	return withAdvice(out), false, nil
 }

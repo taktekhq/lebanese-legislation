@@ -48,7 +48,7 @@ docker compose up -d --force-recreate api mcp web
 
 Arabic, English and French queries can retrieve multilingual source passages. English discovery titles are unofficial aids, not authoritative translations. Availability of a language depends on the source material.
 
-All published ports bind to your own computer. The API has no user authentication and is meant for local use. Before exposing it publicly, add authentication or rate limiting, HTTPS and an appropriate cost limit at your reverse proxy.
+All published ports bind to your own computer. The API has no user authentication and is meant for local use. Before exposing it publicly, set `RATE_LIMIT_PER_MINUTE` (LebaneseLegislation.com uses 60) or limit at your reverse proxy, and add HTTPS and an appropriate cost limit.
 
 Stop services with `docker compose down`. This preserves the database and its release cache. Volume lifecycle belongs to the operator. There is no automatic refresh. Use a different Compose project and fresh volumes to select a new snapshot.
 
@@ -107,6 +107,8 @@ Copy the optional settings from `.env.example`. `./start` creates required passw
 | `GEMINI_CONCURRENCY` | `2` | Provider calls at once, 1 to 16 |
 | `GEMINI_QUERY_CACHE_SIZE` | `256` | Cached answers per cache, up to 256; `0` turns caching off |
 | `GEMINI_QUERY_CACHE_TTL` | `3600` | Seconds an answer stays cached, up to 3600; `0` turns caching off |
+| `RATE_LIMIT_PER_MINUTE` | `0` | Requests a minute per client IP for the API and MCP; `0` is no limit. Set it when you host them publicly |
+| `RATE_LIMIT_BURST` | `20` | Requests a client may send at once above that rate |
 | `MCP_ALLOWED_ORIGINS` | empty | Comma-separated browser origins the MCP server answers, beyond its own localhost address. Clients that send no `Origin` are always answered |
 | `GEMINI_SEARCH_MODEL` | `gemini-3.8-flash` | The model that rewrites questions on the website's search page |
 | `GEMINI_EMBEDDING_MODEL` | `gemini-embedding-001` | Must match the saved vectors |

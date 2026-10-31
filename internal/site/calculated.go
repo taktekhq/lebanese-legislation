@@ -5,6 +5,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -160,23 +162,56 @@ func (s *Server) calculatedMatches(ctx context.Context, q string) []apiArticleHi
 	if rows.Err() != nil || len(found) == 0 {
 		return nil
 	}
-	lawRows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind WHERE l.id = $1`, calculatedLaw)
-	if err != nil {
+	law, ok := s.lawSummaryByID(ctx, calculatedLaw)
+	if !ok {
 		return nil
 	}
-	laws, err := scanLawRows(lawRows)
-	if err != nil || len(laws) != 1 {
-		return nil
-	}
-	law := s.lawSum(ctx, laws[0], s.source(ctx, "law", calculatedLaw))
 	out := make([]apiArticleHit, 0, len(found))
 	for _, m := range found {
-		snippet := []rune(m.text)
-		if len(snippet) > 240 {
-			snippet = append(snippet[:240], '…')
-		}
-		out = append(out, apiArticleHit{Law: law, Number: m.number, Snippet: string(snippet),
+		out = append(out, apiArticleHit{Law: law, Number: m.number, Snippet: shortSnippet(m.text),
 			URL: Base + artPath(calculatedLaw, m.number), MatchedCalculated: true})
 	}
 	return out
+}
+
+func (s *Server) lawSummaryByID(ctx context.Context, id int) (apiLawSummary, bool) {
+	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind WHERE l.id = $1`, id)
+	if err != nil {
+		return apiLawSummary{}, false
+	}
+	laws, err := scanLawRows(rows)
+	if err != nil || len(laws) != 1 {
+		return apiLawSummary{}, false
+	}
+	return s.lawSum(ctx, laws[0], s.source(ctx, "law", id)), true
+}
+
+func shortSnippet(text string) string {
+	r := []rune(text)
+	if len(r) > 240 {
+		return string(append(r[:240], '…'))
+	}
+	return text
+}
+
+var citedPath = regexp.MustCompile(`/(\d+)/article/([^/]+)/$`)
+
+// citedArticle resolves a query that cites an article, such as "المادة 86 من
+// قانون اصول المحاكمات المدنية", the way the website's search does, so the
+// API and MCP put that article first.
+func (s *Server) citedArticle(ctx context.Context, q string) (apiArticleHit, bool) {
+	m := citedPath.FindStringSubmatch(s.articleRef(ctx, q))
+	if m == nil {
+		return apiArticleHit{}, false
+	}
+	id, _ := strconv.Atoi(m[1])
+	var text string
+	if s.db.QueryRow(ctx, `SELECT coalesce(text_ar, '') FROM legislation_article WHERE law_id = $1 AND number = $2 ORDER BY position LIMIT 1`, id, m[2]).Scan(&text) != nil {
+		return apiArticleHit{}, false
+	}
+	law, ok := s.lawSummaryByID(ctx, id)
+	if !ok {
+		return apiArticleHit{}, false
+	}
+	return apiArticleHit{Law: law, Number: m[2], Snippet: shortSnippet(text), URL: Base + artPath(id, m[2]), Cited: true}, true
 }

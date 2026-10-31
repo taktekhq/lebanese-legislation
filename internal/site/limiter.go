@@ -36,7 +36,16 @@ func newIPLimiter(ratePerMin, burst int) *ipLimiter {
 	return &ipLimiter{buckets: map[string]*bucket{}, ratePerSec: float64(ratePerMin) / 60, burst: float64(burst), lastSweep: time.Now()}
 }
 
+// SetRateLimit sets the API and MCP limit per client IP; zero turns it off,
+// which suits a service on your own machine. LebaneseLegislation.com uses 60 a minute.
+func (s *Server) SetRateLimit(perMinute, burst int) {
+	s.ipLim = newIPLimiter(perMinute, burst)
+}
+
 func (l *ipLimiter) Allow(ip string) (time.Duration, bool) {
+	if l.ratePerSec <= 0 {
+		return 0, true
+	}
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	now := time.Now()

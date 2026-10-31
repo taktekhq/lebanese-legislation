@@ -71,3 +71,22 @@ func TestLawOutlineIsWholeUnlessPaged(t *testing.T) {
 		t.Fatalf("past the end: %d", len(past.Articles))
 	}
 }
+
+func TestRateLimitOffAllowsEverything(t *testing.T) {
+	off := newIPLimiter(0, 20)
+	for i := 0; i < 1000; i++ {
+		if _, ok := off.Allow("192.0.2.1"); !ok {
+			t.Fatalf("request %d refused with the limit off", i)
+		}
+	}
+	on := newIPLimiter(60, 5)
+	refused := 0
+	for i := 0; i < 20; i++ {
+		if _, ok := on.Allow("192.0.2.1"); !ok {
+			refused++
+		}
+	}
+	if refused == 0 {
+		t.Fatal("a 60 a minute limit with a burst of 5 must refuse some of 20 quick requests")
+	}
+}

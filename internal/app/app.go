@@ -68,6 +68,17 @@ func run(databaseURL, mode string) error {
 	if err = enableSemanticSearch(handler, pool); err != nil {
 		return err
 	}
+	// Off by default, like the Python service: a service on your own machine
+	// should not throttle its owner. Set it when you host the API or MCP publicly.
+	perMinute, err := envInt("RATE_LIMIT_PER_MINUTE", 0, 0, 100000)
+	if err != nil {
+		return err
+	}
+	burst, err := envInt("RATE_LIMIT_BURST", 20, 1, 10000)
+	if err != nil {
+		return err
+	}
+	handler.SetRateLimit(perMinute, burst)
 	runtimeHandler, err := modeHandler(handler, mode)
 	if err != nil {
 		return err

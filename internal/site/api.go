@@ -149,6 +149,8 @@ type apiArticleHit struct {
 	URL     string        `json:"url"`
 	// MatchedCalculated: the query matched the article's calculated current wording, not its original text.
 	MatchedCalculated bool `json:"matched_calculated_current,omitempty"`
+	// Cited: the query named this article ("المادة 86 من ...").
+	Cited bool `json:"cited,omitempty"`
 }
 
 type apiRulingHit struct {
@@ -292,6 +294,9 @@ func (s *Server) apiSearch(w http.ResponseWriter, r *http.Request) {
 	}
 	if semanticWanted && offset == 0 {
 		s.addRelated(ctx, question, selectWanted, &out)
+		if len(out.Related) > limit {
+			out.Related = out.Related[:limit]
+		}
 	}
 	s.writeJSON(w, 200, out)
 }
@@ -500,17 +505,26 @@ func (s *Server) apiFindArticles(ctx context.Context, q string, limit, offset in
 	if err != nil {
 		return err
 	}
-	var calculated []apiArticleHit
+	var first []apiArticleHit
 	if offset == 0 {
-		calculated = s.calculatedMatches(ctx, q)
+		if hit, ok := s.citedArticle(ctx, q); ok {
+			first = append(first, hit)
+		}
+		first = append(first, s.calculatedMatches(ctx, q)...)
 	}
 	seen := map[string]bool{}
-	for _, c := range calculated {
-		seen[c.Number] = true
+	var extra int
+	for _, h := range first {
+		key := strconv.Itoa(h.Law.ID) + "/" + h.Number
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		out.Articles = append(out.Articles, h)
+		extra++
 	}
-	out.Articles = append(out.Articles, calculated...)
 	for _, r := range rs {
-		if r.x.ID == calculatedLaw && seen[r.art] {
+		if seen[strconv.Itoa(r.x.ID)+"/"+r.art] {
 			continue
 		}
 		out.Articles = append(out.Articles, apiArticleHit{
@@ -523,7 +537,7 @@ func (s *Server) apiFindArticles(ctx context.Context, q string, limit, offset in
 	if len(out.Articles) > limit {
 		out.Articles = out.Articles[:limit]
 	}
-	out.ArtCount += len(calculated)
+	out.ArtCount += extra
 	return nil
 }
 
