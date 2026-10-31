@@ -1,5 +1,7 @@
 # Build the website
 
+The public library is [LebaneseLegislation.com](https://lebaneselegislation.com/). This guide belongs to the [canonical project repository](https://github.com/taktekhq/lebanese-legislation); its [data release](https://github.com/taktekhq/lebanese-legislation/releases/tag/data-2026-10-30.2) links the PostgreSQL download hosted on Hugging Face.
+
 The Go website provides Arabic and English pages. Use Go 1.27.1 or newer and a compatible PostgreSQL database:
 
 ```sh
