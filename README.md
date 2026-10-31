@@ -30,7 +30,7 @@ Requires Docker Compose, 4 GB of available memory and 30 GB of free disk. First 
 
 API and docs: http://localhost:8000/docs. MCP: http://localhost:8001/mcp. Exact search needs no AI key. Semantic search uses your own `GEMINI_API_KEY` against saved embeddings.
 
-[Service reference](docs/reference.md) · [Build the website](docs/website.md) · [Cloudflare](cloudflare/README.md) · [Contribute](CONTRIBUTING.md)
+[Public MCP setup](docs/mcp.md) · [Service reference](docs/reference.md) · [Build the website](docs/website.md) · [Cloudflare](cloudflare/README.md) · [Contribute](CONTRIBUTING.md)
 
 The website stays buildable from source for local or offline hosting. Try the [handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting) or its [source](examples/handwriting/README.md). Drafts stay local.
 
