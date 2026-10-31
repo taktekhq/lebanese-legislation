@@ -16,12 +16,25 @@ Claude Code:
 claude mcp add --transport http lebaneselegislation https://lebaneselegislation.com/mcp
 ```
 
-Cursor, VS Code and other clients (`mcp.json`):
+Cursor (`mcp.json`):
 
 ```json
 {
   "mcpServers": {
     "lebaneselegislation": {
+      "url": "https://lebaneselegislation.com/mcp"
+    }
+  }
+}
+```
+
+VS Code (`.vscode/mcp.json`):
+
+```json
+{
+  "servers": {
+    "lebaneselegislation": {
+      "type": "http",
       "url": "https://lebaneselegislation.com/mcp"
     }
   }
