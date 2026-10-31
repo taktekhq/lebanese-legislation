@@ -27,6 +27,7 @@ jobs:
       - run: docker build -f db/Dockerfile --target db -t lebleg-test-db .
       - run: docker build -f server/Dockerfile --target api -t lebleg-test-api .
       - run: docker build -f server/Dockerfile --target mcp -t lebleg-test-mcp .
+      - run: docker build -f web/Dockerfile -t lebleg-test-web .
       - run: pytest -q
         working-directory: server
         env:
@@ -37,6 +38,7 @@ jobs:
           LEBLEG_TEST_DB_IMAGE: lebleg-test-db
           LEBLEG_TEST_API_IMAGE: lebleg-test-api
           LEBLEG_TEST_MCP_IMAGE: lebleg-test-mcp
+          LEBLEG_TEST_WEB_IMAGE: lebleg-test-web
           PG_DUMP_BIN: /tmp/pg18-bin/pg_dump
           LEBLEG_TEST_PGDUMP: /tmp/pg18-bin/pg_dump
           LEBLEG_TEST_PGRESTORE: /tmp/pg18-bin/pg_restore

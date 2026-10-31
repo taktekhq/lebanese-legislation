@@ -21,9 +21,9 @@ ROOT = Path(__file__).parents[2]
 
 @pytest.fixture
 def service_images():
-    names = {service: os.getenv(f"LEBLEG_TEST_{service.upper()}_IMAGE") for service in ("db", "api", "mcp")}
+    names = {service: os.getenv(f"LEBLEG_TEST_{service.upper()}_IMAGE") for service in ("db", "api", "mcp", "web")}
     if not all(names.values()) or not os.getenv("PG_DUMP_BIN"):
-        pytest.skip("set LEBLEG_TEST_DB_IMAGE/API_IMAGE/MCP_IMAGE and PG_DUMP_BIN for isolated Compose integration")
+        pytest.skip("set LEBLEG_TEST_DB_IMAGE/API_IMAGE/MCP_IMAGE/WEB_IMAGE and PG_DUMP_BIN for isolated Compose integration")
     return names
 
 
@@ -64,7 +64,7 @@ def synthetic_release(general_service, directory):
     return manifest
 
 
-def test_three_services_restore_and_share_results(service_images, general, tmp_path):  # noqa: F811
+def test_services_restore_and_share_results(service_images, general, tmp_path):  # noqa: F811
     manifest = synthetic_release(general, tmp_path)
     assert manifest["counts"]["source_documents"] == manifest["counts"]["semantic_chunks"] == 4
     assert manifest["counts"]["tables"]["legislation_article"] > 600
@@ -73,7 +73,8 @@ def test_three_services_restore_and_share_results(service_images, general, tmp_p
         "COMPOSE_PROJECT_NAME": project, "POSTGRES_PASSWORD": "compose-fixture-owner",
         "READER_PASSWORD": "compose-fixture-reader", "LEBLEG_RELEASE_DIR": str(tmp_path),
         "DB_IMAGE": service_images["db"], "API_IMAGE": service_images["api"], "MCP_IMAGE": service_images["mcp"],
-        "DB_PORT": "0", "API_PORT": "0", "MCP_PORT": "0", "GEMINI_API_KEY": ""
+        "WEB_IMAGE": service_images["web"],
+        "DB_PORT": "0", "API_PORT": "0", "MCP_PORT": "0", "WEB_PORT": "0", "GEMINI_API_KEY": ""
     }
     command = ["docker", "compose", "--project-name", project, "--env-file", "/dev/null",
                "-f", str(ROOT / "compose.yaml"), "-f", str(ROOT / "compose.local.yaml")]
@@ -82,8 +83,8 @@ def test_three_services_restore_and_share_results(service_images, general, tmp_p
         return subprocess.run(command + list(arguments), env=environment, cwd=ROOT,
                               capture_output=True, text=True, check=check, timeout=timeout)
 
-    def address(service):
-        return "http://" + compose("port", service, "8000").stdout.strip()
+    def address(service, port="8000"):
+        return "http://" + compose("port", service, port).stdout.strip()
 
     try:
         started = compose("up", "-d", "--pull", "never", "--wait", "--wait-timeout", "180", check=False, timeout=210)
@@ -95,9 +96,11 @@ def test_three_services_restore_and_share_results(service_images, general, tmp_p
             states = [json.loads(line) for line in state_json.splitlines()]
         if isinstance(states, dict):
             states = [states]
-        assert {state["Service"] for state in states} == {"db", "api", "mcp"}
-        assert all(state["Health"] == "healthy" for state in states)
-        api, mcp = address("api"), address("mcp")
+        assert {state["Service"] for state in states} == {"db", "api", "mcp", "web"}
+        # The website image is distroless and has no health check; it must be running.
+        assert all(state["Health"] == "healthy" for state in states if state["Service"] != "web")
+        assert all(state["State"] == "running" for state in states)
+        api, mcp, web = address("api"), address("mcp"), address("web", "8080")
         with httpx.Client(timeout=10) as client:
             law = client.get(api + "/api/v1/law/1/")
             assert law.status_code == 200, law.text
@@ -120,5 +123,12 @@ def test_three_services_restore_and_share_results(service_images, general, tmp_p
             assert json.loads(tool["result"]["content"][0]["text"])["result"] == result.json()
             assert client.get(mcp + "/api/v1/law/1/").status_code == 404
             assert client.get(mcp + "/search", params={"q": "نص"}).status_code == 404
+            # The website reads the same restored corpus, keyword search included (db/web.sql).
+            page = client.get(web + "/law/1/")
+            assert page.status_code == 200, page.text[:500]
+            assert "نص فرعي" in page.text
+            found = client.get(web + "/search/", params={"q": "نص"})
+            assert found.status_code == 200, found.text[:500]
+            assert "/law/1/" in found.text
     finally:
         compose("down", "--volumes", "--remove-orphans", "--timeout", "5", check=False, timeout=45)
