@@ -28,7 +28,7 @@ func (m *meaningSearch) vectorHits(ctx context.Context, q string, v vectorSearch
 	m.mu.Lock()
 	entry, ok := m.vectors[key]
 	m.mu.Unlock()
-	if ok && time.Since(entry.at) < time.Hour {
+	if ok && m.fresh(entry.at) {
 		return entry.hits, nil
 	}
 	select {
@@ -56,10 +56,12 @@ func (m *meaningSearch) vectorHits(ctx context.Context, q string, v vectorSearch
 		return nil, err
 	}
 	m.mu.Lock()
-	if m.vectors == nil || len(m.vectors) >= 1000 {
+	if m.vectors == nil || !m.keep(len(m.vectors)) {
 		m.vectors = make(map[[32]byte]vectorEntry)
 	}
-	m.vectors[key] = vectorEntry{hits, time.Now()}
+	if m.keep(len(m.vectors)) {
+		m.vectors[key] = vectorEntry{hits, time.Now()}
+	}
 	m.mu.Unlock()
 	return hits, nil
 }

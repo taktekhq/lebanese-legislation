@@ -53,8 +53,16 @@ func TestValidCalculatedAcceptsOnlyTheExactSource(t *testing.T) {
 
 func TestRelatedSaysWhenSemanticSearchIsOff(t *testing.T) {
 	var out apiSearchResult
-	(&Server{}).addRelated(t.Context(), "dismissal without notice", &out)
+	(&Server{}).addRelated(t.Context(), "dismissal without notice", true, &out)
 	if out.Semantic != "unavailable" || out.Related != nil {
 		t.Fatalf("without semantic search: %+v", out)
+	}
+}
+
+func TestAmountsMatchWithOrWithoutSeparators(t *testing.T) {
+	for _, q := range []string{"5,000,000,000", "5000000000", "٥٠٠٠٠٠٠٠٠٠", "5 000 000 000"} {
+		if got := compactAmount(asciiDigits(q)); got != "5000000000" {
+			t.Errorf("%q: %q", q, got)
+		}
 	}
 }

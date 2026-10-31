@@ -26,10 +26,38 @@ type meaningSearch struct {
 	clients     *ipLimiter
 	selected    map[[32]byte]selectedEntry
 	vectors     map[[32]byte]vectorEntry
+	// cacheSize and cacheTTL bound each of the three caches; zero turns caching off.
+	cacheSize int
+	cacheTTL  time.Duration
+}
+
+// Defaults, as the Python service had: two provider calls at once, 256 cached answers for an hour.
+const (
+	defaultMeaningConcurrency = 2
+	defaultMeaningCacheSize   = 256
+	defaultMeaningCacheTTL    = time.Hour
+)
+
+func (m *meaningSearch) fresh(at time.Time) bool {
+	return m.cacheTTL > 0 && time.Since(at) < m.cacheTTL
+}
+
+// keep reports whether a cache holding n entries can take one more, and false when caching is off.
+func (m *meaningSearch) keep(n int) bool { return m.cacheSize > 0 && m.cacheTTL > 0 && n < m.cacheSize }
+
+// SetMeaningLimits sets how many provider calls run at once and how much is cached.
+func (s *Server) SetMeaningLimits(concurrency, cacheSize int, cacheTTL time.Duration) {
+	if s.meaning == nil || concurrency < 1 {
+		return
+	}
+	s.meaning.slots = make(chan struct{}, concurrency)
+	s.meaning.cacheSize, s.meaning.cacheTTL = cacheSize, cacheTTL
 }
 
 func newMeaningSearch(rw QueryRewriter, provider string, shares bool, limit int) *meaningSearch {
-	return &meaningSearch{rw: rw, provider: provider, shares: shares, limit: limit, cache: make(map[[32]byte]meaningEntry), slots: make(chan struct{}, 2), clients: newIPLimiter(6, 2)}
+	return &meaningSearch{rw: rw, provider: provider, shares: shares, limit: limit, cache: make(map[[32]byte]meaningEntry),
+		slots: make(chan struct{}, defaultMeaningConcurrency), clients: newIPLimiter(6, 2),
+		cacheSize: defaultMeaningCacheSize, cacheTTL: defaultMeaningCacheTTL}
 }
 
 func (s *Server) SetMeaningSearch(rw QueryRewriter, provider string, shares bool, daily int) {
@@ -48,7 +76,7 @@ func (m *meaningSearch) Rewrite(ctx context.Context, q string) (nlsearch.Plan, e
 		m.mu.Lock()
 		defer m.mu.Unlock()
 		v, ok := m.cache[key]
-		return v.plan, ok && time.Since(v.at) < time.Hour
+		return v.plan, ok && m.fresh(v.at)
 	}
 	if p, ok := cached(); ok {
 		return p, nil
@@ -76,10 +104,12 @@ func (m *meaningSearch) Rewrite(ctx context.Context, q string) (nlsearch.Plan, e
 	p, err := m.rw.Rewrite(ctx, q)
 	if err == nil {
 		m.mu.Lock()
-		if len(m.cache) >= 1000 {
+		if !m.keep(len(m.cache)) {
 			clear(m.cache)
 		}
-		m.cache[key] = meaningEntry{p, time.Now()}
+		if m.keep(len(m.cache)) {
+			m.cache[key] = meaningEntry{p, time.Now()}
+		}
 		m.mu.Unlock()
 	}
 	return p, err

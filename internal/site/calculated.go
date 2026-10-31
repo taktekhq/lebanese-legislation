@@ -89,3 +89,94 @@ func validCalculated(rowHash string, raw []byte, source string, now time.Time) b
 	return obj.SourceTextAr == source && rowHash == digest && obj.SourceSHA256 == digest &&
 		strings.TrimSpace(obj.TextAr) != "" && obj.TextAr != source
 }
+
+// asciiDigits writes Arabic-Indic and Persian digits as 0-9, as ar_digits does in SQL.
+func asciiDigits(s string) string {
+	return strings.Map(func(r rune) rune {
+		switch {
+		case r >= '٠' && r <= '٩':
+			return '0' + (r - '٠')
+		case r >= '۰' && r <= '۹':
+			return '0' + (r - '۰')
+		}
+		return r
+	}, s)
+}
+
+// compactAmount drops thousands separators and spaces, so 5,000,000,000 and 5000000000 match.
+func compactAmount(s string) string {
+	return strings.Map(func(r rune) rune {
+		if r == ',' || r == '٬' || r == ' ' || r == '\u00a0' {
+			return -1
+		}
+		return r
+	}, s)
+}
+
+// calculatedMatches finds Civil Procedure articles whose calculated wording
+// contains q, as the Python service did, so a search for a current amount
+// (5,000,000,000) finds its article. The snippet stays the original text; the
+// hit says the match came from the calculated wording.
+func (s *Server) calculatedMatches(ctx context.Context, q string) []apiArticleHit {
+	needle := compactAmount(strings.ToLower(asciiDigits(strings.TrimSpace(q))))
+	if len([]rune(needle)) < 3 {
+		return nil
+	}
+	var present bool
+	if err := s.db.QueryRow(ctx, `SELECT to_regclass('public.article_calculated_current') IS NOT NULL`).Scan(&present); err != nil || !present {
+		return nil
+	}
+	rows, err := s.db.Query(ctx, `SELECT c.number, c.source_sha256, c.calculated_current::text, f.text_ar
+		FROM article_calculated_current c
+		JOIN article_in_force f ON (f.law_id,f.number,f.position)=(c.law_id,c.number,c.position)
+		JOIN legislation l ON l.id=c.law_id
+		WHERE c.law_id=$1 AND f.state='in_force' AND f.pending IS FALSE
+		AND (f.valid_from IS NULL OR f.valid_from<=CURRENT_DATE)
+		AND l.status NOT IN ('repealed','annulled')
+		AND (l.issued_on IS NULL OR l.issued_on<=CURRENT_DATE)
+		ORDER BY c.position`, calculatedLaw)
+	if err != nil {
+		return nil
+	}
+	type match struct{ number, text string }
+	var found []match
+	for rows.Next() {
+		var number, hash, raw, source string
+		if rows.Scan(&number, &hash, &raw, &source) != nil {
+			rows.Close()
+			return nil
+		}
+		var obj struct {
+			TextAr string `json:"text_ar"`
+		}
+		if !validCalculated(hash, []byte(raw), source, time.Now()) || json.Unmarshal([]byte(raw), &obj) != nil {
+			continue
+		}
+		if strings.Contains(compactAmount(strings.ToLower(asciiDigits(obj.TextAr))), needle) {
+			found = append(found, match{number, source})
+		}
+	}
+	rows.Close()
+	if rows.Err() != nil || len(found) == 0 {
+		return nil
+	}
+	lawRows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind WHERE l.id = $1`, calculatedLaw)
+	if err != nil {
+		return nil
+	}
+	laws, err := scanLawRows(lawRows)
+	if err != nil || len(laws) != 1 {
+		return nil
+	}
+	law := s.lawSum(ctx, laws[0], s.source(ctx, "law", calculatedLaw))
+	out := make([]apiArticleHit, 0, len(found))
+	for _, m := range found {
+		snippet := []rune(m.text)
+		if len(snippet) > 240 {
+			snippet = append(snippet[:240], '…')
+		}
+		out = append(out, apiArticleHit{Law: law, Number: m.number, Snippet: string(snippet),
+			URL: Base + artPath(calculatedLaw, m.number), MatchedCalculated: true})
+	}
+	return out
+}

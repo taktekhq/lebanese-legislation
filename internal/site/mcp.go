@@ -7,6 +7,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -16,7 +18,8 @@ const (
 	mcpDefaultProtocol = "2025-06-18"
 	mcpMaxBody         = 64 * 1024
 	mcpCallTimeout     = 5 * time.Second
-	mcpMaxListItems    = 500
+	// Search by meaning waits on Gemini, as the website's answer box does.
+	mcpSemanticTimeout = 25 * time.Second
 	mcpCacheTTL        = 60 * time.Second
 	mcpSemaphoreWait   = 2 * time.Second
 )
@@ -71,26 +74,68 @@ func rpcResultResponse(id json.RawMessage, result any) rpcResponse {
 
 func isNotification(raw json.RawMessage) bool { return len(raw) == 0 }
 
-func mcpCORS(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Mcp-Session-Id, Mcp-Protocol-Version, Authorization")
-	w.Header().Set("Access-Control-Expose-Headers", "Mcp-Session-Id, Mcp-Protocol-Version")
+// mcpOriginAllowed protects browsers against DNS rebinding, as the MCP spec
+// asks: a request with an Origin header must come from MCP_ALLOWED_ORIGINS
+// (comma-separated) or from this same localhost address. Clients that send no
+// Origin, such as desktop and server MCP clients, are always allowed.
+func mcpOriginAllowed(r *http.Request) bool {
+	origin := r.Header.Get("Origin")
+	if origin == "" {
+		return true
+	}
+	trimmed := strings.TrimRight(origin, "/")
+	for _, allowed := range strings.Split(os.Getenv("MCP_ALLOWED_ORIGINS"), ",") {
+		if a := strings.TrimRight(strings.TrimSpace(allowed), "/"); a != "" && a == trimmed {
+			return true
+		}
+	}
+	u, err := url.Parse(origin)
+	if err != nil || u.User != nil || (u.Path != "" && u.Path != "/") || u.RawQuery != "" || u.Fragment != "" {
+		return false
+	}
+	scheme := "http"
+	if r.TLS != nil {
+		scheme = "https"
+	}
+	host := u.Hostname()
+	return (host == "localhost" || host == "127.0.0.1" || host == "::1") && u.Scheme == scheme && u.Host == r.Host
+}
+
+// mcpCORS answers an allowed browser origin by name; requests without one get no CORS headers.
+func mcpCORS(w http.ResponseWriter, r *http.Request) bool {
+	if !mcpOriginAllowed(r) {
+		writeRPC(w, http.StatusForbidden, rpcErrorResponse(nil, rpcInvalidRequest, "origin not allowed"))
+		return false
+	}
+	if origin := r.Header.Get("Origin"); origin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Vary", "Origin")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Mcp-Session-Id, Mcp-Protocol-Version, Authorization")
+		w.Header().Set("Access-Control-Expose-Headers", "Mcp-Session-Id, Mcp-Protocol-Version")
+	}
+	return true
 }
 
 func (s *Server) mcpOptions(w http.ResponseWriter, r *http.Request) {
-	mcpCORS(w)
+	if !mcpCORS(w, r) {
+		return
+	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
 func (s *Server) mcpGet(w http.ResponseWriter, r *http.Request) {
-	mcpCORS(w)
+	if !mcpCORS(w, r) {
+		return
+	}
 	w.Header().Set("Allow", "POST, OPTIONS")
 	http.Error(w, "this MCP server is stateless: POST a JSON-RPC request, there is no SSE stream to open", http.StatusMethodNotAllowed)
 }
 
 func (s *Server) mcpPost(w http.ResponseWriter, r *http.Request) {
-	mcpCORS(w)
+	if !mcpCORS(w, r) {
+		return
+	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Mcp-Protocol-Version", mcpDefaultProtocol)
 
@@ -202,7 +247,16 @@ func (s *Server) mcpToolsCall(r *http.Request, req rpcRequest) (rpcResponse, int
 		return rpcResultResponse(req.ID, cached), http.StatusOK
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), mcpCallTimeout)
+	timeout := mcpCallTimeout
+	if p.Name == "search_legislation" {
+		var a struct {
+			Semantic bool `json:"semantic"`
+		}
+		if json.Unmarshal(args, &a) == nil && a.Semantic {
+			timeout = mcpSemanticTimeout
+		}
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), timeout)
 	defer cancel()
 	result, isToolErr, err := s.callTool(ctx, p.Name, args)
 	if err != nil {
@@ -253,6 +307,8 @@ var toolDefs = []map[string]any{
 					"description": "results per category, at most 20"},
 				"semantic": map[string]any{"type": "boolean", "default": false,
 					"description": "also return passages related by meaning, copied from the source texts (needs semantic search on the server)"},
+				"select": map[string]any{"type": "boolean", "default": false,
+					"description": "with semantic, let the model keep only the related passages that answer the query (passage IDs only, never new wording)"},
 			},
 			"required": []string{"query"},
 		},
@@ -263,9 +319,15 @@ var toolDefs = []map[string]any{
 			"contents (article numbers) and the texts it amended or was amended by. Use get_article to read one " +
 			"article's verbatim text. Not legal advice.",
 		"inputSchema": map[string]any{
-			"type":       "object",
-			"properties": map[string]any{"id": map[string]any{"type": "integer", "description": "the law's numeric id, from search_legislation or its URL"}},
-			"required":   []string{"id"},
+			"type": "object",
+			"properties": map[string]any{
+				"id": map[string]any{"type": "integer", "description": "the law's numeric id, from search_legislation or its URL"},
+				"articles_offset": map[string]any{"type": "integer", "minimum": 0, "default": 0,
+					"description": "skip this many articles in the outline (long codes have over 1,000)"},
+				"articles_limit": map[string]any{"type": "integer", "minimum": 1,
+					"description": "return at most this many articles; omit for the full outline"},
+			},
+			"required": []string{"id"},
 		},
 	},
 	{
@@ -337,6 +399,8 @@ type mcpSearchArgs struct {
 	Limit int    `json:"limit,omitempty"`
 	// Semantic adds passages found by meaning (Related), when the server has it set up.
 	Semantic bool `json:"semantic,omitempty"`
+	// Select lets Gemini choose which related passages answer the query.
+	Select bool `json:"select,omitempty"`
 }
 
 func (s *Server) toolSearch(ctx context.Context, raw json.RawMessage) (any, bool, error) {
@@ -379,7 +443,7 @@ func (s *Server) toolSearch(ctx context.Context, raw json.RawMessage) (any, bool
 		s.apiFindLawsEn(ctx, q, a.Year, limit, 0, &out)
 	}
 	if a.Semantic {
-		s.addRelated(ctx, q, &out)
+		s.addRelated(ctx, q, a.Select, &out)
 	}
 	return withAdvice(out), false, nil
 }
@@ -394,12 +458,14 @@ func unmarshalID(raw json.RawMessage) (int, bool) {
 	return a.ID, true
 }
 
-func mcpTruncateLaw(out *apiLawDetail) {
-	if len(out.Articles) > mcpMaxListItems {
-		out.Articles = out.Articles[:mcpMaxListItems]
+// pageLawArticles returns the full outline by default, as the API does, or the
+// requested page of articles. article_count still counts the whole law.
+func pageLawArticles(out *apiLawDetail, offset, limit int) {
+	if offset > 0 {
+		out.Articles = out.Articles[min(offset, len(out.Articles)):]
 	}
-	if len(out.TableOfContents) > mcpMaxListItems {
-		out.TableOfContents = out.TableOfContents[:mcpMaxListItems]
+	if limit > 0 && len(out.Articles) > limit {
+		out.Articles = out.Articles[:limit]
 	}
 }
 
@@ -408,6 +474,13 @@ func (s *Server) toolGetLaw(ctx context.Context, raw json.RawMessage) (any, bool
 	if !ok {
 		return toolErr("id must be a positive integer"), true, nil
 	}
+	var page struct {
+		Offset int `json:"articles_offset"`
+		Limit  int `json:"articles_limit"`
+	}
+	if json.Unmarshal(raw, &page) != nil || page.Offset < 0 || page.Limit < 0 {
+		return toolErr("articles_offset and articles_limit must be non-negative integers"), true, nil
+	}
 	_, out, err := s.lawDetail(ctx, id)
 	if err != nil {
 		if errorIsNoRows(err) {
@@ -415,7 +488,7 @@ func (s *Server) toolGetLaw(ctx context.Context, raw json.RawMessage) (any, bool
 		}
 		return nil, false, err
 	}
-	mcpTruncateLaw(&out)
+	pageLawArticles(&out, page.Offset, page.Limit)
 	return withAdvice(out), false, nil
 }
 

@@ -121,11 +121,24 @@ func enableSemanticSearch(s *site.Server, pool *pgxpool.Pool) error {
 		}
 		daily = n
 	}
+	concurrency, err := envInt("GEMINI_CONCURRENCY", 2, 1, 16)
+	if err != nil {
+		return err
+	}
+	cacheSize, err := envInt("GEMINI_QUERY_CACHE_SIZE", 256, 0, 256)
+	if err != nil {
+		return err
+	}
+	cacheTTL, err := envInt("GEMINI_QUERY_CACHE_TTL", 3600, 0, 3600)
+	if err != nil {
+		return err
+	}
 	rewriter, err := nlsearch.New(nlsearch.Config{Provider: "gemini", Model: model, Key: key})
 	if err != nil {
 		return err
 	}
 	s.SetMeaningSearch(rewriter, "Google Gemini", false, daily)
+	s.SetMeaningLimits(concurrency, cacheSize, time.Duration(cacheTTL)*time.Second)
 	embedder, err := semantic.NewGemini(key, os.Getenv("GEMINI_EMBEDDING_MODEL"))
 	if err != nil {
 		return errors.New("invalid embedding configuration")
@@ -133,6 +146,19 @@ func enableSemanticSearch(s *site.Server, pool *pgxpool.Pool) error {
 	s.SetVectorSearch(semantic.NewStore(pool, embedder))
 	log.Printf("semantic search enabled: %s, at most %d calls a day", model, daily)
 	return nil
+}
+
+// envInt reads an integer setting within [low, high], or def when it is unset.
+func envInt(name string, def, low, high int) (int, error) {
+	raw := os.Getenv(name)
+	if raw == "" {
+		return def, nil
+	}
+	n, err := strconv.Atoi(raw)
+	if err != nil || n < low || n > high {
+		return 0, fmt.Errorf("%s must be %d-%d", name, low, high)
+	}
+	return n, nil
 }
 
 // listenAddr is LISTEN_ADDR, or the mode's usual port on loopback.

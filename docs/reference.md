@@ -78,7 +78,7 @@ When present, `GET /api/v1/law/{id}/article/{number}/` and MCP `get_article` inc
 ## How retrieval works
 
 1. Search matches original text, titles and explicit citations in PostgreSQL first: `GET /api/v1/search/` and MCP `search_legislation`.
-2. With `semantic=true` (API) or `semantic: true` (MCP), and a `GEMINI_API_KEY` on the server, Gemini embeds the question with `gemini-embedding-001` (768 dimensions) and PostgreSQL compares it with the saved passage vectors in `semantic_chunks` (`halfvec(768)`). Found passages come back as `related`. Without a key the result says `"semantic": "unavailable"`.
+2. With `semantic=true` (API) or `semantic: true` (MCP), and a `GEMINI_API_KEY` on the server, Gemini embeds the question with `gemini-embedding-001` (768 dimensions) and PostgreSQL compares it with the saved passage vectors in `semantic_chunks` (`halfvec(768)`). Found passages come back as `related`. Without a key the result says `"semantic": "unavailable"`. Adding `select=true` lets Gemini keep only the passages that answer the question; it returns passage IDs, never wording.
 3. Every passage is reloaded from the source text and hash-checked before it is returned, with a link to its source. The website's search page also uses Gemini to rewrite a question into Arabic search terms.
 
 A missing explicit citation is not silently replaced with a nearby semantic match. An absent or failed provider leaves ordinary search available. Retrieval can miss relevant material or return irrelevant passages. Source links and exact quotations make checking possible; they do not establish legal correctness or current legal status. Scanned ruling pages keep their extraction provenance and confidence fields. OCR can contain errors; consult the linked originals.
@@ -104,10 +104,14 @@ Copy the optional settings from `.env.example`. `./start` creates required passw
 | `MANIFEST_PATH` | `releases/latest.json` | Pointer or versioned manifest path |
 | `GEMINI_API_KEY` | empty | Your key; turns on search by meaning |
 | `GEMINI_MAX_CALLS_PER_DAY` | `500` | Provider calls per UTC day for each service; `0` turns search by meaning off |
+| `GEMINI_CONCURRENCY` | `2` | Provider calls at once, 1 to 16 |
+| `GEMINI_QUERY_CACHE_SIZE` | `256` | Cached answers per cache, up to 256; `0` turns caching off |
+| `GEMINI_QUERY_CACHE_TTL` | `3600` | Seconds an answer stays cached, up to 3600; `0` turns caching off |
+| `MCP_ALLOWED_ORIGINS` | empty | Comma-separated browser origins the MCP server answers, beyond its own localhost address. Clients that send no `Origin` are always answered |
 | `GEMINI_SEARCH_MODEL` | `gemini-3.8-flash` | The model that rewrites questions on the website's search page |
 | `GEMINI_EMBEDDING_MODEL` | `gemini-embedding-001` | Must match the saved vectors |
 
-The daily cap, a one-hour cache per question and at most two simultaneous provider calls live in each service process. Restarting resets the counter, and API, MCP and website each have their own. Use provider billing limits for a durable spending ceiling.
+The daily cap, the cache and the concurrency limit live in each service process. Restarting resets the counter, and API, MCP and website each have their own. Use provider billing limits for a durable spending ceiling.
 
 To pin a release, set `MANIFEST_PATH=releases/<release-id>/manifest.json` and `DATASET_REVISION=<artifact-commit>` before the first start. Updating those settings does not replace an already restored database. Use a separate Compose project and fresh volumes for a new snapshot.
 

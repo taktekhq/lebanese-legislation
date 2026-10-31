@@ -5,7 +5,7 @@ The REST API, published as `ghcr.io/taktekhq/lebanese-legislation-api`. It is th
 | Route | Returns |
 | --- | --- |
 | `GET /api/v1/` | The list of routes |
-| `GET /api/v1/search/?q=` | Laws, articles, rulings and Gazette issues by keyword or citation. `type=laws\|articles\|rulings\|gazette`, `year`, `limit` (1 to 50), `offset`. `semantic=true` adds `related` passages found by meaning |
+| `GET /api/v1/search/?q=` | Laws, articles, rulings and Gazette issues by keyword or citation. `type=laws\|articles\|rulings\|gazette`, `year`, `limit` (1 to 50), `offset`. `semantic=true` adds `related` passages found by meaning, and `select=true` keeps those that answer the question |
 | `GET /api/v1/laws/` | Laws, newest first |
 | `GET /api/v1/law/{id}/` | A law: metadata, outline and amendments |
 | `GET /api/v1/law/{id}/article/{number}/` | An article: original text, versions, changes and citing rulings. Civil Procedure articles carry `calculated_current` when an amount was updated by decree 330819 |

@@ -4,8 +4,8 @@ The MCP server, published as `ghcr.io/taktekhq/lebanese-legislation-mcp`. It is 
 
 | Tool | Does |
 | --- | --- |
-| `search_legislation` | Keyword and citation search across laws, articles, rulings and Gazette issues. `semantic: true` adds passages related by meaning |
-| `get_law` | A law's metadata, outline and amendments |
+| `search_legislation` | Keyword and citation search across laws, articles, rulings and Gazette issues. `semantic: true` adds passages related by meaning; `select: true` keeps those that answer the query |
+| `get_law` | A law's metadata, full outline and amendments. `articles_offset` and `articles_limit` page a long outline |
 | `get_article` | An article's original text, versions, changes and citing rulings |
 | `get_ruling` | A court ruling and its page readings |
 | `get_gazette_issue` | An Official Gazette issue |
@@ -18,7 +18,7 @@ Run it from the repository root against a restored database:
 DATABASE_URL='host=localhost port=5433 dbname=lebleg user=lebleg_reader password=...' go run ./mcp
 ```
 
-It listens on `127.0.0.1:8080` (`LISTEN_ADDR` changes it). In Compose it is on http://localhost:8001/mcp.
+It listens on `127.0.0.1:8080` (`LISTEN_ADDR` changes it). In Compose it is on http://localhost:8001/mcp. Browser requests are answered only from `MCP_ALLOWED_ORIGINS` or the same localhost address.
 
 - [`cloudflare/`](cloudflare/): run this image on Cloudflare Containers.
 - [`server.json`](../server.json) at the repository root is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry for the hosted server, and [`.mcp.json`](../.mcp.json) the client configuration.

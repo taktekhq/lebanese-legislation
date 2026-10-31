@@ -100,3 +100,18 @@ func TestSemanticSearchNeedsAKeyOnly(t *testing.T) {
 		t.Fatal("a negative daily cap must be refused")
 	}
 }
+
+func TestEnvIntBounds(t *testing.T) {
+	t.Setenv("LEBLEG_TEST_INT", "")
+	if n, err := envInt("LEBLEG_TEST_INT", 2, 1, 16); err != nil || n != 2 {
+		t.Fatalf("unset: %d %v", n, err)
+	}
+	t.Setenv("LEBLEG_TEST_INT", "0")
+	if _, err := envInt("LEBLEG_TEST_INT", 2, 1, 16); err == nil {
+		t.Fatal("below the range must be refused")
+	}
+	t.Setenv("LEBLEG_TEST_INT", "16")
+	if n, err := envInt("LEBLEG_TEST_INT", 2, 1, 16); err != nil || n != 16 {
+		t.Fatalf("top of the range: %d %v", n, err)
+	}
+}

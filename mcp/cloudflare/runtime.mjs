@@ -16,6 +16,8 @@ export async function ready(container, env, wait) {
         APP_MODE: 'mcp',
         GEMINI_API_KEY: env.GEMINI_API_KEY || '',
         GEMINI_MAX_CALLS_PER_DAY: env.GEMINI_MAX_CALLS_PER_DAY || '500',
+        GEMINI_CONCURRENCY: env.GEMINI_CONCURRENCY || '2',
+        MCP_ALLOWED_ORIGINS: env.MCP_ALLOWED_ORIGINS || '',
       },
     });
   }

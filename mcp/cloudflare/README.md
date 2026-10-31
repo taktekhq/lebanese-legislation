@@ -26,6 +26,6 @@ npm test
 
 Configuration follows Cloudflare's [runtime environment example](https://developers.cloudflare.com/containers/examples/env-vars-and-secrets/). A dry run validates the Worker bundle and configuration, not remote database connectivity or Cloudflare provisioning.
 
-The MCP server answers browser clients from any origin, as the public endpoint does. Restrict origins at the edge if you need to.
+For browser MCP clients, set `MCP_ALLOWED_ORIGINS` to a comma-separated list of exact allowed origins. Clients without an Origin header need no extra setting.
 
 Optional semantic search uses your own `GEMINI_API_KEY` Worker secret. Query budgets are per process and reset when a container restarts; use provider billing limits for a durable cap.

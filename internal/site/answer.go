@@ -51,7 +51,7 @@ func (m *meaningSearch) selectEvidence(ctx context.Context, q string, p []nlsear
 	m.mu.Lock()
 	entry, ok := m.selected[key]
 	m.mu.Unlock()
-	if ok && time.Since(entry.at) < time.Hour {
+	if ok && m.fresh(entry.at) {
 		return entry.quotes, nil
 	}
 	select {
@@ -83,10 +83,12 @@ func (m *meaningSearch) selectEvidence(ctx context.Context, q string, p []nlsear
 		return nil, err
 	}
 	m.mu.Lock()
-	if m.selected == nil || len(m.selected) >= 1000 {
+	if m.selected == nil || !m.keep(len(m.selected)) {
 		m.selected = make(map[[32]byte]selectedEntry)
 	}
-	m.selected[key] = selectedEntry{qs, time.Now()}
+	if m.keep(len(m.selected)) {
+		m.selected[key] = selectedEntry{qs, time.Now()}
+	}
 	m.mu.Unlock()
 	return qs, nil
 }

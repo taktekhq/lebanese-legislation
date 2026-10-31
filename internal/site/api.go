@@ -13,6 +13,7 @@ import (
 	"unicode"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 )
 
 const apiCacheControl = "public, max-age=60, stale-while-revalidate=300"
@@ -146,6 +147,8 @@ type apiArticleHit struct {
 	Number  string        `json:"article_number"`
 	Snippet string        `json:"snippet"`
 	URL     string        `json:"url"`
+	// MatchedCalculated: the query matched the article's calculated current wording, not its original text.
+	MatchedCalculated bool `json:"matched_calculated_current,omitempty"`
 }
 
 type apiRulingHit struct {
@@ -185,6 +188,8 @@ type apiSearchResult struct {
 	// Related holds passages found by meaning, when semantic search was asked for and is set up.
 	Related  []apiPassage `json:"related,omitempty"`
 	Semantic string       `json:"semantic,omitempty"`
+	// Selection says whether Gemini chose among Related (select=true): "ok" or "unavailable".
+	Selection string `json:"selection,omitempty"`
 }
 
 // apiPassage is a passage copied from the corpus, found by meaning and checked against its source.
@@ -198,8 +203,10 @@ type apiPassage struct {
 	URL        string `json:"url"`
 }
 
-// addRelated fills Related for semantic search, or says why it is empty.
-func (s *Server) addRelated(ctx context.Context, q string, out *apiSearchResult) {
+// addRelated fills Related for semantic search, or says why it is empty. With
+// choose, Gemini picks which passages answer the question; it returns passage
+// IDs only, never wording, and the passages stay copied from the sources.
+func (s *Server) addRelated(ctx context.Context, q string, choose bool, out *apiSearchResult) {
 	if s.vector == nil || s.meaning == nil {
 		out.Semantic = "unavailable"
 		return
@@ -210,6 +217,28 @@ func (s *Server) addRelated(ctx context.Context, q string, out *apiSearchResult)
 		return
 	}
 	out.Semantic = "ok"
+	if choose && len(sources) > 0 {
+		passages := make([]nlsearch.Passage, 0, len(sources))
+		for _, src := range sources {
+			passages = append(passages, src.Passage)
+		}
+		if quotes, err := s.meaning.selectEvidence(ctx, q, passages); err == nil {
+			byID := map[string]answerSource{}
+			for _, src := range sources {
+				byID[src.ID] = src
+			}
+			chosen := make([]answerSource, 0, len(quotes))
+			for _, quote := range quotes {
+				if src, ok := byID[quote.SourceID]; ok {
+					chosen = append(chosen, src)
+					delete(byID, quote.SourceID)
+				}
+			}
+			sources, out.Selection = chosen, "ok"
+		} else {
+			out.Selection = "unavailable"
+		}
+	}
 	for _, src := range sources {
 		out.Related = append(out.Related, apiPassage{ID: src.ID, Title: src.Title, Text: src.Text, Lang: src.Lang,
 			Status: src.Status, Unofficial: src.Unofficial, URL: Base + src.Path})
@@ -218,10 +247,16 @@ func (s *Server) addRelated(ctx context.Context, q string, out *apiSearchResult)
 
 func (s *Server) apiSearch(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := s.ctx(r)
+	if r.URL.Query().Get("semantic") == "true" {
+		// Search by meaning waits on Gemini, as the website's answer box does.
+		cancel()
+		ctx, cancel = context.WithTimeout(r.Context(), 25*time.Second)
+	}
 	defer cancel()
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
 	question := q
 	semanticWanted := r.URL.Query().Get("semantic") == "true"
+	selectWanted := r.URL.Query().Get("select") == "true"
 	typ := r.URL.Query().Get("type")
 	year := clampInt(r.URL.Query().Get("year"), 0, 0, 2100)
 	limit := clampInt(r.URL.Query().Get("limit"), 10, 1, 50)
@@ -256,7 +291,7 @@ func (s *Server) apiSearch(w http.ResponseWriter, r *http.Request) {
 		s.apiFindLawsEn(ctx, q, year, limit, offset, &out)
 	}
 	if semanticWanted && offset == 0 {
-		s.addRelated(ctx, question, &out)
+		s.addRelated(ctx, question, selectWanted, &out)
 	}
 	s.writeJSON(w, 200, out)
 }
@@ -465,7 +500,19 @@ func (s *Server) apiFindArticles(ctx context.Context, q string, limit, offset in
 	if err != nil {
 		return err
 	}
+	var calculated []apiArticleHit
+	if offset == 0 {
+		calculated = s.calculatedMatches(ctx, q)
+	}
+	seen := map[string]bool{}
+	for _, c := range calculated {
+		seen[c.Number] = true
+	}
+	out.Articles = append(out.Articles, calculated...)
 	for _, r := range rs {
+		if r.x.ID == calculatedLaw && seen[r.art] {
+			continue
+		}
 		out.Articles = append(out.Articles, apiArticleHit{
 			Law:     s.lawSum(ctx, r.x, s.source(ctx, "law", r.x.ID)),
 			Number:  r.art,
@@ -473,6 +520,10 @@ func (s *Server) apiFindArticles(ctx context.Context, q string, limit, offset in
 			URL:     Base + artPath(r.x.ID, r.art),
 		})
 	}
+	if len(out.Articles) > limit {
+		out.Articles = out.Articles[:limit]
+	}
+	out.ArtCount += len(calculated)
 	return nil
 }
 

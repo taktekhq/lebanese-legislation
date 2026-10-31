@@ -30,6 +30,7 @@ services:
       # Optional: your own key turns on search by meaning. Exact and citation search need none.
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MAX_CALLS_PER_DAY: ${GEMINI_MAX_CALLS_PER_DAY:-500}
+      GEMINI_CONCURRENCY: ${GEMINI_CONCURRENCY:-2}
     ports: ["127.0.0.1:${API_PORT:-8000}:8000"]
     depends_on:
       db: {condition: service_healthy}
@@ -43,10 +44,12 @@ services:
   mcp:
     image: ${MCP_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-mcp:0.4.0}
     environment:
+      MCP_ALLOWED_ORIGINS: ${MCP_ALLOWED_ORIGINS:-}
       DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"
       # Optional: your own key turns on search by meaning. Exact and citation search need none.
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MAX_CALLS_PER_DAY: ${GEMINI_MAX_CALLS_PER_DAY:-500}
+      GEMINI_CONCURRENCY: ${GEMINI_CONCURRENCY:-2}
     ports: ["127.0.0.1:${MCP_PORT:-8001}:8080"]
     depends_on:
       db: {condition: service_healthy}
@@ -66,6 +69,7 @@ services:
       # Optional: your own key turns on search by meaning. Exact and citation search need none.
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MAX_CALLS_PER_DAY: ${GEMINI_MAX_CALLS_PER_DAY:-500}
+      GEMINI_CONCURRENCY: ${GEMINI_CONCURRENCY:-2}
     ports: ["127.0.0.1:${WEB_PORT:-8080}:8080"]
     depends_on:
       db: {condition: service_healthy}
