@@ -9,6 +9,7 @@
     <p class="tiny subject__note">{{t "seo.title_en_note"}}</p>
   </div>{{else}}<h1 lang="ar" data-reveal style="--d:60ms">{{.Title}}</h1>{{end}}
   {{with .Answer}}<p class="answer" lang="{{uilang}}" dir="{{dir}}">{{.}}</p>{{end}}
+  {{if or .IssuedOn .CodeSlug .PrevLaw .NextLaw}}<p class="tiny seps" lang="{{uilang}}" dir="{{dir}}">{{if not static}}{{with .IssuedOn}}<a class="link" href="{{u (printf "/laws/year/%d/%s/" .Year (kindWord $law.Kind))}}">{{t "hub.year.title" (t (printf "hub.kind.%s" (kindWord $law.Kind))) (printf "%d" .Year)}}</a>{{end}}{{with .CodeSlug}} <a class="link" href="{{u (printf "/codes/%s/" (derefStr .))}}">{{t "hub.code.browse_short"}}</a>{{end}}{{end}}{{with .PrevLaw}} <a class="link" rel="prev" href="{{lawURL .ID}}">{{t "hub.law.prev"}}: <span lang="ar">{{.Ident}}</span></a>{{end}}{{with .NextLaw}} <a class="link" rel="next" href="{{lawURL .ID}}">{{t "hub.law.next"}}: <span lang="ar">{{.Ident}}</span></a>{{end}}</p>{{end}}
   <div class="btn-row" data-reveal style="--d:120ms">
     <button class="btn btn--primary btn--sm" type="button" data-cite="{{.Ident}}: {{.Title}}" data-href="{{citeLaw .ID}}">{{t "law.copy_citation"}}</button>
     {{if .HasFr}}<button class="btn btn--ghost btn--sm" type="button" data-fr-toggle aria-pressed="true">{{t "law.hide_french"}}</button>{{end}}

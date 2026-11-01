@@ -84,6 +84,10 @@ func langCases(t *testing.T, s *Server) []langCase {
 		func(id int, n string) langCase { return langCase{"article", artPath(id, n), true} })
 	one("code", `SELECT law_id, '' FROM code ORDER BY position LIMIT 1`,
 		func(id int, _ string) langCase { return langCase{"code", lawPath(id), true} })
+	one("code hub", `SELECT 0, slug FROM code ORDER BY position LIMIT 1`,
+		func(_ int, slug string) langCase { return langCase{"code hub", "/codes/" + slug + "/", true} })
+	one("kind-year hub", `SELECT 2005, 'decree'`,
+		func(y int, w string) langCase { return langCase{"kind-year hub", kindYearPath(y, w), true} })
 	one("ruling", `SELECT id, '' FROM ruling ORDER BY id LIMIT 1`,
 		func(id int, _ string) langCase { return langCase{"ruling", fmt.Sprintf("/ruling/%d/", id), false} })
 	one("gazette", `SELECT id, '' FROM gazette_issue ORDER BY id LIMIT 1`,

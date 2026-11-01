@@ -1,0 +1,17 @@
+{{define "content"}}{{with .Data}}{{$law := .LawID}}
+<section class="wrap page">
+  <a class="back" href="{{u "/codes/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "hub.code.all_codes"}}</a>
+  <p class="eyebrow" data-reveal>{{t "hub.code.eyebrow"}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{.Heading}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{.Lead}}</p>
+  <p><a class="link" href="{{lawURL $law}}">{{t "hub.code.read_text"}}</a> <span lang="ar">&middot; {{.Title}}</span></p>
+</section>
+<section class="wrap">
+  {{range .Groups}}
+  {{with .Heading}}<h2 class="sec__title" lang="ar" dir="rtl">{{.}}</h2>{{end}}
+  <ul class="pager__nums" dir="rtl" lang="ar">{{range .Numbers}}<li id="a-{{slug .}}"><a class="chip" href="{{artURL $law .}}">المادة {{.}}</a></li>{{end}}</ul>
+  {{end}}
+  {{template "pager" .}}
+</section>
+<div style="height:var(--section-y)"></div>
+{{end}}{{end}}

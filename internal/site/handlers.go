@@ -86,6 +86,7 @@ func (s *Server) routes() {
 		m.HandleFunc("GET /"+k+"/{id}/{$}", s.doc(kind))
 	}
 	s.topicRoutes()
+	s.hubRoutes()
 	s.blogRoutes()
 	m.HandleFunc("GET /.well-known/", probe404)
 	// A GET to /mcp gets the MCP server's answer (mcpGet), not a redirect to
@@ -316,6 +317,7 @@ type List struct {
 	Rows             any
 	Updated          *Updated // "Last updated": when the source records last changed
 	Base             string   // the list's path, when its pages are paths (/opinions/page/2/); empty: ?page=
+	Subhubs          []Chip   // links to the lists this one divides into (a year's kinds); Value is a path
 }
 
 // Path is page n's address when the list paginates by path.
@@ -535,6 +537,7 @@ type Law struct {
 	CitedBy          []DocRow
 	CitedCount       int
 	Related          []LawRow // same kind and year, nearest by date
+	PrevLaw, NextLaw *LawRow  // the texts of the same year and kind word issued just before and just after (hubs.go)
 	CodeSlug         *string
 	TitleEn          *string // unofficial English title of the subject line (db/titles_en.tsv)
 	Answer           string  // the answer line at the top of the page, from record fields only
@@ -787,6 +790,10 @@ func (s *Server) lawPage(w http.ResponseWriter, r *http.Request, part int) {
 			s.fail(w, r, err)
 			return
 		}
+		if l.PrevLaw, l.NextLaw, err = s.neighbours(ctx, l); err != nil {
+			s.fail(w, r, err)
+			return
+		}
 	}
 	s.trackRead(r, l, "")
 	bn := i18n.New(s.lang(r))
@@ -893,6 +900,9 @@ func (s *Server) article(w http.ResponseWriter, r *http.Request) {
 		s.trackRead(r, l, a.Number)
 		p.NoIndex = s.noindexed(ctx, "article", l.ID, a.Position)
 		p.Data.(map[string]any)["Topics"] = s.topicsFor(r, l.ID, a.Number)
+		if l.CodeSlug != nil && !s.isStatic {
+			p.Data.(map[string]any)["Hub"] = codeHubPath(*l.CodeSlug, codeHubPage(i)) + "#a-" + Slug(a.Number)
+		}
 		s.render(w, r, "article", 200, p)
 		return
 	}
