@@ -1,0 +1,118 @@
+name: static-site
+
+on:
+  workflow_dispatch:
+    inputs:
+      shards:
+        description: Shard divisor (the matrix always runs shards 0 through 7)
+        type: number
+        default: 8
+      full:
+        description: Unused for now; a shard re-renders only pages whose hash changed
+        type: boolean
+        default: false
+      route:
+        description: Optional Worker route
+        type: string
+        default: ""
+  workflow_run:
+    workflows: [data]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: static-site
+  cancel-in-progress: false
+
+jobs:
+  render:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    env:
+      DATABASE_URL: postgresql://postgres:ci@127.0.0.1:5432/lebleg
+      LEBLEG_DSN: postgresql://postgres:ci@127.0.0.1:5432/lebleg
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start PostgreSQL 18.6
+        run: |
+          # GitHub's runner has psql; act's smaller image does not.
+          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client >/dev/null; }
+          docker rm -f pg >/dev/null 2>&1 || true
+          docker run -d --name pg -e POSTGRES_PASSWORD=ci -e POSTGRES_DB=lebleg -p 127.0.0.1:5432:5432 \
+            --shm-size=1g postgres:18.6 -c fsync=off -c synchronous_commit=off -c full_page_writes=off \
+            -c max_wal_size=8GB -c maintenance_work_mem=1GB
+          for i in $(seq 60); do docker exec pg pg_isready -U postgres -d lebleg -q && break; sleep 1; done
+          psql --version
+      - name: Load the database
+        run: time data/load.sh "$DATABASE_URL"
+      - name: Load official publications
+        run: psql "$DATABASE_URL" -f db/official.sql
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Build static exporter
+        run: go build -o /tmp/static-export ./cmd/static-export
+      - name: Render and upload shard
+        env:
+          SHARD: ${{ matrix.shard }}
+          DIVISOR: ${{ inputs.shards || 8 }}
+          FULL: ${{ inputs.full || false }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          # Each shard reads and writes its own manifest under _export/shard-<i>-of-<n>/.
+          /tmp/static-export export \
+            -shard "$SHARD/$DIVISOR" \
+            -base https://lebaneselegislation.com \
+            -workers 8 \
+            -max-errors 200 \
+            -r2-bucket lebleg-site \
+            -r2-endpoint https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
+            -out site
+      - name: Redirect data for the Worker (shard 0 only)
+        if: matrix.shard == 0
+        env:
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          /tmp/static-export redirects -out site -db "$LEBLEG_DSN"
+          aws s3 cp site/.export/redirects.json s3://lebleg-site/_export/redirects.json \
+            --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
+            --content-type application/json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: export-${{ matrix.shard }}
+          path: site/.export
+          include-hidden-files: true
+          if-no-files-found: error
+
+  publish:
+    needs: render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Deploy Worker
+        working-directory: workers/static-site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
+          ROUTE: ${{ inputs.route }}
+        run: |
+          args=()
+          if [ -n "$ROUTE" ]; then
+            args+=(--route "$ROUTE")
+          fi
+          npx --yes wrangler@4.40.0 deploy "${args[@]}"
