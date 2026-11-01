@@ -1,0 +1,7 @@
+#!/bin/bash
+# Wrapper so cron/launchd need no environment of their own.
+set -euo pipefail
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PY="$(command -v python3 || echo /usr/bin/python3)"
+cd "$HERE"
+exec "$PY" -m ulscrape.cli "$@"
