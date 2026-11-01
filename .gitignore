@@ -20,3 +20,7 @@ coverage/
 *.test
 # The crawler's own store (manifest, blobs, logs) when UL_DATA is not set.
 scraper/data/
+
+# Manual data is filled on the build machine until it is published (manual/README.md).
+/manual/*
+!/manual/README.md
