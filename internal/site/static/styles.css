@@ -2164,6 +2164,8 @@ table.ref .ar {
 }
 .ai-box__note { margin-top: 12px; }
 .ai-box__left { margin-top: 4px; }
+.ai-box__kind { margin: -4px 0 10px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
+.ai-box__deep { margin-top: 14px; display: grid; gap: 6px; justify-items: start; }
 .ai-box__limit { color: var(--ink); line-height: 1.7; }
 .ai-box__more {
   display: block;

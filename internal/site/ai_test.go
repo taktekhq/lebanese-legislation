@@ -16,12 +16,22 @@ import (
 
 type composeFake struct {
 	fakeRewrite
+	expands  int
+	modes    []string
+	sizes    []int
 	composes int
 	invent   bool
 	received []nlsearch.Passage
 }
 
-func (f *composeFake) Compose(_ context.Context, _ string, p []nlsearch.Passage) ([]nlsearch.Para, error) {
+func (f *composeFake) Expand(_ context.Context, _ string, _, _ []string) (nlsearch.Plan, error) {
+	f.expands++
+	return nlsearch.Plan{Queries: []string{"الإجازة المرضية"}}, nil
+}
+
+func (f *composeFake) ComposeWith(_ context.Context, _ string, p []nlsearch.Passage, m nlsearch.Mode) ([]nlsearch.Para, error) {
+	f.modes = append(f.modes, m.Name)
+	f.sizes = append(f.sizes, len(p))
 	f.composes++
 	f.received = p
 	if len(p) == 0 {
@@ -217,5 +227,47 @@ func TestAIQuestionGoesToPostHog(t *testing.T) {
 	p := got[0]["properties"].(map[string]any)
 	if p["outcome"] != "answered" || p["distinct_id"] != "visitor-1" || p["question_lang"] != "latin" || p["questions_left"] != float64(9) || p["question"] == nil {
 		t.Fatalf("properties: %+v", p)
+	}
+}
+
+func TestDeepAnswerReadsMoreOnceADay(t *testing.T) {
+	s := testServer(t)
+	f := &composeFake{fakeRewrite: fakeRewrite{queries: []string{"الإجازة السنوية"}}}
+	s.SetMeaningSearch(f, "Google Gemini", false, 1000)
+	q := "How much annual leave does an employee get?"
+	me := strings.Repeat("f", 32)
+	if body := askAs(s, me, "2.2.2.2", q); !strings.Contains(body, "data-ai-deep") || !strings.Contains(body, "1 left today") {
+		t.Fatalf("no deep button: %.600s", body)
+	}
+	deep := func() string {
+		r := httptest.NewRequest("POST", "/en/search/ai/deep/", strings.NewReader(url.Values{"q": {q}}.Encode()))
+		r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		r.Header.Set("CF-Connecting-IP", "2.2.2.2")
+		r.AddCookie(&http.Cookie{Name: "ll_ai", Value: me})
+		w := httptest.NewRecorder()
+		s.ServeHTTP(w, r)
+		return w.Body.String()
+	}
+	body := deep()
+	if !strings.Contains(body, "Deep answer") || !strings.Contains(body, "ai-box__text") || strings.Contains(body, "data-ai-deep") {
+		t.Fatalf("no deep answer: %.600s", body)
+	}
+	if f.expands != 1 || f.modes[len(f.modes)-1] != "deep" || f.sizes[len(f.sizes)-1] <= f.sizes[0] {
+		t.Fatalf("deep did not search more: expands=%d modes=%v sizes=%v", f.expands, f.modes, f.sizes)
+	}
+	if body := deep(); !strings.Contains(body, "used today's deep answer") {
+		t.Fatalf("second deep answer allowed: %.400s", body)
+	}
+	if body := askAs(s, me, "2.2.2.2", q); !strings.Contains(body, "ai-box__text") || strings.Contains(body, "data-ai-deep") {
+		t.Fatalf("quick answers stopped or deep button still shown: %.400s", body)
+	}
+}
+
+func TestVectorPassagesComeFirst(t *testing.T) {
+	v := []answerSource{{Passage: nlsearch.Passage{Text: "v1"}, Path: "/a"}, {Passage: nlsearch.Passage{Text: "v2"}, Path: "/b"}}
+	k := []answerSource{{Passage: nlsearch.Passage{Text: "k1"}, Path: "/c"}, {Passage: nlsearch.Passage{Text: "v1"}, Path: "/a"}}
+	got := vectorFirst(v, k, 3)
+	if len(got) != 3 || got[0].Text != "v1" || got[1].Text != "v2" || got[2].Text != "k1" || got[2].ID != "s3" {
+		t.Fatalf("got %+v", got)
 	}
 }

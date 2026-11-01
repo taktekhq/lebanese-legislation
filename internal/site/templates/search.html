@@ -6,7 +6,7 @@
   {{template "search" .Q}}
   {{if .Q}}<span hidden id="search-meta" data-q="{{.Q}}" data-n="{{add (add (add .LawCount .ArtCount) .RulCount) (len .Topics)}}"></span>{{end}}
 </section>
-{{if and meaningEnabled .AskAI}}<section class="wrap" data-ai-answer data-q="{{.Q}}" data-url="{{u "/search/ai/"}}" data-empty="{{if and (not .Laws) (not .Articles) (not .Rulings) (not .Topics)}}1{{end}}" data-error="{{t "search.ai_unavailable"}}" data-finding="{{t "search.ai_finding"}}" data-more="{{t "search.ai_more"}}" data-less="{{t "search.ai_less"}}">
+{{if and meaningEnabled .AskAI}}<section class="wrap" data-ai-answer data-q="{{.Q}}" data-url="{{u "/search/ai/"}}" data-deep-url="{{u "/search/ai/deep/"}}" data-deep-loading="{{t "search.ai_deep_loading"}}" data-empty="{{if and (not .Laws) (not .Articles) (not .Rulings) (not .Topics)}}1{{end}}" data-error="{{t "search.ai_unavailable"}}" data-finding="{{t "search.ai_finding"}}" data-more="{{t "search.ai_more"}}" data-less="{{t "search.ai_less"}}">
 <div class="ai-box" aria-busy="true"><p class="ai-box__head">{{template "ai_mark"}}<span>{{t "search.ai_title"}}</span></p>
 <div class="ai-box__body" data-ai-content role="status" aria-live="polite"><p class="tiny">{{t "search.ai_loading"}}</p><span class="ai-box__skel"></span><span class="ai-box__skel"></span><span class="ai-box__skel ai-box__skel--short"></span></div></div>
 </section>{{end}}

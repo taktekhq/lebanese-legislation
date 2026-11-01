@@ -16,6 +16,7 @@ var beirut = func() *time.Location {
 
 const (
 	questionsPerDay = 10  // per device (ll_ai cookie)
+	deepPerDay      = 1   // deep answers per device, on top of the questions
 	banPerDay       = 100 // questions from one IP in one day that get it banned
 	banFor          = 30 * 24 * time.Hour
 )
@@ -54,6 +55,14 @@ func (c *dailyCounter) take(key string, limit int) (int, bool) {
 	}
 	c.n[key]++
 	return c.n[key], true
+}
+
+// count reads key's count for today without adding to it.
+func (c *dailyCounter) count(key string) int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.roll(time.Now())
+	return c.n[key]
 }
 
 // banList holds IPs barred from AI answers until a time. It lives in the

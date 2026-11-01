@@ -34,7 +34,7 @@ const composePrompt = `You answer a visitor's question about Lebanese law for a 
 Write the answer in the same language as the question, whatever language it is (Arabic, Lebanese Arabic, English, French, Armenian, Spanish, or any other); for Arabic or Lebanese Arabic write Modern Standard Arabic. The passages are mostly in Arabic or French: translate what they say into the question's language.
 
 Return only JSON {"paragraphs":[{"text":"...","quotes":[{"source":"supplied ID","quote":"..."}]}]}.
-- 1 to 4 short paragraphs, 120 words in total at most. The first paragraph answers the question directly in one or two sentences (yes, no, it depends on ...), then the rest explains the conditions and exceptions.
+- {{LENGTH}} The first paragraph answers the question directly in one or two sentences (yes, no, it depends on ...), then the rest explains the conditions and exceptions.
 - Every paragraph has 1 to 3 quotes: the passage ID and the exact words from that passage that support the paragraph, copied character for character in the passage's own language (do not translate, fix spelling or shorten inside a quote), one sentence or clause each, at most 300 characters. Name the law and article in the text when the passage gives them.
 - Passages marked as court rulings are decisions in one case: say so, do not present them as general rules.
 - Plain words, no headings, no lists, no markdown, no legal advice wording ("you should hire ..."), no disclaimers: the page adds its own.
@@ -43,14 +43,38 @@ Return only JSON {"paragraphs":[{"text":"...","quotes":[{"source":"supplied ID",
 // Compose makes one tool-free Gemini call that writes a short answer from the
 // supplied passages only. Every paragraph must name at least one supplied
 // passage; the application links them and shows the passages themselves.
+// Mode sizes a written answer: Quick for the box on every question, Deep
+// for the answer a visitor asks for by button (more passages, longer text,
+// time to think).
+type Mode struct {
+	Name                  string
+	Sources, Chars        int // passages, and their total characters
+	Paras, ParaChars, All int // paragraphs, characters per paragraph, characters in all
+	Length                string
+	Thinking, MaxOut      int
+	Timeout               time.Duration
+}
+
+var (
+	Quick = Mode{Name: "quick", Sources: 16, Chars: 24000, Paras: 4, ParaChars: 1500, All: 3000,
+		Length: "1 to 4 short paragraphs, 120 words in total at most.", Thinking: 0, MaxOut: 4096, Timeout: 20 * time.Second}
+	Deep = Mode{Name: "deep", Sources: 40, Chars: 64000, Paras: 8, ParaChars: 1500, All: 7000,
+		Length: "2 to 8 paragraphs, 350 words in total at most, covering the rule, its conditions, exceptions, deadlines and procedure, and how courts applied it when rulings are supplied.", Thinking: 2048, MaxOut: 12288, Timeout: 60 * time.Second}
+)
+
 func (c *Client) Compose(ctx context.Context, q string, sources []Passage) ([]Para, error) {
+	return c.ComposeWith(ctx, q, sources, Quick)
+}
+
+// ComposeWith is Compose sized by mode.
+func (c *Client) ComposeWith(ctx context.Context, q string, sources []Passage, m Mode) ([]Para, error) {
 	if c.cfg.Provider != "gemini" {
 		return nil, errors.New("written answers require Gemini")
 	}
 	if len(sources) == 0 {
 		return []Para{}, nil
 	}
-	if len(sources) > 16 || utf8.RuneCountInString(q) > 500 {
+	if len(sources) > m.Sources || utf8.RuneCountInString(q) > 500 {
 		return nil, errors.New("answer request too large")
 	}
 	total := 0
@@ -61,7 +85,7 @@ func (c *Client) Compose(ctx context.Context, q string, sources []Passage) ([]Pa
 		}
 		total += n
 	}
-	if total > 24000 {
+	if total > m.Chars {
 		return nil, errors.New("answer context too large")
 	}
 	input, _ := json.Marshal(map[string]any{"question": q, "internal_passages": sources})
@@ -70,8 +94,8 @@ func (c *Client) Compose(ctx context.Context, q string, sources []Passage) ([]Pa
 	para := map[string]any{"type": "object", "required": []string{"text", "quotes"}, "additionalProperties": false, "properties": map[string]any{
 		"text":   map[string]any{"type": "string"},
 		"quotes": map[string]any{"type": "array", "maxItems": 3, "items": cite}}}
-	schema := map[string]any{"type": "object", "required": []string{"paragraphs"}, "additionalProperties": false, "properties": map[string]any{"paragraphs": map[string]any{"type": "array", "maxItems": 4, "items": para}}}
-	body, _ := json.Marshal(map[string]any{"systemInstruction": map[string]any{"parts": []map[string]string{{"text": composePrompt}}}, "contents": []map[string]any{{"role": "user", "parts": []map[string]string{{"text": string(input)}}}}, "generationConfig": map[string]any{"maxOutputTokens": 4096, "temperature": 0.2, "responseMimeType": "application/json", "responseJsonSchema": schema, "thinkingConfig": map[string]int{"thinkingBudget": 0}}})
+	schema := map[string]any{"type": "object", "required": []string{"paragraphs"}, "additionalProperties": false, "properties": map[string]any{"paragraphs": map[string]any{"type": "array", "maxItems": m.Paras, "items": para}}}
+	body, _ := json.Marshal(map[string]any{"systemInstruction": map[string]any{"parts": []map[string]string{{"text": strings.Replace(composePrompt, "{{LENGTH}}", m.Length, 1)}}}, "contents": []map[string]any{{"role": "user", "parts": []map[string]string{{"text": string(input)}}}}, "generationConfig": map[string]any{"maxOutputTokens": m.MaxOut, "temperature": 0.2, "responseMimeType": "application/json", "responseJsonSchema": schema, "thinkingConfig": map[string]int{"thinkingBudget": m.Thinking}}})
 	endpoint := c.cfg.Endpoint
 	if endpoint == "" {
 		model := c.cfg.SelectModel
@@ -80,7 +104,7 @@ func (c *Client) Compose(ctx context.Context, q string, sources []Passage) ([]Pa
 		}
 		endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent"
 	}
-	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, m.Timeout)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
@@ -113,12 +137,12 @@ func (c *Client) Compose(ctx context.Context, q string, sources []Passage) ([]Pa
 			PromptTokenCount, CandidatesTokenCount, ThoughtsTokenCount int
 		}
 	}
-	if json.NewDecoder(io.LimitReader(resp.Body, 64<<10)).Decode(&v) != nil || len(v.Candidates) != 1 || v.Candidates[0].FinishReason != "STOP" {
+	if json.NewDecoder(io.LimitReader(resp.Body, 256<<10)).Decode(&v) != nil || len(v.Candidates) != 1 || v.Candidates[0].FinishReason != "STOP" {
 		return nil, errors.New("answer did not complete")
 	}
 	// What each answer costs, for the bill: tokens in and out.
 	u := v.UsageMetadata
-	log.Printf("ai answer: %d passages, %d tokens in, %d out", len(sources), u.PromptTokenCount, u.CandidatesTokenCount+u.ThoughtsTokenCount)
+	log.Printf("ai answer (%s): %d passages, %d tokens in, %d out", m.Name, len(sources), u.PromptTokenCount, u.CandidatesTokenCount+u.ThoughtsTokenCount)
 	AddUsage(ctx, int64(u.PromptTokenCount), int64(u.CandidatesTokenCount+u.ThoughtsTokenCount))
 	var raw strings.Builder
 	for _, p := range v.Candidates[0].Content.Parts {
@@ -126,7 +150,7 @@ func (c *Client) Compose(ctx context.Context, q string, sources []Passage) ([]Pa
 			raw.WriteString(p.Text)
 		}
 	}
-	return ParseComposed(raw.String(), sources)
+	return parseComposed(raw.String(), sources, m)
 }
 
 // ParseComposed checks a written answer: known passage IDs only, bounded
@@ -134,12 +158,16 @@ func (c *Client) Compose(ctx context.Context, q string, sources []Passage) ([]Pa
 // aside). A quote that is not in the passage is dropped; a paragraph left
 // with none rejects the whole answer rather than showing unbacked text.
 func ParseComposed(raw string, sources []Passage) ([]Para, error) {
+	return parseComposed(raw, sources, Quick)
+}
+
+func parseComposed(raw string, sources []Passage, m Mode) ([]Para, error) {
 	var v struct {
 		Paragraphs []Para `json:"paragraphs"`
 	}
 	d := json.NewDecoder(strings.NewReader(raw))
 	d.DisallowUnknownFields()
-	if d.Decode(&v) != nil || d.Decode(new(any)) != io.EOF || v.Paragraphs == nil || len(v.Paragraphs) > 4 {
+	if d.Decode(&v) != nil || d.Decode(new(any)) != io.EOF || v.Paragraphs == nil || len(v.Paragraphs) > m.Paras {
 		return nil, errors.New("invalid written answer")
 	}
 	text := map[string]string{}
@@ -155,7 +183,7 @@ func ParseComposed(raw string, sources []Passage) ([]Para, error) {
 		p.Text = strings.TrimSpace(p.Text)
 		n := utf8.RuneCountInString(p.Text)
 		total += n
-		if n == 0 || n > 1500 || total > 3000 || len(p.Quotes) > 3 {
+		if n == 0 || n > m.ParaChars || total > m.All || len(p.Quotes) > 3 {
 			return nil, errors.New("invalid written paragraph")
 		}
 		para := Para{Text: p.Text, Quotes: []Cite{}, Sources: []string{}}

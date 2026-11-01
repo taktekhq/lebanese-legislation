@@ -78,6 +78,8 @@
         tpl.innerHTML = html;
         var res = tpl.content.querySelector("[data-ai-results]");
         if (res) res.remove();
+        var deep = tpl.content.querySelector(".ai-box__deep");
+        if (deep) deep.remove(); // the deep answer button needs the full page script
         if (!tpl.content.querySelector(".ai-box__text, .ai-box__limit")) return;
         aiBox = el("section", "wrap");
         var card = el("div", "ai-box");
