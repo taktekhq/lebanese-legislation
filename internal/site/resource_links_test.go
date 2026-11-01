@@ -49,16 +49,11 @@ func TestPublicResourcesAreDirectAndBilingual(t *testing.T) {
 				t.Errorf("%s MCP page misses its %s setup image", lang, img)
 			}
 		}
-		if i, j := strings.Index(body, `href="`+prefix+`/run-it-yourself/"`), strings.Index(body, `id="notify"`); i < 0 || j < 0 || i > j {
-			t.Errorf("%s MCP page does not point to run-it-yourself before the sign-up box", lang)
+		if i, j := strings.Index(body, `href="`+prefix+`/run-it-yourself/"`), strings.Index(body, `/api/v1/law/{id}/`); i < 0 || j < 0 || i < j {
+			t.Errorf("%s MCP page does not point to run-it-yourself at the bottom", lang)
 		}
-		for _, id := range []string{"notify-ok", "notify-bad", "notify-limit"} {
-			if !strings.Contains(body, `id="`+id+`"`) {
-				t.Errorf("%s MCP page misses the #%s message the static sign-up redirects to", lang, id)
-			}
-		}
-		if strings.Contains(body, "taktekbot@") || !strings.Contains(body, "nizar@taktek.io") {
-			t.Errorf("%s MCP page must show nizar@taktek.io and no taktekbot address", lang)
+		if strings.Contains(body, "taktekbot@") {
+			t.Errorf("%s MCP page shows the bot address; contact is nizar@taktek.io", lang)
 		}
 		w := httptest.NewRecorder()
 		s.ServeHTTP(w, httptest.NewRequest("GET", prefix+"/blog/open-source-local-service-starter/", nil))

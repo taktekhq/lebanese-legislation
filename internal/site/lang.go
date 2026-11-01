@@ -12,7 +12,7 @@ import (
 // English interface lives under /en/. The old /ar/... addresses answer a
 // GET or HEAD with a 301 to the same path at the root (query kept), or to
 // where that path has moved since (redirect.go), in one hop; other
-// methods (the notify form posts under the page prefix) are served as Arabic
+// methods are served as Arabic
 // without a redirect. withLang strips the /en or /ar prefix before the
 // request reaches the mux, remembers the language in the request's context,
 // and patches up any redirect the inner handler issues so an /en request

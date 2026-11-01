@@ -20,9 +20,7 @@
      cite_copy           a citation was copied
      language_switch     the link to the other language was followed
      blog_read           a journal post was opened (blog_slug)
-     navigation_click    a header or footer link was followed (surface)
-     notify_submit       the "tell me if AI answers come" form was sent
-     notify_signup       the sign-up went through (the page came back ?notify=ok) */
+     navigation_click    a header or footer link was followed (surface) */
 window.dataLayer = window.dataLayer || [];
 function gtag() { dataLayer.push(arguments); }
 gtag("js", new Date());
@@ -47,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function () {
     track("search", { search_term: q, results: n });
     if (n === 0) track("search_no_results", { search_term: q });
   }
-  if (/[?&]notify=ok\b/.test(location.search)) track("notify_signup", { from: "ai" });
 });
 
 document.addEventListener("click", function (ev) {

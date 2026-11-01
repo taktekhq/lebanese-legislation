@@ -98,9 +98,6 @@ func (s *Server) routes() {
 	// here; /ai/ documents the JSON API and the MCP server, so serve it (its
 	// canonical stays /ai/)
 	m.HandleFunc("GET /developers/{$}", s.aiPage)
-	if !s.isStatic {
-		m.HandleFunc("POST /api/notify", s.notify)
-	}
 	m.HandleFunc("GET /run-it-yourself/{$}", s.localPage)
 	m.HandleFunc("GET /data/{$}", s.data)
 	m.HandleFunc("GET /about/{$}", s.about)

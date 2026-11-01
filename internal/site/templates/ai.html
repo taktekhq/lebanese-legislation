@@ -99,28 +99,8 @@ GET /api/v1/gazette/?since=&amp;until=&amp;order=newest|oldest&amp;limit=&amp;of
     <h2 id="run-yourself">{{t "ai.run_h2"}}</h2>
     <p>{{t "ai.run_p"}} <a class="link" href="{{u "/run-it-yourself/"}}">{{t "ai.run_link"}}</a></p>
 
-    <div class="notify" id="notify">
-      <h2>{{t "ai.notify_h2"}}</h2>
-      <p class="notify__msg" id="notify-ok" role="status">{{t "ai.notify_done"}}</p>
-      <p class="notify__msg" id="notify-bad" role="alert">{{t "ai.notify_bad"}}</p>
-      <p class="notify__msg" id="notify-limit" role="alert">{{t "ai.notify_limit" (safe "<a class=\"link\" href=\"mailto:nizar@taktek.io\">nizar@taktek.io</a>")}}</p>
-      {{if eq .Done "ok"}}<p class="notify__done" role="status">{{t "ai.notify_done"}}</p>
-      {{else}}
-      <p class="notify__intro">{{t "ai.notify_p"}}</p>
-      {{if eq .Done "bad"}}<p class="notify__done" role="alert">{{t "ai.notify_bad"}}</p>{{end}}
-      <form method="post" action="{{u "/api/notify"}}">
-        <input type="hidden" name="from" value="ai">
-        <div class="notify__hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-        <div class="notify__row">
-          <label class="sr-only" for="notify-email">{{t "ai.notify_email_label"}}</label>
-          <input id="notify-email" class="ph-no-capture" type="email" name="email" required maxlength="200" autocomplete="email" placeholder="you@example.com" dir="ltr">
-          <button class="btn btn--primary" type="submit" data-ga="notify_submit">{{t "ai.notify_submit"}}</button>
-        </div>
-        <label class="notify__consent"><input type="checkbox" name="consent" value="yes" required> <span>{{.Consent}}</span></label>
-      </form>
-      <p class="tiny" style="margin-top:12px">{{t "ai.notify_footer" (safe "<a class=\"link\" href=\"mailto:nizar@taktek.io\">nizar@taktek.io</a>") (safe (printf "<a class=\"link\" href=\"%s\">%s</a>" (u "/about/") (t "ai.about_link")))}}</p>
-      {{end}}
-    </div>
+    <h2 id="follow">{{t "ai.follow_h2"}}</h2>
+    <p>{{t "ai.follow_p" (safe "<a class=\"link\" href=\"https://github.com/taktekhq/lebanese-legislation\" rel=\"noopener\">GitHub</a>") (safe "<a class=\"link\" href=\"https://huggingface.co/taktekhq\" rel=\"noopener\">Hugging Face</a>")}}</p>
   </article>
 </section>
 {{end}}{{end}}
