@@ -12,5 +12,10 @@
     <a class="code" href="{{lawURL .ID}}" dir="rtl"><h3 lang="ar">{{.Title}}</h3><span>{{if ne (uilang) "ar"}}<bdi>{{.NameEn}}</bdi>{{with .NameFr}} &middot; <bdi>{{.}}</bdi>{{end}}{{else}}{{with .NameFr}}<bdi lang="fr" dir="ltr">{{.}}</bdi>{{end}}{{end}}</span><span><bdi>{{if .Articles}}{{plural .Articles "article" "articles"}}{{else}}{{t "codes.text_coming"}}{{end}}</bdi>{{with .IssuedOn}} &middot; <bdi>{{date .}}</bdi>{{end}}</span></a>{{end}}
   </div>
 </section>
+{{if not static}}<section class="wrap">
+  <h2 class="sec__title">{{t "hub.code.browse_title"}}</h2>
+  <p class="lead">{{t "hub.code.browse_lead"}}</p>
+  <ul class="doclist">{{range .Data.Codes}}<li><a class="link" href="{{u (printf "/codes/%s/" .Slug)}}">{{if eq (uilang) "ar"}}<span lang="ar">{{.Title}}</span>{{else}}<bdi>{{.NameEn}}</bdi>{{end}}</a> <span class="tiny">{{num .Articles}}</span></li>{{end}}</ul>
+</section>{{end}}
 <div style="height:var(--section-y)"></div>
 {{end}}

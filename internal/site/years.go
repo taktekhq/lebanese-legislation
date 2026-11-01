@@ -134,12 +134,21 @@ func (s *Server) lawsYear(w http.ResponseWriter, r *http.Request) {
 	if label == "no recorded date" {
 		label = s.trOr(r, label, "years.no_recorded_date")
 	}
+	var subhubs []Chip
+	if y > 0 && !s.isStatic {
+		counts, err := s.yearKindCounts(ctx, y)
+		if err != nil {
+			s.fail(w, r, err)
+			return
+		}
+		subhubs = s.kindYearChips(r, y, counts)
+	}
 	s.render(w, r, "laws", 200, Page{
 		Title: s.brandTitle(r, s.trOr(r, "Lebanese legislation of "+label, "years.laws_of_title", label)) + s.pageSuffix(r, page),
 		Path:  pagePath(base, page),
 		Desc: s.trOr(r, fmt.Sprintf("The %s Lebanese laws, decrees and decisions issued in %s. Free.", thousands(total), label),
 			"years.laws_of_desc", thousands(total), label),
-		Data: List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase, Back: "/laws/years/", BackLabel: s.trOr(r, "All years", "years.all_years"),
+		Data: List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase, Subhubs: subhubs, Back: "/laws/years/", BackLabel: s.trOr(r, "All years", "years.all_years"),
 			Eyebrow: s.trOr(r, "Legislation · "+label, "years.legislation_of", label), Heading: s.trOr(r, "Texts of "+label+".", "years.texts_of", label)}})
 }
 

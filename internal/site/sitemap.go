@@ -1,8 +1,8 @@
 package site
 
 import (
+	"bytes"
 	"context"
-	"encoding/xml"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -101,32 +101,6 @@ func (s *Server) indexTables(ctx context.Context) *strings.Replacer {
 	return strings.NewReplacer(
 		"{ps}", have("page_state", `(SELECT NULL::text AS kind, NULL::int AS id, NULL::timestamptz AS changed_at WHERE false)`),
 		"{ni}", have("noindex_page", `(SELECT NULL::text AS kind, NULL::int AS id, NULL::int AS position WHERE false)`))
-}
-
-// sets shape: per file, how many URLs and the newest change in it.
-type fileInfo struct {
-	N   int
-	Mod time.Time
-}
-
-// setFiles measures a set: its files, in one pass over its rows.
-func (s *Server) setFiles(ctx context.Context, set sitemapSet) ([]fileInfo, error) {
-	q := s.indexTables(ctx).Replace(set.rows)
-	rows, err := s.db.Query(ctx, fmt.Sprintf(`SELECT f, count(*)::int, max(m) FROM (
-		SELECT (row_number() OVER () - 1) / %d AS f, m FROM (%s) r(p, m)) x GROUP BY f ORDER BY f`, sitemapSize, q))
-	if err != nil {
-		return nil, err
-	}
-	return pgx.CollectRows(rows, func(row pgx.CollectableRow) (fileInfo, error) {
-		var f int
-		var fi fileInfo
-		var mod *time.Time
-		err := row.Scan(&f, &fi.N, &mod)
-		if mod != nil {
-			fi.Mod = *mod
-		}
-		return fi, err
-	})
 }
 
 // memoCache holds a computed value for a few minutes: building an index of
@@ -241,14 +215,17 @@ func lastmod(t time.Time) string {
 }
 
 func (s *Server) sitemapIndex(w http.ResponseWriter, r *http.Request) {
-	v, err := s.sitemapMemo(r.Context(), "index", func(ctx context.Context) (any, error) { return s.buildIndex(ctx) })
+	out, err := s.buildIndex(r.Context())
 	if err != nil {
-		s.fail(w, r, err)
+		s.sitemapFail(w, r, err)
 		return
 	}
-	xmlOut(w, v.(string))
+	xmlOut(w, out)
 }
 
+// buildIndex lists the files. The small ones are memoized (sitemapMemo), the
+// big families come from setShards, so the index is a few memory reads once
+// the families are built, and its counts always match the files it names.
 func (s *Server) buildIndex(ctx context.Context) (string, error) {
 	var b strings.Builder
 	b.WriteString(`<?xml version="1.0" encoding="UTF-8"?>` + "\n" + `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` + "\n")
@@ -274,14 +251,14 @@ func (s *Server) buildIndex(ctx context.Context) (string, error) {
 	}
 	entry("/blog-sitemap.xml", blogSitemapRows()[0].Mod)
 	for _, set := range sitemapSets {
-		files, err := s.setFiles(ctx, set)
+		files, err := s.setShards(ctx, set)
 		if err != nil {
 			return "", err
 		}
 		for i, f := range files {
-			entry(fmt.Sprintf("/sitemaps/ar-%s-%d.xml", set.name, i+1), f.Mod)
+			entry(fmt.Sprintf("/sitemaps/ar-%s-%d.xml", set.name, i+1), f.mod)
 			if set.name == "laws" {
-				entry(fmt.Sprintf("/sitemaps/laws-%d.xml", i+1), f.Mod)
+				entry(fmt.Sprintf("/sitemaps/laws-%d.xml", i+1), f.mod)
 			}
 		}
 	}
@@ -289,20 +266,38 @@ func (s *Server) buildIndex(ctx context.Context) (string, error) {
 	return b.String(), nil
 }
 
+// sitemapFail answers a sitemap request that could not be served. A build that
+// is still running, or a database that is busy, is a 503 with Retry-After: a
+// crawler waits and comes back, where a 500 reads as a broken site.
+func (s *Server) sitemapFail(w http.ResponseWriter, r *http.Request, err error) {
+	if r.Context().Err() != nil || overloaded(err) {
+		busy(w, sitemapRetryAfter)
+		return
+	}
+	s.fail(w, r, err)
+}
+
+// sitemapRetryAfter is what a crawler is told to wait when a sitemap is not ready.
+const sitemapRetryAfter = "60"
+
 func (s *Server) sitemap(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
 	defer cancel()
 	name := strings.TrimSuffix(r.PathValue("name"), ".xml")
 	arabic := strings.HasPrefix(name, "ar-")
 	name = strings.TrimPrefix(name, "ar-")
-	var urls []SitemapURL
 	switch name {
 	case "core", "pages":
-		var err error
-		if urls, err = s.smallSitemap(ctx, name, arabic); err != nil {
-			s.fail(w, r, err)
+		urls, err := s.smallSitemap(ctx, name, arabic)
+		if err != nil {
+			s.sitemapFail(w, r, err)
 			return
 		}
+		prefix := "/en" // the English files list /en/ addresses, the ar- files the root (Arabic) ones
+		if arabic {
+			prefix = ""
+		}
+		xmlOut(w, urlset(prefix, urls))
 	default:
 		dash := strings.LastIndex(name, "-")
 		n, err := strconv.Atoi(name[dash+1:])
@@ -321,59 +316,31 @@ func (s *Server) sitemap(w http.ResponseWriter, r *http.Request) {
 			s.notFound(w, r)
 			return
 		}
-		q := s.indexTables(ctx).Replace(set.rows)
-		rows, err := s.db.Query(ctx, fmt.Sprintf("%s LIMIT %d OFFSET %d", q, sitemapSize, (n-1)*sitemapSize))
+		files, err := s.setShards(ctx, *set)
 		if err != nil {
-			s.fail(w, r, err)
+			s.sitemapFail(w, r, err)
 			return
 		}
-		urls, err = pgx.CollectRows(rows, func(row pgx.CollectableRow) (SitemapURL, error) {
-			var p string
-			var t *time.Time
-			if err := row.Scan(&p, &t); err != nil {
-				return SitemapURL{}, err
-			}
-			if set.name == "articles" { // law id and article number, joined by a unit separator
-				law, number, _ := strings.Cut(p, "\x1f")
-				id, _ := strconv.Atoi(law)
-				p = artPath(id, number)
-			}
-			u := SitemapURL{Path: p}
-			if t != nil {
-				u.Mod = *t
-			}
-			return u, nil
-		})
-		if err != nil {
-			s.fail(w, r, err)
-			return
-		}
-		if len(urls) == 0 {
+		if n > len(files) {
 			s.notFound(w, r)
 			return
 		}
+		body := files[n-1].ar
+		if !arabic {
+			body = files[n-1].en
+		}
+		xmlOutBytes(w, body)
 	}
-	prefix := "/en" // the English files list /en/ addresses, the ar- files the root (Arabic) ones
-	if arabic {
-		prefix = ""
-	}
-	xmlOut(w, urlset(prefix, urls))
 }
 
 // urlset writes a sitemap file.
 func urlset(prefix string, urls []SitemapURL) string {
-	var b strings.Builder
-	b.WriteString(`<?xml version="1.0" encoding="UTF-8"?>` + "\n" + `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` + "\n")
+	var b bytes.Buffer
+	b.WriteString(urlHead)
 	for _, u := range urls {
-		b.WriteString("<url><loc>")
-		xml.EscapeText(&b, []byte(Base+prefix+u.Path))
-		b.WriteString("</loc>")
-		if m := lastmod(u.Mod); m != "" {
-			b.WriteString("<lastmod>" + m + "</lastmod>")
-		}
-		b.WriteString("</url>\n")
+		writeURL(&b, prefix, u.Path, u.Mod)
 	}
-	b.WriteString("</urlset>\n")
+	b.WriteString(urlFoot)
 	return b.String()
 }
 
@@ -602,4 +569,10 @@ func xmlOut(w http.ResponseWriter, body string) {
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.Header().Set("Cache-Control", sitemapCacheControl)
 	fmt.Fprint(w, body)
+}
+
+func xmlOutBytes(w http.ResponseWriter, body []byte) {
+	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+	w.Header().Set("Cache-Control", sitemapCacheControl)
+	_, _ = w.Write(body)
 }

@@ -96,7 +96,7 @@ func (s *Server) lawFeed(w http.ResponseWriter, r *http.Request) {
 	if s.rightWord(w, r, id) {
 		return
 	}
-	l, err := s.loadLaw(ctx, id, true)
+	l, err := s.loadLawWith(ctx, id, true, false) // the feed lists changes, not rulings
 	if err != nil || l == nil {
 		s.notFound(w, r)
 		return

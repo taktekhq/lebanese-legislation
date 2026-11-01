@@ -9,6 +9,7 @@
   <h2 class="sr-only">{{t "seo.h2_filters"}}</h2>
   {{template "filters" .}}
   <div class="listhead"><h2 class="finder__count">{{plural .Total "text" "texts"}}, {{t "laws.newest_first"}}</h2>{{if not .Heading}}<a class="sec__more" href="{{u "/laws/years/"}}">{{t "laws.browse_by_year"}} <span class="arrow" aria-hidden="true">{{fwdArrow}}</span></a>{{end}}</div>
+  {{with .Subhubs}}<div class="scroller filters" role="group" aria-label="{{t "hub.year.by_kind"}}">{{range .}}<a class="chip" href="{{u .Value}}"><span dir="auto">{{.Label}}</span> <b>{{num .Count}}</b></a>{{end}}</div>{{end}}
   <ul class="doclist">{{range .Rows}}{{template "lawrow" .}}{{end}}</ul>
   {{template "pager" .}}
 </section>

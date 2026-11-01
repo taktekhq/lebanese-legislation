@@ -223,3 +223,9 @@ func undefinedColumn(err error) bool {
 	var pg *pgconn.PgError
 	return errors.As(err, &pg) && pg.Code == "42703"
 }
+
+// undefinedTable: the query names a table the database does not have.
+func undefinedTable(err error) bool {
+	var pg *pgconn.PgError
+	return errors.As(err, &pg) && pg.Code == "42P01"
+}

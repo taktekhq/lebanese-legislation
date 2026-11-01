@@ -1,6 +1,7 @@
 package site
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -208,30 +209,45 @@ type OfficialList struct {
 func (s *Server) officialList(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-	rows, err := s.db.Query(ctx, `SELECT id, kind, number, title, issued_on, gazette_issue FROM official_text
-		WHERE superseded_by_law_id IS NULL ORDER BY issued_on DESC NULLS LAST, number_int DESC NULLS LAST, id DESC LIMIT 500`)
-	if err != nil {
-		s.fail(w, r, err)
-		return
-	}
-	defer rows.Close()
 	l := OfficialList{L: map[string]string{
 		"title": s.trOr(r, "Latest texts from the Official Gazette", "official.list_title"),
 		"intro": s.trOr(r, "Laws and decrees newer than the Lebanese University archive, transcribed from the Official Gazette's page scans. When the University archive adds a text, its page replaces ours.", "official.list_intro"),
 	}}
+	rows, err := s.officialRows(ctx)
+	// The nightly swap reloads the database from data/, which has no
+	// official_text (db/official.sql is applied on its own), so the table can
+	// be missing: that means no texts yet, not a failure. It answered 500 on
+	// 1 Nov 2026.
+	if err != nil && !undefinedTable(err) {
+		s.fail(w, r, err)
+		return
+	}
+	l.Rows = rows
+	l.Total = len(l.Rows)
+	l.Updated = s.updated(r, "official")
+	// An empty list is a thin page: keep it out of search until texts exist.
+	s.render(w, r, "official_list", 200, Page{Lang: "ar", Title: s.brandTitle(r, l.L["title"]), Desc: l.L["intro"], Path: "/official/", Data: l, NoIndex: l.Total == 0})
+}
+
+// officialRows reads the texts UL does not have yet, newest first.
+func (s *Server) officialRows(ctx context.Context) ([]OfficialRow, error) {
+	rows, err := s.db.Query(ctx, `SELECT id, kind, number, title, issued_on, gazette_issue FROM official_text
+		WHERE superseded_by_law_id IS NULL ORDER BY issued_on DESC NULLS LAST, number_int DESC NULLS LAST, id DESC LIMIT 500`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []OfficialRow
 	for rows.Next() {
 		var x OfficialRow
 		var num, issue *string
 		if err := rows.Scan(&x.ID, &x.Kind, &num, &x.Title, &x.IssuedOn, &issue); err != nil {
-			s.fail(w, r, err)
-			return
+			return nil, err
 		}
 		x.Number, x.Issue = str(num), str(issue)
-		l.Rows = append(l.Rows, x)
+		out = append(out, x)
 	}
-	l.Total = len(l.Rows)
-	l.Updated = s.updated(r, "official")
-	s.render(w, r, "official_list", 200, Page{Lang: "ar", Title: s.brandTitle(r, l.L["title"]), Desc: l.L["intro"], Path: "/official/", Data: l})
+	return out, rows.Err()
 }
 
 // officialFiles serves a text's page images and PDF.

@@ -167,6 +167,7 @@ func run(ctx context.Context, cfg config) error {
 		}
 		h.SetEvents(ev)
 	}
+	go h.WarmSitemaps(ctx) // Build the big sitemap files before a crawler needs them.
 	handler, err := modeHandler(site.Compress(h), cfg.mode)
 	if err != nil {
 		return err

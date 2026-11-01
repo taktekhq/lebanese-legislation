@@ -13,6 +13,7 @@
     {{with .Prev}}<a class="btn btn--ghost btn--sm" href="{{artURL $law.ID .Number}}">{{fwdArrow}} المادة {{.Number}}</a>{{end}}
     <a class="btn btn--ghost btn--sm" href="{{lawURL $law.ID}}#a-{{slug .A.Number}}">{{t "art.whole_text"}}</a>
     {{with .Next}}<a class="btn btn--ghost btn--sm" href="{{artURL $law.ID .Number}}">المادة {{.Number}} {{backArrow}}</a>{{end}}
+    {{with .Hub}}<a class="btn btn--ghost btn--sm" href="{{u .}}">{{t "hub.code.in_hub"}}</a>{{end}}
   </div>
 </section>
 {{end}}{{end}}

@@ -86,6 +86,7 @@ func (s *Server) routes() {
 		m.HandleFunc("GET /"+k+"/{id}/{$}", s.doc(kind))
 	}
 	s.topicRoutes()
+	s.hubRoutes()
 	s.blogRoutes()
 	m.HandleFunc("GET /.well-known/", probe404)
 	// A GET to /mcp gets the MCP server's answer (mcpGet), not a redirect to
@@ -316,6 +317,7 @@ type List struct {
 	Rows             any
 	Updated          *Updated // "Last updated": when the source records last changed
 	Base             string   // the list's path, when its pages are paths (/opinions/page/2/); empty: ?page=
+	Subhubs          []Chip   // links to the lists this one divides into (a year's kinds); Value is a path
 }
 
 // Path is page n's address when the list paginates by path.
@@ -535,6 +537,7 @@ type Law struct {
 	CitedBy          []DocRow
 	CitedCount       int
 	Related          []LawRow // same kind and year, nearest by date
+	PrevLaw, NextLaw *LawRow  // the texts of the same year and kind word issued just before and just after (hubs.go)
 	CodeSlug         *string
 	TitleEn          *string // unofficial English title of the subject line (db/titles_en.tsv)
 	Answer           string  // the answer line at the top of the page, from record fields only
@@ -588,6 +591,13 @@ func (c *Scan) PageNumbers() []int {
 func (c *Scan) AgreementPct() string { return fmt.Sprintf("%.1f", 100*c.Agreement) }
 
 func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, error) {
+	return s.loadLawWith(ctx, id, withText, true)
+}
+
+// loadLawWith is loadLaw; rulings says whether every article gets the rulings
+// that cite it. A text's own page shows them for all its articles. An article
+// page shows them for one article (attachRulingsFor), and a feed for none.
+func (s *Server) loadLawWith(ctx context.Context, id int, withText, rulings bool) (*Law, error) {
 	l := &Law{}
 	err := s.db.QueryRow(ctx, `SELECT `+lawRowCols+`, l.gazette_number, l.gazette_date, l.gazette_pages,
 		(SELECT min(issue_id) FROM gazette_entry e WHERE e.law_id = l.id), l.preamble, l.explanatory_note, l.closing,
@@ -703,7 +713,7 @@ func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, erro
 	if s.db.QueryRow(ctx, `SELECT title_en FROM legislation_title_en WHERE law_id = $1`, id).Scan(&te) == nil && te != "" {
 		l.TitleEn = &te
 	}
-	if err := s.attachVersions(ctx, l); err != nil {
+	if err := s.attachVersions(ctx, l, rulings); err != nil {
 		return nil, err
 	}
 	return l, nil
@@ -777,6 +787,10 @@ func (s *Server) lawPage(w http.ResponseWriter, r *http.Request, part int) {
 			l.Related, err = scanLawRows(rows)
 		}
 		if err != nil {
+			s.fail(w, r, err)
+			return
+		}
+		if l.PrevLaw, l.NextLaw, err = s.neighbours(ctx, l); err != nil {
 			s.fail(w, r, err)
 			return
 		}
@@ -863,7 +877,7 @@ func (s *Server) article(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-	l, err := s.loadLaw(ctx, id, true)
+	l, err := s.loadLawWith(ctx, id, true, false)
 	if errors.Is(err, pgx.ErrNoRows) {
 		if !s.aliasRedirect(ctx, w, r, id) {
 			s.notFound(w, r)
@@ -878,10 +892,17 @@ func (s *Server) article(w http.ResponseWriter, r *http.Request) {
 		if Slug(a.Number) != want {
 			continue
 		}
+		if err := s.attachRulingsFor(ctx, l, a.Number); err != nil {
+			s.fail(w, r, err)
+			return
+		}
 		p := s.articlePage(r, l, i)
 		s.trackRead(r, l, a.Number)
 		p.NoIndex = s.noindexed(ctx, "article", l.ID, a.Position)
 		p.Data.(map[string]any)["Topics"] = s.topicsFor(r, l.ID, a.Number)
+		if l.CodeSlug != nil && !s.isStatic {
+			p.Data.(map[string]any)["Hub"] = codeHubPath(*l.CodeSlug, codeHubPage(i)) + "#a-" + Slug(a.Number)
+		}
 		s.render(w, r, "article", 200, p)
 		return
 	}
