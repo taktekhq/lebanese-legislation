@@ -136,7 +136,11 @@
     box.removeAttribute("aria-busy");
     if (wait) wait.remove();
   }
+  /* PostHog, when loaded: the server sends ai_question with the same ID */
+  var ph = window.posthog && window.posthog.get_distinct_id ? window.posthog : null;
+  function track(name, props) { if (ph && ph.capture) ph.capture(name, props); }
   var body = new URLSearchParams({q: section.getAttribute("data-q"), empty: section.getAttribute("data-empty") || ""});
+  try { if (ph) body.set("ph", ph.get_distinct_id() || ""); } catch (e) {}
   var controller = new AbortController();
   var timeout = setTimeout(function () { controller.abort(); }, 30000);
   fetch(section.getAttribute("data-url"), {
@@ -158,6 +162,12 @@
     if (fallback) fallback.hidden = false;
     settle();
     var text = target.querySelector(".ai-box__text");
+    track(text ? "ai_answer_shown" : target.querySelector(".ai-box__limit") ? "ai_limit_shown" : "ai_no_answer_shown",
+      { sources: target.querySelectorAll(".ai-box__src").length, brought_results: !!results });
+    target.addEventListener("click", function (e) {
+      var a = e.target.closest(".ai-box__src");
+      if (a) track("ai_source_clicked", { href: a.getAttribute("href"), position: Number((a.querySelector(".ai-box__n") || {}).textContent) || 0 });
+    });
     if (!text) return;
     box.classList.add("ai-box--collapsed");
     if (target.scrollHeight <= target.clientHeight + 24) {
@@ -173,6 +183,7 @@
       var open = box.classList.toggle("ai-box--collapsed") === false;
       more.setAttribute("aria-expanded", String(open));
       more.textContent = section.getAttribute(open ? "data-less" : "data-more");
+      if (open) track("ai_answer_expanded", {});
     });
     box.append(more);
     /* a citation number opens the box before jumping to its source */

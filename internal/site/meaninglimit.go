@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"errors"
+	"log"
 	"sync"
 	"time"
 
@@ -35,6 +36,9 @@ type meaningSearch struct {
 
 // Defaults when SetMeaningLimits is not called: two provider calls at once,
 // and up to 1,000 answers per cache, each kept for an hour.
+// questionsPerHour is how many AI answers one visitor (IP) gets an hour.
+const questionsPerHour = 10
+
 const (
 	defaultMeaningConcurrency = 2
 	defaultMeaningCacheSize   = 1000
@@ -61,7 +65,7 @@ func (s *Server) SetMeaningLimits(concurrency, cacheSize int, cacheTTL time.Dura
 
 func newMeaningSearch(rw QueryRewriter, provider string, shares bool, limit int) *meaningSearch {
 	return &meaningSearch{rw: rw, provider: provider, shares: shares, limit: limit, cache: make(map[[32]byte]meaningEntry),
-		slots: make(chan struct{}, defaultMeaningConcurrency), clients: newIPLimiter(6, 2),
+		slots: make(chan struct{}, defaultMeaningConcurrency), clients: newHourLimiter(questionsPerHour),
 		cacheSize: defaultMeaningCacheSize, cacheTTL: defaultMeaningCacheTTL}
 }
 
@@ -110,6 +114,8 @@ func (m *meaningSearch) Rewrite(ctx context.Context, q string) (nlsearch.Plan, e
 	m.mu.Unlock()
 	p, err := m.rw.Rewrite(ctx, q)
 	if err == nil {
+		log.Printf("ai rewrite: %d tokens in, %d out", p.InputTokens, p.OutputTokens)
+		nlsearch.AddUsage(ctx, p.InputTokens, p.OutputTokens)
 		m.mu.Lock()
 		if !m.keep(len(m.cache)) {
 			clear(m.cache)

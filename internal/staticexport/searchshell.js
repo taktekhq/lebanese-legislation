@@ -68,6 +68,8 @@
     if (aiBox) { aiBox.remove(); aiBox = null; }
     if (!q) return;
     var body = new URLSearchParams({ q: q });
+    var ph = window.posthog && window.posthog.get_distinct_id ? window.posthog : null;
+    try { if (ph) body.set("ph", ph.get_distinct_id() || ""); } catch (e) {}
     fetch((ar ? "" : "/en") + "/search/ai/", { method: "POST", credentials: "same-origin", body: body })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
       .then(function (html) {
@@ -76,7 +78,7 @@
         tpl.innerHTML = html;
         var res = tpl.content.querySelector("[data-ai-results]");
         if (res) res.remove();
-        if (!tpl.content.querySelector(".ai-box__text")) return;
+        if (!tpl.content.querySelector(".ai-box__text, .ai-box__limit")) return;
         aiBox = el("section", "wrap");
         var card = el("div", "ai-box");
         var head = el("p", "ai-box__head");

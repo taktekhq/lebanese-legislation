@@ -125,3 +125,27 @@ func TestMCPRateLimitReturns429(t *testing.T) {
 		t.Errorf("429 missing Retry-After")
 	}
 }
+
+func TestHourLimiterGivesTenAnHourAndForgetsNothingEarly(t *testing.T) {
+	l := newHourLimiter(10)
+	for i := range 10 {
+		if _, ok := l.Allow("a"); !ok {
+			t.Fatalf("question %d refused", i+1)
+		}
+	}
+	if _, ok := l.Allow("a"); ok {
+		t.Fatal("11th question in the hour allowed")
+	}
+	// 20 idle minutes later the sweep must not hand out a fresh ten.
+	l.buckets["a"].last = l.buckets["a"].last.Add(-20 * time.Minute)
+	l.lastSweep = l.lastSweep.Add(-2 * time.Minute)
+	n := 0
+	for range 10 {
+		if _, ok := l.Allow("a"); ok {
+			n++
+		}
+	}
+	if n > 4 {
+		t.Fatalf("%d questions after 20 idle minutes, want about 3", n)
+	}
+}

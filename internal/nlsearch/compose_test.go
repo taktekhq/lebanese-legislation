@@ -9,22 +9,23 @@ import (
 	"testing"
 )
 
-func TestComposedRejectsUnbackedText(t *testing.T) {
-	sources := []Passage{{ID: "s1", Text: "a"}, {ID: "s2", Text: "b"}}
+func TestComposedNeedsTheTextsOwnWords(t *testing.T) {
+	sources := []Passage{{ID: "s1", Text: "للعامل الحق في اجازة سنوية مدتها خمسة عشر يوما\nبأجر كامل"}, {ID: "s2", Text: "Le jugement pénal ne fait pas obstacle à l'action civile."}}
 	for _, raw := range []string{
-		`{"paragraphs":[{"text":"x","sources":["s3"]}]}`,
-		`{"paragraphs":[{"text":"x","sources":[]}]}`,
-		`{"paragraphs":[{"text":"  ","sources":["s1"]}]}`,
-		`{"paragraphs":[{"text":"x","sources":["s1"],"url":"https://outside.test"}]}`,
+		`{"paragraphs":[{"text":"x","quotes":[{"source":"s3","quote":"للعامل الحق في اجازة"}]}]}`,
+		`{"paragraphs":[{"text":"x","quotes":[]}]}`,
+		`{"paragraphs":[{"text":"x","quotes":[{"source":"s1","quote":"للعامل الحق في اجازة شهرية"}]}]}`,
+		`{"paragraphs":[{"text":"  ","quotes":[{"source":"s1","quote":"للعامل الحق في اجازة"}]}]}`,
+		`{"paragraphs":[{"text":"x","quotes":[{"source":"s1","quote":"للعامل الحق في اجازة"}],"url":"https://outside.test"}]}`,
 		`{"paragraphs":null}`, `{}`, `not json`,
-		`{"paragraphs":[{"text":"` + strings.Repeat("x", 1501) + `","sources":["s1"]}]}`,
 	} {
 		if _, err := ParseComposed(raw, sources); err == nil {
 			t.Errorf("accepted %s", raw)
 		}
 	}
-	p, err := ParseComposed(`{"paragraphs":[{"text":" Yes. ","sources":["s2","s2","s1"]}]}`, sources)
-	if err != nil || len(p) != 1 || p[0].Text != "Yes." || strings.Join(p[0].Sources, ",") != "s2,s1" {
+	// spacing differs from the passage, an invented quote is dropped, the real one kept
+	p, err := ParseComposed(`{"paragraphs":[{"text":" Yes, 15 days. ","quotes":[{"source":"s1","quote":"«خمسة عشر يوما بأجر كامل»"},{"source":"s2","quote":"le jugement civil prime toujours"},{"source":"s2","quote":"Le jugement pénal ne fait pas obstacle"}]}]}`, sources)
+	if err != nil || len(p) != 1 || p[0].Text != "Yes, 15 days." || len(p[0].Quotes) != 2 || p[0].Quotes[0].Quote != "خمسة عشر يوما بأجر كامل" || strings.Join(p[0].Sources, ",") != "s1,s2" {
 		t.Fatalf("got %+v %v", p, err)
 	}
 	p, err = ParseComposed(`{"paragraphs":[]}`, sources)
@@ -37,7 +38,7 @@ func TestComposeSendsPassagesOnly(t *testing.T) {
 	var got map[string]any
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&got)
-		out := `{"paragraphs":[{"text":"نعم.","sources":["s1"]}]}`
+		out := `{"paragraphs":[{"text":"نعم.","quotes":[{"source":"s1","quote":"نص المادة كاملا"}]}]}`
 		_ = json.NewEncoder(w).Encode(map[string]any{"candidates": []any{map[string]any{"finishReason": "STOP", "content": map[string]any{"parts": []any{map[string]any{"text": out}}}}}})
 	}))
 	defer srv.Close()
@@ -45,7 +46,7 @@ func TestComposeSendsPassagesOnly(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, err := c.Compose(context.Background(), "هل؟", []Passage{{ID: "s1", Text: "نص"}})
+	p, err := c.Compose(context.Background(), "هل؟", []Passage{{ID: "s1", Text: "نص المادة كاملا هنا"}})
 	if err != nil || len(p) != 1 || p[0].Text != "نعم." {
 		t.Fatalf("got %+v %v", p, err)
 	}

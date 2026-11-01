@@ -46,6 +46,12 @@ type ipLimiter struct {
 	lastSweep  time.Time
 }
 
+// newHourLimiter allows perHour calls an hour per client IP, all of them at
+// once if the client has been quiet for the hour.
+func newHourLimiter(perHour int) *ipLimiter {
+	return &ipLimiter{buckets: map[string]*bucket{}, ratePerSec: float64(perHour) / 3600, burst: float64(perHour), lastSweep: time.Now()}
+}
+
 func newIPLimiter(ratePerMin, burst int) *ipLimiter {
 	return &ipLimiter{buckets: map[string]*bucket{}, ratePerSec: float64(ratePerMin) / 60, burst: float64(burst), lastSweep: time.Now()}
 }
@@ -84,6 +90,17 @@ func (l *ipLimiter) Allow(ip string) (time.Duration, bool) {
 	return 0, true
 }
 
+// Left says how many whole calls ip may still make now, without using one.
+func (l *ipLimiter) Left(ip string) int {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	b := l.buckets[ip]
+	if b == nil {
+		return int(l.burst)
+	}
+	return int(min(l.burst, b.tokens+time.Since(b.last).Seconds()*l.ratePerSec))
+}
+
 // sweep drops buckets idle for 10 minutes, at most once a minute, so a
 // public endpoint under many distinct IPs does not leak memory.
 func (l *ipLimiter) sweep(now time.Time) {
@@ -91,8 +108,14 @@ func (l *ipLimiter) sweep(now time.Time) {
 		return
 	}
 	l.lastSweep = now
+	// A bucket idle long enough to be full again is the same as no bucket;
+	// dropping it sooner would hand out a fresh allowance early.
+	idle := 10 * time.Minute
+	if full := time.Duration(l.burst / l.ratePerSec * float64(time.Second)); full > idle {
+		idle = full
+	}
 	for ip, b := range l.buckets {
-		if now.Sub(b.last) > 10*time.Minute {
+		if now.Sub(b.last) > idle {
 			delete(l.buckets, ip)
 		}
 	}

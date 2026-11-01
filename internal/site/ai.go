@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 )
@@ -31,12 +32,21 @@ type aiPara struct {
 	Refs []int // 1-based, into aiView.Sources
 }
 
+// aiSource is a cited page and the exact words of it the answer quotes.
+type aiSource struct {
+	answerSource
+	Quotes []string
+}
+
 type aiView struct {
 	Paras                []aiPara
-	Sources              []answerSource
+	Sources              []aiSource
 	Provider             string
 	Unavailable, Missing bool
-	Results              *Results // what the meaning search found, when the page found nothing
+	Results              *Results
+	Left, PerHour        int // questions this visitor may still ask this hour, of PerHour
+	Limited              bool
+	WaitMin              int // when Limited: minutes until the next question // what the meaning search found, when the page found nothing
 }
 
 // composeAnswer is Compose with a content-keyed cache, the shared call budget
@@ -116,8 +126,12 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "not a question", http.StatusBadRequest)
 		return
 	}
-	view := aiView{}
+	view := aiView{PerHour: questionsPerHour}
+	start := time.Now()
+	ctx, usage := nlsearch.WithUsage(r.Context())
+	var reason error // why the answer is unavailable, for the event
 	render := func() {
+		s.trackAI(r, q, view, usage, reason, time.Since(start))
 		ts := s.pages
 		if s.lang(r) == "ar" {
 			ts = s.pagesAr
@@ -127,24 +141,26 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if s.meaning == nil {
-		view.Unavailable = true
+		view.Unavailable, reason = true, errors.New("AI search is off")
 		render()
 		return
 	}
 	view.Provider = s.meaning.provider
-	if _, ok := s.meaning.clients.Allow(clientIP(r)); !ok {
-		view.Unavailable = true
+	ip := clientIP(r)
+	if wait, ok := s.meaning.clients.Allow(ip); !ok {
+		view.Limited, view.WaitMin = true, max(1, int((wait+time.Minute-1)/time.Minute))
 		render()
 		return
 	}
-	ctx, cancel := context.WithTimeout(r.Context(), 28*time.Second)
+	view.Left = s.meaning.clients.Left(ip)
+	ctx, cancel := context.WithTimeout(ctx, 28*time.Second)
 	defer cancel()
 	res, err := s.SearchMeaning(ctx, q, s.meaning)
 	if err == nil && r.PostForm.Get("empty") == "1" && found(res) {
 		view.Results = &res
 	}
 	if err != nil {
-		view.Unavailable = true
+		view.Unavailable, reason = true, err
 		render()
 		return
 	}
@@ -155,7 +171,7 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 	}
 	sources, err := s.answerSources(ctx, q, res)
 	if err != nil {
-		view.Unavailable = true
+		view.Unavailable, reason = true, err
 		render()
 		return
 	}
@@ -182,7 +198,7 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 	}
 	paras, err := s.meaning.composeAnswer(ctx, q, passages)
 	if err != nil {
-		view.Unavailable = true
+		view.Unavailable, reason = true, err
 		render()
 		return
 	}
@@ -190,26 +206,111 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 	render()
 }
 
+// Gemini 3.8 Flash, USD per million tokens (ai.google.dev pricing, 30 Oct
+// 2026; it doubles on 1 Jan 2027). Only for the cost estimate in events.
+const (
+	aiUSDPerMIn  = 0.75
+	aiUSDPerMOut = 3.75
+)
+
+// trackAI sends one ai_question event to PostHog for every question the box
+// answers or declines: what happened, what it cost, and how long it took.
+// The browser's PostHog ID (form field ph) ties it to the visitor's session.
+func (s *Server) trackAI(r *http.Request, q string, v aiView, u *nlsearch.Usage, reason error, took time.Duration) {
+	outcome := "answered"
+	switch {
+	case v.Limited:
+		outcome = "limited"
+	case v.Unavailable:
+		outcome = "unavailable"
+	case v.Missing:
+		outcome = "missing_text"
+	case len(v.Paras) == 0:
+		outcome = "no_answer"
+	}
+	calls, in, out := u.Totals()
+	quotes := 0
+	for _, src := range v.Sources {
+		quotes += len(src.Quotes)
+	}
+	props := map[string]any{
+		"question":        cut(q, 300),
+		"question_lang":   scriptOf(q),
+		"page_lang":       s.lang(r),
+		"outcome":         outcome,
+		"model_calls":     calls,
+		"tokens_in":       in,
+		"tokens_out":      out,
+		"cost_usd":        float64(in)*aiUSDPerMIn/1e6 + float64(out)*aiUSDPerMOut/1e6,
+		"cached":          outcome == "answered" && calls == 0,
+		"duration_ms":     took.Milliseconds(),
+		"paragraphs":      len(v.Paras),
+		"sources":         len(v.Sources),
+		"quotes":          quotes,
+		"questions_left":  v.Left,
+		"wait_minutes":    v.WaitMin,
+		"brought_results": v.Results != nil,
+		"bot":             IsBot(r),
+	}
+	if reason != nil {
+		props["reason"] = cut(reason.Error(), 120)
+	}
+	if id := r.PostForm.Get("ph"); id != "" && len(id) <= 80 {
+		props["distinct_id"] = id
+	}
+	s.captureEvent("ai_question", props)
+}
+
+// scriptOf names the main script of q: "arabic", "latin" or "other".
+func scriptOf(q string) string {
+	var ar, lat, other int
+	for _, c := range q {
+		switch {
+		case unicode.Is(unicode.Arabic, c):
+			ar++
+		case unicode.Is(unicode.Latin, c):
+			lat++
+		case unicode.IsLetter(c):
+			other++
+		}
+	}
+	switch {
+	case ar >= lat && ar >= other && ar > 0:
+		return "arabic"
+	case lat >= other && lat > 0:
+		return "latin"
+	case other > 0:
+		return "other"
+	}
+	return "none"
+}
+
 // numberSources numbers the cited passages in the order the answer first
 // cites them, and drops passages it does not cite. Two passages of the same
-// page (its Arabic and French text) share one number.
-func numberSources(paras []nlsearch.Para, byID map[string]answerSource) ([]aiPara, []answerSource) {
+// page (its Arabic and French text) share one number. Each source keeps the
+// quotes taken from it, once each.
+func numberSources(paras []nlsearch.Para, byID map[string]answerSource) ([]aiPara, []aiSource) {
 	var out []aiPara
-	var sources []answerSource
+	var sources []aiSource
 	num := map[string]int{} // by page path
+	quoted := map[string]bool{}
 	for _, p := range paras {
 		ap := aiPara{Text: p.Text}
 		seen := map[int]bool{}
-		for _, id := range p.Sources {
-			src, ok := byID[id]
+		for _, c := range p.Quotes {
+			src, ok := byID[c.Source]
 			if !ok {
 				continue
 			}
 			n, ok := num[src.Path]
 			if !ok {
-				sources = append(sources, src)
+				sources = append(sources, aiSource{answerSource: src})
 				n = len(sources)
 				num[src.Path] = n
+			}
+			if !quoted[src.Path+"\x00"+c.Quote] {
+				quoted[src.Path+"\x00"+c.Quote] = true
+				sources[n-1].Quotes = append(sources[n-1].Quotes, c.Quote)
 			}
 			if !seen[n] {
 				seen[n] = true

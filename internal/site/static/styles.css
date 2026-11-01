@@ -2148,13 +2148,23 @@ table.ref .ar {
   padding: 12px 0 0;
   border-top: 1px solid var(--line);
   display: grid;
-  gap: 6px;
+  gap: 12px;
 }
 .ai-box__src { display: flex; align-items: baseline; gap: 8px; color: var(--ink-soft); text-decoration: none; font-size: 0.875rem; }
 .ai-box__src .ai-box__n { margin-inline-start: 0; flex: none; }
 .ai-box__src:hover .ai-box__srctitle { color: var(--accent); }
 .ai-box__sources li:target .ai-box__srctitle { color: var(--accent); }
+.ai-box__quote {
+  margin: 6px 0 4px;
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--line-strong);
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
 .ai-box__note { margin-top: 12px; }
+.ai-box__left { margin-top: 4px; }
+.ai-box__limit { color: var(--ink); line-height: 1.7; }
 .ai-box__more {
   display: block;
   width: 100%;
