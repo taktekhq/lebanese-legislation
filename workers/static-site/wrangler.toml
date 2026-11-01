@@ -14,7 +14,7 @@ class_name = "Origin"
 image = "./container/Dockerfile"
 image_build_context = "./container"
 max_instances = 1
-instance_type = "standard-2"
+instance_type = "standard-4"
 
 [[durable_objects.bindings]]
 name = "ORIGIN"
