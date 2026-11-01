@@ -1,0 +1,66 @@
+#!/bin/bash
+# The archive is published: the archive repository's origin/main has a commit
+# within MAX_AGE_H, and no file in it is over MAX_SHARD_MB (GitHub's limit).
+#
+#   scraper/bin/check-archive [--archive DIR] [--now ISO] [--max-age-h H] [--max-shard-mb MB]
+#
+# DIR is a checkout of taktekhq/lebanese-legislation-archive: by default
+# $LEBLEG_ARCHIVE_REPO, else this repository's archive/ submodule.
+set -euo pipefail
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ARCHIVE="${LEBLEG_ARCHIVE_REPO:-$REPO/archive}"
+NOW="$(date +%s)"
+MAX_AGE_H=24
+MAX_SHARD_MB=100
+
+usage() {
+  echo "usage: $0 [--archive DIR] [--now ISO] [--max-age-h H] [--max-shard-mb MB]" >&2
+  exit 2
+}
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --archive|--now|--max-age-h|--max-shard-mb)
+      [ "$#" -ge 2 ] || usage
+      key=$1 value=$2
+      case "$key" in
+        --archive) ARCHIVE=$(cd "$value" && pwd) ;;
+        --now) NOW=$(date -d "$value" +%s 2>/dev/null) || { echo "check-archive: FAIL invalid --now: $value"; exit 1; } ;;
+        --max-age-h) MAX_AGE_H=$value ;;
+        --max-shard-mb) MAX_SHARD_MB=$value ;;
+      esac
+      shift 2 ;;
+    *) usage ;;
+  esac
+done
+[[ "$MAX_AGE_H" =~ ^[0-9]+$ && "$MAX_SHARD_MB" =~ ^[0-9]+$ ]] || usage
+[ -e "$ARCHIVE/.git" ] || { echo "check-archive: FAIL no archive checkout at $ARCHIVE"; exit 1; }
+
+# Never wait on a credential prompt: the pipeline report gives a check 5
+# minutes, and on 27 Oct 2026 step 3 ended with only "context deadline
+# exceeded". Fail at once instead, with git's own reason.
+if ! fetch_err=$(GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/false SSH_ASKPASS=/bin/false \
+    git -C "$ARCHIVE" -c credential.interactive=never fetch -q origin main 2>&1); then
+  echo "check-archive: FAIL fetch origin: $(printf '%s\n' "$fetch_err" | grep -m1 -E '^(fatal|error):' || printf '%s\n' "$fetch_err" | head -1)"; exit 1
+fi
+fail=0
+stamp=$(git -C "$ARCHIVE" log -1 --format=%ct FETCH_HEAD 2>/dev/null || true)
+if [ -z "$stamp" ]; then
+  echo "check-archive: FAIL no commit on the archive's origin/main"; fail=1
+elif (( NOW - stamp > MAX_AGE_H * 3600 || stamp > NOW )); then
+  echo "check-archive: FAIL last archive commit on origin/main is older than ${MAX_AGE_H}h"; fail=1
+else
+  echo "check-archive: ok last archive commit on origin/main is within ${MAX_AGE_H}h"
+fi
+
+limit=$((MAX_SHARD_MB * 1000 * 1000))
+# One awk pass, not a bash loop per entry: the archive holds about 600,000
+# files, and on 30 Oct 2026 the loop alone ran past the report's 5 minutes.
+oversized=$(git -C "$ARCHIVE" ls-tree -r -l FETCH_HEAD | awk -F'\t' -v limit="$limit" '
+  { n = split($1, m, " "); if (m[n] ~ /^[0-9]+$/ && m[n] + 0 > limit) printf " %s", $2 }') || true
+if [ -n "$oversized" ]; then
+  echo "check-archive: FAIL archive file exceeds ${MAX_SHARD_MB} MB:$oversized"; fail=1
+else
+  echo "check-archive: ok archive files are at most ${MAX_SHARD_MB} MB"
+fi
+exit "$fail"

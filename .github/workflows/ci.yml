@@ -14,6 +14,10 @@ jobs:
           python-version: '3.12'
       - run: pip install './tools[build,test]'
       - run: ruff check tools/src tools/tests
+      - name: Scraper
+        run: |
+          python -m compileall -q scraper/ulscrape
+          bash scraper/bin/check-archive_test.sh
       - run: docker build -f db/Dockerfile --target postgres -t lebleg-test-postgres .
       - name: Start disposable PostgreSQL
         run: |

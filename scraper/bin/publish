@@ -1,0 +1,34 @@
+#!/bin/bash
+# Mirror the archive into the archive repository (taktekhq/lebanese-legislation-archive)
+# and commit + push what changed to its main branch, one commit per document type.
+# One commit per type keeps each push under GitHub's 2 GB cap. Big indexes come
+# split into <type>-NN.tsv parts (see cmd_export), so no file reaches GitHub's
+# 100 MB limit; refuse to commit one that does.
+#
+# The archive repository's checkout is $LEBLEG_ARCHIVE_REPO, else this
+# repository's archive/ submodule (git submodule update --init archive).
+set -euo pipefail
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ARCHIVE="${LEBLEG_ARCHIVE_REPO:-$REPO/archive}"
+if [ ! -e "$ARCHIVE/.git" ]; then  # a directory in a clone, a file in a submodule
+  echo "publish: no archive checkout at $ARCHIVE; run git submodule update --init archive, or set LEBLEG_ARCHIVE_REPO" >&2
+  exit 1
+fi
+cd "$ARCHIVE"
+git checkout -q main
+git pull -q --rebase origin main
+"$REPO/scraper/bin/ul-scrape" export --quiet --out "$ARCHIVE"
+big="$(find . -path ./.git -prune -o -type f -size +95M -print)"
+[ -z "$big" ] || { echo "publish: over GitHub's file limit: $big" >&2; exit 1; }
+stamp="$(date -u +%Y-%m-%d)"
+for dir in */; do
+  typ="$(basename "$dir")"
+  # the index (single file or parts), including any just deleted, plus the pages
+  paths=$( { ls "$typ".tsv "$typ"-[0-9][0-9].tsv 2>/dev/null || true
+             git ls-files -- "$typ.tsv" "$typ-[0-9][0-9].tsv"; } | sort -u)
+  git add -A -- $paths "$typ"
+  git diff --cached --quiet && continue
+  n="$(git diff --cached --name-only -- "$typ" | wc -l | tr -d ' ')"
+  git commit -q -m "archive: $typ, $n pages changed ($stamp)"
+  git push -q origin HEAD:main || { git pull -q --rebase origin main && git push -q origin HEAD:main; }
+done
