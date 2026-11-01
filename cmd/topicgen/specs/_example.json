@@ -1,0 +1,15 @@
+{
+  "slug": "end-of-service-indemnity",
+  "title_en": "End-of-service indemnity in Lebanon",
+  "title_ar": "تعويض نهاية الخدمة في لبنان",
+  "question_en": "How much end-of-service indemnity is a worker owed in Lebanon?",
+  "question_ar": "كم يبلغ تعويض نهاية الخدمة المستحق للأجير في لبنان؟",
+  "sub_questions": [
+    "Who is entitled to an indemnity?",
+    "How is it calculated?"
+  ],
+  "notes": "Caveats a writer must respect (e.g. which law is in force, what the articles do NOT say).",
+  "pack": [
+    {"law": 190374, "articles": ["50", "54", "55"], "why": "Labour Code: notice and dismissal indemnity"}
+  ]
+}

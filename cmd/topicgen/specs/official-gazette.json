@@ -1,0 +1,21 @@
+{
+  "slug": "official-gazette",
+  "title_en": "Publication of laws in the Official Gazette and when they take effect",
+  "title_ar": "نشر القوانين في الجريدة الرسمية ومتى تصبح نافذة",
+  "question_en": "How do Lebanese laws become binding, and when must they be published in the Official Gazette?",
+  "question_ar": "كيف تصبح القوانين اللبنانية نافذة، ومتى يجب نشرها في الجريدة الرسمية؟",
+  "sub_questions": [
+    "Who promulgates a law and within what delay?",
+    "What happens if the president does not promulgate a law?",
+    "Within how many days must a law or decree be published?",
+    "From what day is a published law binding on the public?",
+    "What must the administration also publish online?"
+  ],
+  "notes": "Constitution art. 51 and 56: the president promulgates laws and requests their publication; art. 56 sets one month after transmission to the government for ordinary laws and five days for urgent laws; decrees are issued and their publication requested; a Council of Ministers decision or decree becomes automatically enforceable and must be published if the Council insists or the delay (15 days) runs out. Art. 57: the president may ask once for a reconsideration; if the delay passes without promulgation or return the law is enforceable by operation of law and must be published. Art. 58 deals with urgent bills decreed into force. Law 646 of 2 June 1997 (id 179822), art. 1: laws and decrees must be published in the Official Gazette within 15 days of their issue; art. 3 to 6 of that law are empty in the database. Legislative decree 9 of 21 Nov 1939 (id 187847, art. 1): laws and decrees become binding on the eighth day after publication in the Gazette unless the text says otherwise; decrees that do not concern the public take effect on notification; in urgent cases the delay can be shortened if the text is made public by another means. This decree has a 1943 addition (legislative decree 16, id 191219) not in the pack (4-law limit). The database does not tell how the Gazette is sold or its subscription tariff in current terms; do not state it. Law 28 of 2017 on access to information (id 269965): art. 6 requires the 'reasons' (الأسباب الموجبة) to be published with laws and decrees in the Gazette; art. 7 requires the administration to publish its regulatory decrees and decisions on its website within 15 days of issue and in the Gazette in electronic form; art. 9 says the website is the means of publication. This is distinct from the Gazette itself. Most laws set their own entry-into-force clause ('يعمل بهذا القانون فور نشره'), which overrides the eight-day rule.",
+  "pack": [
+    {"law": 244058, "articles": ["51", "56", "57", "58"], "why": "Constitution: promulgation of laws, delays, automatic enforceability, urgent bills"},
+    {"law": 179822, "articles": ["1", "2"], "why": "Law 646 of 1997: 15-day maximum for publishing laws and decrees in the Official Gazette"},
+    {"law": 187847, "articles": ["1"], "why": "Legislative decree 9 of 1939: laws and decrees binding from the eighth day after publication"},
+    {"law": 269965, "articles": ["6", "7", "9"], "why": "Access to information law 28 of 2017: publication of reasons with laws, online publication of decrees"}
+  ]
+}

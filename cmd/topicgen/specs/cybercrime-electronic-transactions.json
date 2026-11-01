@@ -1,0 +1,54 @@
+{
+  "slug": "cybercrime-electronic-transactions",
+  "title_en": "Cybercrime and electronic transactions in Lebanon",
+  "title_ar": "الجرائم المعلوماتية والمعاملات الإلكترونية في لبنان",
+  "question_en": "What does Lebanese law say about electronic signatures, online crimes such as hacking, and the secrecy of communications?",
+  "question_ar": "ماذا يقول القانون اللبناني عن التوقيع الإلكتروني والجرائم المعلوماتية مثل الاختراق وسرية المخابرات؟",
+  "sub_questions": [
+    "Is an electronic signature or document valid as evidence?",
+    "Is hacking or unauthorised access to a computer system a crime, and what is the penalty?",
+    "What are the penalties for forging a bank card or electronic money?",
+    "Can the authorities block a website or freeze an online account?",
+    "When can phone calls and messages be intercepted?",
+    "How is digital evidence seized and used in court?"
+  ],
+  "notes": "The database holds no dedicated cybercrime law. The computer offences are in Chapter on offences of law 81 of 10/10/2018 (id 278573), arts 110 to 117 (unauthorised access, attack on system or data integrity, obstruction, misuse of devices, bank card and electronic money forgery, spam), with digital evidence rules in arts 121 to 127 and blocking powers in arts 125 and 126. Law 81/2018 also covers personal data (arts 85 to 109) and e-commerce and payments, which are not in this pack; arts 106 and 107 hold the personal-data penalties if the writer needs them. Electronic evidence and signature: arts 4, 7, 9 and 17. TRAP: law 81/2018 art 119 amends Penal Code art 453 (forgery) to include electronic media, and art 118 amends art 209 item 3, but the current text of Penal Code art 453 in the database (id 244611) still shows the OLD wording without the electronic support; do not quote 244611 art 453 as current. Quote art 119 of law 81/2018 itself for the amended definition. Secrecy of communications is law 140 of 27/10/1999 (id 198664): art 1 protects it, arts 2 to 9 allow judicial and administrative interception under conditions, art 17 penalises illegal interception. No separate 'law of 2018 on e-signature in the Code of Obligations or Commerce' was found: the e-signature rules are in law 81/2018.",
+  "pack": [
+    {
+      "law": 278573,
+      "articles": [
+        "4",
+        "7",
+        "9",
+        "17",
+        "76",
+        "110",
+        "111",
+        "112",
+        "113",
+        "114",
+        "115",
+        "116",
+        "119",
+        "121",
+        "122",
+        "125",
+        "126",
+        "127"
+      ],
+      "why": "Law 81/2018: electronic writing, signature and evidence; cooperation of technical service providers; computer offences and penalties; digital evidence and website blocking"
+    },
+    {
+      "law": 198664,
+      "articles": [
+        "1",
+        "2",
+        "3",
+        "8",
+        "9",
+        "17"
+      ],
+      "why": "Law 140/1999: secrecy of communications, judicial and administrative interception, lawyers' calls, penalties"
+    }
+  ]
+}

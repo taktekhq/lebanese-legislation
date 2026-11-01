@@ -1,0 +1,67 @@
+{
+  "slug": "inheritance",
+  "title_en": "Inheritance in Lebanon",
+  "title_ar": "الإرث في لبنان",
+  "question_en": "Who inherits and how much under Lebanese law, for non-Muslims and for Sunni and Jaafari Muslims, and how much can a person leave by will?",
+  "question_ar": "من يرث وكم يبلغ نصيبه في القانون اللبناني لغير المحمديين وللمسلمين السنة والجعفريين، وكم يجوز الإيصاء به؟",
+  "sub_questions": [
+    "Which law applies to a non-Muslim estate and which to a Muslim estate?",
+    "How is the estate divided among children, spouse and parents under the 1959 law for non-Muslims?",
+    "What are the fixed shares (fractions) in the Sunni texts?",
+    "How are shares set under the Jaafari texts?",
+    "How much of the estate can be left by will, and what is the reserved share?",
+    "Who inherits if there are no heirs?"
+  ],
+  "notes": "Non-Muslims: Law of 23/6/1959 (id 244354). Art 128 excludes Muslim estates; shares are by classes (art 14), spouse takes a quarter with first-class heirs, half with parents or siblings, five-sixths with grandparents (art 20); estate goes to the State if no heir (art 21). Reserved shares limit wills (arts 58-64: 50% for descendants alone, 30% spouse, 30% parents, 30/10/10 and 40/10 combinations). Muslims: the second law of 23/6/1959 (id 258041, 'inheritance for Muslims') holds the Sunni (Hanafi) fixed shares; its printed article numbers run one above the headings in the text (e.g. 'art 5' is headed '4- the husband', 'art 13' is headed '12- the wife'), so cite the printed number. Its art 25 sends wills of Muslims to the Hanafi rules except where the Jaafari or Druze texts differ. The Jaafari texts (id 258043) are numbered as mas'ala 1707 onwards (not 1 to 107); only a few are packed (1732, 1734, 1735, 1738); the Jaafari will book (id 258044) and the Druze texts (id 258034 and the 1948 Druze personal status law, id 258196) were left out for the four-law limit and should be named as further reading, not summarized. Hanafi wills (id 258042): art 536-537 allow bequest to a stranger up to one third without heirs' consent; a bequest to an heir needs the other heirs' approval. The 1959 Muslim law gives fractions only for the 12 fixed-share heirs and the residuary rules; the page must not compute shares beyond what these articles state. Estate tax is a different law (1951) and is not covered.",
+  "pack": [
+    {
+      "law": 244354,
+      "articles": [
+        "14",
+        "15",
+        "16",
+        "19",
+        "20",
+        "21",
+        "22",
+        "59",
+        "60",
+        "62",
+        "128"
+      ],
+      "why": "Law of 23/6/1959 on inheritance of non-Muslims: classes of heirs, children, parents, spouse, State, illegitimate child, reserved shares against wills, exclusion of Muslims"
+    },
+    {
+      "law": 258041,
+      "articles": [
+        "1",
+        "2",
+        "5",
+        "6",
+        "8",
+        "13",
+        "25"
+      ],
+      "why": "Law of 23/6/1959 on inheritance of Muslims (Sunni fixed shares): list of fixed-share heirs, father, husband, mother, daughter, wife, and applicable law for wills"
+    },
+    {
+      "law": 258043,
+      "articles": [
+        "1732",
+        "1734",
+        "1735",
+        "1738"
+      ],
+      "why": "Jaafari inheritance texts: shares of parents, children, spouse with children"
+    },
+    {
+      "law": 258042,
+      "articles": [
+        "534",
+        "536",
+        "537"
+      ],
+      "why": "Hanafi will texts: how much may be bequeathed and to whom"
+    }
+  ]
+}
