@@ -1,0 +1,12 @@
+name = "lebleg-static-site"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+# The Worker answers on workers.dev until routes are attached. Routes are added
+# one at a time with `wrangler deploy --route "lebaneselegislation.com/law/*"`
+# (the workflow takes them as an input); removing a route returns that path to
+# the live origin. Keep any `routes = [...]` above the first [table].
+workers_dev = true
+
+[[r2_buckets]]
+binding = "SITE"
+bucket_name = "lebleg-site"
