@@ -47,6 +47,8 @@ jobs:
           go-version-file: go.mod
       - name: Archive at its latest main
         run: |
+          # Under act the checkout is bind-mounted and owned by another user.
+          git config --global --add safe.directory '*'
           git submodule update --init --remote archive
           echo "archive: $(git -C archive rev-parse --short=12 HEAD)" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Need manual/
