@@ -1,8 +1,13 @@
 name: data
 # The database in data/: load it into PostgreSQL from the text files, export the
 # Hugging Face Parquet tables, check the row counts, and compare with the dataset
-# on Hugging Face. Nothing is published yet; the Parquet tables are kept as an
-# artifact for a week.
+# on Hugging Face. The Parquet tables are kept as an artifact for a week.
+#
+# The publish job uploads them, with the dataset card, to Hugging Face. It runs
+# on main (push, or workflow_dispatch with publish=true) and only when the
+# HF_TOKEN secret is set; without it, it says so and uploads nothing. Run it on
+# your own machine with act (see docs/ci.md):
+#   act workflow_dispatch -W .github/workflows/data.yml --input publish=true -s HF_TOKEN
 on:
   pull_request:
     paths: ["data/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
@@ -10,6 +15,11 @@ on:
     branches: [main]
     paths: ["data/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Upload the tables to Hugging Face (needs the HF_TOKEN secret)
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -26,6 +36,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Start PostgreSQL 18.6
         run: |
+          # GitHub's runner has psql; act's smaller image does not.
+          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client >/dev/null; }
+          docker rm -f pg >/dev/null 2>&1 || true
           docker run -d --name pg -e POSTGRES_PASSWORD=ci -e POSTGRES_DB=lebleg -p 127.0.0.1:5432:5432 \
             --shm-size=1g postgres:18.6 -c fsync=off -c synchronous_commit=off -c full_page_writes=off \
             -c max_wal_size=8GB -c maintenance_work_mem=1GB
@@ -42,6 +55,7 @@ jobs:
         run: .github/scripts/data-parquet.sh "$DATABASE_URL" "$RUNNER_TEMP/parquet"
       - name: Download the dataset's current Parquet
         run: |
+          python3 -m venv "$RUNNER_TEMP/venv" && . "$RUNNER_TEMP/venv/bin/activate"
           pip install --quiet "huggingface_hub==1.33.0"
           python3 - <<'PY'
           import os
@@ -56,3 +70,38 @@ jobs:
           name: parquet
           path: ${{ runner.temp }}/parquet
           retention-days: 7
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.publish)
+    timeout-minutes: 30
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      HF_REPO: taktekhq/lebanese-legislation
+    steps:
+      - name: Need HF_TOKEN
+        id: token
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "No HF_TOKEN secret: nothing uploaded." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.token.outputs.ok == 'true'
+      - uses: actions/download-artifact@v4
+        if: steps.token.outputs.ok == 'true'
+        with:
+          name: parquet
+          path: ${{ runner.temp }}/out/data
+      - name: Upload to Hugging Face
+        if: steps.token.outputs.ok == 'true'
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv" && . "$RUNNER_TEMP/venv/bin/activate"
+          pip install --quiet "huggingface_hub==1.33.0"
+          curl -fsS "https://huggingface.co/datasets/$HF_REPO/raw/main/README.md" -o "$RUNNER_TEMP/live.md" || true
+          python3 .github/scripts/hf-card.py .github/huggingface/README.md "$RUNNER_TEMP/live.md" "$RUNNER_TEMP/out/README.md"
+          hf upload "$HF_REPO" "$RUNNER_TEMP/out" . --repo-type dataset \
+            --commit-message "Data from $(git rev-parse --short=12 HEAD), $(date -u +%F)"
+          echo "Published https://huggingface.co/datasets/$HF_REPO" | tee -a "$GITHUB_STEP_SUMMARY"
