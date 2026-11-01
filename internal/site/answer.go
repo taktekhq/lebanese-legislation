@@ -65,7 +65,7 @@ func (m *meaningSearch) selectEvidence(ctx context.Context, q string, p []nlsear
 		return nil, err
 	}
 	m.mu.Lock()
-	day := time.Now().UTC().Format("2006-01-02")
+	day := beirutDay(time.Now())
 	if m.day != day {
 		m.day, m.used = day, 0
 	}

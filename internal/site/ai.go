@@ -2,9 +2,12 @@ package site
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -44,9 +47,12 @@ type aiView struct {
 	Provider             string
 	Unavailable, Missing bool
 	Results              *Results
-	Left, PerHour        int // questions this visitor may still ask this hour, of PerHour
-	Limited              bool
-	WaitMin              int // when Limited: minutes until the next question // what the meaning search found, when the page found nothing
+	Left, PerDay         int    // questions this device may still ask today, of PerDay
+	Limited              bool   // this device used its questions for today
+	SiteFull             bool   // the whole site used today's AI allowance
+	Banned               bool   // this IP asked far more than anyone could by hand
+	WaitH, WaitM         int    // when Limited or SiteFull: time until midnight in Beirut
+	Question, IP         string // for the "email us" links // what the meaning search found, when the page found nothing
 }
 
 // composeAnswer is Compose with a content-keyed cache, the shared call budget
@@ -77,7 +83,7 @@ func (m *meaningSearch) composeAnswer(ctx context.Context, q string, p []nlsearc
 		return nil, err
 	}
 	m.mu.Lock()
-	day := time.Now().UTC().Format("2006-01-02")
+	day := beirutDay(time.Now())
 	if m.day != day {
 		m.day, m.used = day, 0
 	}
@@ -126,7 +132,7 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "not a question", http.StatusBadRequest)
 		return
 	}
-	view := aiView{PerHour: questionsPerHour}
+	view := aiView{PerDay: questionsPerDay}
 	start := time.Now()
 	ctx, usage := nlsearch.WithUsage(r.Context())
 	var reason error // why the answer is unavailable, for the event
@@ -146,13 +152,38 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	view.Provider = s.meaning.provider
-	ip := clientIP(r)
-	if wait, ok := s.meaning.clients.Allow(ip); !ok {
-		view.Limited, view.WaitMin = true, max(1, int((wait+time.Minute-1)/time.Minute))
+	who, ip := aiVisitor(w, r), clientIP(r)
+	view.Question, view.IP = q, ip
+	wait := untilMidnight(time.Now())
+	view.WaitH, view.WaitM = int(wait/time.Hour), int(wait%time.Hour/time.Minute)
+	// Misbehaving: 100 questions in a day from one IP. With 10 a device,
+	// that is ten devices maxed out on one network, or a script.
+	if s.meaning.bans.banned(ip) {
+		view.Banned = true
 		render()
 		return
 	}
-	view.Left = s.meaning.clients.Left(ip)
+	if n, _ := s.meaning.networks.take(ip, 0); n >= banPerDay {
+		s.meaning.bans.ban(ip)
+		log.Printf("ai answers: banned %s for %v after %d questions today", ip, banFor, n)
+		s.captureEvent("ai_ip_banned", map[string]any{"questions_today": n, "ban_days": int(banFor / (24 * time.Hour))})
+		view.Banned = true
+		render()
+		return
+	}
+	// Two model calls per question: say so honestly when the day's budget is out.
+	if !s.meaning.budgetFor(2) {
+		view.SiteFull = true
+		render()
+		return
+	}
+	used, ok := s.meaning.devices.take(who, questionsPerDay)
+	if !ok {
+		view.Limited = true
+		render()
+		return
+	}
+	view.Left = questionsPerDay - used
 	ctx, cancel := context.WithTimeout(ctx, 28*time.Second)
 	defer cancel()
 	res, err := s.SearchMeaning(ctx, q, s.meaning)
@@ -206,6 +237,21 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 	render()
 }
 
+// aiVisitor names the browser asking, by a random ll_ai cookie it is given
+// on its first question, so one visitor's limit never touches another's.
+// The cookie holds nothing but that random ID.
+func aiVisitor(w http.ResponseWriter, r *http.Request) string {
+	if c, err := r.Cookie("ll_ai"); err == nil && len(c.Value) == 32 && strings.Trim(c.Value, "0123456789abcdef") == "" {
+		return "v:" + c.Value
+	}
+	b := make([]byte, 16)
+	_, _ = rand.Read(b)
+	id := hex.EncodeToString(b)
+	http.SetCookie(w, &http.Cookie{Name: "ll_ai", Value: id, Path: "/", MaxAge: 365 * 24 * 3600,
+		HttpOnly: true, Secure: r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https", SameSite: http.SameSiteLaxMode})
+	return "v:" + id
+}
+
 // Gemini 3.8 Flash, USD per million tokens (ai.google.dev pricing, 30 Oct
 // 2026; it doubles on 1 Jan 2027). Only for the cost estimate in events.
 const (
@@ -219,6 +265,10 @@ const (
 func (s *Server) trackAI(r *http.Request, q string, v aiView, u *nlsearch.Usage, reason error, took time.Duration) {
 	outcome := "answered"
 	switch {
+	case v.Banned:
+		outcome = "banned"
+	case v.SiteFull:
+		outcome = "site_full"
 	case v.Limited:
 		outcome = "limited"
 	case v.Unavailable:
@@ -248,7 +298,7 @@ func (s *Server) trackAI(r *http.Request, q string, v aiView, u *nlsearch.Usage,
 		"sources":         len(v.Sources),
 		"quotes":          quotes,
 		"questions_left":  v.Left,
-		"wait_minutes":    v.WaitMin,
+		"wait_minutes":    v.WaitH*60 + v.WaitM,
 		"brought_results": v.Results != nil,
 		"bot":             IsBot(r),
 	}

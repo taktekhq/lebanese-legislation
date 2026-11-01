@@ -92,20 +92,92 @@ func TestNumberSourcesSharesOnePagePerNumber(t *testing.T) {
 	}
 }
 
-func TestAIAnswerCountsQuestionsAndSaysHowLongToWait(t *testing.T) {
+// askAs sends a question from one device (its ll_ai cookie) and IP.
+func askAs(s *Server, cookie, ip, q string) string {
+	r := httptest.NewRequest("POST", "/en/search/ai/", strings.NewReader(url.Values{"q": {q}}.Encode()))
+	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Set("CF-Connecting-IP", ip)
+	if cookie != "" {
+		r.AddCookie(&http.Cookie{Name: "ll_ai", Value: cookie})
+	}
+	w := httptest.NewRecorder()
+	s.ServeHTTP(w, r)
+	return w.Body.String()
+}
+
+func TestAILimitIsTenADayPerDevice(t *testing.T) {
 	s := testServer(t)
 	f := &composeFake{fakeRewrite: fakeRewrite{queries: []string{"الإجازة السنوية"}}}
-	s.SetMeaningSearch(f, "Google Gemini", false, 100)
-	w := aiRequest(t, s, "How much annual leave does an employee get?", false)
-	if !strings.Contains(w.Body.String(), "9 of 10 AI questions left this hour") {
-		t.Fatalf("no counter: %.400s", w.Body.String())
+	s.SetMeaningSearch(f, "Google Gemini", false, 1000)
+	q := "How much annual leave & pay does an employee get?"
+	me, other := strings.Repeat("a", 32), strings.Repeat("b", 32)
+	if body := askAs(s, me, "1.1.1.1", q); !strings.Contains(body, "9 of 10 AI questions left today") {
+		t.Fatalf("no counter: %.400s", body)
 	}
 	for range 9 {
-		aiRequest(t, s, "How much annual leave does an employee get?", false)
+		askAs(s, me, "1.1.1.1", q)
 	}
-	w = aiRequest(t, s, "How much annual leave does an employee get?", false)
-	if body := w.Body.String(); !strings.Contains(body, "ask again in 6 minutes") || strings.Contains(body, "ai-box__text") {
-		t.Fatalf("no wait message: %.400s", body)
+	body := askAs(s, me, "1.1.1.1", q)
+	if !strings.Contains(body, "used your 10 AI questions for today") || !strings.Contains(body, "midnight Beirut time") || strings.Contains(body, "ai-box__text") ||
+		!strings.Contains(body, "mailto:nizar@taktek.io?subject=Urgent%20question") || !strings.Contains(body, "body=How%20much%20annual%20leave%20%26%20pay") {
+		t.Fatalf("no limit message or email link: %.800s", body)
+	}
+	// A new device on the same network is not affected.
+	if body := askAs(s, other, "1.1.1.1", q); !strings.Contains(body, "9 of 10 AI questions left today") {
+		t.Fatalf("another device was limited too: %.400s", body)
+	}
+}
+
+func TestAIBansAnIPAfterAHundredADay(t *testing.T) {
+	s := testServer(t)
+	f := &composeFake{fakeRewrite: fakeRewrite{queries: []string{"الإجازة السنوية"}}}
+	s.SetMeaningSearch(f, "Google Gemini", false, 10000)
+	q := "How much annual leave does an employee get?"
+	for range 99 {
+		askAs(s, "", "6.6.6.6", q) // a script: a new device every time
+	}
+	body := askAs(s, "", "6.6.6.6", q)
+	if !strings.Contains(body, "blocked for your internet connection") || !strings.Contains(body, "mailto:nizar@taktek.io?subject=Appeal") || !strings.Contains(body, "IP%3A%206.6.6.6") {
+		t.Fatalf("no ban message: %.800s", body)
+	}
+	if body := askAs(s, strings.Repeat("c", 32), "6.6.6.6", q); !strings.Contains(body, "blocked") {
+		t.Fatal("ban did not stick")
+	}
+	if body := askAs(s, strings.Repeat("c", 32), "7.7.7.7", q); strings.Contains(body, "blocked") {
+		t.Fatal("ban hit another IP")
+	}
+}
+
+func TestAISiteLimitIsHonest(t *testing.T) {
+	s := testServer(t)
+	f := &composeFake{fakeRewrite: fakeRewrite{queries: []string{"الإجازة السنوية"}}}
+	s.SetMeaningSearch(f, "Google Gemini", false, 3) // room for one question (2 calls)
+	q := "How much annual leave does an employee get?"
+	askAs(s, strings.Repeat("d", 32), "8.8.8.8", q)
+	body := askAs(s, strings.Repeat("e", 32), "9.9.9.9", q)
+	if !strings.Contains(body, "limit for the whole site") || !strings.Contains(body, "mailto:nizar@taktek.io") {
+		t.Fatalf("no honest site limit: %.600s", body)
+	}
+}
+
+func TestUntilMidnightIsBeirutTime(t *testing.T) {
+	now := time.Date(2026, 11, 1, 21, 30, 0, 0, time.UTC) // 23:30 in Beirut (UTC+2)
+	if got := untilMidnight(now); got != 30*time.Minute {
+		t.Fatalf("got %v", got)
+	}
+}
+
+func TestAIVisitorCookie(t *testing.T) {
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("POST", "/search/ai/", nil)
+	id := aiVisitor(w, r)
+	c := w.Result().Cookies()
+	if len(c) != 1 || c[0].Name != "ll_ai" || !c[0].HttpOnly || "v:"+c[0].Value != id {
+		t.Fatalf("cookie: %+v %s", c, id)
+	}
+	r.AddCookie(&http.Cookie{Name: "ll_ai", Value: "<script>"})
+	if got := aiVisitor(httptest.NewRecorder(), r); got == "v:<script>" {
+		t.Fatal("accepted a forged cookie value")
 	}
 }
 

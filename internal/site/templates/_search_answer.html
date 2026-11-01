@@ -14,7 +14,12 @@
 {{define "ai_mark"}}<svg class="ai-box__mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.5 4.6 2.9 7 9.5 9.5-6.6 2.5-9 4.9-9.5 9.5-.5-4.6-2.9-7-9.5-9.5 6.6-2.5 9-4.9 9.5-9.5z" fill="currentColor"/></svg>{{end}}
 
 {{define "ai_answer"}}<div data-ai-box>
-{{if .Limited}}<p class="ai-box__limit">{{t "search.ai_limited" .PerHour .WaitMin}}</p>
+{{if .Banned}}<p class="ai-box__limit">{{t "search.ai_banned" .PerDay}}</p>
+<p class="ai-box__limit">{{t "search.ai_appeal" (safe (printf "<a class=\"link\" href=\"mailto:nizar@taktek.io?subject=%s&amp;body=%s\">nizar@taktek.io</a>" (pathq "Appeal: AI answers blocked on Lebanese Legislation") (pathq (printf "IP: %s" .IP))))}}</p>
+{{else if .SiteFull}}<p class="ai-box__limit">{{t "search.ai_site_full" (t "search.ai_wait" .WaitH .WaitM)}}</p>
+<p class="tiny ai-box__note">{{t "search.ai_urgent" (safe (printf "<a class=\"link\" href=\"mailto:nizar@taktek.io?subject=%s&amp;body=%s\">nizar@taktek.io</a>" (pathq "Urgent question on Lebanese Legislation") (pathq .Question)))}}</p>
+{{else if .Limited}}<p class="ai-box__limit">{{t "search.ai_limited" .PerDay (t "search.ai_wait" .WaitH .WaitM)}}</p>
+<p class="tiny ai-box__note">{{t "search.ai_urgent" (safe (printf "<a class=\"link\" href=\"mailto:nizar@taktek.io?subject=%s&amp;body=%s\">nizar@taktek.io</a>" (pathq "Urgent question on Lebanese Legislation") (pathq .Question)))}}</p>
 {{else if .Unavailable}}<p class="tiny">{{t "search.ai_unavailable"}}</p>
 {{else if .Missing}}<p class="tiny">{{t "search.answer_missing"}}</p>
 {{else if .Paras}}{{$src := .Sources}}
@@ -22,5 +27,5 @@
 <ol class="ai-box__sources">{{range $i, $s := $src}}<li id="ai-src-{{add $i 1}}"><a class="ai-box__src" href="{{$s.Path}}" dir="auto"><span class="ai-box__n">{{add $i 1}}</span><span class="ai-box__srctitle">{{$s.Title}}</span>{{if $s.Unofficial}}<span class="tiny">{{t "search.unofficial"}}</span>{{end}}</a>{{range $s.Quotes}}<blockquote class="ai-box__quote" lang="{{$s.Lang}}" dir="auto">{{.}}</blockquote>{{end}}</li>{{end}}</ol>
 <p class="tiny ai-box__note">{{t "search.ai_note" (meaningProvider)}}</p>
 {{else}}<p class="tiny">{{t "search.answer_insufficient"}}</p>{{end}}
-{{if not .Limited}}{{if .PerHour}}<p class="tiny ai-box__left">{{t "search.ai_left" .Left .PerHour}}</p>{{end}}{{end}}
+{{if and .PerDay (not .Limited) (not .SiteFull) (not .Banned) (not .Unavailable)}}<p class="tiny ai-box__left">{{t "search.ai_left" .Left .PerDay}}</p>{{end}}
 </div>{{with .Results}}<div data-ai-results>{{template "results" .}}</div>{{end}}{{end}}
