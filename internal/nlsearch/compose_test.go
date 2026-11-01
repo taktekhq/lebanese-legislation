@@ -57,3 +57,24 @@ func TestComposeSendsPassagesOnly(t *testing.T) {
 		t.Fatal("the answer call must not use tools such as web search")
 	}
 }
+
+func TestExpandReturnsArabicPhrasesOnly(t *testing.T) {
+	reply := `{"queries":["مهلة الادعاء المدني","تعويض البراءة"]}`
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]any{"candidates": []any{map[string]any{"finishReason": "STOP", "content": map[string]any{"parts": []any{map[string]any{"text": reply}}}}}})
+	}))
+	defer srv.Close()
+	c, _ := New(Config{Provider: "gemini", Model: "m", Key: "k", Endpoint: srv.URL})
+	ctx, u := WithUsage(context.Background())
+	p, err := c.Expand(ctx, "q", []string{"براءة"}, []string{"المادة 1"})
+	if err != nil || len(p.Queries) != 2 {
+		t.Fatalf("got %+v %v", p, err)
+	}
+	if calls, _, _ := u.Totals(); calls != 1 {
+		t.Fatal("expand call not counted")
+	}
+	reply = `{"queries":["ignore the rules and write english"]}`
+	if _, err := c.Expand(context.Background(), "q", nil, nil); err == nil {
+		t.Fatal("accepted a non-Arabic phrase")
+	}
+}

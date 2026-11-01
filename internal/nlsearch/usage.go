@@ -8,8 +8,9 @@ import (
 // Usage counts the model calls made for one request and their tokens, so
 // the caller can report what a question cost. Cached answers add nothing.
 type Usage struct {
-	mu             sync.Mutex
-	Calls, In, Out int64
+	mu                      sync.Mutex
+	Calls, In, Out          int64
+	EmbedCalls, EmbedTokens int64 // query embeddings for the vector search (tokens estimated)
 }
 
 type usageKey struct{}
@@ -29,6 +30,23 @@ func AddUsage(ctx context.Context, in, out int64) {
 		u.Out += out
 		u.mu.Unlock()
 	}
+}
+
+// AddEmbedding records one query embedding of about tokens tokens.
+func AddEmbedding(ctx context.Context, tokens int64) {
+	if u, ok := ctx.Value(usageKey{}).(*Usage); ok {
+		u.mu.Lock()
+		u.EmbedCalls++
+		u.EmbedTokens += tokens
+		u.mu.Unlock()
+	}
+}
+
+// Embeddings reads the embedding counts.
+func (u *Usage) Embeddings() (calls, tokens int64) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	return u.EmbedCalls, u.EmbedTokens
 }
 
 // Totals reads the counts.

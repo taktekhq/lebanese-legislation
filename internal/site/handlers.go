@@ -44,6 +44,7 @@ func (s *Server) routes() {
 		m.HandleFunc("POST /search/{$}", s.search)
 		m.HandleFunc("POST /search/answer/{$}", s.answer)
 		m.HandleFunc("POST /search/ai/{$}", s.aiAnswer)
+		m.HandleFunc("POST /search/ai/deep/{$}", s.aiDeepAnswer)
 	}
 	m.HandleFunc("GET /ul/uploads/images/{name...}", s.ulImage)
 	m.HandleFunc("GET /scan/{id}/{file}", s.scanFile)

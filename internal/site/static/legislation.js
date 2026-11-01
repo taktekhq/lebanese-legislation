@@ -168,6 +168,36 @@
       var a = e.target.closest(".ai-box__src");
       if (a) track("ai_source_clicked", { href: a.getAttribute("href"), position: Number((a.querySelector(".ai-box__n") || {}).textContent) || 0 });
     });
+    target.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-ai-deep]");
+      if (!btn) return;
+      btn.disabled = true;
+      track("ai_deep_requested", {});
+      var deepBody = new URLSearchParams(body);
+      deepBody.delete("empty");
+      box.classList.remove("ai-box--collapsed");
+      var oldMore = box.querySelector(".ai-box__more");
+      if (oldMore) oldMore.remove();
+      box.setAttribute("aria-busy", "true");
+      var wait = document.createElement("p");
+      wait.className = "tiny";
+      wait.textContent = section.getAttribute("data-deep-loading");
+      target.textContent = "";
+      target.append(wait);
+      var dc = new AbortController();
+      var dt = setTimeout(function () { dc.abort(); }, 90000);
+      fetch(section.getAttribute("data-deep-url"), { method: "POST", credentials: "same-origin", body: deepBody, signal: dc.signal })
+        .then(function (r) { if (!r.ok) throw new Error("deep answer unavailable"); return r.text(); })
+        .then(function (html) {
+          var t2 = document.createElement("template");
+          t2.innerHTML = html;
+          target.textContent = "";
+          target.append(t2.content);
+          track(target.querySelector(".ai-box__text") ? "ai_deep_shown" : "ai_deep_no_answer", { sources: target.querySelectorAll(".ai-box__src").length });
+        })
+        .catch(function () { target.textContent = section.getAttribute("data-error"); })
+        .finally(function () { clearTimeout(dt); box.removeAttribute("aria-busy"); });
+    });
     if (!text) return;
     box.classList.add("ai-box--collapsed");
     if (target.scrollHeight <= target.clientHeight + 24) {
