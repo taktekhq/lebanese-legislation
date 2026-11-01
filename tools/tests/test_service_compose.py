@@ -10,13 +10,13 @@ from pathlib import Path
 import httpx
 import psycopg
 import pytest
-from corpus_fixture import (
-    build_corpus,  # noqa: F401
-    corpus,  # noqa: F401
-)
 from psycopg import sql
 from psycopg.conninfo import conninfo_to_dict
 from psycopg.types.json import Jsonb
+from testdata.corpus_fixture import (
+    build_corpus,  # noqa: F401
+    corpus,  # noqa: F401
+)
 
 ROOT = Path(__file__).parents[2]
 

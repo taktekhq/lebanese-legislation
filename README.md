@@ -56,7 +56,8 @@ Hugging Face releases/latest.json --> db  (restores once into a volume)
 | [`web/`](web/) | The website: its `main.go`, Dockerfile, SQL schema and a fictional test database. |
 | [`api/`](api/) | The REST API: its `main.go` and Dockerfile. |
 | [`mcp/`](mcp/) | The MCP server: its `main.go`, Dockerfile and a Cloudflare Containers template. |
-| [`internal/`](internal/) | The Go code the three services share: pages, API, MCP tools and search. |
+| [`internal/`](internal/) | The Go code: what the three services share (pages, API, MCP tools, search) and the build that makes the database from the source pages (`internal/build`, with parsing, amendments, citations, the wording guard in `internal/provenance`, the export and the MCP snapshot). |
+| [`cmd/`](cmd/) | Checks of the built data (dates, amounts, citations, article versions, citation recall) and the citation reader. |
 | [`tools/`](tools/) | The Python data tools: restore, rebuild and publish the dump, and the update pipeline. |
 | [`docs/`](docs/) | Service reference, MCP setup, the data update pipeline and changes. |
 
