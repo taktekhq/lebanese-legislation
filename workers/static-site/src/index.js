@@ -9,6 +9,8 @@
 
 import { route, keyFor, resolve, indexRedirectData } from "./route.js";
 import { SECURITY_HEADERS } from "./headers.js";
+import { originFetch } from "./origin.js";
+export { Origin } from "./origin.js";
 
 const REDIRECT_DATA_TTL_MS = 10 * 60 * 1000;
 let redirects = { at: 0, data: null };
@@ -35,8 +37,22 @@ function withHeaders(obj, request) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.pathname.startsWith("/_build/") || url.pathname.startsWith("/_export/")) {
+      return new Response(null, { status: 404, headers: SECURITY_HEADERS });
+    }
+    if (url.hostname === "www.lebaneselegislation.com") {
+      return new Response(null, {
+        status: 301,
+        headers: { ...SECURITY_HEADERS, Location: "https://lebaneselegislation.com" + url.pathname + url.search },
+      });
+    }
+    const postAllowed = /^(?:\/(?:en|ar))?\/(?:api\/notify|search\/|search\/answer\/)$/.test(url.pathname)
+      || url.pathname.startsWith("/ph/");
+    if (request.method !== "GET" && request.method !== "HEAD" && !(request.method === "POST" && postAllowed)) {
+      return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: postAllowed ? "GET, HEAD, POST" : "GET, HEAD" } });
+    }
     if (/shapbot/i.test(request.headers.get("User-Agent") || "")) return new Response(null, { status: 429 }); // as Caddy does
-    if (route(request.method, url.pathname, url.search) === "origin") return fetch(request);
+    if (route(request.method, url.pathname, url.search) === "origin") return originFetch(request, env);
 
     try {
       const key = keyFor(url.pathname);
@@ -66,6 +82,6 @@ export default {
     } catch (err) {
       console.error("static site: falling back to the origin:", err && err.message);
     }
-    return fetch(request);
+    return originFetch(request, env);
   },
 };

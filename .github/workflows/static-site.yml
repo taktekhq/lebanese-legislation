@@ -97,23 +97,3 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
 
-  publish:
-    needs: render
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Deploy Worker
-        working-directory: workers/static-site
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
-          ROUTE: ${{ inputs.route }}
-        run: |
-          args=()
-          if [ -n "$ROUTE" ]; then
-            args+=(--route "$ROUTE")
-          fi
-          npx --yes wrangler@4.40.0 deploy "${args[@]}"
