@@ -697,7 +697,7 @@ type Paths struct {
 func DefaultPaths(repo string) Paths {
 	return Paths{
 		Archive: filepath.Join(repo, "archive"),
-		Bundle:  filepath.Join(repo, "..", "lebgazette-bundle"),
+		Bundle:  filepath.Join(repo, "manual", "scans"),
 		Edits: []string{filepath.Join(repo, "db", "approved_edits.tsv"), filepath.Join(repo, "db", "article_corrections.tsv"),
 			filepath.Join(repo, "db", "centre_errors.tsv")},
 		Known: filepath.Join(repo, "db", "provenance_known.tsv"),
