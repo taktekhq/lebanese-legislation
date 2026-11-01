@@ -52,6 +52,11 @@ func TestPublicResourcesAreDirectAndBilingual(t *testing.T) {
 		if i, j := strings.Index(body, `href="`+prefix+`/run-it-yourself/"`), strings.Index(body, `id="notify"`); i < 0 || j < 0 || i > j {
 			t.Errorf("%s MCP page does not point to run-it-yourself before the sign-up box", lang)
 		}
+		for _, id := range []string{"notify-ok", "notify-bad", "notify-limit"} {
+			if !strings.Contains(body, `id="`+id+`"`) {
+				t.Errorf("%s MCP page misses the #%s message the static sign-up redirects to", lang, id)
+			}
+		}
 		if strings.Contains(body, "taktekbot@") || !strings.Contains(body, "nizar@taktek.io") {
 			t.Errorf("%s MCP page must show nizar@taktek.io and no taktekbot address", lang)
 		}

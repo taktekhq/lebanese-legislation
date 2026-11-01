@@ -10,6 +10,7 @@
 import { route, keyFor, resolve, indexRedirectData } from "./route.js";
 import { SECURITY_HEADERS } from "./headers.js";
 import { originFetch } from "./origin.js";
+import { handleNotify, isNotifyPath } from "./notify.js";
 export { Origin } from "./origin.js";
 
 const REDIRECT_DATA_TTL_MS = 10 * 60 * 1000;
@@ -52,6 +53,16 @@ export default {
       return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: postAllowed ? "GET, HEAD, POST" : "GET, HEAD" } });
     }
     if (/shapbot/i.test(request.headers.get("User-Agent") || "")) return new Response(null, { status: 429 }); // as Caddy does
+    // sign-ups are the Worker's own, so the static site does not need the origin; without
+    // the D1 binding (not created yet) the origin keeps answering as before
+    if (request.method === "POST" && isNotifyPath(url.pathname) && env.NOTIFY_DB) {
+      try {
+        return await handleNotify(request, env);
+      } catch (err) {
+        console.error("notify:", err && err.message);
+        return new Response("Sign-up is unavailable right now. Write to nizar@taktek.io.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
+      }
+    }
     if (route(request.method, url.pathname, url.search) === "origin") return originFetch(request, env);
 
     try {

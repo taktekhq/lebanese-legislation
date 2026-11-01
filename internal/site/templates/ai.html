@@ -101,9 +101,12 @@ GET /api/v1/gazette/?since=&amp;until=&amp;order=newest|oldest&amp;limit=&amp;of
 
     <div class="notify" id="notify">
       <h2>{{t "ai.notify_h2"}}</h2>
+      <p class="notify__msg" id="notify-ok" role="status">{{t "ai.notify_done"}}</p>
+      <p class="notify__msg" id="notify-bad" role="alert">{{t "ai.notify_bad"}}</p>
+      <p class="notify__msg" id="notify-limit" role="alert">{{t "ai.notify_limit" (safe "<a class=\"link\" href=\"mailto:nizar@taktek.io\">nizar@taktek.io</a>")}}</p>
       {{if eq .Done "ok"}}<p class="notify__done" role="status">{{t "ai.notify_done"}}</p>
       {{else}}
-      <p>{{t "ai.notify_p"}}</p>
+      <p class="notify__intro">{{t "ai.notify_p"}}</p>
       {{if eq .Done "bad"}}<p class="notify__done" role="alert">{{t "ai.notify_bad"}}</p>{{end}}
       <form method="post" action="{{u "/api/notify"}}">
         <input type="hidden" name="from" value="ai">

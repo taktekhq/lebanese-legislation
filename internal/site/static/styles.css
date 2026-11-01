@@ -2093,3 +2093,7 @@ table.ref .ar {
 .mcp-step { margin: 16px 0 28px; }
 .mcp-step img { display: block; width: 100%; max-width: 640px; height: auto; border-radius: 12px; }
 .doc pre { overflow-x: auto; max-width: 100%; direction: ltr; text-align: left; }
+/* The sign-up answer arrives as a #fragment so the page stays a static file. */
+.notify__msg { display: none; font-weight: 600; }
+.notify__msg:target { display: block; margin-bottom: 14px; }
+.notify:has(#notify-ok:target) form, .notify:has(#notify-ok:target) .notify__intro { display: none; }

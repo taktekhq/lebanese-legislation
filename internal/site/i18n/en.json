@@ -677,5 +677,6 @@
   "local.web_image": "Website image on GitHub Container Registry",
   "local.images_p": "All four run on Linux AMD64 and ARM64. The images hold no data: it comes from Hugging Face on first start.",
   "local.more_h2": "More",
-  "local.back_ai": "Connect an AI assistant to the public server instead"
+  "local.back_ai": "Connect an AI assistant to the public server instead",
+  "ai.notify_limit": "Too many sign-up tries from your connection. Wait an hour and try again, or write to %s and we will add you."
 }
