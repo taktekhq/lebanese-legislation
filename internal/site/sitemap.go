@@ -399,7 +399,7 @@ func (s *Server) buildSmallSitemap(ctx context.Context, name string, arabic bool
 	var urls []SitemapURL
 	if name == "core" {
 		for _, p := range []string{"/", "/codes/", "/laws/", "/rulings/", "/gazette/", "/opinions/", "/agreements/", "/doctrine/",
-			"/research/", "/changes/", "/contribute/", "/laws/years/", "/rulings/years/", "/gazette/years/"} {
+			"/research/", "/changes/", "/laws/years/", "/rulings/years/", "/gazette/years/"} {
 			urls = append(urls, SitemapURL{p, mods[p]})
 		}
 		rows, err := s.db.Query(ctx, `SELECT c.law_id FROM code c ORDER BY c.position`)

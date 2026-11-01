@@ -8,7 +8,7 @@ package site
 // cookie, no referrer. A line holds the time (to the second), what happened,
 // and whether the request came from a known crawler (so robots can be
 // counted apart). One file per day, <dir>/events/YYYY-MM-DD.jsonl; files older
-// than 90 days are deleted. `lebleg stats` adds a day up.
+// than 90 days are deleted. cmd/usage-stats adds a day up.
 //
 // The "tell me if AI answers come" emails are the only personal data, kept
 // apart in <dir>/notify.jsonl with the consent wording the person agreed to.

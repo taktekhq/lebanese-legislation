@@ -54,7 +54,6 @@ The server itself is [`web/`](../web/README.md) (with `api/` and `mcp/`); these 
 
 | Command | What it does |
 | --- | --- |
-| `static-site` | Writes every public page, and the assets, as static files under a base path (`-out`, `-base`). |
 | `usage-stats` | Adds up one day of the anonymous usage record the web server keeps with `-events`, as JSON. |
 | `journal-sitemap` | Prints the project journal's sitemap from the posts built into the site. No database. |
 | `searchindex` | Builds the semantic search index in its own pgvector database (`GEMINI_API_KEY`). **key** |

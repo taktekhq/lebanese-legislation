@@ -20,11 +20,11 @@ import (
 )
 
 // The full judgment behind a ruling page: the Centre's scanned PDF, kept in a
-// folder outside the database (lebleg ruling-files), and its machine reading
-// in ruling_page (lebleg ruling-read). See internal/modelout/rulings.go.
+// folder outside the database (cmd/ruling-files), and its machine reading
+// in ruling_page (cmd/ruling-read). See internal/modelout/rulings.go.
 
 // SetRulingFiles names the folder holding the judgment PDFs, laid out as
-// lebleg ruling-files writes it (<id÷1000>/<id>.pdf). Empty: no PDF is served.
+// cmd/ruling-files writes it (<id÷1000>/<id>.pdf). Empty: no PDF is served.
 func (s *Server) SetRulingFiles(dir string) { s.rulingDir = dir }
 
 var rulingFileName = regexp.MustCompile(`^([1-9][0-9]{0,8})\.pdf$`)

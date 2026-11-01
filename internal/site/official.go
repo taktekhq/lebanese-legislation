@@ -12,7 +12,7 @@ import (
 )
 
 // OfficialDir holds the page images and PDFs of texts published from official
-// scans (lebleg official-load -files). Empty: the pages show without images.
+// scans (cmd/load-official -files). Empty: the pages show without images.
 var OfficialDir string
 
 // Texts published from official page scans, until UL has them (db/official.sql).

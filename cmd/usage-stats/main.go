@@ -12,21 +12,18 @@ import (
 	"os"
 	"time"
 
+	"github.com/taktekhq/lebanese-legislation/internal/cli"
 	"github.com/taktekhq/lebanese-legislation/internal/site"
 )
 
 func main() {
 	log.SetFlags(0)
-	dir := flag.String("events", "/var/lib/lebleg", "the folder the website's -events flag writes")
+	dir := flag.String("events", "/var/lib/lebleg", "the folder the web server's -events flag writes")
 	day := flag.String("day", time.Now().UTC().AddDate(0, 0, -1).Format("2006-01-02"), "the day to add up (UTC); yesterday by default")
 	flag.Parse()
 	st, err := site.UsageStats(*dir, *day)
-	if err != nil {
-		log.Fatal(err)
-	}
+	cli.Exit(err)
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetEscapeHTML(false)
-	if err := enc.Encode(st); err != nil {
-		log.Fatal(err)
-	}
+	cli.Exit(enc.Encode(st))
 }

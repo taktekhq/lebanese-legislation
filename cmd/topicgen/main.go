@@ -26,11 +26,12 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/taktekhq/lebanese-legislation/internal/cli"
 	"github.com/taktekhq/lebanese-legislation/internal/site/topics"
 )
 
 var (
-	dsn        = flag.String("db", os.Getenv("LEBLEG_DSN"), "database connection string")
+	dsn        = flag.String("db", cli.DefaultDSN(), "database connection string (default LEBLEG_DSN, else the local socket)")
 	specDir    = flag.String("specs", "cmd/topicgen/specs", "directory of specs")
 	outDir     = flag.String("out", "internal/site/topics", "directory of topic files")
 	workDir    = flag.String("work", "cmd/topicgen/work", "directory for raw model answers and reports")
@@ -60,10 +61,8 @@ func main() {
 		os.Exit(2)
 	}
 	cmd, args := flag.Arg(0), flag.Args()[1:]
-	ctx := context.Background()
-	if *dsn == "" {
-		log.Fatal("no database: pass -db or set LEBLEG_DSN")
-	}
+	ctx, stop := cli.Context()
+	defer stop()
 	pool, err := pgxpool.New(ctx, *dsn)
 	if err != nil {
 		log.Fatal(err)

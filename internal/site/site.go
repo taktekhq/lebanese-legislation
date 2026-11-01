@@ -72,7 +72,8 @@ func (s *Server) SetEvents(e *Events) { s.ev = e }
 
 // SetAnalytics turns on the browser analytics: pages load ga.js and ph.js,
 // which send to LebaneseLegislation.com's own Google Analytics and PostHog
-// projects. Off by default, so a copy hosted elsewhere sends nothing to them.
+// projects. internal/app turns it on unless ANALYTICS=off, which the
+// published images set, so a copy hosted elsewhere sends nothing to them.
 func (s *Server) SetAnalytics(on bool) { s.analytics = on }
 
 // New prepares a server on an open pool.

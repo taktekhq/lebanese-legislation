@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/taktekhq/lebanese-legislation/internal/cli"
 	"github.com/taktekhq/lebanese-legislation/internal/site"
 )
 
@@ -17,9 +18,7 @@ func main() {
 	if len(os.Args) != 1 {
 		log.Fatal("usage: journal-sitemap > sitemap.xml")
 	}
-	if err := writeJournalSitemap(os.Stdout); err != nil {
-		log.Fatal(err)
-	}
+	cli.Exit(writeJournalSitemap(os.Stdout))
 }
 
 // writeJournalSitemap exports only the embedded public posts, without a database.

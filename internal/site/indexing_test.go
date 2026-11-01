@@ -204,7 +204,7 @@ func indexedServer(t *testing.T) *Server {
 	s := testServer(t)
 	var n int
 	if err := s.db.QueryRow(context.Background(), `SELECT count(*) FROM page_state`).Scan(&n); err != nil || n == 0 {
-		t.Skip("this database has no page_state: run lebleg build -only indexing")
+		t.Skip("this database has no page_state: run build-db -only indexing")
 	}
 	return s
 }

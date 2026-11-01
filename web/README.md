@@ -32,7 +32,8 @@ A leading `serve` is accepted, so `web serve -addr ... -db ...` works too.
 
 | Setting | Meaning |
 | --- | --- |
-| `POSTHOG_KEY`, `POSTHOG_HOST` | Server errors to PostHog error tracking, and the browser analytics (`static/ga.js`, `static/ph.js`). The scripts hold LebaneseLegislation.com's own Google Analytics and PostHog IDs: change them before you turn this on for another site. Off when unset |
+| `POSTHOG_KEY`, `POSTHOG_HOST` | Server errors to PostHog error tracking. Off when unset |
+| `ANALYTICS` | `off` stops pages loading the browser analytics (`static/ga.js`, `static/ph.js`), which hold LebaneseLegislation.com's own Google Analytics and PostHog IDs. The binary loads them; the images set `off`. Change the IDs before you turn them on for another site |
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_BURST` | Per-client limit on `/api/v1/` and `/mcp`. Default 60 and 20; the images set 0, no limit |
 | `LEBLEG_SEARCH_PROVIDER` | `openai`, `gemini` or `claude`: search by meaning with that provider and its key (`OPENAI_API_KEY`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`). `LEBLEG_SEARCH_MODEL`, `LEBLEG_SEARCH_SELECT_MODEL`, `LEBLEG_SEARCH_DAILY_LIMIT` (default 500) and `LEBLEG_SEARCH_SHARES_DATA` tune it |
 | `LEBLEG_VECTOR_DSN` | A separate pgvector database for the passage vectors (see [`cmd/searchindex`](../cmd/searchindex/)), embedded with `GEMINI_API_KEY` and `LEBLEG_EMBEDDING_MODEL` |
@@ -43,7 +44,6 @@ A leading `serve` is accepted, so `web serve -addr ... -db ...` works too.
 
 | Command | What it does |
 | --- | --- |
-| [`cmd/static-site`](../cmd/static-site/) | Writes the site as static files for a host such as GitHub Pages |
 | [`cmd/usage-stats`](../cmd/usage-stats/) | Adds up one day of the `-events` record, as JSON |
 | [`cmd/journal-sitemap`](../cmd/journal-sitemap/) | Prints the project journal's sitemap; no database |
 | [`cmd/searchindex`](../cmd/searchindex/) | Builds the semantic index in its own pgvector database |

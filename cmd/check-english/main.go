@@ -9,7 +9,6 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -18,17 +17,14 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/taktekhq/lebanese-legislation/internal/checkenglish"
+	"github.com/taktekhq/lebanese-legislation/internal/cli"
 )
 
 func main() {
-	dsn := flag.String("db", os.Getenv("LEBLEG_DSN"), "Postgres connection string (default LEBLEG_DSN)")
+	dsn := flag.String("db", cli.DefaultDSN(), "Postgres connection string (default LEBLEG_DSN, else the local socket)")
 	repo := flag.String("repo", ".", "the repo root, where the templates and export code are")
 	allow := flag.String("allow", "db/english_articles_allow.txt", "article ids (law_id/number, one per line) allowed to hold English")
 	flag.Parse()
-	if *dsn == "" {
-		fmt.Fprintln(os.Stderr, "check-english: no database (-db or LEBLEG_DSN)")
-		os.Exit(2)
-	}
 	viol, err := checkenglish.Surface(*repo)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "check-english:", err)
@@ -42,7 +38,8 @@ func main() {
 			}
 		}
 	}
-	ctx := context.Background()
+	ctx, stop := cli.Context()
+	defer stop()
 	conn, err := pgx.Connect(ctx, *dsn)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "check-english:", err)

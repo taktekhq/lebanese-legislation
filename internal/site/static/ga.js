@@ -3,7 +3,7 @@
    Security Policy needs no extra hash. assets/load.js fetches gtag.js and
    PostHog (ph.js) after the page; what is queued here is sent then.
 
-   Loaded only when the server turns analytics on (POSTHOG_KEY). No consent
+   Loaded unless the server runs with ANALYTICS=off. No consent
    banner: when on, analytics are always on. GA4 gets each
    page's real title and full address (utm_source=chatgpt.com is how visits
    from the ChatGPT app are recognised) and works out the traffic source

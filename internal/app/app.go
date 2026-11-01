@@ -3,8 +3,9 @@
 // binary that picks its mode; APP_MODE overrides it.
 //
 // The binary's defaults are LebaneseLegislation.com's own (canonical links
-// to it, 60 API and MCP requests a minute per client). The published images
-// and compose.yaml set the local defaults instead (PUBLIC_URL, no rate limit).
+// to it, 60 API and MCP requests a minute per client, its browser
+// analytics). The published images set the local defaults instead
+// (PUBLIC_URL, no rate limit, ANALYTICS=off).
 package app
 
 import (
@@ -140,10 +141,11 @@ func run(ctx context.Context, cfg config) error {
 	}
 	h.SetScans(cfg.scans)
 	h.SetRulingFiles(cfg.rulingFiles)
-	// Server errors to PostHog's error tracking, and the browser analytics,
-	// only when POSTHOG_KEY is set.
+	// Server errors to PostHog's error tracking when POSTHOG_KEY is set. The
+	// browser analytics (LebaneseLegislation.com's own projects) are on
+	// unless ANALYTICS=off; the published images set it.
 	h.SetPostHog(os.Getenv("POSTHOG_KEY"), os.Getenv("POSTHOG_HOST"))
-	h.SetAnalytics(os.Getenv("POSTHOG_KEY") != "")
+	h.SetAnalytics(os.Getenv("ANALYTICS") != "off")
 	closeVectors, err := enableSearch(ctx, h, pool)
 	if err != nil {
 		return err

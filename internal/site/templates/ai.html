@@ -93,7 +93,7 @@ GET /api/v1/gazette/?since=&amp;until=&amp;order=newest|oldest&amp;limit=&amp;of
       <li>{{t "ai.limit_5"}}</li>
     </ul>
 
-    {{if .Notify}}<div class="notify" id="notify">
+    <div class="notify" id="notify">
       <h2>{{t "ai.notify_h2"}}</h2>
       {{if eq .Done "ok"}}<p class="notify__done" role="status">{{t "ai.notify_done"}}</p>
       {{else}}
@@ -111,7 +111,7 @@ GET /api/v1/gazette/?since=&amp;until=&amp;order=newest|oldest&amp;limit=&amp;of
       </form>
       <p class="tiny" style="margin-top:12px">{{t "ai.notify_footer" (safe "<a class=\"link\" href=\"mailto:taktekbot@taktek.io\">taktekbot@taktek.io</a>") (safe (printf "<a class=\"link\" href=\"%s\">%s</a>" (u "/about/") (t "ai.about_link")))}}</p>
       {{end}}
-    </div>{{end}}
+    </div>
   </article>
 </section>
 {{end}}{{end}}

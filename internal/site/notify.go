@@ -19,8 +19,7 @@ func (s *Server) aiPage(w http.ResponseWriter, r *http.Request) {
 		Title: "Lebanese law and AI · Lebanese Legislation",
 		Desc:  "How AI assistants can read and cite Lebanese law on this site today, and a way to hear if we ever add AI answers. No AI answers exist here yet.",
 		Path:  "/ai/", NoIndex: r.URL.RawQuery != "",
-		Data: map[string]any{"Done": r.URL.Query().Get("notify"), "Consent": NotifyConsent, "Static": s.isStatic,
-			"Notify": s.ev != nil},
+		Data: map[string]any{"Done": r.URL.Query().Get("notify"), "Consent": NotifyConsent, "Static": s.isStatic},
 	})
 }
 
