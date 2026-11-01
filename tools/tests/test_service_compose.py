@@ -10,7 +10,7 @@ from pathlib import Path
 import httpx
 import psycopg
 import pytest
-from corpus_fixture import (
+from testdata.corpus_fixture import (
     build_corpus,  # noqa: F401
     corpus,  # noqa: F401
 )
