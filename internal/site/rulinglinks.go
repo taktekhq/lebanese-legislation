@@ -60,6 +60,10 @@ func (s *Server) articleRulings(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := s.ctx(r)
 	defer cancel()
 	l, err := s.loadLaw(ctx, id, true)
+	if errorIsNoRows(err) {
+		s.notFound(w, r)
+		return
+	}
 	if err != nil {
 		s.fail(w, r, err)
 		return

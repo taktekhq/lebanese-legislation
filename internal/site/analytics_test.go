@@ -7,13 +7,13 @@ import (
 	"testing"
 )
 
-// The analytics install is the standard one (no consent banner, analytics
-// always on, when the site turns analytics on). On 30 Oct a consent banner and then a
-// hand-written sender replaced both SDKs: GA4 saw one page title for the whole
-// site and a "source" parameter that turned ChatGPT visits into "direct", and
-// PostHog's page views stopped coming from posthog-js, so the website-silent
-// alarm (it counts $lib = 'web') fired while people were reading the site.
-// scripts/analytics-smoke.cjs checks the same in a real browser.
+// The analytics install is the standard one: no consent banner, analytics
+// always on once the server turns them on (SetAnalytics). On 30 Oct a
+// consent banner and then a hand-written sender replaced both SDKs: GA4 saw
+// one page title for the whole site and a "source" parameter that turned
+// ChatGPT visits into "direct", and PostHog's page views stopped coming from
+// posthog-js, so the website-silent alarm (it counts $lib = 'web') fired
+// while people were reading the site.
 func TestAnalyticsStandardInstall(t *testing.T) {
 	s, err := New(nil)
 	if err != nil {
@@ -28,8 +28,17 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 		return w.Body.String()
 	}
 
+	scripts := []string{`src="/ga.js?v=`, `src="/assets/load.js?v=`, `data-ph="/ph.js?v=`}
+	// Off by default: a copy hosted elsewhere sends nothing to our projects.
 	page := get("/blog/")
-	for _, want := range []string{`src="/ga.js?v=`, `src="/assets/load.js?v=`, `data-ph="/ph.js?v=`} {
+	for _, script := range scripts {
+		if strings.Contains(page, script) {
+			t.Errorf("analytics are off, yet the page loads %s", script)
+		}
+	}
+	s.SetAnalytics(true)
+	page = get("/blog/")
+	for _, want := range scripts {
 		if !strings.Contains(page, want) {
 			t.Errorf("the page does not load %s", want)
 		}
