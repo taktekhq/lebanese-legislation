@@ -33,7 +33,7 @@ set -eu
 install -d -o postgres -g postgres -m 0700 "$PGDATA"
 gosu postgres initdb -D "$PGDATA"
 printf 'local all all trust\nhost all all 127.0.0.1/32 trust\n' > "$PGDATA/pg_hba.conf"
-gosu postgres pg_ctl -D "$PGDATA" -o "-c listen_addresses='' -c unix_socket_directories=/tmp -c maintenance_work_mem=2GB -c max_parallel_maintenance_workers=4 -c dynamic_shared_memory_type=mmap -c fsync=off -c full_page_writes=off -c max_wal_size=8GB" -w start
+gosu postgres pg_ctl -D "$PGDATA" -o "-c listen_addresses='' -c unix_socket_directories=/tmp -c maintenance_work_mem=2GB -c max_parallel_maintenance_workers=4 -c dynamic_shared_memory_type=mmap -c fsync=off -c full_page_writes=off -c max_wal_size=1GB -c min_wal_size=80MB -c wal_level=minimal -c max_wal_senders=0" -w start
 psql -h /tmp -U postgres -v ON_ERROR_STOP=1 -c 'CREATE ROLE lebleg_web LOGIN' -c 'CREATE ROLE lebleg'
 for db in lebleg lebleg_search; do
   createdb -h /tmp -U postgres -O lebleg "$db"
@@ -62,7 +62,9 @@ for db in lebleg lebleg_search; do
     -c 'GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO lebleg_web' \
     -c 'ANALYZE'
 done
+psql -h /tmp -U postgres -c CHECKPOINT -c CHECKPOINT
 gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
+du -sh "$PGDATA" "$PGDATA/pg_wal" /scans
 rm -f /tmp/restore.log
 SH
 COPY --from=web /server /usr/local/bin/lebleg-web
