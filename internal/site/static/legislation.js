@@ -115,20 +115,84 @@
 })();
 (function () {
   "use strict";
-  var section = document.querySelector("[data-grounded-answer]");
+  /* The AI answer box at the top of a search that reads as a question. It
+     starts collapsed like a search engine's overview, and, when the page's
+     own search found nothing, also brings the texts the AI search found. */
+  var section = document.querySelector("[data-ai-answer]");
   if (!section) return;
-  var target = section.querySelector("[data-answer-content]");
-  var body = new URLSearchParams({q: section.getAttribute("data-question")});
+  var box = section.querySelector(".ai-box");
+  var target = section.querySelector("[data-ai-content]");
+  var fallback = document.querySelector("[data-ai-fallback]");
+  var wait = null;
+  if (fallback && section.getAttribute("data-empty") === "1") {
+    fallback.hidden = true;
+    wait = document.createElement("p");
+    wait.className = "tiny";
+    wait.style.marginTop = "28px";
+    wait.textContent = section.getAttribute("data-finding");
+    fallback.parentNode.insertBefore(wait, fallback);
+  }
+  function settle() {
+    box.removeAttribute("aria-busy");
+    if (wait) wait.remove();
+  }
+  /* PostHog, when loaded: the server sends ai_question with the same ID */
+  var ph = window.posthog && window.posthog.get_distinct_id ? window.posthog : null;
+  function track(name, props) { if (ph && ph.capture) ph.capture(name, props); }
+  var body = new URLSearchParams({q: section.getAttribute("data-q"), empty: section.getAttribute("data-empty") || ""});
+  try { if (ph) body.set("ph", ph.get_distinct_id() || ""); } catch (e) {}
   var controller = new AbortController();
-  var timeout = setTimeout(function () { controller.abort(); }, 28000);
-  fetch(section.getAttribute("data-answer-url"), {
+  var timeout = setTimeout(function () { controller.abort(); }, 30000);
+  fetch(section.getAttribute("data-url"), {
     method: "POST", credentials: "same-origin", body: body, signal: controller.signal
   }).then(function (response) {
     if (!response.ok) throw new Error("answer unavailable");
     return response.text();
   }).then(function (html) {
-    target.innerHTML = html;
+    var tpl = document.createElement("template");
+    tpl.innerHTML = html;
+    var results = tpl.content.querySelector("[data-ai-results]");
+    if (results) results.remove();
+    target.textContent = "";
+    target.append(tpl.content);
+    if (results && fallback) {
+      fallback.replaceWith(results);
+      fallback = null;
+    }
+    if (fallback) fallback.hidden = false;
+    settle();
+    var text = target.querySelector(".ai-box__text");
+    track(text ? "ai_answer_shown" : target.querySelector(".ai-box__limit") ? "ai_limit_shown" : "ai_no_answer_shown",
+      { sources: target.querySelectorAll(".ai-box__src").length, brought_results: !!results });
+    target.addEventListener("click", function (e) {
+      var a = e.target.closest(".ai-box__src");
+      if (a) track("ai_source_clicked", { href: a.getAttribute("href"), position: Number((a.querySelector(".ai-box__n") || {}).textContent) || 0 });
+    });
+    if (!text) return;
+    box.classList.add("ai-box--collapsed");
+    if (target.scrollHeight <= target.clientHeight + 24) {
+      box.classList.remove("ai-box--collapsed");
+      return;
+    }
+    var more = document.createElement("button");
+    more.type = "button";
+    more.className = "ai-box__more";
+    more.setAttribute("aria-expanded", "false");
+    more.textContent = section.getAttribute("data-more");
+    more.addEventListener("click", function () {
+      var open = box.classList.toggle("ai-box--collapsed") === false;
+      more.setAttribute("aria-expanded", String(open));
+      more.textContent = section.getAttribute(open ? "data-less" : "data-more");
+      if (open) track("ai_answer_expanded", {});
+    });
+    box.append(more);
+    /* a citation number opens the box before jumping to its source */
+    target.addEventListener("click", function (e) {
+      if (e.target.closest(".ai-box__ref") && box.classList.contains("ai-box--collapsed")) more.click();
+    });
   }).catch(function () {
     target.textContent = section.getAttribute("data-error");
+    if (fallback) fallback.hidden = false;
+    settle();
   }).finally(function () { clearTimeout(timeout); });
 })();

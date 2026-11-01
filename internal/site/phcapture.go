@@ -71,6 +71,19 @@ func (s *Server) capture(event string, r *http.Request, props map[string]any) {
 	if c == nil || !c.allow() {
 		return
 	}
+	s.send(c, event, props)
+}
+
+// captureEvent sends a product event (not an error) without the error cap:
+// its callers are capped already (AI questions by the hourly and daily
+// limits). props may set distinct_id; persons are never created.
+func (s *Server) captureEvent(event string, props map[string]any) {
+	if c := s.ph; c != nil {
+		s.send(c, event, props)
+	}
+}
+
+func (s *Server) send(c *phClient, event string, props map[string]any) {
 	p := map[string]any{
 		"$lib":                    "lebaneselegislation-server",
 		"$process_person_profile": false,

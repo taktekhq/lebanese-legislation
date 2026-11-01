@@ -50,7 +50,7 @@ func TestSearchNeverRequiresAMode(t *testing.T) {
 			if rec.Code != 403 || f.calls != 0 {
 				t.Fatal("cross-site request allowed")
 			}
-		} else if rec.Code != 200 || f.calls != 0 || !strings.Contains(rec.Body.String(), "data-grounded-answer") {
+		} else if rec.Code != 200 || f.calls != 0 || !strings.Contains(rec.Body.String(), "data-ai-answer") {
 			t.Fatalf("POST failed: %d calls=%d", rec.Code, f.calls)
 		}
 	}
