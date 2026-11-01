@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -46,11 +47,12 @@ type aiView struct {
 	Provider             string
 	Unavailable, Missing bool
 	Results              *Results
-	Left, PerHour        int // questions this visitor may still ask this hour, of PerHour
-	Limited              bool
-	Network              bool   // limited by the network (IP) cap, not the visitor's own
-	WaitMin              int    // when Limited: minutes until the next question
-	Question             string // when Limited: for the "email us" link // what the meaning search found, when the page found nothing
+	Left, PerDay         int    // questions this device may still ask today, of PerDay
+	Limited              bool   // this device used its questions for today
+	SiteFull             bool   // the whole site used today's AI allowance
+	Banned               bool   // this IP asked far more than anyone could by hand
+	WaitH, WaitM         int    // when Limited or SiteFull: time until midnight in Beirut
+	Question, IP         string // for the "email us" links // what the meaning search found, when the page found nothing
 }
 
 // composeAnswer is Compose with a content-keyed cache, the shared call budget
@@ -81,7 +83,7 @@ func (m *meaningSearch) composeAnswer(ctx context.Context, q string, p []nlsearc
 		return nil, err
 	}
 	m.mu.Lock()
-	day := time.Now().UTC().Format("2006-01-02")
+	day := beirutDay(time.Now())
 	if m.day != day {
 		m.day, m.used = day, 0
 	}
@@ -130,7 +132,7 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "not a question", http.StatusBadRequest)
 		return
 	}
-	view := aiView{PerHour: questionsPerHour}
+	view := aiView{PerDay: questionsPerDay}
 	start := time.Now()
 	ctx, usage := nlsearch.WithUsage(r.Context())
 	var reason error // why the answer is unavailable, for the event
@@ -150,21 +152,38 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	view.Provider = s.meaning.provider
-	who := aiVisitor(w, r)
-	ip := clientIP(r)
-	wait, ok := s.meaning.visitors.Allow(who)
-	if ok {
-		if wait, ok = s.meaning.clients.Allow(ip); !ok {
-			view.Network = true
-		}
-	}
-	if !ok {
-		view.Limited, view.WaitMin = true, max(1, int((wait+time.Minute-1)/time.Minute))
-		view.Question = q
+	who, ip := aiVisitor(w, r), clientIP(r)
+	view.Question, view.IP = q, ip
+	wait := untilMidnight(time.Now())
+	view.WaitH, view.WaitM = int(wait/time.Hour), int(wait%time.Hour/time.Minute)
+	// Misbehaving: 100 questions in a day from one IP. With 10 a device,
+	// that is ten devices maxed out on one network, or a script.
+	if s.meaning.bans.banned(ip) {
+		view.Banned = true
 		render()
 		return
 	}
-	view.Left = min(s.meaning.visitors.Left(who), s.meaning.clients.Left(ip))
+	if n, _ := s.meaning.networks.take(ip, 0); n >= banPerDay {
+		s.meaning.bans.ban(ip)
+		log.Printf("ai answers: banned %s for %v after %d questions today", ip, banFor, n)
+		s.captureEvent("ai_ip_banned", map[string]any{"questions_today": n, "ban_days": int(banFor / (24 * time.Hour))})
+		view.Banned = true
+		render()
+		return
+	}
+	// Two model calls per question: say so honestly when the day's budget is out.
+	if !s.meaning.budgetFor(2) {
+		view.SiteFull = true
+		render()
+		return
+	}
+	used, ok := s.meaning.devices.take(who, questionsPerDay)
+	if !ok {
+		view.Limited = true
+		render()
+		return
+	}
+	view.Left = questionsPerDay - used
 	ctx, cancel := context.WithTimeout(ctx, 28*time.Second)
 	defer cancel()
 	res, err := s.SearchMeaning(ctx, q, s.meaning)
@@ -246,6 +265,10 @@ const (
 func (s *Server) trackAI(r *http.Request, q string, v aiView, u *nlsearch.Usage, reason error, took time.Duration) {
 	outcome := "answered"
 	switch {
+	case v.Banned:
+		outcome = "banned"
+	case v.SiteFull:
+		outcome = "site_full"
 	case v.Limited:
 		outcome = "limited"
 	case v.Unavailable:
@@ -275,8 +298,7 @@ func (s *Server) trackAI(r *http.Request, q string, v aiView, u *nlsearch.Usage,
 		"sources":         len(v.Sources),
 		"quotes":          quotes,
 		"questions_left":  v.Left,
-		"wait_minutes":    v.WaitMin,
-		"network_limited": v.Network,
+		"wait_minutes":    v.WaitH*60 + v.WaitM,
 		"brought_results": v.Results != nil,
 		"bot":             IsBot(r),
 	}

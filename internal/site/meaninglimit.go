@@ -24,8 +24,10 @@ type meaningSearch struct {
 	mu          sync.Mutex
 	cache       map[[32]byte]meaningEntry
 	slots       chan struct{}
-	clients     *ipLimiter // per IP: the old quote box, and the network cap
-	visitors    *ipLimiter // per browser cookie
+	clients     *ipLimiter   // per IP, for the quote box (answer.go)
+	devices     dailyCounter // AI questions per device a day (ai.go)
+	networks    dailyCounter // AI questions per IP a day, for bans
+	bans        banList
 	selected    map[[32]byte]selectedEntry
 	composed    map[[32]byte]composedEntry
 	vectors     map[[32]byte]vectorEntry
@@ -37,14 +39,6 @@ type meaningSearch struct {
 
 // Defaults when SetMeaningLimits is not called: two provider calls at once,
 // and up to 1,000 answers per cache, each kept for an hour.
-// questionsPerHour is how many AI answers one visitor (one browser, by its
-// ll_ai cookie) gets an hour. ipQuestionsPerHour bounds one network, so a
-// bot that drops the cookie cannot get a fresh allowance each time; it is
-// loose because Lebanese mobile carriers put many people behind one IP.
-const (
-	questionsPerHour   = 10
-	ipQuestionsPerHour = 60
-)
 
 const (
 	defaultMeaningConcurrency = 2
@@ -53,6 +47,16 @@ const (
 )
 
 // fresh says whether a cached answer from at may still be used.
+// budgetFor says whether today's site-wide allowance still has n calls.
+func (m *meaningSearch) budgetFor(n int) bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if day := beirutDay(time.Now()); m.day != day {
+		m.day, m.used = day, 0
+	}
+	return m.used+n <= m.limit
+}
+
 func (m *meaningSearch) fresh(at time.Time) bool {
 	return m.cacheTTL > 0 && time.Since(at) < m.cacheTTL
 }
@@ -72,7 +76,7 @@ func (s *Server) SetMeaningLimits(concurrency, cacheSize int, cacheTTL time.Dura
 
 func newMeaningSearch(rw QueryRewriter, provider string, shares bool, limit int) *meaningSearch {
 	return &meaningSearch{rw: rw, provider: provider, shares: shares, limit: limit, cache: make(map[[32]byte]meaningEntry),
-		slots: make(chan struct{}, defaultMeaningConcurrency), clients: newHourLimiter(ipQuestionsPerHour), visitors: newHourLimiter(questionsPerHour),
+		slots: make(chan struct{}, defaultMeaningConcurrency), clients: newIPLimiter(6, 2),
 		cacheSize: defaultMeaningCacheSize, cacheTTL: defaultMeaningCacheTTL}
 }
 
@@ -109,7 +113,7 @@ func (m *meaningSearch) Rewrite(ctx context.Context, q string) (nlsearch.Plan, e
 		return p, nil
 	}
 	m.mu.Lock()
-	day := time.Now().UTC().Format("2006-01-02")
+	day := beirutDay(time.Now())
 	if m.day != day {
 		m.day, m.used = day, 0
 	}
