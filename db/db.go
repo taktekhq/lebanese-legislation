@@ -61,7 +61,7 @@ var (
 	//go:embed aliases.tsv
 	Aliases string
 	// Judgements are a model's checked answers about amendments the
-	// patterns couldn't settle (lebleg judge).
+	// patterns couldn't settle (judge).
 	//go:embed model/judgements.jsonl
 	Judgements string
 )

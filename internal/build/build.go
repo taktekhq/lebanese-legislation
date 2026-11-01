@@ -43,8 +43,8 @@ type Options struct {
 	// Scans is a lebgazette sader-bundle folder: texts the Centre has not
 	// published yet, read from the Gazette's own pages (scans.go). Empty: none.
 	Scans string
-	// RulingFiles is the folder `lebleg ruling-files` fills: each ruling's
-	// scanned judgment (PDF, left where it is) and `lebleg ruling-read`'s
+	// RulingFiles is the folder `ruling-files` fills: each ruling's
+	// scanned judgment (PDF, left where it is) and `ruling-read`'s
 	// machine reading of it, loaded into ruling_file and ruling_page
 	// (internal/modelout). Empty: none.
 	RulingFiles string

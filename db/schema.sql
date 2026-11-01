@@ -240,8 +240,8 @@ CREATE TABLE ruling (
 
 -- The full judgment behind a ruling page («نص الحكم كاملا»): a scanned PDF the
 -- Centre serves at RulingFile.aspx?RuliID=N, kept outside git and served at
--- /ruling-files/<ruling_id>.pdf (`lebleg ruling-files`, loaded by
--- `lebleg build -ruling-files`). The scan is the reference.
+-- /ruling-files/<ruling_id>.pdf (`ruling-files`, loaded by
+-- `build-db -ruling-files`). The scan is the reference.
 CREATE TABLE ruling_file (
   ruling_id   integer PRIMARY KEY REFERENCES ruling (id),
   pages       smallint,                   -- NULL until the scan has been read
@@ -250,7 +250,7 @@ CREATE TABLE ruling_file (
   fetched_at  timestamptz NOT NULL
 );
 
--- A machine reading (Gemini) of the scan, one row per page (`lebleg ruling-read`).
+-- A machine reading (Gemini) of the scan, one row per page (`ruling-read`).
 -- It may contain errors: nothing here is corrected or rewritten, and the scan
 -- stays the reference. Pages the reader could not read are not loaded.
 -- search_stem is for finding a ruling by words only its judgment holds.

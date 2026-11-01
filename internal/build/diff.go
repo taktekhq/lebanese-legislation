@@ -203,7 +203,7 @@ func RunDiff(ctx context.Context, o DiffOptions) error {
 		cmd = exec.CommandContext(ctx, bin, args...)
 		cmd.Dir = tmp
 		if out, err := cmd.CombinedOutput(); err != nil {
-			return fmt.Errorf("lebleg build %s: %s: %w", ref, strings.TrimSpace(string(out)), err)
+			return fmt.Errorf("build-db %s: %s: %w", ref, strings.TrimSpace(string(out)), err)
 		}
 		return nil
 	}

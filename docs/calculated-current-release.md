@@ -32,7 +32,7 @@ hf download taktekhq/lebanese-legislation --repo-type dataset \
   --revision "$DATASET_REVISION" --include 'data/*.parquet' --local-dir ./snapshot
 export DATABASE_URL='<new empty PostgreSQL staging database>'
 export REUSE_DATABASE_URL='<read-only compatible released database>'
-lebleg build --snapshot-dir "$SNAPSHOT_DIR" --revision "$DATASET_REVISION" \
+build-db --snapshot-dir "$SNAPSHOT_DIR" --revision "$DATASET_REVISION" \
   --as-of-date 2026-10-30 --release-id "$RELEASE_ID" \
   --output-dir "./artifacts/release-$RELEASE_ID"
 ```

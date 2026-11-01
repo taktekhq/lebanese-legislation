@@ -1,6 +1,6 @@
 // Package export writes the database out as git-friendly text.
 //
-// Each table becomes data/<table>/<shard>.tsv in PostgreSQL's COPY text
+// Each table becomes tables/<table>/<shard>.tsv in PostgreSQL's COPY text
 // format: one row per line (tabs and line breaks inside values are escaped),
 // sorted by key, split by key range so no file nears GitHub's 100 MB limit.
 // An unchanged row is an unchanged line, so git stores only what changed.
@@ -87,13 +87,13 @@ func Run(ctx context.Context, dsn, dir string, g provenance.Guard, log func(stri
 		order = append(order, t.Name)
 		log("%-22s %10d rows  %3d files", t.Name, n, len(files))
 		cols := strings.Join(t.Columns, ",") + "\n"
-		if err := os.WriteFile(filepath.Join(dir, "data", t.Name, "COLUMNS"), []byte(cols), 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(dir, "tables", t.Name, "COLUMNS"), []byte(cols), 0o644); err != nil {
 			return nil, err
 		}
-		written[filepath.Join(dir, "data", t.Name, "COLUMNS")] = true
+		written[filepath.Join(dir, "tables", t.Name, "COLUMNS")] = true
 	}
 	// Shards whose key range emptied out, and tables that no longer exist.
-	filepath.Walk(filepath.Join(dir, "data"), func(path string, info os.FileInfo, err error) error {
+	filepath.Walk(filepath.Join(dir, "tables"), func(path string, info os.FileInfo, err error) error {
 		if err == nil && !info.IsDir() && !written[path] {
 			os.Remove(path)
 		}
@@ -271,7 +271,7 @@ func ident(cols []string) string {
 
 // write streams the table out, routing each line to its key range's file.
 func (t Table) write(ctx context.Context, conn *pgx.Conn, dir string, w int64) (int64, []string, error) {
-	base := filepath.Join(dir, "data", t.Name)
+	base := filepath.Join(dir, "tables", t.Name)
 	if err := os.MkdirAll(base, 0o755); err != nil {
 		return 0, nil, err
 	}

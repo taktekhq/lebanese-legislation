@@ -115,7 +115,7 @@ func TestSaderlexFileChanged(t *testing.T) {
 		t.Fatalf("got %+v", vs)
 	}
 	if msg := (&BlockedError{Violations: vs}).Error(); !strings.Contains(msg, "1 scanned texts unchecked: the SaderLex bundle has no manifest") ||
-		!strings.Contains(msg, "lebleg provenance manifest -scans") {
+		!strings.Contains(msg, "record-scan-manifest -scans") {
 		t.Errorf("block message: %q", msg)
 	}
 	os.WriteFile(ManifestPath(bundle), []byte("path\tsha256\n"), 0o644)
