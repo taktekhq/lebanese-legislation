@@ -41,7 +41,10 @@ export async function originFetch(request, env) {
     }
   }
 
-  if (env.ORIGIN_MODE === "hetzner") return fetch(request);
+  // A request with the secret test header reaches the container whatever the mode,
+  // so the container can be checked before traffic moves to it.
+  const testing = env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY;
+  if (env.ORIGIN_MODE === "hetzner" && !testing) return fetch(request);
   try {
     const res = await getContainer(env.ORIGIN, "main").fetch(request);
     const headers = new Headers(res.headers);
@@ -51,7 +54,7 @@ export async function originFetch(request, env) {
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
   } catch (err) {
     console.error("container origin:", err && err.message);
-    return new Response("Service unavailable", {
+    return new Response(testing ? "container error: " + (err && err.stack || err) : "Service unavailable", {
       status: 503,
       headers: { ...SECURITY_HEADERS, "Retry-After": "30" },
     });
