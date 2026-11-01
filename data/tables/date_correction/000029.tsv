@@ -1,0 +1,5 @@
+268757	issued_on	2017-12-03	2017-01-03	model	The signature_block explicitly dates the signing to 3 January 2017 (3 كانون الثاني 2017), showing printed_signed confused January (01) with December (12).
+268800	issued_on	2016-12-24	\N	guard	printed as signed after its publication on 22/12/2016; signing date not known
+269950	gazette_date	2003-09-10	2003-10-09	model	Neighbouring decree 11043 was also signed on 2003-09-27, while Gazette issue 47 of 2003 was published on 2003-10-09 (printed 2003-09-10 swapped month and day).
+269954	gazette_date	2003-09-10	2003-10-09	model	Neighbouring decree 11043 confirms the signing date 2003-09-27, while Gazette issue 47 of 2003 was published on 2003-10-09 (month and day swapped in printed_gazette_date 2003-09-10).
+269958	gazette_date	2003-09-10	2003-10-09	model	Neighbouring decree 11043 confirms the 2003-09-27 signing date, while Gazette issue 47 in 2003 was published on 2003-10-09 (month and day swapped in the printed 2003-09-10).

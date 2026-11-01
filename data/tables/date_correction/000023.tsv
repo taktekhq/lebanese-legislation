@@ -1,0 +1,22 @@
+207461	issued_on	2004-03-30	2004-03-03	signature	the text's own signing line
+207493	issued_on	2005-05-28	2005-02-28	signature	the text's own signing line
+207529	issued_on	2004-03-30	2004-03-03	signature	the text's own signing line
+207530	issued_on	2004-03-30	2004-03-03	signature	the text's own signing line
+207680	issued_on	2004-12-09	2003-12-09	model	The signature_block explicitly dates the signing to 9 December 2003, showing a one-year typo in printed_signed.
+208652	issued_on	2004-12-13	2003-12-13	year-typo	a year typo: the texts numbered around it are dated 2003
+208802	issued_on	2004-06-20	2004-06-02	signature	the text's own signing line
+209753	issued_on	2004-09-20	2004-09-02	signature	the text's own signing line
+210681	issued_on	2004-04-27	2004-01-27	signature	the text's own signing line
+211175	issued_on	2005-08-20	2005-06-20	signature	the text's own signing line
+211429	issued_on	2005-09-08	2005-08-08	signature	the text's own signing line
+212089	issued_on	2005-11-26	2005-10-26	signature	the text's own signing line
+212143	issued_on	2005-10-14	2005-10-04	signature	the text's own signing line
+212466	gazette_date	1921-01-01	\N	placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+213082	issued_on	2006-02-27	2006-01-27	signature	the text's own signing line
+213180	issued_on	2006-03-16	2006-03-16	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 7 day(s) earlier
+213503	issued_on	2006-04-30	2006-03-30	signature	the text's own signing line
+213507	issued_on	2006-05-05	2006-04-05	signature	the text's own signing line
+213526	issued_on	2006-04-23	2006-03-23	model	The signature_block explicitly dates the signing to 23 March 2006 (23 آذار 2006), three weeks before the 2006-04-13 Gazette issue 19.
+215236	issued_on	2006-11-11	2006-10-11	signature	the text's own signing line
+215400	issued_on	2006-11-30	2006-10-30	signature	the text's own signing line
+215679	issued_on	2007-02-15	2007-01-15	model	The signature_block states 15 January (كانون الثاني) 2007, showing printed_signed has a month typo (02 instead of 01) while printed_gazette_date (2007-01-25) follows 10 days later.

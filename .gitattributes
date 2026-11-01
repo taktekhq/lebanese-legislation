@@ -1,0 +1,2 @@
+# The database as text: collapse its diffs in pull requests and keep it out of the language stats.
+data/** linguist-generated=true

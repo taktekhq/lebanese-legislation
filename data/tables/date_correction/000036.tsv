@@ -1,0 +1,9 @@
+326449	issued_on	2023-08-14	2023-04-18	signature	the text's own signing line
+327490	issued_on	2023-12-31	2023-01-31	model	The signature block explicitly gives the signing date as 31 January 2023 (31 كانون الثاني 2023), which also fits chronologically between neighbouring numbers 3025 (2023-01-10) and 3027 (2023-02-15).
+329059	issued_on	2023-07-26	2023-06-26	model	The signature_block explicitly dates the signing to 26 June 2023 (26 حزيران 2023), showing a one-digit month typo in printed_signed and placing signing after the latest preamble date (2023-06-23) and 10 days before printed_gazette_date.
+329236	issued_on	2023-11-17	2023-10-17	signature	the text's own signing line
+329237	issued_on	2023-11-24	2023-10-24	signature	the text's own signing line
+329239	issued_on	2023-11-24	2023-10-24	signature	the text's own signing line
+329240	issued_on	2023-11-24	2023-10-24	signature	the text's own signing line
+329242	issued_on	2023-11-27	2023-10-27	signature	the text's own signing line
+331181	issued_on	2024-08-30	2024-08-20	signature	the text's own signing line
