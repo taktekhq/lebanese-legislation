@@ -28,3 +28,5 @@ scraper/data/
 /manual/*
 !/manual/README.md
 workers/mcp/node_modules/
+
+workers/static-site/container/build/

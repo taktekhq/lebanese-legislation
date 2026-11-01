@@ -1,0 +1,76 @@
+name: origin
+
+on:
+  workflow_dispatch:
+    inputs:
+      route:
+        description: Optional comma-separated Worker routes
+        type: string
+        default: ""
+      mode:
+        description: Origin mode
+        type: choice
+        options: [hetzner, container]
+        default: hetzner
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          docker system prune -af
+      - name: Prepare container build context
+        env:
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          build=workers/static-site/container/build
+          mkdir -p "$build/src/web"
+          cp go.mod go.sum THIRD_PARTY_NOTICES.txt "$build/src/"
+          cp -R internal "$build/src/internal"
+          cp web/main.go "$build/src/web/"
+          endpoint=https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+          aws s3 cp s3://lebleg-site/_build/lebleg.dump "$build/lebleg.dump" --endpoint-url "$endpoint"
+          aws s3 cp s3://lebleg-site/_build/lebleg_search.dump "$build/lebleg_search.dump" --endpoint-url "$endpoint"
+          aws s3 sync s3://lebleg-site/_build/scans "$build/scans" --endpoint-url "$endpoint"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        working-directory: workers/static-site
+        run: npm ci
+      - name: Set Gemini secret
+        working-directory: workers/static-site
+        env:
+          GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
+        run: |
+          if [ -n "$GEMINI_API_KEY" ]; then
+            echo "$GEMINI_API_KEY" | npx --yes wrangler@4.40.0 secret put GEMINI_API_KEY
+          fi
+      - name: Deploy Worker and container
+        working-directory: workers/static-site
+        env:
+          MODE: ${{ inputs.mode }}
+          ROUTES: ${{ inputs.route }}
+        run: |
+          args=(--var "ORIGIN_MODE:$MODE")
+          IFS=',' read -r -a routes <<< "$ROUTES"
+          for route in "${routes[@]}"; do
+            route="${route#"${route%%[![:space:]]*}"}"
+            route="${route%"${route##*[![:space:]]}"}"
+            if [ -n "$route" ]; then
+              args+=(--route "$route")
+            fi
+          done
+          npx --yes wrangler@4.40.0 deploy "${args[@]}"
