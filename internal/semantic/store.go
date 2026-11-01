@@ -14,12 +14,15 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/taktekhq/lebanese-legislation/internal/vectorize"
 )
 
 type Store struct {
-	db       *pgxpool.Pool
-	embedder Embedder
-	model    string
+	db        *pgxpool.Pool
+	embedder  Embedder
+	model     string
+	vectorize *vectorize.Client
 }
 
 func NewStore(pool *pgxpool.Pool, embedder Embedder) *Store {
@@ -28,6 +31,51 @@ func NewStore(pool *pgxpool.Pool, embedder Embedder) *Store {
 		model = m.Model()
 	}
 	return &Store{db: pool, embedder: embedder, model: model}
+}
+
+// WithVectorize selects remote nearest-neighbor lookup while keeping rows in PostgreSQL.
+func (s *Store) WithVectorize(client *vectorize.Client) *Store {
+	s.vectorize = client
+	return s
+}
+
+func (s *Store) searchVectorize(ctx context.Context, v []float32, limit int) ([]Hit, error) {
+	matches, err := s.vectorize.Query(ctx, v, limit)
+	if err != nil {
+		return nil, err
+	}
+	if len(matches) == 0 {
+		return nil, nil
+	}
+	ids := make([]string, len(matches))
+	for i, match := range matches {
+		ids[i] = match.ID
+	}
+	rows, err := s.db.Query(ctx, `SELECT kind,source_id,part,lang,title,text,chunk_start,chunk_end,hash,model FROM public.semantic_chunks WHERE `+vectorize.ChunkIDSQL+` = ANY($1::text[]) AND model=$2`, ids, s.model)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	byID := make(map[string]Hit, len(matches))
+	for rows.Next() {
+		var h Hit
+		var model string
+		if err = rows.Scan(&h.Kind, &h.ID, &h.Part, &h.Lang, &h.Title, &h.Text, &h.Start, &h.End, &h.Hash, &model); err != nil {
+			return nil, err
+		}
+		byID[vectorize.ChunkID(model, h.Kind, h.ID, h.Part, h.Lang, h.Hash, h.Start)] = h
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	var out []Hit
+	for _, match := range matches {
+		if h, ok := byID[match.ID]; ok {
+			h.Distance = 1 - match.Score
+			out = append(out, h)
+		}
+	}
+	return out, nil
 }
 
 func (s *Store) EnsureSchema(ctx context.Context) error {
@@ -101,6 +149,9 @@ func (s *Store) Search(ctx context.Context, q string, limit int) ([]Hit, error) 
 	v, err := normalize(vs[0])
 	if err != nil {
 		return nil, err
+	}
+	if s.vectorize != nil {
+		return s.searchVectorize(ctx, v, limit)
 	}
 	tx, err := s.db.BeginTx(ctx, pgx.TxOptions{AccessMode: pgx.ReadOnly})
 	if err != nil {

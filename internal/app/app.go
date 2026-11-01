@@ -28,6 +28,7 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 	"github.com/taktekhq/lebanese-legislation/internal/semantic"
 	"github.com/taktekhq/lebanese-legislation/internal/site"
+	"github.com/taktekhq/lebanese-legislation/internal/vectorize"
 )
 
 // Defaults for semantic search set up from GEMINI_API_KEY alone.
@@ -251,7 +252,12 @@ func enableSearch(ctx context.Context, h *site.Server, pool *pgxpool.Pool) (func
 		vectors.Close()
 		return nil, errors.New("invalid embedding configuration")
 	}
-	h.SetVectorSearch(semantic.NewStore(vectors, embedder))
+	store, err := semanticStore(vectors, embedder)
+	if err != nil {
+		vectors.Close()
+		return nil, err
+	}
+	h.SetVectorSearch(store)
 	log.Printf("semantic retrieval enabled: %s", model)
 	return vectors.Close, nil
 }
@@ -333,7 +339,11 @@ func enableSemanticSearch(s *site.Server, pool *pgxpool.Pool) error {
 	if err != nil {
 		return errors.New("invalid embedding configuration")
 	}
-	s.SetVectorSearch(semantic.NewStore(pool, embedder))
+	store, err := semanticStore(pool, embedder)
+	if err != nil {
+		return err
+	}
+	s.SetVectorSearch(store)
 	log.Printf("semantic search enabled: %s, at most %d calls a day", model, daily)
 	return nil
 }
@@ -405,4 +415,17 @@ func modeHandler(next http.Handler, mode string) (http.Handler, error) {
 	default:
 		return nil, errors.New("APP_MODE must be website, api or mcp")
 	}
+}
+
+// semanticStore keeps the local ANN path unless Vectorize is explicitly selected.
+func semanticStore(pool *pgxpool.Pool, embedder semantic.Embedder) (*semantic.Store, error) {
+	store := semantic.NewStore(pool, embedder)
+	if index := os.Getenv("LEBLEG_VECTORIZE_INDEX"); index != "" {
+		client, err := vectorize.New(os.Getenv("CLOUDFLARE_ACCOUNT_ID"), index, os.Getenv("LEBLEG_VECTORIZE_TOKEN"))
+		if err != nil {
+			return nil, err
+		}
+		store.WithVectorize(client)
+	}
+	return store, nil
 }
