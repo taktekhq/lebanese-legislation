@@ -52,8 +52,9 @@ jobs:
             sleep 1
           done
           [ "$ready" = 1 ] || { docker logs vectors-db; exit 1; }
+          # Data only, no indexes: the export reads the table once in order.
           docker exec vectors-db pg_restore -U postgres --no-owner --no-privileges -j 4 \
-            -d lebleg_search /dump/lebleg_search.dump
+            --section=pre-data --section=data -d lebleg_search /dump/lebleg_search.dump
       - name: Export vectors
         run: go run ./cmd/export-vectors -out "$RUNNER_TEMP/vectors.ndjson"
       - name: Install DuckDB 1.5.6
@@ -61,16 +62,16 @@ jobs:
           curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" https://github.com/duckdb/duckdb/releases/download/v1.5.6/duckdb_cli-linux-amd64.zip
           unzip -q "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/bin"
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
-      - name: Convert to Parquet
+      - name: Parquet and Hugging Face, in the background
         run: |
+          cat > "$RUNNER_TEMP/hf.sh" <<'HF'
+          set -eu
           mkdir -p "$RUNNER_TEMP/out/vectors"
           duckdb -c "SET memory_limit='2GB'; SET temp_directory='$RUNNER_TEMP/duckdb-tmp';
             COPY (SELECT id, document, model, hash, values::FLOAT[768] AS values
               FROM read_json('$RUNNER_TEMP/vectors.ndjson', format='newline_delimited',
                 columns={id: 'VARCHAR', document: 'VARCHAR', model: 'VARCHAR', hash: 'VARCHAR', values: 'FLOAT[768]'}))
             TO '$RUNNER_TEMP/out/vectors/vectors.parquet' (FORMAT parquet, COMPRESSION zstd);"
-      - name: Upload to Hugging Face
-        run: |
           if [ -z "$HF_TOKEN" ]; then
             echo 'No HF_TOKEN secret: vectors.parquet not uploaded.' | tee -a "$GITHUB_STEP_SUMMARY"
           else
@@ -80,6 +81,8 @@ jobs:
             hf upload "$HF_REPO" "$RUNNER_TEMP/out" . --repo-type dataset \
               --commit-message "Vectors from $(git rev-parse --short=12 HEAD), $(date -u +%F)"
           fi
+          HF
+          ( bash "$RUNNER_TEMP/hf.sh" > "$RUNNER_TEMP/hf.log" 2>&1; echo $? > "$RUNNER_TEMP/hf.status" ) &
       - name: Download previous manifest
         run: |
           if ! aws s3 cp s3://lebleg-site/_build/vectors-manifest.tsv "$RUNNER_TEMP/previous.tsv" \
@@ -97,6 +100,12 @@ jobs:
           go run ./cmd/vectorize-sync -in "$RUNNER_TEMP/vectors.ndjson" \
             -prev "$RUNNER_TEMP/previous.tsv" -manifest "$RUNNER_TEMP/vectors-manifest.tsv"
           aws s3 cp "$RUNNER_TEMP/vectors-manifest.tsv" s3://lebleg-site/_build/vectors-manifest.tsv --endpoint-url "$R2_ENDPOINT"
+      - name: Wait for Parquet and Hugging Face
+        if: always()
+        run: |
+          until [ -f "$RUNNER_TEMP/hf.status" ]; do sleep 10; done
+          cat "$RUNNER_TEMP/hf.log"
+          exit "$(cat "$RUNNER_TEMP/hf.status")"
       - name: Clean up database
         if: always()
         run: docker rm -f vectors-db >/dev/null 2>&1 || true
