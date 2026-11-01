@@ -1,6 +1,7 @@
 package app
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -8,8 +9,56 @@ import (
 )
 
 func TestDatabaseURLRequired(t *testing.T) {
-	if err := run("", "website"); err == nil {
+	if err := run(t.Context(), config{mode: "website"}); err == nil {
 		t.Fatal("empty database URL must fail before starting a listener")
+	}
+}
+
+func TestUnknownModeFailsBeforeConnecting(t *testing.T) {
+	if err := run(t.Context(), config{mode: "typo", dsn: "host=192.0.2.1 connect_timeout=1"}); err == nil || !strings.Contains(err.Error(), "APP_MODE") {
+		t.Fatalf("got %v", err)
+	}
+}
+
+// The command line LebaneseLegislation.com has run since before the split
+// into three binaries must keep its meaning.
+func TestFormerServeCommandLine(t *testing.T) {
+	t.Setenv("DATABASE_URL", "")
+	t.Setenv("LEBLEG_DSN", "")
+	cfg, err := parseFlags("website", []string{"serve", "-addr", "0.0.0.0:8765", "-events", "/var/lib/lebleg",
+		"-scans", "/scans", "-ruling-files", "/ruling-files", "-db", "host=postgres user=lebleg_web dbname=lebleg"}, io.Discard)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := config{mode: "website", addr: "0.0.0.0:8765", events: "/var/lib/lebleg", scans: "/scans",
+		rulingFiles: "/ruling-files", dsn: "host=postgres user=lebleg_web dbname=lebleg"}
+	if cfg != want {
+		t.Fatalf("got %+v\nwant %+v", cfg, want)
+	}
+	for _, args := range [][]string{{"-auth", "/run/auth", "-noindex", "-official", "/official"}, {"serve", "-noindex"}} {
+		if _, err := parseFlags("website", args, io.Discard); err != nil {
+			t.Errorf("%v: %v", args, err)
+		}
+	}
+}
+
+func TestFlagDefaultsComeFromTheEnvironment(t *testing.T) {
+	t.Setenv("DATABASE_URL", "")
+	t.Setenv("LEBLEG_DSN", "host=/tmp dbname=lebleg")
+	t.Setenv("LISTEN_ADDR", "")
+	cfg, err := parseFlags("api", nil, io.Discard)
+	if err != nil || cfg.dsn != "host=/tmp dbname=lebleg" || cfg.addr != "127.0.0.1:8000" {
+		t.Fatalf("got %+v %v", cfg, err)
+	}
+	t.Setenv("DATABASE_URL", "postgres://db/legislation")
+	if cfg, _ := parseFlags("api", nil, io.Discard); cfg.dsn != "postgres://db/legislation" {
+		t.Fatalf("DATABASE_URL must come first: %q", cfg.dsn)
+	}
+	if _, err := parseFlags("api", []string{"extra"}, io.Discard); err == nil {
+		t.Fatal("a stray argument must be refused")
+	}
+	if _, err := parseFlags("api", []string{"-nosuchflag"}, io.Discard); err == nil {
+		t.Fatal("an unknown flag must be refused")
 	}
 }
 

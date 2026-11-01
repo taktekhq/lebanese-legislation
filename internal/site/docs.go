@@ -15,6 +15,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// DocRow is any non-legislation document in a list.
 type DocRow struct {
 	Type    string
 	ID      int
@@ -36,6 +37,7 @@ func scanDocRows(rows pgx.Rows) ([]DocRow, error) {
 	})
 }
 
+// URL is the document's page.
 func (d DocRow) URL() string {
 	if d.Type == "law" {
 		return lawPath(d.ID)
@@ -43,10 +45,15 @@ func (d DocRow) URL() string {
 	return fmt.Sprintf("/%s/%d/", d.Type, d.ID)
 }
 
+// Highlight escapes a search excerpt and marks its matches.
 func (d DocRow) Highlight() template.HTML { return mark(d.Snippet) }
 
+// Highlight marks matches in a law row's search excerpt.
 func (l LawRow) Highlight() template.HTML { return mark(l.Snippet) }
 
+// headlineMarks are ts_headline's StartSel and StopSel: the bytes 0x02 and
+// 0x03 themselves, which mark and stripMarks look for. Keep it an
+// interpreted string: in a raw string Postgres gets a literal backslash-x02.
 const headlineMarks = "StartSel=\x02, StopSel=\x03"
 
 func mark(s string) template.HTML {
@@ -57,7 +64,7 @@ func mark(s string) template.HTML {
 
 type docKind struct {
 	key, list, table, title, eyebrow, h1, noun, many, desc string
-	listSQL                                                string
+	listSQL                                                string // type, id, title, kicker, date, snippet
 	orderBy                                                string
 }
 
@@ -96,7 +103,7 @@ func (s *Server) docList(k docKind) http.HandlerFunc {
 		}
 		size := perPage
 		if s.isStatic {
-			size = max(total, 1)
+			size = max(total, 1) // one page: a static copy has no pager to follow
 		}
 		page, pages, listBase, done := s.listPaging(w, r, "/"+k.list+"/", q, total, size)
 		if done {
@@ -126,11 +133,12 @@ func (s *Server) docList(k docKind) http.HandlerFunc {
 	}
 }
 
+// Doc is a single document page: facts, then text.
 type Doc struct {
 	Crumb, CrumbURL string
 	Kicker          []string
 	Title           string
-	Facts           [][2]any
+	Facts           [][2]any // label, value (string or template.HTML)
 	Paras           []string
 	Note            string
 	Source          string
@@ -138,10 +146,11 @@ type Doc struct {
 	Cites           []Ref
 	Articles        []CitedArticle
 	Laws            []LawRow
-	File            *DocFile
-	Reading         *DocReading
+	File            *DocFile    // a ruling's scanned judgment
+	Reading         *DocReading // and its machine reading
 }
 
+// Ref is a reference from a document to a text.
 type Ref struct {
 	LawID *int
 	Label string
@@ -260,6 +269,8 @@ func (s *Server) doc(k docKind) http.HandlerFunc {
 	}
 }
 
+// ---------------------------------------------------------------- rulings
+
 func (s *Server) rulings(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := s.ctx(r)
 	defer cancel()
@@ -283,7 +294,7 @@ func (s *Server) rulings(w http.ResponseWriter, r *http.Request) {
 		s.fail(w, r, err)
 		return
 	}
-	page := min(pageNo(q), max(1, (total+perPage-1)/perPage))
+	page := min(pageNo(q), max(1, (total+perPage-1)/perPage)) // ?page=, as /laws/ (handlers.go)
 	rows, err := s.db.Query(ctx, `SELECT 'ruling', id, title, coalesce(president, ''), decided_on, left(text_ar, 220) FROM ruling`+cond+
 		fmt.Sprintf(" ORDER BY decided_on DESC NULLS LAST, id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage), args...)
 	if err != nil {
@@ -347,7 +358,7 @@ func (s *Server) ruling(w http.ResponseWriter, r *http.Request) {
 	}
 	d.Crumb, d.CrumbURL = s.trOr(r, "Rulings", "ruling.back"), "/rulings/"
 	kickerEn := ""
-	if s.lang(r) != "ar" {
+	if s.lang(r) != "ar" { // the English court name; Arabic pages show only the Arabic one, already in Facts
 		kickerEn = str(courtEn)
 	}
 	d.Kicker = []string{kickerEn, dmy(on)}
@@ -407,6 +418,8 @@ func rulingLD(d Doc, path string, on *time.Time, court *string, year *int) map[s
 	return ld
 }
 
+// ---------------------------------------------------------------- gazette
+
 func (s *Server) gazettes(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := s.ctx(r)
 	defer cancel()
@@ -422,7 +435,7 @@ func (s *Server) gazettes(w http.ResponseWriter, r *http.Request) {
 		s.fail(w, r, err)
 		return
 	}
-	page := min(pageNo(q), max(1, (total+perPage-1)/perPage))
+	page := min(pageNo(q), max(1, (total+perPage-1)/perPage)) // ?page=, as /laws/ (handlers.go)
 	rows, err := s.db.Query(ctx, `SELECT 'gazette', g.id, 'الجريدة الرسمية، العدد ' || coalesce(g.number, '؟'),
 		(SELECT count(*) FROM gazette_entry e WHERE e.issue_id = g.id)::text || ' texts', g.published_on, NULL
 		FROM gazette_issue g`+cond+fmt.Sprintf(" ORDER BY g.published_on DESC NULLS LAST, g.id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage), args...)
@@ -486,7 +499,7 @@ func (s *Server) gazette(w http.ResponseWriter, r *http.Request) {
 		Facts: [][2]any{{s.trOr(r, "Issue", "gazette.fact_issue"), str(number)}, {s.trOr(r, "Published", "gazette.fact_published"), dmy(on)},
 			{s.trOr(r, "Texts", "gazette.fact_texts"), strconv.Itoa(len(laws))}},
 		Laws: laws}
-	if id >= scanIDBase {
+	if id >= scanIDBase { // an issue made for scanned texts: no page at the Centre to link to
 		d.Note = s.trOr(r, "The Centre has not published this issue. These are the texts we read from the scans of its pages.", "gazette.scan_note")
 	} else {
 		d.Source = s.source(ctx, "journal", id)
@@ -499,31 +512,34 @@ func (s *Server) gazette(w http.ResponseWriter, r *http.Request) {
 			"gazette.issue_desc", str(number), dmy(on), len(laws)), Data: d})
 }
 
+// ---------------------------------------------------------------- search
+
+// Results groups what a search found.
 type Results struct {
 	Topics             []TopicHit
-	MeaningUnavailable bool
+	MeaningUnavailable bool // model unavailable or limited: ordinary results are shown
 	Q                  string
 	Laws               []LawRow
 	LawCount           int
-	Articles           []LawRow
+	Articles           []LawRow // the article's law, with Number holding the article
 	ArtCount           int
 	Rulings            []DocRow
 	RulCount           int
-	Via                string
-	ViaKind            string
-	SameNum            []LawRow
-	Near               []LawRow
-	Num                string
-	Year               int
-	Download           bool
-	Missing            string
-	MissingRuling      bool
+	Via                string   // the words searched when the typed ones found nothing
+	ViaKind            string   // "translated" (Latin to Arabic) or "adjusted" (a typo mended, a number or word set aside)
+	SameNum            []LawRow // under a missing citation: texts with that number and another date
+	Near               []LawRow // titles nearest to the query, shown when nothing matched at all
+	Num                string   // a text number the query names ("513 هيئة إدارة السير"); narrows the texts only
+	Year               int      // a year the query names ("... 2024"); narrows the texts only
+	Download           bool     // the query asks how to download the laws: show the dataset first
+	Missing            string   // a citation the database has no text for ("513/2005"), said so instead of near misses
+	MissingRuling      bool     // ... and it named a ruling
 
-	rank string
+	rank string // the words titles are ranked against, when not Q (closeTitles)
 }
 
 func (s *Server) search(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("Cache-Control", "no-store") // also on the redirect to an article: each search is counted
 	q := r.URL.Query().Get("q")
 	if r.Method == http.MethodPost {
 		if !sameSearchOrigin(r) {
@@ -539,25 +555,32 @@ func (s *Server) search(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-
+	// Arabic-Indic digits ("٢٤٨") are folded to 0-9: the indexed texts use 0-9.
 	res := Results{Q: arDigits.Replace(strings.TrimSpace(q))}
 	if len([]rune(res.Q)) > 500 {
 		http.Error(w, "search question is too long", http.StatusBadRequest)
 		return
 	}
 	if res.Q != "" {
-
+		// "المادة 248 موجبات وعقود": straight to the article when one code matches.
 		if to := s.articleRef(ctx, res.Q); to != "" {
+			s.track(r, map[string]any{"k": "search", "q": NormQuery(res.Q), "n": 1, "via": "article"})
 			http.Redirect(w, r, to, http.StatusFound)
 			return
 		}
+		var how string
 		var err error
-		res, _, err = s.searchCached(ctx, res.Q)
+		res, how, err = s.searchCached(ctx, res.Q)
 		if err != nil {
 			s.fail(w, r, err)
 			return
 		}
-
+		ev := map[string]any{"k": "search", "q": NormQuery(res.Q)}
+		if how != "" {
+			ev["via"] = how
+		}
+		ev["n"], ev["laws"], ev["articles"], ev["rulings"] = res.LawCount+res.ArtCount+res.RulCount, res.LawCount, res.ArtCount, res.RulCount
+		s.track(r, ev)
 	}
 	title := s.brandTitle(r, s.trOr(r, "Search", "search.title"))
 	if res.Q != "" {
@@ -567,6 +590,8 @@ func (s *Server) search(w http.ResponseWriter, r *http.Request) {
 		Desc: s.trOr(r, "Search every Lebanese law, article and court ruling, in Arabic or French.", "search.desc"), Data: res})
 }
 
+// searchCached is searchFor, remembered for an hour: the database changes once
+// a night, and the same questions come back (people retyping, bots).
 func (s *Server) searchCached(ctx context.Context, q string) (Results, string, error) {
 	if res, how, ok := s.scache.get(q); ok {
 		return res, how, nil
@@ -578,6 +603,10 @@ func (s *Server) searchCached(ctx context.Context, q string) (Results, string, e
 	return res, how, err
 }
 
+// searchFor answers a search: a citation (a number, a date, a court) is looked
+// up exactly and said to be missing when it is; anything else is searched by
+// words, mended when that finds nothing. how says which ("" for plain words).
+// What people paste is tidied first (tidyQuery); the page keeps what they typed.
 func (s *Server) searchFor(ctx context.Context, q string) (Results, string, error) {
 	t, cut := tidyQuery(q)
 	if t == "" {
@@ -602,7 +631,9 @@ func (s *Server) searchTidy(ctx context.Context, q string) (Results, string, err
 		if err != nil {
 			return res, how, err
 		}
-
+		// A pasted title that itself cites a text: "تعديل المرسوم رقم 15874
+		// تاريخ 5/12/2005 (...)" is the title of decree 617/2007, and opened
+		// decree 15874 (23 Oct 2026). The text with that very title comes first.
 		if !rq.rulingCite() && len(strings.Fields(q)) >= 5 {
 			if row := s.exactTitle(ctx, q); row != nil {
 				var added bool
@@ -629,7 +660,8 @@ func (s *Server) searchTidy(ctx context.Context, q string) (Results, string, err
 	}
 	if found(res) {
 		if res.LawCount == 0 {
-
+			// A Latin-script search: the texts' English titles ("access information"
+			// found one French article and not Law 28/2017, Right to access information).
 			res.Laws, res.LawCount = s.lawsByEnglishTitle(ctx, q, 10)
 		}
 		if res.LawCount == 0 {
@@ -655,9 +687,10 @@ func (s *Server) searchTidy(ctx context.Context, q string) (Results, string, err
 	return alt, how, nil
 }
 
+// find runs the three searches at once; each fills its own part of res.
 func (s *Server) find(ctx context.Context, res *Results) error {
 	res.Topics = searchTopics(res.Q)
-	if res.Num != "" || res.Year != 0 {
+	if res.Num != "" || res.Year != 0 { // a number or a year names a text, not an article or a ruling
 		return s.findLaws(ctx, res)
 	}
 	errs := make(chan error, 3)
@@ -680,7 +713,7 @@ func (s *Server) findLaws(ctx context.Context, res *Results) error {
 	if res.Num == "" && res.Year == 0 {
 		s.addEnglishTitles(ctx, res)
 	}
-
+	// A question that names one text ("cybercrime") has it first (glosspins.go).
 	if res.Num == "" {
 		if pin := s.pinnedRow(ctx, res.Q, res.Year); pin != nil {
 			var added bool
@@ -695,7 +728,7 @@ func (s *Server) findLaws(ctx context.Context, res *Results) error {
 
 func (s *Server) findLawsBase(ctx context.Context, res *Results) error {
 	q := res.Q
-
+	// A citation ("رقم 136 تاريخ 16/09/1983", "513/2005") is an exact number and year, not title words.
 	if num, yr, ok := parseCitation(q); ok {
 		const cw = `l.number::text = $1 AND l.issued_on >= make_date($2, 1, 1) AND l.issued_on < make_date($2 + 1, 1, 1)`
 		if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l WHERE "+cw, num, yr).Scan(&res.LawCount); err != nil {
@@ -711,7 +744,7 @@ func (s *Server) findLawsBase(ctx context.Context, res *Results) error {
 			return err
 		}
 	}
-
+	// Titles: every word of the query, spelling folded, anywhere in the title.
 	conds, args := titleConds(strings.Fields(q), 1)
 	if n, err := strconv.Atoi(res.Num); err == nil {
 		args = append(args, n)
@@ -726,7 +759,14 @@ func (s *Server) findLawsBase(ctx context.Context, res *Results) error {
 		if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l WHERE "+cond, args...).Scan(&res.LawCount); err != nil {
 			return err
 		}
-
+		// A number in the query is first the text's own number: "337" is the
+		// notaries' law 337/1994, not customs tariff amendment no. 337. A bare
+		// number ranks laws before decrees and decisions, and a text of some
+		// length before a one-article ratification. Then codes, then the
+		// closest title, and the closest text in force is lifted to the top
+		// (inForceFirst).
+		// IS TRUE: a text with no number has a NULL number_int, which DESC
+		// would put first.
 		order := ""
 		nums := queryNumbers(q)
 		if len(nums) > 0 {
@@ -757,6 +797,13 @@ func (s *Server) findLawsBase(ctx context.Context, res *Results) error {
 	return nil
 }
 
+// inForceFirst puts the closest text in force first when a repealed one leads,
+// among the texts that rank level with it (number, kind, length, code). "نظام
+// كتاب العدل" opens with law 337/1994, not decree-law 76/1940 that it replaced.
+// Only the first place: ranking every text in force above every repealed one
+// put an amendment of 1961 above the municipal laws for "قانون البلديات", and
+// the Foreign Ministry's rules of 1983 out of the first three for "نظام
+// الخارجية" (23 Oct 2026).
 func inForceFirst(laws []LawRow, nums []int, digits bool) []LawRow {
 	if len(laws) < 2 || laws[0].Status != "repealed" {
 		return laws
@@ -783,6 +830,8 @@ func inForceFirst(laws []LawRow, nums []int, digits bool) []LawRow {
 	return laws
 }
 
+// exactTitle is the text whose title is the query, spelling folded (many
+// titles end in " ."); the newest when several share it. nil when none does.
 func (s *Server) exactTitle(ctx context.Context, q string) *LawRow {
 	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind
 		WHERE ar_norm(l.title) IN (ar_norm($1), ar_norm($1) || ' .', ar_norm($1) || '.')
@@ -797,6 +846,7 @@ func (s *Server) exactTitle(ctx context.Context, q string) *LawRow {
 	return &laws[0]
 }
 
+// findArticles ranks exact phrase, then exact words, then stems; codes first on ties.
 func (s *Server) findArticles(ctx context.Context, res *Results) error {
 	q := articleQuery(res.Q)
 	const artWhere = `(a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1))
@@ -845,6 +895,8 @@ func (s *Server) findRulings(ctx context.Context, res *Results) error {
 	return nil
 }
 
+// ---------------------------------------------------------------- static pages
+
 func (s *Server) static(name, title, desc string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s.render(w, r, name, 200, Page{Title: title, Desc: desc, Path: r.URL.Path})
@@ -864,6 +916,7 @@ func (s *Server) about(w http.ResponseWriter, r *http.Request) {
 		Data: st})
 }
 
+// TableInfo describes one table of the public database.
 type TableInfo struct {
 	Name    string
 	Rows    int
@@ -923,7 +976,7 @@ var tableNotes = map[string]string{
 	"doctrine_article":     "Articles from legal periodicals, with abstracts.",
 	"research":             "Studies.",
 	"reference":            "Every link from a document to a text or article, and whether the Centre's editors, our rules or a model made it.",
-	"source_page":          "Public source addresses and publication change dates.",
+	"source_page":          "The raw page behind every row: address, archive path, SHA-256.",
 	"legislation_scan":     "Texts the Lebanese University has not published yet, read by machine from scans of the Gazette's pages: where the scans came from, how many pages, and how far the two readings agree. Words they disagree on are marked in the text: U+E000 reading one, U+E001 reading two, U+E002.",
 	"legislation_alias":    "The old address of a scanned text the Lebanese University has since published, and the text it now points to.",
 	"centre_error":         "Errors in the Lebanese University's own text of an article (one article repeating another, a stray letter), noted next to the article and never corrected in it. Where a person read the right wording from the printed edition, it is a minor version in article_version.",
@@ -954,12 +1007,17 @@ func orStr(s, alt string) string {
 	return s
 }
 
+// articleRef returns the article's address for "المادة N <code name>" when exactly one
+// principal code matches every name word and has that article; otherwise "".
 func (s *Server) articleRef(ctx context.Context, q string) string {
 	num, words, ok := parseArticleRef(q)
 	if !ok {
 		return ""
 	}
-
+	// The article of a cited text: "المادة 67 من المرسوم 2868 تاريخ
+	// 27/12/1959" is article 67 of decree 2868/1959 (dated 16/12), and listed
+	// texts numbered 67 or nothing (23 Oct 2026). The first of the cited texts
+	// that has the article; a short decree with that number has none.
 	if rq := readQuery(strings.Join(words, " ")); rq.Num > 0 && rq.lawCite() {
 		var res Results
 		if found, err := s.findLawCite(ctx, &res, rq); err == nil && found {
@@ -975,13 +1033,13 @@ func (s *Server) articleRef(ctx context.Context, q string) string {
 	var conds []string
 	var args []any
 	for _, wd := range words {
-		if r := []rune(wd); len(r) > 3 && r[0] == 'و' {
+		if r := []rune(wd); len(r) > 3 && r[0] == 'و' { // "وعقود" is "والعقود" without the article
 			wd = string(r[1:])
 		}
 		args = append(args, "%"+wd+"%")
 		conds = append(conds, fmt.Sprintf("ar_norm(l.title) LIKE ar_norm($%d)", len(args)))
 	}
-
+	// Shortest title first: "قانون العقوبات" beats "قانون العقوبات العسكرية" for "العقوبات".
 	rows, err := s.db.Query(ctx, "SELECT l.id, length(l.title) FROM code c JOIN legislation l ON l.id = c.law_id WHERE "+
 		strings.Join(conds, " AND ")+" ORDER BY length(l.title) LIMIT 2", args...)
 	if err != nil {
@@ -990,7 +1048,9 @@ func (s *Server) articleRef(ctx context.Context, q string) string {
 	type hit struct{ id, n int }
 	hits, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (h hit, err error) { err = row.Scan(&h.id, &h.n); return })
 	if err == nil && len(hits) == 0 && len(words) >= 2 {
-
+		// Not a principal code: any text whose title holds every word and that
+		// has the article ("المادة 47 من قانون تنظيم الملكية المشتركة" is
+		// decree-law 88/1983). Two words at least, so a vague name never jumps.
 		args = append(args, num)
 		rows, err = s.db.Query(ctx, "SELECT l.id, length(l.title) FROM legislation l WHERE "+strings.Join(conds, " AND ")+
 			fmt.Sprintf(" AND EXISTS (SELECT 1 FROM legislation_article a WHERE a.law_id = l.id AND a.number = $%d)", len(args))+

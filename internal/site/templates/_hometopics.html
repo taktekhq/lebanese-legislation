@@ -1,0 +1,12 @@
+{{/* The topics the home page links: the questions people ask most. */}}
+{{define "hometopics"}}{{if .}}
+<section class="wrap sec" id="questions">
+  <div class="sec__head" data-reveal>
+    <div><p class="eyebrow">{{t "home.topics_eyebrow"}}</p><h2 class="sec__title">{{t "home.topics_title"}}</h2></div>
+    <a class="sec__more" href="{{u "/topics/"}}">{{t "home.topics_more"}} <span class="arrow" aria-hidden="true">{{fwdArrow}}</span></a>
+  </div>
+  <div class="codes topiclist" data-reveal>{{range .}}
+    <a class="code" href="{{u (printf "/topic/%s/" .Slug)}}"><b>{{.Title}}</b><span>{{.Question}}</span></a>{{end}}
+  </div>
+</section>
+{{end}}{{end}}

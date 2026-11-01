@@ -77,7 +77,7 @@
   "use strict";
   var form = document.querySelector("[data-goto]");
   if (!form) return;
-  var input = form.querySelector("input"), msg = form.querySelector("[data-goto-msg]");
+  var input = form.querySelector('input[name="n"]'), msg = form.querySelector("[data-goto-msg]");
   var digits = { "٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9",
                  "۰": "0", "۱": "1", "۲": "2", "۳": "3", "۴": "4", "۵": "5", "۶": "6", "۷": "7", "۸": "8", "۹": "9" };
   function norm(s) {
@@ -104,7 +104,9 @@
     }
     msg.hidden = true;
     history.replaceState(null, "", "#" + hit.id);
-    hit.scrollIntoView({ behavior: "smooth", block: "start" });
+    /* Smooth scrolling lays out skipped articles along the way and moves
+       the destination in long texts using content-visibility: auto. */
+    hit.scrollIntoView({ behavior: "instant", block: "start" });
     hit.removeAttribute("data-flash");
     void hit.offsetWidth;
     hit.setAttribute("data-flash", "");

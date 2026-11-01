@@ -1,0 +1,92 @@
+{
+  "slug": "code-of-obligations",
+  "title_en": "Code of Obligations and Contracts: the articles to know first",
+  "title_ar": "قانون الموجبات والعقود: المواد الأكثر فائدة",
+  "question_en": "What does the Lebanese Code of Obligations and Contracts say about forming a contract, consent, capacity, cancellation, damages, liability, limitation and the right of retention?",
+  "question_ar": "ماذا يقول قانون الموجبات والعقود اللبناني عن انعقاد العقد والرضى والأهلية وفسخ العقد والتعويض والمسؤولية ومرور الزمن وحق الحبس؟",
+  "sub_questions": [
+    "When is a contract formed and is silence acceptance?",
+    "Which defects (mistake, deceit, fear) make a contract void or voidable?",
+    "At what age can a person bind himself by contract?",
+    "When can a party cancel a contract because the other did not perform (Article 241)?",
+    "When must someone pay damages for harm caused to another (Articles 122 to 125)?",
+    "How long before a claim is time-barred (Articles 349 and 350)?",
+    "Can a craftsman keep my goods until I pay (Article 677)?"
+  ],
+  "notes": "LAW: Code of Obligations and Contracts of 9/3/1932, id 244226 (the database lists no number for it). Articles searchers type: 221 (binding force of contracts, good faith), 241 (implied cancellation clause in reciprocal contracts), 248 (damages for abusive termination), 124 (damages for abuse of a right), 49 (duty to deliver and keep the thing), 677 (craftsman's right to retain the work until paid, in the contract of work). The general right of retention (haqq al-habs) is Art. 272 (it applies where the debt is connected to the thing) and Art. 677 is the specific rule for the craftsman; do not mix them. Art. 215: majority for contracting at 18. Art. 349: ordinary limitation of ten years; Art. 350: five years for yearly instalments, interest, rents. Art. 235 (ten years to sue for annulment) is not in the pack. The text uses old terms (mudayyin, da'in). This code does not set fixed damages amounts: Art. 259 leaves the amount to the judge, to a statute or to the parties. The Code of Obligations has no consumer-protection rules; those are in the Consumer Protection Law (not in the pack).",
+  "pack": [
+    {
+      "law": 244226,
+      "articles": [
+        "165",
+        "178",
+        "180",
+        "183",
+        "192"
+      ],
+      "why": "Contract formation: agreement, offer and acceptance (silence as acceptance), place and time, lawful object, unlawful contracts"
+    },
+    {
+      "law": 244226,
+      "articles": [
+        "208",
+        "210",
+        "215"
+      ],
+      "why": "Defects of consent (deceit, fear) and capacity at 18"
+    },
+    {
+      "law": 244226,
+      "articles": [
+        "221",
+        "49",
+        "249"
+      ],
+      "why": "Binding force and good faith; duty to deliver; performance in kind"
+    },
+    {
+      "law": 244226,
+      "articles": [
+        "241",
+        "248"
+      ],
+      "why": "Cancellation of reciprocal contracts for non-performance; damages for abusive termination"
+    },
+    {
+      "law": 244226,
+      "articles": [
+        "122",
+        "123",
+        "124",
+        "125"
+      ],
+      "why": "Liability in tort: harm caused by an act, negligence, abuse of a right, liability for others"
+    },
+    {
+      "law": 244226,
+      "articles": [
+        "253",
+        "254",
+        "259",
+        "260"
+      ],
+      "why": "Conditions of damages for non-performance and how they are measured"
+    },
+    {
+      "law": 244226,
+      "articles": [
+        "349",
+        "350"
+      ],
+      "why": "Limitation periods: ten years, five years for periodic claims"
+    },
+    {
+      "law": 244226,
+      "articles": [
+        "272",
+        "677"
+      ],
+      "why": "Right of retention: general rule (272) and the craftsman's right (677)"
+    }
+  ]
+}

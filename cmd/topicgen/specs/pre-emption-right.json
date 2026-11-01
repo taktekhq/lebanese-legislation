@@ -1,0 +1,104 @@
+{
+  "slug": "pre-emption-right",
+  "title_en": "Pre-emption right (shufaa) in Lebanon",
+  "title_ar": "حق الشفعة في لبنان",
+  "question_en": "Who has the right of pre-emption (shufaa) in Lebanon, and how is it exercised?",
+  "question_ar": "من له حق الشفعة في لبنان وكيف يُمارس؟",
+  "sub_questions": [
+    "What is pre-emption and over which property does it apply?",
+    "Who holds the right, and in what order when several claim it?",
+    "In which sales is there no pre-emption?",
+    "What time limits apply, and how is the claim made?",
+    "What must the claimant pay the buyer, and where is it deposited?",
+    "How is the right lost or waived, and what does a successful claim do?"
+  ],
+  "notes": "The rules sit in articles 238 to 254 of the Property Law (High Commissioner decision 3339 of 12/11/1930, id 177709). Those articles were replaced in 1948 (law of 5/2/1948, id 202269, no number in the DB) and again in part by Law 461 of 31/8/1995 (id 244440). The text of 177709 in the database already shows the 1995 wording of articles 239, 240 and 249(1), so the pack cites 177709. The amendment table does not link Law 461 to 177709 (it is flagged for review), so Law 461 is cited only for its transitional article 5. Since 1995 the right belongs to three categories only: the bare owner when the usufruct is sold, a co-owner when a share is sold to a non-co-owner, and the usufructuary when the bare title is sold (art 239). The 1948 categories (neighbour with an easement, owners of floors in a building, owner of hikr or sutuhiyya) were removed by Law 461, which also repealed article 241 (the buyer's priority): the database shows article 241 with an empty text, so it is not in the pack. Law 461 also says any other pre-emption right that arose before it and was not yet used lapsed. Article 249(1) now requires the price to be offered and deposited in the court treasury of the competent court on the day the suit is filed at the latest, unless the registered deed allows deferred payment. Time limits in articles 247 and 248: 10 days after notice by the notary public (plus travel time), or one year from registration if no notice was given; both stop running only when the suit is filed. Article 249(2) says brokerage is capped at the legal tariff; the 1948 law (art 2) makes pre-emption suits subject to a fixed fee. Article 254 excludes waqf property and forced public auctions. Article 244 excludes exchange and sales between spouses, ascendants and descendants, and siblings. Article 838 of the Code of Obligations and Contracts (id 244226) only refers back to these rules for a co-owner's sale of his share. Other pre-emption rights exist for the State and are outside this page: Law 37 of 16/10/2008 art 13 on cultural property and Decree 166 of 1933 art 44 on antiquities. Decree-Law 121 of 1983 (press titles) is repealed. Not in the DB: any court decisions on pre-emption, and the Code of Civil Procedure article 362 on notice abroad is cited but not read here. The Majalla (id 249830) also has pre-emption articles (950 and following) but it is Ottoman civil law and the Property Law governs registered real estate, so it is not in the pack.",
+  "pack": [
+    {
+      "law": 177709,
+      "articles": [
+        "238"
+      ],
+      "why": "Definition of the right, and that it covers freehold and miri land."
+    },
+    {
+      "law": 177709,
+      "articles": [
+        "239",
+        "240",
+        "242",
+        "243"
+      ],
+      "why": "Who holds the right (as amended 1995), the order among claimants, the earlier-title rule and inheritance of the right."
+    },
+    {
+      "law": 177709,
+      "articles": [
+        "244",
+        "254"
+      ],
+      "why": "Against whom the right is used and the sales and properties excluded (exchange, family sales, waqf, public auction)."
+    },
+    {
+      "law": 177709,
+      "articles": [
+        "245",
+        "246"
+      ],
+      "why": "The right is indivisible; the ways it is lost or waived."
+    },
+    {
+      "law": 177709,
+      "articles": [
+        "247",
+        "248"
+      ],
+      "why": "Notice by the buyer, the 10 day and one year limits, and when time stops running."
+    },
+    {
+      "law": 177709,
+      "articles": [
+        "249",
+        "250",
+        "251"
+      ],
+      "why": "What the claimant must pay (price deposited in court, costs, improvements), a later transfer of the property, and a dispute over the price."
+    },
+    {
+      "law": 177709,
+      "articles": [
+        "252",
+        "253"
+      ],
+      "why": "When the right is established and its effect: the claimant stands as buyer, with no grace to pay except the deed's own deferral."
+    },
+    {
+      "law": 244440,
+      "articles": [
+        "5"
+      ],
+      "why": "Transitional rule for suits pending on 7/9/1995, including the extra compensation of up to 15% of the property value."
+    },
+    {
+      "law": 202269,
+      "articles": [
+        "2"
+      ],
+      "why": "Pre-emption suits pay a fixed fee."
+    },
+    {
+      "law": 244226,
+      "articles": [
+        "838"
+      ],
+      "why": "The Code of Obligations sends a co-owner's sale of his share back to the pre-emption rules."
+    },
+    {
+      "law": 202269,
+      "articles": [
+        "1"
+      ],
+      "why": "Added after the second legal review"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "slug": "penal-code-articles",
+  "title_en": "Lebanese Penal Code: the most searched articles",
+  "title_ar": "قانون العقوبات اللبناني: أكثر المواد بحثاً",
+  "question_en": "What do the most cited articles of the Lebanese Penal Code say (homicide, assault, theft, fraud, defamation, adultery, abortion, forgery, self-defence)?",
+  "question_ar": "ماذا تنص أكثر مواد قانون العقوبات اللبناني تداولاً (القتل، الإيذاء، السرقة، الاحتيال، الذم والقدح، الزنا، الإجهاض، التزوير، الدفاع المشروع)؟",
+  "sub_questions": [
+    "What is the penalty for intentional killing under Article 547?",
+    "What does Article 636 say about theft and when is theft aggravated?",
+    "What counts as fraud under Article 655?",
+    "What is the difference between defamation and insult and what is the penalty?",
+    "When is an act in self-defence not a crime (Article 184)?",
+    "What does Article 459 say about forgery of official papers, and Article 770 about breaking administrative regulations?",
+    "What does Article 125 refer to when people mention it with the drugs law?"
+  ],
+  "notes": "LAW: Penal Code, Legislative Decree 340 of 1/3/1943, id 244611. Articles chosen from those searchers type most (459, 636, 655, 219, 547, 770, 534) plus the usual core: self-defence 184, accomplice 219, attempt 200, injuries 554-555, theft 635-638, fraud 655, breach of trust 670, blackmail 650, defamation 582 and insult 584, adultery 487 (489 holds procedure and later domestic-violence additions), abortion 541-543. ART. 125 BELONGS TO THE DRUGS LAW, NOT THE PENAL CODE: Law 673 of 16/3/1998 on narcotics, psychotropic substances and precursors (id 243942, amended by laws 77/1999 and 272/2001). Verified: its Art. 125 punishes with life hard labour and a fine of 25 to 100 million LL whoever intentionally breaks the bans on cultivating banned plants and on trafficking in Table 1 substances, and breaks Art. 15 for Table 2. The Penal Code Art. 125 is something else; a writer must keep the two apart. Facts to respect: amounts are in old Lebanese pounds as enacted (e.g. Art. 636 fine 100,000 to 400,000 LL); Art. 549 still lists death as penalty in the text although practice is a moratorium (state only what the text says); Art. 534 says only 'unnatural intercourse' punishable by up to one year of prison, with no definition in the text (do not add definitions or mention court trends not in the database); Art. 547 second paragraph (spouse killing spouse, 20 to 25 years) is the current wording; Art. 554 and 555 are complaint-based and a waiver by the complainant ends the public case. Art. 770 is the catch-all for breaking administrative or municipal regulations (prison up to three months, fine 100,000 to 600,000 LL) and is also cited by Art. 380 of the traffic law. Art. 459 punishes forgery of official papers by temporary hard labour. Do not give legal advice on specific cases.",
+  "pack": [
+    {
+      "law": 244611,
+      "articles": [
+        "547",
+        "548",
+        "549",
+        "550"
+      ],
+      "why": "Intentional killing, aggravated killing, killing with premeditation or special circumstances, death caused without intent to kill"
+    },
+    {
+      "law": 244611,
+      "articles": [
+        "554",
+        "555",
+        "184"
+      ],
+      "why": "Beating and injury by days of incapacity; self-defence (184)"
+    },
+    {
+      "law": 244611,
+      "articles": [
+        "200",
+        "219"
+      ],
+      "why": "Attempt of a felony and who counts as accomplice"
+    },
+    {
+      "law": 244611,
+      "articles": [
+        "635",
+        "636",
+        "638",
+        "655",
+        "670",
+        "650"
+      ],
+      "why": "Theft defined, simple theft penalty, aggravated theft, fraud, breach of trust, blackmail by threat of exposure"
+    },
+    {
+      "law": 244611,
+      "articles": [
+        "582",
+        "584"
+      ],
+      "why": "Defamation (dhamm) and insult (qadh) and their penalties"
+    },
+    {
+      "law": 244611,
+      "articles": [
+        "487",
+        "489",
+        "534",
+        "541",
+        "543"
+      ],
+      "why": "Adultery and its procedure, unnatural intercourse, abortion offences"
+    },
+    {
+      "law": 244611,
+      "articles": [
+        "459",
+        "770"
+      ],
+      "why": "Forgery of official papers; breach of administrative or municipal regulations"
+    },
+    {
+      "law": 243942,
+      "articles": [
+        "125"
+      ],
+      "why": "Article 125 of the DRUGS law 673/1998 (not the Penal Code): penalty for trafficking and cultivation offences"
+    }
+  ]
+}

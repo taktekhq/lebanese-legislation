@@ -7,24 +7,36 @@ import (
 	"time"
 )
 
+// Reading a search for the parts that name a text rather than describe it.
+// "القانون رقم 175 تاريخ 8/5/2020", "décret 11614 de 1969", "قانون الجنسية
+// 31/1/1946", "قرار رقم 50/2002 تمييز جزائي": a number, a full date or a year,
+// a kind of text and a court are matched exactly; the words left only rank.
+// Before this (21 Oct 2026) the date was cut to its year, so "رقم 28 تاريخ
+// 10/2/2017" listed seven texts numbered 28 of 2017 with the right one sixth,
+// and a date with no number was dropped altogether.
+
 type queryRead struct {
-	Num     int
-	NumWord bool
-	Date    time.Time
-	Year    int
-	Kind    string
-	Court   []string
-	Words   []string
+	Num     int       // the text's or ruling's number (0: none)
+	NumWord bool      // the number came after "رقم", "n°", "no."
+	Date    time.Time // a full date (zero: none)
+	Year    int       // from the date, "513/2005", "de 1969" or a court search's year
+	Kind    string    // law, decree, decreelaw or decision ("": none named)
+	Court   []string  // words naming a court: تمييز, جزائي… (rulings)
+	Words   []string  // the rest, which only rank
 }
 
+// lawCite says whether the query names a text: a full date, or a number with
+// a year, a kind or "رقم".
 func (r queryRead) lawCite() bool {
 	return len(r.Court) == 0 && (!r.Date.IsZero() || (r.Num > 0 && (r.Year > 0 || r.Kind != "" || r.NumWord)))
 }
 
+// rulingCite says whether the query names a ruling: a court with a number or a year.
 func (r queryRead) rulingCite() bool {
 	return len(r.Court) > 0 && (r.Num > 0 || r.Year > 0)
 }
 
+// label is the citation as a reader would write it, for "nothing numbered … here".
 func (r queryRead) label() string {
 	var p []string
 	if r.Num > 0 {
@@ -41,15 +53,22 @@ func (r queryRead) label() string {
 	return strings.Join(p, " ")
 }
 
+// kindGroups are the kinds a kind word covers. A decree-law is a law in
+// everyday speech ("قانون الملكية المشتركة" is decree-law 88/1983), and a law
+// put in force by decree is both.
 var kindGroups = map[string][]string{
 	"law":       {"قانون", "قانون منفذ بمرسوم", "قانون نافذ حكما", "قانون عثماني", "مرسوم إشتراعى"},
 	"decree":    {"مرسوم", "مرسوم نافذ حكما", "مرسوم منفذ بقانون", "قانون منفذ بمرسوم", "مرسوم إشتراعى"},
 	"decreelaw": {"مرسوم إشتراعى"},
 	"decision":  {"قرار", "قرار اداري", "قرار اساسي", "قرار المفوض السامي", "قرار بلدي", "قرار مبدئي", "قرار مشترك", "قرار نافذ حكما", "قرار وسيط"},
 	"system":    {"نظام", "نظام داخلي"},
-	"hc":        {"قرار المفوض السامي"},
+	"hc":        {"قرار المفوض السامي"}, // "122/ل.ر": L.R. marks the High Commissioner's decisions
 }
 
+// kindNear are the kinds people confuse with a kind word, ranked right after
+// the exact kinds: "مرسوم اشتراعي 1306" means law-by-decree 1306/1971 (the
+// Foreign Ministry's rules), and there is no decree-law 1306. A kind in both
+// lists (a decree-law is a law) ranks as exact only.
 var kindNear = map[string][]string{
 	"law":       kindGroups["decree"],
 	"decree":    kindGroups["law"],
@@ -57,6 +76,12 @@ var kindNear = map[string][]string{
 	"hc":        kindGroups["decision"],
 }
 
+// kindOwn are the kinds a kind word names in its own words, ranked before the
+// rest of its group: "قانون 146" is one of the four laws numbered 146, not the
+// decree-laws 146 of 1959 that had ranked first by their length (23 Oct 2026).
+// A kind word not listed here ranks its whole group as its own. Not "مرسوم":
+// "المرسوم 112" is decree-law 112/1959 (the civil servants' rules) and
+// "décret 11614" law-by-decree 11614/1969, as people cite them.
 var kindOwn = map[string][]string{
 	"law": {"قانون", "قانون منفذ بمرسوم", "قانون نافذ حكما", "قانون عثماني"},
 }
@@ -68,6 +93,8 @@ func ownKinds(kind string) []string {
 	return kindGroups[kind]
 }
 
+// kindPhrases, longest first, as they are written after ar_norm-like folding
+// (see foldKindText).
 var kindPhrases = []struct{ in, kind string }{
 	{"قرار المفوض السامي", "hc"}, {"القرار المفوض السامي", "hc"}, {"المفوض السامي", "hc"},
 	{"المرسوم الاشتراعي", "decreelaw"}, {"مرسوم اشتراعي", "decreelaw"}, {"decret-loi", "decreelaw"}, {"decret loi", "decreelaw"},
@@ -77,6 +104,7 @@ var kindPhrases = []struct{ in, kind string }{
 	{"القرار", "decision"}, {"قرار", "decision"}, {"القرارات", "decision"}, {"قرارات", "decision"}, {"arrete", "decision"}, {"decision", "decision"},
 }
 
+// courtWords fold the ways a court is written to the words of ruling.court.
 var courtWords = map[string]string{
 	"تمييز": "تمييز", "التمييز": "تمييز", "تميز": "تمييز", "التميز": "تمييز",
 	"استئناف": "استئناف", "الاستئناف": "استئناف", "إستئناف": "استئناف",
@@ -87,6 +115,7 @@ var courtWords = map[string]string{
 	"cassation": "تمييز",
 }
 
+// citeStop are words a citation carries that say nothing about the text.
 var citeStop = map[string]bool{"رقم": true, "الرقم": true, "عدد": true, "تاريخ": true, "تاريح": true, "بتاريخ": true, "التاريخ": true,
 	"الصادر": true, "الصادرة": true, "صادر": true, "صادرة": true, "المؤرخ": true, "المؤرخة": true, "مؤرخ": true, "وتعديلاته": true, "تعديلاته": true,
 	"وتعديلاتها": true, "تعديلاتها": true, "المتعلق": true, "المتعلقة": true, "issued": true, "on": true,
@@ -98,24 +127,31 @@ var (
 	rqDate      = regexp.MustCompile(`(\d{1,2})\s*[/.\-]\s*(\d{1,2})\s*[/.\-]\s*((?:18|19|20)\d{2})`)
 	rqNumYear   = regexp.MustCompile(`(\d{1,5})\s*/\s*((?:18|19|20)\d{2})\b`)
 	rqNumWord   = regexp.MustCompile(`(?:رقم|الرقم|عدد|n°|no\.?|n\.|number)\s*:?\s*(\d{1,5})`)
-	rqNumLR     = regexp.MustCompile(`(\d{1,5})\s*/\s*[^\d\s]`)
+	rqNumLR     = regexp.MustCompile(`(\d{1,5})\s*/\s*[^\d\s]`) // "122/ل.ر", "15-s" is read as 15 by the bare-number rule
 	rqWordDay   = regexp.MustCompile(`(\d{1,2})\s+([^\s\d]+(?:\s+(?:الثاني|الاول|الأول))?)\s+((?:18|19|20)\d{2})`)
 	rqShortPair = regexp.MustCompile(`(\d{1,2})\s*/\s*(\d{1,4})`)
 	rqBare      = regexp.MustCompile(`\d{1,5}`)
 	rqLR        = regexp.MustCompile(`(?:^|[\s/\-])(?:ل\s*\.?\s*ر|l\s*\.\s*r\.?|lr)(?:[\s.]|$)`)
 )
 
+// Pasted citations carry more than the search needs. tidyQuery mends what
+// people paste: a list bullet ("•\tالقرار رقم 45"), a number glued to a word
+// ("القانون30", "11244تاريخ"), and a gazette reference after the citation
+// ("... عدد الجريدة الرسمية 3 تاريخ النشر 19/1/1949 الصفحة 30-45", "Official
+// Gazette issue: 3 | Date of publication: ..."), whose second date and page
+// numbers were read as the text's own and found nothing (22 Oct 2026).
+// cut says the gazette part was set aside, so the page can say what it searched.
 var (
 	tqGlueAD   = regexp.MustCompile(`([\x{0620}-\x{064A}\x{066E}-\x{06D3}])([0-9])`)
 	tqGlueDA   = regexp.MustCompile(`([0-9])([\x{0620}-\x{064A}\x{066E}-\x{06D3}])`)
 	tqGazette  = regexp.MustCompile(`(?i)[\s,،|(\-]*(?:(?:في\s+)?(?:عدد\s+)?(?:ال)?جريدة\s+(?:ال)?رسمية|تاريخ\s+النشر|(?:the\s+)?official\s+gazette|date\s+of\s+publication|(?:au\s+)?journal\s+officiel|j\.?\s*o\.?\s+n)`)
-	tqLeadJunk = "•·▪◦‣*-–,>|،,.:؛ \t "
+	tqLeadJunk = "•·▪◦‣*-–\u2014>|،,.:؛ \t "
 )
 
 func tidyQuery(q string) (tidy string, cut bool) {
 	q = strings.TrimLeft(arDigits.Replace(q), tqLeadJunk)
 	q = tqGlueDA.ReplaceAllString(tqGlueAD.ReplaceAllString(q, "$1 $2"), "$1 $2")
-
+	// Only after a citation: "قانون الجريدة الرسمية" is a search for that law.
 	if loc := tqGazette.FindStringIndex(q); loc != nil && strings.ContainsAny(q[:loc[0]], "0123456789") {
 		q, cut = q[:loc[0]], true
 	}
@@ -125,13 +161,15 @@ func tidyQuery(q string) (tidy string, cut bool) {
 var monthNumber = map[string]time.Month{
 	"janvier": 1, "fevrier": 2, "mars": 3, "avril": 4, "mai": 5, "juin": 6, "juillet": 7, "aout": 8, "septembre": 9, "octobre": 10, "novembre": 11, "decembre": 12,
 	"january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6, "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12,
-
+	// short forms ("decree 9341 17 nov 2012", 23 Oct 2026); "mars", "mai", "juin" are whole above
 	"jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "sept": 9, "oct": 10, "nov": 11, "dec": 12,
 	"janv": 1, "fevr": 2, "fev": 2, "avr": 4, "juil": 7,
 	"كانون الثاني": 1, "شباط": 2, "اذار": 3, "آذار": 3, "نيسان": 4, "ايار": 5, "أيار": 5, "حزيران": 6, "تموز": 7, "اب": 8, "آب": 8,
 	"ايلول": 9, "أيلول": 9, "تشرين الاول": 10, "تشرين الأول": 10, "تشرين الثاني": 11, "كانون الاول": 12, "كانون الأول": 12,
 }
 
+// foldKindText lower-cases, folds accents, Arabic-Indic digits, backslashes and
+// the hamza of «إشتراعي» so the patterns above can be plain strings.
 func foldKindText(q string) string {
 	q = latinFold(arDigits.Replace(q))
 	q = strings.NewReplacer(`\`, "/", "إشتراعي", "اشتراعي", "إشتراعى", "اشتراعي", "اشتراعى", "اشتراعي", "ـ", "").Replace(q)
@@ -146,6 +184,7 @@ func validDate(d, m, y int) (time.Time, bool) {
 	return t, t.Day() == d
 }
 
+// readQuery takes a search apart. It never fails: what it cannot place stays in Words.
 func readQuery(q string) queryRead {
 	var r queryRead
 	s := " " + foldKindText(q) + " "
@@ -169,7 +208,9 @@ func readQuery(q string) queryRead {
 			}
 		}
 	}
-
+	// Rulings are cited "year/number" too: «قرار رقم 93/33 تاريخ 19/1/1993» is
+	// number 33 of 1993. When one side is the dated year's last two digits,
+	// the other side is the number.
 	if r.Year > 0 {
 		if m := rqShortPair.FindStringSubmatch(s); m != nil {
 			a, _ := strconv.Atoi(m[1])
@@ -214,7 +255,7 @@ func readQuery(q string) queryRead {
 	}
 	var words []string
 	for _, w := range strings.Fields(s) {
-		w = strings.Trim(w, "()«»\"'.:؛,،")
+		w = strings.Trim(w, "()«»\"'.:؛,،") // "Decree 10897, ...": the comma is not part of the number
 		if c, ok := courtWords[w]; ok {
 			r.Court = append(r.Court, c)
 			continue
@@ -222,9 +263,9 @@ func readQuery(q string) queryRead {
 		if w == "" || citeStop[w] {
 			continue
 		}
-		if rqBare.FindString(w) == w {
+		if rqBare.FindString(w) == w { // a bare number
 			n, _ := strconv.Atoi(w)
-			switch {
+			switch { // a year-like number is the year unless "رقم" said otherwise (cut above)
 			case n >= 1800 && n <= 2100 && r.Year == 0:
 				r.Year = n
 			case r.Num == 0:
@@ -240,6 +281,7 @@ func readQuery(q string) queryRead {
 	return r
 }
 
+// indexWord finds phrase in s as whole words (s is padded with spaces).
 func indexWord(s, phrase string) int {
 	for from := 0; ; {
 		i := strings.Index(s[from:], phrase)

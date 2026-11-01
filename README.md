@@ -58,7 +58,7 @@ Hugging Face releases/latest.json --> db  (restores once into a volume)
 | [`mcp/`](mcp/) | The MCP server: its `main.go`, Dockerfile and a Cloudflare Containers template. |
 | [`internal/`](internal/) | The Go code: what the three services share (pages, API, MCP tools, search) and the build that makes the database from the source pages (`internal/build`, with parsing, amendments, citations, the wording guard in `internal/provenance`, the export and the MCP snapshot). |
 | [`scraper/`](scraper/) | The crawler that reads the Lebanese University's site into the archive, and the scripts that publish the archive. |
-| [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export. [Listed here](cmd/README.md). |
+| [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and the website's tools. [Listed here](cmd/README.md). |
 | [`tools/`](tools/) | The Python data tools: restore, rebuild and publish the dump, and the update pipeline. |
 | [`docs/`](docs/) | Service reference, MCP setup, the data update pipeline and changes. |
 

@@ -1,0 +1,19 @@
+{
+  "slug": "founding-an-association",
+  "title_en": "Founding an association in Lebanon",
+  "title_ar": "تأسيس جمعية في لبنان (العلم والخبر)",
+  "question_en": "How do you found an association in Lebanon, and what is the notice of establishment (علم وخبر)?",
+  "question_ar": "كيف تؤسس جمعية في لبنان، وما هو العلم والخبر؟",
+  "sub_questions": [
+    "Is a licence needed to found an association or only a notice?",
+    "What must the founders file with the authorities?",
+    "Who can be a member and what records must the association keep?",
+    "What are the penalties for running an association that did not give notice?",
+    "How are foreign associations treated?"
+  ],
+  "notes": "The governing text is the Ottoman Law of Associations of 3 August 1909 (id 257670), still in force and the only general statute. Art. 2: no prior licence is needed, but the government must be informed after founding. Art. 6: the founders give a signed and sealed statement with the name, purpose, seat and managers plus two copies of the statutes, and receive in exchange the 'علم وخبر' (acknowledgement); secret associations are forbidden. Art. 3 includes the 1928 addition (id 175349): notice is refused and the association dissolved by a Council of Ministers decree if its basis is unlawful. The text uses Ottoman wording ('نظارة الداخلية', 'دار السعادة', fines in gold pieces); a writer must not say what amounts apply today. The text does not say how long the authorities have to answer or that they may refuse notice for reasons other than art. 3; do not invent a delay. Art. 17 allows an association to be declared of public utility by a State Council decision. Art. 12 holds penalties and, as added in 1932, a prison penalty for taking part in a body aimed at obstructing public services. Foreign associations: High Commissioner decision 369 of 21 Dec 1939 (id 187904) requires a prior licence; art. 4 defines a foreign association (including a Lebanon-based one with a quarter foreign members); art. 15 exempts purely religious associations. The decision speaks of the High Commissioner's delegate; do not name which Lebanese authority replaced him because the text does not. Cooperatives and sports or youth associations have separate regimes (cooperatives: decree 3401 of 1965, id 165987, now repealed; sports: decree 2437/1944, id 197775) and are not in the pack; the page should say the pack covers ordinary associations only. In the database, the many 'علم وخبر' items are notices issued by the Ministry of the Interior for individual associations, proof of how the notice is issued but not law.",
+  "pack": [
+    {"law": 257670, "articles": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "13", "14", "15", "17", "18"], "why": "Ottoman Law of Associations of 1909 (with the 1928 and 1932 additions): definition, notice, secret associations, members, records, penalties, public utility"},
+    {"law": 187904, "articles": ["1", "4", "13", "15"], "why": "Decision 369 of 1939: licence for foreign associations, what counts as foreign, penalty, exemption for religious associations"}
+  ]
+}

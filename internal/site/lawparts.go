@@ -7,22 +7,37 @@ import (
 	"strings"
 )
 
-const (
-	partBudget = 700_000
+// A very long text is read in parts. Googlebot reads the first 2 MB of a page
+// and /law/244736/ was 2.2 MB, so a text whose articles come to more than
+// partBudget bytes of HTML is cut into parts of about that size: the text's
+// own address holds the first, /law/{id}/part/2/ the next, each linked from
+// all of the others and each article still on its own page. Nothing is
+// hidden behind a script: every part is plain HTML.
 
+const (
+	// partBudget is the HTML of the articles in one part. With the facts at
+	// the top (20 to 300 KB) a part stays under 1 MB.
+	partBudget = 700_000
+	// chapterBytes is what a chapter heading adds.
 	chapterBytes = 400
 )
 
+// LawPart is one part of a long text, for the links between them.
 type LawPart struct {
 	N        int
-	First    string
+	First    string // number of its first article
 	Last     string
 	Path     string
 	Articles int
 }
 
+// Current says whether this is the part being shown.
 func (p LawPart) Current(of int) bool { return p.N == of }
 
+// splitItems cuts a text's items (chapter headings and articles, with the
+// bytes each takes) into runs of at most budget bytes. A run holds at least
+// one article, and a chapter heading goes with the article after it, never
+// stranded at the end of a part.
 func splitItems(sizes []int, chapter []bool, budget int) [][2]int {
 	var out [][2]int
 	start, cur := 0, 0
@@ -32,7 +47,7 @@ func splitItems(sizes []int, chapter []bool, budget int) [][2]int {
 			for cut > start+1 && chapter[cut-1] {
 				cut--
 			}
-			if cut > start {
+			if cut > start { // the run has an article before the chapters
 				out = append(out, [2]int{start, cut})
 				start = cut
 				cur = 0
@@ -46,6 +61,7 @@ func splitItems(sizes []int, chapter []bool, budget int) [][2]int {
 	return append(out, [2]int{start, len(sizes)})
 }
 
+// itemSizes is the HTML each item of a text takes on its page.
 func (s *Server) itemSizes(r *http.Request, l *Law) (sizes []int, chapter []bool, err error) {
 	pages := s.pages
 	if s.lang(r) == "ar" && s.pagesAr != nil {
@@ -65,6 +81,9 @@ func (s *Server) itemSizes(r *http.Request, l *Law) (sizes []int, chapter []bool
 	return sizes, chapter, nil
 }
 
+// partsOf cuts the text into parts, or returns nil when one page holds it.
+// full is the HTML of the whole page when it has been rendered (a text of
+// under partBudget bytes in all cannot need cutting).
 func (s *Server) partsOf(r *http.Request, l *Law, fullLen int) ([][2]int, error) {
 	if fullLen > 0 && fullLen <= partBudget {
 		return nil, nil
@@ -83,11 +102,14 @@ func (s *Server) partsOf(r *http.Request, l *Law, fullLen int) ([][2]int, error)
 	return splitItems(sizes, chapter, budgetFor(total)), nil
 }
 
+// budgetFor evens the parts out: a text of 1.2 MB is two parts of 600 KB, not
+// a full one and a sliver.
 func budgetFor(total int) int {
 	n := (total + partBudget - 1) / partBudget
-	return min(partBudget, total/n+total/(n*20)+1)
+	return min(partBudget, total/n+total/(n*20)+1) // a little over the mean, so n runs hold it
 }
 
+// lawPart serves /law/{id}/part/{n}/.
 func (s *Server) lawPart(w http.ResponseWriter, r *http.Request) {
 	n, err := strconv.Atoi(r.PathValue("part"))
 	if err != nil || n < 1 {
@@ -97,6 +119,8 @@ func (s *Server) lawPart(w http.ResponseWriter, r *http.Request) {
 	s.lawPage(w, r, n)
 }
 
+// serveLaw writes a text's page, or its part n (n 0 is the text's own
+// address and part 1 when it is cut).
 func (s *Server) serveLaw(w http.ResponseWriter, r *http.Request, l *Law, p Page, n int) {
 	full := ""
 	if n <= 1 {
@@ -116,7 +140,7 @@ func (s *Server) serveLaw(w http.ResponseWriter, r *http.Request, l *Law, p Page
 		s.write(w, r, 200, full)
 		return
 	case len(runs) <= 1, n > len(runs):
-		s.notFound(w, r)
+		s.notFound(w, r) // /part/N/ of a text that is not cut, or past its last part
 		return
 	case n == 1:
 		http.Redirect(w, r, s.u(r, lawPath(l.ID)), http.StatusMovedPermanently)
@@ -164,8 +188,11 @@ func (s *Server) serveLaw(w http.ResponseWriter, r *http.Request, l *Law, p Page
 	s.render(w, r, "law", 200, p)
 }
 
+// pagePartPath is part n's address.
 func pagePartPath(id, n int) string { return fmt.Sprintf("%spart/%d/", lawPath(id), n) }
 
+// SectionPartPath is where a chapter is when it is in another part of the
+// text, "" when it is on this page.
 func (l *Law) SectionPartPath(id int) string {
 	if n := l.SectionPart[id]; n != 0 && n != l.Part {
 		if n == 1 {

@@ -38,6 +38,7 @@ type selectedEntry struct {
 	at     time.Time
 }
 
+// Selection has its own content-keyed cache and shares the rewrite call budget.
 func (m *meaningSearch) selectEvidence(ctx context.Context, q string, p []nlsearch.Passage) ([]nlsearch.Quote, error) {
 	selector, ok := m.rw.(passageSelector)
 	if !ok {
@@ -187,6 +188,8 @@ func (s *Server) answer(w http.ResponseWriter, r *http.Request) {
 	render()
 }
 
+// answerArticle reads the same consolidated wording as the site's current view,
+// excluding repealed, future and unresolved-amendment text. Failure abstains.
 func (s *Server) answerArticle(ctx context.Context, law int, number string) (ar, fr, title, status string, err error) {
 	d, e := semantic.Load(ctx, s.db, semantic.Document{Kind: "article", ID: law, Part: number, Lang: "ar"})
 	if e != nil {
@@ -207,7 +210,7 @@ func textWindow(text, q string, max int) string {
 		return text
 	}
 	start := 0
-
+	// Prefer a contiguous window near the searched words. Never splice excerpts.
 	for _, term := range strings.Fields(q) {
 		if len([]rune(term)) < 3 {
 			continue
@@ -241,7 +244,7 @@ func (s *Server) answerSources(ctx context.Context, q string, res Results) ([]an
 		id := fmt.Sprintf("s%d", len(out)+1)
 		out = append(out, answerSource{Passage: nlsearch.Passage{ID: id, Text: text, Label: title}, Path: path, Title: title, Lang: lang, Status: status, Unofficial: unofficial})
 	}
-
+	// Preserve directly relevant court evidence alongside legislative provisions.
 	for _, r := range res.Rulings[:min(4, len(res.Rulings))] {
 		var text string
 		if s.db.QueryRow(ctx, `SELECT coalesce(text_ar,'') FROM ruling WHERE id=$1`, r.ID).Scan(&text) == nil {
@@ -281,7 +284,8 @@ func (s *Server) answerSources(ctx context.Context, q string, res Results) ([]an
 			add(b.fr, artPath(a.ID, a.Article), label, "fr", b.status, false)
 		}
 	}
-
+	// Search existing English explanations, and link every one to its topic page.
+	// Only paragraphs whose printed citations still match current articles qualify.
 	type candidate struct {
 		t     *topics.Topic
 		p     topics.Para
@@ -361,7 +365,7 @@ func (s *Server) answerSources(ctx context.Context, q string, res Results) ([]an
 		}
 	}
 	if len(out) == 0 && len(res.Laws) > 0 {
-
+		// A title-only hit supplies no guessed answer. Read two actual source articles.
 		rows, err := s.db.Query(ctx, `SELECT number FROM legislation_article WHERE law_id=$1 ORDER BY position LIMIT 2`, res.Laws[0].ID)
 		if err != nil {
 			return nil, err

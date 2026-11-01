@@ -9,12 +9,17 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/taktekhq/lebanese-legislation/internal/provenance"
 )
+
+// Gate is the wording guard (provenance.Guard). An interface, so the web
+// server, which only calculates, does not link the guard and the build.
+type Gate interface {
+	Gate(ctx context.Context, dsn string) error
+}
 
 // Export verifies provenance before atomically writing a derived JSONL sidecar.
 // It never writes to the source database.
-func Export(ctx context.Context, dsn, output string, guard provenance.Guard) (int, error) {
+func Export(ctx context.Context, dsn, output string, guard Gate) (int, error) {
 	if err := guard.Gate(ctx, dsn); err != nil {
 		return 0, err
 	}

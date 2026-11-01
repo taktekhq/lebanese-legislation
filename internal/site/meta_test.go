@@ -1,5 +1,9 @@
 package site
 
+// Ahrefs audit rules, asserted on rendered pages:
+// meta description 70 to 160 characters, title 60 or fewer, each hreflang
+// alternate linking back to its pair, and no http:// image.
+
 import (
 	"context"
 	"html"
@@ -17,6 +21,7 @@ var (
 	imgRe   = regexp.MustCompile(`(?i)<(?:img\b[^>]*\bsrc="http://|meta\b[^>]*(?:property="og:image(?::url)?"[^>]*content="http://|content="http://[^"]*"[^>]*property="og:image(?::url)?")|link\b[^>]*(?:rel="(?:icon|apple-touch-icon)"[^>]*href="http://|href="http://[^"]*"[^>]*rel="(?:icon|apple-touch-icon)"))`)
 )
 
+// checkAudit applies the audit rules to one rendered page.
 func checkAudit(t *testing.T, label, body string) {
 	t.Helper()
 	m := titleRe.FindStringSubmatch(body)
@@ -86,10 +91,9 @@ func TestFinishMetaLimits(t *testing.T) {
 	}
 }
 
+// Every compiled page template uses the shared layout. Rendering every parsed
+// page template without a database proves it emits audited metadata.
 func TestEveryPageTemplateRendersAuditMetadataWithoutDatabase(t *testing.T) {
-	oldBase := Base
-	Base = "https://example.test"
-	t.Cleanup(func() { Base = oldBase })
 	s, err := newServer(nil, false)
 	if err != nil {
 		t.Fatal(err)
@@ -137,6 +141,8 @@ func TestImageAuditFindsHttpURLs(t *testing.T) {
 	}
 }
 
+// TestPagesMeetAuditWithDatabase renders representative page kinds from the
+// corpus in Arabic and English. It skips without a local database.
 func TestPagesMeetAuditWithDatabase(t *testing.T) {
 	s := onpageServer(t)
 	for _, c := range langCases(t, s) {

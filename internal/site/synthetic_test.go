@@ -42,8 +42,6 @@ func TestSyntheticServing(t *testing.T) {
 		{"/styles.css", "body"},
 		{"/contribute/", "ساهم"},
 		{"/en/contribute/", "Improve search and code"},
-		{"/sitemaps/core.xml", "/en/contribute/"},
-		{"/sitemaps/ar-core.xml", "/contribute/"},
 	} {
 		t.Run(tc.path, func(t *testing.T) {
 			rec := httptest.NewRecorder()

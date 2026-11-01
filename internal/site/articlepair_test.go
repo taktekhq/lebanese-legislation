@@ -6,6 +6,12 @@ import (
 	"testing"
 )
 
+// An article page of every kind of text (/law/, /decree/, /text/) carries the
+// same hreflang set as a text's own page: ar and x-default the root, en the
+// /en/ twin, on both interfaces, and each interface is its own canonical.
+// Rendered from the article handler's own Page (articlePage), no database.
+// On 28 Oct the live /decree/198100/article/3/ had no hreflang link while
+// /decree/198100/ had all three.
 func TestArticlePagesOfEveryKindCarryHreflang(t *testing.T) {
 	s := noDBServer(t)
 	for _, c := range []struct {

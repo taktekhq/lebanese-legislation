@@ -11,6 +11,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// DB is a Source over the LebaneseLegislation database. An article's text is
+// the wording the site shows: the latest version that has a text, else the
+// Centre's own.
 type DB struct{ Pool *pgxpool.Pool }
 
 const factsSQL = `SELECT coalesce(
@@ -22,6 +25,7 @@ const factsSQL = `SELECT coalesce(
 	          WHERE v.law_id = a.law_id AND v.article_number = a.number), '')
 	FROM legislation_article a JOIN legislation l ON l.id = a.law_id WHERE a.law_id = $1 AND a.number = $2`
 
+// Article implements Source.
 func (d DB) Article(law int, number string) (Facts, bool, error) {
 	var text, note, title, num, amending string
 	var issued *time.Time

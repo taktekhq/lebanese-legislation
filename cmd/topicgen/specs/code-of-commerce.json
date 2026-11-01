@@ -1,0 +1,25 @@
+{
+  "slug": "code-of-commerce",
+  "title_en": "Lebanese Code of Commerce: merchants, companies, cheques and bankruptcy",
+  "title_ar": "قانون التجارة البرية اللبناني: التاجر والشركات والشيك والإفلاس",
+  "question_en": "What does the Lebanese Code of Commerce say about who is a merchant, registration, companies, cheques and bills of exchange, and bankruptcy?",
+  "question_ar": "ماذا يقول قانون التجارة البرية اللبناني عن صفة التاجر والسجل التجاري والشركات والشيك وسند السحب والإفلاس؟",
+  "sub_questions": [
+    "Who counts as a merchant and which acts are commercial?",
+    "Do I have to register in the commercial register and how soon?",
+    "Which commercial books must a merchant keep and for how long?",
+    "What are the main company types and what is the minimum capital of a joint-stock company?",
+    "What must a cheque contain and within how many days must it be presented?",
+    "When is a merchant declared bankrupt and what happens to acts done before?"
+  ],
+  "notes": "LAW: Code of Commerce (land commerce), Legislative Decree 304 of 24/12/1942, id 244586. The cheque is spelled 'شك' in the database text (Arts. 409 to 445); the bill of exchange is 'سند السحب'. The database does NOT hold in this code a penal article for cheques without funds (the bounced-cheque criminal offence is not in this text) so the page must not describe criminal penalties for a bounced cheque. The limited liability company (SARL) is not regulated by this code (separate law, not in the pack): say so. Art. 83 sets a joint-stock company minimum capital of 30 million LL as enacted/amended (old pounds); do not present it as a current dollar value. Art. 16 (books) includes a digital-books provision added by amendment. Cheque time limits: presentation within 8 days in Lebanon (Art. 426); claims against drawer and endorsers lapse 6 months after the presentation period (Art. 442); bill of exchange claims against the acceptor lapse after 3 years (Art. 398). Art. 10 exempts petty traders from books and publicity rules. Bankruptcy: Art. 489 defines it, Art. 507 lists acts void if done after the cessation of payments or in the 20 days before. Articles 40 and 41 are repealed (replaced by decree-law 11/1967 on the commercial establishment), do not cite them.",
+  "pack": [
+    {"law": 244586, "articles": ["6", "8", "9", "10"], "why": "Commercial acts, acts of a merchant, who is a merchant, small traders exempt"},
+    {"law": 244586, "articles": ["16", "19", "20"], "why": "Commercial books, ten-year retention, books as evidence"},
+    {"law": 244586, "articles": ["24", "26"], "why": "Registration of a merchant (within one month) and of a company in the commercial register"},
+    {"law": 244586, "articles": ["43", "45", "46", "53", "83"], "why": "Companies: written contract, legal personality, partnership, partner status, minimum capital of a joint-stock company"},
+    {"law": 244586, "articles": ["398"], "why": "Limitation of three years on bill of exchange claims against the acceptor"},
+    {"law": 244586, "articles": ["409", "411", "425", "426", "442"], "why": "Cheque: contents, drawee must be a banker holding funds, payable on sight, presentation in 8 days, six-month limitation"},
+    {"law": 244586, "articles": ["489", "490", "501", "507"], "why": "Bankruptcy: definition, declaration by the court, loss of administration, void acts in the suspect period"}
+  ]
+}
