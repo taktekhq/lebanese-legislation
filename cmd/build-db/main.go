@@ -24,9 +24,10 @@ func main() {
 	only := flag.String("only", "", `rerun one step on the database as it is ("amendments", "graph", "ruling-files", "scan-gazette", "indexing")`)
 	citations := flag.String("citations", "db/model/citations.jsonl", "the model's citations (the cite command)")
 	rulingCitations := flag.String("ruling-citations", modelout.DefaultRulingCitations, "the model's reading of rulings, comma-separated files: the texts each applies, cites or interprets (citeagy -source rulings)")
-	scans := flag.String("scans", "", "texts the Centre has not published yet, read from Gazette scans (a lebgazette sader-bundle folder)")
-	rulingFiles := flag.String("ruling-files", "", "the folder ruling-files fills: judgment PDFs' index and the machine readings (empty: skip)")
+	scans := flag.String("scans", "manual/scans", "texts the Centre has not published yet, read from Gazette scans (a lebgazette sader-bundle folder; skipped when absent)")
+	rulingFiles := flag.String("ruling-files", "manual/rulings", "the folder ruling-files fills: judgment PDFs' index and the machine readings (skipped when absent)")
 	flag.Parse()
+	*scans, *rulingFiles = cli.IfExists(*scans), cli.IfExists(*rulingFiles)
 	rep, err := build.Run(ctx, build.Options{Archive: archive.Archive{Dir: *dir}, DSN: *dsn,
 		Workers: *workers, Only: *only, Citations: *citations, RulingCitations: *rulingCitations, Scans: *scans, RulingFiles: *rulingFiles, Log: func(f string, a ...any) { log.Printf(f, a...) }})
 	if rep != nil {

@@ -22,3 +22,7 @@ coverage/
 scraper/data/
 # topicgen raw model answers and reports
 /cmd/topicgen/work/
+
+# Manual data is filled on the build machine until it is published (manual/README.md).
+/manual/*
+!/manual/README.md
