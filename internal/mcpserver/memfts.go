@@ -21,12 +21,76 @@ type memDoc struct {
 	issuedOn string // the law's, for the English titles' year filter
 	code     bool   // the law is a code
 	served   bool   // the law is one the server serves (its kind is known)
-	tokens   []string
+	tokens   []uint32
 }
 
+// memCorpus keeps each token once (vocab) and the rows as token ids: the
+// English titles alone hold about two million tokens.
 type memCorpus struct {
 	docs   []memDoc // in the snapshot's row order
 	avgLen float64
+	vocab  []string
+	ids    map[string]uint32
+}
+
+func (m *memCorpus) intern(t string) uint32 {
+	if id, has := m.ids[t]; has {
+		return id
+	}
+	id := uint32(len(m.vocab))
+	m.vocab = append(m.vocab, t)
+	m.ids[t] = id
+	return id
+}
+
+// idPhrase is a phrase as the token ids each of its positions accepts.
+type idPhrase [][]uint32
+
+func (m *memCorpus) compile(p ftsPhrase) idPhrase {
+	out := make(idPhrase, len(p.tokens))
+	for i, t := range p.tokens {
+		if p.prefix && i == len(p.tokens)-1 {
+			for id, v := range m.vocab {
+				if strings.HasPrefix(v, t) {
+					out[i] = append(out[i], uint32(id))
+				}
+			}
+		} else if id, has := m.ids[t]; has {
+			out[i] = []uint32{id}
+		}
+	}
+	return out
+}
+
+// tf counts the phrase's occurrences in a row.
+func (p idPhrase) tf(doc []uint32) int {
+	n := 0
+	for i := 0; i+len(p) <= len(doc); i++ {
+		ok := true
+		for j, ids := range p {
+			if !containsID(ids, doc[i+j]) {
+				ok = false
+				break
+			}
+		}
+		if ok {
+			n++
+		}
+	}
+	return n
+}
+
+func containsID(ids []uint32, id uint32) bool {
+	if len(ids) < 16 {
+		for _, x := range ids {
+			if x == id {
+				return true
+			}
+		}
+		return false
+	}
+	i := sort.Search(len(ids), func(k int) bool { return ids[k] >= id })
+	return i < len(ids) && ids[i] == id
 }
 
 type memCache struct {
@@ -57,7 +121,7 @@ func (s *Server) loadMem(ctx context.Context, sql string) (*memCorpus, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	m := &memCorpus{}
+	m := &memCorpus{ids: map[string]uint32{}}
 	total := 0
 	for rows.Next() {
 		var d memDoc
@@ -69,7 +133,11 @@ func (s *Server) loadMem(ctx context.Context, sql string) (*memCorpus, error) {
 		if issued != nil {
 			d.issuedOn = *issued
 		}
-		d.tokens = ftsTokens(text)
+		toks := ftsTokens(text)
+		d.tokens = make([]uint32, len(toks))
+		for i, t := range toks {
+			d.tokens[i] = m.intern(t)
+		}
 		total += len(d.tokens)
 		m.docs = append(m.docs, d)
 	}
@@ -106,7 +174,10 @@ func (s *Server) frenchTexts(ctx context.Context) (*memCorpus, error) {
 // codes first, then the best bm25, ties in row order; keep filters rows.
 // Every row counts toward the statistics, as every row of the FTS5 table did.
 func (m *memCorpus) search(q ftsQuery, limit int, keep func(*memDoc) bool) []*memDoc {
-	phrases := q.phrases()
+	var phrases []idPhrase
+	for _, p := range q.phrases() {
+		phrases = append(phrases, m.compile(p))
+	}
 	df := make([]float64, len(phrases))
 	type hit struct {
 		d     *memDoc
