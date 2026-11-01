@@ -28,12 +28,9 @@ new_sqlite_classes = ["Origin"]
 binding = "SITE"
 bucket_name = "lebleg-site"
 
-# "Tell me if this changes" sign-ups (src/notify.js). Create the database once:
-#   wrangler d1 create lebleg-notify
-#   wrangler d1 execute lebleg-notify --remote --file migrations/0001_notify.sql
-# then put the database_id below and remove the leading "#" on these lines.
+# "Tell me if this changes" sign-ups (src/notify.js, migrations/0001_notify.sql).
 # Optional secret for the rate-limit hash: wrangler secret put NOTIFY_SALT
-# [[d1_databases]]
-# binding = "NOTIFY_DB"
-# database_name = "lebleg-notify"
-# database_id = "<id from wrangler d1 create>"
+[[d1_databases]]
+binding = "NOTIFY_DB"
+database_name = "lebleg-notify"
+database_id = "3cdcf19b-917e-4d2b-98fb-53973f03f45d"
