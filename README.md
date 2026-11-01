@@ -52,7 +52,7 @@ Hugging Face releases/latest.json --> db  (restores once into a volume)
 | --- | --- |
 | [`data/`](data/) | The database as text: one folder per table, rows sorted by key, so `git log -p` shows what changed. `data/load.sh` builds it in PostgreSQL. |
 | [`archive/`](https://github.com/taktekhq/lebanese-legislation-archive) | Every source page as the Centre's site served it, with its change history: [its own repository](https://github.com/taktekhq/lebanese-legislation-archive), mounted here as a submodule. A plain clone skips its 606,000 files; `git submodule update --init archive` fetches them. |
-| [`db/`](db/) | The PostgreSQL image. Builds pgvector from source on the official `postgres:18.6` image. |
+| [`db/`](db/) | The database's schema and the build's curated inputs (the Go package `db`), and the PostgreSQL image, built with pgvector on the official `postgres:18.6` image. |
 | [`web/`](web/) | The website: its `main.go`, Dockerfile, SQL schema and a fictional test database. |
 | [`api/`](api/) | The REST API: its `main.go` and Dockerfile. |
 | [`mcp/`](mcp/) | The MCP server: its `main.go`, Dockerfile and a Cloudflare Containers template. |

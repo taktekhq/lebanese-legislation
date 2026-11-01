@@ -1,0 +1,26 @@
+name	law_id	note
+# Names a text is cited by that are not its title, for the model's citations
+# (db/model/*.jsonl). The resolver reads this after number, date and title; it
+# applies only when the text is not dated after the citing text, so a name
+# that meant an earlier text in an earlier time is left unresolved.
+# Only names that fit one text in our data are listed, each checked against
+# the titles and article counts. The ones that do not (قانون الانتخاب,
+# قانون الجزاء, تعريفة الجمارك, الاصول المدنية, قانون الاسكان, قانون الاثار)
+# are left out on purpose: each fits several texts, or none we hold.
+# name is matched as the resolver folds titles: hamza, ta marbuta, a leading
+# "قانون " and "ال" do not matter.
+قانون الجمعيات	257670	the 1909 law; 19 articles; cited from 1926 on, articles up to 14
+قانون الاتصالات	191857	law 431/2002; 53 articles; cited 2005 to 2009, articles up to 48
+قانون الشراء العام	288693	law 244/2021; cited 2022 to 2025
+قانون ضريبة الاملاك المبنية	188353	law of 17 Sep 1962; a 1974 decree title names it so
+قانون رسم الانتقال	185602	decree-law 146/1959; a 2017 law title names it so
+قانون الملكية	177709	decision 3339/1930; laws 322/2001 and 47/1971 call it "قانون الملكية العقارية"
+قانون الملكية العقارية	177709	decision 3339/1930
+قانون الموظفين	179571	decree-law 112/1959; a 1967 law title names it so; texts before 1959 stay unresolved
+نظام الموظفين العام	179571	decree-law 112/1959
+قانون العقوبات العام	244611	decree-law 340/1943, the Penal Code (not the military one)
+قانون موازنة عام 93	244771	law 280/1993, the budget
+قانون موازنة 1985	244344	law 7/1985, the budget
+قانون موازنة عام 2005	245911	law 715/2006, the budget of 2005
+قانون موازنة سنة 1946	202034	the 1946 budget
+قانون موازنة سنة 1950	168802	the 1950 budget

@@ -1,0 +1,66 @@
+# English and French names for the Centre's vocabularies. Drafted 2026-10-01,
+# to be checked by a person. Columns: list, Arabic name (as the Centre prints
+# it), English, French. The Centre's own ids come from its search forms.
+list	name_ar	name_en	name_fr
+kind	أمر	Order	Ordre
+kind	اتفاقية	Agreement	Convention
+kind	اتفاقية دولية	International agreement	Convention internationale
+kind	اعلام	Notification	Notification
+kind	اعلان	Announcement	Annonce
+kind	افادة	Attestation	Attestation
+kind	الدستور	Constitution	Constitution
+kind	انذار	Formal notice	Mise en demeure
+kind	براءة سلطانية	Sultanic berat	Bérat impérial
+kind	بلاغ	Communiqué	Communiqué
+kind	بيان	Statement	Déclaration
+kind	تعليمات	Instructions	Instructions
+kind	تعميم	Circular	Circulaire
+kind	تقرير	Report	Rapport
+kind	خط همايوني	Imperial rescript (Hatt-ı Hümayun)	Hatt-i Humayoun
+kind	دستور	Constitution	Constitution
+kind	دعوة	Convocation	Convocation
+kind	دفتر شروط	Specifications	Cahier des charges
+kind	رأي	Opinion	Avis
+kind	عقد	Contract	Contrat
+kind	عقد جماعي	Collective agreement	Convention collective
+kind	علم وخبر	Notice of association	Récépissé de déclaration
+kind	قانون	Law	Loi
+kind	قانون عثماني	Ottoman law	Loi ottomane
+kind	قانون منفذ بمرسوم	Law enacted by decree	Loi mise en vigueur par décret
+kind	قانون نافذ حكما	Law in force by operation of law	Loi exécutoire de plein droit
+kind	قرار	Decision	Arrêté
+kind	قرار اداري	Administrative decision	Arrêté administratif
+kind	قرار اساسي	Basic decision	Arrêté de base
+kind	قرار المفوض السامي	High Commissioner's decision	Arrêté du Haut-Commissaire
+kind	قرار بلدي	Municipal decision	Arrêté municipal
+kind	قرار مبدئي	Preliminary decision	Décision de principe
+kind	قرار نافذ حكما	Decision in force by operation of law	Arrêté exécutoire de plein droit
+kind	قرار وسيط	Interim decision	Décision intermédiaire
+kind	كتاب	Letter	Lettre
+kind	لائحة	List	Liste
+kind	محضر	Minutes	Procès-verbal
+kind	محضر جلسة	Minutes of session	Procès-verbal de séance
+kind	مختلف	Miscellaneous	Divers
+kind	مذكرة	Memorandum	Note
+kind	مذكرة خدمة	Service memorandum	Note de service
+kind	مرسوم	Decree	Décret
+kind	مرسوم إشتراعى	Legislative decree	Décret-loi
+kind	مرسوم منفذ بقانون	Decree enacted by law	Décret mis en vigueur par la loi
+kind	مرسوم نافذ حكما	Decree in force by operation of law	Décret exécutoire de plein droit
+kind	ملحق	Annex	Annexe
+kind	نظام	Regulation	Règlement
+kind	نظام داخلي	Internal regulation	Règlement intérieur
+kind	نموذج	Form	Formulaire
+kind	غير محدد	Unspecified	Non précisé
+court	إستئناف مدني	Civil Court of Appeal	Cour d'appel civile
+court	ابتدائي مدني	Civil Court of First Instance	Tribunal civil de première instance
+court	استئناف جزائي	Criminal Court of Appeal	Cour d'appel pénale
+court	المجلس الدستوري	Constitutional Council	Conseil constitutionnel
+court	المجلس العدلي	Judicial Council	Conseil de justice
+court	تمييز جزائي - مطبوعات	Court of Cassation, criminal chamber (press)	Cour de cassation, chambre pénale (presse)
+court	تمييز جزائي	Court of Cassation, criminal chamber	Cour de cassation, chambre pénale
+court	تمييز مدني	Court of Cassation, civil chamber	Cour de cassation, chambre civile
+court	شورى	State Council	Conseil d'État
+court	مجالس العمل التحكيمية	Labour Arbitration Councils	Conseils arbitraux du travail
+court	محكمة الاستئناف الناظرة بجرائم المطبوعات	Court of Appeal for press offences	Cour d'appel des délits de presse
+court	محكمة الجنايات	Criminal Court	Cour criminelle

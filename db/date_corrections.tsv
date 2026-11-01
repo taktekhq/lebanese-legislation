@@ -1,0 +1,498 @@
+law_id	field	printed	corrected	method	reason
+7817	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+8404	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+8823	issued_on	1958-12-30	1958-01-30	signature	the text's own signing line
+8877	issued_on	1996-12-08	1995-12-08	signature	the text's own signing line
+8925	issued_on	1971-12-26	1970-12-26	signature	the text's own signing line
+8990	gazette_date	2004-04-02	2004-12-02	gazette-issue	the text's own signing line confirms the date; Gazette issue 64 of that year
+9299	issued_on	2008-11-27	2008-10-27	signature	the text's own signing line
+165668	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+165735	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+165783	gazette_date	1994-09-01	1997-07-17	gazette-issue	the text's own signing line confirms the date; Gazette issue 35 of that year
+165886	issued_on	1992-12-19	1991-12-19	signature	the text's own signing line
+166075	gazette_date	1996-01-04	1997-01-02	gazette-issue	the text's own signing line confirms the date; Gazette issue 1 of that year
+166170	issued_on	1994-12-30	1993-12-30	signature	the text's own signing line
+166173	issued_on	1994-12-28	1993-12-28	signature	the text's own signing line
+166473	issued_on	1959-03-15	1959-03-05	signature	the text's own signing line
+166476	issued_on	1959-03-14	1959-03-04	signature	the text's own signing line
+166629	issued_on	1954-03-23	1954-02-23	signature	the text's own signing line
+166936	issued_on	1967-12-31	1967-12-19	signature	the text's own signing line
+167081	issued_on	1969-01-06	1969-01-06	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 7 day(s) earlier
+167350	issued_on	1959-03-15	1959-03-05	signature	the text's own signing line
+167353	issued_on	1959-03-17	1959-03-07	signature	the text's own signing line
+168038	issued_on	1945-03-23	1945-03-23	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 2 day(s) earlier
+168266	issued_on	2003-03-20	2003-02-20	signature	the text's own signing line
+168318	issued_on	2003-03-21	2003-02-21	signature	the text's own signing line
+168401	issued_on	1975-02-14	1975-02-14	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+168829	issued_on	1949-09-26	1949-03-26	signature	the text's own signing line
+169461	issued_on	1960-03-31	1960-03-26	signature	the text's own signing line
+169696	issued_on	1959-04-16	1959-04-06	signature	the text's own signing line
+170474	issued_on	1975-04-09	1957-04-09	signature	the text's own signing line
+170770	issued_on	1922-12-17	1922-12-17	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 2 day(s) earlier
+171394	gazette_date	1923-01-29	1924-01-29	gazette-issue	the text's own signing line confirms the date; Gazette issue 1734 of that year
+171566	issued_on	1944-05-04	1944-05-04	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+172012	issued_on	1984-06-22	1984-06-22	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+172437	issued_on	1951-05-28	1951-04-28	signature	the text's own signing line
+172473	issued_on	1950-05-18	1950-05-08	signature	the text's own signing line
+172565	issued_on	1999-10-27	1998-10-27	model	The signature block explicitly gives the signing date as 27 October 1998, showing a one-year typo in printed_signed.
+173092	issued_on	1926-07-16	1926-07-16	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 3 day(s) earlier
+173093	issued_on	1926-07-15	1926-07-15	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 2 day(s) earlier
+173531	issued_on	1996-12-15	1995-12-15	signature	the text's own signing line
+173581	issued_on	1995-12-06	1995-01-06	signature	the text's own signing line
+173589	issued_on	1995-10-04	1995-01-04	signature	the text's own signing line
+174259	issued_on	1999-11-23	1998-11-23	model	The signature block explicitly gives the signing date as 23 November 1998, which is also confirmed by neighbouring decision 489 signed on 1998-11-23.
+174307	issued_on	2003-05-15	2003-04-15	model	The signature_block explicitly states the signing date as 15 April 2003 (15 نيسان 2003), confirming printed_signed has a month typo and fits before printed_gazette_date (2003-04-24).
+174605	issued_on	2003-05-15	2003-04-15	signature	the text's own signing line
+174979	issued_on	1996-12-08	1995-12-08	model	The signature block explicitly gives the signing date as 8 December 1995, showing printed_signed has a one-year typo.
+175461	issued_on	1948-12-29	1948-01-29	model	The signature_block explicitly dates the decision to 29 Kanoun al-Thani (January) 1948, showing printed_signed confused January with December (Kanoun al-Awwal).
+176129	gazette_date	1922-05-31	1929-05-31	gazette-issue	the texts numbered around it are dated 1929; Gazette issue 2240 of that year
+177003	issued_on	1959-06-15	1959-06-05	signature	the text's own signing line
+177004	issued_on	1959-06-13	1959-06-03	signature	the text's own signing line
+177288	issued_on	1999-11-23	1998-11-23	model	The signature_block explicitly dates the signing to 23 November 1998, showing printed_signed has a one-year typo.
+177289	issued_on	1999-11-23	1998-11-23	model	The signature_block explicitly dates the signing to 23 November 1998 (showing a one-year typo in printed_signed), which precedes the 1999-05-20 publication in Gazette issue 24.
+178059	issued_on	1994-09-16	1994-06-16	signature	the text's own signing line
+178826	issued_on	1973-03-31	1973-03-31	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 2 day(s) earlier
+178834	issued_on	2002-05-29	2002-04-29	signature	the text's own signing line
+179310	issued_on	1955-07-27	1955-06-27	signature	the text's own signing line
+179709	issued_on	1932-11-08	1931-11-08	year-typo	a year typo: the texts numbered around it are dated 1931
+180145	issued_on	2002-05-19	2002-04-19	signature	the text's own signing line
+180486	issued_on	2002-05-27	2002-04-27	model	The signature_block explicitly states the signing date is 27 April (نيسان) 2002, making printed_signed a one-month typo.
+180836	issued_on	1998-09-08	1998-06-08	signature	the text's own signing line
+181342	issued_on	1964-12-31	1963-12-31	signature	the text's own signing line
+181659	issued_on	1996-12-06	1995-12-06	signature	the text's own signing line
+181667	issued_on	1996-11-10	1995-11-10	signature	the text's own signing line
+181669	issued_on	1996-06-09	1996-01-09	signature	the text's own signing line
+181721	issued_on	1995-12-17	1995-01-17	signature	the text's own signing line
+181749	issued_on	1983-12-22	1982-12-22	signature	the text's own signing line
+182249	gazette_date	1986-07-23	1987-07-23	gazette-issue	the text's own signing line confirms the date; Gazette issue 30 of that year
+182626	issued_on	1935-06-11	1935-03-11	signature	the text's own signing line
+183538	issued_on	1998-08-07	1998-07-07	signature	the text's own signing line
+183724	issued_on	2000-08-20	2000-07-20	signature	the text's own signing line
+184631	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184632	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184633	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184634	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184635	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184636	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184637	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184638	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184639	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184640	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184641	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184642	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184643	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184644	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184645	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184646	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184650	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184651	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184652	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184653	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184654	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184656	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184657	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184658	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184659	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184660	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184661	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184662	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184664	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184666	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184667	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184668	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184669	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184670	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184671	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184672	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184677	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184678	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184679	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184680	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184681	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184682	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184683	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184684	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184685	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184686	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184687	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184689	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184690	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184691	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184692	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184693	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184694	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184695	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184697	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184698	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184702	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184703	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184704	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184705	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184706	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184707	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184708	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184709	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184710	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184711	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184712	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184713	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184714	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184715	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184716	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184717	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184718	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+184788	issued_on	1960-08-30	1960-07-30	signature	the text's own signing line
+185376	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185377	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185378	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185379	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185380	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185381	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185382	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185383	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185384	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185385	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185386	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185387	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185388	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185389	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185390	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185391	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185392	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185393	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185394	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185395	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185396	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185397	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185398	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185399	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185400	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185401	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185402	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185403	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185404	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185405	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185406	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185407	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185408	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185409	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185410	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185411	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185412	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185413	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185414	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185415	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185416	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185417	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185418	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185419	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185420	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185421	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185422	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185423	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185424	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185425	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185427	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185428	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185429	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185430	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185431	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185432	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185433	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185434	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185435	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185436	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185437	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185438	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185439	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185440	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185441	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185442	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185443	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185444	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185445	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185446	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185447	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185448	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185449	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185450	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185451	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185452	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185453	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185454	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185455	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185456	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185457	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185458	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185459	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185460	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185461	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185462	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185463	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185464	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185465	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185466	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185467	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185468	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185471	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185472	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185473	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185474	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185475	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185476	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185477	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185478	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185479	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185480	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185481	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185482	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185483	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185484	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185485	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185486	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185487	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185488	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185489	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185490	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185491	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185492	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185493	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185494	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185495	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185497	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185498	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185499	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185500	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185501	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185502	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185503	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185504	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185505	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185506	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185507	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185508	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185509	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185510	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185511	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185512	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+185513	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186267	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186268	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186269	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186270	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186271	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186272	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186273	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186274	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186275	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186276	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186277	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186278	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186279	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186280	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186291	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186292	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186293	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186299	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186300	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186301	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186302	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186303	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186304	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186305	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186306	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186307	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186308	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186317	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186318	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186319	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186320	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186324	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186325	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186326	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186328	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186329	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186330	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186342	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186345	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186346	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186347	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186348	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186349	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186350	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186351	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186352	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186353	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186354	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186355	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186356	gazette_date	1918-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+186525	issued_on	1948-09-10	1948-09-10	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 2 day(s) earlier
+186947	issued_on	2003-08-18	2003-07-18	signature	the text's own signing line
+187371	gazette_date	1936-05-08	1967-05-08	gazette-issue	Gazette issue 37 of 1967 is dated 08/05/1967; the printed 1936 is a year typo
+187371	issued_on	1967-05-09	1967-05-09	issue-earlier	the text's own signing line confirms 09/05/1967; its Gazette issue carries a date one day earlier
+187374	issued_on	1967-05-09	1967-05-09	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+189632	gazette_date	1941-03-28	1942-03-28	gazette-issue	the text's own signing line confirms the date; Gazette issue 3977 of that year
+189650	issued_on	1942-04-09	1942-04-09	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+189901	issued_on	1998-12-07	1998-01-07	signature	the text's own signing line
+190148	issued_on	1996-12-20	1995-12-20	signature	the text's own signing line
+191186	issued_on	1943-04-01	1943-04-01	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+191846	issued_on	1966-05-24	1966-05-24	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+192555	issued_on	1969-05-27	1969-05-27	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+192972	issued_on	1944-10-26	1944-10-26	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+193315	issued_on	1993-11-23	1993-10-23	signature	the text's own signing line
+193318	issued_on	1993-11-23	1993-10-23	signature	the text's own signing line
+194028	issued_on	1998-10-29	1998-09-29	signature	the text's own signing line
+194757	issued_on	1959-08-17	1959-08-07	signature	the text's own signing line
+194759	issued_on	1959-08-14	1959-08-04	signature	the text's own signing line
+194842	issued_on	1998-10-13	1998-10-13	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 3 day(s) earlier
+196089	issued_on	1986-11-28	1986-10-28	signature	the text's own signing line
+197223	issued_on	1946-12-17	1946-01-17	signature	the text's own signing line
+197334	issued_on	1962-11-16	1962-01-16	signature	the text's own signing line
+197506	issued_on	2002-09-28	2002-08-28	signature	the text's own signing line
+199159	issued_on	1994-06-22	1964-06-22	signature	the text's own signing line
+200597	issued_on	2001-11-30	2001-10-30	signature	the text's own signing line
+202327	issued_on	1964-12-30	1963-12-30	signature	the text's own signing line
+202341	issued_on	1964-12-31	1963-12-31	year-typo	a year typo: the texts numbered around it are dated 1963
+202342	issued_on	1964-12-31	1963-12-31	year-typo	a year typo: the texts numbered around it are dated 1963
+202867	issued_on	1965-08-06	1965-08-06	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+203433	issued_on	1959-12-26	1959-11-28	signature	the text's own signing line
+203757	issued_on	1968-08-27	1968-08-27	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+204090	issued_on	1961-12-10	1961-02-10	signature	the text's own signing line
+205054	issued_on	2001-09-04	2000-09-04	model	The signature block explicitly states a signing date of 4/9/2000, showing printed_signed has a one-year typo and following the August 2000 preamble dates.
+205146	issued_on	1958-12-13	1958-02-13	signature	the text's own signing line
+205257	gazette_date	1957-02-20	1962-02-21	gazette-issue	the text's own signing line confirms the date; Gazette issue 8 of that year
+205463	issued_on	1968-10-04	1968-10-04	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+205464	issued_on	1968-10-04	1968-10-04	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+206170	issued_on	2001-12-23	2000-12-23	signature	the text's own signing line
+206271	issued_on	2000-02-28	2000-02-08	model	The signature block explicitly gives the signing date as 8 February 2000 (2000-02-08), showing that printed_signed (2000-02-28) has a one-digit typo.
+207461	issued_on	2004-03-30	2004-03-03	signature	the text's own signing line
+207493	issued_on	2005-05-28	2005-02-28	signature	the text's own signing line
+207529	issued_on	2004-03-30	2004-03-03	signature	the text's own signing line
+207530	issued_on	2004-03-30	2004-03-03	signature	the text's own signing line
+207680	issued_on	2004-12-09	2003-12-09	model	The signature_block explicitly dates the signing to 9 December 2003, showing a one-year typo in printed_signed.
+208652	issued_on	2004-12-13	2003-12-13	year-typo	a year typo: the texts numbered around it are dated 2003
+208802	issued_on	2004-06-20	2004-06-02	signature	the text's own signing line
+209753	issued_on	2004-09-20	2004-09-02	signature	the text's own signing line
+210681	issued_on	2004-04-27	2004-01-27	signature	the text's own signing line
+211175	issued_on	2005-08-20	2005-06-20	signature	the text's own signing line
+211429	issued_on	2005-09-08	2005-08-08	signature	the text's own signing line
+212089	issued_on	2005-11-26	2005-10-26	signature	the text's own signing line
+212143	issued_on	2005-10-14	2005-10-04	signature	the text's own signing line
+212466	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+213082	issued_on	2006-02-27	2006-01-27	signature	the text's own signing line
+213180	issued_on	2006-03-16	2006-03-16	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 7 day(s) earlier
+213503	issued_on	2006-04-30	2006-03-30	signature	the text's own signing line
+213507	issued_on	2006-05-05	2006-04-05	signature	the text's own signing line
+213526	issued_on	2006-04-23	2006-03-23	model	The signature_block explicitly dates the signing to 23 March 2006 (23 آذار 2006), three weeks before the 2006-04-13 Gazette issue 19.
+215236	issued_on	2006-11-11	2006-10-11	signature	the text's own signing line
+215400	issued_on	2006-11-30	2006-10-30	signature	the text's own signing line
+215679	issued_on	2007-02-15	2007-01-15	model	The signature_block states 15 January (كانون الثاني) 2007, showing printed_signed has a month typo (02 instead of 01) while printed_gazette_date (2007-01-25) follows 10 days later.
+216640	issued_on	2007-05-26	2007-04-26	signature	the text's own signing line
+217548	gazette_date	2006-12-23	2007-10-08	model	Preamble dates up to June 2007 and neighbour #60 on 2007-07-28 confirm the 2007 signing date, while Gazette issue 61 in 2007 was published on 2007-10-08 rather than the 2006 issue 61 date.
+217714	gazette_date	2007-09-10	2010-11-30	gazette-issue	the text's own signing line confirms the date; Gazette issue 55 of that year
+220959	issued_on	2008-10-24	2008-09-24	signature	the text's own signing line
+221280	issued_on	2008-11-27	2008-10-27	signature	the text's own signing line
+221335	issued_on	2008-11-29	2008-10-29	signature	the text's own signing line
+221337	issued_on	2008-11-29	2008-10-29	signature	the text's own signing line
+221339	issued_on	2008-11-29	2008-10-29	signature	the text's own signing line
+222933	issued_on	2009-11-13	2009-05-13	signature	the text's own signing line
+223738	issued_on	2009-08-08	2009-07-08	signature	the text's own signing line
+224037	issued_on	2009-09-18	2009-08-18	signature	the text's own signing line
+224235	issued_on	2009-11-24	2009-10-24	signature	the text's own signing line
+224236	issued_on	2009-11-24	2009-10-24	signature	the text's own signing line
+224246	issued_on	2009-11-15	2009-11-05	signature	the text's own signing line
+224573	issued_on	2010-02-04	2010-01-04	signature	the text's own signing line
+224577	issued_on	2010-02-04	2010-01-04	signature	the text's own signing line
+224579	issued_on	2010-02-05	2010-01-05	signature	the text's own signing line
+224653	issued_on	2010-02-05	2010-01-05	signature	the text's own signing line
+226798	issued_on	2010-10-07	2010-09-07	signature	the text's own signing line
+226801	issued_on	2010-10-07	2010-09-07	signature	the text's own signing line
+226802	issued_on	2010-10-07	2010-09-07	signature	the text's own signing line
+226803	issued_on	2010-10-07	2010-09-07	signature	the text's own signing line
+227058	issued_on	2010-12-20	2010-10-20	model	Decree 5258 was signed on 2010-10-20, confirming a month typo in the signing date (December instead of October) just before the 2010-10-28 publication in issue 50.
+227412	issued_on	2010-12-27	2010-11-27	signature	the text's own signing line
+227939	issued_on	2011-11-27	2011-01-27	signature	the text's own signing line
+228069	issued_on	2011-12-25	2011-02-25	signature	the text's own signing line
+232361	issued_on	2012-06-18	2012-05-18	signature	the text's own signing line
+236051	issued_on	2013-10-28	2013-09-28	signature	the text's own signing line
+236053	issued_on	2013-10-28	2013-09-28	signature	the text's own signing line
+236055	issued_on	2013-10-28	2013-09-28	signature	the text's own signing line
+236132	issued_on	2013-11-28	2013-11-18	signature	the text's own signing line
+236399	issued_on	2013-10-09	2013-02-01	signature	the text's own signing line
+236580	issued_on	2014-12-14	2014-01-14	model	The signature_block explicitly dates the signing to 14 January (كانون الثاني) 2014 rather than December, which aligns with the 2014-01-30 publication date.
+236581	issued_on	2014-12-07	2014-01-07	signature	the text's own signing line
+236582	issued_on	2014-12-07	2014-01-07	signature	the text's own signing line
+236583	issued_on	2014-12-10	2014-01-10	signature	the text's own signing line
+236584	issued_on	2014-12-17	2014-01-17	signature	the text's own signing line
+236585	issued_on	2014-12-15	2014-01-15	signature	the text's own signing line
+236586	issued_on	2014-12-16	2014-01-16	signature	the text's own signing line
+236587	issued_on	2014-12-16	2014-01-16	signature	the text's own signing line
+236588	issued_on	2014-12-16	2014-01-16	signature	the text's own signing line
+239452	gazette_date	2015-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+239679	issued_on	2015-05-04	2015-02-04	signature	the text's own signing line
+239717	issued_on	2015-03-02	2015-02-02	signature	the text's own signing line
+239718	issued_on	2015-03-02	2015-02-02	signature	the text's own signing line
+242475	issued_on	2016-02-05	2016-01-05	signature	the text's own signing line
+243867	issued_on	1963-12-31	1963-12-31	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+244396	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+244397	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+244398	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+244399	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+244434	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+244435	gazette_date	1921-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+244597	issued_on	1994-11-03	1994-10-03	signature	the text's own signing line
+244635	issued_on	1963-05-29	1963-05-29	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 2 day(s) earlier
+244974	gazette_date	1960-10-01	1970-10-01	gazette-issue	the text's own signing line confirms the date; Gazette issue 79 of that year
+252657	issued_on	1996-12-03	1996-01-03	model	The signature block explicitly gives the signing date as 3 January 1996 (3 كانون الثاني 1996),8 days before the printed Gazette publication date.
+253565	issued_on	2000-06-20	2000-06-02	signature	the text's own signing line
+255489	issued_on	1959-08-14	1959-08-04	signature	the text's own signing line
+255960	issued_on	2000-12-22	1999-12-22	year-typo	a year typo: the texts numbered around it are dated 1999
+256278	issued_on	2004-03-13	2004-02-13	signature	the text's own signing line
+256327	issued_on	2005-01-15	2005-01-15	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 2 day(s) earlier
+257464	issued_on	2015-11-22	2015-10-22	signature	the text's own signing line
+257502	issued_on	2015-11-22	2015-10-22	signature	the text's own signing line
+268757	issued_on	2017-12-03	2017-01-03	model	The signature_block explicitly dates the signing to 3 January 2017 (3 كانون الثاني 2017), showing printed_signed confused January (01) with December (12).
+269950	gazette_date	2003-09-10	2003-10-09	model	Neighbouring decree 11043 was also signed on 2003-09-27, while Gazette issue 47 of 2003 was published on 2003-10-09 (printed 2003-09-10 swapped month and day).
+269954	gazette_date	2003-09-10	2003-10-09	model	Neighbouring decree 11043 confirms the signing date 2003-09-27, while Gazette issue 47 of 2003 was published on 2003-10-09 (month and day swapped in printed_gazette_date 2003-09-10).
+269958	gazette_date	2003-09-10	2003-10-09	model	Neighbouring decree 11043 confirms the 2003-09-27 signing date, while Gazette issue 47 in 2003 was published on 2003-10-09 (month and day swapped in the printed 2003-09-10).
+275595	issued_on	2018-05-02	2018-05-02	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 5 day(s) earlier
+280565	gazette_date	1986-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+280569	gazette_date	1962-01-01		placeholder	UL gives only the year of the Gazette volume (01/01 placeholder)
+280753	issued_on	2019-07-12	2019-03-12	model	The signature block explicitly gives the signing date as 12 March 2019 (12 آذار 2019), which matches neighbouring numbers 3032 (2019-03-11) and 3034 (2019-03-15) and precedes Gazette issue 20 on 2019-04-11.
+280790	issued_on	2019-05-11	2019-03-11	signature	the text's own signing line
+284765	issued_on	2019-11-29	2019-10-29	signature	the text's own signing line
+284919	issued_on	2019-12-16	2019-12-16	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 4 day(s) earlier
+285076	issued_on	2020-02-17	2020-01-17	signature	the text's own signing line
+285109	gazette_date	2020-01-16	2021-01-21	gazette-issue	the text's own signing line confirms the date; Gazette issue 3 of that year
+285145	issued_on	2020-01-26	2020-01-26	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 3 day(s) earlier
+285418	issued_on	2020-06-05	2020-06-05	issue-earlier	the text's own signing line confirms the date; its Gazette issue carries a date 1 day(s) earlier
+286683	issued_on	2020-12-19	2020-12-09	signature	the text's own signing line
+287010	issued_on	2021-12-25	2021-01-25	signature	the text's own signing line
+288507	issued_on	2021-11-29	2021-10-29	signature	the text's own signing line
+288588	issued_on	2021-11-29	2021-10-29	signature	the text's own signing line
+288750	issued_on	2021-11-26	2021-10-26	signature	the text's own signing line
+289185	issued_on	2022-02-28	2022-01-28	model	The signature_block explicitly dates the signing to 28 January (كانون الثاني) 2022, making the printed month (02 instead of 01) a typo and fitting right before the 2022-02-03 Gazette publication.
+291681	issued_on	2021-12-20	2021-12-10	signature	the text's own signing line
+293751	issued_on	2022-09-30	2022-03-30	signature	the text's own signing line
+297058	issued_on	2022-05-29	2022-04-29	signature	the text's own signing line
+297060	issued_on	2022-05-29	2022-04-29	signature	the text's own signing line
+297063	issued_on	2022-05-29	2022-04-29	signature	the text's own signing line
+297067	issued_on	2022-05-29	2022-04-29	signature	the text's own signing line
+297069	issued_on	2022-05-29	2022-04-29	signature	the text's own signing line
+297072	issued_on	2022-05-27	2022-04-27	signature	the text's own signing line
+302282	gazette_date	2022-05-04	2022-08-04	model	The signature block, preamble, and neighbouring decisions confirm signing on 2022-07-27, while the gazette date 2022-05-04 has a one-digit month typo for 2022-08-04 (or the gazette date is unsupported if not 2022-08-04, wait: never invent a date that is not supported by the evidence, so gazette is null).
+323027	issued_on	2023-12-22	2022-12-22	signature	the text's own signing line
+326449	issued_on	2023-08-14	2023-04-18	signature	the text's own signing line
+327490	issued_on	2023-12-31	2023-01-31	model	The signature block explicitly gives the signing date as 31 January 2023 (31 كانون الثاني 2023), which also fits chronologically between neighbouring numbers 3025 (2023-01-10) and 3027 (2023-02-15).
+329059	issued_on	2023-07-26	2023-06-26	model	The signature_block explicitly dates the signing to 26 June 2023 (26 حزيران 2023), showing a one-digit month typo in printed_signed and placing signing after the latest preamble date (2023-06-23) and 10 days before printed_gazette_date.
+329236	issued_on	2023-11-17	2023-10-17	signature	the text's own signing line
+329237	issued_on	2023-11-24	2023-10-24	signature	the text's own signing line
+329239	issued_on	2023-11-24	2023-10-24	signature	the text's own signing line
+329240	issued_on	2023-11-24	2023-10-24	signature	the text's own signing line
+329242	issued_on	2023-11-27	2023-10-27	signature	the text's own signing line
+331181	issued_on	2024-08-30	2024-08-20	signature	the text's own signing line
+333092	issued_on	2025-03-22	2025-03-12	model	The signature_block explicitly states the signing date as 12 March 2025 (a one-digit typo in printed_signed 2025-03-22), which aligns with neighbouring decision 335 signed on 2025-03-11 and precedes the 2025-03-20 Gazette publication.
+333096	issued_on	2025-03-22	2025-03-12	model	The signature block explicitly gives the signing date as 12 March 2025 (2025-03-12), showing a one-digit typo in printed_signed (2025-03-22) and placing signing after the preamble date 2025-03-06 and before the 2025-03-20 Gazette issue.
+333188	issued_on	2025-09-11	2025-04-11	signature	the text's own signing line
+333556	issued_on	2025-05-23	2025-05-13	model	The signature block explicitly gives the signing date as 13 May 2025 (2025-05-13), showing a one-digit typo in printed_signed (2025-05-23) while confirming the Gazette issue 23 date of 2025-05-22.
+335716	issued_on	2026-12-31	2025-12-31	signature	the text's own signing line

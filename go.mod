@@ -5,6 +5,7 @@ go 1.27.1
 require (
 	github.com/anthropics/anthropic-sdk-go v1.84.0
 	github.com/jackc/pgx/v5 v5.11.0
+	golang.org/x/net v0.41.0
 	golang.org/x/text v0.42.0
 )
 

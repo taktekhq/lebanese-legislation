@@ -1,0 +1,16 @@
+# Texts that change every sum of money in another text without naming its
+# articles ("all amounts wherever they appear in the Code of Civil Procedure
+# are multiplied by fifty"). A citation can only link such a text to the
+# changed text as a whole, so no article page showed it. The build links
+# each one, as published, to every article in scope that states a sum in
+# Lebanese pounds (graph_edge source 'editorial'). Nothing is computed and
+# no wording changes: the reader sees the article as published and the text
+# that changed its sums.
+#
+# Listed only when the change is not in the Centre's wording yet. Columns:
+# the changing text's Centre id and article, the changed text's Centre id,
+# the first and last article in scope (empty for every article), what it
+# changes (sums: any sum; fines: only articles that also name a fine), a note.
+by_law_id	by_article	law_id	from	to	changes	note
+330819	1	244565			sums	Decree 13909/2024: every sum in the Code of Civil Procedure x50, from 19 Sep 2024
+330076	42	246455			fines	Budget Law 324/2024 art. 42: fines in the Traffic Law (Law 243/2012) x10, never under 250,000
