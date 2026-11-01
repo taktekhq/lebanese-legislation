@@ -148,7 +148,7 @@ func TestManifestBesideTheBundle(t *testing.T) {
 		t.Errorf("a manifest inside the folder was read: %v", err)
 	}
 	// From a checkout's root, as the nightly, snapshot.sh and hf.sh run it.
-	if got := ManifestPath(DefaultPaths("repo").Bundle); got != "lebgazette-bundle.manifest.tsv" {
+	if got := ManifestPath(DefaultPaths("repo").Bundle); got != "repo/manual/scans.manifest.tsv" {
 		t.Errorf("default manifest %q", got)
 	}
 }

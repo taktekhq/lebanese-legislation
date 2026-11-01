@@ -6,6 +6,11 @@ import (
 	"unicode"
 )
 
+// The texts are in Arabic, but people type English and French. When a Latin
+// query finds nothing, translate it word by word with this small glossary and
+// search again. It translates the question only; no wording shown as law is
+// ever produced here. A query is translated only when every word is known,
+// because the words are ANDed and one stranger would empty the result again.
 var glossPhrases = map[string]string{
 	"self defense":        "الدفاع المشروع",
 	"self defence":        "الدفاع المشروع",
@@ -61,6 +66,9 @@ func hasArabic(s string) bool {
 	return false
 }
 
+// latinFold lower-cases a Latin query, straightens curly apostrophes and
+// strips French accents ("nationalité" is "nationalite"), so one spelling of
+// a term serves every way of typing it.
 func latinFold(s string) string {
 	return strings.ToLower(latinAccents.Replace(s))
 }
@@ -69,13 +77,13 @@ var latinAccents = strings.NewReplacer("’", "'", "‘", "'", "é", "e", "è", 
 	"î", "i", "ï", "i", "ô", "o", "ù", "u", "û", "u", "ç", "c", "É", "E", "È", "E", "À", "A", "Ç", "C")
 
 var (
-	glossPhraseKeys []string
+	glossPhraseKeys []string // longest first, so "labor law" wins over "labor"
 	glossPhraseAr   = map[string]string{}
 	glossWordAr     = map[string]string{}
 )
 
 func init() {
-	for _, m := range []map[string]string{glossTerms, glossPhrases, glossWords} {
+	for _, m := range []map[string]string{glossTerms, glossPhrases, glossWords} { // later maps win
 		for k, ar := range m {
 			k = latinFold(k)
 			if strings.ContainsAny(k, " ") {
@@ -96,21 +104,27 @@ func init() {
 	})
 }
 
+// latinTokens splits a Latin query into lower-case words (letters, digits, hyphen, apostrophe).
 func latinTokens(q string) []string {
 	toks := strings.FieldsFunc(latinFold(q), func(r rune) bool {
 		return !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '-' && r != '\''
 	})
 	for i, t := range toks {
-		toks[i] = strings.TrimSuffix(t, "'s")
+		toks[i] = strings.TrimSuffix(t, "'s") // "Lebanon's"
 	}
 	return toks
 }
 
+// glossQuery returns the Arabic search for a Latin query, or "" when the
+// query is already Arabic or has no word it can translate. Words it does not
+// know are left out when others are known: the words are ANDed, and one
+// stranger would empty the result again.
 func glossQuery(q string) string {
 	ar, _ := glossQueryWhole(q)
 	return ar
 }
 
+// glossQueryWhole is glossQuery that also says whether every content word was translated.
 func glossQueryWhole(q string) (string, bool) {
 	if strings.TrimSpace(q) == "" || hasArabic(q) {
 		return "", false

@@ -1,5 +1,9 @@
 package site
 
+// Overload protection for a small shared box: a per-client token bucket, a
+// global semaphore on concurrent DB work, and a short-lived cache for
+// identical tool calls. Shared by /mcp (mcp.go) and /api/v1 (api.go).
+
 import (
 	"context"
 	"encoding/json"
@@ -9,6 +13,11 @@ import (
 	"time"
 )
 
+// ---------------------------------------------------------------- client IP
+
+// clientIP is who to blame for a request: Cloudflare's CF-Connecting-IP
+// when present (the reverse proxy forwards it unchanged),
+// else the connection's own remote address.
 func clientIP(r *http.Request) string {
 	if ip := r.Header.Get("CF-Connecting-IP"); ip != "" {
 		return ip
@@ -19,11 +28,16 @@ func clientIP(r *http.Request) string {
 	return r.RemoteAddr
 }
 
+// ---------------------------------------------------------------- token bucket
+
 type bucket struct {
 	tokens float64
 	last   time.Time
 }
 
+// ipLimiter is one token bucket per client IP: ratePerMin tokens added per
+// minute, up to burst. Idle buckets are swept so the map does not grow
+// without bound on a public endpoint.
 type ipLimiter struct {
 	mu         sync.Mutex
 	buckets    map[string]*bucket
@@ -36,12 +50,16 @@ func newIPLimiter(ratePerMin, burst int) *ipLimiter {
 	return &ipLimiter{buckets: map[string]*bucket{}, ratePerSec: float64(ratePerMin) / 60, burst: float64(burst), lastSweep: time.Now()}
 }
 
-// SetRateLimit sets the API and MCP limit per client IP; zero turns it off,
-// which suits a service on your own machine. LebaneseLegislation.com uses 60 a minute.
+// SetRateLimit replaces the per-client limit shared by /api/v1 and /mcp:
+// perMinute requests a minute per client IP, up to burst at once. 0 turns
+// the limit off. Call before serving.
 func (s *Server) SetRateLimit(perMinute, burst int) {
 	s.ipLim = newIPLimiter(perMinute, burst)
 }
 
+// Allow reports whether ip may make one more call now; when not, it says
+// how long until the next token is available (for Retry-After). A limiter
+// with no rate lets every call through.
 func (l *ipLimiter) Allow(ip string) (time.Duration, bool) {
 	if l.ratePerSec <= 0 {
 		return 0, true
@@ -66,6 +84,8 @@ func (l *ipLimiter) Allow(ip string) (time.Duration, bool) {
 	return 0, true
 }
 
+// sweep drops buckets idle for 10 minutes, at most once a minute, so a
+// public endpoint under many distinct IPs does not leak memory.
 func (l *ipLimiter) sweep(now time.Time) {
 	if now.Sub(l.lastSweep) < time.Minute {
 		return
@@ -78,10 +98,18 @@ func (l *ipLimiter) sweep(now time.Time) {
 	}
 }
 
+// ---------------------------------------------------------------- global semaphore
+
+// dbSemaphore caps concurrent DB-touching requests across /mcp and, once
+// wired, /api/v1, so a burst of calls queues briefly instead of saturating
+// Postgres on a 2 vCPU box.
 type dbSemaphore struct{ slots chan struct{} }
 
 func newDBSemaphore(n int) *dbSemaphore { return &dbSemaphore{slots: make(chan struct{}, n)} }
 
+// acquire blocks up to wait for a free slot; release must be called
+// exactly once when the caller is done. ok is false when no slot opened up
+// in time (the caller should answer 503).
 func (d *dbSemaphore) acquire(ctx context.Context, wait time.Duration) (release func(), ok bool) {
 	select {
 	case d.slots <- struct{}{}:
@@ -100,11 +128,18 @@ func (d *dbSemaphore) acquire(ctx context.Context, wait time.Duration) (release 
 	}
 }
 
+// ---------------------------------------------------------------- short-lived cache
+
 type cacheEntry struct {
 	value   any
 	expires time.Time
 }
 
+// ttlCache holds the result of an identical tool call (same tool name,
+// same arguments) for a short time, so a repeated search or lookup (a
+// model retrying, or several users asking the same thing) does not hit
+// Postgres again. FIFO eviction once max is reached: simple, and plenty
+// for the handful of distinct calls this gets in any one minute.
 type ttlCache struct {
 	mu      sync.Mutex
 	entries map[string]cacheEntry
@@ -118,7 +153,9 @@ func newTTLCache(max int, ttl time.Duration) *ttlCache {
 }
 
 func cacheKey(tool string, args json.RawMessage) string {
-
+	// args is already canonical JSON as unmarshalled from the wire for a
+	// given call; two calls with the same bytes get the same key, which is
+	// all that matters (not a sorted-key canonicalization).
 	return tool + "\x00" + string(args)
 }
 

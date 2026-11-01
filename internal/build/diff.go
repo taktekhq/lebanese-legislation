@@ -135,10 +135,10 @@ func RunDiff(ctx context.Context, o DiffOptions) error {
 		o.Report = "diff-build-report.txt"
 	}
 	if o.Scans == "" {
-		o.Scans = filepath.Join(o.Repo, "../lebgazette-bundle")
+		o.Scans = filepath.Join(o.Repo, "manual/scans")
 	}
 	if o.RulingFiles == "" {
-		o.RulingFiles = filepath.Join(o.Repo, "../lebleg-ruling-files")
+		o.RulingFiles = filepath.Join(o.Repo, "manual/rulings")
 	}
 	if _, err := os.Stat(o.Archive); err != nil {
 		return fmt.Errorf("diff-build: archive: %w", err)

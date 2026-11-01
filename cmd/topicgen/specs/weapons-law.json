@@ -1,0 +1,66 @@
+{
+  "slug": "weapons-law",
+  "title_en": "Weapons and ammunition law in Lebanon",
+  "title_ar": "قانون الأسلحة والذخائر في لبنان",
+  "question_en": "What does Lebanese law say about owning, carrying and selling weapons and ammunition, and what are the penalties (Article 72)?",
+  "question_ar": "ماذا يقول القانون اللبناني عن حيازة الأسلحة والذخائر وحملها وبيعها، وما هي العقوبات (المادة 72)؟",
+  "sub_questions": [
+    "What are the categories of weapons and which ones need a licence?",
+    "Who can get a licence to own or carry a weapon and at what age?",
+    "What does Article 72 punish and with what penalty?",
+    "What is the penalty for firing a weapon in a populated place or into a crowd?",
+    "What must an heir or a person who finds a weapon do?",
+    "What is needed to hunt with a firearm?"
+  ],
+  "notes": "MAIN LAW: Legislative Decree 137 of 12/6/1959 (Arms and Ammunition law), id 180890. It replaced the arms law of 18/6/1952 (id 244190), whose hunting part (Art. 81 onward) was repealed by Hunting Law 580/2004 (Art. 22). The Art. 72 in the database is the version rewritten by Law 22 of 29/3/1966: prison 6 months to 3 years and a fine of 1,000 to 5,000 LL (or either) for making, trading, buying, importing or stealing war weapons of categories 1 to 4 without a licence; prison 6 months to 2 years for carrying such weapons, or usable ammunition or parts, without a licence; the court may ban carrying war weapons. Art. 79 sends Art. 72 offences to the military court. The 1962 law rewriting Art. 72 was cancelled by Law 22/1966. Fines are in old pounds (1,000 to 5,000 LL), unadjusted; say so. Category 4 includes pistols and revolvers (Art. 2, as amended by decree 1/1958) and a licence for category 4 lasts one year and is renewable, max two category-4 weapons (Art. 24, 28); category 5 (hunting guns) licence is personal and issued once (Art. 24). Minimum age 18, hunting arms 16 under guardian's responsibility (Art. 29). The database holds no later enacted text changing these penalties. Hunting: Law 580/2004 requires a hunting licence from the Environment Ministry based on a weapon licence plus third-party insurance (Art. 6); fees for hunting weapons are in Art. 20 (amounts as stated there). Do not describe how to obtain a licence beyond what these articles say (the practical procedure is set by decrees not in the pack). Art. 2 is long (about 4,500 characters) but needed: it defines the nine categories.",
+  "pack": [
+    {
+      "law": 180890,
+      "articles": [
+        "2",
+        "24",
+        "25",
+        "26",
+        "28",
+        "29",
+        "32"
+      ],
+      "why": "Categories of weapons and licensing: who may own or carry, age and conditions, one-year category 4 licence, limit of two pistols, withdrawal"
+    },
+    {
+      "law": 180890,
+      "articles": [
+        "39",
+        "40",
+        "41",
+        "43"
+      ],
+      "why": "Lost weapons, found weapons, inheritance, amnesty period for unlicensed weapons"
+    },
+    {
+      "law": 180890,
+      "articles": [
+        "72",
+        "73",
+        "74",
+        "75",
+        "76",
+        "78",
+        "79"
+      ],
+      "why": "Penalties: Art. 72 (war weapons), Art. 73 (hunting and non-war weapons), confiscation, firing in a populated place, explosives, residual penalty, military court"
+    },
+    {
+      "law": 207339,
+      "articles": [
+        "6",
+        "8",
+        "13",
+        "14",
+        "15",
+        "20"
+      ],
+      "why": "Hunting law 580/2004: licence conditions, no-hunting zones, personal annual licence, penalties, weapon licence fees"
+    }
+  ]
+}

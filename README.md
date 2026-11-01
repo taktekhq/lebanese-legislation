@@ -61,6 +61,9 @@ Hugging Face releases/latest.json --> db  (restores once into a volume)
 | [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and the PostgreSQL release (restore, build, publish). [Listed here](cmd/README.md). |
 | [`tools/`](tools/) | Only `tools/src/lebleg/sql/web.sql` now: what the website, API and MCP read beyond the release dump, applied by `restore-release`. |
 | [`docs/`](docs/) | Service reference, MCP setup, CI and changes. |
+| [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and the website's tools. [Listed here](cmd/README.md). |
+| [`tools/`](tools/) | The Python data tools: restore, rebuild and publish the dump, and the update pipeline. |
+| [`docs/`](docs/) | Service reference, MCP setup, the data update pipeline and changes. |
 
 `compose.yaml` runs the four images. `compose.build.yaml` builds them from this checkout instead. `compose.local.yaml` loads a dump you already downloaded. `server.json` is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry and `.mcp.json` the client configuration for the hosted server.
 

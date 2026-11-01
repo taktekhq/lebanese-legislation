@@ -1,5 +1,24 @@
 package site
 
+// An MCP server (Model Context Protocol, modelcontextprotocol.io) at /mcp:
+// Streamable HTTP transport, stateless JSON-RPC 2.0, protocol version
+// 2025-06-18 (2025-03-26 is accepted too). Every tool reads the same
+// Postgres the website and the JSON API read (api.go); nothing here writes
+// or paraphrases a legal text, and every result carries the site's
+// canonical URL and the not-legal-advice line (notLegalAdvice, api.go).
+//
+// The -mcp image serves it (internal/app, mode mcp) and so does the website.
+// LebaneseLegislation.com answers /mcp from a separate server at the edge
+// that reads a nightly snapshot, so the site's own database never carries
+// that traffic; a request that still reaches the origin gets these same
+// tools. routes() (handlers.go) registers GET /mcp and GET /mcp/, which
+// answer 405 (mcpGet) so a client probing the address gets no 404 page;
+// mcpRoutes adds POST and OPTIONS.
+//
+// A get_links tool over the citation graph (db/graph.sql) is not offered
+// yet: it is not in toolDefs and has no case in callTool, so tools/list does
+// not advertise it.
+
 import (
 	"context"
 	"encoding/json"
@@ -16,16 +35,17 @@ import (
 
 const (
 	mcpDefaultProtocol = "2025-06-18"
-	mcpMaxBody         = 64 * 1024
-	mcpCallTimeout     = 5 * time.Second
-	// Search by meaning waits on Gemini, as the website's answer box does.
-	mcpSemanticTimeout = 25 * time.Second
-	mcpCacheTTL        = 60 * time.Second
-	mcpSemaphoreWait   = 2 * time.Second
+	mcpMaxBody         = 64 * 1024        // request body cap
+	mcpCallTimeout     = 5 * time.Second  // per tools/call context timeout
+	mcpSemanticTimeout = 25 * time.Second // a search that also asks for related passages
+	mcpCacheTTL        = 60 * time.Second // identical tool calls, briefly
+	mcpSemaphoreWait   = 2 * time.Second  // how long tools/call queues for a DB slot
 )
 
 var mcpSupportedProtocols = map[string]bool{"2025-06-18": true, "2025-03-26": true}
 
+// mcpRoutes registers POST and OPTIONS /mcp, once (routes() calls it).
+// GET /mcp is routes()'s already: registering it here too would panic.
 func (s *Server) mcpRoutes() {
 	if s.isStatic || s.mcpRegistered {
 		return
@@ -36,6 +56,8 @@ func (s *Server) mcpRoutes() {
 	s.mux.HandleFunc("OPTIONS /mcp", s.mcpOptions)
 	s.mux.HandleFunc("OPTIONS /mcp/", s.mcpOptions)
 }
+
+// ---------------------------------------------------------------- JSON-RPC envelope
 
 type rpcRequest struct {
 	JSONRPC string          `json:"jsonrpc"`
@@ -72,12 +94,17 @@ func rpcResultResponse(id json.RawMessage, result any) rpcResponse {
 	return rpcResponse{JSONRPC: "2.0", ID: id, Result: result}
 }
 
+// isNotification says whether a JSON-RPC request carries no id (a
+// notification; must not get a response body at all) vs id present,
+// including a literal null (a request; gets a response).
 func isNotification(raw json.RawMessage) bool { return len(raw) == 0 }
 
-// mcpOriginAllowed protects browsers against DNS rebinding, as the MCP spec
-// asks: a request with an Origin header must come from MCP_ALLOWED_ORIGINS
-// (comma-separated) or from this same localhost address. Clients that send no
-// Origin, such as desktop and server MCP clients, are always allowed.
+// ---------------------------------------------------------------- HTTP entry points
+
+// mcpOriginAllowed is the MCP specification's rule against DNS rebinding: a
+// request with no Origin (a desktop client, curl) is answered; a browser's
+// is answered only from an origin listed in MCP_ALLOWED_ORIGINS (comma
+// separated, exact) or from this same localhost address.
 func mcpOriginAllowed(r *http.Request) bool {
 	origin := r.Header.Get("Origin")
 	if origin == "" {
@@ -101,7 +128,8 @@ func mcpOriginAllowed(r *http.Request) bool {
 	return (host == "localhost" || host == "127.0.0.1" || host == "::1") && u.Scheme == scheme && u.Host == r.Host
 }
 
-// mcpCORS answers an allowed browser origin by name; requests without one get no CORS headers.
+// mcpCORS answers 403 to a browser origin that is not allowed, and returns
+// false; otherwise it sets the CORS headers for that origin.
 func mcpCORS(w http.ResponseWriter, r *http.Request) bool {
 	if !mcpOriginAllowed(r) {
 		writeRPC(w, http.StatusForbidden, rpcErrorResponse(nil, rpcInvalidRequest, "origin not allowed"))
@@ -124,6 +152,9 @@ func (s *Server) mcpOptions(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// mcpGet: Streamable HTTP allows a GET to open a server-to-client SSE
+// stream for out-of-band notifications. This server is stateless and has
+// none to send, so GET is not supported; 405 names the one method that is.
 func (s *Server) mcpGet(w http.ResponseWriter, r *http.Request) {
 	if !mcpCORS(w, r) {
 		return
@@ -172,7 +203,11 @@ func (s *Server) mcpPost(w http.ResponseWriter, r *http.Request) {
 	defer release()
 
 	if isNotification(req.ID) {
-
+		// A notification (no "id" field, e.g. notifications/initialized)
+		// gets no JSON-RPC response at all per spec, only the HTTP status;
+		// still run it, in case a method ever has a side effect worth
+		// having (today only notifications/initialized exists, and it does
+		// nothing server-side: this is stateless).
 		s.handleRPC(r, req)
 		w.WriteHeader(http.StatusAccepted)
 		return
@@ -188,6 +223,9 @@ func writeRPC(w http.ResponseWriter, status int, resp rpcResponse) {
 	enc.Encode(resp)
 }
 
+// handleRPC dispatches one parsed request to the right method; mcpPost
+// handles transport concerns (size, rate limit, the DB semaphore, whether
+// to write a body at all for a notification).
 func (s *Server) handleRPC(r *http.Request, req rpcRequest) (rpcResponse, int) {
 	switch req.Method {
 	case "initialize":
@@ -281,12 +319,21 @@ func mustJSON(v any) string {
 	return string(b)
 }
 
+// withAdvice wraps a tool's result with the not-legal-advice line, so every
+// tool answer carries it regardless of whether the underlying struct
+// already does (several do, as apiXxxDetail.NotLegalAdvice; this makes it
+// unconditional, including for search and get_gazette_issue, which don't).
 func withAdvice(v any) map[string]any {
 	return map[string]any{"result": v, "not_legal_advice": notLegalAdvice}
 }
 
 func toolErr(msg string) map[string]any { return map[string]any{"error": msg} }
 
+// ---------------------------------------------------------------- tools/list
+
+// toolDefs is what tools/list returns: name, a description a model can act
+// on, and a JSON Schema input. toolNames is the same set, for a fast
+// membership check in tools/call.
 var toolDefs = []map[string]any{
 	{
 		"name": "search_legislation",
@@ -375,6 +422,13 @@ var toolNames = func() map[string]bool {
 	return m
 }()
 
+// ---------------------------------------------------------------- tools/call dispatch
+
+// callTool runs one tool. The second return says whether the result is a
+// tool-level error (bad input, not found: reported inside the MCP result
+// with isError: true, per spec, so a model can see and react to it); the
+// third is a transport/internal error (a DB failure), which the caller
+// turns into a JSON-RPC error instead.
 func (s *Server) callTool(ctx context.Context, name string, args json.RawMessage) (any, bool, error) {
 	switch name {
 	case "search_legislation":
@@ -397,9 +451,10 @@ type mcpSearchArgs struct {
 	Kind  string `json:"kind,omitempty"`
 	Year  int    `json:"year,omitempty"`
 	Limit int    `json:"limit,omitempty"`
-	// Semantic adds passages found by meaning (Related), when the server has it set up.
+	// Semantic adds passages related by meaning (needs a vector index).
 	Semantic bool `json:"semantic,omitempty"`
-	// Select lets Gemini choose which related passages answer the query.
+	// Select, with Semantic, keeps only the passages the model picks as
+	// answering the query: it returns passage IDs, never new wording.
 	Select bool `json:"select,omitempty"`
 }
 
@@ -461,8 +516,8 @@ func unmarshalID(raw json.RawMessage) (int, bool) {
 	return a.ID, true
 }
 
-// pageLawArticles returns the full outline by default, as the API does, or the
-// requested page of articles. article_count still counts the whole law.
+// pageLawArticles keeps one page of a law's article outline: skip offset,
+// then at most limit (0: all the rest).
 func pageLawArticles(out *apiLawDetail, offset, limit int) {
 	if offset > 0 {
 		out.Articles = out.Articles[min(offset, len(out.Articles)):]

@@ -10,11 +10,16 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// Browsing by year: how Lebanese texts are cited ("Law 44/2015") and the way
+// a static copy can list 100,000 texts without a server to filter them.
+
+// YearCount is one year and how many documents it has; year 0 is undated.
 type YearCount struct {
 	Year  int
 	Count int
 }
 
+// Decade groups years for the index page.
 type Decade struct {
 	Label string
 	Years []YearCount
@@ -22,7 +27,7 @@ type Decade struct {
 
 type yearKind struct {
 	key, eyebrow, h1, lead, noun, many string
-	yearsSQL                           string
+	yearsSQL                           string // year, count
 }
 
 var yearKinds = map[string]yearKind{
@@ -37,6 +42,7 @@ var yearKinds = map[string]yearKind{
 		yearsSQL: `SELECT coalesce(extract(year FROM published_on)::int, 0), count(*)::int FROM gazette_issue GROUP BY 1 ORDER BY 1 DESC`},
 }
 
+// Years lists the years a kind of document has, for the static writer too.
 func (s *Server) Years(ctx context.Context, kind string) ([]YearCount, error) {
 	rows, err := s.db.Query(ctx, yearKinds[kind].yearsSQL)
 	if err != nil {
@@ -71,7 +77,7 @@ func (s *Server) yearIndex(kind string) http.HandlerFunc {
 			d.Years = append(d.Years, y)
 		}
 		nounKey, manyKey := k.key+".noun", k.key+".many"
-		if k.key == "laws" {
+		if k.key == "laws" { // the "laws" docKind doesn't exist; its noun/many live under "laws.count*"
 			nounKey, manyKey = "laws.count", "laws.count_many"
 		}
 		h1 := s.trOr(r, stripNbsp(k.h1), "years.index."+k.key+".h1")
@@ -137,6 +143,8 @@ func (s *Server) lawsYear(w http.ResponseWriter, r *http.Request) {
 			Eyebrow: s.trOr(r, "Legislation · "+label, "years.legislation_of", label), Heading: s.trOr(r, "Texts of "+label+".", "years.texts_of", label)}})
 }
 
+// yearSize is how many texts a year's list shows on a page; a static copy has
+// no pager to follow, so it shows a year whole.
 func (s *Server) yearSize() int {
 	if s.isStatic {
 		return 1 << 30

@@ -11,11 +11,17 @@ import (
 	"unicode/utf8"
 )
 
+// Listing by date: GET /api/v1/laws/ and GET /api/v1/gazette/. The same
+// shapes as the hosted MCP server's tools list_legislation and
+// list_gazette_issues, so a client can use either.
+
 const (
 	listDefaultLimit = 50
 	listMaxLimit     = 100
 )
 
+// parseDateBound reads YYYY, YYYY-MM or YYYY-MM-DD. A bound is inclusive: as
+// a start it is the first day of the period, as an end its last day.
 func parseDateBound(s string, end bool) (time.Time, error) {
 	for _, layout := range []string{"2006-01-02", "2006-01", "2006"} {
 		t, err := time.Parse(layout, s)
@@ -35,10 +41,11 @@ func parseDateBound(s string, end bool) (time.Time, error) {
 	return time.Time{}, fmt.Errorf("%q is not a date: use YYYY, YYYY-MM or YYYY-MM-DD", s)
 }
 
+// listParams are the parameters both listings share.
 type listParams struct {
-	since, until  string
+	since, until  string // as the caller wrote them
 	from, to      *time.Time
-	order         string
+	order         string // "newest" or "oldest"
 	limit, offset int
 	kind          string
 }
@@ -77,6 +84,7 @@ func nilIfEmpty(s string) *string {
 	return &s
 }
 
+// where builds the date condition on expr, with args numbered from n.
 func (p listParams) where(expr string, args []any) (string, []any) {
 	var conds []string
 	if p.from != nil {
@@ -97,12 +105,14 @@ func (p listParams) dir() string {
 	return "DESC"
 }
 
+// ---------------------------------------------------------------- texts
+
 type apiListedLaw struct {
 	apiLawSummary
 	GazetteNumber  *string `json:"gazette_number,omitempty"`
 	GazetteDate    *string `json:"gazette_date,omitempty"`
 	GazetteIssueID *int    `json:"gazette_issue_id,omitempty"`
-	Date           *string `json:"date,omitempty"`
+	Date           *string `json:"date,omitempty"` // coalesce(gazette_date, issued_on): what since, until and the order use
 }
 
 type apiLawList struct {
@@ -121,7 +131,8 @@ func (s *Server) listLaws(ctx context.Context, p listParams) (apiLawList, error)
 		Order: p.order, Offset: p.offset, Laws: []apiListedLaw{}}
 	const date = "coalesce(l.gazette_date, l.issued_on)"
 	cond, args := p.where(date, nil)
-
+	// a list by date leaves out the texts with no date, as the MCP Worker's
+	// list_legislation does, so both answer the same total
 	conds := []string{date + " IS NOT NULL"}
 	if cond != "" {
 		conds = append(conds, cond)
@@ -178,12 +189,14 @@ func (s *Server) apiLaws(w http.ResponseWriter, r *http.Request) {
 	s.writeJSON(w, 200, out)
 }
 
+// ---------------------------------------------------------------- issues
+
 type apiIssueRow struct {
 	ID          int     `json:"id"`
 	Number      *string `json:"number,omitempty"`
 	PublishedOn *string `json:"published_on,omitempty"`
 	TextCount   int     `json:"text_count"`
-	Source      string  `json:"source"`
+	Source      string  `json:"source"` // "centre", or "scans" for an issue made for texts read from the Gazette's scanned pages
 	URL         string  `json:"url"`
 }
 
@@ -252,6 +265,13 @@ func (s *Server) apiGazettes(w http.ResponseWriter, r *http.Request) {
 	s.writeJSON(w, 200, out)
 }
 
+// ---------------------------------------------------------------- amended_by / amended
+
+// apiLawChange is one text that changed this law (amended_by) or that this
+// law changed (amended): one entry per relation and other text. Articles are
+// the articles of THIS law the other text touches (amended_by), or the
+// articles of the other text this law touches (amended); empty when the
+// change is to the text as a whole.
 type apiLawChange struct {
 	Relation    string        `json:"relation"`
 	Verb        string        `json:"verb"`
@@ -260,11 +280,14 @@ type apiLawChange struct {
 	Articles    []string      `json:"articles,omitempty"`
 }
 
+// changeVerbs are the hosted MCP server's words for each relation.
 var changeVerbs = map[string]string{
 	"replace": "Replaced or reworded", "amend": "Edited in part", "repeal": "Repealed",
 	"insert": "Added to", "suspend": "Suspended", "extend": "Extended",
 }
 
+// changeRelation names a change the way the graph does: a part reworded is
+// "amend", a part added is "insert", else the action itself.
 func changeRelation(c Change) string {
 	switch {
 	case c.Part != nil && *c.Part == "+":
@@ -275,10 +298,19 @@ func changeRelation(c Change) string {
 	return c.Action
 }
 
+// changeRelations are the graph relations that change a text (the MCP's
+// CHANGE_RELATIONS).
 var changeRelations = []string{"replace", "amend", "repeal", "insert", "suspend", "extend"}
 
+// lawLinks lists the texts that changed law id (toThis) or that it changed,
+// from graph_edge, the way the MCP's get_law does: linked and no_article
+// edges between legislation, one entry per relation and other text, ordered
+// by the other text's date (gazette date, else issue date), then id. Edges to
+// or from one article add that article to Articles. The date shown is the
+// amending text's: the other text's for amended_by, selfDate (this law's
+// gazette date, else issue date) for amended.
 func (s *Server) lawLinks(ctx context.Context, id int, toThis bool, selfDate *time.Time) ([]apiLawChange, error) {
-	near := "e.from_id"
+	near := "e.from_id" // the other text's side of the edge
 	if !toThis {
 		near = "e.to_law_id"
 	}
@@ -336,6 +368,8 @@ func (s *Server) lawLinks(ctx context.Context, id int, toThis bool, selfDate *ti
 	return out, nil
 }
 
+// sortArticles orders article numbers the way the MCP does (numeric-aware:
+// "2" before "10", "12" before "12-1" before "12 مكرر").
 func sortArticles(xs []string) {
 	sort.SliceStable(xs, func(a, b int) bool { return naturalLess(xs[a], xs[b]) })
 }
@@ -372,6 +406,11 @@ func digitRun(s string) int {
 	return n
 }
 
+// mergeAmendments adds what the amendment table (the changes parsed down to
+// the article) knows and the graph lacks: a pair (relation, other text) the
+// graph does not list, articles not yet named, and a date when the graph has
+// none. The graph's entries keep their order; an extra pair is placed by the
+// other text's issue date.
 func mergeAmendments(graph, amend []apiLawChange) []apiLawChange {
 	type key struct {
 		relation string
@@ -384,7 +423,7 @@ func mergeAmendments(graph, amend []apiLawChange) []apiLawChange {
 	for _, a := range amend {
 		i, ok := at[key{a.Relation, a.Law.ID}]
 		if !ok {
-
+			// slot after the last entry whose text is not newer
 			pos := len(graph)
 			for pos > 0 && a.Law.IssuedOn != nil && graph[pos-1].Law.IssuedOn != nil && *graph[pos-1].Law.IssuedOn > *a.Law.IssuedOn {
 				pos--
@@ -416,7 +455,7 @@ func (s *Server) lawChanges(ctx context.Context, changes []Change) []apiLawChang
 	}
 	idx := map[key]int{}
 	var out []apiLawChange
-	var eff []*time.Time
+	var eff []*time.Time // the earliest effective date among a group's changes
 	for _, c := range changes {
 		rel := changeRelation(c)
 		k := key{rel, c.By.ID}
@@ -438,7 +477,7 @@ func (s *Server) lawChanges(ctx context.Context, changes []Change) []apiLawChang
 			out[i].Articles = appendNew(out[i].Articles, *c.Article)
 		}
 	}
-
+	// Dated by the change, else by the other text's own date; oldest first.
 	when := make([]time.Time, len(out))
 	for i := range out {
 		switch {

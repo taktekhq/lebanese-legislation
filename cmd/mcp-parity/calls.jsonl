@@ -1,0 +1,21 @@
+# Twenty calls covering the ten tools, for go run ./cmd/mcp-parity -calls cmd/mcp-parity/calls.jsonl
+{"name":"search_legislation","arguments":{"query":"قانون العقوبات 670"}}
+{"name":"search_legislation","arguments":{"query":"الصورية سند الضد"}}
+{"name":"search_legislation","arguments":{"query":"cybercrime","kind":"laws"}}
+{"name":"search_legislation","arguments":{"query":"Penal Code","kind":"laws","limit":5}}
+{"name":"search_legislation","arguments":{"query":"2025","kind":"gazette","limit":5}}
+{"name":"search_legislation","arguments":{"query":"contrat","kind":"articles","limit":5}}
+{"name":"search_legislation","arguments":{"query":"الإيجار","kind":"rulings","limit":5}}
+{"name":"search_legislation","arguments":{"query":"عقد العمل","kind":"articles","limit":5}}
+{"name":"get_law","arguments":{"id":190374}}
+{"name":"get_law","arguments":{"id":244565}}
+{"name":"get_article","arguments":{"law_id":244565,"number":"11"}}
+{"name":"get_article","arguments":{"law_id":190374,"number":"50"}}
+{"name":"get_law_texts","arguments":{"law_id":244611,"limit":5}}
+{"name":"get_ruling","arguments":{"id":70390}}
+{"name":"get_gazette_issue","arguments":{"id":16890}}
+{"name":"get_links","arguments":{"key":"law/190374","limit":5}}
+{"name":"get_links","arguments":{"key":"law/244611/art/37","direction":"to","limit":5}}
+{"name":"list_legislation","arguments":{"since":"2025-01","limit":5}}
+{"name":"list_gazette_issues","arguments":{"since":"2025","limit":5}}
+{"name":"possibly_affected","arguments":{"law_id":190374}}

@@ -52,9 +52,9 @@ func TestLatinWords(t *testing.T) {
 	for in, want := range map[string]string{
 		"Shehab":               "شهاب",
 		"Chehab":               "شهاب",
-		"kenaan":               "كنعان",
+		"kenaan":               "كنعان", // «كانون» has the same consonants as "knn" but is not what "kenaan" says
 		"L'emir khaled":        "امير خالد",
-		"al ta3adi fi l bina2": "التعدي بناء",
+		"al ta3adi fi l bina2": "التعدي بناء", // the -i ending picks «التعدي» over the commoner «تعود»
 		"zzzz":                 "",
 	} {
 		if got := latinWords(in, v); got != want {
@@ -80,13 +80,15 @@ func TestVocabNearest(t *testing.T) {
 }
 
 func TestParseArticleRefArabicIndic(t *testing.T) {
-
+	// ٩٥٩ is 959: the code name words are what is left.
 	n, words, ok := parseArticleRef(arDigits.Replace("٩٥٩ اصول محاكمات مدنيه"))
 	if !ok || n != "959" || strings.Join(words, " ") != "اصول محاكمات مدنيه" {
 		t.Errorf("parseArticleRef = %q %q %v", n, words, ok)
 	}
 }
 
+// The queries that found nothing on 8 to 19 Oct 2026 (posthog-demand.md), run
+// against a real database: each must now find something. Needs LEBLEG_DSN; skipped without it.
 func TestZeroResultQueriesNowFind(t *testing.T) {
 	dsn := os.Getenv("LEBLEG_DSN")
 	if dsn == "" {
@@ -109,6 +111,7 @@ func TestZeroResultQueriesNowFind(t *testing.T) {
 	}
 	s.vocab.Store(v)
 
+	// The number of an article of a code: straight to the article.
 	if to := s.articleRef(ctx, arDigits.Replace("٩٥٩ اصول محاكمات مدنيه")); !strings.HasSuffix(to, "/article/959/") {
 		t.Errorf("articleRef for ٩٥٩ اصول محاكمات مدنيه = %q, want the article 959 address", to)
 	}
@@ -150,6 +153,7 @@ func TestZeroResultQueriesNowFind(t *testing.T) {
 		}
 	}
 
+	// Topic plus year keeps the year: every text found is from 2024.
 	res, how, err := s.rescue(ctx, "تعيين في وزارة الخارجية 2024")
 	if err != nil || how == "" {
 		t.Fatalf("year query: %v %q", err, how)
@@ -160,6 +164,7 @@ func TestZeroResultQueriesNowFind(t *testing.T) {
 		}
 	}
 
+	// Nonsense still finds nothing, and the page then offers nearest titles or browse links.
 	if _, how, _ := s.rescue(ctx, "zzzz qqqq"); how != "" {
 		t.Errorf("nonsense was rescued via %s", how)
 	}

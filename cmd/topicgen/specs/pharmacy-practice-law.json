@@ -1,0 +1,123 @@
+{
+  "slug": "pharmacy-practice-law",
+  "title_en": "Pharmacy practice law in Lebanon (Law 367 of 1994)",
+  "title_ar": "قانون مزاولة مهنة الصيدلة في لبنان (القانون 367 لعام 1994)",
+  "question_en": "Who may open and run a pharmacy in Lebanon, and what does the pharmacy practice law (Law 367 of 1994) require?",
+  "question_ar": "من يحق له فتح صيدلية وإدارتها في لبنان وماذا يفرض قانون مزاولة مهنة الصيدلة رقم 367 لعام 1994؟",
+  "sub_questions": [
+    "Who may practise as a pharmacist in Lebanon and what are the conditions?",
+    "How is a pharmacy licensed: documents, the 300 metre distance rule, and who may own one?",
+    "What must the pharmacist do personally: manage the pharmacy, no second pharmacy, a deputy, night and holiday duty?",
+    "When can a drug be dispensed without a prescription, and what is the prescription rule for controlled substances?",
+    "Can the pharmacist replace the prescribed drug with a cheaper generic (article 47 as amended in 2020)?",
+    "What are the penalties for opening a pharmacy without a licence, selling fake or unregistered drugs, or lending one's name?"
+  ],
+  "notes": "Law 367 of 1/8/1994 (id 244369, 101 entries: a first entry holding the promulgation text, then articles 1 to 100) is in force and is the only law in the pack. Amendments recorded in the database: Law 90 of 6/3/2010 (id 225095) re-wrote art 37 (medicinal herbs; not in the pack); Law 91 of 6/3/2010 (id 225096) re-wrote arts 46 and 47 (prescription form in three copies, no change of quantities or substitution of a substance by the pharmacist); Law 117 of 26/6/2010 (id 226083) replaced art 92 (fake, smuggled, expired, unregistered drugs: prison of at least 5 years and a fine of 100 to 150 million pounds, lifetime ban on a pharmacist convicted of a felony or of pharmaceutical fraud); Law 274 of 15/4/2014 (id 236987) changed art 54 para 4 (the registration committee must decide within three months and give reasons for a refusal) and arts 55 paras 7 and 8 (teaching hospitals); Law 207 of 30/12/2020 (id 286771) amended art 47 again: the pharmacist may, 'despite any other text', dispense a generic (Generique or Brand Generic) instead of the drug named in the prescription if the substitute is on the Ministry of Health list, has the same active substances, doses, bioequivalence and form, is cheaper to the public, and the patient agrees; the pharmacist writes the drug on the receipt with the words 'substituted under article 47 new', and insurers (public and private) must accept the substitute without a new prescription. Only arts 37, 46, 47 and 92 have stored versions; the 2014 changes to arts 54 and 55 are in the amending law but only art 54 has a stored version. Law 322 of 22/12/2023 (id 329374, clinical pharmacy) adds a second chapter to Title 1 (arts 8 bis and following: the clinical pharmacist, registered with the Order and holding a specialisation); it is not folded into the stored articles, so 'article 8' here is the original article 8. Traps: the stored art 12 states the distance rule as 300 m (200 m for pharmacies that existed before Law 635 of 23/4/1997) and describes how it is measured; the database does not hold Law 635/1997 itself. Fine amounts in arts 86 to 93 are written in 1994 and 2010 pounds and have lost most of their value since 2019; the text stored is what is in force and the page must not convert it. Art 18 sends night and holiday opening to the Order of Pharmacists, which sets the weekly guard table and the hours by region. NOT in the database: the law on the Order of Pharmacists, the Ministry of Health decisions listing drugs sold without a prescription (art 43), the list of generic substitutes (art 47), the drug schedules A and B (art 48), and the narcotics law; the page must say these sit outside the pack and give the Order as the place to confirm hours and registration. The law does not set a minimum floor area or shop opening hours; art 16 only requires the pharmacist to be present throughout working hours.",
+  "pack": [
+    {
+      "law": 244369,
+      "articles": [
+        "2",
+        "3"
+      ],
+      "why": "Who may practise or use the title pharmacist: licence from the Minister of Health and the conditions (degree, baccalaureate, clean record, colloquium exam)."
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "9",
+        "10",
+        "11"
+      ],
+      "why": "Opening a pharmacy: ministerial licence, only to a Lebanese licensed pharmacist; documents, the Order's two-week advisory opinion, priority of applications; registration and lease or title deed."
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "12"
+      ],
+      "why": "Distance rule: 300 m to the nearest pharmacy, how it is measured, 200 m for older pharmacies."
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "14",
+        "19",
+        "89"
+      ],
+      "why": "Ownership: only the pharmacist owns and sells; contracts giving a non-pharmacist a share are void; companies of Lebanese pharmacists; penalty for lending one's name."
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "15",
+        "16",
+        "81"
+      ],
+      "why": "Duties of the pharmacist: one pharmacy only, runs it personally, deputy for absences, pharmacist present during opening hours, incompatible jobs."
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "18",
+        "23"
+      ],
+      "why": "Night and holiday duty rota set by the Order; heirs may run the pharmacy for up to five years."
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "27",
+        "43",
+        "48"
+      ],
+      "why": "Equipment and emergency stock; no dispensing without a prescription except for drugs set by ministerial decision; controlled substances only on prescription."
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "46",
+        "47"
+      ],
+      "why": "Prescription form in three copies, no changes by the pharmacist; generic substitution under art 47 as amended in 2010 and 2020."
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "86",
+        "91",
+        "92",
+        "93"
+      ],
+      "why": "Penalties: opening without licence, withdrawal of the licence, fake or unregistered drugs (art 92 as replaced in 2010), other breaches."
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "87"
+      ],
+      "why": "Added after the legal review"
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "88"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "8"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 244369,
+      "articles": [
+        "5"
+      ],
+      "why": "Added after the second legal review"
+    }
+  ]
+}

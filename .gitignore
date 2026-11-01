@@ -21,3 +21,10 @@ coverage/
 # The crawler's own store (manifest, blobs, logs) when UL_DATA is not set.
 scraper/data/
 .release/
+# topicgen raw model answers and reports
+/cmd/topicgen/work/
+
+# Manual data is filled on the build machine until it is published (manual/README.md).
+/manual/*
+!/manual/README.md
+workers/mcp/node_modules/

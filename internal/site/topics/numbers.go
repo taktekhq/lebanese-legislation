@@ -6,6 +6,15 @@ import (
 	"strings"
 )
 
+// Numbers pulls every number a text states: digits (Western or
+// Arabic-Indic, with thousands separators), English number words from two
+// up ("fifteen", "twenty-five", "two hundred") and Arabic number words
+// ("خمسة عشر", "ثلاثين", "سنتين"). It is what the checks compare between
+// a topic's wording and the articles it cites.
+//
+// Source text is read with every form it holds (strict=false): a phrase
+// gives its whole value and each word's own, so "خمس وعشرين" yields 25, 5
+// and 20. A topic's own wording is read strictly: a phrase gives one value.
 func Numbers(s string, strict bool) map[string]bool {
 	out := map[string]bool{}
 	s = digitsASCII.Replace(s)
@@ -15,7 +24,7 @@ func Numbers(s string, strict bool) map[string]bool {
 	for _, v := range englishNumbers(s) {
 		out[strconv.Itoa(v)] = true
 	}
-	if !strict && strings.Contains(arFold.Replace(s), "ونصف") {
+	if !strict && strings.Contains(arFold.Replace(s), "ونصف") { // "شهر ونصف": one and a half
 		for i := 0; i <= 12; i++ {
 			out[strconv.Itoa(i)+".5"] = true
 		}
@@ -40,26 +49,30 @@ func canon(d string) string {
 	return d
 }
 
+// addDigits records a digit run as printed and in the readings a reader
+// would give it: 2,250,000 and 2.250.000 are 2250000; 7.5 stays 7.5.
 func addDigits(out map[string]bool, tok string) {
 	parts := strings.FieldsFunc(tok, func(r rune) bool { return r == '.' || r == ',' })
 	if len(parts) == 1 {
 		out[canon(parts[0])] = true
 		return
 	}
-	grouped := true
+	grouped := true // 2,250,000: groups of three after the first are thousands
 	for _, p := range parts[1:] {
 		grouped = grouped && len(p) == 3
 	}
-	if !grouped {
+	if !grouped { // 10.5 mentions 10 and 5 too
 		for _, p := range parts {
 			out[canon(p)] = true
 		}
 	}
 	out[canon(strings.Join(parts, ""))] = true
 	if frac := strings.TrimRight(parts[len(parts)-1], "0"); len(parts) == 2 && frac != "" && strings.Contains(tok, ".") {
-		out[canon(parts[0])+"."+frac] = true
+		out[canon(parts[0])+"."+frac] = true // 1.500 may be one and a half; 1,500 is not
 	}
 }
+
+// ---------------------------------------------------------------- English
 
 var enUnits = map[string]int{"two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
 	"eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
@@ -68,6 +81,8 @@ var enUnits = map[string]int{"two": 2, "three": 3, "four": 4, "five": 5, "six": 
 var enScales = map[string]int{"hundred": 100, "thousand": 1000, "million": 1000000}
 var wordRun = regexp.MustCompile(`[A-Za-z]+`)
 
+// englishNumbers reads number words; a lone "one" is not a number (it is
+// "no one", "one of"), but "twenty-one" and "one hundred" are.
 func englishNumbers(s string) []int {
 	var out []int
 	toks := wordRun.FindAllString(strings.ToLower(s), -1)
@@ -91,7 +106,7 @@ func englishNumbers(s string) []int {
 					onlyOne = false
 				}
 			} else if sc, ok := enScales[w]; ok {
-				if cur == 0 && total == 0 {
+				if cur == 0 && total == 0 { // "per thousand": a scale word alone is not a number
 					break phrase
 				}
 				if cur == 0 {
@@ -130,10 +145,14 @@ func isNumWord(w string) bool {
 	return a || b
 }
 
+// ---------------------------------------------------------------- Arabic
+
 var arFold = strings.NewReplacer("أ", "ا", "إ", "ا", "آ", "ا", "ى", "ي", "ة", "ه", "ـ", "", "ً", "", "ٌ", "", "ٍ", "", "َ", "", "ُ", "", "ِ", "", "ّ", "", "ْ", "", "ٰ", "")
 
 var arWord = regexp.MustCompile(`[\p{Arabic}]+`)
 
+// Arabic number words, folded (alef forms, ta marbuta, diacritics). kind:
+// u unit, t ten, h hundred, k thousand, a "ashar" (the ten in 11 to 19).
 type arNum struct {
 	v    int
 	kind byte
@@ -171,7 +190,7 @@ var arNums = func() map[string]arNum {
 	add('k', 1000, "الاف", "آلاف")
 	add('m', 1000000, "مليون", "ملايين", "مليونا")
 	add('m', 2000000, "مليونان", "مليونين", "مليوني")
-
+	// duals of the units of time and money that stand for 2
 	add('h', 100, "مايه")
 	add('h', 200, "مايتي", "مايتين", "مايتان")
 	for pre, v := range map[string]int{"ثلاث": 3, "اربع": 4, "خمس": 5, "ست": 6, "سبع": 7, "ثمان": 8, "تسع": 9} {
@@ -179,7 +198,7 @@ var arNums = func() map[string]arNum {
 			add('h', v*100, pre+suf)
 		}
 	}
-
+	// ordinals (with "ال" stripped): "اليوم الرابع", "الحادي والثلاثين"
 	add('u', 1, "حادي", "حاديه", "اول", "اولي", "اوله")
 	add('u', 2, "ثاني", "ثانيه")
 	add('u', 3, "ثالث", "ثالثه")
@@ -202,7 +221,7 @@ func arabicNumbers(s string, strict bool) []int {
 	for i, l := range locs {
 		toks[i] = folded[l[0]:l[1]]
 	}
-
+	// a phrase runs over number words separated by spaces only
 	joined := func(i int) bool { return strings.TrimSpace(folded[locs[i-1][1]:locs[i][0]]) == "" }
 	i := 0
 	for i < len(toks) {
@@ -221,14 +240,14 @@ func arabicNumbers(s string, strict bool) []int {
 			if !ok {
 				break
 			}
-			if n.kind == 'u' && cur != 0 && cur%10 != 0 && cur < 20 {
+			if n.kind == 'u' && cur != 0 && cur%10 != 0 && cur < 20 { // two units in a row are two numbers
 				break
 			}
 			parts = append(parts, n.v)
 			switch n.kind {
 			case 'u', 't', 'd':
 				cur += n.v
-			case 'a':
+			case 'a': // ashar after a unit: a teen
 				if cur >= 1 && cur <= 9 {
 					cur += 10
 				} else {
@@ -246,11 +265,11 @@ func arabicNumbers(s string, strict bool) []int {
 				g := n.v
 				if (n.v == 1000 || n.v == 1000000) && cur > 0 && cur < 1000 {
 					g = cur * n.v
-					if !strict {
+					if !strict { // "100 million to 150 million": the 150 is read as written
 						out = append(out, cur)
 					}
 				}
-				if !strict {
+				if !strict { // "خمسين ألف وماية ألف" is two amounts, each a group
 					out = append(out, g)
 				}
 				total += g
@@ -274,8 +293,10 @@ func arabicNumbers(s string, strict bool) []int {
 	return out
 }
 
+// arLookup finds a number word, with or without the article "ال" or the
+// one-letter prefixes (و and, ب by, ل for, ف then): "بخمسين" is fifty.
 func arLookup(w string) (arNum, bool) {
-	if strings.HasPrefix(w, "بال") {
+	if strings.HasPrefix(w, "بال") { // "بالمئة" is "per cent", not a hundred
 		return arNum{}, false
 	}
 	if n, ok := arNums[w]; ok {

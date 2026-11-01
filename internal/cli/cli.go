@@ -72,3 +72,16 @@ func GuardFlags(fs *flag.FlagSet) func() provenance.Guard {
 		return g
 	}
 }
+
+// IfExists returns dir when it exists, else "" (and says so), so a manual/
+// folder that was not filled in is skipped instead of failing the run.
+func IfExists(dir string) string {
+	if dir == "" {
+		return ""
+	}
+	if _, err := os.Stat(dir); err != nil {
+		log.Printf("%s: not there, skipped", dir)
+		return ""
+	}
+	return dir
+}

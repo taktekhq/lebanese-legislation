@@ -62,3 +62,14 @@ publish with their keys.
 | `build-release` | Builds a release from a database loaded from `data/`: reuses an earlier release's vectors, embeds the rest (**key**: `GEMINI_API_KEY`, only with `-embed-missing`, capped), validates, writes `corpus.dump` and `manifest.json`. Exit 2 when vectors are still missing. |
 | `publish-release` | Uploads a built release to the Hugging Face dataset in one commit, with the `latest` pointer and the card's release block, then reads it back to check it (**key**: `HF_TOKEN`). |
 
+## The website
+
+The server itself is [`web/`](../web/README.md) (with `api/` and `mcp/`); these are its tools.
+
+| Command | What it does |
+| --- | --- |
+| `usage-stats` | Adds up one day of the anonymous usage record the web server keeps with `-events`, as JSON. |
+| `journal-sitemap` | Prints the project journal's sitemap from the posts built into the site. No database. |
+| `searchindex` | Builds the semantic search index in its own pgvector database (`GEMINI_API_KEY`). **key** |
+| `topicgen` | Writes and checks the topic pages with a model that sees only the cited articles (claude, codex or agy CLI). **key** |
+| `check-english` | Checks that English stays an unofficial aid: flagged surfaces, English titles for new texts, no Latin article bodies. |

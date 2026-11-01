@@ -1,0 +1,42 @@
+{
+  "slug": "income-tax-brackets",
+  "title_en": "Income tax rates and brackets in Lebanon",
+  "title_ar": "معدلات وشرائح ضريبة الدخل في لبنان",
+  "question_en": "What are the income tax rates and brackets on salaries and on company profits in Lebanon?",
+  "question_ar": "ما هي معدلات وشرائح ضريبة الدخل على الرواتب والأجور وعلى أرباح الشركات في لبنان؟",
+  "sub_questions": [
+    "What are the salary tax brackets and rates?",
+    "What deductions reduce taxable income (family, children)?",
+    "What tax do companies pay on profit?",
+    "What rate applies to interest, dividends and non-residents?",
+    "Which salary items are exempt?",
+    "What are the penalties for late declaration?"
+  ],
+  "notes": "The text in force is legislative decree 144 of 12/6/1959 (id 185603) as amended; all the figures live in that decree, not in law 282/1993 (id 166166), whose rates were replaced several times. The current salary brackets (art 58) and profit brackets (art 32) and deductions (arts 31, 56, 59) were last replaced by the 2024 budget law 324 of 12/2/2024 (id 330076), effective 15/2/2024 per the database history, after earlier replacement in November 2022. Amounts are in Lebanese pounds: salary tax is 2% up to 360,000,000, then 4%, 7%, 11%, 15%, 20% and 25% above 13,500,000,000 (art 58); profit tax on individuals is 4% to 25% (art 32), and capital companies (SAL, SARL, partnership-limited-by-shares limited partners) pay a flat 17%. Personal deduction is 450,000,000 plus 225,000,000 for a married taxpayer and 45,000,000 per child (art 31). Art 33 still prints a 15% municipal surcharge on profit tax, but law 282/1993 art 23 abolished municipal and reconstruction surcharges, and art 32 says no surcharge is added: flag as a conflict and do not state that the surcharge applies. Interest on bank deposits is 7% (art 69), dividends of capital companies 10% (art 72 bis), movable capital income 10% (art 72), non-resident payments 17% on a deemed base of 20% or 50% (art 42). Whether these LL figures keep real value is outside the law's text. Related articles of the income tax law that other laws touch: art 103 was rewritten by law 306/2022 (banking secrecy). The pack includes every article holding a rate, bracket or deduction amount, plus exemptions and who must file.",
+  "pack": [
+    {
+      "law": 185603,
+      "articles": [
+        "5",
+        "11",
+        "30",
+        "31",
+        "32",
+        "33",
+        "42",
+        "43",
+        "46",
+        "47",
+        "50",
+        "56",
+        "58",
+        "59",
+        "63",
+        "69",
+        "72",
+        "72 مكرر"
+      ],
+      "why": "Income tax decree 144/1959 as amended: exemptions, who files, penalties, deductions, profit and salary brackets, non-resident, interest and dividend rates, withholding"
+    }
+  ]
+}

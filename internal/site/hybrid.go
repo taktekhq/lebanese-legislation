@@ -21,6 +21,7 @@ type vectorEntry struct {
 	at   time.Time
 }
 
+// SetVectorSearch attaches the independently maintained search database.
 func (s *Server) SetVectorSearch(v vectorSearcher) { s.vector = v }
 
 func (m *meaningSearch) vectorHits(ctx context.Context, q string, v vectorSearcher) ([]semantic.Hit, error) {
@@ -95,7 +96,7 @@ func (s *Server) vectorSources(ctx context.Context, q string) ([]answerSource, e
 	canonical := map[string]semantic.Document{}
 	invalid := map[string]bool{}
 	for _, h := range hits {
-
+		// The index is a candidate finder. Only the current corpus owns the evidence.
 		key := fmt.Sprintf("%s/%d/%s/%s", h.Kind, h.ID, h.Part, h.Lang)
 		if invalid[key] {
 			continue

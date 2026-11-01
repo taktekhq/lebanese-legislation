@@ -1,5 +1,11 @@
 package site
 
+// Tests for the two interfaces: Arabic at the root  and
+// English under /en/. Every route renders with the right lang/dir, internal
+// links stay in their interface, the hreflang pair is present. Like
+// api_test.go, these skip rather than fail when the local Postgres isn't
+// reachable.
+
 import (
 	"net/http/httptest"
 	"regexp"
@@ -20,6 +26,9 @@ func getHTML(t *testing.T, s *Server, path string) (int, string, map[string]stri
 	return resp.StatusCode, rec.Body.String(), headers
 }
 
+// arPaths are representative pages across every kind of page the site
+// serves, each as the root (Arabic) path; the test requests that path and its
+// /en/ and /ar/ mirrors.
 var arPaths = []string{
 	"/", "/laws/", "/codes/", "/rulings/", "/gazette/", "/changes/", "/search/",
 	"/data/", "/ai/", "/about/", "/opinions/", "/agreements/", "/doctrine/", "/research/",
@@ -70,6 +79,7 @@ func TestArabicLawAndArticlePages(t *testing.T) {
 			t.Fatalf("law page %s: missing lang/dir", prefix)
 		}
 		assertInternalLinksAreRoot(t, body, "/en"+lawPath(lawID))
+		// a text's own page has an hreflang pair with its /en/ twin (TestLawPagesArePairs)
 
 		code, body, _ = getHTML(t, s, prefix+artPath(lawID, number))
 		if code != 200 {
@@ -89,6 +99,33 @@ func TestArabicLawAndArticlePages(t *testing.T) {
 
 var hrefRe = regexp.MustCompile(`\shref="(/[^"#]*)"`)
 
+var anchorRe = regexp.MustCompile(`<a\s[^>]*>`)
+var anchorAttrRe = regexp.MustCompile(`\s(href|lang)="([^"]*)"`)
+
+// langTaggedLinks counts, per href, the anchors that declare their content
+// language as lang. Multilingual search links an excerpt to the page holding
+// that exact text, so such a link may cross interfaces. Counting occurrences
+// keeps an untagged link to the same address an error.
+func langTaggedLinks(body, lang string) map[string]int {
+	out := map[string]int{}
+	for _, tag := range anchorRe.FindAllString(body, -1) {
+		var href, l string
+		for _, m := range anchorAttrRe.FindAllStringSubmatch(tag, -1) {
+			if m[1] == "href" {
+				href = m[2]
+			} else {
+				l = m[2]
+			}
+		}
+		if href != "" && l == lang {
+			out[href]++
+		}
+	}
+	return out
+}
+
+// neutralPath is a path shared by both interfaces by design: static files,
+// feeds, scans, the API.
 func neutralPath(p string) bool {
 	for _, pre := range []string{"/assets/", "/styles", "/legislation", "/scan/", "/ruling-files/", "/api/", "/mcp", "/ph/", "/sitemap"} {
 		if strings.HasPrefix(p, pre) {
@@ -98,15 +135,22 @@ func neutralPath(p string) bool {
 	return strings.HasSuffix(p, ".css") || strings.HasSuffix(p, ".js") || strings.HasSuffix(p, "feed.xml")
 }
 
+// assertInternalLinksAreRoot checks that every root-relative href on an Arabic
+// page is a root (Arabic) address, other than the one link to the page's
+// English version and links marked lang="en" (English content, such as a
+// search excerpt that matched English text).
 func assertInternalLinksAreRoot(t *testing.T, body, english string) {
 	t.Helper()
 	nEn := 0
+	englishContent := langTaggedLinks(body, "en")
 	for _, m := range hrefRe.FindAllStringSubmatch(body, -1) {
 		p := m[1]
 		switch {
 		case neutralPath(p):
 		case p == english:
 			nEn++
+		case strings.HasPrefix(p, "/en/") && englishContent[p] > 0:
+			englishContent[p]--
 		case strings.HasPrefix(p, "/ar/") || strings.HasPrefix(p, "/en/"):
 			t.Errorf("internal link %q on an Arabic page is not a root address", p)
 		}
@@ -116,10 +160,19 @@ func assertInternalLinksAreRoot(t *testing.T, body, english string) {
 	}
 }
 
+// assertInternalLinksUnderEn checks that every root-relative href on an
+// English page stays under /en (the pages have no other way to be reached),
+// except links marked lang="ar" to a root address (Arabic content).
 func assertInternalLinksUnderEn(t *testing.T, body string) {
 	t.Helper()
+	arabic := langTaggedLinks(body, "ar")
 	for _, m := range hrefRe.FindAllStringSubmatch(body, -1) {
-		if p := m[1]; !neutralPath(p) && !strings.HasPrefix(p, "/en/") && p != "/en" {
+		p := m[1]
+		if !strings.HasPrefix(p, "/ar/") && arabic[p] > 0 {
+			arabic[p]--
+			continue
+		}
+		if !neutralPath(p) && !strings.HasPrefix(p, "/en/") && p != "/en" {
 			t.Errorf("internal link %q on an English page does not stay under /en", p)
 		}
 	}
@@ -192,5 +245,15 @@ func TestArabicSitemapURLsAreRoot(t *testing.T) {
 	}
 	if strings.Contains(body, "/ar/") || strings.Contains(body, "/en/") {
 		t.Errorf("ar-laws-1.xml lists a prefixed address")
+	}
+}
+
+func TestLangTaggedLinksCountOnlyTaggedAnchors(t *testing.T) {
+	body := `<a class="docrow" href="/en/topic/x/" lang="en" dir="auto">x</a><a href="/en/topic/x/">x</a><a lang="ar" href="/topic/y/">y</a>`
+	if got := langTaggedLinks(body, "en"); got["/en/topic/x/"] != 1 || len(got) != 1 {
+		t.Errorf("lang=en links: %v, want only /en/topic/x/ once", got)
+	}
+	if got := langTaggedLinks(body, "ar"); got["/topic/y/"] != 1 || len(got) != 1 {
+		t.Errorf("lang=ar links: %v, want only /topic/y/ once", got)
 	}
 }

@@ -1,0 +1,85 @@
+{
+  "slug": "traffic-fines",
+  "title_en": "Traffic fines and the points system in Lebanon",
+  "title_ar": "مخالفات السير والغرامات ونظام النقاط في لبنان",
+  "question_en": "How much is a traffic fine in Lebanon, how are violations classified, and when do points or the driving licence get taken away?",
+  "question_ar": "كم تبلغ غرامة مخالفة السير في لبنان، وكيف تصنّف المخالفات، ومتى تُسحب النقاط أو رخصة السوق؟",
+  "sub_questions": [
+    "How are traffic violations classified into categories and what fine does each category carry?",
+    "How long do I have to pay a ticket at the reduced amount, and what happens if I do not?",
+    "How many points does a driver have and when is the licence taken away?",
+    "When are points given back to a driver?",
+    "What are the penalties for causing a death or injury while driving, or leaving the scene?",
+    "Can I contest a ticket in court?"
+  ],
+  "notes": "LAW IN FORCE: Traffic Law 243 of 22/10/2012 (the new traffic law), law id 246455. TRAP: search engines and AI answers send readers to 'Art. 154 of the traffic law' for fines. Verified: Art. 154 is about vehicle registration plates (details of plates, letters, colours; amended by law 61/2016 and budget laws) and Art. 154-1 is about fees for distinguished plate numbers. Neither holds a fine. The fines are set by Art. 374 (six categories with minimum and maximum amounts), Art. 377 (reduced ticket amounts if paid within 30 days) and in the violation TABLES annexed to the law (pedestrians, tables 1 to 5), which say which violation falls in which category and how many points it costs. MISSING: the annexed tables themselves are NOT in the database text, so a writer must not state which fine a specific violation (speeding, phone, seat belt, red light) carries beyond what Art. 374/375/17/24 say; say the table decides. Art. 17 (bans, incl. alcohol, phone) and Art. 24 (speed limits) define the conduct but give no amount. Amounts in Art. 374 and 377 are in Lebanese pounds as enacted in 2012 (e.g. category 1: 100,000 to 150,000 LL; reduced ticket 50,000 LL); the database holds no enacted amendment raising traffic fines in 2024 or 2025 (no amending law found; the only 2024-2025 texts touching traffic are customs and licence-extension decisions). Do not state any 2024-2025 increase. Say amounts are the face values in the law and may have been adjusted by practice or later texts not in the database. Points: 12 points (Art. 365); losing all points means the licence is withdrawn for 6 months with a course, repeat within 3 years means 1 year plus a retest. Points return after 2 years without a point-deducting violation, 3 points after 1 year (Art. 367). Max 8 points deducted for several simultaneous violations unless all points are lost (Art. 368). Art. 381: no mitigating circumstances (Penal Code Art. 254) on fines. Art. 382: a fine cannot be reduced below the category minimum on objection. Art. 154 is about 3,500 characters; it is only there to show the trap and can be quoted briefly.",
+  "pack": [
+    {
+      "law": 246455,
+      "articles": [
+        "374",
+        "375",
+        "376",
+        "377",
+        "398",
+        "399"
+      ],
+      "why": "Violation categories and fine ranges (Art. 374), unlisted violations default to category 1, ticket procedure, reduced amounts within 30 days, effect of payment"
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "364",
+        "365",
+        "366",
+        "367",
+        "368"
+      ],
+      "why": "Points system: 12 points, licence withdrawal, surrender, restoration of points, cap on points removed"
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "373",
+        "380",
+        "381",
+        "382",
+        "400"
+      ],
+      "why": "Repeat offences doubled, no mitigating circumstances, fine floor on objection, administrative licence withdrawal for 24 hours"
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "344",
+        "345",
+        "346",
+        "347"
+      ],
+      "why": "Criminal penalties: leaving the scene, death or injury by a driver, aggravating factors, licence cancellation"
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "383",
+        "385"
+      ],
+      "why": "Fixed fines and points for taximeter fraud and radar detectors"
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "17",
+        "24"
+      ],
+      "why": "The conduct itself: alcohol limits, phone use while driving, speed limits (no amounts here, amounts come from the tables)"
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "154"
+      ],
+      "why": "Included only to show the trap: Art. 154 is about registration plates, not fines"
+    }
+  ]
+}

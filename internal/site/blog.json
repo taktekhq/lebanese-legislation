@@ -1,0 +1,2607 @@
+[
+  {
+    "Slug": "public-website-source-and-demo",
+    "Milestone": "2026-10-30",
+    "Published": "2026-10-30",
+    "Commit": "6929aa95ace5",
+    "EvidenceKind": "public-commit",
+    "Title": "Build the website from public source",
+    "TitleAr": "شغّل الموقع من الشيفرة العامة",
+    "Summary": "The website source and a synthetic fixture are public. Developers can inspect the Arabic and English interface, test keyword search, and follow the separate service distribution.",
+    "SummaryAr": "أصبحت شيفرة الموقع ومثال ببيانات اصطناعية متاحَين علناً. يستطيع المطوّرون فحص الواجهة العربية والإنكليزية وتجربة البحث بالكلمات ومراجعة توزيع الخدمات المنفصل.",
+    "Sections": [
+      {
+        "Heading": "Website source published on 30 October",
+        "Body": "The public lebanese-legislation repository contains the Go website behind Lebanese Legislation, including Arabic and English pages. Developers can inspect its browsing and keyword-search code, build it locally and connect it to a compatible PostgreSQL database. The repository documents the required Go version and environment variables."
+      },
+      {
+        "Heading": "Try one fictional law first",
+        "Body": "A synthetic fixture contains one fictional law and article. Its documented example lets developers open a law page and call the search API without treating demonstration text as Lebanese law. This makes the interface and request format easier to inspect before connecting a real database."
+      },
+      {
+        "Heading": "Follow the canonical service repository",
+        "Body": "The current README directs database, general API and MCP image users to the separate starter repository. The MCP target wraps its matching API image and exposes MCP and health routes. Provider-backed meaning search is disabled in the standalone website build. Do not assume every hosted capability is present locally."
+      },
+      {
+        "Heading": "Review the source and reuse terms",
+        "Body": "MIT covers the public code. Source documents keep their own rights and attribution. The website can be built into an image locally; current documentation says its website image is not published, while earlier tags remain available. Start with the source instructions and the synthetic fixture."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "نشر شيفرة الموقع في 30 تشرين الأول",
+        "Body": "يضم مستودع lebanese-legislation العام شيفرة موقع Lebanese Legislation المكتوبة بلغة Go، بما فيها الصفحات العربية والإنكليزية. يستطيع المطوّرون فحص شيفرة التصفّح والبحث بالكلمات، وبناء الموقع محلياً وربطه بقاعدة PostgreSQL متوافقة. وتوضح الوثائق إصدار Go المطلوب ومتغيّرات البيئة اللازمة لتشغيله."
+      },
+      {
+        "Heading": "ابدأ بقانون افتراضي واحد",
+        "Body": "يتضمّن المثال الاصطناعي قانوناً افتراضياً ومادة واحدة. تتيح خطواته الموثّقة فتح صفحة قانون واستدعاء واجهة البحث من دون التعامل مع نص العرض على أنه قانون لبناني. يساعد ذلك على فحص الواجهة وصيغة الطلب قبل ربط الموقع بقاعدة بيانات فعلية ومراجعة النتائج التي تعيدها."
+      },
+      {
+        "Heading": "راجع مستودع الخدمات المعتمد",
+        "Body": "توجّه الوثائق الحالية مستخدمي صور قاعدة البيانات وواجهة البرمجة العامة وخادم MCP إلى مستودع الإعداد المنفصل. يغلّف هدف MCP صورة API المطابقة ويعرض مسارات MCP وفحص الحالة. البحث بالمعنى المعتمد على مزوّد خارجي معطّل في بناء الموقع المستقل. لذلك ينبغي مراجعة الإمكانات المتاحة محلياً قبل استخدامها."
+      },
+      {
+        "Heading": "راجع الشيفرة وشروط إعادة الاستخدام",
+        "Body": "يشمل ترخيص MIT الشيفرة العامة. وتحتفظ الوثائق المصدرية بحقوقها ومتطلبات نسبها. يمكن بناء صورة للموقع محلياً، وتذكر الوثائق الحالية أن صورة الموقع لا تُنشر ضمن المسار الحالي، مع بقاء الوسوم السابقة متاحة. ابدأ بتعليمات المستودع والمثال الاصطناعي لفهم ما ستشغّله وكيفية إيقافه."
+      }
+    ],
+    "Action": "Read the developer documentation",
+    "ActionPath": "/developers/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation",
+        "Label": "Public website source and current README on GitHub",
+        "LabelAr": "شيفرة الموقع العامة والوثائق الحالية على GitHub"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/commit/6929aa95ace5",
+        "Label": "Initial public source commit on GitHub",
+        "LabelAr": "التغيير الأول للشيفرة العامة على GitHub"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation",
+        "Label": "Public code and services on GitHub",
+        "LabelAr": "التوزيع المعتمد للخدمات على GitHub"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation",
+    "ResourceLabel": "View the website source on GitHub",
+    "ResourceLabelAr": "افتح شيفرة الموقع على GitHub",
+    "Updated": "2026-10-31"
+  },
+  {
+    "Slug": "court-scans-source-dataset",
+    "Milestone": "2026-10-30",
+    "Published": "2026-10-30",
+    "Commit": "e72810cf5df1712c87d05248909f9249d5ae8c5d",
+    "EvidenceKind": "public-commit",
+    "Title": "Original court scans are available for document research",
+    "TitleAr": "المسوح الأصلية للأحكام متاحة لأبحاث الوثائق",
+    "Summary": "The court-scan release contains 44,766 PDFs and indexes for 274,936 pages. It preserves source links and hashes, with separate rights and privacy guidance.",
+    "SummaryAr": "يضم إصدار مسوح الأحكام 44,766 ملف PDF وفهارس لـ274,936 صفحة. ويحفظ روابط المصادر والبصمات الرقمية، مع إرشادات مستقلة للحقوق والخصوصية.",
+    "Sections": [
+      {
+        "Heading": "A separate release of source scans",
+        "Body": "Lebanese Court Scans was released on Hugging Face on 30 October 2026. Its dataset card records 44,766 original court-decision PDFs and 274,936 pages. This is a separate publication from the structured legal tables. It gives document researchers access to the scanned material behind court records."
+      },
+      {
+        "Heading": "Indexes preserve a route back to the PDF",
+        "Body": "The documents and pages Parquet configurations load indexes, rather than every PDF. Records retain source links, ruling identifiers, hashes and available fetch dates. The schema explains how to download and verify an individual file. The release is a static snapshot, without a fixed update schedule or a claim to contain every Lebanese judgment."
+      },
+      {
+        "Heading": "Unlabelled material needs careful interpretation",
+        "Body": "The archive mixes handwriting, typewriting, print, stamps and signatures. It has no transcription labels or trained model weights. OCR scores are triage hints. Neither a handwriting-only benchmark nor reviewed reference transcriptions should be inferred from this release."
+      },
+      {
+        "Heading": "Read the rights guidance before reuse",
+        "Body": "The scans are not anonymised and may contain sensitive case details. Their source is the Lebanese University Centre for Research and Studies in Legal Informatics. Retain attribution and source links. The dataset licence is other; MIT applies only to its code. Read RIGHTS.md before choosing a downstream use."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "إصدار مستقل للمسوح الأصلية",
+        "Body": "نُشرت مجموعة Lebanese Court Scans على Hugging Face في 30 تشرين الأول 2026. تسجّل بطاقتها 44,766 ملف PDF أصلياً لقرارات قضائية و274,936 صفحة. وهي منشور منفصل عن الجداول القانونية المنظّمة. تتيح للباحثين في الوثائق الوصول إلى المادة المصوّرة التي تستند إليها السجلات القضائية."
+      },
+      {
+        "Heading": "فهارس تقود إلى ملف PDF الأصلي",
+        "Body": "يحمّل إعدادا Parquet المسمّيان documents وpages الفهارس، لا جميع ملفات PDF. تحفظ السجلات روابط المصادر ومعرّفات الأحكام والبصمات الرقمية وتواريخ الجلب المتاحة. وتشرح وثيقة البنية كيفية تنزيل ملف محدّد والتحقّق منه. الإصدار لقطة ثابتة بلا جدول تحديث محدّد أو ادعاء بأنه يضم كل الأحكام اللبنانية."
+      },
+      {
+        "Heading": "مواد بلا تسميات تحتاج إلى قراءة دقيقة",
+        "Body": "يجمع الأرشيف بين الخط اليدوي والنص المكتوب بالآلة والطباعة والأختام والتواقيع. ولا يتضمّن تسميات نسخ نصّي أو أوزان نموذج مدرّب. درجات OCR مؤشّرات للفرز الأولي. ولا يعني نشر هذه المواد أنها معيار تقييم مخصّص للخط اليدوي أو أنها تضم نصوصاً مرجعية خضعت للمراجعة."
+      },
+      {
+        "Heading": "اقرأ إرشادات الحقوق قبل إعادة الاستخدام",
+        "Body": "الوثائق غير مجهّلة وقد تتضمّن تفاصيل قضائية حسّاسة. مصدرها مركز الأبحاث والدراسات في المعلوماتية القانونية في الجامعة اللبنانية. احتفظ بنسبة المصدر وروابطه. ترخيص المجموعة هو other، فيما يقتصر MIT على الشيفرة. راجع RIGHTS.md لتحديد الحقوق والقيود المناسبة لاستخدامك المقصود قبل إعادة النشر أو المعالجة."
+      }
+    ],
+    "Action": "Read the source and reuse policy",
+    "ActionPath": "/about/",
+    "Sources": [
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-court-scans",
+        "Label": "Court-scan dataset and publication card",
+        "LabelAr": "مجموعة مسوح الأحكام وبطاقة النشر"
+      },
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-court-scans/commit/e72810cf5df1712c87d05248909f9249d5ae8c5d",
+        "Label": "Scan and index publication commit",
+        "LabelAr": "تغيير نشر المسوح والفهارس"
+      },
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-court-scans/blob/main/RIGHTS.md",
+        "Label": "Source rights and privacy guidance",
+        "LabelAr": "إرشادات حقوق المصادر والخصوصية"
+      }
+    ],
+    "ResourceURL": "https://huggingface.co/datasets/taktekhq/lebanese-court-scans",
+    "ResourceLabel": "Open the court-scan dataset on Hugging Face",
+    "ResourceLabelAr": "افتح مجموعة مسح الأحكام على Hugging Face",
+    "Updated": "2026-10-31"
+  },
+  {
+    "Slug": "browser-court-transcription-drafts",
+    "Milestone": "2026-10-30",
+    "Published": "2026-10-30",
+    "Commit": "fd8898cff6d572a421c40700c01414cf779eaeef",
+    "EvidenceKind": "public-commit",
+    "Title": "Draft a court-page transcription in your browser",
+    "TitleAr": "اكتب مسودة نسخ لصفحة حكم في متصفّحك",
+    "Summary": "A public handwriting demo pairs three original scan pages with a local editor. Downloads remain unreviewed drafts and nothing is automatically submitted.",
+    "SummaryAr": "يجمع عرض عام للخط اليدوي ثلاث صفحات أصلية من الأحكام مع محرّر محلي. تبقى التنزيلات مسودات غير مراجعة، ولا يُرسل أي نص تلقائياً.",
+    "Sections": [
+      {
+        "Heading": "Three source pages and an editor",
+        "Body": "The Lebanese Legal Handwriting Space was published on Hugging Face on 30 October 2026. It presents three original court-scan previews beside an Arabic text editor. Visitors can select a page, copy what they can read and mark uncertain or illegible passages. No signup or API key is required."
+      },
+      {
+        "Heading": "Drafts stay in the browser",
+        "Body": "The published demo uses local scripts and images. Its documentation states that there is no submission endpoint or analytics. Browser storage keeps a separate draft for each ruling and physical PDF page. Storage is not a backup; visitors choose when to download their JSON file."
+      },
+      {
+        "Heading": "Export records the draft status",
+        "Body": "An export retains the ruling identifier, physical page number, original PDF hash, draft text and self-reported origin. It explicitly records that the text is unreviewed and unsubmitted, with no agreed annotation licence. A machine-assisted origin label does not establish independent human review. This demo does not complete Dactelo’s acceptance process."
+      },
+      {
+        "Heading": "Inspect the page and its source",
+        "Body": "These are mixed court records, with handwriting and print, rather than anonymised samples or reference transcriptions. MIT covers the demo code, not the scan rights. Use the original PDF link and read the dataset rights and contribution guidance before sharing a draft."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ثلاث صفحات مصدرية ومحرّر",
+        "Body": "نُشر فضاء Lebanese Legal Handwriting على Hugging Face في 30 تشرين الأول 2026. يعرض معاينات لثلاث صفحات أصلية من أحكام قضائية إلى جانب محرّر للنص العربي. يستطيع الزائر اختيار صفحة ونسخ ما يقرأه وتحديد المقاطع غير المقروءة أو غير المؤكدة. ولا يتطلب العرض إنشاء حساب أو مفتاح API."
+      },
+      {
+        "Heading": "المسودات تبقى في المتصفّح",
+        "Body": "يستخدم العرض المنشور ملفات برمجية وصوراً محلية. وتذكر وثائقه أنه لا يحتوي على نقطة إرسال أو أدوات تحليلات. يحتفظ تخزين المتصفّح بمسودة مستقلة لكل حكم وصفحة فعلية من ملف PDF. هذا التخزين ليس نسخة احتياطية. يختار الزائر بنفسه متى ينزّل ملف JSON لحفظ عمله."
+      },
+      {
+        "Heading": "التصدير يسجّل حالة المسودة",
+        "Body": "يحفظ الملف المصدّر معرّف الحكم ورقم الصفحة الفعلية وبصمة ملف PDF الأصلي ونص المسودة ومصدرها كما يصفه الكاتب. ويسجّل صراحة أن النص غير مراجَع وغير مرسَل، وبلا ترخيص متّفق عليه للتعليقات النصية. اختيار مساعدة آلية لا يثبت مراجعة بشرية مستقلة. ولا يُكمل هذا العرض مسار القبول في Dactelo."
+      },
+      {
+        "Heading": "راجع الصفحة ومصدرها",
+        "Body": "هذه سجلات قضائية تجمع الخط اليدوي والطباعة، وليست عيّنات مجهّلة أو نصوصاً مرجعية. يقتصر ترخيص MIT على شيفرة العرض، ولا يشمل حقوق المسوح. استخدم رابط ملف PDF الأصلي واقرأ إرشادات الحقوق والمساهمة في مجموعة البيانات قبل مشاركة مسودة أو اعتماد قراءة للنص."
+      }
+    ],
+    "Action": "Explore the source material",
+    "ActionPath": "/about/",
+    "Sources": [
+      {
+        "URL": "https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting",
+        "Label": "Public browser transcription demo",
+        "LabelAr": "عرض النسخ النصّي العام في المتصفّح"
+      },
+      {
+        "URL": "https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting/blob/main/README.md",
+        "Label": "Local storage, export and review boundaries",
+        "LabelAr": "التخزين المحلي وحدود التصدير والمراجعة"
+      },
+      {
+        "URL": "https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting/commit/fd8898cff6d572a421c40700c01414cf779eaeef",
+        "Label": "Demo publication commit",
+        "LabelAr": "تغيير نشر العرض"
+      }
+    ],
+    "ResourceURL": "https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting",
+    "ResourceLabel": "Open the handwriting demo on Hugging Face",
+    "ResourceLabelAr": "افتح تجربة قراءة المخطوطات على Hugging Face",
+    "Updated": "2026-10-31"
+  },
+  {
+    "Slug": "hugging-face-resource-collection",
+    "Milestone": "2026-10-30",
+    "Published": "2026-10-30",
+    "Commit": "",
+    "EvidenceKind": "publication-record",
+    "Title": "One collection links the public datasets and tools",
+    "TitleAr": "مجموعة واحدة تربط البيانات والأدوات العامة",
+    "Summary": "The Hugging Face collection brings structured legal data, court scans and the browser transcription demo into one public resource list.",
+    "SummaryAr": "تجمع مجموعة Hugging Face البيانات القانونية المنظّمة ومسوح الأحكام وعرض النسخ النصّي في المتصفّح ضمن قائمة موارد عامة واحدة.",
+    "Sections": [
+      {
+        "Heading": "A shared starting point for public resources",
+        "Body": "The Lebanese Legislation collection on Hugging Face links the project’s structured dataset, court-scan dataset and browser handwriting demo. Its public record shows an update on 30 October 2026. The collection offers one destination for readers deciding which type of material fits their work."
+      },
+      {
+        "Heading": "Choose tables, scans or a local draft",
+        "Body": "The structured dataset contains legal records and relationships. The scan dataset provides original court PDFs with document and page indexes. The demo lets visitors write a local transcription draft for three selected pages. These resources serve different tasks; a table row is not necessarily a distinct law, and an original scan is not a reviewed transcription."
+      },
+      {
+        "Heading": "Follow the code and service links",
+        "Body": "Collection notes also point to the public website source, the PostgreSQL and pgvector starter, and hosted API documentation. These links help developers move from an overview to setup instructions. Availability of a collection link does not establish that a full database snapshot has been released or restored."
+      },
+      {
+        "Heading": "Check each resource before reuse",
+        "Body": "Each destination keeps its own documentation and limits. Read dataset cards, source attribution and rights information. The browser demo exports unreviewed drafts, and source scans are not anonymised. The collection is a resource guide, not an endorsement by the source institution or a single licence covering every item."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "نقطة بداية مشتركة للموارد العامة",
+        "Body": "تربط مجموعة Lebanese Legislation على Hugging Face بين البيانات المنظّمة ومجموعة مسوح الأحكام وعرض الخط اليدوي في المتصفّح. يُظهر سجلّها العام تحديثاً في 30 تشرين الأول 2026. وهي وجهة واحدة للقراء الذين يريدون تحديد نوع المادة المناسب لعملهم قبل فتح ملفات أو إعداد خدمات."
+      },
+      {
+        "Heading": "اختر الجداول أو المسوح أو المسودة المحلية",
+        "Body": "تضم مجموعة البيانات المنظّمة سجلات قانونية والعلاقات بينها. وتوفّر مجموعة المسوح ملفات PDF أصلية للأحكام مع فهارس للوثائق والصفحات. أما العرض فيتيح كتابة مسودة نسخ محلية لثلاث صفحات مختارة. لكل مورد غرض مختلف. صف الجدول ليس بالضرورة قانوناً مستقلاً، والمسح الأصلي ليس نصاً خضع للمراجعة."
+      },
+      {
+        "Heading": "اتبع روابط الشيفرة والخدمات",
+        "Body": "تشير ملاحظات المجموعة أيضاً إلى شيفرة الموقع العامة ومستودع إعداد PostgreSQL وpgvector ووثائق واجهة البرمجة المستضافة. تساعد هذه الروابط المطوّر على الانتقال من عرض الموارد إلى تعليمات الإعداد. لا يثبت وجود رابط في المجموعة صدور لقطة كاملة لقاعدة البيانات أو نجاح استعادتها وتشغيلها."
+      },
+      {
+        "Heading": "راجع كل مورد قبل إعادة استخدامه",
+        "Body": "يحتفظ كل مقصد بوثائقه وحدوده الخاصة. اقرأ بطاقات البيانات ونسبة المصادر ومعلومات الحقوق. يصدّر عرض المتصفّح مسودات غير مراجعة، والمسوح المصدرية غير مجهّلة. المجموعة دليل للموارد، ولا تعني تأييد المؤسسة المصدرية أو وجود ترخيص واحد يشمل كل عنصر أو كل استخدام محتمل له."
+      }
+    ],
+    "Action": "Read the developer documentation",
+    "ActionPath": "/developers/",
+    "Sources": [
+      {
+        "URL": "https://huggingface.co/collections/taktekhq/lebanese-legislation",
+        "Label": "Public resource collection",
+        "LabelAr": "مجموعة الموارد العامة"
+      },
+      {
+        "URL": "https://huggingface.co/api/collections/taktekhq/lebanese-legislation",
+        "Label": "Collection record and update timestamp",
+        "LabelAr": "سجل المجموعة وتاريخ تحديثها"
+      }
+    ],
+    "ResourceURL": "https://huggingface.co/collections/taktekhq/lebanese-legislation",
+    "ResourceLabel": "Browse the Hugging Face collection",
+    "ResourceLabelAr": "تصفّح المجموعة على Hugging Face",
+    "Updated": "2026-10-31"
+  },
+  {
+    "Slug": "service-images-release",
+    "Milestone": "2026-10-30",
+    "Published": "2026-10-30",
+    "Commit": "5fad3970f0ee",
+    "Title": "Database, API and MCP service images are public",
+    "TitleAr": "صور خدمات قاعدة البيانات وAPI وMCP متاحة علناً",
+    "Summary": "Version 0.1.4 service images are publicly available for Linux AMD64 and ARM64. The first database release manifest remains pending. This update explains what researchers and developers can use today.",
+    "SummaryAr": "أصبحت صور حاويات الخدمات بالإصدار 0.1.4 متاحة علناً لنظام Linux بمعماريتَي AMD64 وARM64. لا يزال ملف بيان الإصدار الأول لقاعدة البيانات قيد الانتظار. يوضح هذا التحديث ما يمكن للباحثين والمطوّرين استخدامه اليوم.",
+    "Sections": [
+      {
+        "Heading": "Service images published on 30 October 2026",
+        "Body": "Lebanese Legislation has published version 0.1.4 container images for a PostgreSQL database, an HTTP API and an MCP server. Each image is available from the public GitHub Container Registry for Linux AMD64 and ARM64. The public starter repository documents their configuration and deployment."
+      },
+      {
+        "Heading": "Database startup still depends on a release manifest",
+        "Body": "At the public availability check on 30 October 2026, the expected releases/latest.json file in the structured dataset returned HTTP 404. The starter documentation also states that the first database manifest is pending. Default startup requires that manifest. Prepared local snapshots are a documented alternative. Publication of the images does not establish that a complete public copy of the legal database has been restored and validated."
+      },
+      {
+        "Heading": "Preserve sources and document rights",
+        "Body": "The public service code is MIT licensed. Source documents retain their own rights; the code license does not grant rights to every document. Read the dataset card and rights information before reuse. Keep document titles, source links and machine-reading confidence fields with the records. A retrieved passage or generated summary does not establish a legal interpretation. Check the original publication and relevant amendments before relying on a result."
+      },
+      {
+        "Heading": "Read the release documentation",
+        "Body": "The sources link to the public starter, the structured dataset and the hosted API and MCP documentation. They describe separate routes to legal material. Consult the starter for the current database release status before planning a local deployment. This article records the service-image release on 30 October 2026."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "نشر صور الخدمات في 30 تشرين الأول 2026",
+        "Body": "نشرت Lebanese Legislation صور حاويات بالإصدار 0.1.4 لقاعدة بيانات PostgreSQL وواجهة HTTP API وخادم MCP. تتوفّر كل صورة علناً في سجل حاويات GitHub لنظام Linux بمعماريتَي AMD64 وARM64. يشرح مستودع الإعداد العام كيفية ضبط الخدمات ونشرها."
+      },
+      {
+        "Heading": "تشغيل قاعدة البيانات لا يزال يتطلب ملف بيان الإصدار",
+        "Body": "عند فحص التوفّر العام في 30 تشرين الأول 2026، أعاد المسار المتوقع releases/latest.json في مجموعة البيانات المنظّمة استجابة HTTP 404. وتذكر وثائق الإعداد أيضاً أن ملف بيان الإصدار الأول لقاعدة البيانات قيد الانتظار. يتطلب التشغيل الافتراضي هذا الملف. وتوثّق الإرشادات استخدام لقطات محلية مُعدّة مسبقاً كخيار بديل. لا يثبت نشر الصور استعادة نسخة عامة كاملة من قاعدة البيانات القانونية والتحقّق منها."
+      },
+      {
+        "Heading": "احفظ المراجع وراعِ حقوق الوثائق",
+        "Body": "شيفرة الخدمات العامة منشورة بترخيص MIT. تحتفظ الوثائق المصدرية بحقوقها الخاصة، ولا يمنح ترخيص الشيفرة حقوقاً لكل وثيقة. اقرأ بطاقة مجموعة البيانات ومعلومات الحقوق قبل إعادة الاستخدام. احتفظ بعناوين الوثائق وروابط مصادرها وحقول الثقة في القراءة الآلية مع السجلات. لا يثبت استرجاع مقطع أو توليد ملخّص صحة تفسير قانوني. راجع النشر الأصلي والتعديلات ذات الصلة قبل الاعتماد على النتيجة."
+      },
+      {
+        "Heading": "راجع وثائق الإصدار",
+        "Body": "تقود المصادر إلى مستودع الإعداد العام ومجموعة البيانات المنظّمة ووثائق واجهة البرمجة وخادم MCP المستضافَين. تصف طرقاً منفصلة للوصول إلى المادة القانونية. راجع المستودع لمعرفة وضع إصدار قاعدة البيانات الحالي قبل التخطيط لتشغيل محلي. تسجّل هذه المقالة إصدار صور الخدمات في 30 تشرين الأول 2026."
+      }
+    ],
+    "Action": "Use the API and MCP",
+    "ActionPath": "/ai/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation",
+        "Label": "Public code and release status on GitHub",
+        "LabelAr": "المستودع العام ووضع الإصدار على GitHub"
+      },
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+        "Label": "Public dataset and dataset card",
+        "LabelAr": "مجموعة البيانات العامة وبطاقتها"
+      },
+      {
+        "URL": "/ai/",
+        "Label": "Hosted API and MCP documentation",
+        "LabelAr": "وثائق واجهة البرمجة وخادم MCP"
+      },
+      {
+        "URL": "https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db",
+        "Label": "Database image on GitHub Container Registry",
+        "LabelAr": "صورة قاعدة البيانات على GitHub Container Registry"
+      },
+      {
+        "URL": "https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-api",
+        "Label": "API image on GitHub Container Registry",
+        "LabelAr": "صورة API على GitHub Container Registry"
+      },
+      {
+        "URL": "https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-mcp",
+        "Label": "MCP image on GitHub Container Registry",
+        "LabelAr": "صورة MCP على GitHub Container Registry"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/reference.md",
+        "Label": "Local setup and restore reference on GitHub",
+        "LabelAr": "مرجع الإعداد المحلي والاستعادة على GitHub"
+      },
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases",
+        "Label": "PostgreSQL snapshot releases on Hugging Face, with manifests and checksums",
+        "LabelAr": "إصدارات لقطة PostgreSQL على Hugging Face، مع البيانات والبصمات"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation",
+    "ResourceLabel": "Run the public services from GitHub",
+    "ResourceLabelAr": "شغّل الخدمات العامة من GitHub",
+    "Updated": "2026-10-31"
+  },
+  {
+    "Slug": "open-source-local-service-starter",
+    "Milestone": "2026-10-30",
+    "Published": "2026-10-30",
+    "Commit": "04b885e",
+    "Title": "An open-source starter for local legal services",
+    "TitleAr": "مشروع مفتوح المصدر لتشغيل الخدمات القانونية محلياً",
+    "Summary": "A public MIT-licensed starter documents a local database, API and MCP setup with configurable services.",
+    "SummaryAr": "يوثّق مشروع عام بترخيص MIT إعداد قاعدة بيانات وواجهة API وخادم MCP محلياً بخدمات قابلة للضبط.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "The public service starter makes the local deployment route inspectable."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "It includes source code, configuration examples and documentation for a PostgreSQL database, HTTP API and MCP server. Developers can study how the services fit together and adapt the configuration to their own environment."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Read the setup guide before starting the stack. The database workflow expects a published release manifest or a prepared local snapshot. At the 30 October availability check, the first public restore manifest remained pending, so a default fresh download could not be represented as a validated end-to-end installation."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "The service code is MIT licensed. The documents and dataset have their own source and rights information, which remains relevant when copying or redistributing legal records. This milestone concerns the public source and deployment instructions. The container images, their architectures and release status are described in a separate article."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "يجعل مشروع إعداد الخدمات العام طريقة التشغيل المحلي قابلة للفحص."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "فهو يتضمن الشيفرة وأمثلة الضبط ووثائق قاعدة بيانات PostgreSQL وواجهة HTTP API وخادم MCP. ويمكن للمطوّر دراسة العلاقة بين الخدمات وتكييف الإعدادات مع بيئته، بدلاً من الاعتماد على خدمة مستضافة من دون معرفة طريقة تركيب هذه المكوّنات محلياً."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "اقرأ دليل الإعداد قبل تشغيل المجموعة. يتوقّع مسار قاعدة البيانات ملف بيان إصدار منشوراً أو لقطة محلية مجهّزة. عند فحص التوفّر في 30 تشرين الأول، كان بيان الاستعادة العام الأول لا يزال قيد الانتظار. لذلك لا يمكن وصف تنزيل افتراضي جديد بأنه تثبيت مكتمل جرى التحقق منه من البداية إلى النهاية."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "شيفرة الخدمات مرخّصة بترخيص MIT. وللوثائق ومجموعة البيانات معلومات مصادر وحقوق مستقلة تظل مهمة عند النسخ أو إعادة النشر. يتناول هذا الإنجاز الشيفرة العامة وتعليمات التشغيل، بينما تعرض مقالة منفصلة صور الحاويات ومعمارياتها ووضع إصدارها."
+      }
+    ],
+    "Action": "Read deployment documentation",
+    "ActionPath": "/ai/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation",
+        "Label": "Public code and release status on GitHub",
+        "LabelAr": "المستودع العام ووضع الإصدار على GitHub"
+      },
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+        "Label": "Public dataset and dataset card",
+        "LabelAr": "مجموعة البيانات العامة وبطاقتها"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/reference.md",
+        "Label": "Local setup and restore reference on GitHub",
+        "LabelAr": "مرجع الإعداد المحلي والاستعادة على GitHub"
+      },
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases",
+        "Label": "PostgreSQL snapshot releases on Hugging Face, with manifests and checksums",
+        "LabelAr": "إصدارات لقطة PostgreSQL على Hugging Face، مع البيانات والبصمات"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation",
+    "ResourceLabel": "Open the source and setup on GitHub",
+    "ResourceLabelAr": "افتح الشيفرة ودليل الإعداد على GitHub",
+    "Updated": "2026-10-31"
+  },
+  {
+    "Slug": "semantic-retrieval-with-source-checks",
+    "Milestone": "2026-10-29",
+    "Published": "2026-10-30",
+    "Commit": "9895215db4",
+    "Title": "Find legal passages by meaning, then check the source",
+    "TitleAr": "العثور على المقاطع بالمعنى ثم التحقق من المصدر",
+    "Summary": "An optional vector index broadens discovery while rereading candidate passages from the canonical collection.",
+    "SummaryAr": "يوسّع فهرس متجهي اختياري الاكتشاف، مع إعادة قراءة المقاطع المرشّحة من المجموعة الأصلية.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "Keyword search can miss a relevant passage when the question uses different words."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The semantic-retrieval work added an optional vector index alongside ordinary matching and interpreted queries. Exact citations and article references keep their direct route instead of being broadened into unrelated semantic results."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "A candidate from the index is checked against the library's current source record before its text is used. Stored source hashes and passage positions help reject stale or mismatched content. If the optional index is unavailable, ordinary retrieval remains available."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "This release added retrieval infrastructure; it did not train or publish a Lebanese legal model. Semantic similarity is a way to find candidates, not a legal conclusion. A technically valid excerpt can still be irrelevant or incomplete for a question. Check its source, date and surrounding provisions before relying on it."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "قد يفوّت البحث بالكلمات مقطعاً مناسباً عندما يستخدم السؤال تعبيراً مختلفاً."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف العمل على الاسترجاع بالمعنى فهرساً متجهياً اختيارياً إلى جانب المطابقة المعتادة والاستعلامات المفسّرة. وتحتفظ الإحالات الدقيقة وأرقام المواد بمسارها المباشر، بدلاً من توسيعها إلى نتائج متقاربة في المعنى لكنها قد تخص نصوصاً أو أحكاماً مختلفة."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "يُراجَع المقطع المرشّح من الفهرس مقابل سجل المصدر الحالي في المكتبة قبل استخدام نصه. تساعد بصمات المحتوى ومواضع المقاطع على رفض النصوص القديمة أو غير المتطابقة. وإذا لم يكن الفهرس الاختياري متاحاً، يبقى الاسترجاع المعتاد قائماً حتى لا يعتمد الوصول إلى السجلات على هذه الطبقة وحدها."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "أضاف الإصدار بنية للاسترجاع، ولم يدرّب أو ينشر نموذجاً لبنانياً قانونياً. التشابه في المعنى وسيلة للعثور على مرشّحين، لا نتيجة قانونية. قد يكون الاقتباس مطابقاً تقنياً لكنه غير كافٍ للسؤال. راجع مصدره وتاريخه والأحكام المحيطة به قبل الاعتماد عليه."
+      }
+    ],
+    "Action": "Search legal passages",
+    "ActionPath": "/search/",
+    "Sources": [
+      {
+        "URL": "/search/",
+        "Label": "Search and source excerpts",
+        "LabelAr": "البحث ومقاطع المصادر"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation",
+        "Label": "Public code and release status on GitHub",
+        "LabelAr": "المستودع العام ووضع الإصدار على GitHub"
+      }
+    ],
+    "Updated": "2026-10-31"
+  },
+  {
+    "Slug": "unified-multilingual-source-search",
+    "Milestone": "2026-10-29",
+    "Published": "2026-10-30",
+    "Commit": "6709dc75cd",
+    "Title": "Search across languages with source excerpts",
+    "TitleAr": "البحث بلغات متعددة مع مقاطع من المصادر",
+    "Summary": "One search combines ordinary results with a later source-excerpt section, keeping the quoted wording tied to the library.",
+    "SummaryAr": "يجمع بحث واحد النتائج المعتادة وقسماً لاحقاً لمقاطع المصادر، مع إبقاء الاقتباسات مرتبطة بالمكتبة.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "The unified search release brought Arabic source text, published French text, unofficial English titles and topic explanations into one search journey."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "Ordinary results appear first. A later section can select relevant passages from the retrieved collection, so waiting for the model does not delay the first results."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "The model selects supplied passage identifiers. The server copies the corresponding source wording and provides the links, rather than accepting model-written legal paragraphs or invented addresses. If the available evidence is insufficient, the service can say so instead of filling the gap with an answer."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "Exact wording checks establish where a quotation came from. They do not establish that the selected passage is complete or sufficient for the question. Read its context and labels, especially unofficial English explanations. The search disclosure explains when a question and retrieved passages are sent to the configured provider."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "جمع إصدار البحث الموحّد النصوص العربية والفرنسية المنشورة والعناوين الإنكليزية غير الرسمية والشروح الموضوعية في رحلة بحث واحدة."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "تظهر النتائج المعتادة أولاً. ويمكن لقسم لاحق اختيار مقاطع ذات صلة من المجموعة المسترجعة، بحيث لا يؤخّر انتظار النموذج ظهور النتائج الأولى أو يمنع القارئ من فتح الوثائق المتاحة."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "يختار النموذج معرّفات مقاطع مقدّمة له. ثم ينسخ الخادم كلمات المصدر ويضع الروابط، بدلاً من قبول فقرات قانونية يكتبها النموذج أو عناوين يخترعها. وإذا كانت الأدلة المتاحة غير كافية، يمكن للخدمة التصريح بذلك بدلاً من ملء الفجوة بإجابة لا يستند نصها إلى مصدر قابل للمراجعة."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "تثبت مطابقة الصياغة مصدر الاقتباس، لكنها لا تثبت اكتماله أو كفايته للسؤال. اقرأ السياق والتسميات، وخصوصاً عند ظهور شرح إنكليزي غير رسمي. ويوضح إفصاح البحث متى يُرسَل السؤال والمقاطع المسترجعة إلى مزوّد النموذج المهيّأ للخدمة، حتى يعرف المستخدم كيفية معالجة طلبه."
+      }
+    ],
+    "Action": "Try legal search",
+    "ActionPath": "/search/",
+    "Sources": [
+      {
+        "URL": "/search/",
+        "Label": "Unified legal search",
+        "LabelAr": "البحث القانوني الموحّد"
+      },
+      {
+        "URL": "/about/",
+        "Label": "Search processing disclosure",
+        "LabelAr": "إفصاح معالجة البحث"
+      }
+    ]
+  },
+  {
+    "Slug": "constitutional-council-source-notes",
+    "Milestone": "2026-10-28",
+    "Published": "2026-10-30",
+    "Commit": "1b8cc7dee0",
+    "Title": "Show Constitutional Council decisions beside the law",
+    "TitleAr": "إظهار قرارات المجلس الدستوري إلى جانب القانون",
+    "Summary": "Source-linked Council notes add another part of the context needed to read a law’s status.",
+    "SummaryAr": "تضيف ملاحظات مرتبطة بقرارات المجلس الدستوري جانباً آخر من السياق اللازم لقراءة وضع القانون.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "An amendment history is not the only context that can affect how a law should be read."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The Council-note work added source-linked Constitutional Council decisions to relevant law and article pages. It provided a place to record an annulment or a finding about a text's legal force without presenting that event as an ordinary legislative amendment."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Read the note together with the Council's own publication. The decision date, affected provisions and actual outcome matter. A short explanation helps locate the issue, but the operative wording and reasons remain in the linked source."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "The initial records cover particular decisions, not a complete Council archive. An English explanation is unofficial. A missing note does not establish that no constitutional challenge exists, and a note should not be expanded into claims about provisions or consequences that the underlying decision does not support."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "لا يقتصر السياق المؤثر في قراءة القانون على سجل تعديلاته."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف العمل على ملاحظات المجلس الدستوري قرارات مرتبطة بمصادرها إلى صفحات القوانين والمواد المعنية. وأتاح تسجيل إبطال أو تقرير يتعلق بنفاذ نص، من دون عرضه وكأنه تعديل تشريعي عادي صادر عن الجهة التي أقرّت القانون أو غيّرته."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "اقرأ الملاحظة مع النشر الصادر عن المجلس نفسه. فتاريخ القرار والمواد المعنية والنتيجة الفعلية أمور أساسية لفهمه. يساعد الشرح المختصر على تحديد المسألة، لكن الصياغة الحاسمة والأسباب تبقيان في المصدر المرتبط الذي ينبغي الرجوع إليه قبل استخلاص أثر قانوني أو اقتباس النتيجة."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "تغطّي السجلات الأولى قرارات محددة، وليست أرشيفاً كاملاً للمجلس. والشروح الإنكليزية غير رسمية. لا يثبت غياب الملاحظة عدم وجود مراجعة دستورية، ولا يجوز توسيعها إلى ادعاءات بشأن مواد أو آثار لا يدعمها القرار الأصلي أو لم يتناولها بصراحة."
+      }
+    ],
+    "Action": "Browse the legislation",
+    "ActionPath": "/laws/",
+    "Sources": [
+      {
+        "URL": "/laws/",
+        "Label": "Legislation and Council notes",
+        "LabelAr": "التشريعات وملاحظات المجلس الدستوري"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      },
+      {
+        "URL": "https://www.cc.gov.lb/documents/598/%D9%82%D8%B1%D8%A7%D8%B1_%D8%B1%D9%82%D9%85_12-2026_V4.pdf",
+        "Label": "Constitutional Council decision 12/2026",
+        "LabelAr": "قرار المجلس الدستوري رقم 12/2026"
+      }
+    ]
+  },
+  {
+    "Slug": "ruling-links-back-to-cited-articles",
+    "Milestone": "2026-10-27",
+    "Published": "2026-10-30",
+    "Commit": "3b0c174775",
+    "Title": "Open the cited article from a ruling",
+    "TitleAr": "فتح المادة المستشهد بها من صفحة الاجتهاد",
+    "Summary": "Ruling pages gain direct links to the legal articles identified in the citation graph.",
+    "SummaryAr": "تضيف صفحات الاجتهاد روابط مباشرة إلى المواد القانونية المحدّدة في شبكة الإحالات.",
+    "Sections": [
+      {
+        "Heading": "From collected citations to navigation",
+        "Body": "Extracting a citation and making it useful on a page are separate steps. After earlier work added judgment references to the graph, the 27 October interface update exposed cited articles on ruling pages. A reader could move from the judicial record directly to a linked legal provision."
+      },
+      {
+        "Heading": "Follow a provision from the ruling",
+        "Body": "Open a ruling and inspect its cited-article links. Each destination identifies the parent text and article number, so you can read the provision rather than rely on a short reference inside the judgment."
+      },
+      {
+        "Heading": "Read in both directions",
+        "Body": "Article pages already offered routes to related rulings. The reverse links completed another reading path: start with the judgment, open its cited rule, then investigate that rule’s context and other linked material."
+      },
+      {
+        "Heading": "A link is a route to evidence",
+        "Body": "The links depend on recorded and matched citations. They can be incomplete or mistaken. Check the original judgment passage and the provision’s identity before treating the relationship as legally significant."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "من جمع الإحالات إلى التصفّح",
+        "Body": "استخراج الإحالة وإتاحتها للقارئ في الصفحة خطوتان مختلفتان. بعد إضافة مراجع الأحكام إلى الشبكة، أظهر تحديث الواجهة في 27 تشرين الأول المواد المستشهد بها داخل صفحات الاجتهاد. وأصبح بإمكان القارئ الانتقال مباشرة من السجل القضائي إلى حكم تشريعي مرتبط به، بدلاً من إعادة البحث عنه من البداية."
+      },
+      {
+        "Heading": "اتبع المادة من الحكم",
+        "Body": "افتح سجل الاجتهاد وافحص روابط المواد المستشهد بها. يحدّد كل رابط النص الذي تنتمي إليه المادة ورقمها، حتى تتمكن من قراءة الحكم نفسه بدلاً من الاكتفاء بإشارة قصيرة داخل القرار أو تفسيرها من دون الرجوع إلى مصدرها."
+      },
+      {
+        "Heading": "مساران للقراءة",
+        "Body": "كانت صفحات المواد توفّر طرقاً إلى اجتهادات مرتبطة بها. وأكملت الروابط العكسية طريقاً آخر: البدء بالحكم، ثم فتح القاعدة التي يستشهد بها، ثم فحص سياقها والمواد الأخرى المرتبطة بها في المكتبة."
+      },
+      {
+        "Heading": "الرابط طريق إلى الدليل",
+        "Body": "تعتمد الروابط على إحالات مسجّلة ومطابقة، وقد تكون ناقصة أو خاطئة. راجع الفقرة الأصلية في الحكم وهوية المادة قبل اعتبار العلاقة ذات أثر قانوني أو الاستناد إليها في تفسير معين."
+      }
+    ],
+    "Sources": [
+      {
+        "URL": "/rulings/",
+        "Label": "Rulings and cited-article links",
+        "LabelAr": "الاجتهاد وروابط المواد المستشهد بها"
+      },
+      {
+        "URL": "/codes/",
+        "Label": "Codes and article pages",
+        "LabelAr": "القوانين الأساسية وصفحات المواد"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Citation and graph records",
+        "LabelAr": "سجلات الإحالات والشبكة"
+      }
+    ],
+    "Action": "Open a ruling",
+    "ActionPath": "/rulings/"
+  },
+  {
+    "Slug": "missing-citation-clear-results",
+    "Milestone": "2026-10-24",
+    "Published": "2026-10-30",
+    "Commit": "26260b7663",
+    "Title": "Say when the exact cited text is missing",
+    "TitleAr": "توضيح غياب النص ذي الإحالة المطلوبة",
+    "Summary": "When an exact citation is absent, search can show same-number texts from other dates with a clear notice.",
+    "SummaryAr": "عند غياب الإحالة المطابقة، يمكن للبحث عرض نصوص بالرقم نفسه في تواريخ أخرى مع تنبيه واضح.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A plausible result can be misleading when it shares a number with a missing text."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The missing-citation change made that distinction explicit. If search cannot find the cited number and date, it can say so and list same-number records from other dates as alternatives to inspect."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Read the notice before opening a nearby result. It explains why a text appeared and what failed to match. A result from another year may help identify a mistaken citation, but it does not replace the requested record or prove that the citation itself is wrong."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "This is a more informative response to a gap in the catalogue. It preserves the difference between absence from this library and absence from Lebanese law. Check the source publication or another reliable source when the exact record is needed, and keep its full date with the number."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "قد تكون النتيجة المقنعة مضلّلة إذا كانت تشترك في الرقم مع نص غير موجود."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أوضح تعديل البحث هذا الفرق. فعندما لا يجد البحث الرقم والتاريخ المطلوبين معاً، يمكنه التصريح بذلك وعرض سجلات تحمل الرقم نفسه في تواريخ أخرى، بوصفها بدائل للفحص لا تطابقاً مؤكداً مع الإحالة التي أدخلها القارئ."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "اقرأ التنبيه قبل فتح نتيجة قريبة. يشرح سبب ظهورها والجزء الذي لم يطابق طلبك. قد يساعد نص من سنة أخرى على اكتشاف خطأ في الإحالة، لكنه لا يحل محل السجل المطلوب ولا يثبت أن الإحالة الأصلية خاطئة أو أن النص المقصود لم يصدر."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "تقدّم هذه الاستجابة معلومات أوضح عن فجوة في الفهرس. وتحافظ على الفرق بين غياب النص عن المكتبة وغيابه عن القانون اللبناني. راجع النشر الأصلي أو مصدراً موثوقاً آخر عندما تحتاج إلى السجل الدقيق، واحتفظ بالتاريخ الكامل إلى جانب رقمه."
+      }
+    ],
+    "Action": "Search the library",
+    "ActionPath": "/search/",
+    "Sources": [
+      {
+        "URL": "/search/",
+        "Label": "Citation-aware search",
+        "LabelAr": "البحث بالإحالات القانونية"
+      }
+    ]
+  },
+  {
+    "Slug": "handwritten-judgments-confidence",
+    "Milestone": "2026-10-24",
+    "Published": "2026-10-30",
+    "Commit": "4d8c00988c",
+    "Title": "Read difficult judgments with a visible warning",
+    "TitleAr": "قراءة الأحكام الصعبة مع تنبيه ظاهر",
+    "Summary": "Hard-to-read judgment pages can be published with a low-confidence warning and the original PDF link.",
+    "SummaryAr": "يمكن نشر صفحات الأحكام الصعبة مع تنبيه إلى ضعف الثقة ورابط النسخة الأصلية المصوّرة.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "Handwritten judgments are part of the legal record even when transcription is difficult."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The 24 October confidence policy made completed readings available while marking difficult pages as low confidence. It avoided treating the number of readers alone as the definition of a reliable page."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Use the text to locate a passage, then compare it with the original PDF. A warning tells you to expect more reading errors, particularly in handwriting. The API exposes the page's confidence flag so an application can retain the same distinction instead of presenting every transcription with equal certainty."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "A page with one reading may be visible, and a later reading may improve it. The warning is about the transcription, not a judgment about the court's decision. Do not use a difficult passage as a verified quotation without checking its image and surrounding text."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "تبقى الأحكام المكتوبة بخط اليد جزءاً من السجل القانوني حتى عندما تصعب قراءتها."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أتاحت سياسة الثقة في 24 تشرين الأول القراءات المنجزة، مع وسم الصفحات الصعبة بانخفاض الثقة. ولم تجعل عدد القرّاء وحده معياراً لتعريف الصفحة الموثوقة، لأن وضوح النص نفسه وطبيعة الصورة يؤثران أيضاً في جودة القراءة."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "استخدم النص لتحديد موضع الفقرة، ثم قارنه بملف PDF الأصلي. ينبّهك التحذير إلى توقع أخطاء قراءة أكثر، وخصوصاً في الكتابة اليدوية. وتكشف الواجهة البرمجية علامة الثقة الخاصة بالصفحة، حتى يحتفظ التطبيق بالتمييز نفسه بدلاً من تقديم جميع النسخ النصية وكأنها متساوية في اليقين."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "قد تظهر صفحة لها قراءة واحدة، وقد تحسّنها قراءة لاحقة. يخص التنبيه جودة النقل النصي، ولا يحكم على قرار المحكمة أو صحته. لا تستخدم فقرة صعبة كاقتباس متحقَّق منه من دون مراجعة صورتها والنص المحيط بها في المستند الأصلي."
+      }
+    ],
+    "Action": "Inspect ruling readings",
+    "ActionPath": "/rulings/",
+    "Sources": [
+      {
+        "URL": "/rulings/",
+        "Label": "Judgment readings and original PDFs",
+        "LabelAr": "قراءات الأحكام وملفاتها الأصلية"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      },
+      {
+        "URL": "/ai/",
+        "Label": "Hosted API and MCP documentation",
+        "LabelAr": "وثائق واجهة البرمجة وخادم MCP"
+      }
+    ]
+  },
+  {
+    "Slug": "distinct-article-numbers",
+    "Milestone": "2026-10-24",
+    "Published": "2026-10-30",
+    "Commit": "7a6a4c2f27",
+    "Title": "Keep repeated and sub-numbered articles distinct",
+    "TitleAr": "تمييز المواد المكرّرة والمتفرّعة في البحث والروابط",
+    "Summary": "Article lookup accepts spelling variants while preserving distinct legal provision numbers.",
+    "SummaryAr": "يقبل الوصول إلى المواد اختلافات الكتابة مع المحافظة على تمييز أرقام الأحكام القانونية.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A small difference in an article number can identify a different legal provision."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The article-number work normalised accepted spellings for lookup and redirected them to a consistent address. At the same time, it preserved distinctions such as repeated articles and sub-numbered provisions rather than collapsing them into the plain number."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "When opening an article, check the number shown beside the parent text. The graph and page address should refer to that same provision. A familiar spelling can help you find it, but the lookup must not erase a suffix that makes the provision legally different."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "This work improves citation handling rather than changing the law's numbering. The source's actual form remains significant. If a search leads to a nearby provision, compare the complete number and heading before copying the link into a brief, note or dataset."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "قد يحدّد فرق صغير في رقم المادة حكماً قانونياً مختلفاً."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "وحّد العمل على أرقام المواد صيغ الكتابة المقبولة عند الوصول، وحوّلها إلى عنوان متّسق. وفي الوقت نفسه حافظ على اختلاف المواد المكرّرة والمتفرّعة، بدلاً من دمجها بالمادة التي تحمل الرقم البسيط نفسه أو معاملتها كصيغ متبادلة لحكم واحد."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "عند فتح مادة، راجع رقمها الظاهر إلى جانب النص الذي تنتمي إليه. يجب أن تشير الشبكة وعنوان الصفحة إلى الحكم نفسه. تساعد طريقة الكتابة المألوفة على العثور عليه، لكن عملية المطابقة يجب ألا تمحو لاحقة تجعل المادة مختلفة قانونياً عن غيرها أو تغيّر هوية الإحالة."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "يحسّن هذا العمل التعامل مع الإحالات، ولا يعيد ترقيم القانون. تبقى الصيغة الموجودة في المصدر ذات أهمية. وإذا قادك البحث إلى مادة قريبة، فقارن الرقم الكامل والعنوان قبل نسخ الرابط إلى مذكرة أو ملاحظة أو مجموعة بيانات يمكن أن يستخدمها شخص آخر."
+      }
+    ],
+    "Action": "Browse code articles",
+    "ActionPath": "/codes/",
+    "Sources": [
+      {
+        "URL": "/codes/",
+        "Label": "Codes and article links",
+        "LabelAr": "القوانين وروابط المواد"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      }
+    ]
+  },
+  {
+    "Slug": "api-listings-and-amendment-details",
+    "Milestone": "2026-10-24",
+    "Published": "2026-10-30",
+    "Commit": "34e44cdc05",
+    "Title": "List legislation and inspect amendment relationships",
+    "TitleAr": "تصفّح التشريعات وفحص علاقات التعديل برمجياً",
+    "Summary": "API and MCP listings add date filters, pagination and article-level amendment relationships.",
+    "SummaryAr": "أضافت قوائم API وMCP مرشّحات زمنية وتصفّحاً بالصفحات وعلاقات تعديل على مستوى المواد.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "The first API served searches and individual records."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The 24 October expansion added legislation and Gazette listings, with date filtering and pagination. Amendment responses also identified the affected articles, allowing software to distinguish a change to particular provisions from a relationship involving a whole text."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Use a date range to build a publication list, then follow the next-page offset until the listing ends. Retrieve the records you need and inspect the amended and amending relationships. The hosted API and MCP documentation describes the corresponding operations and their limits."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "A list is bounded by the library's contents and recorded dates. It should not be presented as an official notification that every publication in a period has been captured. Preserve source notices for scanned texts, and distinguish an amendment relationship from a general reference or an unresolved lead."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "كانت الواجهة الأولى تتيح البحث وطلب السجلات منفردة."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف توسّع 24 تشرين الأول قوائم للتشريعات وأعداد الجريدة الرسمية، مع التصفية بالتاريخ والتصفّح على صفحات. وأصبحت استجابات التعديل تحدّد المواد المعنية أيضاً، مما يتيح للتطبيق التمييز بين تغيير أحكام محددة وعلاقة تتناول النص ككل من دون تعيين مواد منفردة."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "استخدم نطاقاً زمنياً لبناء قائمة منشورات، ثم اتبع إزاحة الصفحة التالية حتى تنتهي النتائج. اطلب السجلات التي تحتاجها وافحص علاقات النصوص المعدِّلة والمعدَّلة. تشرح وثائق API وMCP المستضافَين العمليات المتقابلة وحدودها، حتى يمكن تنفيذ الوصول إلى البيانات بطريقة واضحة وقابلة للتكرار."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "تحدّ محتويات المكتبة والتواريخ المسجّلة نطاق القائمة. لذلك لا تعرضها كتأكيد رسمي على جمع كل منشور صدر خلال فترة معينة. احتفظ بتنبيهات مصادر النصوص المقروءة من الصور، وميّز بين علاقة التعديل والإشارة العامة والخيط البحثي الذي لم يُحسم بعد."
+      }
+    ],
+    "Action": "Read integration documentation",
+    "ActionPath": "/ai/",
+    "Sources": [
+      {
+        "URL": "/ai/",
+        "Label": "Hosted API and MCP documentation",
+        "LabelAr": "وثائق واجهة البرمجة وخادم MCP"
+      }
+    ]
+  },
+  {
+    "Slug": "gazette-issues-for-scanned-texts",
+    "Milestone": "2026-10-24",
+    "Published": "2026-10-30",
+    "Commit": "9e88f547c7",
+    "Title": "Keep scanned legislation with its Gazette issue",
+    "TitleAr": "ربط التشريعات المصوّرة بعدد الجريدة الرسمية",
+    "Summary": "Scanned texts gain an issue-level publication route as well as their individual document pages.",
+    "SummaryAr": "تكتسب النصوص المصوّرة مساراً إلى عدد نشرها، إلى جانب صفحات الوثائق المنفردة.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A law page is easier to verify when its publication reference leads to the issue that carried it."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The Gazette-issue work connected scanned legislation to issue records, using the Centre's issue when available and a scan-based issue record where needed. It also normalised equivalent issue-number spellings to avoid duplicate entries."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Open the Gazette record to see the texts associated with that issue, then follow an individual document and its scan notice. This provides a publication-oriented route into recent material, complementing search by law number, year or subject."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "An issue record reflects the material represented in the library. It is not an assurance that every page or item in the official issue has been captured. Check the publication reference and the underlying scans when a complete issue or a specific page is required for your research."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "يسهل التحقق من صفحة قانون عندما يقود مرجع نشرها إلى العدد الذي تضمّنه."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "ربط العمل على أعداد الجريدة الرسمية التشريعات المقروءة من الصور بسجلات الأعداد، باستخدام عدد المركز عندما يكون متاحاً وسجل مستند إلى الصور عند الحاجة. ووحّد صيغ كتابة أرقام الأعداد المتكافئة لتجنّب إنشاء قيود مكرّرة للعدد نفسه."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "افتح سجل الجريدة لرؤية النصوص المرتبطة بالعدد، ثم اتبع الوثيقة المنفردة وتنبيه مصدر صورتها. يقدّم ذلك طريقاً إلى المواد الحديثة انطلاقاً من النشر، ويكمل البحث برقم القانون أو السنة أو الموضوع. ويساعد أيضاً على قراءة النص ضمن المجموعة التي نُشر معها بدلاً من عزله عن مرجعه."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "يعكس سجل العدد المواد الممثّلة في المكتبة، ولا يضمن التقاط كل صفحة أو بند في العدد الرسمي. راجع مرجع النشر والصور الأصلية عندما يحتاج بحثك إلى عدد كامل أو صفحة محددة، ولا تفترض أن قائمة النصوص المتاحة وحدها تمثّل النشر الرسمي بأكمله."
+      }
+    ],
+    "Action": "Browse Gazette issues",
+    "ActionPath": "/gazette/",
+    "Sources": [
+      {
+        "URL": "/gazette/",
+        "Label": "Gazette issues and publication entries",
+        "LabelAr": "أعداد الجريدة الرسمية وقيود النشر"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      }
+    ]
+  },
+  {
+    "Slug": "rulings-linked-to-articles",
+    "Milestone": "2026-10-23",
+    "Published": "2026-10-30",
+    "Commit": "303954c0ec",
+    "Title": "Extract citations from judgments and summaries",
+    "TitleAr": "استخراج الإحالات من الأحكام والملخّصات",
+    "Summary": "Reading judgment records adds citations to the legal graph, extending the material available for article-to-ruling research.",
+    "SummaryAr": "تضيف قراءة سجلات الأحكام إحالات إلى الشبكة القانونية، وتوسّع المواد المتاحة للبحث من المادة إلى الاجتهاد.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "The University's catalogue already connected some articles to rulings."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The October judgment-reading work extended that map by identifying citations inside ruling text and summaries. These records expanded the graph behind article-to-ruling research. Direct navigation from a ruling back to its cited provisions was a separate interface step added on 27 October."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Use these links to assemble a reading list around a provision. Open the ruling and check the relevant passage in its original scan. A link can reveal useful context, but the role of a citation may vary: a court can apply a rule, discuss it or recount an argument about it."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "Citation extraction is fallible, especially when a record is short or a scan is difficult. Later validation rejected unsupported quotations and improved target matching. A missing link does not establish that no ruling discusses an article, and a present link does not by itself establish a binding interpretation."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "كان فهرس الجامعة يربط بعض المواد باجتهادات مرتبطة بها."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "وسّع العمل على قراءة الأحكام في تشرين الأول هذه الخريطة بتحديد الإحالات داخل متون الأحكام وملخّصاتها. أضافت السجلات مادة إلى الشبكة المستخدمة للبحث من المادة إلى الاجتهاد. أما الانتقال المباشر من الحكم إلى مواده المستشهد بها، فكان خطوة مستقلة في الواجهة أُضيفت في 27 تشرين الأول."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "استخدم الروابط لتكوين قائمة قراءة حول مادة معينة. افتح الحكم وراجع الفقرة ذات الصلة في نسخته المصوّرة الأصلية. قد تكشف الإحالة سياقاً مفيداً، لكن دورها يختلف: فقد تطبّق المحكمة القاعدة أو تناقشها أو تنقل حجة تتعلق بها. لا يكفي وجود الرقم وحده لفهم هذا الدور."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "قد يخطئ استخراج الإحالات، وخصوصاً في السجلات القصيرة أو الصور الصعبة. حسّنت مراجعات لاحقة مطابقة النصوص ورفض الاقتباسات غير المسندة. غياب الرابط لا يثبت غياب الاجتهاد، ووجوده لا يثبت وحده تفسيراً ملزماً للمادة أو انطباقه على حالة معينة."
+      }
+    ],
+    "Action": "Explore rulings",
+    "ActionPath": "/rulings/",
+    "Sources": [
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      },
+      {
+        "URL": "/rulings/",
+        "Label": "Rulings and cited provisions",
+        "LabelAr": "الاجتهاد والمواد المستشهد بها"
+      }
+    ]
+  },
+  {
+    "Slug": "arabic-default-library",
+    "Milestone": "2026-10-21",
+    "Published": "2026-10-30",
+    "Commit": "2393a834a9",
+    "Title": "Arabic becomes the library’s default language",
+    "TitleAr": "العربية تصبح اللغة الافتراضية للمكتبة",
+    "Summary": "The main website now opens in Arabic, with the English interface under /en/.",
+    "SummaryAr": "أصبحت الصفحة الرئيسية للموقع بالعربية، مع الإبقاء على الواجهة الإنكليزية تحت /en/.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "On 21 October, Arabic became the default language at the library's main address."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The English interface moved under /en/. This aligned the first visit with the language of most of the source material while retaining an English route for readers discovering Lebanese legal records from abroad or through English searches."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Use the language switch to move between versions of a page. The surrounding labels and explanations change, while the legal text retains its source language. English titles remain discovery aids, separately labelled from official wording."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "Changing the default also required consistent page addresses, language links and redirects. Older Arabic addresses can lead to the current page. When sharing a citation, use the final document address rather than a search result or an old interface path, and include the legal citation itself for clarity."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "في 21 تشرين الأول، أصبحت العربية اللغة الافتراضية في العنوان الرئيسي للمكتبة."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "وانتقلت الواجهة الإنكليزية إلى المسار /en/. يقرّب هذا التغيير الزيارة الأولى من لغة معظم المواد المصدرية، مع إبقاء طريق إنكليزي للقرّاء الذين يتعرّفون إلى السجلات القانونية اللبنانية من الخارج أو يبحثون عنها باستخدام كلمات إنكليزية."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "استخدم مفتاح اللغة للانتقال بين نسختَي الصفحة. تتغيّر التسميات والشروح المحيطة بالنص، بينما يحتفظ الحكم القانوني بلغة مصدره. وتبقى العناوين الإنكليزية وسائل للاكتشاف، مميّزة عن الصياغة الرسمية، فلا يصبح النص القانوني مترجماً لمجرد عرضه داخل واجهة إنكليزية أو الوصول إليه من خلالها."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "تطلّب تغيير اللغة الافتراضية اتساقاً بين العناوين وروابط اللغات والتحويلات. وقد تقودك العناوين العربية القديمة إلى الصفحة الحالية. عند مشاركة إحالة، استخدم العنوان النهائي للوثيقة وأرفق به الإحالة القانونية نفسها، بدلاً من الاكتفاء برابط نتائج البحث أو مسار واجهة قديم."
+      }
+    ],
+    "Action": "Open the Arabic library",
+    "ActionPath": "/",
+    "Sources": [
+      {
+        "URL": "https://lebaneselegislation.com/",
+        "Label": "Arabic default",
+        "LabelAr": "العربية الافتراضية"
+      },
+      {
+        "URL": "https://lebaneselegislation.com/en/",
+        "Label": "English interface",
+        "LabelAr": "الواجهة الإنكليزية"
+      }
+    ]
+  },
+  {
+    "Slug": "judgment-reading-disputes",
+    "Milestone": "2026-10-21",
+    "Published": "2026-10-30",
+    "Commit": "e1692c6616",
+    "Title": "Make uncertain judgment readings visible",
+    "TitleAr": "إظهار مواضع الشك في قراءة الأحكام",
+    "Summary": "Judgment pages and API responses can mark words where machine readings disagree.",
+    "SummaryAr": "يمكن لصفحات الأحكام واستجابات الواجهة إظهار الكلمات التي تختلف فيها القراءات الآلية.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "Court scans pose a different reading problem from clean typed legislation."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The judgment update added a way to show disputed spans in the page text and API response. Where multiple readings produced different words, the difference could remain visible for a reader to compare with the original judgment."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "A highlighted disagreement is a reason to inspect that place in the PDF. It is more useful than assuming the rest of a machine-readable paragraph has been legally verified. The original scan link stays available on the ruling page so the check can happen at the source."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "The reading process evolved after this release. The later confidence policy permits a page with one reading to appear and warns about difficult material. Do not interpret this historical milestone as a promise that every published page has several independent readings or that agreement proves accuracy."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "تطرح صور الأحكام مشكلة قراءة تختلف عن التشريعات المطبوعة بوضوح."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف تحديث الأحكام طريقة لعرض المقاطع المختلف عليها في نص الصفحة وفي استجابة الواجهة البرمجية. وعندما تنتج القراءات كلمات مختلفة، يمكن إبقاء الاختلاف ظاهراً لكي يقارنه القارئ بالحكم المصوّر، بدلاً من إخفائه داخل نص يبدو محسوم الصياغة."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "يشير الاختلاف المعلّم إلى موضع ينبغي فحصه في ملف PDF. ولا يعني أن بقية الفقرة المقروءة آلياً خضعت لتدقيق قانوني. يبقى رابط الصورة الأصلية متاحاً في صفحة الاجتهاد، حتى يستطيع القارئ مراجعة الكلمات في مكانها وقراءة الفقرات المحيطة بها أيضاً."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "تطوّرت سياسة القراءة بعد هذا الإصدار. تسمح سياسة الثقة اللاحقة بعرض صفحة لها قراءة واحدة، مع تنبيه للمواد الصعبة. لذلك لا ينبغي فهم هذا الإنجاز التاريخي كتعهد بأن كل صفحة منشورة لها قراءات مستقلة متعددة، أو بأن اتفاق القراءات يثبت دقة النص."
+      }
+    ],
+    "Action": "Read a judgment",
+    "ActionPath": "/rulings/",
+    "Sources": [
+      {
+        "URL": "/rulings/",
+        "Label": "Rulings and scan links",
+        "LabelAr": "الاجتهاد وروابط الصور"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      }
+    ]
+  },
+  {
+    "Slug": "english-titles-arabic-source",
+    "Milestone": "2026-10-21",
+    "Published": "2026-10-30",
+    "Commit": "ab13e4ed6e",
+    "Title": "English titles help you find the Arabic source",
+    "TitleAr": "عناوين إنكليزية للوصول إلى المصدر العربي",
+    "Summary": "On 21 October 2026, unofficial English titles added another route into the collection. The Arabic source remains the reference for checking the wording.",
+    "SummaryAr": "في 21 تشرين الأول 2026، أضافت العناوين الإنكليزية غير الرسمية طريقاً آخر إلى المجموعة. يبقى المصدر العربي مرجعاً للتحقّق من الصياغة.",
+    "Sections": [
+      {
+        "Heading": "An aid to discovery",
+        "Body": "An English-speaking researcher may know the subject of a Lebanese text without knowing its Arabic title. Unofficial English titles make that first step easier. The 21 October work added these titles as a discovery aid and marked their status explicitly."
+      },
+      {
+        "Heading": "What an English title can tell you",
+        "Body": "A translated title can help identify a likely document and make a result easier to scan. It cannot carry the full meaning of an article, an exception or a later amendment. Open the text and check its number, date and publication reference before deciding that it answers your question."
+      },
+      {
+        "Heading": "Keep translation separate from authority",
+        "Body": "The English aid is not an official translation and does not replace the Arabic wording. A machine-generated rendering may choose an imperfect legal term. Quote the underlying source when precision matters, and identify any translation as a translation. A bilingual interface does not make every source document bilingual."
+      },
+      {
+        "Heading": "Where to start",
+        "Body": "Use the English interface to browse legislation or enter a known title. Switch to the Arabic page to check the source wording. The published dataset identifies unofficial translated titles separately from the underlying text. Preserve that distinction when exporting a record or displaying the title in another application."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "وسيلة للمساعدة في العثور على النص",
+        "Body": "قد يعرف الباحث الذي يستخدم الإنكليزية موضوع النص اللبناني من دون معرفة عنوانه العربي. تسهّل العناوين الإنكليزية غير الرسمية هذه الخطوة الأولى. أضاف عمل 21 تشرين الأول هذه العناوين كوسيلة للاستكشاف، مع توضيح صفتها."
+      },
+      {
+        "Heading": "ماذا يخبرك العنوان الإنكليزي؟",
+        "Body": "قد يساعد العنوان المترجم في تحديد وثيقة محتملة وقراءة النتائج بسرعة. لكنه لا يحمل المعنى الكامل لمادة أو استثناء أو تعديل لاحق. افتح النص وتحقّق من رقمه وتاريخه ومرجع نشره قبل اعتباره جواباً لسؤالك."
+      },
+      {
+        "Heading": "ميّز الترجمة عن الحجية",
+        "Body": "المساعدة الإنكليزية ليست ترجمة رسمية ولا تحلّ محل الصياغة العربية. قد تختار الترجمة المولّدة آلياً مصطلحاً قانونياً غير دقيق. اقتبس المصدر الأصلي عندما تتطلب المسألة الدقة، وعرّف الترجمة بوصفها ترجمة. ولا تعني الواجهة الثنائية اللغة أن كل وثيقة مصدرية متاحة بلغتين."
+      },
+      {
+        "Heading": "من أين تبدأ؟",
+        "Body": "استخدم الواجهة الإنكليزية لتصفّح التشريعات أو إدخال عنوان معروف، ثم انتقل إلى الصفحة العربية للتحقّق من الصياغة. تميّز مجموعة البيانات العناوين المترجمة غير الرسمية عن النص الأصلي. احتفظ بهذا التمييز عند تصدير سجل أو عرض عنوانه في تطبيق آخر، حتى يفهم القارئ وظيفة الترجمة وحدودها."
+      }
+    ],
+    "Action": "Browse the collection",
+    "ActionPath": "/laws/",
+    "Sources": [
+      {
+        "URL": "https://lebaneselegislation.com/en/laws/",
+        "Label": "Unofficial English discovery titles",
+        "LabelAr": "عناوين إنكليزية غير رسمية للاكتشاف"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      },
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+        "Label": "Public dataset and dataset card",
+        "LabelAr": "مجموعة البيانات العامة وبطاقتها"
+      }
+    ]
+  },
+  {
+    "Slug": "source-linked-topic-guides",
+    "Milestone": "2026-10-21",
+    "Published": "2026-10-30",
+    "Commit": "f3339e5b76",
+    "Title": "Start with a topic, then follow the legal text",
+    "TitleAr": "البدء بموضوع ثم الانتقال إلى النص القانوني",
+    "Summary": "Topic guides offer another entry point into the library, with links back to the provisions discussed.",
+    "SummaryAr": "توفّر الأدلة الموضوعية مدخلاً آخر إلى المكتبة، مع روابط إلى الأحكام التي تشرحها.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "People often arrive with a subject rather than a law number."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "Topic guides added explanations organised around practical legal themes, giving readers a route from a familiar question to the relevant texts. The first group was reviewed and rewritten in October, with further guides added as the collection developed."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Read a guide to orient your search, then follow its article references. The links matter because an explanation may simplify a rule whose conditions and exceptions sit in the original provision. English explanations are unofficial aids; they do not replace the Arabic source."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "A topic guide is not individual legal advice or an assurance that every related rule is covered. Check dates, amendments and the particular provision before applying it. The guides complement citation search and code browsing, especially when a reader does not yet know which document to open."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "يبدأ كثير من القرّاء بموضوع، لا برقم قانون."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضافت الأدلة الموضوعية شروحاً منظّمة حول مسائل قانونية عملية، لتوفّر طريقاً من السؤال المألوف إلى النصوص ذات الصلة. خضعت المجموعة الأولى للمراجعة وإعادة الكتابة في تشرين الأول، ثم أُضيفت أدلة أخرى مع تطوّر المجموعة واتساع الموضوعات المتاحة للقراءة."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "اقرأ الدليل لتحديد اتجاه البحث، ثم اتبع إحالاته إلى المواد. لهذه الروابط أهمية لأن الشرح قد يبسّط قاعدة ترد شروطها واستثناءاتها في الحكم الأصلي. والشروح الإنكليزية وسائل مساعدة غير رسمية، فلا تحل محل المصدر العربي ولا تتحول إلى صياغة قانونية معتمدة لمجرد نشرها في الموقع."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "الدليل الموضوعي ليس استشارة لحالة فردية ولا ضماناً بتغطية كل قاعدة مرتبطة بالموضوع. راجع التاريخ والتعديلات والمادة المقصودة قبل تطبيقها. وتكمل الأدلة البحث بالإحالة وتصفّح القوانين الأساسية، وخصوصاً عندما لا يعرف القارئ بعد أي وثيقة ينبغي فتحها."
+      }
+    ],
+    "Action": "Browse topic guides",
+    "ActionPath": "/topics/",
+    "Sources": [
+      {
+        "URL": "/topics/",
+        "Label": "Topic guides and article references",
+        "LabelAr": "الأدلة الموضوعية وإحالات المواد"
+      },
+      {
+        "URL": "/about/",
+        "Label": "Sources and scope",
+        "LabelAr": "المصادر وحدود المكتبة"
+      }
+    ]
+  },
+  {
+    "Slug": "full-judgment-scans-and-search",
+    "Milestone": "2026-10-20",
+    "Published": "2026-10-30",
+    "Commit": "daeabde7c3",
+    "Title": "Read the judgment behind a ruling record",
+    "TitleAr": "قراءة الحكم الكامل وراء سجل الاجتهاد",
+    "Summary": "Ruling pages gained access to full judgment scans, machine readings and search beyond catalogue summaries.",
+    "SummaryAr": "أضافت صفحات الاجتهاد الوصول إلى صور الأحكام الكاملة وقراءاتها الآلية والبحث خارج الملخّصات.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A short ruling summary may identify a decision without showing the reasoning behind it."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The full-judgment work added the scanned judgment behind a ruling record and a page-by-page machine reading where available. Search could then use judgment text instead of stopping at the catalogue's summary."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Open a ruling, follow its original PDF link and compare the relevant passage with the scan. The page reading helps locate words in a long document; the image gives you the reference for checking them. Availability depends on whether that judgment has a scan and a completed reading."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "Machine reading is especially fallible on poor scans and handwriting. A searchable passage should lead back to the original, not conceal it. Later work added visible disagreements, confidence warnings and page-level API access. Those additions refine the same principle: make the reasoning easier to inspect while preserving its source."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "قد يعرّف الملخّص القصير بقرار قضائي من دون إظهار أسبابه كاملة."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف العمل على الأحكام الكاملة المستند المصوّر وراء سجل الاجتهاد، وقراءة آلية لكل صفحة عندما تكون متاحة. وأصبح البحث قادراً على استخدام متن الحكم، بدلاً من التوقّف عند ملخّص الفهرس أو الكلمات الموجودة فيه وحدها."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "افتح سجل الاجتهاد واتبع رابط ملف PDF الأصلي، ثم قارن الفقرة المطلوبة بالصورة. تساعد القراءة النصية على تحديد موضع الكلمات في مستند طويل، وتوفّر الصورة مرجع التحقق منها. ويتوقف التوفّر على وجود نسخة مصوّرة وقراءة منجزة للحكم نفسه، فلا تفترض أن كل سجل يملك الأمرين."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "قد تخطئ القراءة الآلية، وخصوصاً في الصور الضعيفة والكتابة اليدوية. يجب أن يقود المقطع القابل للبحث إلى الأصل وأن يبقيه ظاهراً. أضاف العمل اللاحق مواضع اختلاف القراءات وتنبيهات الثقة ووصولاً برمجياً إلى الصفحات، مع المحافظة على هذا المبدأ نفسه."
+      }
+    ],
+    "Action": "Browse court rulings",
+    "ActionPath": "/rulings/",
+    "Sources": [
+      {
+        "URL": "/rulings/",
+        "Label": "Ruling records and original scans",
+        "LabelAr": "سجلات الاجتهاد والصور الأصلية"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      }
+    ]
+  },
+  {
+    "Slug": "source-errors-and-printed-corrections",
+    "Milestone": "2026-10-20",
+    "Published": "2026-10-30",
+    "Commit": "f3619234d4",
+    "Title": "Distinguish a source error from a legal amendment",
+    "TitleAr": "التمييز بين خطأ المصدر والتعديل القانوني",
+    "Summary": "Notes and version records explain corrections without presenting every wording difference as a new law.",
+    "SummaryAr": "تشرح الملاحظات وسجلات النسخ التصحيحات من دون تصوير كل اختلاف في الصياغة كتعديل تشريعي جديد.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A copied source can contain a repeated passage, a stray character or a layout error."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The source-error work added notes beside affected articles, while later corrections used printed-edition evidence where available. This kept a technical or transcription correction distinct from a legal event that changed the provision."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Read the note and the version history when a passage appears inconsistent. A minor correction should have an explanation and supporting source, rather than silently becoming a new statement of the law. The database separates source-error records from the amendment relationships used for legislative changes."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "The distinction protects the history of the text. It does not establish that every error has been found or authorise automatic rewriting of difficult passages. When wording matters, compare the referenced edition or publication and keep the correction evidence with any quotation or extracted record."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "قد يحتوي المصدر المنقول على فقرة مكرّرة أو حرف زائد أو خطأ ناتج عن تنسيق الصفحة."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف العمل على أخطاء المصدر ملاحظات إلى جانب المواد المعنية، واستخدمت تصحيحات لاحقة أدلة من طبعات مطبوعة عندما توفّرت. وبذلك بقي التصحيح التقني أو النصي مختلفاً عن الحدث القانوني الذي غيّر الحكم بتشريع لاحق."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "اقرأ الملاحظة وسجل النسخ عندما تبدو فقرة غير متّسقة. يجب أن يملك التصحيح تفسيراً ومصدراً داعماً، بدلاً من أن يصبح بصمت صياغة جديدة للقانون. وتفصل قاعدة البيانات سجلات أخطاء المصدر عن علاقات التعديل المستخدمة لتسجيل التغييرات التشريعية، حتى يمكن معرفة سبب الاختلاف المعروض وطبيعته."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "يحافظ هذا التمييز على تاريخ النص، لكنه لا يثبت اكتشاف جميع الأخطاء أو يجيز إعادة كتابة المقاطع الصعبة آلياً. عندما تكون الصياغة حاسمة، قارِن الطبعة أو النشر المشار إليه واحتفظ بأدلة التصحيح مع الاقتباس أو السجل المستخرج الذي ستستخدمه لاحقاً."
+      }
+    ],
+    "Action": "Inspect source notes",
+    "ActionPath": "/data/",
+    "Sources": [
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      }
+    ]
+  },
+  {
+    "Slug": "refreshing-citations-and-dataset",
+    "Milestone": "2026-10-19",
+    "Published": "2026-10-30",
+    "Commit": "64ef03de10",
+    "Title": "Carry new records into citations and dataset updates",
+    "TitleAr": "إدراج السجلات الجديدة في الإحالات وتحديثات البيانات",
+    "Summary": "The update workflow links newly collected texts and refreshes the dataset alongside the library.",
+    "SummaryAr": "يربط مسار التحديث النصوص المضافة حديثاً ويحدّث مجموعة البيانات إلى جانب المكتبة.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A downloadable collection is more useful when it does not become detached from the website it represents."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The October update work added citation reading for newly collected texts, rebuilding of the relationship graph and refresh of the Hugging Face export. The intent is to carry new material through the same retrieval routes as earlier records."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Check the dataset revision and the relevant record before comparing results across dates. An update can change a title, source relationship or amendment record as well as add a new text. Preserve a revision identifier when an analysis needs to be reproduced later."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "A scheduled workflow is not a promise that every run succeeds or that every source publication is captured immediately. Read the visible update information and inspect the files actually available. Hosted pages, a dataset download and an assistant-facing snapshot can have different refresh times."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "تكون المجموعة القابلة للتنزيل أكثر فائدة عندما لا تنفصل عن الموقع الذي تمثّله."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف العمل على التحديث قراءة إحالات النصوص المجمّعة حديثاً وإعادة بناء شبكة العلاقات وتحديث تصدير Hugging Face. والهدف هو تمرير المواد الجديدة عبر طرق الاسترجاع نفسها المستخدمة للسجلات السابقة، بدلاً من إبقائها إضافات منفصلة بلا روابط."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "تحقّق من إصدار مجموعة البيانات والسجل المعني قبل مقارنة نتائج جُمعت في تواريخ مختلفة. فقد يغيّر التحديث عنواناً أو علاقة مصدرية أو سجل تعديل، ولا يقتصر على إضافة نص جديد. احتفظ بمعرّف الإصدار إذا كنت تحتاج إلى إعادة إنتاج التحليل أو شرح سبب اختلاف النتائج لاحقاً."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "لا يعني وجود مسار مجدول نجاح كل تشغيل أو التقاط كل منشور مصدري فور صدوره. اقرأ معلومات التحديث الظاهرة وافحص الملفات المتاحة فعلياً. وقد تختلف أوقات تحديث صفحات الموقع والتنزيل ولقطة البيانات المخصّصة للمساعدات، لذلك يجب التحقق من النسخة المستخدمة في كل مسار."
+      }
+    ],
+    "Action": "Check the dataset",
+    "ActionPath": "/data/",
+    "Sources": [
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+        "Label": "Public dataset and dataset card",
+        "LabelAr": "مجموعة البيانات العامة وبطاقتها"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      }
+    ]
+  },
+  {
+    "Slug": "search-by-legal-citation",
+    "Milestone": "2026-10-17",
+    "Published": "2026-10-30",
+    "Commit": "1844a5d3e4",
+    "Title": "Search with the citation you already have",
+    "TitleAr": "البحث بالإحالة القانونية المتاحة لديك",
+    "Summary": "Number, year and date recognition helps a legal citation reach the intended text.",
+    "SummaryAr": "يساعد التعرّف إلى الرقم والسنة والتاريخ على الوصول من الإحالة إلى النص المقصود.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A legal citation is more than a bag of keywords."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The citation-search work added direct number-and-year lookup, then support for full dates and dates written with Arabic or French month names. Arabic-Indic digits were folded into the same lookup path, so the way a number is typed need not decide whether it can be found."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Enter the citation as you have it, including the kind of text and full date when known. Those details help distinguish records that share a number. Article-and-code queries can also lead directly to a numbered provision instead of a broad list of keyword matches."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "A matching number alone is not proof of identity. Different texts can reuse it across dates, years and kinds. Read the result's title and publication details before relying on it, and keep the complete citation in your notes."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "الإحالة القانونية أكثر من مجموعة كلمات مفتاحية."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف العمل على البحث وصولاً مباشراً بالرقم والسنة، ثم دعماً للتواريخ الكاملة وأسماء الأشهر العربية والفرنسية. وأصبح إدخال الأرقام العربية الهندية يقود إلى مسار البحث نفسه، حتى لا تحدّد طريقة كتابة الرقم وحدها إمكان العثور على السجل المطلوب."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "أدخل الإحالة كما لديك، مع نوع النص والتاريخ الكامل إذا كانا معروفين. تساعد هذه التفاصيل على التمييز بين سجلات تحمل الرقم نفسه. ويمكن أن تقود الاستعلامات التي تجمع رقم المادة واسم القانون مباشرة إلى الحكم المقصود، بدلاً من قائمة واسعة من النتائج التي تطابق الكلمات فقط."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "لا تكفي مطابقة الرقم لإثبات هوية النص. فقد يتكرر الرقم بين تواريخ وسنوات وأنواع مختلفة. اقرأ عنوان النتيجة وبيانات نشرها قبل اعتمادها، واحتفظ بالإحالة الكاملة في ملاحظاتك حتى تتمكن من العودة إلى السجل ذاته ومقارنته بمصدره."
+      }
+    ],
+    "Action": "Search a citation",
+    "ActionPath": "/search/",
+    "Sources": [
+      {
+        "URL": "/search/",
+        "Label": "Legal search",
+        "LabelAr": "البحث القانوني"
+      },
+      {
+        "URL": "/ai/",
+        "Label": "Hosted API and MCP documentation",
+        "LabelAr": "وثائق واجهة البرمجة وخادم MCP"
+      }
+    ]
+  },
+  {
+    "Slug": "evidence-for-corrected-dates",
+    "Milestone": "2026-10-16",
+    "Published": "2026-10-30",
+    "Commit": "31682f9357",
+    "Title": "Keep the evidence behind corrected dates",
+    "TitleAr": "حفظ أدلة تصحيح تواريخ النصوص",
+    "Summary": "Date corrections record the original value, the replacement and the evidence used to settle the difference.",
+    "SummaryAr": "تسجّل تصحيحات التواريخ القيمة الأصلية والبديلة والأدلة المستخدمة لحسم الاختلاف.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A date can look precise while being wrong."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The October correction work addressed source records with inconsistent publication and signing dates, year mistakes or placeholders. It added a date-correction table so a changed value could be inspected together with its explanation and supporting evidence."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "For research that depends on chronology, compare the original date, the correction and the Gazette information. Keep the correction record with your extract. This makes it possible to explain why a library date differs from the source catalogue rather than silently overwriting the discrepancy in a spreadsheet."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "A correction is not a guarantee that every date in the collection has been checked. Some records remain uncertain or lack enough evidence to settle a value. Distinguish a documented correction from an inferred date, and check the original publication when timing has legal consequences."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "قد يبدو التاريخ دقيقاً رغم أنه خاطئ."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "عالج العمل في تشرين الأول سجلات مصدرية تتعارض فيها تواريخ التوقيع والنشر، أو تتضمن سنة خاطئة أو قيمة مؤقتة. وأُضيف جدول لتصحيحات التواريخ، بحيث يمكن فحص القيمة المعدّلة مع تفسيرها والأدلة التي استند إليها التغيير، بدلاً من إخفاء القيمة القديمة."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "إذا كان بحثك يعتمد على تسلسل الأحداث، فقارن التاريخ الأصلي بالتصحيح ومعلومات الجريدة الرسمية. احتفظ بسجل التصحيح مع البيانات المستخرجة. يتيح ذلك تفسير اختلاف تاريخ المكتبة عن فهرس المصدر، بدلاً من استبدال القيمة في جدول عمل من دون توثيق سبب الاختلاف أو طريقة حسمه."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "لا يعني وجود تصحيح أن جميع تواريخ المجموعة قد خضعت للمراجعة. فقد تبقى سجلات غير محسومة أو تفتقر إلى الأدلة الكافية. ميّز بين التصحيح الموثّق والتاريخ المستنتج، وارجع إلى النشر الأصلي عندما تكون للوقت آثار قانونية في موضوع البحث أو الاستخدام."
+      }
+    ],
+    "Action": "Inspect correction records",
+    "ActionPath": "/data/",
+    "Sources": [
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      },
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+        "Label": "Public dataset and dataset card",
+        "LabelAr": "مجموعة البيانات العامة وبطاقتها"
+      }
+    ]
+  },
+  {
+    "Slug": "visible-scan-reading-disagreements",
+    "Milestone": "2026-10-16",
+    "Published": "2026-10-30",
+    "Commit": "12e26ede296",
+    "Title": "Show where Gazette readings disagree",
+    "TitleAr": "إظهار مواضع اختلاف قراءات الجريدة الرسمية",
+    "Summary": "Disputed words remain visible on scanned legislation and in machine-readable responses.",
+    "SummaryAr": "تبقى الكلمات المختلف على قراءتها ظاهرة في التشريعات المصوّرة وفي الاستجابات القابلة للمعالجة.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A clean-looking transcription can hide uncertainty that matters in law."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The scan-reading update kept both alternatives where independent readings disagreed, instead of quietly choosing one. The website, JSON API and MCP responses gained a way to display or explain those disputed spans."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "When a passage shows alternative readings, open its source page image before quoting it. A number, negation or short word can change the effect of a provision. Visible alternatives give a reader a precise location to check rather than a general warning somewhere else on the page."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "Reader agreement is a comparison between transcriptions, not a measured probability that the legal text is correct. Even matching readings can share an error. Source images, publication references and any recorded gaps remain part of the evidence. This feature applies to scanned legislation; later judgment work introduced related controls for court documents."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "قد تخفي النسخة النصية المرتّبة شكاً مهماً في القراءة القانونية."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "احتفظ تحديث القراءة بالاحتمالين عندما اختلفت قراءتان مستقلتان، بدلاً من اختيار إحداهما بصمت. وأصبح الموقع وواجهة JSON API واستجابات MCP قادرة على عرض هذه المواضع المختلف عليها أو شرح معناها، مع إبقاء الصلة بالنص المصدري الذي يمكن مراجعته."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "عندما يظهر مقطع بقراءتين، افتح صورة صفحته الأصلية قبل اقتباسه. فقد يغيّر رقم أو نفي أو كلمة قصيرة أثر الحكم. تحدّد البدائل الظاهرة موضعاً دقيقاً للمراجعة، بدلاً من الاكتفاء بتحذير عام بعيد عن الفقرة التي تحتاج إلى تدقيق أو مقارنة."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "اتفاق القرّاء مقارنة بين نسخ نصية، وليس احتمالاً مقاساً لصحة النص القانوني. وقد تتفق القراءات على خطأ واحد. لذلك تبقى الصور ومراجع النشر والفجوات المسجّلة جزءاً من الأدلة. يخص هذا الإنجاز التشريعات المصوّرة، ثم أُضيفت ضوابط مشابهة لقراءة مستندات الأحكام لاحقاً."
+      }
+    ],
+    "Action": "Inspect the data fields",
+    "ActionPath": "/data/",
+    "Sources": [
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      },
+      {
+        "URL": "/ai/",
+        "Label": "Hosted API and MCP documentation",
+        "LabelAr": "وثائق واجهة البرمجة وخادم MCP"
+      }
+    ]
+  },
+  {
+    "Slug": "gazette-scans-fill-source-gaps",
+    "Milestone": "2026-10-16",
+    "Published": "2026-10-30",
+    "Commit": "0ee5196c090",
+    "Title": "Read recent legislation from Gazette scans",
+    "TitleAr": "قراءة تشريعات حديثة من صور الجريدة الرسمية",
+    "Summary": "Gazette page scans provide another source when a recent text is missing from the main collection.",
+    "SummaryAr": "توفّر صور صفحات الجريدة الرسمية مصدراً آخر عندما يغيب نص حديث عن المجموعة الأساسية.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A legal catalogue can be large and still miss recent publications."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The Gazette-scan release added legislation read from page images when the Lebanese University collection did not yet contain the text. These records entered the same legislation and article structure as the rest of the library, with a visible notice about their source."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Open a scanned text and compare its machine reading with the page images. Its publication reference and source notice explain where it came from. When the University's record becomes available, the library can link the earlier scan address to that record rather than leave competing copies."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "The milestone expands access, not certainty. Machine reading can misread characters, skip a passage or confuse a quoted article with the surrounding law. Treat the page image as the reference and pay particular attention to marked differences and gaps."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "قد يكون الفهرس القانوني كبيراً ومع ذلك يفتقد منشورات حديثة."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف إصدار صور الجريدة الرسمية تشريعات قُرئت من صور الصفحات عندما لم تكن مجموعة الجامعة اللبنانية تتضمن النص بعد. ودخلت هذه السجلات بنية التشريعات والمواد نفسها المستخدمة في المكتبة، مع تنبيه ظاهر يشرح اختلاف مصدرها وطريقة إعدادها."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "افتح النص المقروء من الصور وقارنه بصفحات النشر المصوّرة. يوضح مرجع النشر والتنبيه المصاحب مكان الحصول عليه. وعندما يصبح سجل الجامعة متاحاً، يمكن ربط عنوان النسخة السابقة به، بدلاً من ترك نسختين متنافستين تربكان القارئ أو توحيان بوجود نصّين مختلفين في المجموعة."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "يوسّع هذا الإنجاز الوصول إلى النصوص، لكنه لا يزيل احتمالات الخطأ. قد تسيء القراءة الآلية فهم حرف أو تتجاوز فقرة أو تخلط مادة مقتبسة بالقانون المحيط بها. تبقى صورة الصفحة مرجع المقارنة، وخصوصاً عند وجود اختلافات أو فجوات معلّمة."
+      }
+    ],
+    "Action": "Explore legislation",
+    "ActionPath": "/laws/",
+    "Sources": [
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      },
+      {
+        "URL": "/laws/",
+        "Label": "Legislation including scanned texts",
+        "LabelAr": "التشريعات بما فيها النصوص المقروءة من الصور"
+      }
+    ]
+  },
+  {
+    "Slug": "search-with-english-and-french-terms",
+    "Milestone": "2026-10-15",
+    "Published": "2026-10-30",
+    "Commit": "b4cc0fc993a",
+    "Title": "Find Arabic records with English or French terms",
+    "TitleAr": "العثور على السجلات العربية بكلمات إنكليزية أو فرنسية",
+    "Summary": "A glossary fallback helps readers reach Arabic legal records when an English or French query has no direct match.",
+    "SummaryAr": "يساعد الرجوع إلى مسرد المصطلحات في الوصول إلى السجلات العربية عندما لا يطابق البحث الإنكليزي أو الفرنسي نصاً مباشرة.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A reader may know a legal subject in English or French while the relevant record is titled in Arabic."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The 15 October search update added a glossary fallback when ordinary matching found nothing. It mapped supported terms to Arabic search language rather than pretending that every article had an English translation."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Try the subject you know, then inspect the Arabic title and citation of the returned record. The fallback is a discovery aid. Its usefulness depends on the available glossary and the words used in the source, so a different expression may still require another search."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "Later search work broadened language handling, corrected misleading name matches and added unofficial English titles. Those developments build on this earlier step. A translated search term does not establish a translated legal rule: open the source text and read its conditions, exceptions and amendments."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "قد يعرف القارئ موضوعاً قانونياً بالإنكليزية أو الفرنسية بينما يحمل السجل المقصود عنواناً عربياً."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف تحديث البحث في 15 تشرين الأول الرجوع إلى مسرد مصطلحات عندما لا تعثر المطابقة المعتادة على نتيجة. وربط المصطلحات المدعومة بكلمات بحث عربية، بدلاً من الإيحاء بأن لكل مادة ترجمة إنكليزية يمكن البحث في متنها."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "جرّب الموضوع بالكلمات التي تعرفها، ثم افحص العنوان العربي وإحالة السجل الناتج. المسرد وسيلة للاكتشاف. وتعتمد فائدته على المصطلحات المتاحة والكلمات التي يستخدمها المصدر، لذلك قد يتطلب تعبير آخر محاولة بحث جديدة أو الرجوع إلى اسم القانون الأساسي أو رقمه للوصول إلى المادة المقصودة."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "وسّعت تحديثات لاحقة التعامل مع اللغات وصحّحت مطابقات أسماء مضلّلة وأضافت عناوين إنكليزية غير رسمية. وهي تطوّر الخطوة الأولى ولا تغيّر حدودها: ترجمة كلمة البحث لا تثبت ترجمة القاعدة القانونية. افتح المصدر واقرأ شروطه واستثناءاته وتعديلاته قبل الاعتماد على النتيجة."
+      }
+    ],
+    "Action": "Try a subject search",
+    "ActionPath": "/search/",
+    "Sources": [
+      {
+        "URL": "/search/",
+        "Label": "Multilingual legal search",
+        "LabelAr": "البحث القانوني بلغات متعددة"
+      }
+    ]
+  },
+  {
+    "Slug": "official-mcp-registry-listing",
+    "Milestone": "2026-10-13",
+    "Published": "2026-10-30",
+    "Commit": "",
+    "EvidenceKind": "publication-record",
+    "Title": "Find the hosted service in the official MCP registry",
+    "TitleAr": "اعثر على الخدمة المستضافة في سجل MCP الرسمي",
+    "Summary": "The official registry lists com.lebaneselegislation/mcp with the hosted endpoint. Its publication record dates to 13 October 2026.",
+    "SummaryAr": "يسجّل سجل MCP الرسمي الخدمة com.lebaneselegislation/mcp مع عنوانها المستضاف. ويعود تاريخ نشر السجل إلى 13 تشرين الأول 2026.",
+    "Sections": [
+      {
+        "Heading": "A registry entry published on 13 October",
+        "Body": "Lebanese Legislation has an active entry in the official Model Context Protocol registry under com.lebaneselegislation/mcp. The registry records publication on 13 October 2026. This milestone concerns service discovery: it gives developers a public metadata record for the hosted legal-source retrieval service."
+      },
+      {
+        "Heading": "The record identifies the hosted endpoint",
+        "Body": "The entry specifies a Streamable HTTP remote at https://lebaneselegislation.com/mcp and links to the project’s setup page. Its description covers searching and reading laws, articles, court rulings and the Official Gazette. Developers can use the record to confirm the service name and destination before configuring a compatible client."
+      },
+      {
+        "Heading": "Registry version and running service are separate",
+        "Body": "At the 30 October check, the latest registry record remained version 1.0.0. That value describes the registered metadata and should not be treated as a verified statement about every currently deployed tool or container. Consult current project documentation for configuration and available capabilities."
+      },
+      {
+        "Heading": "Use retrieved material with its source",
+        "Body": "A registry listing does not validate a legal interpretation or every retrieved passage. Keep citations and source links when using results, and check the original text and amendments. The registry describes the hosted service; the separate public repositories document options for local deployment."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "سجل نُشر في 13 تشرين الأول",
+        "Body": "تملك Lebanese Legislation إدخالاً نشطاً في سجل Model Context Protocol الرسمي باسم com.lebaneselegislation/mcp. يسجّل السجل نشره في 13 تشرين الأول 2026. يتعلّق هذا الإنجاز بإمكانية العثور على الخدمة، إذ يوفّر للمطوّرين بيانات وصفية عامة عن خدمة استرجاع المصادر القانونية المستضافة."
+      },
+      {
+        "Heading": "السجل يحدّد عنوان الخدمة المستضافة",
+        "Body": "يحدّد الإدخال اتصال Streamable HTTP بعنوان https://lebaneselegislation.com/mcp، ويربط بصفحة إعداد المشروع. ويصف البحث في القوانين والمواد والأحكام القضائية والجريدة الرسمية وقراءتها. يستطيع المطوّر استخدام السجل للتحقّق من اسم الخدمة ووجهتها قبل إعداد عميل متوافق للاتصال بها والاطلاع على وثائقها الحالية."
+      },
+      {
+        "Heading": "إصدار السجل والخدمة المشغّلة منفصلان",
+        "Body": "عند الفحص في 30 تشرين الأول، بقي أحدث سجل منشور بالإصدار 1.0.0. يصف هذا الرقم البيانات الوصفية المسجّلة، ولا يثبت تفاصيل كل أداة أو حاوية منشورة حالياً. راجع وثائق المشروع الحالية لمعرفة إعداد الاتصال والإمكانات المتاحة بدلاً من استنتاجها من رقم السجل وحده."
+      },
+      {
+        "Heading": "احتفظ بمصدر المادة المسترجعة",
+        "Body": "وجود الخدمة في السجل لا يثبت صحة تفسير قانوني أو كل مقطع مسترجع. احتفظ بالإحالات وروابط المصادر عند استخدام النتائج، وراجع النص الأصلي وتعديلاته. يصف السجل الخدمة المستضافة، فيما توثّق المستودعات العامة المنفصلة خيارات التشغيل المحلي. ابدأ بصفحة الإعداد لاختيار الطريقة التي تناسب عميلك."
+      }
+    ],
+    "Action": "Configure the hosted MCP service",
+    "ActionPath": "/ai/",
+    "Sources": [
+      {
+        "URL": "https://registry.modelcontextprotocol.io/v0.1/servers?search=com.lebaneselegislation",
+        "Label": "Official registry record and publication timestamp",
+        "LabelAr": "سجل MCP الرسمي وتاريخ النشر"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation",
+        "Label": "Hosted service setup documentation",
+        "LabelAr": "وثائق إعداد الخدمة المستضافة"
+      }
+    ]
+  },
+  {
+    "Slug": "code-wide-amount-changes",
+    "Milestone": "2026-10-13",
+    "Published": "2026-10-30",
+    "Commit": "cc0b614e406",
+    "Title": "Keep code-wide amount changes beside the articles",
+    "TitleAr": "ربط تعديلات المبالغ العامة بالمواد المعنية",
+    "Summary": "Changes that multiply sums across a code now have links to provisions containing those amounts.",
+    "SummaryAr": "أصبحت التعديلات التي تضاعف المبالغ في قانون كامل مرتبطة بالمواد التي تتضمن هذه المبالغ.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "Not every amendment names one article and supplies replacement wording."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "A text can change monetary amounts throughout a code. The October graph update connected that kind of measure to articles containing the affected sums, so a reader would have a route to the later legislation beside the earlier provision."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "This work covered code-wide changes in civil procedure and traffic legislation. Its purpose is to make a relevant amending text visible when the original article alone could leave a reader with an outdated figure. Open the linked measure and check its scope, dates and exceptions."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "A recorded relationship does not calculate every amount that applies to a particular dispute. Effective dates and the circumstances of the case can matter. Keep the amending text with any quoted figure, and distinguish a source's original amount from a later rule changing how that amount must be read."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "لا يذكر كل تعديل مادة واحدة ويقدّم صياغة بديلة لها."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "فقد يغيّر نص تشريعي المبالغ المالية الواردة في قانون كامل. ربط تحديث الشبكة في تشرين الأول هذا النوع من التدابير بالمواد التي تتضمن مبالغ معنية، بحيث يجد القارئ طريقاً إلى التشريع اللاحق إلى جانب الحكم الأقدم عند قراءته."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "شمل العمل تعديلات عامة للمبالغ في أصول المحاكمات المدنية وتشريعات السير. والغرض منه إظهار النص المعدِّل ذي الصلة، لأن الاكتفاء بالمادة الأصلية قد يترك القارئ أمام رقم قديم. افتح التدبير المرتبط وراجع نطاقه وتواريخه والاستثناءات التي قد يذكرها قبل تطبيقه على مبلغ محدّد."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "لا تحسب العلاقة المسجّلة كل مبلغ واجب التطبيق في نزاع بعينه. فقد تؤثر تواريخ النفاذ وظروف القضية في النتيجة. احتفظ بالنص المعدِّل مع أي رقم تقتبسه، وميّز بين المبلغ الأصلي في المصدر والقاعدة اللاحقة التي تغيّر طريقة قراءته أو احتسابه."
+      }
+    ],
+    "Action": "Browse the affected codes",
+    "ActionPath": "/codes/",
+    "Sources": [
+      {
+        "URL": "/codes/",
+        "Label": "Codes and their amendments",
+        "LabelAr": "القوانين الأساسية وتعديلاتها"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      }
+    ]
+  },
+  {
+    "Slug": "arabic-interface",
+    "Milestone": "2026-10-13",
+    "Published": "2026-10-30",
+    "Commit": "72c99de4d8e",
+    "Title": "Read the library through an Arabic interface",
+    "TitleAr": "قراءة المكتبة بواجهة عربية",
+    "Summary": "Arabic navigation brought the catalogue, source information and document pages into the language of the legal texts.",
+    "SummaryAr": "أتاحت الواجهة العربية تصفّح الفهرس والمصادر والوثائق بلغة النصوص القانونية.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "Arabic legal text deserves an interface that can be used in Arabic throughout the reading journey."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The 13 October interface work added Arabic routes, labels, document headings and information pages. It also addressed right-to-left layout, including how navigation and code cards fit on smaller screens."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Use the language switch to move between interfaces while following the same underlying collection. An interface translation changes the surrounding navigation and explanations; it does not turn an Arabic legal provision into an English translation. The source text keeps its own language."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "This first Arabic interface preceded the later decision to make Arabic the website's default. The distinction matters in a history of access: Arabic support was already present before the root addresses changed. Readers following older addresses should use the current canonical page shown by the site."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "تحتاج النصوص القانونية العربية إلى واجهة يمكن استخدامها بالعربية طوال رحلة القراءة."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف العمل في 13 تشرين الأول مسارات وعناوين وتسميات وصفحات معلومات عربية. وشمل أيضاً اتجاه العرض من اليمين إلى اليسار، وطريقة ظهور التنقّل وبطاقات القوانين الأساسية على الشاشات الصغيرة، حتى لا تقتصر العربية على متن الوثيقة وحده."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "استخدم مفتاح اللغة للانتقال بين الواجهتين مع متابعة المجموعة نفسها. تغيّر ترجمة الواجهة عناصر التنقّل والشروح المحيطة بالنص، لكنها لا تحوّل المادة القانونية العربية إلى ترجمة إنكليزية. يحتفظ النص المصدري بلغته، ويجب التمييز بين لغة الصفحة ولغة الحكم القانوني الموجود فيها."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "سبقت هذه الواجهة قرار جعل العربية اللغة الافتراضية للموقع. وهذا فرق مهم في تاريخ الوصول: كانت الواجهة العربية موجودة قبل تغيير عناوين الصفحات الرئيسية. وعند اتباع عنوان قديم، استخدم الصفحة الحالية التي يحيلك إليها الموقع وراجع النص المرتبط بها."
+      }
+    ],
+    "Action": "Use the Arabic library",
+    "ActionPath": "/",
+    "Sources": [
+      {
+        "URL": "https://lebaneselegislation.com/",
+        "Label": "Arabic library",
+        "LabelAr": "المكتبة العربية"
+      },
+      {
+        "URL": "https://lebaneselegislation.com/en/",
+        "Label": "English interface",
+        "LabelAr": "الواجهة الإنكليزية"
+      }
+    ]
+  },
+  {
+    "Slug": "open-data-api-mcp",
+    "Milestone": "2026-10-13",
+    "Published": "2026-10-30",
+    "Commit": "9ec3786d0b7",
+    "Title": "Let an assistant retrieve Lebanese legal sources",
+    "TitleAr": "تمكين المساعد من استرجاع المصادر القانونية اللبنانية",
+    "Summary": "The public MCP server gives compatible assistants tools to search the library and retrieve its records.",
+    "SummaryAr": "يوفّر خادم MCP العام أدوات للمساعدات المتوافقة للبحث في المكتبة واسترجاع سجلاتها.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "On 13 October, the public MCP server added a connection between compatible assistants and the legal library."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "Instead of relying only on a model's training data, an assistant could search the collection and request a law, article, ruling or Gazette record from a documented service."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Connect the server address in a client that supports the documented transport. Ask the assistant to retrieve the source text and keep its links visible. The tools are designed to return stored records and passages, so a reader can open the same material on the website."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "Retrieval does not make everything an assistant says reliable. A model may misunderstand a provision, overlook context or cite an incomplete record. Read the returned text and relevant amendments. This article records the hosted service milestone; the separate 30 October service-image release has its own journal entry."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "في 13 تشرين الأول، أضاف خادم MCP العام صلة بين المساعدات المتوافقة والمكتبة القانونية."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "بدلاً من الاعتماد على بيانات تدريب النموذج وحدها، أصبح بإمكان المساعد البحث في المجموعة وطلب قانون أو مادة أو حكم أو سجل من الجريدة الرسمية عبر خدمة موثّقة، مع إبقاء المصدر متاحاً للقراءة."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "أضف عنوان الخادم في تطبيق يدعم طريقة الاتصال المبيّنة في الوثائق. اطلب من المساعد استرجاع النص الأصلي وإظهار روابطه. صُمّمت الأدوات لإعادة السجلات والمقاطع المخزّنة، بحيث يستطيع القارئ فتح المادة نفسها على الموقع ومراجعة سياقها، بدلاً من الاكتفاء بالشرح الذي يكتبه المساعد عنها."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "لا يجعل الاسترجاع كل ما يقوله المساعد موثوقاً. فقد يسيء فهم مادة أو يغفل سياقاً أو يستشهد بسجل ناقص. اقرأ النص المعاد والتعديلات المرتبطة به. تسجّل هذه المقالة إنجاز الخدمة المستضافة، أما إصدار صور الخدمات في 30 تشرين الأول فله مقالة مستقلة في السجل."
+      }
+    ],
+    "Action": "Connect an assistant",
+    "ActionPath": "/ai/",
+    "Sources": [
+      {
+        "URL": "/ai/",
+        "Label": "Hosted API and MCP documentation",
+        "LabelAr": "وثائق واجهة البرمجة وخادم MCP"
+      }
+    ]
+  },
+  {
+    "Slug": "follow-amendments",
+    "Milestone": "2026-10-13",
+    "Published": "2026-10-30",
+    "Commit": "45482be110",
+    "Title": "Follow changes to a law in your feed reader",
+    "TitleAr": "تابع تعديلات القانون في قارئ الخلاصات",
+    "Summary": "On 13 October 2026, Atom feeds made changes to Lebanese law easier to follow without an account. The feeds point back to the amending texts.",
+    "SummaryAr": "في 13 تشرين الأول 2026، أتاحت خلاصات Atom متابعة تغييرات القانون اللبناني دون حساب. تقود الخلاصة إلى النصوص المعدِّلة.",
+    "Sections": [
+      {
+        "Heading": "A law is more than its original publication",
+        "Body": "A text can remain available while later legislation changes particular provisions. Finding the original wording is only part of the task. The October amendment work connected amending texts to their targets and added feeds for following those relationships."
+      },
+      {
+        "Heading": "Follow the whole collection or one text",
+        "Body": "The changes page links to an Atom feed of recent amendments. Individual law feeds let a reader follow the changes associated with a particular text. Add the feed address to an Atom-compatible reader. New entries identify the amending text and point back to its page, so you can read the underlying material."
+      },
+      {
+        "Heading": "Treat a feed as a reading queue",
+        "Body": "A feed helps you notice a recorded change. It is not a guarantee that every relevant legal development has been captured. The source collection, the extraction process and the timing of updates all affect what appears. Read the linked amendment and verify its date and scope before relying on it."
+      },
+      {
+        "Heading": "Keep the amending text in view",
+        "Body": "A feed entry is a pointer to a source, so keep the linked amending text with your notes. Compare the affected provision and any recorded effective date. Following one law is useful for a focused reading list, while the collection feed helps you notice changes beyond the texts you already know."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "القانون أكثر من نشره الأصلي",
+        "Body": "قد يبقى النص متاحاً بينما تعدّل تشريعات لاحقة بعض أحكامه. العثور على الصياغة الأصلية جزء من المهمة فقط. ربط عمل تشرين الأول النصوص المعدِّلة بالنصوص التي تستهدفها، وأضاف خلاصات لمتابعة هذه العلاقات."
+      },
+      {
+        "Heading": "تابع المجموعة أو نصاً بعينه",
+        "Body": "تتيح صفحة التغييرات خلاصة Atom للتعديلات الأخيرة. وتتيح خلاصات القوانين متابعة التغييرات المرتبطة بنص محدّد. أضف عنوان الخلاصة إلى قارئ متوافق مع Atom. تحدّد الإدخالات الجديدة النص المعدِّل وتقود إلى صفحته لقراءة المادة المصدرية."
+      },
+      {
+        "Heading": "الخلاصة قائمة للقراءة",
+        "Body": "تساعدك الخلاصة على ملاحظة تغيير مسجّل، لكنها لا تضمن التقاط كل تطوّر قانوني ذي صلة. يؤثّر المصدر والاستخراج وتوقيت التحديث في ما يظهر. اقرأ التعديل المرتبط وتحقّق من تاريخه ونطاقه قبل الاعتماد عليه."
+      },
+      {
+        "Heading": "أبقِ النص المعدِّل ضمن المراجعة",
+        "Body": "يشير إدخال الخلاصة إلى مصدر، فاحتفظ بالنص المعدِّل المرتبط مع ملاحظاتك. قارِن المادة المعنية وأي تاريخ نفاذ مسجّل. تفيد متابعة قانون واحد في إعداد قائمة قراءة مركّزة، بينما تساعدك خلاصة المجموعة على ملاحظة تغييرات تتجاوز النصوص التي تعرفها أو تتابعها مسبقاً."
+      }
+    ],
+    "Action": "Follow legal changes",
+    "ActionPath": "/changes/",
+    "Sources": [
+      {
+        "URL": "/changes/feed.xml",
+        "Label": "Collection amendment feed",
+        "LabelAr": "خلاصة تعديلات المجموعة"
+      },
+      {
+        "URL": "/changes/",
+        "Label": "Changes and individual law feeds",
+        "LabelAr": "التغييرات وخلاصات القوانين المنفردة"
+      }
+    ]
+  },
+  {
+    "Slug": "hugging-face-legal-dataset",
+    "Milestone": "2026-10-13",
+    "Published": "2026-10-30",
+    "Commit": "39590993625",
+    "Title": "Download structured legal data on Hugging Face",
+    "TitleAr": "تنزيل بيانات قانونية منظّمة عبر Hugging Face",
+    "Summary": "The public dataset makes the library available as structured tables for analysis and reuse.",
+    "SummaryAr": "تتيح مجموعة البيانات العامة الحصول على المكتبة في جداول منظّمة للتحليل وإعادة الاستخدام.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "On 13 October, the library added a public Hugging Face dataset as a separate route to the legal material."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "Readers no longer had to visit one page at a time to work with a collection of records. The export presents relational tables in Parquet format, with the dataset card explaining their structure and provenance."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Download the tables needed for your project and retain their identifiers when joining legislation, articles, amendments or references. This makes tasks such as comparing records or inspecting relationships possible in ordinary data tools. Check the dataset's actual revision when reproducing an analysis."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "This dataset release is distinct from the later container release. Public table downloads were available before the new database restore manifest. A pending manifest for that newer workflow does not make the earlier dataset unavailable. Document rights and source attribution remain separate from software licensing."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "في 13 تشرين الأول، أضافت المكتبة مجموعة بيانات عامة على Hugging Face كطريق مستقل للوصول إلى المواد القانونية."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "لم يعد العمل على مجموعة من السجلات يتطلّب زيارة كل صفحة منفردة. يقدّم التصدير جداول مترابطة بصيغة Parquet، وتشرح بطاقة المجموعة بنيتها ومصادرها وكيفية التعامل مع المعلومات الموجودة فيها."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "نزّل الجداول اللازمة لمشروعك، واحتفظ بمعرّفاتها عند وصل التشريعات بالمواد والتعديلات والمراجع. يتيح ذلك مقارنة السجلات وفحص العلاقات بينها بأدوات تحليل البيانات المعتادة. وعند إعادة إنتاج دراسة، تحقّق من إصدار الملفات المستخدم وسجّل تاريخ الحصول عليه، لأن محتوى المجموعة قد يتغيّر مع التحديثات."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "يختلف هذا الإنجاز عن إصدار الحاويات اللاحق. كانت الجداول متاحة للتنزيل قبل ملف بيان استعادة قاعدة البيانات الجديد. لذلك لا يجعل انتظار هذا الملف مجموعة البيانات السابقة غير متاحة. وتظل حقوق الوثائق ونسبها إلى المصدر منفصلة عن ترخيص البرمجيات."
+      }
+    ],
+    "Action": "Inspect the dataset",
+    "ActionPath": "/data/",
+    "Sources": [
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+        "Label": "Public dataset and dataset card",
+        "LabelAr": "مجموعة البيانات العامة وبطاقتها"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      }
+    ],
+    "ResourceURL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+    "ResourceLabel": "Open the dataset on Hugging Face",
+    "ResourceLabelAr": "افتح مجموعة البيانات على Hugging Face",
+    "Updated": "2026-10-31"
+  },
+  {
+    "Slug": "mapping-legal-citations",
+    "Milestone": "2026-10-13",
+    "Published": "2026-10-30",
+    "Commit": "1a75e58b78e",
+    "Title": "Follow the links between legal texts",
+    "TitleAr": "تتبّع الروابط بين النصوص القانونية",
+    "Summary": "A legal graph connects texts, articles, rulings and Gazette issues while preserving the kind of relationship.",
+    "SummaryAr": "تربط شبكة قانونية النصوص والمواد والأحكام وأعداد الجريدة الرسمية مع بيان نوع العلاقة.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A reference to another law is useful only if a reader can identify what it points to."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The legal graph work assembled relationships among texts, individual articles, rulings and Gazette issues. It distinguished citations from amendments instead of treating every reference as the same kind of link."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Follow a linked reference from a record, or inspect the graph and reference tables in the dataset. These routes help a researcher move from a provision to related material without repeatedly rebuilding the same citation map by hand. Source information records how a relationship was obtained."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "Some links are research leads. A general repeal that might affect a text is not a finding that the text was repealed. The distinction matters when reading a graph: a connection helps locate material, but the underlying words and their legal effect still need to be checked."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "لا تفيد الإشارة إلى قانون آخر إلا إذا أمكن للقارئ تحديد النص المقصود."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "جمع العمل على الشبكة القانونية العلاقات بين النصوص والمواد المنفردة والأحكام وأعداد الجريدة الرسمية. وميّز بين الاستشهاد والتعديل، بدلاً من عرض كل إشارة وكأنها علاقة قانونية من النوع نفسه أو لها الأثر ذاته."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "يمكنك تتبّع المرجع المرتبط داخل السجل، أو فحص جداول الشبكة والإحالات في مجموعة البيانات. تساعد هذه المسارات الباحث على الانتقال من حكم إلى المواد ذات الصلة، من دون إعادة بناء خريطة المراجع يدوياً في كل مشروع. وتحفظ معلومات المصدر كيفية الحصول على العلاقة المعروضة."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "بعض الروابط مجرّد خيوط للبحث. فالنص الذي قد يتأثر بإلغاء عام ليس نصاً ثبت إلغاؤه. هذا التمييز ضروري عند قراءة الشبكة: تساعد العلاقة على الوصول إلى المادة، لكن يجب مراجعة الكلمات الأصلية وأثرها القانوني قبل استخلاص نتيجة منها أو الاعتماد عليها."
+      }
+    ],
+    "Action": "Inspect the legal graph",
+    "ActionPath": "/data/",
+    "Sources": [
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      },
+      {
+        "URL": "/ai/",
+        "Label": "Hosted API and MCP documentation",
+        "LabelAr": "وثائق واجهة البرمجة وخادم MCP"
+      }
+    ]
+  },
+  {
+    "Slug": "json-api-for-legal-records",
+    "Milestone": "2026-10-13",
+    "Published": "2026-10-30",
+    "Commit": "c723f559e46",
+    "Title": "Retrieve legal records through a JSON API",
+    "TitleAr": "استرجاع السجلات القانونية عبر واجهة JSON API",
+    "Summary": "A read-only HTTP interface lets applications search and retrieve records without parsing website pages.",
+    "SummaryAr": "تتيح واجهة HTTP للقراءة فقط البحث واسترجاع السجلات دون استخراجها من صفحات الموقع.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "The first public JSON API added structured access to search results, laws, individual articles, rulings and Gazette issues."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "An application could request a record directly rather than infer its structure from a rendered page. The interface is read-only, with documented limits for shared public use."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Start with the API documentation and a small search request. Open the returned record, preserve its identifiers and source links, and fetch the particular article when you need the wording of a provision. That keeps a citation connected to the document it describes."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "An API response is a representation of the library's records. It is not an independent legal authority or a substitute for reading the relevant publication. Later changes expanded listings and amendment details; consult the current documentation when building an integration rather than assuming the first release's fields are the whole interface."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "أضافت واجهة JSON API العامة الأولى وصولاً منظّماً إلى نتائج البحث والقوانين والمواد المنفردة والأحكام وأعداد الجريدة الرسمية."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أصبح بإمكان التطبيق طلب سجل مباشرة بدلاً من استنتاج بنيته من شكل الصفحة المعروضة. الواجهة مخصّصة للقراءة فقط، ولها حدود استخدام موثّقة تسمح بمشاركة الخدمة العامة بين المستخدمين."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "ابدأ بوثائق الواجهة وطلب بحث صغير. افتح السجل الذي تعيده النتيجة، واحتفظ بمعرّفاته وروابط مصادره، ثم اطلب المادة المحددة عندما تحتاج إلى صياغة الحكم. بهذه الطريقة تبقى الإحالة مرتبطة بالوثيقة التي تصفها، ويمكن مراجعة مصدرها وسياقها في خطوة تالية."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "استجابة الواجهة تمثيل لسجلات المكتبة، وليست مرجعاً قانونياً مستقلاً أو بديلاً من قراءة النشر ذي الصلة. وسّعت تحديثات لاحقة قوائم السجلات وتفاصيل التعديلات. راجع الوثائق الحالية عند بناء تطبيق، ولا تفترض أن حقول الإصدار الأول تمثّل جميع إمكانات الواجهة اليوم."
+      }
+    ],
+    "Action": "Read the API documentation",
+    "ActionPath": "/ai/",
+    "Sources": [
+      {
+        "URL": "/ai/",
+        "Label": "Hosted API and MCP documentation",
+        "LabelAr": "وثائق واجهة البرمجة وخادم MCP"
+      }
+    ]
+  },
+  {
+    "Slug": "source-and-reuse-policy",
+    "Milestone": "2026-10-12",
+    "Published": "2026-10-30",
+    "Commit": "2492c7f4d20",
+    "Title": "Make the source and reuse terms visible",
+    "TitleAr": "إظهار مصادر النصوص وشروط إعادة استخدامها",
+    "Summary": "The library documents attribution and rights separately from the software used to serve it.",
+    "SummaryAr": "توثّق المكتبة نسب النصوص وحقوقها بصورة مستقلة عن ترخيص البرمجيات التي تعرضها.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "Free access to a legal website does not answer every question about reusing its contents."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The October source and rights work added explicit credit and licence information to the database page. It distinguished the documents from the software that stores, searches and presents them."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Read the source policy and dataset card before republishing a collection or building a product on it. Keep the Centre's attribution and the original references with extracted records. A file format that is easy to download does not remove the need to check the rights of the material inside it."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "Lebanese Legislation is an independent library. Its publication does not imply endorsement by a university, court, lawyer or law firm. Showing that boundary beside the data helps readers understand both what they can inspect and what the service does not certify."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "لا تجيب مجانية الدخول إلى موقع قانوني عن جميع الأسئلة المتعلقة بإعادة استخدام محتواه."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضاف العمل على المصادر والحقوق معلومات واضحة عن نسب البيانات وترخيصها في صفحة قاعدة البيانات. وفصل بين الوثائق نفسها والبرمجيات التي تخزّنها وتبحث فيها وتعرضها للقرّاء، لأن لكل منهما وضعاً مختلفاً يجب مراجعته."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "اقرأ سياسة المصادر وبطاقة مجموعة البيانات قبل إعادة نشر مجموعة أو بناء منتج يعتمد عليها. احتفظ بالإشارة إلى المركز والمراجع الأصلية مع السجلات المستخرجة. وسهولة تنزيل ملف أو تحويله إلى صيغة أخرى لا تلغي ضرورة التحقق من حقوق المواد الموجودة داخله وشروط استخدامها."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "Lebanese Legislation مكتبة مستقلة. ولا يعني نشرها اعتماداً من جامعة أو محكمة أو محامٍ أو مكتب محاماة. يساعد توضيح هذا الحد إلى جانب البيانات على معرفة ما يمكن للقارئ فحصه، وما لا تصدّق عليه الخدمة أو تضمنه."
+      }
+    ],
+    "Action": "Read the source policy",
+    "ActionPath": "/about/",
+    "Sources": [
+      {
+        "URL": "/about/",
+        "Label": "Sources and scope",
+        "LabelAr": "المصادر وحدود المكتبة"
+      },
+      {
+        "URL": "/data/#license",
+        "Label": "Data attribution and rights",
+        "LabelAr": "حقوق البيانات ونسبها"
+      },
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+        "Label": "Public dataset and dataset card",
+        "LabelAr": "مجموعة البيانات العامة وبطاقتها"
+      }
+    ]
+  },
+  {
+    "Slug": "public-law-library",
+    "Milestone": "2026-10-08",
+    "Published": "2026-10-30",
+    "Commit": "7d2eae9082",
+    "Title": "Lebanese law, open to read",
+    "TitleAr": "القانون اللبناني متاح للقراءة",
+    "Summary": "On 8 October 2026, Lebanese Legislation launched as a public library of Lebanese legal texts. Read the source, follow its references, and check the official publication.",
+    "SummaryAr": "في 8 تشرين الأول 2026، أُطلقت Lebanese Legislation كمكتبة عامة للنصوص القانونية اللبنانية. اقرأ النص وتتبّع مراجعه وراجِع النشر الرسمي.",
+    "Sections": [
+      {
+        "Heading": "What became available",
+        "Body": "The public launch brought legislation, judgments and Official Gazette material into a website that readers can use without signing in. The project starts from documents published by the Lebanese University’s Centre for Research and Studies in Legal Informatics. It gives those documents stable pages and a shared way to search and browse them."
+      },
+      {
+        "Heading": "Start with a text, then check its context",
+        "Body": "Use the legislation list when you know the kind of text you need. Use the codes page for a principal code, or search by a title, number or year. A result is a starting point for reading. The text’s date, publication reference and links matter as much as the matching words."
+      },
+      {
+        "Heading": "What the library does not establish",
+        "Body": "An independent legal library is not an official publisher. A source may be incomplete, a later amendment may require further checking, and a search result does not decide how a rule applies to a particular case. Compare the relevant text with the Official Gazette and seek qualified advice where necessary."
+      },
+      {
+        "Heading": "Keep the source with the citation",
+        "Body": "When saving a passage, retain its document title, number, date and source link. A stable page makes it easier to return to the record, while the original publication provides the reference for checking its wording. The source policy explains how the collection is assembled and where its limits remain."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي أصبح متاحاً؟",
+        "Body": "جمع الإطلاق العام التشريعات والأحكام ومواد الجريدة الرسمية في موقع يمكن استخدامه دون تسجيل الدخول. يبدأ المشروع من الوثائق المنشورة لدى مركز الدراسات والأبحاث في المعلوماتية القانونية في الجامعة اللبنانية، ويوفّر لها صفحات ثابتة وطريقة مشتركة للبحث والتصفّح."
+      },
+      {
+        "Heading": "ابدأ بالنص ثم تحقّق من سياقه",
+        "Body": "استخدم قائمة التشريعات إذا كنت تعرف نوع النص، وصفحة القوانين الأساسية للوصول إلى قانون رئيسي، أو ابحث بالعنوان أو الرقم أو السنة. النتيجة بداية للقراءة. تاريخ النص ومرجع نشره وروابطه لا تقل أهمية عن الكلمات المطابقة."
+      },
+      {
+        "Heading": "حدود المكتبة",
+        "Body": "المكتبة القانونية المستقلة ليست جهة نشر رسمية. قد يكون المصدر ناقصاً، وقد يستلزم تعديل لاحق مزيداً من التحقّق. ولا تحدّد نتيجة البحث كيفية تطبيق قاعدة على حالة بعينها. قارِن النص بالجريدة الرسمية واستشر محامياً مؤهلاً عند الحاجة."
+      },
+      {
+        "Heading": "احتفظ بالمصدر مع الإحالة",
+        "Body": "عند حفظ مقطع، احتفظ بعنوان الوثيقة ورقمها وتاريخها ورابط مصدرها. يسهّل العنوان الثابت العودة إلى السجل، بينما يوفّر النشر الأصلي مرجع التحقق من الصياغة. وتشرح سياسة المصادر كيفية تجميع المجموعة وحدودها، حتى يبقى النص المنقول مرتبطاً بسياقه وبالمعلومات اللازمة لمراجعته."
+      }
+    ],
+    "Action": "Browse legislation",
+    "ActionPath": "/laws/",
+    "Sources": [
+      {
+        "URL": "/about/",
+        "Label": "Sources and scope",
+        "LabelAr": "المصادر وحدود المكتبة"
+      },
+      {
+        "URL": "/laws/",
+        "Label": "Browse legislation",
+        "LabelAr": "تصفّح التشريعات"
+      }
+    ]
+  },
+  {
+    "Slug": "article-versions-and-amendments",
+    "Milestone": "2026-10-01",
+    "Published": "2026-10-30",
+    "Commit": "b261c03eb66",
+    "Title": "Read an article with its amendment history",
+    "TitleAr": "قراءة المادة مع سجل تعديلاتها",
+    "Summary": "An amendment layer separates a legal change from the wording originally displayed by the source.",
+    "SummaryAr": "تفصل طبقة التعديلات بين التغيير القانوني والصيغة التي يعرضها المصدر الأصلي.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "Finding a law is only the start when later legislation changes its articles."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The amendment work introduced records for the amending text, the affected provision, the kind of change and the resulting version. That lets an article carry its history rather than silently presenting one undated block of wording."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "The public database exposes amendment and article-version tables. On a legal page, follow the linked amending text and read the operative provision itself. The history helps explain why a displayed version differs from the original publication."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "The process copies legal wording from recorded sources. Model-assisted checking can help identify whether a change is already reflected, but it is not a licence to invent replacement wording. Effective dates, unresolved changes and source gaps still require attention when assessing which version to use."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "لا ينتهي البحث عند العثور على قانون إذا كانت تشريعات لاحقة قد غيّرت مواده."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أنشأ العمل على التعديلات سجلات للنص المعدِّل والمادة المستهدفة ونوع التغيير والنسخة الناتجة عنه. وهكذا يمكن للمادة أن تحمل تاريخها، بدلاً من عرض صيغة واحدة بلا تفسير لتاريخها أو كيفية تكوينها."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "تتضمن قاعدة البيانات العامة جداول للتعديلات ونسخ المواد. وعند قراءة صفحة قانونية، يمكنك الانتقال إلى النص المعدِّل وقراءة الحكم الذي أحدث التغيير. يساعد سجل النسخ على تفسير اختلاف الصيغة المعروضة عن النشر الأصلي، وعلى إبقاء أسباب هذا الاختلاف متاحة للمراجعة."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "تُنسخ الصياغة القانونية من المصادر المسجّلة. قد تساعد المقارنة الآلية في تحديد ما إذا كان المصدر قد استوعب تعديلاً، لكنها لا تبرّر اختراع صيغة بديلة. تظل تواريخ النفاذ والتعديلات غير المحسومة والنواقص في المصادر أموراً يجب الانتباه إليها عند اختيار النسخة المناسبة للقراءة."
+      }
+    ],
+    "Action": "Read amendment records",
+    "ActionPath": "/changes/",
+    "Sources": [
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      },
+      {
+        "URL": "/changes/",
+        "Label": "Recorded amendments",
+        "LabelAr": "التعديلات المسجّلة"
+      }
+    ]
+  },
+  {
+    "Slug": "articles-and-code-navigation",
+    "Milestone": "2026-10-01",
+    "Published": "2026-10-30",
+    "Commit": "c9deb974648",
+    "Title": "Open a code at the article you need",
+    "TitleAr": "الوصول مباشرة إلى المادة المطلوبة في القانون",
+    "Summary": "Article navigation and stable code pages make long legal texts easier to read and cite.",
+    "SummaryAr": "تسهّل روابط المواد وصفحات القوانين الأساسية قراءة النصوص الطويلة والرجوع إليها.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "A long code is difficult to use when the only route is scrolling through the whole document."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "Early article navigation gave readers a way to open a text at a numbered provision. Principal codes also received their own entry points, so a familiar code name could lead to the underlying legal record."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "Use the codes list to choose a text, then its outline or article links to reach the provision. Keeping the article attached to its parent text preserves the title, publication information and amendment context that a copied paragraph can lose."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "Article numbering has legal significance. A repeated or sub-numbered provision is not interchangeable with the plain number beside it. Later search and address improvements extended this navigation while keeping distinct provisions separate."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "يصعب استخدام قانون طويل إذا كان الوصول إلى مادة معينة يتطلّب تمرير الوثيقة كاملة."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "أضافت أدوات التصفّح المبكرة وسيلة لفتح النص عند حكم محدّد برقمه. وأصبحت للقوانين الأساسية نقاط دخول خاصة، تتيح الانتقال من الاسم المتداول للقانون إلى سجله القانوني والمعلومات المرتبطة به."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "اختر النص من قائمة القوانين الأساسية، ثم استخدم الفهرس أو روابط المواد للوصول إلى الموضع المطلوب. يبقى رقم المادة مرتبطاً بعنوان القانون ومرجع نشره وسياق تعديلاته. وتساعد هذه المعلومات على فهم الفقرة في مكانها، وهي معلومات قد تضيع عند نسخها منفصلة وإرسالها خارج الصفحة."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "لترقيم المواد دلالة قانونية. فالمادة المكرّرة أو المتفرّعة ليست بالضرورة المادة ذات الرقم البسيط نفسه. وسّعت تحسينات البحث والروابط اللاحقة هذه الطريقة في الوصول، مع المحافظة على اختلاف المواد. راجع عنوان النص ورقم المادة معاً قبل اعتماد الإحالة."
+      }
+    ],
+    "Action": "Browse principal codes",
+    "ActionPath": "/codes/",
+    "Sources": [
+      {
+        "URL": "/codes/",
+        "Label": "Principal codes",
+        "LabelAr": "القوانين الأساسية"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      }
+    ]
+  },
+  {
+    "Slug": "preserving-legal-source-pages",
+    "Milestone": "2026-10-01",
+    "Published": "2026-10-30",
+    "Commit": "e422330670e",
+    "Title": "Keeping legal records traceable to their source",
+    "TitleAr": "حفظ السجلات القانونية مع مراجعها الأصلية",
+    "Summary": "The first archive established the source trail behind the library: original pages, stable record identities and structured exports.",
+    "SummaryAr": "أرسى الأرشيف الأول مسار المراجع في المكتبة، من الصفحات الأصلية إلى معرّفات السجلات والتصدير المنظّم.",
+    "Sections": [
+      {
+        "Heading": "The reader’s problem",
+        "Body": "Before a legal collection can be searched, its records need a source trail."
+      },
+      {
+        "Heading": "What changed",
+        "Body": "The October archive brought legislation, rulings, Gazette records and other legal documents into a structure that could be parsed and checked again. It preserved the connection between a database record and the page from which it was read."
+      },
+      {
+        "Heading": "Using the feature",
+        "Body": "That connection matters when two versions differ or a record looks incomplete. The database describes source-page addresses and content hashes alongside legal records. Researchers can investigate a particular item rather than treating a downloaded table as an unexplained collection of text."
+      },
+      {
+        "Heading": "Reading the evidence",
+        "Body": "This was groundwork for the public library, which opened on 8 October. An archived page records what a source published when fetched. It does not establish that the page is an official consolidated statement of current law."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما الذي يحتاجه القارئ؟",
+        "Body": "يحتاج البحث في مجموعة قانونية إلى معرفة مصدر كل سجل."
+      },
+      {
+        "Heading": "ما الذي تغيّر؟",
+        "Body": "جمع الأرشيف الأول التشريعات والأحكام وأعداد الجريدة الرسمية ووثائق قانونية أخرى في بنية يمكن قراءتها ومعالجتها مجدداً. وحافظ على الصلة بين سجل قاعدة البيانات والصفحة التي أُخذ منها، بدلاً من فصل النص عن مرجعه عند نقله."
+      },
+      {
+        "Heading": "كيف تستخدمه؟",
+        "Body": "تساعد هذه الصلة عند اختلاف نسختين أو ظهور نقص في سجل معيّن. تصف قاعدة البيانات عناوين الصفحات المصدرية وبصمات محتواها إلى جانب السجلات القانونية. ويمكن للباحث تتبّع وثيقة بعينها ومراجعة أصلها، بدلاً من التعامل مع ملف التنزيل على أنه مجموعة نصوص مجهولة المصدر."
+      },
+      {
+        "Heading": "قراءة الأدلة",
+        "Body": "شكّل هذا العمل أساساً للمكتبة العامة التي افتُتحت في 8 تشرين الأول. تحفظ الصفحة المؤرشفة ما نشره المصدر وقت جلبها. لكنها لا تثبت وحدها أن النص يجمع جميع التعديلات أو يمثّل الصيغة القانونية النافذة اليوم."
+      }
+    ],
+    "Action": "Explore the database",
+    "ActionPath": "/data/",
+    "Sources": [
+      {
+        "URL": "/data/",
+        "Label": "Database tables and provenance",
+        "LabelAr": "جداول قاعدة البيانات ومصادرها"
+      },
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+        "Label": "Public dataset and dataset card",
+        "LabelAr": "مجموعة البيانات العامة وبطاقتها"
+      }
+    ]
+  },
+  {
+    "Slug": "preserve-first-build-search-next",
+    "Milestone": "2026-09-25",
+    "Published": "2026-10-30",
+    "Commit": "",
+    "Title": "Preserve the sources before building search",
+    "TitleAr": "حفظ المصادر قبل بناء البحث",
+    "Summary": "The first project step was to preserve raw legal material and plan repeatable updates before building a reading and search interface.",
+    "SummaryAr": "كانت الخطوة الأولى حفظ المواد القانونية الخام والتخطيط لتحديثات قابلة للتكرار قبل بناء واجهة القراءة والبحث.",
+    "Sections": [
+      {
+        "Heading": "Begin with the material",
+        "Body": "The project began on 25 September with a source-first plan: preserve raw legal pages before deciding how readers would search and use them. Keeping the original material would allow later parsing and interface work to be checked against what had actually been collected."
+      },
+      {
+        "Heading": "Separate preservation from presentation",
+        "Body": "The initial work explored the source structure and how its records could be collected. Ordinary filters and a possible model-assisted interface belonged to a later stage. Planning those tools did not mean they were already available."
+      },
+      {
+        "Heading": "Plan for changes",
+        "Body": "Repeatable updates were part of the initial requirement, so the collection could be revisited rather than treated as a one-time download. That goal later developed into the archive and update workflows described elsewhere in this journal."
+      },
+      {
+        "Heading": "Before the public library",
+        "Body": "This is the project’s starting milestone, not its public launch. The reading website opened later. Preserved source material provides a basis for inspection, while completeness, legal currency and interpretation still require separate checks."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "البدء بالمادة القانونية",
+        "Body": "بدأ المشروع في 25 أيلول بخطة تعطي الأولوية للمصدر: حفظ الصفحات القانونية الخام قبل تحديد طريقة بحث القرّاء فيها واستخدامها. يتيح الاحتفاظ بالمادة الأصلية مقارنة التحليل والواجهة اللذين سيُبنيان لاحقاً بما جُمع فعلياً، بدلاً من فقدان المرجع بعد تحويل محتواه إلى سجلات جديدة."
+      },
+      {
+        "Heading": "فصل الحفظ عن العرض",
+        "Body": "استكشف العمل الأول بنية المصدر وطريقة جمع سجلاته. أما المرشّحات المعتادة واحتمال إضافة واجهة بمساعدة نموذج فكانا مرحلة لاحقة. لا يعني التخطيط لهذه الأدوات أنها كانت متاحة بالفعل، ولا أن الموقع العام أُطلق في ذلك الوقت."
+      },
+      {
+        "Heading": "التخطيط للتغيّر",
+        "Body": "شمل المطلب الأول تحديثات قابلة للتكرار، حتى يمكن العودة إلى المجموعة وتحديثها بدلاً من التعامل معها كتنزيل لمرة واحدة. وتطوّر هذا الهدف لاحقاً إلى مسارات الأرشفة والتحديث الموصوفة في مقالات أخرى من السجل."
+      },
+      {
+        "Heading": "قبل افتتاح المكتبة",
+        "Body": "يمثّل هذا الإنجاز بداية المشروع لا إطلاقه العام. افتُتح موقع القراءة لاحقاً. توفّر المادة المحفوظة أساساً للفحص، بينما يظل اكتمال المجموعة وحداثتها القانونية وتفسيرها مسائل تحتاج إلى تحقق مستقل عند الاستخدام."
+      }
+    ],
+    "Sources": [
+      {
+        "URL": "/about/",
+        "Label": "Resulting library sources and scope",
+        "LabelAr": "مصادر المكتبة الناتجة وحدودها"
+      },
+      {
+        "URL": "/data/",
+        "Label": "Resulting source-page and legal tables",
+        "LabelAr": "جداول الصفحات المصدرية والبيانات القانونية الناتجة"
+      }
+    ],
+    "Action": "Inspect source provenance",
+    "ActionPath": "/data/",
+    "EvidenceKind": "conversation"
+  }
+]

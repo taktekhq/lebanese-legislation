@@ -5,6 +5,17 @@ import (
 	"strings"
 )
 
+// Some questions name one text, not a topic: "cybercrime" is Law 81 of 2018
+// (electronic transactions and personal data), which holds the Lebanese
+// offences against information systems, while a title search for the word
+// finds only decrees about the cybercrime bureau. These terms put that text
+// first in a search, and the other results follow it. The list is small and
+// kept by hand; it points at a text, it never writes wording shown as law.
+//
+// The hosted MCP server keeps a copy of these terms, so it ranks the same
+// text first.
+
+// lawEtransactions is Law 81 of 10 Oct 2018, المعاملات الإلكترونية والبيانات ذات الطابع الشخصي.
 const lawEtransactions = 278573
 
 var glossPinTerms = map[string]int{
@@ -18,8 +29,10 @@ var glossPinTerms = map[string]int{
 	"جرائم معلوماتية": lawEtransactions, "جرائم الكترونية": lawEtransactions,
 }
 
+// pinArStop are Arabic words that never change which text is meant.
 var pinArStop = map[string]bool{"قانون": true, "القانون": true, "لبنان": true, "في": true}
 
+// glossPins maps pinKey of each term to the text's id.
 var glossPins = map[string]int{}
 
 func init() {
@@ -28,6 +41,10 @@ func init() {
 	}
 }
 
+// pinKey folds a question to the form the pinned terms are kept in: Latin
+// lower case, accents and hyphens dropped, the little words of glossStop
+// left out; Arabic with spelling folded, the article ال (as often as it begins) of each word and
+// the words قانون and لبنان left out.
 func pinKey(q string) string {
 	var out []string
 	if hasArabic(q) {
@@ -35,7 +52,7 @@ func pinKey(q string) string {
 			if pinArStop[w] {
 				continue
 			}
-			for len([]rune(w)) > 4 && strings.HasPrefix(w, "ال") {
+			for len([]rune(w)) > 4 && strings.HasPrefix(w, "ال") { // "الالكترونية" and "الكترونية" are one word
 				w = string([]rune(w)[2:])
 			}
 			out = append(out, w)
@@ -50,6 +67,7 @@ func pinKey(q string) string {
 	return strings.Join(out, " ")
 }
 
+// pinnedLaw returns the id of the text a question names, or 0.
 func pinnedLaw(q string) int {
 	if k := pinKey(q); k != "" {
 		return glossPins[k]
@@ -57,6 +75,8 @@ func pinnedLaw(q string) int {
 	return 0
 }
 
+// pinnedRow loads the text q names, nil when q names none, the text is not in
+// this database, or year asks for another year.
 func (s *Server) pinnedRow(ctx context.Context, q string, year int) *LawRow {
 	id := pinnedLaw(q)
 	if id == 0 {
@@ -76,6 +96,8 @@ func (s *Server) pinnedRow(ctx context.Context, q string, year int) *LawRow {
 	return &got[0]
 }
 
+// withPin puts the pinned row first in laws (once), and says whether it was
+// not there before, so the count of matches grows by one.
 func withPin(laws []LawRow, pin *LawRow, limit int) ([]LawRow, bool) {
 	if pin == nil {
 		return laws, false

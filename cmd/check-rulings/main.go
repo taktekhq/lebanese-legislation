@@ -20,7 +20,7 @@ func main() {
 	ctx, stop := cli.Context()
 	defer stop()
 	dsn := flag.String("db", cli.DefaultDSN(), "Postgres connection string")
-	dir := flag.String("dir", "../lebleg-ruling-files", "ruling files and reading directory")
+	dir := flag.String("dir", "manual/rulings", "ruling files and reading directory")
 	pdfDir := flag.String("pdfs", "", "directory holding the <id>.pdf files (default: -dir)")
 	archiveDir := flag.String("archive", "archive", "archived source pages")
 	since := flag.Duration("since", 26*time.Hour, "recent-reading window")

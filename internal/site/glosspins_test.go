@@ -43,9 +43,11 @@ func TestWithPin(t *testing.T) {
 	}
 }
 
+// Law 81 of 2018 is first for every spelling, in the API and the search
+// page, with the other results after it.
 func TestCybercrimeFindsLaw81(t *testing.T) {
 	s := testServer(t)
-	s.ipLim = newIPLimiter(1_000_000, 1_000_000)
+	s.ipLim = newIPLimiter(1_000_000, 1_000_000) // many requests from one test client
 	for _, q := range cyberQueries {
 		var out apiSearchResult
 		getJSON(t, s, "/api/v1/search/?type=laws&q="+url.QueryEscape(q), &out)
@@ -65,7 +67,7 @@ func TestCybercrimeFindsLaw81(t *testing.T) {
 			t.Errorf("search page %q: first law = %+v, want %d", q, res.Laws, lawEtransactions)
 		}
 	}
-
+	// Other results stay after it (the English titles for "cybercrime"), and it is listed once.
 	var out apiSearchResult
 	getJSON(t, s, "/api/v1/search/?q=cybercrime&limit=20", &out)
 	n := 0
@@ -77,7 +79,7 @@ func TestCybercrimeFindsLaw81(t *testing.T) {
 	if n != 1 || len(out.Laws) < 2 {
 		t.Errorf("cybercrime: law 81 listed %d times among %d laws", n, len(out.Laws))
 	}
-
+	// Another year does not pin it; a later page does not repeat it.
 	for _, path := range []string{"/api/v1/search/?type=laws&year=1999&q=cybercrime", "/api/v1/search/?type=laws&offset=1&q=cybercrime"} {
 		var y apiSearchResult
 		getJSON(t, s, path, &y)

@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+// An article the Centre's note holds as repealed renders, with no versions
+// (Labour Code 13) or with an older in-force version from an amendment.
 func TestArticleRepealedByNoteRenders(t *testing.T) {
 	s, err := New(nil)
 	if err != nil {

@@ -1,0 +1,118 @@
+{
+  "slug": "traffic-authority-decree-11244",
+  "title_en": "The Traffic Authority (TMV) and Decree 11244 of 2003",
+  "title_ar": "هيئة إدارة السير والآليات والمركبات والمرسوم 11244 لعام 2003",
+  "question_en": "What is the Traffic, Vehicles and Vehicle Fleet Management Authority and what does Decree 11244 of 25/10/2003 regulate?",
+  "question_ar": "ما هي هيئة إدارة السير والآليات والمركبات وماذا ينظم المرسوم 11244 تاريخ 25/10/2003؟",
+  "sub_questions": [
+    "What tasks does the Authority have (Art. 2): traffic signals, traffic engineering, paid roadside parking, information and training, support to the traffic police?",
+    "How is the Authority organised: the director general and the units that report to him (Art. 3), and the registration, engineering, parking and secretariat services (Art. 4 to 8)?",
+    "Which service registers vehicles, issues vehicle licences, does the mechanical inspection and holds driving tests and issues, renews or exchanges driving licences (Art. 4)?",
+    "Who works there and how are staff recruited: grades, conditions, age, nationality, competitive exam, contracts (Art. 9 to 17)?",
+    "How does the traffic law 243/2012 refer to the Authority (the competent administration, the national road safety committee, annual vehicle fees, flagging a vehicle file after a traffic judgment)?",
+    "Which amendments touched the decree (decree 97/2017 on the regional units, decree 8988/2012 on table 8)?"
+  ],
+  "notes": "WHAT THE DECREE IS: Decree 11244 of 25/10/2003 (law id 198100, status in_force) sets the tasks, the staff structure ('malak'), the salary scale and the hiring conditions of the Authority (TMV, 'hay'at idarat al-sayr wal-aliyat wal-markabat'). It is an organisation decree, not a traffic-rules text: it contains no fines and no driving rules. Those are in Traffic Law 243 of 22/10/2012 (id 246455). Do not present the decree as the source of any fine or licence condition. ARTICLES: Art. 1 definitions (the Authority, the board of directors, the chairman, the director general). Art. 2 the Authority's 8 tasks. Art. 3 the executive body: a director general and five units directly under him (vehicle registration service, traffic engineering service, parking service, secretariat/diwan service, IT department). Art. 4 detail of the registration service: registration department, mechanics (inspection) department, driving (sawq) department, regional units; Art. 5 traffic engineering; Art. 6 parking; Art. 7 secretariat (admin, legal, media, finance and supplies); Art. 8 IT. Art. 9 to 17 staff: grades, tables, recruitment conditions, exam rules, contracts. WHO HEADS IT: the decree names a board of directors, a chairman and a director general (Art. 1) and puts the director general at the head of the executive body (Art. 3). It does not set out the board's membership or powers in the pack articles. The DB holds appointment decrees (e.g. decree 7427 of 15/02/2002 and decree 14522 of 03/06/2005 appoint one person as full-time chairman of the board and director general), so the chairman and the director general can be the same person; do not name anyone. The establishing law of the Authority is not found by title in the DB; do not cite one. AMENDMENTS (verified in the amendment table): (1) Decree 97 of 03/02/2017 (id 270025) replaces paragraph 4 of 'first' in Art. 4: the regional units are now vehicle sections in Dekwaneh, Saida, Tripoli, Zahle, Nabatieh, Akkar and Baalbek, and vehicle branches in Ouzai, Jounieh and Aley. The Art. 4 text in the pack already shows this wording. (2) Decree 8988 of 29/09/2012 (id 233078) amends table 8 (the additional hiring conditions per job) attached to the decree. The tables themselves are NOT in the DB text. Other decrees touching the Authority (salary rises: decree 5525 of 2010 and 5158 of 2019; treasury advances; budget credit transfers; weighing committees for trucks and buses) are not amendments of the structure and are not worth covering. NO ARTICLE of decree 11244 is repealed according to the amendment table. SALARY TABLES: the salary scales, grades and numbers of posts are in annexed tables that are not in the DB and are not worth quoting. Focus the page on tasks, structure and powers, and give staffing only in one short section (Art. 9 and 10: Lebanese for at least ten years, aged 20 to 44, medically fit, civil rights, no disciplinary dismissal, a competitive exam). A TRAP: Art. 2 task 5 slips between 'the Authority' and 'the establishment' (al-mu'assasa) in the same text; read both as the Authority. Task 5 says the Authority may contract with municipalities to run parking meters and share revenue, and may boot cars (BOOT) with unpaid parking fees. HOW LAW 243/2012 USES THE AUTHORITY: Art. 2 item 24 defines 'the competent administration' as the Authority and item 25 'the competent service' as the vehicle registration service. Art. 359 makes its director general a member of the National Road Safety Committee chaired by the interior minister. Art. 371 blocks the Authority's transactions and annual-fee payments outside its centres while a traffic judgment against the vehicle remains unpaid. Art. 386 says annual vehicle fees are collected on payment orders issued by the Authority, with dates fixed by decisions of the interior and finance ministers. Art. 369 links the traffic enforcement offices online to the Authority's database. In practice licensing tests and vehicle inspection (mecanique) are done by the Authority's departments, as Art. 4 says. Search traffic: art. 3 of this decree is a top landing; answer plainly that it lists the five units under the director general. Do not claim any figure on current fees, staff numbers or fines.",
+  "pack": [
+    {
+      "law": 198100,
+      "articles": [
+        "1"
+      ],
+      "why": "Definitions: the Authority, board of directors, chairman, director general."
+    },
+    {
+      "law": 198100,
+      "articles": [
+        "2"
+      ],
+      "why": "The Authority's eight tasks: enforcing traffic and registration rules, signals, traffic engineering, operational planning, roadside parking, information and training, external services, support to enforcement."
+    },
+    {
+      "law": 198100,
+      "articles": [
+        "3"
+      ],
+      "why": "The executive body: the director general and the five units under him. A top landing."
+    },
+    {
+      "law": 198100,
+      "articles": [
+        "4"
+      ],
+      "why": "Registration service in detail: registration, mechanical inspection, driving tests and licences, regional units (as amended by decree 97/2017)."
+    },
+    {
+      "law": 198100,
+      "articles": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "why": "Traffic engineering, parking, secretariat and IT units and their duties."
+    },
+    {
+      "law": 198100,
+      "articles": [
+        "9",
+        "10",
+        "16",
+        "17"
+      ],
+      "why": "Staffing in short: grades and annexed tables, hiring conditions, job duties set by the board, contracting of specialists."
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "2"
+      ],
+      "why": "Item 24 and 25 define the competent administration (the Authority) and competent service in the traffic law."
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "359",
+        "369",
+        "371",
+        "386"
+      ],
+      "why": "How the 2012 traffic law uses the Authority: road safety committee seat, online database link, blocking of transactions after unpaid judgments, annual fees by payment order."
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "387"
+      ],
+      "why": "Added after the legal review"
+    },
+    {
+      "law": 198100,
+      "articles": [
+        "12"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 198100,
+      "articles": [
+        "11"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "1"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 246455,
+      "articles": [
+        "372"
+      ],
+      "why": "Added after the second legal review"
+    }
+  ]
+}

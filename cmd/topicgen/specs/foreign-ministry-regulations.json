@@ -1,0 +1,98 @@
+{
+  "slug": "foreign-ministry-regulations",
+  "title_en": "Regulations of the Ministry of Foreign Affairs and Emigrants",
+  "title_ar": "نظام وزارة الخارجية والمغتربين",
+  "question_en": "What do the regulations of the Ministry of Foreign Affairs and Emigrants say about the Ministry, its diplomatic corps and its staff?",
+  "question_ar": "ماذا يقول نظام وزارة الخارجية والمغتربين عن الوزارة وسلكها الدبلوماسي وموظفيها؟",
+  "sub_questions": [
+    "What does the Ministry do and how is its central administration organised, including the Expatriates directorate?",
+    "Who runs the Ministry day to day (Secretary General, administrative committee, legal adviser)?",
+    "How are diplomats and consuls recruited and promoted, and what are the ranks?",
+    "Who can be appointed ambassador from outside the corps, and what are honorary consuls allowed to do?",
+    "How long can an official serve abroad, and how long must he or she spend at headquarters?",
+    "What rules bind staff abroad: marriage permission, leaving the post, outside work, leave?"
+  ],
+  "notes": "The Ministry's regulations in force are Law 1306 of 18/6/1971 (id 244773, 'nizam wizarat al-kharijiyya wal-mughtaribin', put into force by decree; the DB shows it as in_force, with 48 numbered articles plus a promulgation decree). Decree-law 94 of 16/9/1983 (id 244658) replaced it with a new regulation but is marked repealed: decree-law 24 of 23/3/1985 (id 168725) art 1 repeals 94/1983 and the texts issued under it, and art 2 revives every text that 94/1983 had repealed or amended. So 1306/1971 as amended is the working regulation again; do NOT cite 94/1983 as current (its 53 articles are not in the pack). The DB does not list which texts 94/1983 repealed, so the revival of 1306 is inferred from art 2 of 24/1985. The stored wording of 1306 already incorporates later amendments, flagged in its own text. Art 4 (a Secretary General exercises the Director General powers), arts 5 and 9 and art 36 and art 37 carry the wording of Law 13 of 17/5/1980 (id 244132) and the 1979 law it amends (decree 2220 of 18/8/1979, not in the DB as a separate text). Art 12 carries the 1979 recruitment wording (National Institute of Administration graduates, law degree, age cap 35, special exam). Art 12 para 4 still says a woman candidate must be single; the DB does not show it repealed, but it conflicts with equal treatment, so state it as written and say that the DB does not show whether it is applied. Art 17(1) (ambassadors from outside the corps, at most 15) carries Law 5 of 2/6/1977 (id 170404); Law 5/1977 art 2 also sets Table 1 at 60 posts of ambassador or minister plenipotentiary, but Law 13/1980 art 9 replaced all four tables, so the tables' present numbers are NOT in the DB; do not quote 60 as current. Art 39 para 2 was repealed by Law 376 of 4/11/1994 (id 194141), so only para 1 (marriage needs prior permission of the Minister, otherwise deemed resigned) remains. Art 19 paras 3-4 (honorary consuls, no Lebanese in foreign missions) were added by Law 13/1980. Decree 6745 of 26/11/1951 (id 196323) gave the Minister a Director General; art 4 of 1306 as amended now gives these powers to a Secretary General, so 6745/1951 is historical and is not in the pack. The DB holds no salary tables, no decree on allowances, no list of missions and no discipline code of its own: discipline is by general civil service law (art 40 refers to 'the penalties in general law'). The Expatriates directorate appears only as a name in art 3 and art 1 (the Ministry 'cares for expatriates'); the DB has no article regulating its tasks.",
+  "pack": [
+    {
+      "law": 244773,
+      "articles": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "7",
+        "10"
+      ],
+      "why": "Mission of the Ministry (foreign policy and care of expatriates), its two corps, the twelve central units including the Expatriates directorate, the Secretary General, legal adviser, administrative committee, and creation of missions."
+    },
+    {
+      "law": 244773,
+      "articles": [
+        "12",
+        "13",
+        "15",
+        "16",
+        "17"
+      ],
+      "why": "How diplomats and consuls are recruited (exam, age, degree), promoted, when they may go abroad, ministerial titles for heads of mission, and ambassadors from outside the corps (max 15, age 40, end with the President's term)."
+    },
+    {
+      "law": 244773,
+      "articles": [
+        "18",
+        "19"
+      ],
+      "why": "Honorary consuls (how appointed, limits) and the ban on honorary diplomatic posts and titles."
+    },
+    {
+      "law": 244773,
+      "articles": [
+        "22",
+        "34",
+        "36",
+        "38"
+      ],
+      "why": "Maximum time abroad (10 years first category, 7 years second and third), minimum two years at headquarters, annual leave, inspection of missions, and ambassadors placing posts at the new President's disposal."
+    },
+    {
+      "law": 244773,
+      "articles": [
+        "39",
+        "40",
+        "44"
+      ],
+      "why": "Conduct rules abroad: marriage needs prior permission (deemed resigned otherwise), no leaving the post without written permission, no other work."
+    },
+    {
+      "law": 170404,
+      "articles": [
+        "1"
+      ],
+      "why": "Amends art 17(1) of 1306: up to fifteen ambassadors from outside the corps."
+    },
+    {
+      "law": 168725,
+      "articles": [
+        "1",
+        "2"
+      ],
+      "why": "Repeals decree-law 94/1983 and revives the texts it repealed or amended, so 1306/1971 governs."
+    },
+    {
+      "law": 244773,
+      "articles": [
+        "35"
+      ],
+      "why": "Added after the legal review"
+    },
+    {
+      "law": 244773,
+      "articles": [
+        "45"
+      ],
+      "why": "Added after the second legal review"
+    }
+  ]
+}
