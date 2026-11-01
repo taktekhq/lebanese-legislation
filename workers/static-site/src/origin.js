@@ -13,6 +13,18 @@ export class Origin extends Container {
       "LEBLEG_SEARCH_DAILY_LIMIT", "LEBLEG_SEARCH_SHARES_DATA",
     ].filter((key) => env[key] !== undefined).map((key) => [key, env[key]]));
   }
+
+  // A cold start opens a 10 GB database and warms the server's caches before it
+  // listens, which takes longer than the library's default 20 seconds.
+  async fetch(request) {
+    if (!this.ctx.container?.running) {
+      await this.startAndWaitForPorts({
+        ports: [this.defaultPort],
+        cancellationOptions: { instanceGetTimeoutMS: 120_000, portReadyTimeoutMS: 300_000 },
+      });
+    }
+    return super.fetch(request);
+  }
 }
 
 export async function originFetch(request, env) {
