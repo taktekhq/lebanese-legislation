@@ -13,7 +13,7 @@ The API and MCP images now run the same Go code as the website, which is the cod
 - The MCP image listens on 8080 inside the container, as before; Compose maps it to 8001. Browser requests must still come from `MCP_ALLOWED_ORIGINS` or the same localhost address. `get_law` returns the full outline, as before, with optional `articles_offset` and `articles_limit`.
 - Settings are unchanged (`GEMINI_API_KEY`, `GEMINI_MAX_CALLS_PER_DAY`, `GEMINI_CONCURRENCY`, `GEMINI_QUERY_CACHE_SIZE`, `GEMINI_QUERY_CACHE_TTL`, `MCP_ALLOWED_ORIGINS`). New: `GEMINI_SEARCH_MODEL`, `GEMINI_EMBEDDING_MODEL`, and `RATE_LIMIT_PER_MINUTE` and `RATE_LIMIT_BURST` for a per-client limit when you host the API or MCP publicly (off by default, as before).
 - `lebleg restore` now adds what the services read (`tools/src/lebleg/sql/web.sql`) itself, so the update pipeline and your own PostgreSQL get it too.
-- `./start` writes `.env` itself; `lebleg init` and `lebleg serve` are gone. Each Go image has a built-in health check (`/server healthcheck`).
+- `./start` writes `.env` itself; `lebleg init` and `the web server` are gone. Each Go image has a built-in health check (`/server healthcheck`).
 - The handwriting demo left this repository. Its source is the [Hugging Face Space](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting).
 
 ## 0.3.0

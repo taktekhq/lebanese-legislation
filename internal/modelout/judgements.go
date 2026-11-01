@@ -8,7 +8,7 @@ import (
 )
 
 // Judgements are a model's checked answers about amendments the patterns
-// couldn't settle (db/model/judgements.jsonl, written by lebleg judge). They
+// couldn't settle (db/model/judgements.jsonl, written by judge). They
 // decide which version of an article stands, never what a version says: the
 // build gets a Verdict, a state and the model's name, and no text.
 type Judgements struct{ m map[string]judge.Judgement }

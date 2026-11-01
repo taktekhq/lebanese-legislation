@@ -12,13 +12,13 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/archive"
 )
 
-// The indexing step on a loaded database (LEBLEG_DSN, as `lebleg build` left
+// The indexing step on a loaded database (LEBLEG_DSN, as `build-db` left
 // it): it is repeatable, a page whose content has not changed keeps its
 // changed_at, and the placeholder documents are listed.
 func TestIndexingStepOnLoadedDatabase(t *testing.T) {
 	dsn := os.Getenv("LEBLEG_DSN")
 	if dsn == "" {
-		t.Skip("no LEBLEG_DSN: a database built by lebleg build")
+		t.Skip("no LEBLEG_DSN: a database built by build-db")
 	}
 	ctx := context.Background()
 	conn, err := pgx.Connect(ctx, dsn)

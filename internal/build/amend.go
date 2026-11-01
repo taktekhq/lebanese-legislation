@@ -443,7 +443,7 @@ func (b *builder) versions(changes []*change) ([][]any, error) {
 		})
 		u := centre[k]
 		// A model's checked answer, where the patterns couldn't tell (see
-		// lebleg judge): only for the same inputs it was shown. It says
+		// judge): only for the same inputs it was shown. It says
 		// which version stands, never what one says.
 		for _, c := range cs {
 			if shows(u, c) {
