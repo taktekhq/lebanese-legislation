@@ -26,3 +26,4 @@ scraper/data/
 # Manual data is filled on the build machine until it is published (manual/README.md).
 /manual/*
 !/manual/README.md
+workers/mcp/node_modules/
