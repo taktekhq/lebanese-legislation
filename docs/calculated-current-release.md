@@ -20,28 +20,24 @@ Previously published dumps remain restorable without this table.
 ## Reproducible full rebuild
 
 Use a new empty PostgreSQL database and a separate output directory. Read the
-old release only through `REUSE_DATABASE_URL`. Pin the dataset revision after
-uploading the sidecar, rather than downloading from a moving branch.
+old release only through `REUSE_DATABASE_URL`. Pin the source to a commit of
+this repository, whose `data/article_calculated_current.jsonl` is the sidecar.
 
 ```sh
-python -m pip install './tools[build,test]'
-export DATASET_REVISION='<immutable 40-character Hub commit>'
-export SNAPSHOT_DIR='./snapshot/data'
+export REVISION='<40-character commit of this repository>'
 export RELEASE_ID='<unused release ID>'
-hf download taktekhq/lebanese-legislation --repo-type dataset \
-  --revision "$DATASET_REVISION" --include 'data/*.parquet' --local-dir ./snapshot
+export SOURCE_DATABASE_URL='<a database loaded from data/ by data/load.sh>'
 export DATABASE_URL='<new empty PostgreSQL staging database>'
 export REUSE_DATABASE_URL='<read-only compatible released database>'
-build-db --snapshot-dir "$SNAPSHOT_DIR" --revision "$DATASET_REVISION" \
-  --as-of-date 2026-10-30 --release-id "$RELEASE_ID" \
-  --output-dir "./artifacts/release-$RELEASE_ID"
+go run ./cmd/build-release -revision "$REVISION" -as-of 2026-10-30 \
+  -release-id "$RELEASE_ID" -out "./artifacts/release-$RELEASE_ID"
 ```
 
 The command reuses only matching canonical source references, source hashes,
 exact excerpts and Unicode boundaries. It makes no embedding requests without
-`--embed-missing`. Exit status 2 means incomplete coverage; inspect
+`-embed-missing`. Exit status 2 means incomplete coverage; inspect
 `coverage.json` before considering paid embeddings. Preserve the staging DB and
-use `--resume` with the identical identity/date to finish the same build.
+use `-resume` with the identical identity/date to finish the same build.
 
 Build and restore both require PostgreSQL 18.6, pgvector 0.8.2 and
 `halfvec(768)`. The model is `gemini-embedding-001`, dimension 768,
@@ -52,12 +48,12 @@ PostgreSQL 18.6 and pgvector 0.8.2. Build a runtime/publisher from this source c
 retrieval includes calculated-text matching. An older runtime can restore the
 additive table but its literal lookup cannot search the calculated wording.
 
-Restore into a separate fresh database with the normal `lebleg restore` command
+Restore into a separate fresh database with the normal `restore-release` command
 and versioned manifest. Verify 34 derived rows, article 86 metadata and literal
 `5,000,000,000` lookup, original wording/hash parity, source/chunk integrity and
 complete vector coverage. The dump includes the derived table automatically;
 its count appears in `manifest.counts.tables`. Release format stays version 1.
-Run independent review before upload or deployment. `lebleg publish` preserves
+Run independent review before upload or deployment. `publish-release` preserves
 older release directories and refuses an existing release ID.
 
 ## Limited disk space

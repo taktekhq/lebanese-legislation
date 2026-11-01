@@ -12,6 +12,14 @@ The website is now the code LebaneseLegislation.com runs, not a copy from 30 Oct
 - MCP `get_law` and API search keep their 0.4.0 behaviour. Searching for a calculated amount now needs a digit in the query.
 - New commands: `cmd/usage-stats`, `cmd/journal-sitemap`, `cmd/searchindex`, `cmd/topicgen`, `cmd/check-english`.
 
+The data tools are Go commands now, one per job; the Python package in `tools/` is gone.
+
+- `restore-release` replaces `lebleg restore` (the db image runs it on first start), `check-release` the image's health check, `build-release` `lebleg build` and `publish-release` `lebleg publish`. Manifest format, checksums, release ids, the Hugging Face layout, vector reuse, the embedding settings and the budget caps are unchanged.
+- `build-release` reads the public tables from a database loaded from `data/` (`data/load.sh`) instead of Parquet files.
+- `publish-release` also writes the release block of the dataset card in the same commit, and reads the release back anonymously to check it.
+- The release runs as a workflow, [`release.yml`](../.github/workflows/release.yml), today on our own machine with `act` and the `GEMINI_API_KEY` and `HF_TOKEN` secrets. `lebleg pipeline` (its detect, approve, tick and retry states) and `lebleg seed` are gone: the workflow, its run history and re-runs replace the first, and the second filled an index outside this repository.
+- The version lives in `internal/release/VERSION`.
+
 ## 0.4.0
 
 The API and MCP images now run the same Go code as the website, which is the code behind LebaneseLegislation.com and its public MCP server. Python stays for the data tools only.

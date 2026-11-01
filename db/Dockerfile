@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # PostgreSQL 18.6 with pgvector 0.8.2. On first start with an empty volume it
-# downloads, verifies and restores the public database release.
+# downloads, verifies and restores the public database release (restore-release).
 # Build from the repository root: docker build -f db/Dockerfile -t lebanese-legislation-db .
 # PostgreSQL and extension source versions are pinned for reproducible restores.
 ARG POSTGRES_BASE=postgres:18.6-trixie@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
@@ -25,29 +25,42 @@ COPY db/init-reader.sh /docker-entrypoint-initdb.d/20-lebleg-reader.sh
 LABEL org.opencontainers.image.source="https://github.com/taktekhq/lebanese-legislation"
 LABEL org.opencontainers.image.licenses="PostgreSQL"
 
-# The restore code is the tools/ package, installed with matching PostgreSQL clients.
+# The release commands (cmd/restore-release, cmd/check-release, cmd/build-release,
+# cmd/publish-release), built for the target platform.
+FROM --platform=$BUILDPLATFORM golang:1.27.1-bookworm AS commands
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY internal/ ./internal/
+COPY cmd/restore-release/ ./cmd/restore-release/
+COPY cmd/check-release/ ./cmd/check-release/
+COPY cmd/build-release/ ./cmd/build-release/
+COPY cmd/publish-release/ ./cmd/publish-release/
+ARG TARGETOS
+ARG TARGETARCH
+RUN for c in restore-release check-release build-release publish-release; do \
+      CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags='-s -w' -o /out/$c ./cmd/$c || exit 1; \
+    done
+
+# PostgreSQL with the restore and its check, beside the matching PostgreSQL clients.
 FROM postgres AS backend
 RUN apt-get update \
- && apt-get install -y --no-install-recommends python3 python3-venv ca-certificates \
- && rm -rf /var/lib/apt/lists/* \
- && python3 -m venv /opt/venv
+ && apt-get install -y --no-install-recommends ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /opt/lebleg
-COPY LICENSE ./
-COPY tools/pyproject.toml ./tools/
-COPY tools/src/ ./tools/src/
-RUN /opt/venv/bin/pip install --no-cache-dir ./tools
+COPY LICENSE THIRD_PARTY_NOTICES.txt ./
+COPY --from=commands /out/restore-release /out/check-release /usr/local/bin/
 LABEL org.opencontainers.image.licenses="MIT"
-ENV PATH="/opt/venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 
-# Optional contributor tools: rebuild and publish snapshots from public Parquet.
+# Contributor tools: build and publish a release. The workflow in
+# .github/workflows/release.yml runs them here, beside pg_dump 18.6.
 FROM backend AS publisher
-RUN /opt/venv/bin/pip install --no-cache-dir './tools[build]'
-ENTRYPOINT ["lebleg"]
-CMD ["--help"]
+COPY --from=commands /out/build-release /out/publish-release /usr/local/bin/
+CMD ["build-release", "-h"]
 
 # Default target, published as ghcr.io/taktekhq/lebanese-legislation-db.
 FROM backend AS db
-COPY db/release.py db/health.sh db/web-schema.sh tools/src/lebleg/sql/web.sql ./db/
+COPY db/health.sh db/web-schema.sh tools/src/lebleg/sql/web.sql ./db/
 COPY db/init-release.sh /docker-entrypoint-initdb.d/30-lebleg-release.sh
 HEALTHCHECK --interval=10s --timeout=10s --start-period=2h --retries=3 CMD ["bash", "/opt/lebleg/db/health.sh"]
 ENTRYPOINT ["docker-entrypoint.sh"]

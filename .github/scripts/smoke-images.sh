@@ -20,7 +20,7 @@ trap cleanup EXIT
 docker network create "$net" >/dev/null
 docker run -d --name "$pg" --network "$net" -e POSTGRES_DB=legislation -e POSTGRES_HOST_AUTH_METHOD=trust \
   -v "$root/web/schema:/schema:ro" -v "$root/web/testdata:/testdata:ro" postgres:17-alpine >/dev/null
-for _ in $(seq 1 60); do docker exec "$pg" pg_isready -U postgres -d legislation >/dev/null 2>&1 && break; sleep 1; done
+for _ in $(seq 1 60); do docker exec "$pg" pg_isready -h 127.0.0.1 -U postgres -d legislation >/dev/null 2>&1 && break; sleep 1; done
 for sql in /schema/schema.sql /schema/graph.sql /schema/amendments.sql /schema/official.sql /schema/indexes.sql /testdata/synthetic.sql; do
   docker exec "$pg" psql -q -v ON_ERROR_STOP=1 -U postgres -d legislation -f "$sql" >/dev/null
 done
@@ -32,8 +32,10 @@ expect() { [ "$2" = "$3" ] || { echo "$platform: $1 returned $2, want $3" >&2; e
 
 for architecture in ${SMOKE_ARCHITECTURES:-amd64 arm64}; do
   platform="linux/$architecture"
-  docker run --rm --platform "$platform" --entrypoint /opt/venv/bin/python "$DB_IMAGE" \
-    -c 'import psycopg; from lebleg.restore import restore'
+  for command in restore-release check-release; do
+    docker run --rm --platform "$platform" "$DB_IMAGE" "$command" -h >/dev/null 2>&1 \
+      || { echo "$platform: $command does not run in the db image" >&2; exit 1; }
+  done
   docker run --rm --platform "$platform" --entrypoint bash "$DB_IMAGE" -n /opt/lebleg/db/web-schema.sh
 
   declare -A url=()
