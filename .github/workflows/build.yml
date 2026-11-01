@@ -66,6 +66,10 @@ jobs:
             --shm-size=2g lebleg-build-postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off \
             -c max_wal_size=8GB -c maintenance_work_mem=1GB
           for i in $(seq 60); do docker exec lebleg-build-pg pg_isready -U postgres -d lebleg -q && break; sleep 1; done
+      - name: Load the previous data
+        # The build keeps graph_edge ids and page_state from the database it
+        # replaces; starting from the last export keeps them stable.
+        run: data/load.sh "$LEBLEG_DSN" | tail -1
       - name: Build the commands
         run: mkdir -p bin && go build -o bin/ ./cmd/...
       - name: Build the database
