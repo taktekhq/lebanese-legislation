@@ -267,8 +267,8 @@ type candidate struct {
 const articleMatchFrom = `FROM legislation_article a JOIN legislation l ON l.id = a.law_id JOIN legislation_kind k ON k.name_ar = l.kind
 	LEFT JOIN code c ON c.law_id = a.law_id`
 
-func (s *Server) candidates(ctx context.Context, vec, where string, params []any, phrases []ftsPhrase) ([]candidate, error) {
-	tfs := tfColumns(phrases, vec, &params)
+func (s *Server) candidates(ctx context.Context, vec, text, where string, params []any, phrases []ftsPhrase) ([]candidate, error) {
+	tfs := tfColumns(phrases, vec, text, &params)
 	rows, err := s.db.Query(ctx, `SELECT a.law_id, a.position, c.law_id IS NOT NULL, `+tfs+` `+articleMatchFrom+` WHERE `+where, params...)
 	if err != nil {
 		return nil, err
@@ -322,19 +322,19 @@ func (s *Server) articleMatch(ctx context.Context, match string, limit, lawID in
 		return nil, nil
 	}
 	phrases := q.phrases()
-	where := `a.search_exact @@ $1::tsquery`
-	params := []any{q.tsquery()}
+	var params []any
+	where := q.where("a.search_exact", "a.text_ar", &params)
 	if lawID != 0 {
 		params = append(params, lawID)
-		where += ` AND a.law_id = $2`
+		where += fmt.Sprintf(` AND a.law_id = $%d`, len(params))
 	}
 	// Codes rank first: when they alone fill the page, the others need no score.
-	cands, err := s.candidates(ctx, "a.search_exact", where+` AND c.law_id IS NOT NULL`, params, phrases)
+	cands, err := s.candidates(ctx, "a.search_exact", "a.text_ar", where+` AND c.law_id IS NOT NULL`, params, phrases)
 	if err != nil {
 		return nil, err
 	}
 	if len(cands) < limit {
-		more, err := s.candidates(ctx, "a.search_exact", where+` AND c.law_id IS NULL`, params, phrases)
+		more, err := s.candidates(ctx, "a.search_exact", "a.text_ar", where+` AND c.law_id IS NULL`, params, phrases)
 		if err != nil {
 			return nil, err
 		}
@@ -372,8 +372,10 @@ func (s *Server) articleMatch(ctx context.Context, match string, limit, lawID in
 		return nil, err
 	}
 	df, err := s.phraseRows(ctx, "articles", phrases, func(ctx context.Context, p ftsPhrase) (float64, error) {
+		var ps []any
+		w := ftsQuery{groups: [][]ftsPhrase{{p}}}.where("a.search_exact", "a.text_ar", &ps)
 		var n float64
-		err := s.db.QueryRow(ctx, `SELECT count(*)::float8 FROM legislation_article WHERE search_exact @@ $1::tsquery`, p.tsquery()).Scan(&n)
+		err := s.db.QueryRow(ctx, `SELECT count(*)::float8 FROM legislation_article a WHERE `+w, ps...).Scan(&n)
 		return n, err
 	})
 	if err != nil {
@@ -439,58 +441,12 @@ func (s *Server) countArticles(ctx context.Context, match string, cap int) (int,
 	if !ok {
 		return 0, nil
 	}
+	var ps []any
+	w := q.where("a.search_exact", "a.text_ar", &ps)
+	ps = append(ps, cap)
 	var n int
-	err := s.db.QueryRow(ctx, `SELECT count(*) FROM (SELECT 1 FROM legislation_article WHERE search_exact @@ $1::tsquery LIMIT $2) x`, q.tsquery(), cap).Scan(&n)
+	err := s.db.QueryRow(ctx, fmt.Sprintf(`SELECT count(*) FROM (SELECT 1 FROM legislation_article a WHERE %s LIMIT $%d) x`, w, len(ps)), ps...).Scan(&n)
 	return n, err
-}
-
-// frenchVec is the French text folded as FTS5's remove_diacritics did.
-var frenchVec = "to_tsvector('simple', " + fmt.Sprintf(frFoldSQL, "a.text_fr") + ")"
-
-// frenchMatch matches the French texts the Centre published.
-func (s *Server) frenchMatch(ctx context.Context, match string, limit int) ([]articleHit, error) {
-	q, ok := parseFTS(match).usable()
-	if !ok {
-		return nil, nil
-	}
-	phrases := q.phrases()
-	var params []any
-	where := []string{`a.text_fr ~ '\S'`}
-	if pf := q.prefilter("a.text_fr", "regex", &params); pf != "" {
-		where = append(where, pf)
-	}
-	params = append(params, q.tsquery())
-	where = append(where, fmt.Sprintf("%s @@ $%d::tsquery", frenchVec, len(params)))
-	cands, err := s.candidates(ctx, frenchVec, strings.Join(where, " AND "), params, phrases)
-	if err != nil || len(cands) == 0 {
-		return nil, err
-	}
-	st, err := s.stats.corpus(ctx, "french", func(ctx context.Context) (corpusStats, error) {
-		var st corpusStats
-		err := s.db.QueryRow(ctx, `SELECT count(*)::float8, coalesce(avg((SELECT sum(cardinality(u.positions)) FROM unnest(`+frenchVec+`) u)), 0)::float8
-			FROM legislation_article a WHERE a.text_fr ~ '\S'`).Scan(&st.rows, &st.avgLen)
-		return st, err
-	})
-	if err != nil {
-		return nil, err
-	}
-	df, err := s.phraseRows(ctx, "french", phrases, func(ctx context.Context, p ftsPhrase) (float64, error) {
-		pq := ftsQuery{groups: [][]ftsPhrase{{p}}}
-		var ps []any
-		w := []string{`a.text_fr ~ '\S'`}
-		if pf := pq.prefilter("a.text_fr", "regex", &ps); pf != "" {
-			w = append(w, pf)
-		}
-		ps = append(ps, pq.tsquery())
-		w = append(w, fmt.Sprintf("%s @@ $%d::tsquery", frenchVec, len(ps)))
-		var n float64
-		err := s.db.QueryRow(ctx, `SELECT count(*)::float8 FROM legislation_article a WHERE `+strings.Join(w, " AND "), ps...).Scan(&n)
-		return n, err
-	})
-	if err != nil {
-		return nil, err
-	}
-	return s.hitsFor(ctx, rank(cands, st, df, limit), "a.text_fr")
 }
 
 // calculatedLaw is the Code of Civil Procedure, the one text with
@@ -594,9 +550,12 @@ func (s *Server) findRulings(ctx context.Context, q string, limit int, forms boo
 	if !ok {
 		return out, nil
 	}
+	var params []any
+	w := fq.where("r.search_exact", rulingText, &params)
+	params = append(params, limit)
 	rows, err := s.db.Query(ctx, `SELECT r.id, r.title, r.court, to_char(r.decided_on, 'YYYY-MM-DD'), r.text_ar,
 		EXISTS (SELECT 1 FROM ruling_file rf WHERE rf.ruling_id = r.id)
-		FROM ruling r WHERE r.search_exact @@ $1::tsquery ORDER BY r.decided_on DESC NULLS LAST, r.id LIMIT $2`, fq.tsquery(), limit)
+		FROM ruling r WHERE `+w+fmt.Sprintf(` ORDER BY r.decided_on DESC NULLS LAST, r.id LIMIT $%d`, len(params)), params...)
 	if err != nil {
 		return nil, err
 	}
@@ -623,6 +582,9 @@ func (s *Server) findRulings(ctx context.Context, q string, limit int, forms boo
 	return out, rows.Err()
 }
 
+// rulingText is what a ruling's search vector reads: its title and text.
+const rulingText = "(r.title || ' ' || coalesce(r.text_ar, ''))"
+
 // pdfURL is the judgment's scan on the Lebanese University's site.
 func pdfURL(id int) string {
 	return fmt.Sprintf("https://legallaw.ul.edu.lb/RulingFile.aspx?RuliID=%d&type=list", id)
@@ -633,8 +595,11 @@ func (s *Server) countRulings(ctx context.Context, match string, cap int) (int, 
 	if !ok {
 		return 0, nil
 	}
+	var ps []any
+	w := q.where("r.search_exact", rulingText, &ps)
+	ps = append(ps, cap)
 	var n int
-	err := s.db.QueryRow(ctx, `SELECT count(*) FROM (SELECT 1 FROM ruling WHERE search_exact @@ $1::tsquery LIMIT $2) x`, q.tsquery(), cap).Scan(&n)
+	err := s.db.QueryRow(ctx, fmt.Sprintf(`SELECT count(*) FROM (SELECT 1 FROM ruling r WHERE %s LIMIT $%d) x`, w, len(ps)), ps...).Scan(&n)
 	return n, err
 }
 

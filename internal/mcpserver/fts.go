@@ -195,68 +195,133 @@ func (q ftsQuery) tsquery() string {
 	return strings.Join(groups, " & ")
 }
 
+// Postgres's parser keeps digits joined by "/", "." or "-" as one token
+// ("670/672", "15.4.2014"), where FTS5 splits them, so a phrase with digits
+// is matched against the text itself: the words around it go to the
+// tsvector, the phrase to a regular expression with FTS5's token
+// boundaries.
+
+func (p ftsPhrase) hasDigit() bool {
+	for _, t := range p.tokens {
+		for _, r := range t {
+			if unicode.IsDigit(r) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func digitGroup(g []ftsPhrase) bool {
+	for _, p := range g {
+		if p.hasDigit() {
+			return true
+		}
+	}
+	return false
+}
+
+// pattern is the phrase as a regular expression over the text.
+func (p ftsPhrase) pattern() string {
+	parts := make([]string, len(p.tokens))
+	for i, t := range p.tokens {
+		parts[i] = regexp.QuoteMeta(t)
+	}
+	re := `(^|[^[:alnum:]])` + strings.Join(parts, `[^[:alnum:]]+`)
+	if !p.prefix {
+		re += `([^[:alnum:]]|$)`
+	}
+	return re
+}
+
+func (p ftsPhrase) longest() string {
+	best := ""
+	for _, t := range p.tokens {
+		if runeLen(t) > runeLen(best) {
+			best = t
+		}
+	}
+	return best
+}
+
+// textMatch is the SQL condition that text holds phrase p.
+func (p ftsPhrase) textMatch(text string, args *[]any) string {
+	*args = append(*args, "%"+likeEscape(p.longest())+"%", p.pattern())
+	return fmt.Sprintf("(%s ILIKE $%d AND %s ~* $%d)", text, len(*args)-1, text, len(*args))
+}
+
+// where is the SQL condition for the query over a row whose search vector
+// is vec and whose text is text.
+func (q ftsQuery) where(vec, text string, args *[]any) string {
+	var lexical, digits ftsQuery
+	for _, g := range q.groups {
+		if digitGroup(g) {
+			digits.groups = append(digits.groups, g)
+		} else {
+			lexical.groups = append(lexical.groups, g)
+		}
+	}
+	var conds []string
+	if len(lexical.groups) > 0 {
+		*args = append(*args, lexical.tsquery())
+		conds = append(conds, fmt.Sprintf("%s @@ $%d::tsquery", vec, len(*args)))
+	} else {
+		// Only numbers: the index still narrows the rows, by each phrase's
+		// first token as a prefix ("670" finds "670/672").
+		var loose ftsQuery
+		for _, g := range digits.groups {
+			var alts []ftsPhrase
+			for _, p := range g {
+				alts = append(alts, ftsPhrase{tokens: p.tokens[:1], prefix: true})
+			}
+			loose.groups = append(loose.groups, alts)
+		}
+		*args = append(*args, loose.tsquery())
+		conds = append(conds, fmt.Sprintf("%s @@ $%d::tsquery", vec, len(*args)))
+	}
+	for _, g := range digits.groups {
+		alts := make([]string, len(g))
+		for i, p := range g {
+			if p.hasDigit() {
+				alts[i] = p.textMatch(text, args)
+			} else {
+				*args = append(*args, ftsQuery{groups: [][]ftsPhrase{{p}}}.tsquery())
+				alts[i] = fmt.Sprintf("%s @@ $%d::tsquery", vec, len(*args))
+			}
+		}
+		conds = append(conds, "("+strings.Join(alts, " OR ")+")")
+	}
+	return strings.Join(conds, " AND ")
+}
+
 // likeEscape escapes s for a LIKE pattern.
 func likeEscape(s string) string {
 	return strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`).Replace(s)
 }
 
-// prefilter narrows rows with conditions cheaper than building a tsvector
-// for every row, before the tsvector check: each group's longest token must
-// occur in the text. With like "ILIKE" the condition is one an index can
-// serve (the trigram index on law titles); with "regex" it is a
-// case-insensitive regular expression that also takes accented vowels for
-// plain ones ("ecrit" finds "écrit"), for the Latin texts. Groups with a
-// token too short to help are left to the tsvector check alone.
+// prefilter narrows law titles with conditions the trigram index on
+// ar_norm(title) serves, before the tsvector check: each group's longest
+// token must occur in the title. Groups with a token too short for
+// trigrams are left to the tsvector check alone.
 func (q ftsQuery) prefilter(expr, like string, args *[]any) string {
 	var conds []string
 	for _, g := range q.groups {
 		var alts []string
 		ok := true
 		for _, p := range g {
-			best := ""
-			for _, t := range p.tokens {
-				if runeLen(t) > runeLen(best) {
-					best = t
-				}
-			}
+			best := p.longest()
 			if runeLen(best) < 3 {
 				ok = false
 				break
 			}
-			if like == "regex" {
-				*args = append(*args, accentRegex(best))
-				alts = append(alts, fmt.Sprintf("%s ~* $%d", expr, len(*args)))
-			} else {
-				*args = append(*args, "%"+likeEscape(best)+"%")
-				alts = append(alts, fmt.Sprintf("%s %s $%d", expr, like, len(*args)))
-			}
+			*args = append(*args, "%"+likeEscape(best)+"%")
+			alts = append(alts, fmt.Sprintf("%s %s $%d", expr, like, len(*args)))
 		}
 		if ok && len(alts) > 0 {
 			conds = append(conds, "("+strings.Join(alts, " OR ")+")")
 		}
 	}
 	return strings.Join(conds, " AND ")
-}
-
-var accentClasses = map[rune]string{
-	'a': "[aàáâãäåāăą]", 'e': "[eèéêëēĕėęě]", 'i': "[iìíîïīĭį]", 'o': "[oòóôõöōŏő]", 'u': "[uùúûüūŭůűų]",
-	'c': "[cçćč]", 'n': "[nñńň]", 'y': "[yýÿ]", 'z': "[zźżž]", 'd': "[dď]",
-}
-
-// accentRegex is a token as a regular expression that matches it with or
-// without accents.
-func accentRegex(t string) string {
-	var b strings.Builder
-	for _, r := range t {
-		if c, ok := accentClasses[r]; ok {
-			b.WriteString(c)
-		} else if unicode.IsLetter(r) || unicode.IsDigit(r) {
-			b.WriteRune(r)
-		} else {
-			b.WriteString(regexp.QuoteMeta(string(r)))
-		}
-	}
-	return b.String()
 }
 
 // matches reports whether a token list (one row) satisfies the query, the
@@ -337,10 +402,16 @@ func bm25(st corpusStats, df []float64, tf []float64, dl float64) float64 {
 
 // tfColumns is the select list that reads, from a tsvector, a row's length
 // (dl) and each phrase's term frequency (tf0, tf1...): the occurrences of the
-// phrase's last token, or of any token it begins when it is a prefix.
-func tfColumns(phrases []ftsPhrase, vec string, args *[]any) string {
+// phrase's last token, or of any token it begins when it is a prefix; a
+// phrase with digits is counted in the text instead.
+func tfColumns(phrases []ftsPhrase, vec, text string, args *[]any) string {
 	cols := []string{"coalesce(sum(cardinality(u.positions)), 0)::float8"}
 	for _, p := range phrases {
+		if p.hasDigit() {
+			*args = append(*args, p.pattern())
+			cols = append(cols, fmt.Sprintf("regexp_count(%s, $%d, 1, 'i')::float8", text, len(*args)))
+			continue
+		}
 		last := p.tokens[len(p.tokens)-1]
 		*args = append(*args, last)
 		cond := fmt.Sprintf("u.lexeme = $%d", len(*args))

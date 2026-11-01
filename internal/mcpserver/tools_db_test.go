@@ -620,3 +620,13 @@ func TestToolsAgainstFixtureAreJSON(t *testing.T) {
 	_ = context.Background
 	_ = json.Valid
 }
+
+func TestWarm(t *testing.T) {
+	s := dbServer(t)
+	if err := s.Warm(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if s.englishMem.corpus == nil || len(s.englishMem.corpus.docs) != 4 || s.frenchMem.corpus == nil || len(s.frenchMem.corpus.docs) != 3 {
+		t.Errorf("warmed: %+v %+v", s.englishMem.corpus, s.frenchMem.corpus)
+	}
+}

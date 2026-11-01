@@ -442,8 +442,7 @@ func (s *Server) lawTitleSearch(ctx context.Context, match string, year yearVal,
 		if pf := q.prefilter("ar_norm(l.title)", "ILIKE", &params); pf != "" {
 			where = append(where, pf)
 		}
-		params = append(params, q.tsquery())
-		where = append(where, fmt.Sprintf("to_tsvector('simple', ar_norm(l.title)) @@ $%d::tsquery", len(params)))
+		where = append(where, q.where("to_tsvector('simple', ar_norm(l.title))", "l.title", &params))
 	}
 	if year.positive() {
 		params = append(params, year.s+"-%")
@@ -473,8 +472,8 @@ func (s *Server) countLawTitles(ctx context.Context, match string, cap int) (int
 	if pf := q.prefilter("ar_norm(l.title)", "ILIKE", &params); pf != "" {
 		where = append(where, pf)
 	}
-	params = append(params, q.tsquery(), cap)
-	where = append(where, fmt.Sprintf("to_tsvector('simple', ar_norm(l.title)) @@ $%d::tsquery", len(params)-1))
+	where = append(where, q.where("to_tsvector('simple', ar_norm(l.title))", "l.title", &params))
+	params = append(params, cap)
 	var n int
 	err := s.db.QueryRow(ctx, `SELECT count(*) FROM (SELECT 1 FROM legislation l WHERE `+strings.Join(where, " AND ")+
 		fmt.Sprintf(` LIMIT $%d) x`, len(params)), params...).Scan(&n)
@@ -503,13 +502,8 @@ func fts5French(q string) string {
 }
 
 var (
-	nonAlnum  = regexp.MustCompile(`[^a-z0-9]+`)
-	enStop    = setOf("the", "of", "a", "an", "in", "and", "on", "for", "to", "by", "with", "is", "are")
-	frFoldSQL = func() string {
-		from := "àáâãäåāăąçćčďèéêëēĕėęěìíîïīĭįñńňòóôõöōŏőùúûüūŭůűųýÿźżž"
-		to := "aaaaaaaaacccdeeeeeeeeeiiiiiiinnnooooooooouuuuuuuuuyyzzz"
-		return "translate(lower(%s), '" + from + "', '" + to + "')"
-	}()
+	nonAlnum = regexp.MustCompile(`[^a-z0-9]+`)
+	enStop   = setOf("the", "of", "a", "an", "in", "and", "on", "for", "to", "by", "with", "is", "are")
 )
 
 // fts5English builds a MATCH for the English titles: every content word, as
@@ -532,98 +526,6 @@ func fts5English(q string) string {
 		}
 	}
 	return strings.Join(out, " AND ")
-}
-
-// englishTitleSearch matches the unofficial English titles, codes first,
-// then by bm25.
-func (s *Server) englishTitleSearch(ctx context.Context, match string, year yearVal, limit int) ([]lawRow, error) {
-	q, ok := parseFTS(match).usable()
-	if !ok {
-		return nil, nil
-	}
-	vec := "to_tsvector('simple', " + fmt.Sprintf(frFoldSQL, "te.title_en") + ")"
-	var params []any
-	where := []string{`te.title_en ~ '\S'`}
-	if pf := q.prefilter("te.title_en", "regex", &params); pf != "" {
-		where = append(where, pf)
-	}
-	params = append(params, q.tsquery())
-	where = append(where, fmt.Sprintf("%s @@ $%d::tsquery", vec, len(params)))
-	if year.positive() {
-		params = append(params, year.s+"-%")
-		where = append(where, fmt.Sprintf("to_char(l.issued_on, 'YYYY-MM-DD') LIKE $%d", len(params)))
-	}
-	phrases := q.phrases()
-	tfs := tfColumns(phrases, vec, &params)
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, `+tfs+` FROM `+lawFrom+` WHERE `+strings.Join(where, " AND "), params...)
-	if err != nil {
-		return nil, err
-	}
-	var stats [][]float64
-	laws, err := scanLaws(rows, func() []any {
-		stats = append(stats, nil)
-		return []any{&stats[len(stats)-1]}
-	})
-	if err != nil {
-		return nil, err
-	}
-	if len(laws) == 0 {
-		return nil, nil
-	}
-	st, err := s.stats.corpus(ctx, "english", s.englishStats)
-	if err != nil {
-		return nil, err
-	}
-	df, err := s.phraseRows(ctx, "english", phrases, func(ctx context.Context, p ftsPhrase) (float64, error) {
-		pq := ftsQuery{groups: [][]ftsPhrase{{p}}}
-		var ps []any
-		w := []string{`title_en ~ '\S'`}
-		if pf := pq.prefilter("title_en", "regex", &ps); pf != "" {
-			w = append(w, pf)
-		}
-		ps = append(ps, pq.tsquery())
-		w = append(w, fmt.Sprintf("to_tsvector('simple', "+frFoldSQL+") @@ $%d::tsquery", "title_en", len(ps)))
-		var n float64
-		err := s.db.QueryRow(ctx, `SELECT count(*)::float8 FROM legislation_title_en WHERE `+strings.Join(w, " AND "), ps...).Scan(&n)
-		return n, err
-	})
-	if err != nil {
-		return nil, err
-	}
-	type scored struct {
-		l     lawRow
-		code  bool
-		score float64
-	}
-	sc := make([]scored, len(laws))
-	for i, l := range laws {
-		sc[i] = scored{l, l.CodeSlug != nil, bm25(st, df, stats[i][1:], stats[i][0])}
-	}
-	sort.SliceStable(sc, func(i, j int) bool {
-		if sc[i].code != sc[j].code {
-			return sc[i].code
-		}
-		if sc[i].score != sc[j].score {
-			return sc[i].score > sc[j].score
-		}
-		return sc[i].l.ID < sc[j].l.ID
-	})
-	var out []lawRow
-	for i := 0; i < len(sc) && i < limit; i++ {
-		out = append(out, sc[i].l)
-	}
-	return out, nil
-}
-
-func (s *Server) englishStats(ctx context.Context) (corpusStats, error) {
-	var st corpusStats
-	if err := s.db.QueryRow(ctx, `SELECT count(*)::float8 FROM legislation_title_en WHERE title_en ~ '\S'`).Scan(&st.rows); err != nil {
-		return st, err
-	}
-	// The average length from a fixed sample: building every title's vector takes seconds.
-	err := s.db.QueryRow(ctx, `SELECT coalesce(avg((SELECT sum(cardinality(u.positions)) FROM unnest(to_tsvector('simple', `+
-		fmt.Sprintf(frFoldSQL, "title_en")+`)) u)), 0)::float8 FROM legislation_title_en TABLESAMPLE SYSTEM (10) REPEATABLE (1) WHERE title_en ~ '\S'`).Scan(&st.avgLen)
-	return st, err
 }
 
 // phraseRows is how many rows of a corpus hold each phrase (cached).

@@ -111,8 +111,10 @@ type Server struct {
 	refusal *rateLimiter
 	bg      sync.WaitGroup
 
-	codeCache codeList
-	calcCache calcIndex
+	codeCache  codeList
+	calcCache  calcIndex
+	englishMem memCache
+	frenchMem  memCache
 
 	badgeMu    sync.Mutex
 	badgeAt    time.Time

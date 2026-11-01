@@ -5,7 +5,7 @@
 //
 //	go run ./cmd/mcp-parity -dsn "$DATABASE_URL" -calls calls.jsonl [-remote https://lebaneselegislation.com/mcp] [-out dir]
 //
-// calls.jsonl holds one call per line: {"name": "get_law", "arguments": {"id": 244565}}.
+// calls.jsonl (one is next to this file) holds one call per line: {"name": "get_law", "arguments": {"id": 244565}}.
 // Every remote call is a real request (and is counted in that server's
 // analytics): keep the list short.
 package main
@@ -44,6 +44,7 @@ func main() {
 	remote := flag.String("remote", "", "another MCP endpoint to compare with")
 	outDir := flag.String("out", "", "directory to write each answer to (local-N.json, remote-N.json)")
 	slow := flag.Duration("slow", 0, "print every query slower than this")
+	warm := flag.Bool("warm", false, "read ahead what searches need before the first call, as a running server does")
 	flag.Parse()
 	if *dsn == "" || *callsPath == "" {
 		flag.Usage()
@@ -68,6 +69,13 @@ func main() {
 	}
 	defer pool.Close()
 	h := mcpserver.New(pool, mcpserver.Config{RateLimitPerMinute: -1})
+	if *warm {
+		started := time.Now()
+		if err := h.Warm(ctx); err != nil {
+			fail(err)
+		}
+		fmt.Printf("warmed in %s\n", time.Since(started).Round(time.Millisecond))
+	}
 	if *outDir != "" {
 		if err := os.MkdirAll(*outDir, 0o755); err != nil {
 			fail(err)
