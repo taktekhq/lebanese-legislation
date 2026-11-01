@@ -16,13 +16,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/taktekhq/lebanese-legislation/internal/cli"
 	"github.com/taktekhq/lebanese-legislation/internal/hfhub"
 	"github.com/taktekhq/lebanese-legislation/internal/release"
 )
 
 func main() {
-	ctx, stop := cli.Context()
+	ctx, stop := release.Context()
 	defer stop()
 	dir := flag.String("dir", "", "the release directory (manifest.json and its dump)")
 	repo := flag.String("repo", release.DefaultRepo, "the Hugging Face dataset")
@@ -33,17 +32,17 @@ func main() {
 	endpoint := flag.String("hub", release.Env("HF_ENDPOINT", hfhub.DefaultEndpoint), "the Hugging Face endpoint")
 	flag.Parse()
 	if *dir == "" {
-		cli.Exit(errors.New("-dir is required"))
+		release.Exit(errors.New("-dir is required"))
 	}
 	token := os.Getenv("HF_TOKEN")
 	if token == "" {
-		cli.Exit(errors.New("HF_TOKEN is required to publish"))
+		release.Exit(errors.New("HF_TOKEN is required to publish"))
 	}
 	hub := hfhub.New(*endpoint, token)
 	oid, r, err := release.Publish(ctx, hub, *dir, release.PublishOptions{Repo: *repo, ExpectLatest: *expect, Card: *card, SetupURL: *setup})
-	cli.Exit(err)
+	release.Exit(err)
 	if *verify {
-		cli.Exit(release.VerifyPublished(ctx, hfhub.New(*endpoint, ""), *repo, oid, r, filepath.Join(*dir, r.Dump.Path)))
+		release.Exit(release.VerifyPublished(ctx, hfhub.New(*endpoint, ""), *repo, oid, r, filepath.Join(*dir, r.Dump.Path)))
 	}
 	out, _ := json.Marshal(map[string]string{"artifact_revision": oid, "release_id": r.ReleaseID})
 	fmt.Println(string(out))

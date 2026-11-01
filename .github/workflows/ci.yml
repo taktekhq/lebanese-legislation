@@ -3,17 +3,17 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
-  # tools/ (restore, build, publish, pipeline), the db/ image, and the four images in Compose.
+  # The release commands (cmd/*-release, internal/release*, internal/embedding,
+  # internal/hfhub) against a throwaway pgvector PostgreSQL, the db image's
+  # first boot, the scraper, and the four images.
   test:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-go@v5
         with:
-          python-version: '3.12'
-      - run: pip install './tools[build,test]'
-      - run: ruff check tools/src tools/tests
+          go-version-file: go.mod
       - name: Scraper
         run: |
           python -m compileall -q scraper/ulscrape
@@ -22,30 +22,30 @@ jobs:
       - name: Start disposable PostgreSQL
         run: |
           docker run -d --name lebleg-test -p 127.0.0.1:55433:5432 -e POSTGRES_USER=lebleg -e POSTGRES_PASSWORD=test -e POSTGRES_DB=lebleg lebleg-test-postgres
-          for i in $(seq 1 60); do docker exec lebleg-test pg_isready -U lebleg && break; sleep 1; done
+          for i in $(seq 1 60); do docker exec lebleg-test pg_isready -h 127.0.0.1 -U lebleg && break; sleep 1; done
+          # pg_dump and pg_restore 18.6, from the same image.
           mkdir -p /tmp/pg18-bin
           for client in pg_dump pg_restore; do
-            printf '#!/bin/sh\nexec docker run --rm -i --network host -v /tmp:/tmp -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -e PGHOST -e PGPORT -e PGUSER -e PGDATABASE -e PGSSLMODE -e PGPASSWORD -e PGOPTIONS --entrypoint %s lebleg-test-postgres "$@"\n' "$client" > "/tmp/pg18-bin/$client"
+            printf '#!/bin/sh\nexec docker run --rm -i --network host -v /tmp:/tmp -e PGHOST -e PGPORT -e PGUSER -e PGDATABASE -e PGSSLMODE -e PGPASSWORD -e PGOPTIONS --entrypoint %s lebleg-test-postgres "$@"\n' "$client" > "/tmp/pg18-bin/$client"
             chmod +x "/tmp/pg18-bin/$client"
           done
-          echo '/tmp/pg18-bin' >> "$GITHUB_PATH"
       - run: docker build -f db/Dockerfile --target db -t lebleg-test-db .
+      - run: docker build -f db/Dockerfile --target publisher -t lebleg-test-publisher .
+      - name: Release command tests
+        run: go test -count=1 ./internal/release/... ./internal/releasedb/... ./internal/embedding/... ./internal/hfhub/... ./cmd/restore-release ./cmd/check-release ./cmd/build-release ./cmd/publish-release
+        env:
+          LEBLEG_RELEASE_TEST_DSN: postgres://lebleg:test@127.0.0.1:55433/lebleg
+          LEBLEG_TEST_PGDUMP: /tmp/pg18-bin/pg_dump
+          LEBLEG_TEST_PGRESTORE: /tmp/pg18-bin/pg_restore
+          LEBLEG_TEST_DB_IMAGE: lebleg-test-db
       - run: docker build -f api/Dockerfile -t lebleg-test-api .
       - run: docker build -f mcp/Dockerfile -t lebleg-test-mcp .
       - run: docker build -f web/Dockerfile -t lebleg-test-web .
-      - run: pytest -q
-        working-directory: tools
+      - name: Image smoke checks
         env:
-          LEBLEG_PIPELINE_IMAGE_TEST: "1"
-          LEBLEG_TEST_ADMIN_DSN: host=127.0.0.1 port=55433 user=lebleg password=test dbname=lebleg
-          RUNTIME_TEST_DSN: host=127.0.0.1 port=55433 user=lebleg password=test dbname=lebleg
-          LEBLEG_TEST_IMAGE: lebleg-test-postgres
-          LEBLEG_TEST_DB_IMAGE: lebleg-test-db
-          LEBLEG_TEST_API_IMAGE: lebleg-test-api
-          LEBLEG_TEST_MCP_IMAGE: lebleg-test-mcp
-          LEBLEG_TEST_WEB_IMAGE: lebleg-test-web
-          PG_DUMP_BIN: /tmp/pg18-bin/pg_dump
-          LEBLEG_TEST_PGDUMP: /tmp/pg18-bin/pg_dump
-          LEBLEG_TEST_PGRESTORE: /tmp/pg18-bin/pg_restore
-          PG_RESTORE_BIN: /tmp/pg18-bin/pg_restore
-      - run: docker build -f db/Dockerfile --target publisher -t lebleg-test-publisher .
+          DB_IMAGE: lebleg-test-db
+          API_IMAGE: lebleg-test-api
+          MCP_IMAGE: lebleg-test-mcp
+          WEB_IMAGE: lebleg-test-web
+          SMOKE_ARCHITECTURES: amd64
+        run: bash .github/scripts/smoke-images.sh

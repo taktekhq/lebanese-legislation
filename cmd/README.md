@@ -47,3 +47,18 @@ run on public data only.
 | `calculated-current` | Writes each article's source-verified calculated wording to `data/article_calculated_current.jsonl`. |
 | `export-graph` | Writes the citation graph as CSV and GraphML. |
 | `mcp-snapshot` | Writes a SQLite (D1) snapshot of the database for the hosted MCP Worker. |
+
+## The PostgreSQL release
+
+The dump on Hugging Face (`releases/<id>/corpus.dump`) that the db image
+restores. These take `-db` from `DATABASE_URL`. The
+[release workflow](../.github/workflows/release.yml) runs the build and
+publish with their keys.
+
+| Command | What it does |
+| --- | --- |
+| `restore-release` | Downloads a release (or takes a local manifest), checks its SHA-256, restores it into an empty PostgreSQL 18.6 with pgvector 0.8.2, checks every count, hash and index, applies `web.sql` and records a receipt. The db image runs it on first start. |
+| `check-release` | Exit 1 unless the database holds one verified restored release. The db image's health check. |
+| `build-release` | Builds a release from a database loaded from `data/`: reuses an earlier release's vectors, embeds the rest (**key**: `GEMINI_API_KEY`, only with `-embed-missing`, capped), validates, writes `corpus.dump` and `manifest.json`. Exit 2 when vectors are still missing. |
+| `publish-release` | Uploads a built release to the Hugging Face dataset in one commit, with the `latest` pointer and the card's release block, then reads it back to check it (**key**: `HF_TOKEN`). |
+

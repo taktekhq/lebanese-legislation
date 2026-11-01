@@ -19,14 +19,13 @@ import (
 	"time"
 	_ "time/tzdata" // the budget day follows a named zone, also in containers without zoneinfo
 
-	"github.com/taktekhq/lebanese-legislation/internal/cli"
 	"github.com/taktekhq/lebanese-legislation/internal/embedding"
 	"github.com/taktekhq/lebanese-legislation/internal/release"
 	"github.com/taktekhq/lebanese-legislation/internal/releasedb"
 )
 
 func main() {
-	ctx, stop := cli.Context()
+	ctx, stop := release.Context()
 	defer stop()
 	dsn := flag.String("db", release.Env("DATABASE_URL", ""), "the empty staging database, PostgreSQL 18.6 with pgvector 0.8.2 (default DATABASE_URL)")
 	source := flag.String("source-db", release.Env("SOURCE_DATABASE_URL", ""), "a database loaded from data/ by data/load.sh, read only (default SOURCE_DATABASE_URL)")
@@ -73,11 +72,11 @@ func main() {
 	if *embed {
 		key := os.Getenv("GEMINI_API_KEY")
 		gemini, err := embedding.NewGemini(key, embedding.Config{})
-		cli.Exit(err)
+		release.Exit(err)
 		var provider embedding.Counter = gemini
 		if *dailyDir != "" {
 			provider, err = embedding.NewDaily(provider, *dailyDir, *dailyUSD, *price, *zone)
-			cli.Exit(err)
+			release.Exit(err)
 		}
 		if *maxTokens > 0 {
 			path := *ledger
@@ -85,7 +84,7 @@ func main() {
 				path = filepath.Join(*out, "embedding-budget.json")
 			}
 			provider, err = embedding.NewBudgeted(provider, *maxTokens, path)
-			cli.Exit(err)
+			release.Exit(err)
 		}
 		o.Embedder = provider
 	}
@@ -94,5 +93,5 @@ func main() {
 		log.Print(err)
 		os.Exit(2)
 	}
-	cli.Exit(err)
+	release.Exit(err)
 }

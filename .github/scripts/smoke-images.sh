@@ -32,8 +32,10 @@ expect() { [ "$2" = "$3" ] || { echo "$platform: $1 returned $2, want $3" >&2; e
 
 for architecture in ${SMOKE_ARCHITECTURES:-amd64 arm64}; do
   platform="linux/$architecture"
-  docker run --rm --platform "$platform" --entrypoint /opt/venv/bin/python "$DB_IMAGE" \
-    -c 'import psycopg; from lebleg.restore import restore'
+  for command in restore-release check-release; do
+    docker run --rm --platform "$platform" "$DB_IMAGE" "$command" -h >/dev/null 2>&1 \
+      || { echo "$platform: $command does not run in the db image" >&2; exit 1; }
+  done
   docker run --rm --platform "$platform" --entrypoint bash "$DB_IMAGE" -n /opt/lebleg/db/web-schema.sh
 
   declare -A url=()

@@ -337,6 +337,10 @@ func dumpDatabase(ctx context.Context, dsn, destination, pgDump string) error {
 	if err := tmp.Sync(); err != nil {
 		return err
 	}
+	// The dump is a public file: readable by the db image's postgres user.
+	if err := tmp.Chmod(0o644); err != nil {
+		return err
+	}
 	// A hard link is atomic and refuses an existing destination.
 	return os.Link(tmp.Name(), destination)
 }

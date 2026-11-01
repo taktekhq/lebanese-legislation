@@ -9,16 +9,15 @@ package main
 import (
 	"flag"
 
-	"github.com/taktekhq/lebanese-legislation/internal/cli"
 	"github.com/taktekhq/lebanese-legislation/internal/release"
 	"github.com/taktekhq/lebanese-legislation/internal/releasedb"
 )
 
 func main() {
-	ctx, stop := cli.Context()
+	ctx, stop := release.Context()
 	defer stop()
-	dsn := flag.String("db", release.Env("DATABASE_URL", cli.DefaultDSN()), "the database (default DATABASE_URL)")
+	dsn := flag.String("db", release.Env("DATABASE_URL", ""), "the database (default DATABASE_URL)")
 	manifest := flag.String("manifest", release.Env("LEBLEG_MANIFEST_FILE", ""), "a local manifest the restored release must match")
 	flag.Parse()
-	cli.Exit(releasedb.CheckReceipt(ctx, *dsn, *manifest))
+	release.Exit(releasedb.CheckReceipt(ctx, *dsn, *manifest))
 }

@@ -32,7 +32,7 @@ jobs:
           REQUESTED_VERSION: ${{ inputs.version }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=$(python3 -c 'import tomllib; print(tomllib.load(open("tools/pyproject.toml","rb"))["project"]["version"])')
+          VERSION=$(cat internal/release/VERSION)
           if [ "$GITHUB_EVENT_NAME" = push ]; then
             test "$GITHUB_REF_NAME" = "v$VERSION"
           else
