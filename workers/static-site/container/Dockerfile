@@ -26,9 +26,9 @@ COPY --from=pgvector-build /out/usr/share/postgresql/18/extension/vector* /usr/s
 
 FROM pg AS origin
 ENV PGDATA=/var/lib/postgresql/data
-COPY build/lebleg.dump build/lebleg_search.dump /tmp/
 COPY build/scans/ /scans/
-RUN <<'SH'
+# The dumps are mounted for this step only, so they never become an image layer.
+RUN --mount=type=bind,source=build,target=/dumps <<'SH'
 set -eu
 install -d -o postgres -g postgres -m 0700 "$PGDATA"
 gosu postgres initdb -D "$PGDATA"
@@ -38,7 +38,7 @@ psql -h /tmp -U postgres -v ON_ERROR_STOP=1 -c 'CREATE ROLE lebleg_web LOGIN' -c
 for db in lebleg lebleg_search; do
   createdb -h /tmp -U postgres -O lebleg "$db"
   psql -h /tmp -U postgres -d "$db" -v ON_ERROR_STOP=1 -c 'CREATE EXTENSION vector'
-  if ! pg_restore -h /tmp -U postgres --no-owner --role=lebleg -j 4 -d "$db" "/tmp/$db.dump" 2> /tmp/restore.log; then
+  if ! pg_restore -h /tmp -U postgres --no-owner --role=lebleg -j 4 -d "$db" "/dumps/$db.dump" 2> /tmp/restore.log; then
     cat /tmp/restore.log >&2
     # Only absent roles referenced by the dump's GRANTs may be ignored.
     awk '
@@ -64,7 +64,7 @@ for db in lebleg lebleg_search; do
     -c 'ANALYZE'
 done
 gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
-rm /tmp/lebleg.dump /tmp/lebleg_search.dump /tmp/restore.log
+rm -f /tmp/restore.log
 SH
 COPY --from=web /server /usr/local/bin/lebleg-web
 COPY build/src/THIRD_PARTY_NOTICES.txt /THIRD_PARTY_NOTICES.txt
