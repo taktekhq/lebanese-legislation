@@ -1,0 +1,111 @@
+name: build
+# Rebuild the database from the source pages and publish it as text in data/.
+#
+# Brings archive/ to the archive repository's latest main, builds the
+# database from it and from manual/ (build-db), runs the gates (the build
+# report, check-dates, check-amounts), exports into data/ (export-data runs
+# the wording guard first and writes nothing when a text is not in its
+# source), and commits data/ with the archive pointer. Advisory checks
+# (versions, rulings, recall) are reported but never hold the commit.
+#
+# The model readings (cite, judge) are not run here: they are run by hand
+# and committed to db/model/, and the next build reads them.
+#
+# Pushing needs a token that can write to this repository: GitHub's own
+# GITHUB_TOKEN on GitHub, the GITHUB_TOKEN secret under act. Without push=true
+# it builds and checks only. manual/ is required unless without_manual=true,
+# because a build without it drops the scanned texts from data/.
+#   act workflow_dispatch -W .github/workflows/build.yml --input push=true -s GITHUB_TOKEN -b
+on:
+  workflow_dispatch:
+    inputs:
+      push:
+        description: Commit and push data/ when it changed
+        type: boolean
+        default: false
+      without_manual:
+        description: Build even when manual/ is missing (drops the texts it holds)
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: build
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      LEBLEG_DSN: host=127.0.0.1 port=55440 user=postgres password=ci dbname=lebleg
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Archive at its latest main
+        run: |
+          git submodule update --init --remote archive
+          echo "archive: $(git -C archive rev-parse --short=12 HEAD)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Need manual/
+        if: ${{ !inputs.without_manual }}
+        run: |
+          for d in manual/scans manual/rulings; do
+            [ -d "$d" ] || { echo "$d is missing; fill manual/ or run with without_manual=true" >&2; exit 1; }
+          done
+      - name: Start PostgreSQL
+        run: |
+          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client >/dev/null; }
+          docker build -q -f db/Dockerfile --target postgres -t lebleg-build-postgres .
+          docker rm -f lebleg-build-pg >/dev/null 2>&1 || true
+          docker run -d --name lebleg-build-pg -e POSTGRES_PASSWORD=ci -e POSTGRES_DB=lebleg -p 127.0.0.1:55440:5432 \
+            --shm-size=2g lebleg-build-postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off \
+            -c max_wal_size=8GB -c maintenance_work_mem=1GB
+          for i in $(seq 60); do docker exec lebleg-build-pg pg_isready -U postgres -d lebleg -q && break; sleep 1; done
+      - name: Build the commands
+        run: mkdir -p bin && go build -o bin/ ./cmd/...
+      - name: Build the database
+        run: |
+          rc=0
+          bin/build-db > "$RUNNER_TEMP/build-report.txt" 2>&1 || rc=$?
+          tail -40 "$RUNNER_TEMP/build-report.txt"
+          [ "$rc" -eq 0 ] || { echo "build-db exit $rc" >&2; exit 1; }
+          grep -q '^publishable: true' "$RUNNER_TEMP/build-report.txt" || { echo "build report: not publishable" >&2; exit 1; }
+          if grep -Ein 'deadlock|graph_edge_pkey' "$RUNNER_TEMP/build-report.txt"; then echo "build report: forbidden error" >&2; exit 1; fi
+      - name: Indexing metadata
+        continue-on-error: true
+        run: bin/build-db -only indexing
+      - name: Check dates
+        run: bin/check-dates
+      - name: Check amounts
+        run: bin/check-amounts
+      - name: Check versions (advisory)
+        continue-on-error: true
+        run: bin/check-versions
+      - name: Check rulings (advisory)
+        continue-on-error: true
+        run: bin/check-rulings
+      - name: Check recall (advisory)
+        continue-on-error: true
+        run: bin/recall-report
+      - name: Export into data/
+        run: |
+          bin/export-data -out data
+          bin/calculated-current -out data/article_calculated_current.jsonl
+          git add -A data archive
+          git diff --cached --stat | tail -5 | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Commit and push
+        if: inputs.push
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --cached --quiet; then echo "No changes." | tee -a "$GITHUB_STEP_SUMMARY"; exit 0; fi
+          counts=$(python3 -c 'import json; s=json.load(open("data/stats.json")); print(" ".join(f"{t}:{s[t]}" for t in ("legislation","legislation_article","ruling")))')
+          git -c user.name="taktekbot" -c user.email="327521424+taktekbot@users.noreply.github.com" \
+            commit -q -m "Data: $(date -u +%F): $counts" -m "Built from archive $(git -C archive rev-parse --short=12 HEAD)."
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main
+      - name: Stop PostgreSQL
+        if: always()
+        run: docker rm -f lebleg-build-pg >/dev/null 2>&1 || true
