@@ -9,9 +9,6 @@ package site
 // and whether the request came from a known crawler (so robots can be
 // counted apart). One file per day, <dir>/events/YYYY-MM-DD.jsonl; files older
 // than 90 days are deleted. cmd/usage-stats adds a day up.
-//
-// The "tell me if AI answers come" emails are the only personal data, kept
-// apart in <dir>/notify.jsonl with the consent wording the person agreed to.
 
 import (
 	"bufio"
@@ -37,13 +34,7 @@ type Events struct {
 	mu  sync.Mutex
 	day string
 	f   *os.File
-
-	// at most notifyBurst sign-ups a minute, whoever sends them
-	notifyWindow time.Time
-	notifyCount  int
 }
-
-const notifyBurst = 20
 
 // OpenEvents records into dir, creating it.
 func OpenEvents(dir string) (*Events, error) {
@@ -95,31 +86,6 @@ func (e *Events) prune(now time.Time) {
 
 var errTooMany = errors.New("too many sign-ups this minute")
 
-// Notify keeps one "tell me if AI answers come" sign-up.
-func (e *Events) Notify(email, from, consent string) error {
-	if e == nil {
-		return errors.New("not recording")
-	}
-	now := time.Now().UTC()
-	e.mu.Lock()
-	defer e.mu.Unlock()
-	if now.Sub(e.notifyWindow) > time.Minute {
-		e.notifyWindow, e.notifyCount = now, 0
-	}
-	if e.notifyCount >= notifyBurst {
-		return errTooMany
-	}
-	e.notifyCount++
-	b, _ := json.Marshal(map[string]string{"t": now.Format(time.RFC3339), "email": email, "from": from, "consent": consent})
-	f, err := os.OpenFile(filepath.Join(e.dir, "notify.jsonl"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, err = f.Write(append(b, '\n'))
-	return err
-}
-
 var botUA = regexp.MustCompile(`(?i)bot|crawl|spider|slurp|fetch|preview|scan|monitor|curl|wget|python|go-http|headless|lighthouse|httpclient|java/|okhttp|axios|node-fetch|facebookexternalhit|bingpreview|gptbot|chatgpt|claude|perplexity|bytespider|semrush|ahrefs|mj12|dotbot|petalbot|yandex|baidu|duckduck|applebot|amazonbot|ccbot|diffbot|meta-external`)
 
 // IsBot says whether a request comes from a crawler or a script, by its user
@@ -170,8 +136,6 @@ type DayStats struct {
 	TopLaws        []Count `json:"top_laws"`
 	TopKinds       []Count `json:"top_kinds"`
 	TopCodes       []Count `json:"top_codes"`
-	NotifySignups  int     `json:"notify_signups"`
-	NotifyTotal    int     `json:"notify_total"`
 	AIPageViews    int     `json:"ai_page_views"`
 }
 
@@ -257,17 +221,6 @@ func UsageStats(dir, day string) (*DayStats, error) {
 	}
 	st.TopQueries, st.TopZeroQueries = top(queries, nil, 20), top(zero, nil, 20)
 	st.TopLaws, st.TopKinds, st.TopCodes = top(laws, titles, 15), top(kinds, nil, 10), top(codes, nil, 10)
-	if nb, err := os.ReadFile(filepath.Join(dir, "notify.jsonl")); err == nil {
-		for _, line := range strings.Split(string(nb), "\n") {
-			if line == "" {
-				continue
-			}
-			st.NotifyTotal++
-			if strings.Contains(line, `"t":"`+day) {
-				st.NotifySignups++
-			}
-		}
-	}
 	return st, nil
 }
 

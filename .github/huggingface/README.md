@@ -126,4 +126,4 @@ Source text, machine readings and editorial corrections have different provenanc
 
 The structured dataset is rebuilt nightly. Individual tables can be incomplete. Judgment reading is still under way. Original court PDFs are available separately in [Lebanese Court Scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans).
 
-You can also use the [JSON API](https://lebaneselegislation.com/developers/) or [MCP server](https://lebaneselegislation.com/ai/). This dataset is not legal advice. Send corrections to taktekbot@taktek.io.
+You can also use the [JSON API](https://lebaneselegislation.com/developers/) or [MCP server](https://lebaneselegislation.com/ai/). This dataset is not legal advice. Send corrections to nizar@taktek.io.

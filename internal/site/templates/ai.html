@@ -7,17 +7,6 @@
 </section>
 <section class="wrap" style="padding-bottom:var(--section-y)">
   <article class="doc">
-    <section class="local-services">
-    <h2 id="local-services">{{t "resources.services"}}</h2>
-    <p>{{t "resources.services_note"}}</p>
-    <p><a class="link" href="https://github.com/taktekhq/lebanese-legislation">{{t "resources.local_docs"}}</a></p>
-    <ul class="local-images">
-      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db">{{t "resources.db_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-db:0.2.0</code></li>
-      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-api">{{t "resources.api_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-api:0.2.0</code></li>
-      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-mcp">{{t "resources.mcp_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-mcp:0.2.0</code></li>
-    </ul>
-    <p><a class="link" href="{{u "/data/"}}">{{t "resources.data_link"}}</a></p>
-    </section>
     <h2>{{t "ai.what_h2"}}</h2>
     <p>{{t "ai.what_p1"}}</p>
     <p>{{t "ai.what_p2"}}</p>
@@ -28,13 +17,26 @@
     <p>{{t "ai.server_p2"}}</p>
 
     <h3>{{t "ai.claude_h3"}}</h3>
-    <p>{{t "ai.claude_p"}}</p>
+    <ol>
+      <li>{{t "ai.claude_s1"}}</li>
+      <li>{{t "ai.claude_s2"}}</li>
+      <li>{{t "ai.claude_s3"}}</li>
+      <li>{{t "ai.claude_s4"}}</li>
+    </ol>
+    <figure class="mcp-step"><img src="/assets/mcp/claude.svg" alt="{{t "ai.img_claude"}}" width="640" loading="lazy" decoding="async"></figure>
 
     <h3>{{t "ai.claude_code_h3"}}</h3>
     <pre><code>claude mcp add --transport http lebanese-legislation {{absURL "/mcp"}}</code></pre>
+    <figure class="mcp-step"><img src="/assets/mcp/claude-code.svg" alt="{{t "ai.img_claude_code"}}" width="640" loading="lazy" decoding="async"></figure>
 
     <h3>{{t "ai.chatgpt_h3"}}</h3>
-    <p>{{t "ai.chatgpt_p"}}</p>
+    <ol>
+      <li>{{t "ai.chatgpt_s1"}}</li>
+      <li>{{t "ai.chatgpt_s2"}}</li>
+      <li>{{t "ai.chatgpt_s3"}}</li>
+      <li>{{t "ai.chatgpt_s4"}}</li>
+    </ol>
+    <figure class="mcp-step"><img src="/assets/mcp/chatgpt.svg" alt="{{t "ai.img_chatgpt"}}" width="640" loading="lazy" decoding="async"></figure>
 
     <h3>{{t "ai.cursor_h3"}}</h3>
     <pre><code>{
@@ -44,6 +46,7 @@
     }
   }
 }</code></pre>
+    <figure class="mcp-step"><img src="/assets/mcp/cursor.svg" alt="{{t "ai.img_cursor"}}" width="640" loading="lazy" decoding="async"></figure>
 
     <h3>{{t "ai.gemini_h3"}}</h3>
     <pre><code>{
@@ -93,25 +96,11 @@ GET /api/v1/gazette/?since=&amp;until=&amp;order=newest|oldest&amp;limit=&amp;of
       <li>{{t "ai.limit_5"}}</li>
     </ul>
 
-    <div class="notify" id="notify">
-      <h2>{{t "ai.notify_h2"}}</h2>
-      {{if eq .Done "ok"}}<p class="notify__done" role="status">{{t "ai.notify_done"}}</p>
-      {{else}}
-      <p>{{t "ai.notify_p"}}</p>
-      {{if eq .Done "bad"}}<p class="notify__done" role="alert">{{t "ai.notify_bad"}}</p>{{end}}
-      <form method="post" action="{{u "/api/notify"}}">
-        <input type="hidden" name="from" value="ai">
-        <div class="notify__hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-        <div class="notify__row">
-          <label class="sr-only" for="notify-email">{{t "ai.notify_email_label"}}</label>
-          <input id="notify-email" class="ph-no-capture" type="email" name="email" required maxlength="200" autocomplete="email" placeholder="you@example.com" dir="ltr">
-          <button class="btn btn--primary" type="submit" data-ga="notify_submit">{{t "ai.notify_submit"}}</button>
-        </div>
-        <label class="notify__consent"><input type="checkbox" name="consent" value="yes" required> <span>{{.Consent}}</span></label>
-      </form>
-      <p class="tiny" style="margin-top:12px">{{t "ai.notify_footer" (safe "<a class=\"link\" href=\"mailto:taktekbot@taktek.io\">taktekbot@taktek.io</a>") (safe (printf "<a class=\"link\" href=\"%s\">%s</a>" (u "/about/") (t "ai.about_link")))}}</p>
-      {{end}}
-    </div>
+    <h2 id="run-yourself">{{t "ai.run_h2"}}</h2>
+    <p>{{t "ai.run_p"}} <a class="link" href="{{u "/run-it-yourself/"}}">{{t "ai.run_link"}}</a></p>
+
+    <h2 id="follow">{{t "ai.follow_h2"}}</h2>
+    <p>{{t "ai.follow_p" (safe "<a class=\"link\" href=\"https://github.com/taktekhq/lebanese-legislation\" rel=\"noopener\">GitHub</a>") (safe "<a class=\"link\" href=\"https://huggingface.co/taktekhq\" rel=\"noopener\">Hugging Face</a>")}}</p>
   </article>
 </section>
 {{end}}{{end}}

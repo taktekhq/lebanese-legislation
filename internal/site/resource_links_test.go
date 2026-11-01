@@ -23,7 +23,7 @@ func TestPublicResourcesAreDirectAndBilingual(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, dest := range []string{"https://github.com/taktekhq/lebanese-legislation", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/data", "https://huggingface.co/datasets/taktekhq/lebanese-court-scans", "https://huggingface.co/collections/taktekhq/lebanese-legislation", prefix + "/ai/#local-services"} {
+		for _, dest := range []string{"https://github.com/taktekhq/lebanese-legislation", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/data", "https://huggingface.co/datasets/taktekhq/lebanese-court-scans", "https://huggingface.co/collections/taktekhq/lebanese-legislation", prefix + "/run-it-yourself/"} {
 			if !strings.Contains(body, `href="`+dest+`"`) {
 				t.Errorf("%s resource hub missing direct %s", lang, dest)
 			}
@@ -31,14 +31,29 @@ func TestPublicResourcesAreDirectAndBilingual(t *testing.T) {
 		if strings.Contains(body, "github.com/taktekhq/lebanese-legislation/releases") {
 			t.Errorf("%s resource hub links a GitHub data release; the dump lives on Hugging Face", lang)
 		}
+		body, err = s.execute(r, "local", Page{Path: "/run-it-yourself/"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, image := range []string{"db", "api", "mcp", "web"} {
+			if !strings.Contains(body, `href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-`+image+`"`) {
+				t.Errorf("%s run-it-yourself page misses image %s", lang, image)
+			}
+		}
 		body, err = s.execute(r, "ai", Page{Path: "/ai/", Data: map[string]any{"Static": false}})
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, image := range []string{"db", "api", "mcp"} {
-			if !strings.Contains(body, `href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-`+image+`"`) {
-				t.Errorf("%s misses image %s", lang, image)
+		for _, img := range []string{"claude", "chatgpt", "claude-code", "cursor"} {
+			if !strings.Contains(body, `src="/assets/mcp/`+img+`.svg"`) {
+				t.Errorf("%s MCP page misses its %s setup image", lang, img)
 			}
+		}
+		if i, j := strings.Index(body, `href="`+prefix+`/run-it-yourself/"`), strings.Index(body, `/api/v1/law/{id}/`); i < 0 || j < 0 || i < j {
+			t.Errorf("%s MCP page does not point to run-it-yourself at the bottom", lang)
+		}
+		if strings.Contains(body, "taktekbot@") {
+			t.Errorf("%s MCP page shows the bot address; contact is nizar@taktek.io", lang)
 		}
 		w := httptest.NewRecorder()
 		s.ServeHTTP(w, httptest.NewRequest("GET", prefix+"/blog/open-source-local-service-starter/", nil))

@@ -17,7 +17,6 @@ func TestHTMLCacheControl(t *testing.T) {
 		{"/laws/year/2020/?page=2", 200, htmlCacheOK},
 		{"/search/?q=tax", 200, "no-store"},
 		{"/ar/search/", 200, "no-store"},
-		{"/ai/?notify=ok", 200, "no-store"},
 		{"/law/1/", 404, htmlCache404},
 		{"/law/1/", 500, "no-store"},
 	} {

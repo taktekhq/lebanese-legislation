@@ -281,7 +281,7 @@ const (
 func htmlCacheControl(r *http.Request, code int) string {
 	p := stripLang(r.URL.Path)
 	switch {
-	case code >= 500, strings.HasPrefix(p, "/search"), r.URL.Query().Has("q"), r.URL.Query().Has("notify"):
+	case code >= 500, strings.HasPrefix(p, "/search"), r.URL.Query().Has("q"):
 		return "no-store"
 	case code == http.StatusNotFound:
 		return htmlCache404

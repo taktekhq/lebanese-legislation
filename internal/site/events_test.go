@@ -3,7 +3,6 @@ package site
 import (
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -89,38 +88,5 @@ func TestEventsAndStats(t *testing.T) {
 	}
 	if st.Reads != 2 || st.ReadsBots != 1 || st.ArticleReads != 1 || st.TopLaws[0].Key != "244226" || st.TopCodes[0].Key != code {
 		t.Errorf("reads: %+v", st)
-	}
-}
-
-func TestNotify(t *testing.T) {
-	dir := t.TempDir()
-	ev, _ := OpenEvents(dir)
-	s := &Server{ev: ev}
-	post := func(form url.Values) string {
-		r := httptest.NewRequest("POST", "/api/notify", strings.NewReader(form.Encode()))
-		r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-		w := httptest.NewRecorder()
-		s.notify(w, r)
-		return w.Header().Get("Location")
-	}
-	if got := post(url.Values{"email": {"a@example.com"}}); !strings.Contains(got, "notify=bad") {
-		t.Errorf("no consent: %s", got)
-	}
-	if got := post(url.Values{"email": {"not an email"}, "consent": {"yes"}}); !strings.Contains(got, "notify=bad") {
-		t.Errorf("bad email: %s", got)
-	}
-	if got := post(url.Values{"email": {"robot@example.com"}, "consent": {"yes"}, "website": {"x"}}); !strings.Contains(got, "notify=ok") {
-		t.Errorf("honeypot: %s", got)
-	}
-	if got := post(url.Values{"email": {"a@example.com"}, "consent": {"yes"}, "from": {"ai"}}); !strings.Contains(got, "notify=ok") {
-		t.Errorf("good: %s", got)
-	}
-	b, _ := os.ReadFile(filepath.Join(dir, "notify.jsonl"))
-	if n := strings.Count(string(b), "\n"); n != 1 || !strings.Contains(string(b), "a@example.com") || strings.Contains(string(b), "robot@") {
-		t.Errorf("notify.jsonl: %s", b)
-	}
-	st, _ := UsageStats(dir, time.Now().UTC().Format("2006-01-02"))
-	if st.NotifySignups != 1 || st.NotifyTotal != 1 {
-		t.Errorf("notify counts: %+v", st)
 	}
 }

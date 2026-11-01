@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -178,16 +177,8 @@ func TestAPIFailCapturesException(t *testing.T) {
 	}
 }
 
-// The notify form's email address stays out of session replays, and the
-// privacy text names PostHog in both languages.
+// The privacy text names PostHog in both languages.
 func TestPostHogPrivacy(t *testing.T) {
-	b, err := templateFS.ReadFile("templates/ai.html")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !regexp.MustCompile(`<input id="notify-email"[^>]*class="[^"]*ph-no-capture`).Match(b) {
-		t.Error("the notify email input is not marked ph-no-capture")
-	}
 	for _, lang := range []string{"en", "ar"} {
 		raw, err := os.ReadFile("i18n/" + lang + ".json")
 		if err != nil {

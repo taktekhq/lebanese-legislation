@@ -167,7 +167,6 @@ Everything a page shows is decided by its path. The inventory (a grep of
 | filters, sorting, `?page=` | list handlers (`handlers.go`, `docs.go`) | only the unfiltered list and its `/page/N/` paths are files; a filtered address goes to the origin |
 | search | `GET /search/?q=`, `POST /search/`, `POST /search/answer/`, `/api/v1/search/` | one static `/search/` page (`-search-shell`) whose script calls `GET /api/v1/search/` and draws the results; the API stays on the origin. Same origin means no CORS; a different API host needs CORS on the Go API and its address in the CSP `connect-src`. The server-rendered search page also feeds `ga.js`'s `search` event through a hidden element; a static page has to send that event itself, which is analytics work this spike did not do |
 | go to an article | `/law/N/go/?n=` | origin (a query) |
-| notify form | `POST /api/notify`, `/ai/?notify=ok` | origin |
 | usage log | `events.go`: reads and searches written to a file, no visitor data | pages stop counting reads; `lebleg stats` loses them; search events stay with the API |
 | rate limiting | `limiter.go` for the API and MCP | unchanged, origin |
 | `/official/`, `/ruling-files/`, `/scan/`, `/ul/uploads/images/`, `/mcp`, `/healthz`, `/.well-known/`, `/ph/` | disk files, a database table, the MCP endpoint, the PostHog proxy | origin (Caddy proxies `/ph/` to PostHog; that is analytics and stays as it is) |

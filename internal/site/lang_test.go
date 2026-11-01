@@ -191,21 +191,6 @@ func TestArPrefixRedirectsToRoot(t *testing.T) {
 	}
 }
 
-// The notify form posts under the page's prefix; a POST under /ar/ is served,
-// not redirected (a 301 would turn it into a GET).
-func TestArPostIsNotRedirected(t *testing.T) {
-	s := testServer(t)
-	for prefix, want := range map[string]string{"/ar": "/ai/?notify=bad#notify", "": "/ai/?notify=bad#notify", "/en": "/en/ai/?notify=bad#notify"} {
-		r := httptest.NewRequest("POST", prefix+"/api/notify", strings.NewReader("email=a%40example.com"))
-		r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-		rec := httptest.NewRecorder()
-		s.ServeHTTP(rec, r)
-		if rec.Code != http.StatusSeeOther || rec.Header().Get("Location") != want {
-			t.Errorf("POST %s/api/notify: %d Location %q, want 303 %q", prefix, rec.Code, rec.Header().Get("Location"), want)
-		}
-	}
-}
-
 func TestRobotsAndLlmsUseTheNewPaths(t *testing.T) {
 	s := &Server{}
 	rec := httptest.NewRecorder()

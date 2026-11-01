@@ -2090,6 +2090,10 @@ table.ref .ar {
 
 /* the link to the English version, at the top of every Arabic page */
 
+.mcp-step { margin: 16px 0 28px; }
+.mcp-step img { display: block; width: 100%; max-width: 640px; height: auto; border-radius: 12px; }
+.doc pre { overflow-x: auto; max-width: 100%; direction: ltr; text-align: left; }
+
 /* AI answer on question searches: a collapsed overview, sources numbered under it */
 .ai-box {
   position: relative;
