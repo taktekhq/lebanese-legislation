@@ -63,7 +63,17 @@ type Server struct {
 	dbSem  *dbSemaphore
 	ttlLRU *ttlCache
 
+	// Admission control for the pages (admit.go): pageSlots at a time, a wait of admitWait for one.
+	pageSem   *dbSemaphore
+	heavySem  *dbSemaphore  // the whole-text routes among them: heavyRoute
+	admitWait time.Duration // zero: the default, admitWait; tests shorten it
+
+	// Seams for tests of the sitemap cache (sitemap_sets.go); nil in production.
+	versionFn func(context.Context) string
+	buildSet  func(context.Context, sitemapSet) ([]sitemapShard, error)
+
 	memo      memoCache                                         // sitemap.go
+	sets      setCache                                          // the big sitemap families, built once: sitemap_sets.go
 	coreExtra []func(ctx context.Context) ([]SitemapURL, error) // more core sitemap entries: AddCoreSitemap
 }
 
@@ -96,7 +106,7 @@ func newServer(db *pgxpool.Pool, static bool) (*Server, error) {
 		}
 	}
 	s := &Server{db: db, pages: map[string]*template.Template{}, mux: http.NewServeMux(), isStatic: static,
-		ipLim: newIPLimiter(60, 20), dbSem: newDBSemaphore(4), ttlLRU: newTTLCache(256, mcpCacheTTL)}
+		ipLim: newIPLimiter(60, 20), dbSem: newDBSemaphore(4), ttlLRU: newTTLCache(256, mcpCacheTTL), pageSem: newDBSemaphore(pageSlots), heavySem: newDBSemaphore(heavySlots)}
 	if db != nil && !static {
 		go func() { // a few seconds at most; until it is there, typos and Arabizi are simply not mended
 			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
@@ -179,6 +189,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Something went wrong on our side.", http.StatusInternalServerError)
 		}
 	}()
+	release, ok := s.admit(w, r)
+	if !ok {
+		return
+	}
+	defer release()
 	s.handler.ServeHTTP(w, r)
 	if d := time.Since(start); d > 800*time.Millisecond {
 		log.Printf("slow %s %s", r.URL.RequestURI(), d.Round(time.Millisecond))
@@ -279,6 +294,10 @@ func htmlCacheControl(r *http.Request, code int) string {
 func (s *Server) fail(w http.ResponseWriter, r *http.Request, err error) {
 	log.Printf("error %s: %v", r.URL.RequestURI(), err)
 	s.captureError(r, "error", err)
+	if overloaded(err) { // out of time or the database away: ask the client to come back, not a bug
+		busy(w, busyAfter)
+		return
+	}
 	w.Header().Set("Cache-Control", "no-store")
 	http.Error(w, "Something went wrong on our side.", http.StatusInternalServerError)
 }

@@ -588,6 +588,13 @@ func (c *Scan) PageNumbers() []int {
 func (c *Scan) AgreementPct() string { return fmt.Sprintf("%.1f", 100*c.Agreement) }
 
 func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, error) {
+	return s.loadLawWith(ctx, id, withText, true)
+}
+
+// loadLawWith is loadLaw; rulings says whether every article gets the rulings
+// that cite it. A text's own page shows them for all its articles. An article
+// page shows them for one article (attachRulingsFor), and a feed for none.
+func (s *Server) loadLawWith(ctx context.Context, id int, withText, rulings bool) (*Law, error) {
 	l := &Law{}
 	err := s.db.QueryRow(ctx, `SELECT `+lawRowCols+`, l.gazette_number, l.gazette_date, l.gazette_pages,
 		(SELECT min(issue_id) FROM gazette_entry e WHERE e.law_id = l.id), l.preamble, l.explanatory_note, l.closing,
@@ -703,7 +710,7 @@ func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, erro
 	if s.db.QueryRow(ctx, `SELECT title_en FROM legislation_title_en WHERE law_id = $1`, id).Scan(&te) == nil && te != "" {
 		l.TitleEn = &te
 	}
-	if err := s.attachVersions(ctx, l); err != nil {
+	if err := s.attachVersions(ctx, l, rulings); err != nil {
 		return nil, err
 	}
 	return l, nil
@@ -863,7 +870,7 @@ func (s *Server) article(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-	l, err := s.loadLaw(ctx, id, true)
+	l, err := s.loadLawWith(ctx, id, true, false)
 	if errors.Is(err, pgx.ErrNoRows) {
 		if !s.aliasRedirect(ctx, w, r, id) {
 			s.notFound(w, r)
@@ -877,6 +884,10 @@ func (s *Server) article(w http.ResponseWriter, r *http.Request) {
 	for i, a := range l.List {
 		if Slug(a.Number) != want {
 			continue
+		}
+		if err := s.attachRulingsFor(ctx, l, a.Number); err != nil {
+			s.fail(w, r, err)
+			return
 		}
 		p := s.articlePage(r, l, i)
 		s.trackRead(r, l, a.Number)

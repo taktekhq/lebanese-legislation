@@ -4,6 +4,8 @@ import (
 	"context"
 	"sort"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 )
 
 // Linked changes, from the graph (db/graph.sql): every text that changed an
@@ -228,11 +230,38 @@ const maxRulings = 20
 
 // attachRulings gives each article the rulings that cite it, newest first.
 func (s *Server) attachRulings(ctx context.Context, l *Law, byNumber map[string]*Article) error {
-	rows, err := s.db.Query(ctx, `SELECT e.to_article, r.id, coalesce(r.court, ''), coalesce(r.number, ''), r.year, r.decided_on
+	return s.attachRulingsWhere(ctx, l, byNumber, "")
+}
+
+// attachRulingsFor does it for the one article an article page shows. Reading
+// every ruling edge of a text to show one article cost 45% of the CPU of
+// those pages on the Code of Obligations (profile, 1 Nov 2026). The article
+// that gets them is the one attachRulings would pick: byNumber keeps the last
+// article of a number.
+func (s *Server) attachRulingsFor(ctx context.Context, l *Law, number string) error {
+	byNumber := map[string]*Article{}
+	for _, a := range l.List {
+		byNumber[a.Number] = a
+	}
+	if byNumber[number] == nil {
+		return nil
+	}
+	return s.attachRulingsWhere(ctx, l, map[string]*Article{number: byNumber[number]}, number)
+}
+
+func (s *Server) attachRulingsWhere(ctx context.Context, l *Law, byNumber map[string]*Article, only string) error {
+	const cols = `SELECT e.to_article, r.id, coalesce(r.court, ''), coalesce(r.number, ''), r.year, r.decided_on
 		FROM graph_edge e JOIN ruling r ON r.id = e.from_id
 		WHERE e.from_type = 'ruling' AND e.to_law_id = $1 AND e.to_article IS NOT NULL
-		  AND e.status = 'linked'
-		ORDER BY r.decided_on DESC NULLS LAST, r.id DESC`, l.ID)
+		  AND e.status = 'linked'`
+	const order = ` ORDER BY r.decided_on DESC NULLS LAST, r.id DESC`
+	var rows pgx.Rows
+	var err error
+	if only == "" {
+		rows, err = s.db.Query(ctx, cols+order, l.ID)
+	} else {
+		rows, err = s.db.Query(ctx, cols+` AND e.to_article = $2`+order, l.ID, only)
+	}
 	if err != nil {
 		return err
 	}

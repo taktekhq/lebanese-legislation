@@ -212,7 +212,7 @@ func (s *Server) changes(ctx context.Context, cond, other string, id int) ([]Cha
 // attachVersions gives a law's articles their versions and unconfirmed
 // changes, adds articles that only amendments carry, and notes a repeal of
 // the whole text.
-func (s *Server) attachVersions(ctx context.Context, l *Law) error {
+func (s *Server) attachVersions(ctx context.Context, l *Law, rulings bool) error {
 	all, err := s.changes(ctx, "x.law_id = $1", "x.by_law_id", l.ID)
 	if err != nil {
 		return err
@@ -262,6 +262,9 @@ func (s *Server) attachVersions(ctx context.Context, l *Law) error {
 	}
 	if err := s.attachLinks(ctx, l, byNumber); err != nil {
 		return err
+	}
+	if !rulings { // an article page or a feed: see loadLawWith
+		return nil
 	}
 	return s.attachRulings(ctx, l, byNumber)
 }
