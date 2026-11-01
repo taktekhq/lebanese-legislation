@@ -221,3 +221,12 @@ func TestUndefinedColumn(t *testing.T) {
 		t.Error("only 42703")
 	}
 }
+
+func TestUndefinedTable(t *testing.T) {
+	if !undefinedTable(&pgconn.PgError{Code: "42P01"}) {
+		t.Fatal("42P01 is an undefined table")
+	}
+	if undefinedTable(&pgconn.PgError{Code: "42703"}) || undefinedTable(nil) {
+		t.Fatal("only 42P01 is an undefined table")
+	}
+}

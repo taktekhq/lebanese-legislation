@@ -92,7 +92,8 @@ func (s *Server) attachLinks(ctx context.Context, l *Law, byNumber map[string]*A
 		SELECT e.by_id, coalesce(e.by_article, ''), coalesce(e.article, ''), e.relation, e.part, e.source,
 		       coalesce(l.gazette_date, l.issued_on), coalesce(a.text_ar, ''), `+lawRowCols+`
 		FROM e JOIN legislation l ON l.id = e.by_id JOIN legislation_kind k ON k.name_ar = l.kind
-		LEFT JOIN legislation_article a ON a.law_id = e.by_id AND a.number = e.by_article`, l.ID, linkRelations)
+		LEFT JOIN legislation_article a ON a.law_id = e.by_id AND a.number = e.by_article
+		ORDER BY e.by_id, coalesce(e.by_article, ''), coalesce(e.article, ''), e.relation, e.part NULLS FIRST, e.source NULLS FIRST`, l.ID, linkRelations)
 	if err != nil {
 		return err
 	}
