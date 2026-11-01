@@ -56,7 +56,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
         run: |
           if [ -n "$GEMINI_API_KEY" ]; then
-            echo "$GEMINI_API_KEY" | npx --yes wrangler@4.40.0 secret put GEMINI_API_KEY
+            echo "$GEMINI_API_KEY" | npx --yes wrangler@4.151.1 secret put GEMINI_API_KEY
           fi
       - name: Deploy Worker and container
         working-directory: workers/static-site
@@ -73,4 +73,4 @@ jobs:
               args+=(--route "$route")
             fi
           done
-          npx --yes wrangler@4.40.0 deploy "${args[@]}"
+          npx --yes wrangler@4.151.1 deploy "${args[@]}"
