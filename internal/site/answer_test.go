@@ -45,14 +45,22 @@ func TestUnifiedSearchHasNoModeChoice(t *testing.T) {
 	s := testServer(t)
 	f := &evidenceFake{fakeRewrite: fakeRewrite{queries: []string{"قانون العمل"}}}
 	s.SetMeaningSearch(f, "Google Gemini", false, 10)
+	// A lookup of a text gets no AI answer at all.
 	w := httptest.NewRecorder()
 	s.ServeHTTP(w, httptest.NewRequest("GET", "/en/search/?q=labor", nil))
 	body := w.Body.String()
-	if w.Code != 200 || strings.Contains(body, `name="meaning"`) || !strings.Contains(body, "data-grounded-answer") || f.calls != 0 {
-		t.Fatalf("GET flow wrong: status=%d calls=%d", w.Code, f.calls)
+	if w.Code != 200 || strings.Contains(body, `name="meaning"`) || strings.Contains(body, "data-ai-answer") || f.calls != 0 {
+		t.Fatalf("lookup flow wrong: status=%d calls=%d", w.Code, f.calls)
 	}
-	if !strings.Contains(body, "/190374/") || strings.Index(body, "/190374/") > strings.Index(body, "data-grounded-answer") {
-		t.Fatal("exact source does not precede automatic answer")
+	// A question gets the AI box above the results, filled after the page loads.
+	w = httptest.NewRecorder()
+	s.ServeHTTP(w, httptest.NewRequest("GET", "/en/search/?q="+url.QueryEscape("how many days of annual leave does a worker get?"), nil))
+	body = w.Body.String()
+	if w.Code != 200 || !strings.Contains(body, "data-ai-answer") || f.calls != 0 {
+		t.Fatalf("question flow wrong: status=%d calls=%d", w.Code, f.calls)
+	}
+	if strings.Index(body, "data-ai-answer") > strings.Index(body, "data-search-results") {
+		t.Fatal("the AI answer must come before the results")
 	}
 }
 

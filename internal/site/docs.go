@@ -534,6 +534,7 @@ type Results struct {
 	Download           bool     // the query asks how to download the laws: show the dataset first
 	Missing            string   // a citation the database has no text for ("513/2005"), said so instead of near misses
 	MissingRuling      bool     // ... and it named a ruling
+	AskAI              bool     // the search reads as a question: the page asks for an AI answer (IsQuestion)
 
 	rank string // the words titles are ranked against, when not Q (closeTitles)
 }
@@ -582,6 +583,7 @@ func (s *Server) search(w http.ResponseWriter, r *http.Request) {
 		ev["n"], ev["laws"], ev["articles"], ev["rulings"] = res.LawCount+res.ArtCount+res.RulCount, res.LawCount, res.ArtCount, res.RulCount
 		s.track(r, ev)
 	}
+	res.AskAI = s.meaning != nil && IsQuestion(res.Q)
 	title := s.brandTitle(r, s.trOr(r, "Search", "search.title"))
 	if res.Q != "" {
 		title = res.Q + " · " + title

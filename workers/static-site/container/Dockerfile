@@ -33,12 +33,11 @@ set -eu
 install -d -o postgres -g postgres -m 0700 "$PGDATA"
 gosu postgres initdb -D "$PGDATA"
 printf 'local all all trust\nhost all all 127.0.0.1/32 trust\n' > "$PGDATA/pg_hba.conf"
-gosu postgres pg_ctl -D "$PGDATA" -o "-c listen_addresses='' -c unix_socket_directories=/tmp" -w start
+gosu postgres pg_ctl -D "$PGDATA" -o "-c listen_addresses='' -c unix_socket_directories=/tmp -c maintenance_work_mem=2GB -c max_parallel_maintenance_workers=4 -c dynamic_shared_memory_type=mmap -c fsync=off -c full_page_writes=off -c max_wal_size=8GB -c wal_level=minimal -c max_wal_senders=0" -w start
 psql -h /tmp -U postgres -v ON_ERROR_STOP=1 -c 'CREATE ROLE lebleg_web LOGIN' -c 'CREATE ROLE lebleg'
 for db in lebleg lebleg_search; do
   createdb -h /tmp -U postgres -O lebleg "$db"
-  psql -h /tmp -U postgres -d "$db" -v ON_ERROR_STOP=1 -c 'CREATE EXTENSION vector'
-  if ! pg_restore -h /tmp -U postgres --no-owner --no-privileges --role=lebleg -j 4 -d "$db" "/dumps/$db.dump" 2> /tmp/restore.log; then
+  if ! pg_restore -h /tmp -U postgres --no-owner --no-privileges -j 4 -d "$db" "/dumps/$db.dump" 2> /tmp/restore.log; then
     cat /tmp/restore.log >&2
     # Only absent roles referenced by the dump's GRANTs may be ignored.
     awk '
@@ -63,7 +62,11 @@ for db in lebleg lebleg_search; do
     -c 'GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO lebleg_web' \
     -c 'ANALYZE'
 done
+# Fast restore with a big WAL cap, then shrink pg_wal once before the image is saved.
+psql -h /tmp -U postgres -c "ALTER SYSTEM SET max_wal_size = '256MB'" -c "ALTER SYSTEM SET min_wal_size = '80MB'" -c "SELECT pg_reload_conf()" -c CHECKPOINT -c CHECKPOINT
+psql -h /tmp -U postgres -c "ALTER SYSTEM RESET max_wal_size" -c "ALTER SYSTEM RESET min_wal_size"
 gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
+du -sh "$PGDATA" "$PGDATA/pg_wal" /scans
 rm -f /tmp/restore.log
 SH
 COPY --from=web /server /usr/local/bin/lebleg-web

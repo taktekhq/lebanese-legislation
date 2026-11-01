@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"errors"
+	"log"
 	"sync"
 	"time"
 
@@ -23,8 +24,12 @@ type meaningSearch struct {
 	mu          sync.Mutex
 	cache       map[[32]byte]meaningEntry
 	slots       chan struct{}
-	clients     *ipLimiter
+	clients     *ipLimiter   // per IP, for the quote box (answer.go)
+	devices     dailyCounter // AI questions per device a day (ai.go)
+	networks    dailyCounter // AI questions per IP a day, for bans
+	bans        banList
 	selected    map[[32]byte]selectedEntry
+	composed    map[[32]byte]composedEntry
 	vectors     map[[32]byte]vectorEntry
 
 	// How many answers each cache keeps, and for how long. 0 turns caching off.
@@ -34,6 +39,7 @@ type meaningSearch struct {
 
 // Defaults when SetMeaningLimits is not called: two provider calls at once,
 // and up to 1,000 answers per cache, each kept for an hour.
+
 const (
 	defaultMeaningConcurrency = 2
 	defaultMeaningCacheSize   = 1000
@@ -41,6 +47,16 @@ const (
 )
 
 // fresh says whether a cached answer from at may still be used.
+// budgetFor says whether today's site-wide allowance still has n calls.
+func (m *meaningSearch) budgetFor(n int) bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if day := beirutDay(time.Now()); m.day != day {
+		m.day, m.used = day, 0
+	}
+	return m.used+n <= m.limit
+}
+
 func (m *meaningSearch) fresh(at time.Time) bool {
 	return m.cacheTTL > 0 && time.Since(at) < m.cacheTTL
 }
@@ -97,7 +113,7 @@ func (m *meaningSearch) Rewrite(ctx context.Context, q string) (nlsearch.Plan, e
 		return p, nil
 	}
 	m.mu.Lock()
-	day := time.Now().UTC().Format("2006-01-02")
+	day := beirutDay(time.Now())
 	if m.day != day {
 		m.day, m.used = day, 0
 	}
@@ -109,6 +125,8 @@ func (m *meaningSearch) Rewrite(ctx context.Context, q string) (nlsearch.Plan, e
 	m.mu.Unlock()
 	p, err := m.rw.Rewrite(ctx, q)
 	if err == nil {
+		log.Printf("ai rewrite: %d tokens in, %d out", p.InputTokens, p.OutputTokens)
+		nlsearch.AddUsage(ctx, p.InputTokens, p.OutputTokens)
 		m.mu.Lock()
 		if !m.keep(len(m.cache)) {
 			clear(m.cache)
