@@ -20,7 +20,7 @@ trap cleanup EXIT
 docker network create "$net" >/dev/null
 docker run -d --name "$pg" --network "$net" -e POSTGRES_DB=legislation -e POSTGRES_HOST_AUTH_METHOD=trust \
   -v "$root/web/schema:/schema:ro" -v "$root/web/testdata:/testdata:ro" postgres:17-alpine >/dev/null
-for _ in $(seq 1 60); do docker exec "$pg" pg_isready -U postgres -d legislation >/dev/null 2>&1 && break; sleep 1; done
+for _ in $(seq 1 60); do docker exec "$pg" pg_isready -h 127.0.0.1 -U postgres -d legislation >/dev/null 2>&1 && break; sleep 1; done
 for sql in /schema/schema.sql /schema/graph.sql /schema/amendments.sql /schema/official.sql /schema/indexes.sql /testdata/synthetic.sql; do
   docker exec "$pg" psql -q -v ON_ERROR_STOP=1 -U postgres -d legislation -f "$sql" >/dev/null
 done
