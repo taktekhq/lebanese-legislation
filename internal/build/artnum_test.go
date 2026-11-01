@@ -9,14 +9,14 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// The graph step, run on a loaded database (LEBLEG_DSN, as `lebleg build -only
+// The graph step, run on a loaded database (LEBLEG_DSN, as `build-db -only
 // graph` left it): Law 3/2025 inserts articles 12-1 to 12-10 into the Labour
 // Code (190374), and every edge to them is spelled "12-N", none "12/N". And the
 // build check finds no other spelling anywhere.
 func TestGraphArticleNumbersInDB(t *testing.T) {
 	dsn := os.Getenv("LEBLEG_DSN")
 	if dsn == "" {
-		t.Skip("no LEBLEG_DSN: a database built by lebleg build")
+		t.Skip("no LEBLEG_DSN: a database built by build-db")
 	}
 	ctx := context.Background()
 	conn, err := pgx.Connect(ctx, dsn)

@@ -1,7 +1,7 @@
 -- The graph: every link we know between two items of the corpus, in one
 -- table, so the whole graph comes out of the database with one query.
 -- Created after amendments.sql, and again on its own by
--- "lebleg build -only graph".
+-- "build-db -only graph".
 --
 -- An item is addressed by a key that says what it is:
 --   law/<id>                 a text (law, decree, decision...)

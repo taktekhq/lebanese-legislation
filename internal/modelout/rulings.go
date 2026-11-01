@@ -14,8 +14,8 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/rulingfile"
 )
 
-// The full judgments behind ruling pages (lebleg ruling-files downloads the
-// scanned PDFs, lebleg ruling-read has Gemini transcribe them). The PDFs stay
+// The full judgments behind ruling pages (ruling-files downloads the
+// scanned PDFs, ruling-read has Gemini transcribe them). The PDFs stay
 // outside the database; what is loaded is index.tsv's row for each PDF and the
 // text read from it, page by page. Both jobs run for days, so a folder is
 // loaded as it stands: a ruling not read yet simply has no pages.
@@ -36,7 +36,7 @@ type RulingStats struct {
 	Pages int // pages of text in those readings
 }
 
-// RulingFiles loads the folder `lebleg ruling-files` fills (dir) into
+// RulingFiles loads the folder `ruling-files` fills (dir) into
 // ruling_file and ruling_page: each held ruling's PDF row, and the text a
 // model read from it, page by page. It starts clean, so a rerun on a loaded
 // database ("-only ruling-files") holds no stale page.
