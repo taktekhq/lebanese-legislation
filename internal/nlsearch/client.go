@@ -1,4 +1,5 @@
-// Package nlsearch interprets questions for retrieval. It never writes law or answers.
+// Package nlsearch interprets questions for retrieval and, on request, writes a
+// short answer from supplied passages only (compose.go). It never writes law.
 package nlsearch
 
 import (

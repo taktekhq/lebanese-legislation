@@ -25,6 +25,7 @@ type meaningSearch struct {
 	slots       chan struct{}
 	clients     *ipLimiter
 	selected    map[[32]byte]selectedEntry
+	composed    map[[32]byte]composedEntry
 	vectors     map[[32]byte]vectorEntry
 
 	// How many answers each cache keeps, and for how long. 0 turns caching off.

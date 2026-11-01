@@ -59,7 +59,50 @@
     section(T.gazette, r.gazette_count, (r.gazette || []).map(function (g) { return { url: g.url, title: g.title || g.issue || "", snippet: g.snippet }; }));
     if (!box.firstChild) box.appendChild(el("p", "lead", T.none));
   }
+  // A search that reads as a question also gets the AI answer box above the
+  // results. The site's server decides (POST /search/ai/ answers 400 for a
+  // lookup of a text), so nothing shows for "قانون العمل" or "44/2015".
+  var aiBox = null, aiSeq = 0;
+  function ai(q) {
+    var seq = ++aiSeq;
+    if (aiBox) { aiBox.remove(); aiBox = null; }
+    if (!q) return;
+    var body = new URLSearchParams({ q: q });
+    fetch((ar ? "" : "/en") + "/search/ai/", { method: "POST", credentials: "same-origin", body: body })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function (html) {
+        if (seq !== aiSeq) return;
+        var tpl = document.createElement("template");
+        tpl.innerHTML = html;
+        var res = tpl.content.querySelector("[data-ai-results]");
+        if (res) res.remove();
+        if (!tpl.content.querySelector(".ai-box__text")) return;
+        aiBox = el("section", "wrap");
+        var card = el("div", "ai-box");
+        var head = el("p", "ai-box__head");
+        head.appendChild(el("span", null, ar ? "إجابة بالذكاء الاصطناعي" : "AI answer"));
+        var content = el("div", "ai-box__body");
+        content.appendChild(tpl.content);
+        card.appendChild(head);
+        card.appendChild(content);
+        aiBox.appendChild(card);
+        box.parentNode.insertBefore(aiBox, box);
+        card.classList.add("ai-box--collapsed");
+        if (content.scrollHeight <= content.clientHeight + 24) { card.classList.remove("ai-box--collapsed"); return; }
+        var more = el("button", "ai-box__more", ar ? "عرض المزيد" : "Show more");
+        more.type = "button";
+        more.setAttribute("aria-expanded", "false");
+        more.addEventListener("click", function () {
+          var open = !card.classList.toggle("ai-box--collapsed");
+          more.setAttribute("aria-expanded", String(open));
+          more.textContent = open ? (ar ? "عرض أقل" : "Show less") : (ar ? "عرض المزيد" : "Show more");
+        });
+        card.appendChild(more);
+      })
+      .catch(function () {});
+  }
   function run(q) {
+    ai(q);
     if (!q) { box.textContent = ""; return; }
     box.textContent = T.busy;
     fetch(api + "/api/v1/search/?limit=20&q=" + encodeURIComponent(q), { headers: { Accept: "application/json" } })
