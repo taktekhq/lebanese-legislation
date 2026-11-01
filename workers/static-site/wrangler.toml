@@ -27,3 +27,6 @@ new_sqlite_classes = ["Origin"]
 [[r2_buckets]]
 binding = "SITE"
 bucket_name = "lebleg-site"
+
+[observability]
+enabled = true
