@@ -8,7 +8,7 @@ on:
         type: number
         default: 8
       full:
-        description: Force a full export (currently unsupported by the exporter)
+        description: Unused for now; a shard re-renders only pages whose hash changed
         type: boolean
         default: false
       route:
@@ -69,22 +69,26 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          # The exporter reads _export/manifest.jsonl from R2 automatically.
-          # It has no full-export override. Do not silently ignore full=true.
-          if [ "$FULL" = "true" ]; then
-            echo "::error::The exporter cannot bypass the previous R2 manifest; full=true is unsupported."
-            exit 1
-          fi
-          # Current exporter rejects -shard with -r2-bucket and does not emit
-          # redirects.json for partial exports. Exporter changes are required
-          # before this requested sharded R2 pipeline can complete.
+          # Each shard reads and writes its own manifest under _export/shard-<i>-of-<n>/.
           /tmp/static-export export \
             -shard "$SHARD/$DIVISOR" \
             -base https://lebaneselegislation.com \
             -workers 8 \
+            -max-errors 200 \
             -r2-bucket lebleg-site \
             -r2-endpoint https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
             -out site
+      - name: Redirect data for the Worker (shard 0 only)
+        if: matrix.shard == 0
+        env:
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          /tmp/static-export redirects -out site -db "$LEBLEG_DSN"
+          aws s3 cp site/.export/redirects.json s3://lebleg-site/_export/redirects.json \
+            --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
+            --content-type application/json
       - uses: actions/upload-artifact@v4
         with:
           name: export-${{ matrix.shard }}
@@ -97,58 +101,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: export-*
-          path: exports
-      - name: Merge and upload Worker redirects
-        env:
-          AWS_DEFAULT_REGION: auto
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          shards = sorted(Path("exports").glob("export-*"))
-          if len(shards) != 8:
-              raise SystemExit("Expected eight shard artifacts")
-          ids = {"decree": set(), "text": set()}
-          aliases = {}
-          for shard in shards:
-              # Require redirect data from every shard rather than publish
-              # incomplete routing data. Current exporter does not emit it.
-              data = json.loads((shard / "redirects.json").read_text())
-              for kind, values in ids.items():
-                  ranges = data[kind] or []
-                  if len(ranges) % 2:
-                      raise SystemExit(f"Invalid {kind} ranges in {shard}")
-                  for start, count in zip(ranges[::2], ranges[1::2]):
-                      values.update(range(start, start + count))
-              for old, new in data["aliases"] or []:
-                  if old in aliases and aliases[old] != new:
-                      raise SystemExit(f"Conflicting redirect alias: {old}")
-                  aliases[old] = new
-
-          def compact(values):
-              result = []
-              for value in sorted(values):
-                  if result and value == result[-2] + result[-1]:
-                      result[-1] += 1
-                  else:
-                      result.extend([value, 1])
-              return result
-
-          merged = {kind: compact(values) for kind, values in ids.items()}
-          merged["aliases"] = sorted(aliases.items())
-          Path("redirects.json").write_text(json.dumps(merged, separators=(",", ":")))
-          PY
-          aws s3 cp redirects.json s3://lebleg-site/_export/redirects.json \
-            --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
-            --content-type application/json
-          # The Worker does not read manifests. Do not upload merged manifests
-          # here: safe incremental shard publication is not implemented yet.
       - uses: actions/setup-node@v4
         with:
           node-version: 22

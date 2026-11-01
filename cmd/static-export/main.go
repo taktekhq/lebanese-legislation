@@ -87,7 +87,8 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 	r2bucket := fs.String("r2-bucket", "", "upload changed pages to this R2 bucket instead of keeping them on disk (keys in $R2_ACCESS_KEY_ID and $R2_SECRET_ACCESS_KEY)")
 	r2endpoint := fs.String("r2-endpoint", os.Getenv("R2_ENDPOINT"), "R2 endpoint, https://<account-id>.r2.cloudflarestorage.com (default $R2_ENDPOINT)")
 	r2workers := fs.Int("r2-workers", 96, "uploads in flight")
-	shardArg := fs.String("shard", "", "render only slice i of n of the site, as i/n (for splitting a full export across jobs); not yet usable with -r2-bucket")
+	maxErrors := fs.Int("max-errors", 0, "pages that may fail before the export counts as failed")
+	shardArg := fs.String("shard", "", "render only slice i of n of the site, as i/n (for splitting a full export across jobs)")
 	meaningNotice := fs.Bool("meaning-notice", false, "render the search forms as the live site does when search by meaning is on (the notice under the box); no request is ever sent to the provider")
 	dry := fs.Bool("dry-run", false, "with -r2-bucket: render everything and count what would be uploaded, send nothing")
 	if err := fs.Parse(args); err != nil {
@@ -101,11 +102,13 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 		if n, err := fmt.Sscanf(*shardArg, "%d/%d", &shard, &shards); n != 2 || err != nil || shards < 2 || shard < 0 || shard >= shards {
 			return fmt.Errorf("export: -shard wants i/n with 0 <= i < n and n >= 2, got %q", *shardArg)
 		}
-		if *r2bucket != "" {
-			return errors.New("export: -shard with -r2-bucket needs a step that merges the shards' manifests and deletes what is gone, which is not written yet")
-		}
 	}
 	partial := *paths != "" || *sampleN > 0 || *limit > 0 || shards > 1
+	// Each shard keeps its own manifest in the bucket, so shards never overwrite one another's.
+	meta := "_export/"
+	if shards > 1 {
+		meta = fmt.Sprintf("_export/shard-%d-of-%d/", shard, shards)
+	}
 	if *r2bucket != "" && partial && !*dry {
 		return errors.New("export: -r2-bucket needs a full export (no -paths, -sample or -limit) unless -dry-run, or the stored manifest would forget pages")
 	}
@@ -166,14 +169,14 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 		}
 		o.PrevEntries = map[string]staticexport.Entry{}
 		if r2 != nil {
-			b, err := r2.Get(ctx, "_export/manifest.jsonl")
+			b, err := r2.Get(ctx, meta+"manifest.jsonl")
 			switch {
 			case errors.Is(err, staticexport.ErrNotFound):
 				fmt.Fprintln(stderr, "no previous manifest in the bucket: a first build uploads everything")
 			case err != nil:
 				return fmt.Errorf("reading the previous manifest: %w", err)
 			default:
-				if o.PrevEntries, err = staticexport.ParseManifest(bytes.NewReader(b), "_export/manifest.jsonl"); err != nil {
+				if o.PrevEntries, err = staticexport.ParseManifest(bytes.NewReader(b), meta+"manifest.jsonl"); err != nil {
 					return err
 				}
 			}
@@ -198,7 +201,7 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 	if err != nil {
 		return err
 	}
-	if st.Errors > 0 {
+	if st.Errors > int64(*maxErrors) {
 		return fmt.Errorf("%d pages failed, first: %s", st.Errors, strings.Join(st.FirstErrs[:min(3, len(st.FirstErrs))], "; "))
 	}
 	if !partial { // the redirect data needs the whole manifest
@@ -215,7 +218,7 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 		}
 	}
 	if r2 != nil && !up.DryRun {
-		return publish(ctx, r2, *out, st.RemovedKeys, stdout)
+		return publish(ctx, r2, *out, meta, st.RemovedKeys, stdout)
 	}
 	return nil
 }
@@ -224,7 +227,7 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 // script), deletes the pages that are gone, and last stores the manifest, so a
 // run that stops half way leaves the previous manifest, and the next run
 // repeats what this one did not finish.
-func publish(ctx context.Context, r2 *staticexport.R2, out string, removed []string, stdout io.Writer) error {
+func publish(ctx context.Context, r2 *staticexport.R2, out, meta string, removed []string, stdout io.Writer) error {
 	sem := make(chan struct{}, 32)
 	var wg sync.WaitGroup
 	var mu sync.Mutex
@@ -289,7 +292,7 @@ func publish(ctx context.Context, r2 *staticexport.R2, out string, removed []str
 		if err != nil {
 			return err
 		}
-		if err := r2.Put(ctx, "_export/"+name, b, staticexport.PutOptions{ContentType: contentType(name)}); err != nil {
+		if err := r2.Put(ctx, meta+name, b, staticexport.PutOptions{ContentType: contentType(name)}); err != nil {
 			return err
 		}
 	}
