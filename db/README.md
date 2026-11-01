@@ -1,4 +1,19 @@
-# Database image
+# Database
+
+This folder holds two things: the database's schema with the inputs the build reads (the Go package `db`), and the PostgreSQL image.
+
+## Schema and build inputs
+
+`db.go` embeds these into the build (`internal/build`), so a build needs nothing outside this repository:
+
+| File | What |
+| --- | --- |
+| `schema.sql`, `indexes.sql`, `amendments.sql`, `graph.sql`, `official.sql` | the tables, views, search functions and indexes |
+| `amendments.tsv`, `aliases.tsv`, `amounts.tsv`, `amounts_review.tsv`, `article_corrections.tsv`, `centre_errors.tsv`, `date_corrections.tsv`, `codes.tsv`, `council_rulings.tsv`, `approved_edits.tsv`, `provenance_known.tsv` | decisions a person checked: amendments kept or rejected, names that point to a text, sums a text changes, corrections to the Centre's text and dates, the principal codes, the Constitutional Council's rulings |
+| `names.tsv`, `titles_en.tsv` | English and French names for the Centre's vocabularies, and unofficial English titles |
+| `model/` | what a model read: citations between texts and in rulings, and judgements on amendments; matched against the data on every build |
+
+## Image
 
 `ghcr.io/taktekhq/lebanese-legislation-db` is PostgreSQL 18.6 with pgvector 0.8.2, built from the official `postgres:18.6` image. Both are pinned: the base by digest, the pgvector source by SHA-256.
 

@@ -1,0 +1,20 @@
+# A person's decisions on amendments, applied over what the build reads from
+# the amending articles (internal/amend). One row per amended article:
+#   apply   the change is right: apply it (and add it if the build missed
+#           it; the new wording is then taken from between the amending
+#           article's « »)
+#   reject  the build or the model misread it: don't show it (the pattern
+#           pass's change and the model's link alike)
+#   repeal  the amending article repeals the article: apply it as a repeal
+#           (also when the build couldn't name the text, or missed it)
+# Columns: the amending text's Centre id and article, the amended text's
+# Centre id and article, the decision, a note.
+by_law_id	by_article	law_id	article	decision	note
+329366	1	244483	73	apply	Law 321/2023 replaced Art. 73 of the Code of Criminal Procedure (formal objections); reported 2026-10-01
+2000200346	4	244611	43	repeal	Law 68/2026, art. 4: «تلغى المادة ٤٣ من قانون العقوبات»; the pattern pass read the name as «العقوبات والمواد» and found no text; Penal Code 43 (execution of the death penalty) is repealed from 2026-08-20. Reported lebanesebarprep/0008, 2026-10-28
+2000200346	4	244483	420	repeal	Law 68/2026, art. 4: «والمواد من ٤٢٠ ضمنا حتى ٤٢٤ ضمنا من القانون رقم ٣٢٨ تاريخ ٢٠٠١/٨/٢ (قانون أصول المحاكمات الجزائية)»; the pattern pass missed this half of the article. 2026-10-28
+2000200346	4	244483	421	repeal	Law 68/2026, art. 4: «والمواد من ٤٢٠ ضمنا حتى ٤٢٤ ضمنا من القانون رقم ٣٢٨ تاريخ ٢٠٠١/٨/٢ (قانون أصول المحاكمات الجزائية)»; the pattern pass missed this half of the article. 2026-10-28
+2000200346	4	244483	422	repeal	Law 68/2026, art. 4: «والمواد من ٤٢٠ ضمنا حتى ٤٢٤ ضمنا من القانون رقم ٣٢٨ تاريخ ٢٠٠١/٨/٢ (قانون أصول المحاكمات الجزائية)»; the pattern pass missed this half of the article. 2026-10-28
+2000200346	4	244483	423	repeal	Law 68/2026, art. 4: «والمواد من ٤٢٠ ضمنا حتى ٤٢٤ ضمنا من القانون رقم ٣٢٨ تاريخ ٢٠٠١/٨/٢ (قانون أصول المحاكمات الجزائية)»; the pattern pass missed this half of the article. 2026-10-28
+2000200346	4	244483	424	repeal	Law 68/2026, art. 4: «والمواد من ٤٢٠ ضمنا حتى ٤٢٤ ضمنا من القانون رقم ٣٢٨ تاريخ ٢٠٠١/٨/٢ (قانون أصول المحاكمات الجزائية)»; the pattern pass missed this half of the article. 2026-10-28
+244683	13	244611	51	reject	The Centre's text of Decree-law 112/1983, art. 13 says «تلغى المادة 51», but the wording it gives is Penal Code art. 251 (mitigating excuses) word for word, and art. 51 (length of imprisonment) keeps its 1943 text; most likely 251 with a digit dropped (centre_errors.tsv). 2026-10-28

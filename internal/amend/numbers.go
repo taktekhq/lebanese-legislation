@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+// Article numbers as amending texts write them: "73", "/5/", "73 مكرر",
+// "12 مكرر 2", ordinals ("الثالثه والسبعون", "الحاديه عشره بعد المائه"),
+// lists ("504 و505 و506", "الثانيه والرابعه") and ranges ("من 1 الي 30").
+// All folded (see Fold).
+
 var units = map[string]int{
 	"اولي": 1, "اول": 1, "حاديه": 1, "حادي": 1, "واحده": 1, "واحد": 1,
 	"ثانيه": 2, "ثاني": 2, "ثالثه": 3, "ثالث": 3, "رابعه": 4, "رابع": 4,
@@ -26,6 +31,7 @@ var hundreds = map[string]int{
 	"تسعمائه": 900, "تسعمئه": 900,
 }
 
+// word strips a leading و and ال: "والعشرين" → "عشرين".
 func word(tok string) (w string, and bool) {
 	if strings.HasPrefix(tok, "و") && !strings.HasPrefix(tok, "واحد") {
 		tok, and = strings.TrimPrefix(tok, "و"), true
@@ -33,6 +39,9 @@ func word(tok string) (w string, and bool) {
 	return strings.TrimPrefix(tok, "ال"), and
 }
 
+// ordinal reads an ordinal number at the start of toks and says how many
+// tokens it used: "الثالثه والسبعون" is 73, "الحاديه عشره" 11, "الثامنه
+// عشره بعد المائه" 118, "الوحيده" 1 (a text's sole article).
 func ordinal(toks []string) (n, used int) {
 	if len(toks) == 0 {
 		return 0, 0
@@ -61,6 +70,7 @@ func ordinal(toks []string) (n, used int) {
 	default:
 		return 0, 0
 	}
+	// "… بعد المائه": past the hundred.
 	if used+1 < len(toks) && toks[used] == "بعد" {
 		if h := hundreds[strings.TrimPrefix(toks[used+1], "ال")]; h > 0 {
 			n, used = n+h, used+2
@@ -72,10 +82,16 @@ func ordinal(toks []string) (n, used int) {
 var (
 	digitsNo = regexp.MustCompile(`^(?:رقم )?/?(\d{1,4})/?(?: ?(مكرر)(?: ?(\d{1,2})(?:\D|$))?)?`)
 	rangeSep = regexp.MustCompile(`^(?:الي|إلى|حتي|لغايه) `)
+	// subNo is the "/1" of "12/1" or the " - 3" of "586 - 3"; dateTail
+	// rules out a date ("12/9/1946"), a number with a year ("28/2017") and a
+	// list marker after a heading ("المادة 23 - 1 - يحق").
 	subNo    = regexp.MustCompile(`^ ?[/-] ?(?:\((\d{1,2})\)|(\d{1,2}))`)
 	dateTail = regexp.MustCompile(`^(?:\d| ?[/-] ?\d| ?[-.)ـ])`)
 )
 
+// one reads a single article number at the start of s: its canonical form
+// (as the database numbers articles: "73", "73 مكرر", "12 مكرر 2") and the
+// bytes used.
 func one(s string) (string, int) {
 	if m := digitsNo.FindStringSubmatchIndex(s); m != nil {
 		num := s[m[2]:m[3]]
@@ -85,6 +101,7 @@ func one(s string) (string, int) {
 		}
 		end := m[3]
 		if m[4] < 0 {
+			// "12/1", "586 - 3": an article numbered under another one.
 			if sm := subNo.FindStringSubmatchIndex(s[end:]); sm != nil {
 				after := s[end+sm[1]:]
 				if !dateTail.MatchString(after) {
@@ -125,6 +142,9 @@ func one(s string) (string, int) {
 	return "", 0
 }
 
+// numbers reads a list of article numbers at the start of s ("504 و505 و
+// 506", "الثانيه والرابعه", "من 1 الي 30", "28 و 29") and the bytes used.
+// A parenthesis after a number ("7 (فقرتها 2)") is skipped.
 func numbers(s string) ([]string, int) {
 	pos := 0
 	if strings.HasPrefix(s, "من ") {
@@ -138,6 +158,7 @@ func numbers(s string) ([]string, int) {
 	pos += n
 	for {
 		rest := s[pos:]
+		// A range: "1 الي 30".
 		if m := rangeSep.FindStringIndex(strings.TrimPrefix(rest, " ")); m != nil {
 			skip := len(rest) - len(strings.TrimPrefix(rest, " ")) + m[1]
 			if last, n := one(rest[skip:]); n > 0 {
@@ -152,6 +173,7 @@ func numbers(s string) ([]string, int) {
 				}
 			}
 		}
+		// "(فقرتها 2)" after a number belongs to it.
 		if strings.HasPrefix(rest, " (") {
 			if j := strings.Index(rest, ")"); j > 0 && j < 40 {
 				pos += j + 1
@@ -171,6 +193,8 @@ func numbers(s string) ([]string, int) {
 		default:
 			return out, pos
 		}
+		// "والرابعه" is the next of a list; a compound ordinal ("الحاديه
+		// والعشرين") was already read whole by one().
 		next, n := one(rest[k:])
 		if n == 0 {
 			return out, pos
@@ -180,6 +204,9 @@ func numbers(s string) ([]string, int) {
 	}
 }
 
+// ArticleNumber reads a printed article number ("الأولى", "١٢ مكرر", "وحيدة")
+// as the database numbers articles ("1", "12 مكرر", "وحيدة"). ok is false
+// when the words are not a number from start to end.
 func ArticleNumber(printed string) (num string, ok bool) {
 	s := FoldString(printed)
 	if w := strings.TrimPrefix(s, "ال"); w == "وحيده" || w == "وحيد" { // not word(): its و is not "and" here
