@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+// Private puts the site behind one shared password and keeps it out of
+// search engines: for previews before launch.
 func Private(h http.Handler, user, pass string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Robots-Tag", "noindex, nofollow")
@@ -19,6 +21,9 @@ func Private(h http.Handler, user, pass string) http.Handler {
 	})
 }
 
+// NoIndex keeps the site out of search engines without a password: for a
+// public preview before launch. robots.txt disallows crawling and every
+// response says noindex.
 func NoIndex(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Robots-Tag", "noindex, nofollow")

@@ -1,0 +1,67 @@
+{
+  "slug": "rent-law",
+  "title_en": "Rent law in Lebanon: old leases and the new rent law",
+  "title_ar": "قانون الإيجارات في لبنان: العقود القديمة والقانون الجديد",
+  "question_en": "What does Lebanese law say about old (pre-1992) leases, rent increases and eviction under the new rent law, and what happens to non-residential leases?",
+  "question_ar": "ماذا يقول القانون اللبناني عن عقود الإيجار القديمة (قبل 1992) وزيادات البدلات والإخلاء بموجب قانون الإيجارات الجديد، وماذا عن الأماكن غير السكنية؟",
+  "sub_questions": [
+    "Which leases does the new rent law cover?",
+    "How long are old residential leases extended and how does the rent rise?",
+    "What is the 'replacement rent' (badal al-mithl) and how is it set?",
+    "When can a landlord take the premises back and what compensation is due?",
+    "When does a tenant lose the extension?",
+    "What is the position of non-residential (commercial) leases?"
+  ],
+  "notes": "The Centre holds two enactments of the 2014 law (ids 246504 and 246516); the one in force and used here is the consolidated text published as Law 2 of 28/2/2017 (id 270074, 'deemed in force' by constitutional article 57), which re-enacts the 2014 law with the changes after the Constitutional Council annulled the committee provisions in decision 6/2014. The Council rejected the challenge to the 2017 law in decision 3/2017 (id 270425), and its text is in the database only as a decision without articles, so it cannot be quoted in the pack. Law 160/1992 (the earlier extension law) is not in the pack; art 55 here only extends it to 28/12/2014 and adds a 12.8% rise from 1/2/2012. Residential: art 15 extends leases up to 9 years (12 for tenants helped by the Fund), rent rising to replacement rent, which art 20 sets at 4% of the sale value; but the Fund (arts 3-13) and the committee have not been shown as operational and art 58 suspends the Fund-related provisions and related court cases until the Fund starts; say that honestly. Non-residential: art 38 in the database shows the 2018 wording (extension to 31/12/2019); later laws moved it (Law 176/2020 one year, Law 243/2021 to 30/6/2022). A 2025 law 11 of 5/6/2025 (non-residential rents) was the subject of Constitutional Council decision 5/2025 and was amended by Law 24 of 14/8/2025, but the text of Law 11/2025 itself is NOT in the database; only the amendments in Law 24/2025 are, which restate arts 3, 4, 6, 10(d) and 15 of Law 11 (extension periods of five to six years or more, replacement rent 5%, staged increases). Do not describe Law 11/2025 beyond what those articles say. Code of Obligations lease chapter was not packed (limit of four laws).",
+  "pack": [
+    {
+      "law": 270074,
+      "articles": [
+        "1",
+        "2",
+        "14",
+        "15",
+        "16",
+        "18",
+        "20",
+        "22",
+        "23",
+        "25",
+        "32",
+        "33",
+        "34",
+        "38",
+        "39",
+        "42",
+        "55",
+        "58"
+      ],
+      "why": "Rent Law (2014 law as in force by Law 2/2017): scope, extension, replacement rent, rent increases, recovery of premises and compensation, loss of extension, successors, suspension of Fund provisions"
+    },
+    {
+      "law": 285264,
+      "articles": [
+        "1"
+      ],
+      "why": "Law 176/2020: one-year extension of non-residential leases (amends art 38)"
+    },
+    {
+      "law": 288657,
+      "articles": [
+        "1"
+      ],
+      "why": "Law 243/2021: extension of non-residential leases to 30/6/2022 (amends art 38)"
+    },
+    {
+      "law": 2000197087,
+      "articles": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "why": "Law 24/2025: amends Law 11 of 5/6/2025 on non-residential rents (extension periods, replacement rent, staged increases, indemnity)"
+    }
+  ]
+}

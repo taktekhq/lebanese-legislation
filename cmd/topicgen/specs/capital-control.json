@@ -1,0 +1,56 @@
+{
+  "slug": "capital-control",
+  "title_en": "Capital controls and bank withdrawal limits in Lebanon",
+  "title_ar": "القيود على تحويل الأموال وعلى السحوبات المصرفية في لبنان",
+  "question_en": "Is there a Lebanese law that restricts bank withdrawals and transfers abroad, and what does the law say about the free movement of capital?",
+  "question_ar": "هل يوجد قانون لبناني يقيّد السحوبات المصرفية والتحويلات إلى الخارج، وماذا يقول القانون عن حرية تحويل الأموال؟",
+  "sub_questions": [
+    "Does Lebanon have a capital control law?",
+    "What do the old exchange-control decrees say about foreign currency?",
+    "What powers does the central bank have over money and banks?",
+    "What does the 2025 bank restructuring law say about deposits, and is it in force?",
+    "Can a bank be liquidated or restructured, and who decides?"
+  ],
+  "notes": "The database holds NO enacted law that imposes capital controls or withdrawal limits. Withdrawal limits were set by Banque du Liban circulars and bank practice, and those circulars are not in the pack (decisions on exchange operations such as basic decision 6568 of 1997 exist but are not about withdrawal limits). The page must say this plainly. What exists: (1) the Code of Money and Credit (id 244905) arts 70, 75 and 76 on the central bank's mission and powers; art 76 lets BDL take 'all measures it sees fit' on liquidity and credit, listed non-exhaustively (reserve ratios etc.); none of them mentions restricting withdrawals. (2) Mandate-era exchange decrees: decree 13532 of 5/11/1948 (id 195608) on foreign currency dealing: arts 4, 7 and 9 give freedom to hold, sell and move foreign currency and banknotes, and art 5 and 6 contain surrender and licence rules from that era. The earlier decree 2025 of 1944 (id 244592) imposed exchange control, and the database lists both as in force with no later repeal shown; the writer must not claim which one prevails today and should say only what each text says and its date. (3) Law 23 of 14/8/2025 on reforming and reorganising banks (id 2000197086), amended by law 71 of 10/9/2026 (id 2000200594): resolution tools (bail-in, merger, transfer), liquidation, deposit coverage in liquidation. Its art 37 and law 71's art 29 say its execution is SUSPENDED until the financial gap and deposit recovery law is passed and published, so it does not yet apply; that financial gap law is not in the database. Art 3 states the purpose; art 25 (interest stops on deposits in liquidation) is long and left out. Law 71/2026 rewrote many articles of law 23, and the database shows the amended wording. Not in the pack because of the 4-law cap: law 193 of 2020 (id 285836) obliging banks to release up to 10,000 USD for university students abroad and law 283 of 2022 (id 290501), law 177 of 2020 (id 285266) suspending loan instalments. No 'law on exceptional and temporary restrictions' was found in the database.",
+  "pack": [
+    {
+      "law": 244905,
+      "articles": [
+        "70",
+        "75",
+        "76"
+      ],
+      "why": "Code of Money and Credit: central bank mission, exchange stability, liquidity measures; shows what BDL may do and that no article imposes withdrawal limits"
+    },
+    {
+      "law": 195608,
+      "articles": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "9"
+      ],
+      "why": "Decree 13532 of 1948: freedom to hold, sell and export foreign currency and banknotes, with the surrender and licensing rules of that era"
+    },
+    {
+      "law": 2000197086,
+      "articles": [
+        "3",
+        "13",
+        "28",
+        "37"
+      ],
+      "why": "Law 23 of 2025 on bank reform: purpose, resolution tools, deposit coverage in liquidation, suspension of execution"
+    },
+    {
+      "law": 2000200594,
+      "articles": [
+        "29"
+      ],
+      "why": "Law 71 of 2026 amending law 23 of 2025: its execution stays suspended until the financial gap law is published"
+    }
+  ]
+}

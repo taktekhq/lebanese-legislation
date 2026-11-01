@@ -1,5 +1,12 @@
 package topics
 
+// The topic pages' tests. The structure checks run everywhere. The
+// grounding checks (every cited article exists, every quote is an exact
+// piece of its article's stored text, every number a statement makes is in a
+// cited article) need the database: they run when LEBLEG_DSN is set (or a
+// local database named lebleg is reachable) and are skipped otherwise, like
+// the other database tests of this module.
+
 import (
 	"context"
 	"os"
@@ -28,7 +35,7 @@ func testDB(t *testing.T) DB {
 	t.Helper()
 	dsn := os.Getenv("LEBLEG_DSN")
 	if dsn == "" {
-		dsn = "host=/tmp dbname=lebleg"
+		t.Skip("LEBLEG_DSN not set")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -43,6 +50,9 @@ func testDB(t *testing.T) DB {
 	return DB{Pool: pool}
 }
 
+// TestGrounding is the verifier: a quote that is not an exact piece of the
+// cited article's text, a cited article that does not exist, or a number in
+// a statement that no cited article holds, fails the build.
 func TestGrounding(t *testing.T) {
 	db := testDB(t)
 	for _, tp := range All() {
@@ -52,6 +62,7 @@ func TestGrounding(t *testing.T) {
 	}
 }
 
+// fake is a Source for the checker's own tests.
 type fake map[string]Facts
 
 func (f fake) Article(law int, number string) (Facts, bool, error) {

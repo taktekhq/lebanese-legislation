@@ -1,0 +1,126 @@
+{
+  "slug": "notaries-law",
+  "title_en": "Notaries in Lebanon: the notary law (Law 337 of 1994)",
+  "title_ar": "الكتّاب العدل في لبنان: قانون 337 لعام 1994",
+  "question_en": "What does a notary do in Lebanon, and what does the notary law (Law 337 of 1994) provide?",
+  "question_ar": "ماذا يفعل الكاتب العدل في لبنان وماذا ينص قانون الكتاب العدل رقم 337 لعام 1994؟",
+  "sub_questions": [
+    "What is a notary (kateb adl) and who pays him?",
+    "Who can be appointed a notary and when does his service end?",
+    "Which acts does a notary draw up or certify, and what is he forbidden to do?",
+    "What steps must a notary follow when he draws up a deed (identity, reading, language, signatures)?",
+    "How much is a deed worth in evidence, and how are fees and charges set?",
+    "How are notaries inspected and disciplined, and what is the Council of Notaries?"
+  ],
+  "notes": "Law 337 of 8/6/1994 (id 183490, 51 articles) repealed Legislative Decree 76 of 7/12/1940 (art 42). Amendments seen in the database: Law 362 of 1/8/1994 (id 183489) rewrote art 5 item 2 (age 25 to 44), art 9 (service ends at 64) and art 19, and repealed art 20 (art 20 is an empty row); Law 224 of 29/5/2000 (id 177800) amended the fund article; budget law 326/2001 (id 183079, art 49) amended art 34 (remitting fees every two weeks or at 10 million LL, instalments of fines); Law 272 of 15/4/2014 (id 246503) rewrote art 19 (fund committee of six) and added arts 45 to 51 creating the Council of Notaries; Law 26 of 10/2/2017 (id 269963) amended art 10 item 2 and repealed item 2 para 3 (added by Law 290/2014). WARNING on art 10 item 2: Constitutional Council decision 1 of 21/2/2017 (id 270060) annulled arts 1 and 2 of Law 26/2017, which are the arts that rewrote art 10 item 2 (stand-in retired notaries, conditions, 6 months a year). The database still shows that rewritten text and holds the decision only as a title without articles, so art 10 is NOT in the pack as current wording; say that art 10 item 1 (30 days administrative leave a year, sick leave) stands, and that how a vacant or absent post is covered is not settled by the text held here. Law 290 of 2014 (confirming notaries after a restricted exam) was suspended and annulled by Constitutional Council decisions 1/2014 and 3/2014 (ids 237194, 237397). NOT in the database: the fee Table (A) attached to the law (the amounts per deed), the 1936 decree 730 method, and any current fee in today's lira; art 33 states the 1994 add-on amounts (30 percent of the state fees plus 7,000 LL per page, 1,500 LL typing per page, 0.001 on contracts for the land or commercial registers, 20,000 or 35,000 LL for a visit) which are old figures, and later practice and receipt rules sit in Ministry of Finance decisions 796/2019 (id 284693) and 46/2024 (id 329683). Notaries are public officers attached to the Ministry of Justice, not paid by the state (art 2). Trap: vehicle sales are NOT a notary act in this law; art 22 gives the notary any deed the law does not forbid or reserve to another public officer, and art 37 forbids deeds reserved exclusively to another authority (vehicle transfers go through the vehicle registration authority, real estate through the land registry, which are not covered by this law). Powers of attorney are covered only through the general power of art 22 item 1 (deeds of the Code of Obligations and Contracts), the text does not list them by name. Art 37 items 1 and 2 are identical in the database. Art 28: a notarial deed has the evidentiary force of an official deed under the Code of Civil Procedure, the details sit in that code, not held in the pack. Art 16: criminal prosecution of a notary for his work needs the Justice Minister's permission.",
+  "pack": [
+    {
+      "law": 183490,
+      "articles": [
+        "2"
+      ],
+      "why": "Defines the notary as a public officer attached to the Ministry of Justice, paid by clients, not the state."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "3"
+      ],
+      "why": "Number, seat and territorial area of notaries are set by decree."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "5",
+        "7"
+      ],
+      "why": "Appointment: Lebanese for ten years, age 25 to 44, law degree, clean record, exam, then six months of training."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "9"
+      ],
+      "why": "Service ends by right at age 64 (as rewritten by Law 362/1994)."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "22",
+        "23"
+      ],
+      "why": "The notary's functions: deeds, deposits, protests, notices, wills, translators' signatures, and what he may do outside hours."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "24",
+        "26",
+        "29"
+      ],
+      "why": "Procedure for a deed: checking identity and capacity, reading the deed aloud, Arabic text, signatures and form."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "28"
+      ],
+      "why": "Evidentiary force of a notarial deed equals an official deed."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "33",
+        "36"
+      ],
+      "why": "Fees: state fees from Table A, notary's own charges, receipts, and fee per signature."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "37",
+        "38"
+      ],
+      "why": "Prohibitions: reserved deeds, relatives, secrecy, strikes, incompatible jobs, absence."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "12",
+        "14",
+        "15",
+        "16"
+      ],
+      "why": "Inspection, who decides discipline, the five penalties, and criminal and civil liability."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "45",
+        "50"
+      ],
+      "why": "The Council of Notaries created by Law 272/2014 and the powers of its bureau."
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "8"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "27"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 183490,
+      "articles": [
+        "39"
+      ],
+      "why": "Added after the second legal review"
+    }
+  ]
+}

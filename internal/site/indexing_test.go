@@ -11,6 +11,8 @@ import (
 	"testing"
 )
 
+// ---------------------------------------------------------------- no database
+
 func TestPagePath(t *testing.T) {
 	for _, c := range []struct {
 		base string
@@ -31,11 +33,11 @@ func TestPageNums(t *testing.T) {
 	if got := pageNums(1, 1); got != nil {
 		t.Errorf("one page has no pager: %v", got)
 	}
-
+	// short list: every page is linked
 	if got := pageNums(3, 9); len(got) != 9 || got[0] != 1 || got[8] != 9 {
 		t.Errorf("9 pages: %v", got)
 	}
-
+	// long list: first, last, a window, every tenth page; 0 stands for a gap
 	got := pageNums(37, 91)
 	has := map[int]bool{}
 	for _, n := range got {
@@ -46,7 +48,7 @@ func TestPageNums(t *testing.T) {
 			t.Errorf("page 37 of 91 lacks %d: %v", n, got)
 		}
 	}
-
+	// a very long list stays small, and any page is within two clicks of any other
 	big := pageNums(1200, 2578)
 	if len(big) > 90 {
 		t.Errorf("2,578 pages made %d links", len(big))
@@ -56,12 +58,13 @@ func TestPageNums(t *testing.T) {
 		for _, n := range pageNums(p, 2578) {
 			reach[n] = true
 		}
-
+		// from page p the pager links page 1, the last page and hundreds; the
+		// target is one more pager away from a hundred
 		if !reach[1] || !reach[2578] {
 			t.Fatalf("page %d does not link the first and last pages", p)
 		}
 	}
-
+	// no gap marker twice in a row, none at the ends
 	for _, n := range [][]int{got, big} {
 		if n[0] == 0 || n[len(n)-1] == 0 {
 			t.Errorf("gap at an end: %v", n)
@@ -74,6 +77,8 @@ func TestPageNums(t *testing.T) {
 	}
 }
 
+// A crawler that starts on page 1 of a list of up to 300 pages reaches any page
+// in two clicks, and any of 2,578 in three.
 func TestEveryPageIsAFewClicksAway(t *testing.T) {
 	for _, pages := range []int{91, 250, 2578} {
 		maxHops := 2
@@ -138,7 +143,7 @@ func TestCanonicalRule(t *testing.T) {
 }
 
 func TestSplitItems(t *testing.T) {
-
+	// five articles of 300 with a chapter heading before the fourth
 	sizes := []int{300, 300, 300, chapterBytes, 300, 300}
 	chapter := []bool{false, false, false, true, false, false}
 	for _, run := range splitItems(sizes, chapter, 650) {
@@ -146,12 +151,12 @@ func TestSplitItems(t *testing.T) {
 			t.Errorf("a run ends with a chapter heading: %v", run)
 		}
 	}
-
+	// a chapter is never the last item of a run
 	runs := splitItems([]int{500, chapterBytes, 500}, []bool{false, true, false}, 600)
 	if len(runs) != 2 || runs[0] != [2]int{0, 1} || runs[1] != [2]int{1, 3} {
 		t.Errorf("chapter stranded: %v", runs)
 	}
-
+	// one huge article is a run of its own, nothing is dropped
 	runs = splitItems([]int{2000, 10, 10}, []bool{false, false, false}, 100)
 	total := 0
 	for _, r := range runs {
@@ -160,7 +165,7 @@ func TestSplitItems(t *testing.T) {
 	if total != 3 || runs[0] != [2]int{0, 1} {
 		t.Errorf("runs = %v", runs)
 	}
-
+	// runs tile the items
 	for i := 1; i < len(runs); i++ {
 		if runs[i][0] != runs[i-1][1] {
 			t.Errorf("gap between runs: %v", runs)
@@ -181,6 +186,8 @@ func TestSectionPartPath(t *testing.T) {
 	}
 }
 
+// ---------------------------------------------------------------- with the database
+
 func get(t *testing.T, s *Server, path string) (*http.Response, string) {
 	t.Helper()
 	rec := httptest.NewRecorder()
@@ -190,12 +197,14 @@ func get(t *testing.T, s *Server, path string) (*http.Response, string) {
 	return resp, string(b)
 }
 
+// indexedServer is a server on a database that has the tables the build adds
+// for indexing (noindex_page, page_state), or skips.
 func indexedServer(t *testing.T) *Server {
 	t.Helper()
 	s := testServer(t)
 	var n int
 	if err := s.db.QueryRow(context.Background(), `SELECT count(*) FROM page_state`).Scan(&n); err != nil || n == 0 {
-		t.Skip("this database has no page_state: run lebleg build -only indexing")
+		t.Skip("this database has no page_state: run build-db -only indexing")
 	}
 	return s
 }
@@ -215,6 +224,8 @@ func head(body string) (canon, robots string, hreflang int) {
 	return canon, robots, strings.Count(body, `rel="alternate" hreflang=`)
 }
 
+// A text's own page is a pair: the English twin is self-canonical, the Arabic
+// root names the same hreflang set. The pages under a text stay on the root.
 func TestLawPagesArePairs(t *testing.T) {
 	s := indexedServer(t)
 	_, en := get(t, s, "/en/decree/193806/")
@@ -239,6 +250,8 @@ func TestLawPagesArePairs(t *testing.T) {
 	}
 }
 
+// An article under a text is a pair like the text's own page: its /en/
+// address is self-canonical and both name the same hreflang set.
 func TestArticlePagesArePairs(t *testing.T) {
 	s := indexedServer(t)
 	_, en := get(t, s, "/en/decree/193806/article/1/")
@@ -302,11 +315,11 @@ func TestThinPagesAreNoindexFollow(t *testing.T) {
 	if resp.StatusCode != 200 || robots != "noindex, follow" {
 		t.Errorf("thin article %d/%s: status %d robots %q", law, num, resp.StatusCode, robots)
 	}
-
+	// the page is still there, with its text and a link back to the text it belongs to
 	if !strings.Contains(body, lawPath(law)) {
 		t.Error("a thin article does not link to its text")
 	}
-
+	// a substantial article of the same text kind stays indexable
 	var good int
 	var gnum string
 	if err := s.db.QueryRow(ctx, `SELECT a.law_id, a.number FROM legislation_article a
@@ -376,12 +389,12 @@ func TestPaginatedPagesAreIndexableAndLinked(t *testing.T) {
 	if _, en := get(t, s, "/en/opinions/page/3/"); !strings.Contains(en, `href="/en/opinions/page/4/"`) {
 		t.Error("the English pager does not stay under /en")
 	}
-
+	// a filtered list keeps ?page= and stays out of the index
 	_, f := get(t, s, "/rulings/?decade=2010&page=2")
 	if _, robots, _ := head(f); robots != "noindex, follow" {
 		t.Errorf("filtered page: robots %q", robots)
 	}
-
+	// the long lists the years cover keep ?page=, blocked by robots.txt and noindex
 	for _, p := range []string{"/laws/?page=2", "/rulings/?page=2", "/gazette/?page=2"} {
 		resp, deep := get(t, s, p)
 		if _, robots, _ := head(deep); resp.StatusCode != 200 || robots != "noindex, follow" {
@@ -421,7 +434,7 @@ func TestYearListsArePaged(t *testing.T) {
 			t.Errorf("%s lists %d texts", p, n)
 		}
 	}
-
+	// every page of the year is linked from its first page
 	_, first := get(t, s, "/laws/year/2005/")
 	var total int
 	if err := s.db.QueryRow(context.Background(), `SELECT count(*) FROM legislation WHERE issued_on >= '2005-01-01' AND issued_on < '2006-01-01'`).Scan(&total); err != nil {
@@ -459,7 +472,7 @@ func TestLongTextIsInPartsUnderOneMegabyte(t *testing.T) {
 		if resp.StatusCode != 200 || len(body) > 1_000_000 {
 			t.Errorf("%s: %d, %d bytes", m[1], resp.StatusCode, len(body))
 		}
-
+		// 244736 is one of the codes, so it has English content and is its own canonical
 		if canon, robots, _ := head(body); canon != Base+m[1] || !strings.HasPrefix(robots, "index") {
 			t.Errorf("%s: canonical %q robots %q", m[1], canon, robots)
 		}
@@ -476,11 +489,11 @@ func TestLongTextIsInPartsUnderOneMegabyte(t *testing.T) {
 	if resp, _ := get(t, s, "/law/244736/part/99/"); resp.StatusCode != 404 {
 		t.Errorf("a part past the last: %d", resp.StatusCode)
 	}
-
+	// a text that is not cut has no parts
 	if resp, _ := get(t, s, "/law/244058/part/2/"); resp.StatusCode != 404 {
 		t.Errorf("the Constitution has no part 2: %d", resp.StatusCode)
 	}
-
+	// go to an article of a long text finds its page
 	resp, _ = get(t, s, "/law/244736/go/?n=140&s=1")
 	if resp.StatusCode != 302 || !strings.Contains(resp.Header.Get("Location"), "/article/140/") {
 		t.Errorf("go to article: %d %q", resp.StatusCode, resp.Header.Get("Location"))

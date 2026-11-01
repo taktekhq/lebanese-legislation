@@ -1,0 +1,102 @@
+{
+  "slug": "building-violations-encroachment",
+  "title_en": "Building violations and encroachment in Lebanon: licence, fines, demolition and settlement",
+  "title_ar": "مخالفات البناء والتعدي في لبنان: الرخصة والغرامات والهدم والتسوية",
+  "question_en": "What happens when someone builds without a licence or beyond it in Lebanon, and can the violation be settled?",
+  "question_ar": "ماذا يحدث عند البناء دون رخصة أو خلافاً لها في لبنان، وهل يمكن تسوية المخالفة؟",
+  "sub_questions": [
+    "When is a building licence required?",
+    "What happens to works started without a licence or against it (stop order, report, demolition, register entry)?",
+    "What are the fines and the prison term?",
+    "Can a past violation be settled, and on what terms (Law 139 of 2019)?",
+    "Which violations cannot be settled?",
+    "What can a neighbour do when someone builds against their rights (views, setbacks, damage to the next plot)?"
+  ],
+  "notes": "LAW IN FORCE: the Building Law is Law 646 of 11/12/2004 (id 210543, 29 numbered articles plus an issuing paragraph), which amended and replaced Legislative Decree 148 of 16/9/1983 (id 244684, marked repealed; art. 26 of Law 646 repeals it): do NOT use the 1983 text, its fines (1,000 to 50,000 LBP) are obsolete. Law 646 art. 1 makes a prior licence mandatory for building, converting, restoring and renewing; art. 23: works without a licence or against it are stopped by operation of law, a violation report is drawn up, the owner must apply for a licence; if the works comply with the plan the licence is given with a fine of twice all the fees; a building whose roof has been poured is considered complete; the fine and fees are a preferential debt on the property; a building that contradicts the plan or the law must be demolished by the owner, otherwise the administration demolishes at his expense; the violation is entered on the property register until settled or removed. Art. 24: fine 2,000,000 to 100,000,000 LBP for the person responsible; continuing after being stopped: 4,000,000 to 200,000,000 LBP and prison of one week to 15 days or one of the two. Art. 22: responsible engineer and contractor duties. Art. 21 garage. Law 139 of 9/7/2019 (id 282243, 22 articles, in force from publication) settles violations built on private property between 13/9/1971 and 31/12/2018; owners had two years from its issue to choose demolition or settlement against fees and fines (art. 3), declaration within two years (art. 7), 40 percent reduction of fines if declaration and file are filed within the two years and the amounts are paid within three months (art. 9), 1 percent per month surcharge after six months, violations after 1/1/2019 are demolished by operation of law (art. 14 item 5). THE TWO YEARS HAVE LONG RUN OUT (the law was issued in July 2019): the DB holds no later law extending the period (verified: no amending law is linked to 139/2019), so the page must say that the texts we hold show a window that has ended and must not claim it is open. Exclusions: art. 20 (civil aviation easements, nature reserves, antiquities protection zones, private land next to public maritime or river property unless a certificate shows no encroachment), art. 19 (cases filed or final judgments before the law), art. 2 (setbacks from roads, planned roads and public property: demolition right kept, fine of four times the fees), art. 15 (no settlement without a sewage treatment station where no sewer network). Art. 14 item 1: the violator stays liable to third parties. Law 276 of 15/4/2014 (id 236989, single article) cut arrears on fines under older settlement laws by 90 percent if paid before 30/9/2014: expired, mention only as history or leave out. Neighbour rights: Property Law decision 3339 of 12/11/1930 (id 177709) arts. 13 (ownership covers above and below), 65 (works that damage neighbouring land), 66, 67 (windows and balconies facing a neighbour at a distance), 69 (how the distance is measured), 73 (trees near the boundary). ENCROACHMENT ON PUBLIC PROPERTY: the amnesty law 70 of 2026 excludes continuing encroachment on public property (art. 2 item 6, id 2000200481): mention in one sentence with a link. The page is about civil and administrative consequences of building violations; the DB holds no specific Penal Code article for 'encroachment on a neighbour's building' and the writer must not invent one. Amounts are the face values in LBP as enacted.",
+  "pack": [
+    {
+      "law": 210543,
+      "articles": [
+        "1",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7",
+        "19",
+        "21",
+        "22",
+        "23",
+        "24",
+        "26"
+      ],
+      "why": "Building Law 646/2004: licence, exemption by declaration, how it is given, execution, occupancy permit, subdividing, violations before occupancy, stop order and demolition, fines, repeal of the 1983 law"
+    },
+    {
+      "law": 282243,
+      "articles": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "7",
+        "9",
+        "10",
+        "14",
+        "15",
+        "16",
+        "19",
+        "20"
+      ],
+      "why": "Law 139/2019 settlement of violations from 13/9/1971 to 31/12/2018"
+    },
+    {
+      "law": 177709,
+      "articles": [
+        "13",
+        "65",
+        "66",
+        "67",
+        "69",
+        "73"
+      ],
+      "why": "Property Law 1930: ownership, works harming neighbouring land, windows, balconies, trees"
+    },
+    {
+      "law": 2000200481,
+      "articles": [
+        "2"
+      ],
+      "why": "Amnesty law 2026: continuing encroachment on public property is excluded"
+    },
+    {
+      "law": 177709,
+      "articles": [
+        "64"
+      ],
+      "why": "Added after the legal review"
+    },
+    {
+      "law": 177709,
+      "articles": [
+        "68"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 282243,
+      "articles": [
+        "17"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 2000200481,
+      "articles": [
+        "1"
+      ],
+      "why": "Added after the second legal review"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "slug": "nationality",
+  "title_en": "Lebanese nationality: who is Lebanese and how it is acquired or lost",
+  "title_ar": "الجنسية اللبنانية: اكتسابها وفقدانها وتجنيس الزوجة الأجنبية",
+  "question_en": "Who is Lebanese by law, and can a foreign or Palestinian wife of a Lebanese man obtain Lebanese nationality?",
+  "question_ar": "من هو اللبناني بحكم القانون، وهل تستطيع الزوجة الأجنبية أو الفلسطينية للبناني الحصول على الجنسية اللبنانية؟",
+  "sub_questions": [
+    "Who is Lebanese by birth, and does a Lebanese mother pass nationality to her children?",
+    "Can a foreign wife of a Lebanese man become Lebanese, and after how long?",
+    "Can a foreign husband of a Lebanese woman obtain nationality?",
+    "How is nationality lost or recovered?",
+    "Which court hears nationality disputes?"
+  ],
+  "notes": "The basic text is the High Commissioner decision 15 of 19 January 1925 (id 172156, titled 'التابعية اللبنانية'), as amended: art. 5, 6 and 7 were re-enacted by the law of 11 January 1960 (id 181437, arts 1-3) with the same wording; art. 3 of the decision is empty (repealed by decision 122 of 1939). Nationality by descent is only through the father (art. 1(1)); art. 2 deals with an illegitimate child; the database holds no text giving a Lebanese mother's child the nationality, so the page must say the law does not contain one. A foreign WIFE of a Lebanese man becomes Lebanese on her request one year after the marriage is registered (art. 5, repeated by 1960 law art. 1). The database holds NO equivalent text for a foreign HUSBAND of a Lebanese woman; the Lebanese woman keeps her nationality when she marries a foreigner (art. 6 / 1960 law art. 2) and may, under the 1960 law art. 5, apply on her own to be given Lebanese nationality again after five years of uninterrupted residence if her husband agrees. Naturalisation is discretionary by decree; the 1939 naturalisation conditions law (id 187182, ten years residence) was repealed by legislative decree 48 of 31 May 1940 (id 188016, art. 1), so do not present the 1939 conditions as in force. Naturalised persons cannot hold public office for ten years (law of 7 June 1937, id 135073); decree 15 art. 4 lets the wife and adult children of a naturalised person obtain nationality without a residence condition. Palestinians: the database holds NO enacted text that regulates Palestinians' naturalisation or the nationality of a Palestinian spouse; there is no rule special to them, so the general rules above apply on their face. The 1994 naturalisation decree (5247/1994) is not in the database as text; only the 2011 withdrawal decrees that refer to it (e.g. id 229842, which withdraws nationality from named persons found registered as Palestinian refugees) exist, and they are lists of names, not rules, so they are not in the pack. Constitution art. 6 (nationality and its acquisition, preservation and loss are set by law) is the constitutional base; omitted only because of the 4-law limit. Loss of nationality: law of 31 Jan 1946 (id 202037). Recovery for descendants of emigrants registered in the 1921-1924 and 1932 censuses: law 41 of 24 Nov 2015 (id 241396, long article, 4764 characters, needed because it holds the whole procedure). Nationality cases belong to the civil courts only (decree 15 art. 9). Law 68 of 1967 (id 206942) makes the State, through the public prosecutor, party to nationality cases.",
+  "pack": [
+    {"law": 172156, "articles": ["1", "2", "4", "5", "7", "8", "9", "10"], "why": "Decision 15 of 1925: who is Lebanese, spouse and children rules, loss, jurisdiction of civil courts"},
+    {"law": 181437, "articles": ["1", "2", "3", "4", "5"], "why": "Law of 11 January 1960 amending decision 15: foreign wife, Lebanese woman marrying a foreigner, recovery"},
+    {"law": 202037, "articles": ["1", "2", "3"], "why": "Law of 31 January 1946: loss of nationality, return of persons of Lebanese origin, naturalised person absent five years"},
+    {"law": 241396, "articles": ["1"], "why": "Law 41 of 2015: conditions and procedure to recover Lebanese nationality"}
+  ]
+}

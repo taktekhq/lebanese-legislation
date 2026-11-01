@@ -9,15 +9,24 @@ import (
 	"unicode/utf8"
 )
 
+// Facts are what the database holds about one article: the wording the site
+// shows now (Text), and everything else a statement about it may repeat
+// (Extra: the note printed beside the number, the law's title, number and
+// dates, the amending text's number and date).
 type Facts struct {
 	Text  string
 	Extra string
 }
 
+// Source looks an article up by its address.
 type Source interface {
 	Article(law int, number string) (Facts, bool, error)
 }
 
+// Check runs the structural checks, which need no database, then the checks
+// against the database: every cited article exists, every quote is an exact
+// piece of its article's text, and every number a statement makes appears in
+// an article it cites. It returns one line per problem.
 func Check(t *Topic, src Source) []string {
 	p := Structure(t)
 	if src != nil {
@@ -31,6 +40,7 @@ var (
 	dateRe = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
 )
 
+// Structure checks a topic without the database.
 func Structure(t *Topic) []string {
 	var p []string
 	add := func(f string, a ...any) { p = append(p, fmt.Sprintf(t.Slug+": "+f, a...)) }
@@ -139,13 +149,14 @@ func Structure(t *Topic) []string {
 			add("cite %s is never used", c.ID)
 		}
 	}
-
+	// the two languages tell the same thing: same shape, same cites
 	if a, b := shape(&t.EN), shape(&t.AR); a != b {
 		add("English and Arabic differ in shape:\n  en %s\n  ar %s", a, b)
 	}
 	return p
 }
 
+// shape writes a content's structure and cites as one line.
 func shape(c *Content) string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "answer%v", c.Answer.Cites)
@@ -188,10 +199,11 @@ func sentences(s string) int {
 	return len(sentenceEnd.FindAllStringIndex(strings.TrimSpace(s)+" ", -1))
 }
 
+// Grounding checks a topic against the database.
 func Grounding(t *Topic, src Source) []string {
 	var p []string
 	add := func(f string, a ...any) { p = append(p, fmt.Sprintf(t.Slug+": "+f, a...)) }
-	facts := map[string]Facts{}
+	facts := map[string]Facts{} // by cite id
 	for _, c := range t.Articles {
 		f, ok, err := src.Article(c.Law, c.Article)
 		if err != nil {
@@ -232,7 +244,7 @@ func Grounding(t *Topic, src Source) []string {
 	for _, c := range t.Articles {
 		every = append(every, c.ID)
 	}
-	artNums := map[string]bool{}
+	artNums := map[string]bool{} // the numbers of the articles the topic cites
 	for _, c := range t.Articles {
 		for n := range Numbers(c.Article, false) {
 			artNums[n] = true
@@ -246,7 +258,7 @@ func Grounding(t *Topic, src Source) []string {
 		}
 		var bad []string
 		for n := range Numbers(text, true) {
-			if n == "0" || n == "1" || set[n] {
+			if n == "0" || n == "1" || set[n] { // "1": a singular noun ("ساعة") states it without a number word
 
 				continue
 			}
@@ -281,6 +293,7 @@ func Grounding(t *Topic, src Source) []string {
 	return p
 }
 
+// artNumber is the article number of a cite, so a statement may say "Article 72".
 func artNumber(t *Topic, id string) string {
 	if c := t.Cite(id); c != nil {
 		return c.Article
@@ -291,6 +304,9 @@ func artNumber(t *Topic, id string) string {
 var articleRef = regexp.MustCompile(`(?i)(?:articles?|arts?\.?|المادة|المواد|المادتين|مادة|المادتان)\s*\d+(?:\s*(?:,|،|-|–|and|to|و)?\s*\d+)*`)
 var digitsOnly = regexp.MustCompile(`\d+`)
 
+// stripArticleRefs removes the numbers in "Article 40" or "المادتين 41 و42"
+// that are the numbers of articles the topic cites: they point at an article,
+// they are not a figure the law states.
 func stripArticleRefs(text string, articles map[string]bool) string {
 	text = digitsASCII.Replace(text)
 	return articleRef.ReplaceAllStringFunc(text, func(m string) string {

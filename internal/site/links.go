@@ -6,16 +6,24 @@ import (
 	"time"
 )
 
+// Linked changes, from the graph (db/graph.sql): every text that changed an
+// article (or a whole text), shown under it with the amending article's
+// own words, newest first, inside the article's amendment disclosure. Nothing
+// is merged into the article; all records remain available even when the
+// Centre's text already carries the change.
+
+// Link is one amending article that changes this article or text.
 type Link struct {
 	Relation  string
 	Part      *string
 	By        LawRow
 	ByArticle string
-	Effective *time.Time
-	Text      string
-	Sources   []string
+	Effective *time.Time // the amending text's gazette date, else its date
+	Text      string     // the amending article, as published
+	Sources   []string   // who found the link: model, parser, centre
 }
 
+// Verb says what the change did, for the line above its wording.
 func (k Link) Verb() string {
 	switch k.Relation {
 	case "replace":
@@ -40,6 +48,8 @@ func (k Link) Verb() string {
 	return "Changed"
 }
 
+// VerbKey is Verb's i18n key (see internal/site/i18n, keys "verb.*"), used
+// by the Arabic templates' linkVerb func instead of the English sentence.
 func (k Link) VerbKey() string {
 	switch k.Relation {
 	case "replace", "amend", "repeal", "insert", "suspend", "extend",
@@ -49,6 +59,8 @@ func (k Link) VerbKey() string {
 	return "default"
 }
 
+// Affected is a general repeal that may touch this article or text: a list
+// to check, never a finding.
 type Affected struct {
 	By        LawRow
 	ByArticle string
@@ -57,6 +69,10 @@ type Affected struct {
 var linkRelations = []string{"replace", "amend", "repeal", "insert", "suspend", "extend",
 	"note_amended_by", "note_repealed_by", "note_added_by"}
 
+// attachLinks gives a law and its articles the texts that changed them, and
+// the general repeals that may touch them. Notes the Centre printed inside
+// an article point the other way (from the noted article to the amending
+// text), so they are read as links into the article that carries them.
 func (s *Server) attachLinks(ctx context.Context, l *Law, byNumber map[string]*Article) error {
 	rows, err := s.db.Query(ctx, `
 		WITH e AS (
@@ -106,7 +122,7 @@ func (s *Server) attachLinks(ctx context.Context, l *Law, byNumber map[string]*A
 	}
 	sort.SliceStable(order, func(i, j int) bool {
 		a, b := seen[order[i]].Effective, seen[order[j]].Effective
-		return a != nil && (b == nil || a.Before(*b))
+		return a != nil && (b == nil || a.After(*b))
 	})
 	for _, id := range order {
 		k := *seen[id]
@@ -121,7 +137,7 @@ func (s *Server) attachLinks(ctx context.Context, l *Law, byNumber map[string]*A
 
 	rows, err = s.db.Query(ctx, `SELECT p.repealing_article, coalesce(p.article_number, ''), `+lawRowCols+`
 		FROM possibly_affected p JOIN legislation l ON l.id = p.repealing_law_id JOIN legislation_kind k ON k.name_ar = l.kind
-		WHERE p.law_id = $1 ORDER BY l.issued_on, p.repealing_article`, l.ID)
+		WHERE p.law_id = $1 ORDER BY l.issued_on DESC NULLS LAST, p.repealing_article, l.id`, l.ID)
 	if err != nil {
 		return err
 	}
@@ -151,14 +167,18 @@ func appendNew(xs []string, x string) []string {
 	return append(xs, x)
 }
 
+// LinkGroup is one amending text and the articles of this text it changed.
 type LinkGroup struct {
 	By       LawRow
-	Articles []string
+	Articles []string // "" for the text as a whole
 	latest   *time.Time
 }
 
+// Arts lists the articles changed, for the "Amended by" row.
 func (g LinkGroup) Arts() string { return ChangeGroup{Articles: g.Articles}.Arts() }
 
+// LinkGroups groups every text that changed this one, newest first, from
+// the graph.
 func (l *Law) LinkGroups() []LinkGroup {
 	byID := map[int]*LinkGroup{}
 	var order []int
@@ -193,6 +213,7 @@ func (l *Law) LinkGroups() []LinkGroup {
 	return out
 }
 
+// RulingRef is a ruling that cites an article in the graph.
 type RulingRef struct {
 	ID     int
 	Court  string
@@ -201,8 +222,11 @@ type RulingRef struct {
 	On     *time.Time
 }
 
+// maxRulings is how many rulings an article's page lists; the count says
+// how many there are.
 const maxRulings = 20
 
+// attachRulings gives each article the rulings that cite it, newest first.
 func (s *Server) attachRulings(ctx context.Context, l *Law, byNumber map[string]*Article) error {
 	rows, err := s.db.Query(ctx, `SELECT e.to_article, r.id, coalesce(r.court, ''), coalesce(r.number, ''), r.year, r.decided_on
 		FROM graph_edge e JOIN ruling r ON r.id = e.from_id

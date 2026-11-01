@@ -10,8 +10,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// A text's address names what it is: /law/ for laws (and the constitution),
+// /decree/ for decrees, /text/ for every other kind (decisions, circulars,
+// notices…). All three answer for any text and send the wrong word to the
+// right one, so no old link breaks.
+
 var addressWords = []string{"law", "decree", "text"}
 
+// wordForKind is the word in the address of a text of this kind.
 func wordForKind(kind string) string {
 	switch {
 	case strings.HasPrefix(kind, "مرسوم"):
@@ -22,6 +28,8 @@ func wordForKind(kind string) string {
 	return "text"
 }
 
+// textWords holds the word of every text that is not a law; loaded once
+// when the server starts (the database is swapped by restarting the app).
 var textWords = map[int]string{}
 
 func loadTextWords(ctx context.Context, db *pgxpool.Pool) error {
@@ -55,12 +63,18 @@ func textWord(id int) string {
 	return "law"
 }
 
+// lawPath is a text's address: /law/12/, /decree/34/, /text/56/.
 func lawPath(id int) string { return "/" + textWord(id) + "/" + strconv.Itoa(id) + "/" }
 
+// artPath is an article's address within its text.
 func artPath(id int, number string) string {
 	return lawPath(id) + "article/" + url.PathEscape(Slug(number)) + "/"
 }
 
+// rightWord sends a request that names a text with the wrong word (/law/
+// for a decree) to its address, keeping the rest of the path, and on to
+// wherever else that address has moved (redirect.go). It says whether it
+// redirected.
 func (s *Server) rightWord(w http.ResponseWriter, r *http.Request, id int) bool {
 	if word, _, _, ok := textAddress(r.URL.EscapedPath()); !ok || word == textWord(id) {
 		return false

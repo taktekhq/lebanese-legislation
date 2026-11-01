@@ -1,0 +1,56 @@
+{
+  "slug": "banking-secrecy",
+  "title_en": "Banking secrecy in Lebanon",
+  "title_ar": "السرية المصرفية في لبنان",
+  "question_en": "What does Lebanese law say about banking secrecy, and when can it be lifted?",
+  "question_ar": "ماذا يقول القانون اللبناني عن السرية المصرفية ومتى يمكن رفعها؟",
+  "sub_questions": [
+    "Which banks and which people are bound by banking secrecy?",
+    "Who can ask a bank for account information despite secrecy?",
+    "Can a bank account be seized or frozen, and by whom?",
+    "Is secrecy lifted for public officials, politicians and bank directors?",
+    "What penalty applies to a banker who discloses client information, or who refuses to answer a lawful request?"
+  ],
+  "notes": "Main statute is the law of 3/9/1956 (id 186456). The database shows its CURRENT wording: arts 1, 2, 3, 4, 7 and 8 were replaced by law 306 of 2022 (id 315943, in force from 3/11/2022), so do not quote the 1956 original. Cite 186456 for the substance, not 315943 art 1. Art 2(b) lists persons to whom secrecy does not apply (public officials, heads of political bodies and civil society, candidates, bank board members, executives and auditors, owners of media companies) and keeps effect for 5 years after leaving office and back to 23/9/1988. Art 7 lists who may demand information: courts in corruption, property-crime, money laundering and illicit enrichment cases, the Special Investigation Commission, the National Anti-Corruption Commission, the tax administration (under the tax procedures law 44/2008), and BDL, the Banking Control Commission and the deposit insurance corporation for restructuring the sector; general requests under item (f) can be challenged before the urgent matters judge. Art 8 sets penalties (jail one to three months, fine 150 to 300 times the minimum wage for disclosure). Art 4 limits seizure of deposits. Law 44/2015 (id 241399) art 8 lets the Special Investigation Commission lift secrecy and freeze accounts; art 16 says contrary provisions of the 1956 law are not applied against it. Code of Money and Credit art 150 (id 244905) now says the 1956 law does not stop BDL and Banking Control Commission staff doing their duties. Art 151 binds BDL staff to the 1956 secrecy. Law 306/2022 art 3 (id 315943) rewrites art 23 of the tax procedures law 44/2008 (that law is not quoted here) and art 4 rewrites art 103 of the income tax law. Not in the pack: law 200 of 29/12/2020 (id 286755) suspended secrecy for one year for audits of BDL and public bodies; it has expired. Law 23 of 14/8/2025 on bank restructuring (id 2000197086) art 35 only applies law 306/2022 to its scope, and the law's execution is suspended until the financial gap law is passed. Constitutional Council decision 19 of 22/12/2022 (id 326660) is in the database as a title only, with no body text, concerning a partial challenge of law 306/2022; the page should not say what it decided. No separate text of Penal Code art 579 (professional secrecy) was verified here.",
+  "pack": [
+    {
+      "law": 186456,
+      "articles": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "why": "Banking secrecy law of 3/9/1956 in its current wording after law 306/2022: scope, duty of secrecy, exceptions and persons excluded, numbered accounts, seizure, who may demand information, penalties"
+    },
+    {
+      "law": 241399,
+      "articles": [
+        "3",
+        "8",
+        "16"
+      ],
+      "why": "Anti-money-laundering law 44/2015: penalties, Special Investigation Commission powers to lift secrecy and freeze accounts, effect on the 1956 law"
+    },
+    {
+      "law": 244905,
+      "articles": [
+        "150",
+        "151"
+      ],
+      "why": "Code of Money and Credit: central bank staff duty of secrecy and the carve-out for supervisors"
+    },
+    {
+      "law": 315943,
+      "articles": [
+        "3",
+        "4"
+      ],
+      "why": "Law 306/2022: access of the tax administration to bank-protected information (art 23 tax procedures law, art 103 income tax law)"
+    }
+  ]
+}

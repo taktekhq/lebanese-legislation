@@ -7,14 +7,26 @@ import (
 	"strings"
 )
 
+// When a search finds nothing, these are tried in turn, cheapest first, and
+// the first that finds something is shown with a line saying what was
+// searched instead. None of them writes anything shown as law; they only
+// mend the question.
+//
+//	translated  Latin words to Arabic: the glossary (gloss.go), then names and
+//	            Arabizi read letter by letter against the title words (translit.go)
+//	adjusted    a number or a year in the question narrows the texts
+//	            ("513 هيئة إدارة السير", "... 2024"), a typo is mended
+//	            ("الاستلذ"), or the commonest words are set aside
+
 var (
 	searchYear = regexp.MustCompile(`^(?:19|20)\d\d$`)
 	searchNum  = regexp.MustCompile(`^\d{1,5}$`)
-
+	// little Arabic words that no title search should be held up by
 	searchStop = map[string]bool{"في": true, "من": true, "على": true, "عن": true, "الى": true, "إلى": true, "او": true, "أو": true,
 		"و": true, "ان": true, "أن": true, "هل": true, "ما": true, "رقم": true, "تاريخ": true}
 )
 
+// splitNumbers pulls a text number and a year out of a query, leaving the words.
 func splitNumbers(q string) (num string, year int, words []string) {
 	for _, w := range strings.Fields(arDigits.Replace(q)) {
 		switch {
@@ -32,11 +44,13 @@ func splitNumbers(q string) (num string, year int, words []string) {
 
 func found(r Results) bool { return r.LawCount+r.ArtCount+r.RulCount+len(r.Topics) > 0 }
 
+// rescue returns the results of the first way of reading the query that
+// finds anything, and how ("" when none did).
 func (s *Server) rescue(ctx context.Context, q string) (Results, string, error) {
 	v := s.vocab.Load()
 	num, year, words := splitNumbers(q)
 	kind := "adjusted"
-	if !hasArabic(q) {
+	if !hasArabic(q) { // English, French, a name or Arabizi: read it into Arabic words first
 		plain := strings.Join(words, " ")
 		ar, whole := glossQueryWhole(plain)
 		if !whole {
@@ -65,17 +79,17 @@ func (s *Server) rescue(ctx context.Context, q string) (Results, string, error) 
 			return alt, "", false, err
 		}
 		alt.Via, alt.ViaKind = alt.Q, kind
-		if num != "" || year != 0 {
+		if num != "" || year != 0 { // say the number or the year too
 			alt.Via = strings.Join(strings.Fields(alt.Q+" "+num+" "+yearStr(year)), " ")
 		}
 		alt.Q = q
 		return alt, how, found(alt), nil
 	}
-
+	// The question as read, with its number and year.
 	if res, how, ok, err := try(words, num, year, kind, "read"); err != nil || ok {
 		return res, how, err
 	}
-
+	// A year with fewer words: the commonest words go first, the year stays.
 	if year != 0 && num == "" {
 		rest := words
 		for i := 0; i < 2 && len(rest) > 1; i++ {
@@ -85,13 +99,13 @@ func (s *Server) rescue(ctx context.Context, q string) (Results, string, error) 
 			}
 		}
 	}
-
+	// Without the number and the year ("513" may be an article, not a decree).
 	if num != "" || year != 0 {
 		if res, how, ok, err := try(words, "", 0, "adjusted", "words"); err != nil || ok {
 			return res, how, err
 		}
 	}
-
+	// A typo: a word no title holds is replaced by the nearest one that some title does.
 	fixed := make([]string, 0, len(words))
 	changed := false
 	for _, w := range words {
@@ -108,11 +122,11 @@ func (s *Server) rescue(ctx context.Context, q string) (Results, string, error) 
 			return res, how, err
 		}
 	}
-
+	// Set words aside, one at a time, so the rest still answers.
 	rest := fixed
 	for i := 0; i < 3 && len(rest) > 1; i++ {
 		rest = dropOne(v, rest)
-		if len(rest) == 1 && wordWeight(v, rest[0]) > 500 {
+		if len(rest) == 1 && wordWeight(v, rest[0]) > 500 { // one commonplace word ("قانون") answers nothing
 			break
 		}
 		if res, how, ok, err := try(rest, "", 0, "adjusted", "relax"); err != nil || ok {
@@ -129,12 +143,14 @@ func yearStr(y int) string {
 	return strconv.Itoa(y)
 }
 
+// dropOne leaves out the word that tells least: one no title holds, else the
+// commonest. The rest keep their order.
 func dropOne(v *vocab, words []string) []string {
 	drop, best := 0, -1
 	for i, w := range words {
 		n := wordWeight(v, w)
 		if n == 0 {
-			n = 1 << 30
+			n = 1 << 30 // unknown: first to go
 		}
 		if n > best {
 			drop, best = i, n
@@ -145,6 +161,7 @@ func dropOne(v *vocab, words []string) []string {
 	return append(out, words[drop+1:]...)
 }
 
+// wordWeight is how often a word occurs in titles; unknown words weigh 0.
 func wordWeight(v *vocab, w string) int {
 	if v == nil {
 		return 0
@@ -156,6 +173,14 @@ func wordWeight(v *vocab, w string) int {
 	return v.freq[strings.TrimPrefix(w, "ال")]
 }
 
+// closeTitles are the titles that hold all but one of the query's words, for
+// a search whose words no title holds together but some articles do: "قانون
+// الغابات اللبناني" listed 56 articles and not the forest law, whose title has
+// no «اللبناني» (22 Oct 2026). Kind words stay; the word that tells least goes
+// (dropOne). Titles still rank against the whole query. One word left alone
+// is not enough ("عدم الصفة" is not every title with «الصفة»), unless a kind
+// word came with it; two dropped words drifted ("المرأة اللبنانية المقترنة
+// بأجنبي" became any title on Lebanese women).
 func (s *Server) closeTitles(ctx context.Context, q string) []LawRow {
 	v := s.vocab.Load()
 	if v == nil || !hasArabic(q) {
@@ -185,6 +210,8 @@ func (s *Server) closeTitles(ctx context.Context, q string) []LawRow {
 	return alt.Laws[:min(5, len(alt.Laws))]
 }
 
+// queryNumbers are the numbers in a query that may be a text's number: not a
+// year, at most five digits.
 func queryNumbers(q string) []int {
 	var out []int
 	for _, w := range strings.Fields(q) {
@@ -198,6 +225,10 @@ func queryNumbers(q string) []int {
 	return out
 }
 
+// articleQuery is the query an article search runs: without its kind words
+// and little words when at least two others remain. "قانون المرأة اللبنانية
+// المقترنة بأجنبي" found no article, as none says «قانون» too (22 Oct 2026);
+// the kind word still counts for titles.
 func articleQuery(q string) string {
 	ws := strings.Fields(q)
 	keep := make([]string, 0, len(ws))
@@ -213,6 +244,8 @@ func articleQuery(q string) string {
 	return q
 }
 
+// nearTitles are the titles most like the query, for a page that found
+// nothing: something to click instead of an empty page.
 func (s *Server) nearTitles(ctx context.Context, q string) []LawRow {
 	if !hasArabic(q) || len([]rune(q)) < 3 {
 		return nil
@@ -230,6 +263,9 @@ func (s *Server) nearTitles(ctx context.Context, q string) []LawRow {
 	return near
 }
 
+// sameNumber lists the texts that carry a number, whatever their date: shown
+// under "no text has that number and date", so a wrong year is one click away
+// (decree 9341 asked as 2012 is 2022). Never a silent fallback.
 func (s *Server) sameNumber(ctx context.Context, n int) []LawRow {
 	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind
 		WHERE l.number_int = $1 ORDER BY l.issued_on DESC NULLS LAST LIMIT 8`, n)

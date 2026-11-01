@@ -1,3 +1,8 @@
+// Package topics holds the topic pages of LebaneseLegislation: short plain
+// explanations of what Lebanese law says on one question, every statement
+// tied to an article of the database and the article's own words quoted.
+// The pages are data files (one JSON file per topic, embedded); the site
+// renders them and the checks in check.go keep them honest.
 package topics
 
 import (
@@ -12,6 +17,9 @@ import (
 //go:embed *.json
 var files embed.FS
 
+// Cite is one article a topic relies on, with the words quoted from it. The
+// quote is Arabic, as printed, and must be an exact piece of the article's
+// current text.
 type Cite struct {
 	ID      string `json:"id"`
 	Law     int    `json:"law"`
@@ -19,29 +27,36 @@ type Cite struct {
 	Quote   string `json:"quote"`
 }
 
+// Para is a paragraph. Cites lists the Cite ids that carry its legal
+// statements. A paragraph with no cite must say Note (framing, a pointer or
+// a limit of the page, never a statement of what the law provides).
 type Para struct {
 	Text  string   `json:"text"`
 	Cites []string `json:"cites,omitempty"`
 	Note  bool     `json:"note,omitempty"`
 }
 
+// Row is a table row; Cites tie its figures to articles.
 type Row struct {
 	Cells []string `json:"cells"`
 	Cites []string `json:"cites"`
 }
 
+// Table is a small reference table.
 type Table struct {
 	Caption string   `json:"caption"`
 	Head    []string `json:"head"`
 	Rows    []Row    `json:"rows"`
 }
 
+// Section answers one sub-question.
 type Section struct {
 	Heading string `json:"heading"`
 	Paras   []Para `json:"paras"`
 	Table   *Table `json:"table,omitempty"`
 }
 
+// Content is a topic in one language.
 type Content struct {
 	Title       string    `json:"title"`
 	Question    string    `json:"question"`
@@ -50,16 +65,19 @@ type Content struct {
 	Sections    []Section `json:"sections"`
 }
 
+// Topic is one page, in both languages. The articles are shared: the
+// quotes stay in Arabic on either page.
 type Topic struct {
 	Slug      string  `json:"slug"`
 	Order     int     `json:"order"`
-	Published string  `json:"published"`
-	Updated   string  `json:"updated"`
+	Published string  `json:"published"` // YYYY-MM-DD
+	Updated   string  `json:"updated"`   // YYYY-MM-DD, "last checked"
 	Articles  []Cite  `json:"articles"`
 	EN        Content `json:"en"`
 	AR        Content `json:"ar"`
 }
 
+// Lang returns the content for "en" or "ar".
 func (t *Topic) Lang(lang string) *Content {
 	if lang == "ar" {
 		return &t.AR
@@ -67,6 +85,7 @@ func (t *Topic) Lang(lang string) *Content {
 	return &t.EN
 }
 
+// Cite returns the cite with that id.
 func (t *Topic) Cite(id string) *Cite {
 	for i := range t.Articles {
 		if t.Articles[i].ID == id {
@@ -82,6 +101,7 @@ var (
 	loadEr error
 )
 
+// Load parses every embedded topic, ordered by Order then slug.
 func Load() ([]*Topic, error) {
 	once.Do(func() {
 		names, err := files.ReadDir(".")
@@ -119,11 +139,14 @@ func Load() ([]*Topic, error) {
 	return loaded, loadEr
 }
 
+// All is Load without the error: a topic file that does not parse is caught
+// by the tests, and the site serves the ones that do.
 func All() []*Topic {
 	ts, _ := Load()
 	return ts
 }
 
+// Get returns the topic with that slug, or nil.
 func Get(slug string) *Topic {
 	for _, t := range All() {
 		if t.Slug == slug {
@@ -133,6 +156,7 @@ func Get(slug string) *Topic {
 	return nil
 }
 
+// ByArticle lists the topics that quote an article.
 func ByArticle(law int, number string) []*Topic {
 	var out []*Topic
 	for _, t := range All() {

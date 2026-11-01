@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+// apiFindLawsEn adds the texts whose unofficial English title holds every
+// word of a Latin-script query, after the Arabic matches already in out
+// (ranked below them). Arabic stays the official title; this only lets an
+// English question find a text. An older database without the table adds
+// nothing.
 func (s *Server) apiFindLawsEn(ctx context.Context, q string, year, limit, offset int, out *apiSearchResult) {
 	pats := englishTitlePats(q)
 	if len(pats) == 0 {
@@ -25,7 +30,7 @@ func (s *Server) apiFindLawsEn(ctx context.Context, q string, year, limit, offse
 	for _, l := range out.Laws {
 		seen[l.ID] = true
 	}
-
+	// Offset applies to the Arabic matches first; English ones fill what is left of the page.
 	room := limit - len(out.Laws)
 	if room <= 0 {
 		out.LawCount += n
@@ -54,6 +59,8 @@ func (s *Server) apiFindLawsEn(ctx context.Context, q string, year, limit, offse
 	out.LawCount += n
 }
 
+// englishTitlePats are ILIKE patterns, one per word of a Latin-script query
+// (none for Arabic, or when only little words are left).
 func englishTitlePats(q string) []string {
 	if hasArabic(q) {
 		return nil
@@ -68,6 +75,10 @@ func englishTitlePats(q string) []string {
 	return pats
 }
 
+// lawsByEnglishTitle is the search page's use of the English titles: the
+// texts whose title_en holds every word of a Latin-script query, codes first,
+// then the shortest title (the closest to the words), newest on ties. An older
+// database without the table finds nothing.
 func (s *Server) lawsByEnglishTitle(ctx context.Context, q string, limit int) ([]LawRow, int) {
 	pats := englishTitlePats(q)
 	if len(pats) == 0 {
@@ -91,6 +102,12 @@ func (s *Server) lawsByEnglishTitle(ctx context.Context, q string, limit int) ([
 	return laws, n
 }
 
+// apiRescue is the zero-result rescue the search page runs (searchfallback.go)
+// for /api/v1/search and the MCP search tool: when a search found nothing, the
+// question is read again (English or French terms to Arabic, Latin names and
+// Arabizi, a year or a number as a filter, a typo mended) and the first
+// reading that finds something fills out, with searched_instead saying what
+// was searched. typ is "" or one of laws, articles, rulings, gazette.
 func (s *Server) apiRescue(ctx context.Context, q, typ string, year, offset int, limit int, out *apiSearchResult) {
 	if typ == "gazette" || year > 0 || offset > 0 || out.LawCount+out.ArtCount+out.RulCount+out.GazCount > 0 {
 		return
@@ -108,9 +125,10 @@ func (s *Server) apiRescue(ctx context.Context, q, typ string, year, offset int,
 	}
 	if typ == "" || typ == "articles" {
 		out.ArtCount = alt.ArtCount
+		calculated := s.apiHitCalculator(ctx)
 		for _, a := range alt.Articles[:min(limit, len(alt.Articles))] {
 			out.Articles = append(out.Articles, apiArticleHit{Law: s.lawSum(ctx, a, s.source(ctx, "law", a.ID)),
-				Number: a.Article, Snippet: stripMarks(a.Snippet), URL: Base + artPath(a.ID, a.Article)})
+				CalculatedCurrent: calculated(a.ID, a.Article), Number: a.Article, Snippet: stripMarks(a.Snippet), URL: Base + artPath(a.ID, a.Article)})
 		}
 	}
 	if typ == "" || typ == "rulings" {

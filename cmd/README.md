@@ -47,3 +47,15 @@ run on public data only.
 | `calculated-current` | Writes each article's source-verified calculated wording to `data/article_calculated_current.jsonl`. |
 | `export-graph` | Writes the citation graph as CSV and GraphML. |
 | `mcp-snapshot` | Writes a SQLite (D1) snapshot of the database for the hosted MCP Worker. |
+
+## The website
+
+The server itself is [`web/`](../web/README.md) (with `api/` and `mcp/`); these are its tools.
+
+| Command | What it does |
+| --- | --- |
+| `usage-stats` | Adds up one day of the anonymous usage record the web server keeps with `-events`, as JSON. |
+| `journal-sitemap` | Prints the project journal's sitemap from the posts built into the site. No database. |
+| `searchindex` | Builds the semantic search index in its own pgvector database (`GEMINI_API_KEY`). **key** |
+| `topicgen` | Writes and checks the topic pages with a model that sees only the cited articles (claude, codex or agy CLI). **key** |
+| `check-english` | Checks that English stays an unofficial aid: flagged surfaces, English titles for new texts, no Latin article bodies. |

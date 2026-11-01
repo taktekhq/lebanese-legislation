@@ -1,8 +1,12 @@
 package site
 
+// glossTerms is the English and French legal topics people type, with the Arabic
+// words the texts use. The Arabic was proposed by Gemini and kept only when it
+// matches real titles or articles in the database (checked 20 Oct 2026). It
+// translates the question only; no wording shown as law is ever produced here.
 var glossTerms = map[string]string{
 	"access to information":          "الحق في الوصول الى المعلومات",
-	"access information":             "الوصول الى المعلومات",
+	"access information":             "الوصول الى المعلومات", // added 21 Oct 2026 from searches people made; each matches real titles
 	"right to access information":    "الحق في الوصول الى المعلومات",
 	"right of access to information": "الحق في الوصول الى المعلومات",
 	"right to information":           "الحق في الوصول الى المعلومات",

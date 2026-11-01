@@ -38,6 +38,8 @@ var (
 	fetchedSizes map[string]int
 )
 
+// fetchAll reads every file the index lists (once per test run: the articles
+// take a second each).
 func fetchAll(t *testing.T, s *Server) (index urlset_, files map[string]urlset_, sizes map[string]int) {
 	t.Helper()
 	fetched.Do(func() {
@@ -83,7 +85,7 @@ func TestSitemapIndexAndFiles(t *testing.T) {
 			if !strings.HasPrefix(u.Loc, Base+"/") {
 				t.Errorf("%s: %q", path, u.Loc)
 			}
-			if strings.Contains(path, "core") {
+			if strings.Contains(path, "core") { // a subset, listed again below by design
 				continue
 			}
 			if seen[u.Loc] {
@@ -94,6 +96,9 @@ func TestSitemapIndexAndFiles(t *testing.T) {
 	}
 }
 
+// A shard built from page dates that cannot be when a page changed: law 7815
+// (decree of 8 Mar 1964) as ar-laws-1.xml listed it on 28 Oct 2026, a date
+// after today, and an unknown one. None of them is printed; a real change is.
 func TestSitemapShardLastmodIsInRange(t *testing.T) {
 	today := time.Now().UTC().Format("2006-01-02")
 	body := urlset("", []SitemapURL{
@@ -120,6 +125,10 @@ func TestSitemapShardLastmodIsInRange(t *testing.T) {
 	}
 }
 
+// Every lastmod the sitemaps print is a day a page could have changed: not
+// before the scraper first fetched the Centre (the pages did not exist), not
+// after today. They used to give the text's own date: ar-laws-1.xml had 12,891
+// of 45,000 before 1970 on 28 Oct 2026.
 func TestSitemapLastmodIsWhenThePageChanged(t *testing.T) {
 	s := indexedServer(t)
 	index, files, _ := fetchAll(t, s)
@@ -141,7 +150,7 @@ func TestSitemapLastmodIsWhenThePageChanged(t *testing.T) {
 		for _, u := range f.URLs {
 			check(u.Loc, u.Lastmod)
 			if strings.Contains(path, "pages") {
-				continue
+				continue // later pages of a list carry none, by design
 			}
 			total++
 			if u.Lastmod != "" {
@@ -152,7 +161,8 @@ func TestSitemapLastmodIsWhenThePageChanged(t *testing.T) {
 	if bad > 0 {
 		t.Errorf("%d lastmods outside %s to %s", bad, first, today)
 	}
-
+	// a database built before the build raised old dates to the day the page
+	// first existed still holds them; the sitemaps leave those out
 	var old int
 	if err := s.db.QueryRow(context.Background(), `SELECT count(*) FROM page_state WHERE changed_at < $1`, firstFetch).Scan(&old); err != nil {
 		t.Fatal(err)
@@ -170,23 +180,37 @@ func TestSitemapLeavesOutWhatIsNotIndexed(t *testing.T) {
 	s := indexedServer(t)
 	_, files, _ := fetchAll(t, s)
 	all := map[string]bool{}
+	blog := map[string]bool{}
 	for path, f := range files {
 		for _, u := range f.URLs {
 			all[u.Loc] = true
 			if strings.HasPrefix(u.Loc, Base+"/ar/") {
 				t.Errorf("%s lists the /ar/ address %s, which is not canonical", path, u.Loc)
 			}
-			if strings.HasPrefix(path, "/sitemaps/ar-") {
+			switch {
+			case strings.HasPrefix(path, "/sitemaps/ar-"):
 				if strings.HasPrefix(u.Loc, Base+"/en/") {
 					t.Errorf("%s lists a non-Arabic address %s", path, u.Loc)
 				}
-			} else if !strings.HasPrefix(u.Loc, Base+"/en/") {
+			case path == "/blog-sitemap.xml":
+				// The journal is indexed in both languages, so its sitemap lists both.
+				blog[u.Loc] = true
+			case !strings.HasPrefix(u.Loc, Base+"/en/"):
 				t.Errorf("%s lists a non-English address %s", path, u.Loc)
 			}
 		}
 	}
+	for loc := range blog {
+		twin := Base + "/en" + strings.TrimPrefix(loc, Base)
+		if p := strings.TrimPrefix(loc, Base+"/en"); p != loc {
+			twin = Base + p
+		}
+		if !blog[twin] {
+			t.Errorf("/blog-sitemap.xml lists %s without its other language %s", loc, twin)
+		}
+	}
 	ctx := context.Background()
-
+	// no English address of an Arabic text; only codes and interface pages
 	for loc := range all {
 		p := strings.TrimPrefix(loc, Base)
 		if !strings.HasPrefix(p, "/en/") {
@@ -215,7 +239,7 @@ func TestSitemapLeavesOutWhatIsNotIndexed(t *testing.T) {
 			t.Errorf("code %d is not in both languages", codeID)
 		}
 	}
-
+	// thin articles, placeholder documents and the second of two same-numbered articles
 	rows, err := s.db.Query(ctx, `SELECT n.kind, n.id, a.number FROM noindex_page n
 		LEFT JOIN legislation_article a ON n.kind = 'article' AND a.law_id = n.id AND a.position = n.position
 		WHERE n.kind <> 'ruling' ORDER BY random() LIMIT 400`)
@@ -245,7 +269,7 @@ func TestSitemapLeavesOutWhatIsNotIndexed(t *testing.T) {
 	if checked < 50 {
 		t.Skip("few noindex pages in this database")
 	}
-
+	// the thin articles are a real share, and the substantial ones are listed
 	articles := 0
 	for path, f := range files {
 		if strings.Contains(path, "articles") {
@@ -284,7 +308,7 @@ func TestSitemapPagesHoldThePaginationPaths(t *testing.T) {
 }
 
 func TestOldDatabaseStillHasSitemaps(t *testing.T) {
-
+	// a database from before noindex_page and page_state lists every page, no lastmod
 	s := testServer(t)
 	r := s.indexTables(context.Background())
 	q := r.Replace("SELECT 1 FROM {ps} p, {ni} n")
@@ -293,6 +317,8 @@ func TestOldDatabaseStillHasSitemaps(t *testing.T) {
 	}
 }
 
+// laws-N lists the /en/ twin of every text's own page, row for row with
+// ar-laws-N and with the same lastmod; no other family has English files.
 func TestEnglishLawsSitemapMirrorsArabic(t *testing.T) {
 	s := indexedServer(t)
 	index, files, _ := fetchAll(t, s)
@@ -323,6 +349,7 @@ func TestEnglishLawsSitemapMirrorsArabic(t *testing.T) {
 	}
 }
 
+// The sitemaps change once a night: the edge may keep them 12 hours.
 func TestSitemapCacheHeaders(t *testing.T) {
 	s := testServer(t)
 	for _, path := range []string{"/sitemap.xml", "/sitemaps/ar-core.xml", "/sitemaps/core.xml"} {
@@ -336,6 +363,7 @@ func TestSitemapCacheHeaders(t *testing.T) {
 	}
 }
 
+// The index and the small files are built once per data load: the second ask is a memory read.
 func TestSitemapMemo(t *testing.T) {
 	s := testServer(t)
 	get(t, s, "/sitemap.xml")

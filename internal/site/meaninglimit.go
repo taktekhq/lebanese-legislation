@@ -26,26 +26,30 @@ type meaningSearch struct {
 	clients     *ipLimiter
 	selected    map[[32]byte]selectedEntry
 	vectors     map[[32]byte]vectorEntry
-	// cacheSize and cacheTTL bound each of the three caches; zero turns caching off.
+
+	// How many answers each cache keeps, and for how long. 0 turns caching off.
 	cacheSize int
 	cacheTTL  time.Duration
 }
 
-// Defaults, as the Python service had: two provider calls at once, 256 cached answers for an hour.
+// Defaults when SetMeaningLimits is not called: two provider calls at once,
+// and up to 1,000 answers per cache, each kept for an hour.
 const (
 	defaultMeaningConcurrency = 2
-	defaultMeaningCacheSize   = 256
+	defaultMeaningCacheSize   = 1000
 	defaultMeaningCacheTTL    = time.Hour
 )
 
+// fresh says whether a cached answer from at may still be used.
 func (m *meaningSearch) fresh(at time.Time) bool {
 	return m.cacheTTL > 0 && time.Since(at) < m.cacheTTL
 }
 
-// keep reports whether a cache holding n entries can take one more, and false when caching is off.
+// keep says whether a cache holding n answers may take one more.
 func (m *meaningSearch) keep(n int) bool { return m.cacheSize > 0 && m.cacheTTL > 0 && n < m.cacheSize }
 
-// SetMeaningLimits sets how many provider calls run at once and how much is cached.
+// SetMeaningLimits sets how many provider calls run at once and how the
+// answer caches behave. Call it after SetMeaningSearch, before serving.
 func (s *Server) SetMeaningLimits(concurrency, cacheSize int, cacheTTL time.Duration) {
 	if s.meaning == nil || concurrency < 1 {
 		return
@@ -60,6 +64,8 @@ func newMeaningSearch(rw QueryRewriter, provider string, shares bool, limit int)
 		cacheSize: defaultMeaningCacheSize, cacheTTL: defaultMeaningCacheTTL}
 }
 
+// SetMeaningSearch enables explicit, user-requested interpretation. Call before serving.
+// The allowance counts attempted API calls per UTC day, in this server process.
 func (s *Server) SetMeaningSearch(rw QueryRewriter, provider string, shares bool, daily int) {
 	if rw == nil || daily < 1 || daily > 10000 {
 		return

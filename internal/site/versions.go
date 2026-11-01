@@ -5,24 +5,32 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 )
 
+// Amendments and versions on the site. An amended article prints the wording
+// in force, says which text changed it and when, and keeps its history; a
+// text's page lists the texts that amended it, and the ones it amended.
+
+// Change is one amendment. On an amended article By is the amending text;
+// in a text's "Amends" list By is the text it changed.
 type Change struct {
 	ID        int
-	Action    string
-	Article   *string
-	Part      *string
+	Action    string  // replace, repeal, insert
+	Article   *string // the article changed; nil for the text as a whole
+	Part      *string // the part changed, as the amendment names it; "+" an addition
 	TextAr    *string
 	Effective *time.Time
-	Status    string
+	Status    string // applied, partial, review
 	By        LawRow
 	ByArticle string
 }
 
+// Verb says what the change did, for a history line.
 func (c *Change) Verb() string {
 	switch {
 	case c.Part != nil && *c.Part == "+":
@@ -37,6 +45,8 @@ func (c *Change) Verb() string {
 	return "Replaced"
 }
 
+// VerbKey is Verb's i18n key (see internal/site/i18n, keys "cverb.*"), used
+// by the Arabic templates' changeVerb func instead of the English word.
 func (c *Change) VerbKey() string {
 	switch {
 	case c.Part != nil && *c.Part == "+":
@@ -51,6 +61,8 @@ func (c *Change) VerbKey() string {
 	return "default"
 }
 
+// PartLabel is the part changed as the amendment names it, "" for all of
+// the article or an addition.
 func (c *Change) PartLabel() string {
 	if c.Part == nil || *c.Part == "+" {
 		return ""
@@ -58,19 +70,32 @@ func (c *Change) PartLabel() string {
 	return *c.Part
 }
 
+// Version is one wording of an article. A major version is a legal event
+// (a text changed the article, from a date); a minor one is a person's
+// rewrite of the same legal state (a correction).
 type Version struct {
 	Major, Minor int
 	From         *time.Time
 	To           *time.Time
-	State        string
+	State        string // in_force, repealed
 	TextAr       *string
-	Source       string
+	Source       string // centre, amendment, editorial, none
 	Note         *string
-	Change       *Change
+	Change       *Change // what made it; nil for 1.0
 }
 
+// Label is the version number, "2.1".
 func (v Version) Label() string { return strconv.Itoa(v.Major) + "." + strconv.Itoa(v.Minor) }
 
+// History lists versions newest first for display, keeping the internal
+// chronological order used to select the current wording unchanged.
+func (a *Article) History() []Version {
+	history := slices.Clone(a.Versions)
+	slices.Reverse(history)
+	return history
+}
+
+// Latest is the newest version, nil for an article never amended.
 func (a *Article) Latest() *Version {
 	if n := len(a.Versions); n > 0 {
 		return &a.Versions[n-1]
@@ -78,6 +103,8 @@ func (a *Article) Latest() *Version {
 	return nil
 }
 
+// current is the index of the version whose wording is printed, -1 when
+// it's the Centre's text of an article never amended.
 func (a *Article) current() int {
 	for i := len(a.Versions) - 1; i >= 0; i-- {
 		if a.Versions[i].TextAr != nil {
@@ -87,6 +114,7 @@ func (a *Article) current() int {
 	return -1
 }
 
+// Current is the version whose wording is printed.
 func (a *Article) Current() *Version {
 	if i := a.current(); i >= 0 {
 		return &a.Versions[i]
@@ -94,6 +122,7 @@ func (a *Article) Current() *Version {
 	return nil
 }
 
+// Shown is the wording to print: the latest one known.
 func (a *Article) Shown() string {
 	if c := a.Current(); c != nil && !a.RepealedNote() {
 		return *c.TextAr
@@ -101,6 +130,8 @@ func (a *Article) Shown() string {
 	return a.TextAr
 }
 
+// Ahead says whether the printed wording is newer than the Centre's text:
+// the Centre still has an earlier version.
 func (a *Article) Ahead() bool {
 	i := a.current()
 	if i < 0 || a.Versions[i].Source == "centre" {
@@ -114,6 +145,8 @@ func (a *Article) Ahead() bool {
 	return false
 }
 
+// Pending lists the changes after the printed wording that it doesn't
+// include yet: parts changed whose full new wording nobody wrote out.
 func (a *Article) Pending() []Version {
 	i := a.current()
 	major := 0
@@ -129,23 +162,32 @@ func (a *Article) Pending() []Version {
 	return out
 }
 
+// Repealed says whether the latest version repealed the article.
 func (a *Article) Repealed() bool {
 	l := a.Latest()
 	return l != nil && l.State == "repealed" || a.RepealedNote()
 }
 
+// repealedNote is how the Centre's note opens on an article it holds as
+// repealed ("مادة ملغاة (الغيت بموجب …)"); it empties the text then.
 var repealedNote = regexp.MustCompile(`^\s*مادة ملغا`)
 
+// RepealedNote says whether the Centre's own note says the article is
+// repealed. It is newer than any version we read (db/amendments.sql's
+// article_in_force reads it the same way).
 func (a *Article) RepealedNote() bool {
 	return a.Note != nil && repealedNote.MatchString(*a.Note)
 }
 
+// ChangeGroup is the changes one text made to another, for a law's page.
 type ChangeGroup struct {
 	By       LawRow
 	Date     *time.Time
-	Articles []string
+	Articles []string // "" for the text as a whole
 }
 
+// changes lists amendments matching cond with the other text (joined on
+// other) as By, oldest first.
 func (s *Server) changes(ctx context.Context, cond, other string, id int) ([]Change, error) {
 	rows, err := s.db.Query(ctx, `SELECT x.id, x.action, x.article_number, x.part, x.text_ar, x.effective_on, x.status, x.by_article, `+lawRowCols+`
 		FROM amendment x JOIN legislation l ON l.id = `+other+` JOIN legislation_kind k ON k.name_ar = l.kind
@@ -167,6 +209,9 @@ func (s *Server) changes(ctx context.Context, cond, other string, id int) ([]Cha
 	return out, rows.Err()
 }
 
+// attachVersions gives a law's articles their versions and unconfirmed
+// changes, adds articles that only amendments carry, and notes a repeal of
+// the whole text.
 func (s *Server) attachVersions(ctx context.Context, l *Law) error {
 	all, err := s.changes(ctx, "x.law_id = $1", "x.by_law_id", l.ID)
 	if err != nil {
@@ -221,6 +266,9 @@ func (s *Server) attachVersions(ctx context.Context, l *Law) error {
 	return s.attachRulings(ctx, l, byNumber)
 }
 
+// sortChanges files the changes to this text: a repeal of the whole text,
+// or a change shown (all but those still in review). A whole-text repeal
+// makes the text repealed.
 func (l *Law) sortChanges(all []Change) {
 	for _, c := range all {
 		switch {
@@ -235,6 +283,8 @@ func (l *Law) sortChanges(all []Change) {
 	}
 }
 
+// insertArticle places an article only an amendment carries ("12 مكرر")
+// after the article it follows.
 func (l *Law) insertArticle(a *Article) {
 	n := leadInt(a.Number)
 	at := len(l.List)
@@ -268,6 +318,7 @@ func leadInt(s string) int {
 	return n
 }
 
+// group gathers changes by the other text, newest first.
 func group(cs []Change) []ChangeGroup {
 	var out []ChangeGroup
 	at := map[int]int{}
@@ -303,6 +354,7 @@ func group(cs []Change) []ChangeGroup {
 	return out
 }
 
+// Arts prints a group's articles: "Art. 73", "Arts. 4, 5, 6", "the whole text".
 func (g ChangeGroup) Arts() string {
 	var nums []string
 	whole := false
@@ -333,21 +385,28 @@ func (g ChangeGroup) Arts() string {
 	return s
 }
 
+// ChangeEntry is one amending text on the changes page, with what it changed.
 type ChangeEntry struct {
 	By      LawRow
 	Date    *time.Time
 	Targets []ChangeTarget
 }
 
+// ChangeTarget is a text an amending text changed, and which articles.
 type ChangeTarget struct {
 	Law      LawRow
-	Articles []string
+	Articles []string // "" for the text as a whole
 }
 
+// Arts prints the target's articles like a group's.
 func (t ChangeTarget) Arts() string { return ChangeGroup{Articles: t.Articles}.Arts() }
 
+// recentChanges lists the latest amendments, newest first, by amending text.
+// latestChanges lists the newest changes, grouped by amending text (at
+// most 120 texts), newest first.
 func (s *Server) latestChanges(ctx context.Context) ([]ChangeEntry, error) {
-
+	// From the graph: every change a text made to another, whoever found it
+	// (the model, the patterns), dated by the amending text's gazette.
 	rows, err := s.db.Query(ctx, `SELECT e.from_id, coalesce(b.gazette_date, b.issued_on) AS on, coalesce(e.to_article, ''), `+lawRowCols+`
 		FROM graph_edge e JOIN legislation b ON b.id = e.from_id
 		JOIN legislation l ON l.id = e.to_law_id JOIN legislation_kind k ON k.name_ar = l.kind
@@ -433,6 +492,7 @@ func (s *Server) recentChanges(w http.ResponseWriter, r *http.Request) {
 		Data: entries})
 }
 
+// ReviewRow is one thing for a person to check.
 type ReviewRow struct {
 	Law       LawRow
 	Article   string
@@ -442,9 +502,11 @@ type ReviewRow struct {
 	Date      *time.Time
 	Reason    string
 	Judgement string
-	Key       string
+	Key       string // the line for db/amendments.tsv: amending id, article, amended id, article
 }
 
+// review lists what needs a person: the changes to the principal codes the
+// build couldn't place.
 func (s *Server) review(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := s.ctx(r)
 	defer cancel()

@@ -10,6 +10,11 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/site/topics"
 )
 
+// Topic pages: /topics/ lists them, /topic/<slug>/ explains one question in
+// plain words, every statement tied to an article whose own words are quoted
+// beneath it. The pages are the data files in internal/site/topics; the
+// tests there keep each quote an exact piece of the article.
+
 func (s *Server) topicRoutes() {
 	s.mux.HandleFunc("GET /topics/{$}", s.topicsIndex)
 	s.mux.HandleFunc("GET /topic/{slug}/{$}", s.topic)
@@ -22,6 +27,8 @@ func (s *Server) topicRoutes() {
 	})
 }
 
+// topicSitemapPaths are the topics' root paths, for the sitemap of pages (the
+// English core file lists them under /en/, the Arabic one at the root).
 func topicSitemapPaths() []string {
 	paths := []string{"/topics/"}
 	for _, t := range topics.All() {
@@ -30,8 +37,10 @@ func topicSitemapPaths() []string {
 	return paths
 }
 
+// TopicRef is a topic as the article page and the index name it.
 type TopicRef struct{ Slug, Title, Question string }
 
+// topicsFor lists, in the request's language, the topics that quote an article.
 func (s *Server) topicsFor(r *http.Request, law int, number string) []TopicRef {
 	var out []TopicRef
 	for _, t := range topics.ByArticle(law, number) {
@@ -53,28 +62,33 @@ func (s *Server) topicsIndex(w http.ResponseWriter, r *http.Request) {
 		LD: []any{breadcrumbs(s.tr(r, "topics.title"), "/topics/")}})
 }
 
+// CiteView is one quoted article.
 type CiteView struct {
-	N      int
-	Quote  string
+	N      int    // the order of first use on the page
+	Quote  string // Arabic, as printed
 	Number string
-	Path   string
-	Law    string
-	LawEn  string
-	Hidden bool
+	Path   string // the article's address
+	Law    string // how the law is cited, in Arabic
+	LawEn  string // the code's English name, when it has one
+	Hidden bool   // already quoted higher up the page
 }
 
+// ParaView is a paragraph with the articles it rests on.
 type ParaView struct {
 	Text   string
 	Note   bool
-	Refs   []CiteView
-	Quotes []CiteView
+	Refs   []CiteView // every article it cites, as links
+	Quotes []CiteView // those not quoted yet, with their words
 }
 
+// RowView is a table row.
 type RowView struct {
 	Cells []string
 	Refs  []CiteView
 }
 
+// TableView is a section's table; Quotes are the words of the articles its
+// rows cite that the page has not quoted yet.
 type TableView struct {
 	Caption string
 	Head    []string
@@ -82,6 +96,7 @@ type TableView struct {
 	Quotes  []CiteView
 }
 
+// SectionView answers one sub-question.
 type SectionView struct {
 	Heading string
 	ID      string
@@ -89,6 +104,8 @@ type SectionView struct {
 	Table   *TableView
 }
 
+// addRef adds a link chip unless the block already links that article (two
+// quotes of one article give one chip).
 func addRef(refs []CiteView, v CiteView) []CiteView {
 	for _, r := range refs {
 		if r.Path == v.Path {
@@ -98,6 +115,7 @@ func addRef(refs []CiteView, v CiteView) []CiteView {
 	return append(refs, v)
 }
 
+// TopicView is what the topic template prints.
 type TopicView struct {
 	Slug     string
 	C        *topics.Content
@@ -111,7 +129,7 @@ type topicLaw struct {
 	cite, en string
 }
 
-var topicLaws sync.Map
+var topicLaws sync.Map // law id -> topicLaw
 
 func (s *Server) topicLaw(ctx context.Context, id int) topicLaw {
 	if v, ok := topicLaws.Load(id); ok {
@@ -158,8 +176,8 @@ func (s *Server) topic(w http.ResponseWriter, r *http.Request) {
 	lang := s.lang(r)
 	c := t.Lang(lang)
 	n := 0
-	order := map[string]int{}
-	shown := map[string]bool{}
+	order := map[string]int{}  // cite id -> number
+	shown := map[string]bool{} // quoted already
 	view := func(id string, quote bool) (CiteView, bool) {
 		ct := t.Cite(id)
 		if ct == nil {
@@ -225,6 +243,8 @@ func (s *Server) topic(w http.ResponseWriter, r *http.Request) {
 		Data: tv})
 }
 
+// topicLD is the page's schema.org Article: its modified date and a
+// citation to the Legislation page of every article it quotes.
 func (s *Server) topicLD(r *http.Request, t *topics.Topic, c *topics.Content, path string, ctx context.Context) map[string]any {
 	var cites []any
 	seen := map[string]bool{}

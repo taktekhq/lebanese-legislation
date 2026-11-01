@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+// A Constitutional Council decision shows on the law page, naming the
+// articles it struck, and next to each of those articles.
 func TestCouncilRulingRenders(t *testing.T) {
 	s, err := New(nil)
 	if err != nil {
@@ -54,6 +56,9 @@ func TestCouncilRulingRenders(t *testing.T) {
 	}
 }
 
+// A decision that the text is not in force shows as the text's status, in
+// place of the record's own status, and the answer line does not also call
+// it in force.
 func TestCouncilNotInForceRenders(t *testing.T) {
 	s, err := New(nil)
 	if err != nil {

@@ -1,0 +1,124 @@
+{
+  "slug": "foreign-workers-work-permits",
+  "title_en": "Foreign workers in Lebanon: work permits and the sponsorship system",
+  "title_ar": "العمال الأجانب في لبنان: إجازات العمل ونظام الكفالة",
+  "question_en": "What do Lebanese texts say about work permits and the rights of foreign workers, including domestic workers under sponsorship?",
+  "question_ar": "ماذا تقول النصوص اللبنانية عن إجازات العمل وحقوق العمال الأجانب، بمن فيهم عاملات المنازل في إطار الكفالة؟",
+  "sub_questions": [
+    "Who needs a work permit and what is the two-step process (prior approval, then permit)?",
+    "On what grounds is a permit granted, how long does it last and when is it cancelled?",
+    "Can a foreign worker change employer or type of work?",
+    "Are domestic workers covered by the Labour Code, and what protections do the texts that do exist give them?",
+    "What do recruitment offices owe the worker and the employer (repatriation, replacement, fees, violence, complaints)?",
+    "What insurance must the employer buy, and what are the penalties for breaking the rules?"
+  ],
+  "notes": "The word kafala (sponsorship) does not appear in any Lebanese statute in the database. The system exists in practice through the employer-bound permit and prior approval of Decree 17561 of 18/9/1964 (id 204889), and the texts below describe it without using that word. Decree 17561 is held as one text with its amendments applied: arts 11 to 13 were replaced by Decree 1582 of 25/4/1984 (id 167114, amendment 47) and art 14 by Decree 14268 of 4/3/2005 (id 207086); the art 14 text in the pack is the 2005 wording (permit up to three years, renewal request at least one month before expiry, otherwise cancelled). Domestic workers: Labour Code art 7 excludes 'domestic servants in private homes' from the Code, so the Code's rules on notice, dismissal and end-of-service indemnity (e.g. art 50) do not apply to them by their own terms; art 59 gives foreign employees the rights of Lebanese ones on dismissal on condition of reciprocity and a work permit, but that is inside the Code and so does not reach excluded domestic workers. Their protection comes from ministerial decisions on recruitment offices and insurance. Recruitment offices: Decision 41/1 of 11/5/2022 (id 302347) is in force (it takes effect three months after publication) and expressly repeals Decision 168/1 of 27/11/2015 (id 242492); older decisions (5/2003, 70/2003, 213/1992) are superseded or not in the pack. Insurance: the successive decisions 117/1 (2004), 1/1 and 6/1 (2005) were replaced by 52/1 of 14/5/2009 (id 223096; the database dates it 14/4/2009), whose art 1 was replaced by Decision 4/1 of 9/1/2024 (id 329714): repatriation of remains at least USD 8,000, permanent disability at least USD 10,000, hospital cover at least USD 23,000 a year; the other articles of the 2009 decision stand. Penalties: the Labour Code art 107 (as amended, fines of millions of pounds, set before the currency collapse) and Law of 10/7/1962 on entry and residence (id 179943) art 25 bans foreigners from working without Ministry of Labour authorisation. NOT in the database: the unified domestic-worker employment contract itself (Decision 47 of 28/3/2009, id 222773, art 1 only requires 'the unified contract model' for domestic workers; the model's text is not held), the annual Minister of Labour decision listing jobs reserved for Lebanese (decree art 9), the ministerial decisions on required documents beyond those cited, Public Security (General Security) residence rules and the exit visa practice, any bilateral labour agreements, and case law. Say clearly that rights such as passport retention, wage payment dates or weekly rest for domestic workers are not set out in a statute held here. Decision 48 of 11/5/2005 (id 208490) only delegates who signs permits; art 4 lets regional heads decide domestic and agricultural worker permits that match the prior approval. Palestinian refugees registered with the Interior Ministry are exempt from reciprocity and the permit fee (Labour Code art 59).",
+  "pack": [
+    {
+      "law": 204889,
+      "articles": [
+        "1",
+        "2",
+        "6",
+        "8",
+        "14",
+        "15",
+        "17",
+        "21"
+      ],
+      "why": "Decree 17561/1964 as amended: prior approval, permit within 10 days of entry, grounds for a permit and Lebanese preference, 3-year maximum, ban on changing employer or work, cancellation, penalties"
+    },
+    {
+      "law": 190374,
+      "articles": [
+        "7",
+        "8",
+        "50",
+        "59",
+        "107"
+      ],
+      "why": "Labour Code 1946: exclusion of domestic servants (art 7), scope (8), dismissal rules for covered workers (50), foreign employees' rights on reciprocity and permit (59), penalties for violations (107)"
+    },
+    {
+      "law": 179943,
+      "articles": [
+        "25"
+      ],
+      "why": "Law of 10/7/1962: foreigners may not work without Ministry of Labour authorisation"
+    },
+    {
+      "law": 302347,
+      "articles": [
+        "24",
+        "28",
+        "29",
+        "30",
+        "34"
+      ],
+      "why": "Decision 41/1 of 2022 on domestic-worker recruitment offices: employer permit duty within 10 days, reporting abuse, ban on violence, repatriation and replacement, blacklist of employers, licence cancellation"
+    },
+    {
+      "law": 208490,
+      "articles": [
+        "4"
+      ],
+      "why": "Decision 48/2005: who decides permits for domestic and agricultural workers"
+    },
+    {
+      "law": 329714,
+      "articles": [
+        "1"
+      ],
+      "why": "Decision 4/1 of 2024: current minimum insurance cover for foreign employees and domestic workers"
+    },
+    {
+      "law": 223096,
+      "articles": [
+        "5"
+      ],
+      "why": "Decision 52/1 of 2009: employer must file the insurance policy with each permit request and renewal"
+    },
+    {
+      "law": 222773,
+      "articles": [
+        "1"
+      ],
+      "why": "Decision 47/2009: documents for a permit, including the unified contract for domestic workers"
+    },
+    {
+      "law": 204889,
+      "articles": [
+        "7"
+      ],
+      "why": "Added after the legal review"
+    },
+    {
+      "law": 302347,
+      "articles": [
+        "27"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 302347,
+      "articles": [
+        "31"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 223096,
+      "articles": [
+        "3"
+      ],
+      "why": "Added after the second legal review"
+    },
+    {
+      "law": 204889,
+      "articles": [
+        "9"
+      ],
+      "why": "Added after the second legal review"
+    }
+  ]
+}

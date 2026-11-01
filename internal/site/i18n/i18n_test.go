@@ -2,6 +2,9 @@ package i18n
 
 import "testing"
 
+// TestEveryKeyHasArabic logs (never fails the build) any UI string that
+// has no Arabic translation yet, so a gap is visible without blocking
+// deploys; a missing key falls back to English on the page itself.
 func TestEveryKeyHasArabic(t *testing.T) {
 	if len(Missing) > 0 {
 		t.Logf("%d UI string(s) have no Arabic translation yet, falling back to English: %v", len(Missing), Missing)

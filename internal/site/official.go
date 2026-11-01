@@ -11,7 +11,12 @@ import (
 	"time"
 )
 
+// OfficialDir holds the page images and PDFs of texts published from official
+// scans (cmd/load-official -files). Empty: the pages show without images.
 var OfficialDir string
+
+// Texts published from official page scans, until UL has them (db/official.sql).
+// UL first: a row UL already has is not shown, its address redirects to UL's page.
 
 const (
 	mkStart = ""
@@ -19,20 +24,24 @@ const (
 	mkEnd   = ""
 )
 
+// OSeg is a run of text; a flagged one carries the second reader's wording.
 type OSeg struct {
 	Text string
 	Alt  string
 	Flag bool
 }
 
+// OPara is one printed paragraph.
 type OPara []OSeg
 
+// OPage is one Gazette page: its image and the text read from it, column by column.
 type OPage struct {
 	N    int
 	Img  string
 	Cols [][]OPara
 }
 
+// Official is what the page template shows.
 type Official struct {
 	ID                  int
 	Kind, Number, Title string
@@ -46,9 +55,10 @@ type Official struct {
 	Pages               []OPage
 	Words, Flagged      int
 	Agreement           float64
-	L                   map[string]string
+	L                   map[string]string // labels
 }
 
+// parseCol turns a merged column ("text ‹a|b› text", one paragraph per line) into paragraphs.
 func parseCol(col string) []OPara {
 	var out []OPara
 	for _, ln := range strings.Split(col, "\n") {
@@ -148,7 +158,7 @@ func (s *Server) official(w http.ResponseWriter, r *http.Request) {
 		s.notFound(w, r)
 		return
 	}
-	if o == nil {
+	if o == nil { // UL has it: UL first
 		http.Redirect(w, r, s.u(r, s.finalPath(r.Context(), fmt.Sprintf("/law/%d/", law))), http.StatusMovedPermanently)
 		return
 	}
@@ -179,6 +189,7 @@ func (s *Server) official(w http.ResponseWriter, r *http.Request) {
 		Path: fmt.Sprintf("/official/%d/", id), OGType: "article", Data: o})
 }
 
+// OfficialRow is a text in the list.
 type OfficialRow struct {
 	ID                  int
 	Kind, Number, Title string
@@ -186,6 +197,7 @@ type OfficialRow struct {
 	Issue               string
 }
 
+// OfficialList is the list page.
 type OfficialList struct {
 	Rows    []OfficialRow
 	Total   int
@@ -222,6 +234,7 @@ func (s *Server) officialList(w http.ResponseWriter, r *http.Request) {
 	s.render(w, r, "official_list", 200, Page{Lang: "ar", Title: s.brandTitle(r, l.L["title"]), Desc: l.L["intro"], Path: "/official/", Data: l})
 }
 
+// officialFiles serves a text's page images and PDF.
 func (s *Server) officialFiles(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	name := r.PathValue("name")

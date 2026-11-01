@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+// An Atom feed of the latest changes to Lebanese law (/changes/feed.xml):
+// one entry per amending text, naming the texts and articles it changed.
+// Feed readers, news apps and law firms' tools can follow it without
+// visiting the site.
+
 type atomFeed struct {
 	XMLName xml.Name    `xml:"http://www.w3.org/2005/Atom feed"`
 	Title   string      `xml:"title"`
@@ -78,6 +83,8 @@ func (s *Server) changesFeed(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// lawFeed is one text's changes (/law/{id}/feed.xml): follow the Labour Code
+// without an account.
 func (s *Server) lawFeed(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := s.ctx(r)
 	defer cancel()
