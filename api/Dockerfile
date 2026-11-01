@@ -6,8 +6,6 @@ WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY internal/ ./internal/
-# internal/calculatedcurrent reads the wording guard (internal/provenance), which needs the db package.
-COPY db/ ./db/
 COPY api/main.go ./api/
 ARG TARGETOS
 ARG TARGETARCH
