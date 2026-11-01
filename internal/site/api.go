@@ -1,5 +1,18 @@
 package site
 
+// The read-only JSON API, /api/v1/. Five endpoints, each backed by the same
+// Postgres queries the HTML pages use (see handlers.go and docs.go): search,
+// a law's metadata and table of contents, one article's verbatim text, a
+// ruling, and a gazette issue. Nothing here paraphrases or rewrites a legal
+// text; every text field is copied from the database as the Centre
+// published it. Every response carries the site's own canonical URL and,
+// where known, the Centre's source page.
+//
+// Responses are cacheable (Cache-Control, no per-visitor data) so Cloudflare
+// and the MCP Worker in front of it can serve repeat requests without
+// hitting Postgres. Usage is counted the same anonymous way as page views
+// (events.go): no IP, no user agent, no cookie.
+
 import (
 	"context"
 	"encoding/json"
@@ -13,15 +26,30 @@ import (
 	"unicode"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/taktekhq/lebanese-legislation/internal/calculatedcurrent"
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 )
 
 const apiCacheControl = "public, max-age=60, stale-while-revalidate=300"
 
+// notLegalAdvice is the line every API response and MCP tool result outside
+// the HTML pages carries; the HTML pages already show the Arabic, French and
+// English notice on every page (templates/layout.html).
 const notLegalAdvice = "Not legal advice. Official texts from the Lebanese University's Centre for Research and Studies in Legal Informatics."
 
+// apiSemaphoreWait mirrors mcpSemaphoreWait (mcp.go): how long a /api/v1
+// request queues for a DB slot before answering 503.
 const apiSemaphoreWait = 2 * time.Second
 
+// apiLimited wraps a DB-backed /api/v1 handler with the same per-client
+// token bucket and global DB semaphore built for /mcp (limiter.go): that
+// file's own doc says they're "safe to wire onto /api/v1 too", but until
+// now nothing did, leaving this public, unauthenticated JSON API free to
+// open as many concurrent Postgres queries as there were simultaneous
+// requests, on a box whose web role allows only 20 connections. Without
+// this, apiSearch alone (4 queries fired in parallel per request with no
+// "type" filter) could exhaust the pool with a handful of concurrent
+// requests and starve every other visitor.
 func (s *Server) apiLimited(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ip := clientIP(r)
@@ -49,6 +77,7 @@ func (s *Server) apiRoutes() {
 	m.HandleFunc("GET /api/v1/{$}", s.apiRoot)
 	m.HandleFunc("GET /api/v1/search/{$}", s.apiLimited(s.apiSearch))
 	m.HandleFunc("GET /api/v1/law/{id}/{$}", s.apiLimited(s.apiLaw))
+	m.HandleFunc("GET /api/v1/law/{id}/calculated-current/{$}", s.apiLimited(s.apiCalculatedCurrent))
 	m.HandleFunc("GET /api/v1/law/{id}/article/{n}/{$}", s.apiLimited(s.apiArticle))
 	m.HandleFunc("GET /api/v1/ruling/{id}/{$}", s.apiLimited(s.apiRuling))
 	m.HandleFunc("GET /api/v1/gazette/{id}/{$}", s.apiLimited(s.apiGazette))
@@ -103,6 +132,10 @@ func (s *Server) apiRoot(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ---------------------------------------------------------------- shared shapes
+
+// apiLawSummary is a law or decree's identity, without its text: what a
+// search result or a gazette issue's contents list carries.
 type apiLawSummary struct {
 	ID           int     `json:"id"`
 	Kind         string  `json:"kind"`
@@ -110,10 +143,10 @@ type apiLawSummary struct {
 	Number       *string `json:"number,omitempty"`
 	IssuedOn     *string `json:"issued_on,omitempty"`
 	Title        string  `json:"title"`
-	TitleEn      *string `json:"title_en,omitempty"`
+	TitleEn      *string `json:"title_en,omitempty"` // unofficial English title (a model's rendering of the Arabic one); the Arabic title is official and more accurate
 	Status       string  `json:"status"`
 	ArticleCount int     `json:"article_count"`
-	Code         *string `json:"code,omitempty"`
+	Code         *string `json:"code,omitempty"` // the curated code's short name, e.g. "Code of Obligations and Contracts"
 	URL          string  `json:"url"`
 	SourceURL    string  `json:"source_url,omitempty"`
 }
@@ -142,14 +175,18 @@ func clampInt(s string, def, lo, hi int) int {
 	return max(lo, min(hi, n))
 }
 
+// ---------------------------------------------------------------- search
+
 type apiArticleHit struct {
-	Law     apiLawSummary `json:"law"`
-	Number  string        `json:"article_number"`
-	Snippet string        `json:"snippet"`
-	URL     string        `json:"url"`
-	// MatchedCalculated: the query matched the article's calculated current wording, not its original text.
+	CalculatedCurrent *calculatedcurrent.Record `json:"calculated_current,omitempty"`
+	Law               apiLawSummary             `json:"law"`
+	Number            string                    `json:"article_number"`
+	Snippet           string                    `json:"snippet"`
+	URL               string                    `json:"url"`
+	// MatchedCalculated says the query matched the calculated current
+	// amount, not the published wording the snippet shows.
 	MatchedCalculated bool `json:"matched_calculated_current,omitempty"`
-	// Cited: the query named this article ("المادة 86 من ...").
+	// Cited says the query cites this article ("المادة 86 من ..."), so it comes first.
 	Cited bool `json:"cited,omitempty"`
 }
 
@@ -160,9 +197,11 @@ type apiRulingHit struct {
 	DecidedOn string `json:"decided_on,omitempty"`
 	Snippet   string `json:"snippet,omitempty"`
 	URL       string `json:"url"`
-
+	// PDFURL is the judgment's scan on the Lebanese University's site, for
+	// every ruling that has one: give it with any answer about the ruling.
 	PDFURL string `json:"pdf_url,omitempty"`
-
+	// JudgmentPage is set when only the machine reading of the scanned
+	// judgment matched, not the title or summary: the page the snippet is from.
 	JudgmentPage int `json:"judgment_page,omitempty"`
 }
 
@@ -183,18 +222,22 @@ type apiSearchResult struct {
 	RulCount int             `json:"ruling_count"`
 	Gazette  []apiGazetteHit `json:"gazette,omitempty"`
 	GazCount int             `json:"gazette_count"`
-
+	// SearchedInstead is set when q found nothing and the results are for a
+	// reading of it: the words searched ("قانون العمل" for "labor law").
+	// SearchedInsteadKind is "translated" (Latin to Arabic) or "adjusted" (a typo
+	// mended, a number or year used as a filter, a common word set aside).
 	SearchedInstead     string `json:"searched_instead,omitempty"`
 	SearchedInsteadKind string `json:"searched_instead_kind,omitempty"`
-
-	// Related holds passages found by meaning, when semantic search was asked for and is set up.
+	// Related are passages close in meaning to q (semantic=true), copied
+	// from the source texts. Semantic is "ok" or "unavailable".
 	Related  []apiPassage `json:"related,omitempty"`
 	Semantic string       `json:"semantic,omitempty"`
-	// Selection says whether Gemini chose among Related (select=true): "ok" or "unavailable".
+	// Selection is "ok" when a model kept only the related passages that
+	// answer q (select=true), or "unavailable" when it could not.
 	Selection string `json:"selection,omitempty"`
 }
 
-// apiPassage is a passage copied from the corpus, found by meaning and checked against its source.
+// apiPassage is one related passage, verbatim from its source.
 type apiPassage struct {
 	ID         string `json:"id"`
 	Title      string `json:"title"`
@@ -205,9 +248,9 @@ type apiPassage struct {
 	URL        string `json:"url"`
 }
 
-// addRelated fills Related for semantic search, or says why it is empty. With
-// choose, Gemini picks which passages answer the question; it returns passage
-// IDs only, never wording, and the passages stay copied from the sources.
+// addRelated fills out.Related from the vector index. With choose, the
+// model picks which passages answer q; it returns their IDs only, so every
+// passage shown is still the source's own text.
 func (s *Server) addRelated(ctx context.Context, q string, choose bool, out *apiSearchResult) {
 	if s.vector == nil || s.meaning == nil {
 		out.Semantic = "unavailable"
@@ -248,17 +291,16 @@ func (s *Server) addRelated(ctx context.Context, q string, choose bool, out *api
 }
 
 func (s *Server) apiSearch(w http.ResponseWriter, r *http.Request) {
+	semanticWanted := r.URL.Query().Get("semantic") == "true"
+	selectWanted := r.URL.Query().Get("select") == "true"
 	ctx, cancel := s.ctx(r)
-	if r.URL.Query().Get("semantic") == "true" {
-		// Search by meaning waits on Gemini, as the website's answer box does.
+	if semanticWanted { // embedding the question and choosing passages take longer
 		cancel()
 		ctx, cancel = context.WithTimeout(r.Context(), 25*time.Second)
 	}
 	defer cancel()
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
 	question := q
-	semanticWanted := r.URL.Query().Get("semantic") == "true"
-	selectWanted := r.URL.Query().Get("select") == "true"
 	typ := r.URL.Query().Get("type")
 	year := clampInt(r.URL.Query().Get("year"), 0, 0, 2100)
 	limit := clampInt(r.URL.Query().Get("limit"), 10, 1, 50)
@@ -268,7 +310,7 @@ func (s *Server) apiSearch(w http.ResponseWriter, r *http.Request) {
 		s.writeJSON(w, 200, out)
 		return
 	}
-	if t, _ := tidyQuery(q); t != "" {
+	if t, _ := tidyQuery(q); t != "" { // a pasted bullet, a glued number, a gazette reference
 		q = t
 	}
 	var err error
@@ -298,9 +340,14 @@ func (s *Server) apiSearch(w http.ResponseWriter, r *http.Request) {
 			out.Related = out.Related[:limit]
 		}
 	}
+	s.track(r, map[string]any{"k": "search", "q": NormQuery(q), "api": true,
+		"n": out.LawCount + out.ArtCount + out.RulCount + out.GazCount})
 	s.writeJSON(w, 200, out)
 }
 
+// apiFindAll searches the four kinds at once, each on its own connection
+// (each fills its own fields of out). One after the other, a common word
+// ("قانون") took 5.4 to 6.9 s on the production server, past the MCP's 5 s budget.
 func (s *Server) apiFindAll(ctx context.Context, q string, year, limit, offset int, out *apiSearchResult) error {
 	errs := make(chan error, 4)
 	go func() { errs <- s.apiFindLaws(ctx, q, year, limit, offset, out) }()
@@ -316,11 +363,15 @@ func (s *Server) apiFindAll(ctx context.Context, q string, year, limit, offset i
 	return err
 }
 
+// apiFindLaws mirrors findLaws in docs.go: every word of q, spelling folded,
+// anywhere in the title. year, when > 0, narrows to laws issued that year
+// (the MCP search_legislation tool's year filter; the HTTP API takes it as
+// ?year=).
 func (s *Server) apiFindLaws(ctx context.Context, q string, year, limit, offset int, out *apiSearchResult) error {
 	if err := s.apiFindLawsBase(ctx, q, year, limit, offset, out); err != nil || offset > 0 {
 		return err
 	}
-
+	// A question that names one text ("cybercrime") has it first (glosspins.go).
 	if pin := s.pinnedRow(ctx, q, year); pin != nil {
 		first := s.lawSum(ctx, *pin, s.source(ctx, "law", pin.ID))
 		laws := []apiLawSummary{first}
@@ -344,7 +395,7 @@ func (s *Server) apiFindLaws(ctx context.Context, q string, year, limit, offset 
 }
 
 func (s *Server) apiFindLawsBase(ctx context.Context, q string, year, limit, offset int, out *apiSearchResult) error {
-
+	// A citation ("law 28 of 10/2/2017", "رقم 175 تاريخ 8/5/2020") is looked up exactly, as on the site.
 	if rq := readQuery(q); rq.lawCite() && year == 0 && offset == 0 {
 		var res Results
 		ok, err := s.findLawCite(ctx, &res, rq)
@@ -359,7 +410,8 @@ func (s *Server) apiFindLawsBase(ctx context.Context, q string, year, limit, off
 			return nil
 		}
 	}
-
+	// A law's id, and the codes by their English or French name ("Penal
+	// Code", "code penal"), as the MCP's search_legislation finds them.
 	if year == 0 && offset == 0 {
 		found, err := s.apiFindLawByIDOrCode(ctx, q)
 		if err != nil {
@@ -410,10 +462,14 @@ func isDigits(s string) bool {
 	return s != "" && strings.Trim(s, "0123456789") == ""
 }
 
+// codeNameFold folds a code's name for matching: latinFold, with hyphens and
+// apostrophes as spaces ("Code pénal" matches "code-penal").
 func codeNameFold(s string) string {
 	return strings.Join(strings.Fields(strings.NewReplacer("-", " ", "'", " ").Replace(latinFold(s))), " ")
 }
 
+// apiFindLawByIDOrCode finds a law by its id, and the codes whose English or
+// French name or slug holds every word of a Latin-script q.
 func (s *Server) apiFindLawByIDOrCode(ctx context.Context, q string) ([]LawRow, error) {
 	var found []LawRow
 	if isDigits(q) && len(q) <= 9 {
@@ -467,6 +523,7 @@ func (s *Server) apiFindLawByIDOrCode(ctx context.Context, q string) ([]LawRow, 
 	return found, nil
 }
 
+// apiFindArticles mirrors findArticles in docs.go.
 func (s *Server) apiFindArticles(ctx context.Context, q string, limit, offset int, out *apiSearchResult) error {
 	const artWhere = `(a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1))
 		OR a.search_stem @@ websearch_to_tsquery('arabic', ar_light($1))
@@ -505,6 +562,8 @@ func (s *Server) apiFindArticles(ctx context.Context, q string, limit, offset in
 	if err != nil {
 		return err
 	}
+	// An article the query cites, and articles whose calculated amount
+	// matches it, come first, once each.
 	var first []apiArticleHit
 	if offset == 0 {
 		if hit, ok := s.citedArticle(ctx, q); ok {
@@ -523,15 +582,17 @@ func (s *Server) apiFindArticles(ctx context.Context, q string, limit, offset in
 		out.Articles = append(out.Articles, h)
 		extra++
 	}
+	calculated := s.apiHitCalculator(ctx)
 	for _, r := range rs {
 		if seen[strconv.Itoa(r.x.ID)+"/"+r.art] {
 			continue
 		}
 		out.Articles = append(out.Articles, apiArticleHit{
-			Law:     s.lawSum(ctx, r.x, s.source(ctx, "law", r.x.ID)),
-			Number:  r.art,
-			Snippet: stripMarks(r.hl),
-			URL:     Base + artPath(r.x.ID, r.art),
+			Law:               s.lawSum(ctx, r.x, s.source(ctx, "law", r.x.ID)),
+			Number:            r.art,
+			CalculatedCurrent: calculated(r.x.ID, r.art),
+			Snippet:           stripMarks(r.hl),
+			URL:               Base + artPath(r.x.ID, r.art),
 		})
 	}
 	if len(out.Articles) > limit {
@@ -575,6 +636,9 @@ func (s *Server) apiFindRulings(ctx context.Context, q string, limit, offset int
 	return nil
 }
 
+// apiFindGazette has no HTML equivalent (the search page only covers laws,
+// articles and rulings): a loose match on the issue's own number, since
+// gazette issues carry no body text of their own to search.
 func (s *Server) apiFindGazette(ctx context.Context, q string, limit, offset int, out *apiSearchResult) error {
 	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM gazette_issue WHERE number ILIKE '%' || $1 || '%'`, q).Scan(&out.GazCount); err != nil {
 		return err
@@ -604,17 +668,19 @@ func (s *Server) apiFindGazette(ctx context.Context, q string, limit, offset int
 	return rows.Err()
 }
 
+// ---------------------------------------------------------------- one law
+
 type apiSection struct {
 	ID      int     `json:"id"`
 	Depth   int     `json:"depth"`
 	Heading string  `json:"heading"`
-	Note    *string `json:"note,omitempty"`
+	Note    *string `json:"note,omitempty"` // the Centre's editorial note on the chapter
 }
 
 type apiArticleRef struct {
 	Position  int    `json:"position"`
 	Number    string `json:"number"`
-	SectionID *int   `json:"section_id,omitempty"`
+	SectionID *int   `json:"section_id,omitempty"` // the table_of_contents entry it sits under
 	URL       string `json:"url"`
 }
 
@@ -628,12 +694,18 @@ type apiLawDetail struct {
 	Closing         *string         `json:"closing,omitempty"`
 	TableOfContents []apiSection    `json:"table_of_contents,omitempty"`
 	Articles        []apiArticleRef `json:"articles,omitempty"`
-
+	// AmendedBy: the texts that changed this one; Amended: the texts this one
+	// changed. One entry per relation and other text, oldest first; articles
+	// are named when the change is to articles, not to the text as a whole.
 	AmendedBy      []apiLawChange `json:"amended_by,omitempty"`
 	Amended        []apiLawChange `json:"amended,omitempty"`
 	NotLegalAdvice string         `json:"not_legal_advice"`
 }
 
+// loadLawOutline loads what lawDetail shows of a law: its header, chapters,
+// article numbers (with those only an amendment carries) and the changes to
+// it. Not the texts, versions, links or rulings loadLaw adds for the page:
+// on the Penal Code those took 2 to 4 s on the production server.
 func (s *Server) loadLawOutline(ctx context.Context, id int) (*Law, error) {
 	l, err := s.loadLaw(ctx, id, false)
 	if err != nil {
@@ -662,7 +734,7 @@ func (s *Server) loadLawOutline(ctx context.Context, id int) (*Law, error) {
 		return nil, err
 	}
 	l.sortChanges(all)
-
+	// The articles only an amendment carries, placed as attachVersions does.
 	rows, err = s.db.Query(ctx, `SELECT DISTINCT article_number FROM article_version WHERE law_id = $1 ORDER BY article_number`, id)
 	if err != nil {
 		return nil, err
@@ -684,6 +756,10 @@ func (s *Server) loadLawOutline(ctx context.Context, id int) (*Law, error) {
 	return l, nil
 }
 
+// lawDetail loads a law and builds the shape /api/v1/law/{id} and the (not
+// yet wired) MCP get_law tool both return; see api.go's package doc. It
+// returns the loaded Law too, so a caller can track a read (trackRead) the
+// way the HTTP handler does.
 func (s *Server) lawDetail(ctx context.Context, id int) (*Law, apiLawDetail, error) {
 	l, err := s.loadLawOutline(ctx, id)
 	if err != nil {
@@ -693,13 +769,16 @@ func (s *Server) lawDetail(ctx context.Context, id int) (*Law, apiLawDetail, err
 	return l, out, err
 }
 
+// lawDetailOf builds lawDetail's shape from a law loaded by loadLawOutline
+// (or loadLaw, which loads more).
 func (s *Server) lawDetailOf(ctx context.Context, l *Law) (apiLawDetail, error) {
 	id := l.ID
 	out := apiLawDetail{apiLawSummary: s.lawSum(ctx, l.LawRow, s.source(ctx, "law", id)),
 		GazetteNumber: l.GazetteNumber, Preamble: l.Preamble, ExplanatoryNote: l.ExplanatoryNote, Closing: l.Closing,
 		GazetteIssueID: l.GazetteIssue, NotLegalAdvice: notLegalAdvice}
 	out.GazetteDate = ymd(l.GazetteDate)
-
+	// From the link graph, as the MCP's get_law does; the amendment table adds
+	// what the graph lacks (see mergeAmendments).
 	self := l.GazetteDate
 	if self == nil {
 		self = l.IssuedOn
@@ -736,7 +815,7 @@ func (s *Server) apiLaw(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-	_, out, err := s.lawDetail(ctx, id)
+	l, out, err := s.lawDetail(ctx, id)
 	if err != nil {
 		if errorIsNoRows(err) {
 			s.apiNotFound(w, "law")
@@ -745,8 +824,11 @@ func (s *Server) apiLaw(w http.ResponseWriter, r *http.Request) {
 		s.apiFail(w, r, err)
 		return
 	}
+	s.trackRead(r, l, "")
 	s.writeJSON(w, 200, out)
 }
+
+// ---------------------------------------------------------------- one article
 
 type apiArticleVersion struct {
 	Major      int     `json:"major"`
@@ -759,6 +841,8 @@ type apiArticleVersion struct {
 	Note       *string `json:"note,omitempty"`
 }
 
+// apiChange is a text that changed the article, with the amending
+// article's own words, newest first (the same list the article page shows).
 type apiChange struct {
 	Relation  string        `json:"relation"`
 	Part      *string       `json:"part,omitempty"`
@@ -770,12 +854,15 @@ type apiChange struct {
 	URL       string        `json:"url"`
 }
 
+// apiAffected is a general repeal ("all contrary provisions are repealed")
+// that may touch the article: a lead to check, never a finding.
 type apiAffected struct {
 	By        apiLawSummary `json:"by"`
 	ByArticle string        `json:"by_article"`
 	URL       string        `json:"url"`
 }
 
+// apiRulingRef is a ruling that applied the article, newest first.
 type apiRulingRef struct {
 	ID        int     `json:"id"`
 	Court     string  `json:"court"`
@@ -786,28 +873,31 @@ type apiRulingRef struct {
 }
 
 type apiArticleDetail struct {
-	Law          apiLawSummary       `json:"law"`
-	Number       string              `json:"number"`
-	Note         *string             `json:"note,omitempty"`
-	CentreError  *CentreError        `json:"centre_error,omitempty"`
-	TextAr       string              `json:"text_ar"`
-	TextFr       *string             `json:"text_fr,omitempty"`
-	CentreTextAr *string             `json:"centre_text_ar,omitempty"`
-	CentreTextFr *string             `json:"centre_text_fr,omitempty"`
-	InForceFrom  *string             `json:"in_force_from,omitempty"`
-	Versions     []apiArticleVersion `json:"versions,omitempty"`
-	Repealed     bool                `json:"repealed,omitempty"`
-	// CalculatedCurrent is the export's calculated wording (Civil Procedure amounts), never a quotation.
-	CalculatedCurrent json.RawMessage `json:"calculated_current,omitempty"`
-	Changes           []apiChange     `json:"changes,omitempty"`
-	Affected          []apiAffected   `json:"possibly_affected_by,omitempty"`
-	RulingCount       int             `json:"rulings_count,omitempty"`
-	Rulings           []apiRulingRef  `json:"rulings,omitempty"`
-	URL               string          `json:"url"`
-	SourceURL         string          `json:"source_url,omitempty"`
-	NotLegalAdvice    string          `json:"not_legal_advice"`
+	CalculatedCurrent *calculatedcurrent.Record `json:"calculated_current,omitempty"`
+	Law               apiLawSummary             `json:"law"`
+	Number            string                    `json:"number"`
+	Note              *string                   `json:"note,omitempty"`
+	CentreError       *CentreError              `json:"centre_error,omitempty"`
+	TextAr            string                    `json:"text_ar"`
+	TextFr            *string                   `json:"text_fr,omitempty"`
+	CentreTextAr      *string                   `json:"centre_text_ar,omitempty"`
+	CentreTextFr      *string                   `json:"centre_text_fr,omitempty"`
+	InForceFrom       *string                   `json:"in_force_from,omitempty"`
+	Versions          []apiArticleVersion       `json:"versions,omitempty"`
+	Repealed          bool                      `json:"repealed,omitempty"`
+	Changes           []apiChange               `json:"changes,omitempty"`
+	Affected          []apiAffected             `json:"possibly_affected_by,omitempty"`
+	RulingCount       int                       `json:"rulings_count,omitempty"`
+	Rulings           []apiRulingRef            `json:"rulings,omitempty"`
+	URL               string                    `json:"url"`
+	SourceURL         string                    `json:"source_url,omitempty"`
+	NotLegalAdvice    string                    `json:"not_legal_advice"`
 }
 
+// articleDetail loads a law and finds one article in it, by its printed
+// number or the slug form (the HTTP route matches on the slug; the MCP
+// get_article tool, not yet wired, takes either). art is nil, with no
+// error, when the law exists but has no such article.
 func (s *Server) articleDetail(ctx context.Context, lawID int, number string) (l *Law, art *Article, out apiArticleDetail, err error) {
 	l, err = s.loadLaw(ctx, lawID, true)
 	if err != nil {
@@ -829,14 +919,17 @@ func (s *Server) articleDetail(ctx context.Context, lawID int, number string) (l
 				TextSource: v.Source, Note: v.Note})
 		}
 		out.Repealed = a.Repealed()
-
+		out.CalculatedCurrent = l.calculatedCurrent(a)
+		// text_ar is the wording the page prints (in force today). When an
+		// amendment replaced the Centre's text, the Centre's wording, and its
+		// French, which follows it, move to centre_text_*, so a client quoting
+		// text_ar never quotes a superseded article. Same shape as the MCP.
 		if shown := a.Shown(); shown != a.TextAr {
 			centre := a.TextAr
 			out.TextAr, out.CentreTextAr = shown, &centre
 			out.TextFr, out.CentreTextFr = nil, a.TextFr
 		}
-		out.TextAr = scanReadings(out.TextAr)
-		out.CalculatedCurrent = s.calculatedCurrent(ctx, lawID, a.Number, out.TextAr, out.Repealed)
+		out.TextAr = scanReadings(out.TextAr) // a scanned text's disputed spans, as the MCP shows them
 		for _, k := range a.Links {
 			out.Changes = append(out.Changes, apiChange{Relation: k.Relation, Part: k.Part,
 				By: s.lawSum(ctx, k.By, ""), ByArticle: k.ByArticle, Effective: ymd(k.Effective), TextAr: k.Text,
@@ -864,7 +957,7 @@ func (s *Server) apiArticle(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-	_, a, out, err := s.articleDetail(ctx, id, r.PathValue("n"))
+	l, a, out, err := s.articleDetail(ctx, id, r.PathValue("n"))
 	if err != nil {
 		if errorIsNoRows(err) {
 			s.apiNotFound(w, "law")
@@ -877,8 +970,11 @@ func (s *Server) apiArticle(w http.ResponseWriter, r *http.Request) {
 		s.apiNotFound(w, "article")
 		return
 	}
+	s.trackRead(r, l, a.Number)
 	s.writeJSON(w, 200, out)
 }
+
+// ---------------------------------------------------------------- one ruling
 
 type apiRulingDetail struct {
 	ID        int      `json:"id"`
@@ -891,22 +987,25 @@ type apiRulingDetail struct {
 	President *string  `json:"president,omitempty"`
 	Members   []string `json:"members,omitempty"`
 	TextAr    *string  `json:"text_ar,omitempty"`
-	Note      string   `json:"note,omitempty"`
+	Note      string   `json:"note,omitempty"` // set when the Centre holds only the judgment's file
 	URL       string   `json:"url"`
 	SourceURL string   `json:"source_url,omitempty"`
-
-	PagesModel     string          `json:"pages_model,omitempty"`
-	PDFURL         string          `json:"pdf_url,omitempty"`
-	PageCount      int             `json:"page_count,omitempty"`
+	// The full judgment: the Centre's scan (a PDF) and its machine reading,
+	// page by page. The reading may contain errors; the scan is the reference.
+	PagesModel     string          `json:"pages_model,omitempty"` // which models read the pages, as in the dataset
+	PDFURL         string          `json:"pdf_url,omitempty"`     // the scan on the Lebanese University's site: give it with any answer
+	PageCount      int             `json:"page_count,omitempty"`  // pages in the scan
 	Pages          []apiRulingPage `json:"pages,omitempty"`
 	PagesNote      string          `json:"pages_note,omitempty"`
 	NotLegalAdvice string          `json:"not_legal_advice"`
 }
 
+// apiRulingPage is one page of a judgment's machine reading.
 type apiRulingPage struct {
 	N      int    `json:"n"`
 	TextAr string `json:"text_ar"`
-
+	// LowConfidence: the page is hard to read (mostly handwriting); expect
+	// errors and read the scan (pdf_url).
 	LowConfidence bool `json:"low_confidence,omitempty"`
 }
 
@@ -938,7 +1037,7 @@ func (s *Server) rulingDetail(ctx context.Context, id int) (apiRulingDetail, err
 	}
 	if len(j.Pages) > 0 {
 		for _, p := range j.Pages {
-			out.Pages = append(out.Pages, apiRulingPage{N: p.N, TextAr: scanReadings(p.Text), LowConfidence: p.LowConfidence})
+			out.Pages = append(out.Pages, apiRulingPage{N: p.N, TextAr: scanReadings(p.Text), LowConfidence: p.LowConfidence}) // readers' disputes spelled out
 		}
 		out.PageCount = max(out.PageCount, j.Pages[len(j.Pages)-1].N)
 		out.PagesModel = j.Model
@@ -977,6 +1076,8 @@ func (s *Server) apiRuling(w http.ResponseWriter, r *http.Request) {
 	}
 	s.writeJSON(w, 200, out)
 }
+
+// ---------------------------------------------------------------- one gazette issue
 
 type apiGazetteDetail struct {
 	ID        int             `json:"id"`
@@ -1031,3 +1132,49 @@ func (s *Server) apiGazette(w http.ResponseWriter, r *http.Request) {
 }
 
 func errorIsNoRows(err error) bool { return errors.Is(err, pgx.ErrNoRows) }
+
+// apiHitCalculator loads the reviewed law once per search response. Search
+// snippets stay verbatim; the separate record uses current source and state.
+func (s *Server) apiHitCalculator(ctx context.Context) func(int, string) *calculatedcurrent.Record {
+	var records map[string]*calculatedcurrent.Record
+	loaded := false
+	return func(lawID int, number string) *calculatedcurrent.Record {
+		if lawID != 244565 {
+			return nil
+		}
+		if !loaded {
+			loaded = true
+			records = map[string]*calculatedcurrent.Record{}
+			if law, err := s.loadLaw(ctx, lawID, true); err == nil {
+				for _, a := range law.List {
+					if _, exists := records[a.Number]; !exists {
+						records[a.Number] = law.calculatedCurrent(a)
+					}
+				}
+			}
+		}
+		return records[number]
+	}
+}
+
+// apiCalculatedCurrent exposes all currently eligible calculated articles,
+// including an explicit empty map when there are no derived claims.
+func (s *Server) apiCalculatedCurrent(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || id != 244565 {
+		http.NotFound(w, r)
+		return
+	}
+	law, err := s.loadLaw(r.Context(), id, true)
+	if errors.Is(err, pgx.ErrNoRows) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		_ = json.NewEncoder(w).Encode(map[string]any{"law_id": id, "articles": map[string]any{}})
+		return
+	}
+	if err != nil {
+		http.Error(w, "cannot load current law", http.StatusServiceUnavailable)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	_ = json.NewEncoder(w).Encode(map[string]any{"law_id": id, "articles": law.calculatedCollection()})
+}

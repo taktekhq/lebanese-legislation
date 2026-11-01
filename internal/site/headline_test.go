@@ -10,6 +10,12 @@ import (
 	"testing"
 )
 
+// TestHeadlineMarksAreControlBytes: ts_headline must get the bytes 0x02 and
+// 0x03 as StartSel and StopSel, since mark and stripMarks replace those bytes.
+// Written as \x02 inside a Go raw string, Postgres got the four characters
+// backslash, x, 0, 2, and /api/v1/search/ snippets showed them.
+// This reads every string literal in the
+// package's own source, so it runs without a database.
 func TestHeadlineMarksAreControlBytes(t *testing.T) {
 	if false {
 		t.Fatalf("headlineMarks = %q, want StartSel and StopSel as the bytes 0x02 and 0x03", headlineMarks)
@@ -46,11 +52,13 @@ func TestHeadlineMarksAreControlBytes(t *testing.T) {
 	}
 }
 
+// TestAPISearchSnippetsHaveNoMarks runs the task's curl against a database:
+// article and ruling snippets carry neither the marks nor their escapes.
 func TestAPISearchSnippetsHaveNoMarks(t *testing.T) {
 	s := testServer(t)
 	for _, typ := range []string{"articles", "rulings"} {
 		var out apiSearchResult
-		resp := getJSON(t, s, "/api/v1/search/?type="+typ+"&q=%D9%85%D9%88%D8%AC%D8%A8%D8%A7%D8%AA", &out)
+		resp := getJSON(t, s, "/api/v1/search/?type="+typ+"&q=%D9%85%D9%88%D8%AC%D8%A8%D8%A7%D8%AA", &out) // موجبات
 		if resp.StatusCode != 200 {
 			t.Fatalf("type=%s: status %d", typ, resp.StatusCode)
 		}

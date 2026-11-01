@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// maxAge reads max-age from a Cache-Control value; -1 when there is none.
 func maxAge(cc string) int {
 	m := regexp.MustCompile(`(?:^|[ ,])max-age=(\d+)`).FindStringSubmatch(cc)
 	if m == nil {
@@ -18,6 +19,9 @@ func maxAge(cc string) int {
 	return n
 }
 
+// The paths and the client are from the 28 Oct 2026 origin log:
+// codex-mcp-client asked for OAuth metadata
+// 19,071 times a day and sent 2,881 GETs to /mcp.
 func TestProbesAnsweredWithoutAPage(t *testing.T) {
 	s, err := New(nil)
 	if err != nil {
@@ -57,6 +61,9 @@ func TestProbesAnsweredWithoutAPage(t *testing.T) {
 	}
 }
 
+// The sitemap index and every shard go out through xmlOut: crawlers and the
+// edge may keep them at least an hour (the DB-backed TestSitemapCacheHeaders
+// checks the routes themselves).
 func TestSitemapCacheControlPublicHour(t *testing.T) {
 	rec := httptest.NewRecorder()
 	xmlOut(rec, "<urlset/>")
@@ -66,6 +73,8 @@ func TestSitemapCacheControlPublicHour(t *testing.T) {
 	}
 }
 
+// routes() owns GET /mcp (the 405 above); calling mcpRoutes again must not
+// register anything twice: the mux panics on a pattern registered twice.
 func TestMCPRoutesAfterRoutesDoNotConflict(t *testing.T) {
 	s, err := New(nil)
 	if err != nil {

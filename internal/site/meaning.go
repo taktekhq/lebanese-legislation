@@ -16,6 +16,8 @@ type QueryRewriter interface {
 
 var ErrMeaningUnavailable = errors.New("search by meaning unavailable")
 
+// SearchDocuments exposes the ordinary retrieval path for offline comparisons.
+// It does not call a model or record visitor activity.
 func (s *Server) SearchDocuments(ctx context.Context, q string) (Results, error) {
 	if path := s.articleRef(ctx, q); path != "" {
 		parts := strings.Split(strings.Trim(path, "/"), "/")
@@ -42,6 +44,9 @@ func (s *Server) SearchDocuments(ctx context.Context, q string) (Results, error)
 	return r, err
 }
 
+// SearchMeaning interprets a question, then reads only published database text.
+// Explicit citations always use ordinary search, including missing citations.
+// A provider failure returns ordinary results and an error so the UI can say so.
 func (s *Server) SearchMeaning(ctx context.Context, q string, rw QueryRewriter) (Results, error) {
 	t, _ := tidyQuery(q)
 	if t == "" {
@@ -88,7 +93,7 @@ func (s *Server) SearchMeaning(ctx context.Context, q string, rw QueryRewriter) 
 		}
 	}
 	laws, articles, rulings := map[int]bool{}, map[string]bool{}, map[int]bool{}
-
+	// Round-robin gives every interpretation a place before one fills the list.
 	for i := 0; i < 10; i++ {
 		for _, r := range sets {
 			if i < len(r.Laws) {

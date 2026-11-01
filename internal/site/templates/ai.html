@@ -7,6 +7,17 @@
 </section>
 <section class="wrap" style="padding-bottom:var(--section-y)">
   <article class="doc">
+    <section class="local-services">
+    <h2 id="local-services">{{t "resources.services"}}</h2>
+    <p>{{t "resources.services_note"}}</p>
+    <p><a class="link" href="https://github.com/taktekhq/lebanese-legislation">{{t "resources.local_docs"}}</a></p>
+    <ul class="local-images">
+      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db">{{t "resources.db_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-db:0.2.0</code></li>
+      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-api">{{t "resources.api_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-api:0.2.0</code></li>
+      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-mcp">{{t "resources.mcp_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-mcp:0.2.0</code></li>
+    </ul>
+    <p><a class="link" href="{{u "/data/"}}">{{t "resources.data_link"}}</a></p>
+    </section>
     <h2>{{t "ai.what_h2"}}</h2>
     <p>{{t "ai.what_p1"}}</p>
     <p>{{t "ai.what_p2"}}</p>
@@ -82,7 +93,25 @@ GET /api/v1/gazette/?since=&amp;until=&amp;order=newest|oldest&amp;limit=&amp;of
       <li>{{t "ai.limit_5"}}</li>
     </ul>
 
-
+    {{if .Notify}}<div class="notify" id="notify">
+      <h2>{{t "ai.notify_h2"}}</h2>
+      {{if eq .Done "ok"}}<p class="notify__done" role="status">{{t "ai.notify_done"}}</p>
+      {{else}}
+      <p>{{t "ai.notify_p"}}</p>
+      {{if eq .Done "bad"}}<p class="notify__done" role="alert">{{t "ai.notify_bad"}}</p>{{end}}
+      <form method="post" action="{{u "/api/notify"}}">
+        <input type="hidden" name="from" value="ai">
+        <div class="notify__hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+        <div class="notify__row">
+          <label class="sr-only" for="notify-email">{{t "ai.notify_email_label"}}</label>
+          <input id="notify-email" class="ph-no-capture" type="email" name="email" required maxlength="200" autocomplete="email" placeholder="you@example.com" dir="ltr">
+          <button class="btn btn--primary" type="submit" data-ga="notify_submit">{{t "ai.notify_submit"}}</button>
+        </div>
+        <label class="notify__consent"><input type="checkbox" name="consent" value="yes" required> <span>{{.Consent}}</span></label>
+      </form>
+      <p class="tiny" style="margin-top:12px">{{t "ai.notify_footer" (safe "<a class=\"link\" href=\"mailto:taktekbot@taktek.io\">taktekbot@taktek.io</a>") (safe (printf "<a class=\"link\" href=\"%s\">%s</a>" (u "/about/") (t "ai.about_link")))}}</p>
+      {{end}}
+    </div>{{end}}
   </article>
 </section>
 {{end}}{{end}}

@@ -21,6 +21,7 @@ func day(y int, m time.Month, d int) *time.Time {
 	return &t
 }
 
+// decree is a text with every record field the answer line can use.
 func decree() *Law {
 	return &Law{
 		LawRow: LawRow{ID: 193806, Kind: "مرسوم", KindEn: ptr("Decree"), Number: ptr("16436"), IssuedOn: day(1964, 5, 25),
@@ -53,7 +54,7 @@ func TestIdentIn(t *testing.T) {
 	if got := identIn(en, noDate); got != "Law No. 44" {
 		t.Errorf("no date: %q", got)
 	}
-
+	// A kind with no English name keeps the Arabic identifier whole.
 	noEn := LawRow{Kind: "قرار مشترك", Number: ptr("5"), IssuedOn: day(2000, 1, 1)}
 	if got := identIn(en, noEn); got != noEn.Ident() {
 		t.Errorf("no English kind: %q", got)
@@ -72,13 +73,13 @@ func TestTitleIdentifierFirstAndNeverCut(t *testing.T) {
 			t.Errorf("%s title is %d characters: %q", b.Lang, n, got)
 		}
 	}
-
+	// A long identifier is never cut, even past the limit; the subject goes.
 	long := decree()
 	long.Number = ptr("123456789/2015 and 987654321/2016 and more")
 	if got := lawTitle(en, long); got != identIn(en, long.LawRow) {
 		t.Errorf("long identifier: got %q", got)
 	}
-
+	// The unofficial English title is the subject on the English site only.
 	l.TitleEn = ptr("Setting the certificates and conditions for appointing technical staff")
 	if got := lawTitle(en, l); !strings.Contains(got, "Setting the certificates") {
 		t.Errorf("English subject missing: %q", got)
@@ -86,7 +87,7 @@ func TestTitleIdentifierFirstAndNeverCut(t *testing.T) {
 	if got := lawTitle(ar, l); strings.Contains(got, "Setting") {
 		t.Errorf("English subject leaked into the Arabic title: %q", got)
 	}
-
+	// A title that is only the identifier is not repeated.
 	same := decree()
 	same.Title = identIn(en, same.LawRow)
 	if got := lawTitle(en, same); got != same.Title {
@@ -123,18 +124,18 @@ func TestAnswerLineFromRecordOnly(t *testing.T) {
 	if strings.Contains(strings.ToLower(got), "in force") || strings.Contains(got, "Repealed") {
 		t.Errorf("answer claims a status the record does not hold: %q", got)
 	}
-
+	// A repeal is said only when the record has one.
 	l.Status = "repealed"
 	if got := lawAnswer(en, l); !strings.Contains(got, "Status: repealed.") || strings.Contains(got, "No repeal recorded") {
 		t.Errorf("repealed answer: %q", got)
 	}
-
+	// Facts the record lacks are left out, not invented.
 	bare := &Law{LawRow: LawRow{Kind: "قانون", KindEn: ptr("Law"), Status: "in_force"}}
 	got = lawAnswer(en, bare)
 	if strings.Contains(got, "Gazette") || strings.Contains(got, "Articles") || strings.Contains(got, "changing") {
 		t.Errorf("bare answer invents facts: %q", got)
 	}
-
+	// Amending texts are counted from the record.
 	l.Status = "in_force"
 	l.Changes = []Change{{By: LawRow{ID: 1}}, {By: LawRow{ID: 2}}}
 	if got := lawAnswer(en, l); !strings.Contains(got, "changing it: 2.") {
@@ -187,7 +188,7 @@ func TestMetaDescription(t *testing.T) {
 			t.Errorf("%s description lacks the Gazette issue: %q", b.Lang, d)
 		}
 	}
-
+	// Article description: facts first, the article's words only if they fit.
 	if d := articleDesc(en, l, "1", "ينشر هذا المرسوم"); !strings.HasPrefix(d, "Article 1 of Decree No. 16436") || len([]rune(d)) > descMax {
 		t.Errorf("article description: %q", d)
 	}
@@ -217,7 +218,7 @@ func TestLegislationLDHonest(t *testing.T) {
 	if got := legislationLD(l, "/decree/193806/", "")["legislationLegalForce"]; got != "https://schema.org/NotInForce" {
 		t.Errorf("repealed text: %v", got)
 	}
-
+	// It must serialise as the JSON-LD the layout prints.
 	b, err := json.Marshal(legislationLD(l, "/decree/193806/", ""))
 	if err != nil || !strings.Contains(string(b), `"@type":"Legislation"`) {
 		t.Errorf("marshal: %v %s", err, b)
@@ -252,6 +253,9 @@ func TestCutWords(t *testing.T) {
 	}
 }
 
+// TestPagesRenderAnswerLine renders real pages from a local database and
+// checks the visible answer line, the titles and the structured data on both
+// languages. It skips without a database (LEBLEG_DSN or the local socket).
 func TestPagesRenderAnswerLine(t *testing.T) {
 	s := onpageServer(t)
 	for _, c := range []struct{ path, title, answer, h1 string }{

@@ -6,12 +6,16 @@ import (
 	"net/http"
 )
 
+// CitedArticle is an article a ruling cites in graph_edge.
 type CitedArticle struct {
 	LawID   int
 	Number  string
 	LawName string
 }
 
+// rulingArticles returns every linked article cited by a ruling, in article
+// order within each cited text. Duplicate graph edges to the same article are
+// collapsed.
 func (s *Server) rulingArticles(ctx context.Context, id int) ([]CitedArticle, error) {
 	rows, err := s.db.Query(ctx, `SELECT DISTINCT e.to_law_id, e.to_article, l.kind || coalesce(' رقم ' || l.number, ''),
 		coalesce(a.position, 2147483647)
@@ -43,6 +47,7 @@ func (s *Server) rulingArticles(ctx context.Context, id int) ([]CitedArticle, er
 	return out, rows.Err()
 }
 
+// articleRulings serves the full, newest-first list for an article.
 func (s *Server) articleRulings(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -84,7 +89,7 @@ func (s *Server) articleRulings(w http.ResponseWriter, r *http.Request) {
 		s.fail(w, r, err)
 		return
 	}
-
+	// Multiple citations by one ruling to this article should appear once.
 	seen := map[int]bool{}
 	unique := list[:0]
 	for _, x := range list {

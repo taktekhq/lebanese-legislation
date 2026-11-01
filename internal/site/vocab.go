@@ -9,11 +9,17 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// The words the titles use, with how often, kept in memory so a typo
+// ("الاستلذ") or a name typed in Latin letters ("Shehab") can be matched to a
+// real word. About 85,000 words; loaded once when the server starts. It only
+// steers the question; no wording shown as law is ever produced from it.
 type vocab struct {
 	freq   map[string]int
-	bySkel map[string][]string
+	bySkel map[string][]string // consonant skeleton -> words, most frequent first
 }
 
+// arNormGo is ar_norm (db/schema.sql) in Go: no tashkeel or tatweel, alef
+// forms folded to ا, ى to ي, ة to ه.
 func arNormGo(s string) string {
 	var b strings.Builder
 	for _, r := range s {
@@ -32,6 +38,10 @@ func arNormGo(s string) string {
 	return b.String()
 }
 
+// arSkeleton is a word's consonants: the article ال, and the letters that
+// stand for vowels (ا و ي), are dropped, so the Latin spelling with no vowels
+// ("bnaa2" for «بناء») meets the Arabic one. Hamza (ء ئ ؤ) is kept, since
+// Arabizi writes it as 2.
 func arSkeleton(w string) string {
 	w = arNormGo(w)
 	if r := []rune(w); len(r) > 4 && strings.HasPrefix(w, "ال") {
@@ -85,8 +95,10 @@ func loadVocab(ctx context.Context, db *pgxpool.Pool) (*vocab, error) {
 	return newVocab(freq), rows.Err()
 }
 
+// has says whether the word is in the vocabulary (already folded).
 func (v *vocab) has(w string) bool { return v != nil && v.freq[w] > 0 }
 
+// maxEdits is how many letters a word of this length may be off by.
 func maxEdits(n int) int {
 	switch {
 	case n < 4:
@@ -97,6 +109,8 @@ func maxEdits(n int) int {
 	return 2
 }
 
+// nearest returns the most frequent word within a few letters of w, and says
+// whether there was one. The word itself wins when it is known.
 func (v *vocab) nearest(w string) (string, bool) {
 	if v == nil {
 		return "", false
@@ -127,8 +141,15 @@ func (v *vocab) nearest(w string) (string, bool) {
 	return best, bestD <= limit
 }
 
+// bySkeleton returns the most frequent word whose consonants are sk, or, if
+// none, one whose consonants are a letter off (a vowel written as a consonant
+// is the usual slip). sk must have at least 3 letters.
 func (v *vocab) bySkeleton(sk string) (string, bool) { return v.bySkeletonEnding(sk, "") }
 
+// bySkeletonExact is bySkeletonEnding without the one-letter-off guess. Latin
+// words are read with it: English and French words are not Arabizi, and the
+// guess matched them to any title word one letter away ("access" read «ككسس»
+// became «تكساس», Texas; 21 Oct 2026).
 func (v *vocab) bySkeletonExact(sk, ending string) (string, bool) {
 	if v == nil || len([]rune(sk)) < 3 || len(v.bySkel[sk]) == 0 {
 		return "", false
@@ -136,6 +157,7 @@ func (v *vocab) bySkeletonExact(sk, ending string) (string, bool) {
 	return v.bySkeletonEnding(sk, ending)
 }
 
+// bySkeletonEnding is bySkeleton preferring words whose last letter is one of ending.
 func (v *vocab) bySkeletonEnding(sk, ending string) (string, bool) {
 	if v == nil || len([]rune(sk)) < 3 {
 		return "", false
@@ -164,6 +186,8 @@ func (v *vocab) bySkeletonEnding(sk, ending string) (string, bool) {
 	return best, best != ""
 }
 
+// editWithin is the edit distance of a and b when it is at most max, and
+// max+1 otherwise.
 func editWithin(a, b []rune, max int) int {
 	if d := len(a) - len(b); d > max || d < -max {
 		return max + 1
@@ -192,6 +216,7 @@ func editWithin(a, b []rune, max int) int {
 	return prev[len(b)]
 }
 
+// isArabicWord is true when every letter of w is Arabic.
 func isArabicWord(w string) bool {
 	if w == "" {
 		return false

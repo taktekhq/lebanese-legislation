@@ -16,6 +16,8 @@ type gzWriter struct {
 
 func (w gzWriter) Write(b []byte) (int, error) { return w.gz.Write(b) }
 
+// Compress gzips responses for clients that accept it. A whole code is
+// 1.5 MB of HTML and about a fifth of that compressed.
 func Compress(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {

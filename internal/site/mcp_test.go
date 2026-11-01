@@ -1,5 +1,11 @@
 package site
 
+// Tests for the MCP JSON-RPC handling (mcp.go). The server is not wired
+// into routes() yet (see mcp.go's package doc), so these call s.mcpPost
+// directly rather than through s.ServeHTTP/the mux. They share testServer
+// from api_test.go: skip, rather than fail, when there is no local
+// Postgres.
+
 import (
 	"bytes"
 	"encoding/json"
@@ -46,6 +52,7 @@ func TestMCPInitialize(t *testing.T) {
 		t.Errorf("missing capabilities")
 	}
 
+	// an older protocol version the server also accepts is echoed back
 	rec = mcpDo(t, s, `{"jsonrpc":"2.0","id":2,"method":"initialize","params":{"protocolVersion":"2025-03-26"}}`)
 	json.Unmarshal(rec.Body.Bytes(), &resp)
 	m, _ = resp.Result.(map[string]any)
@@ -53,6 +60,7 @@ func TestMCPInitialize(t *testing.T) {
 		t.Errorf("did not echo a supported older protocol version: %v", m["protocolVersion"])
 	}
 
+	// an unknown one falls back to the server's default rather than erroring
 	rec = mcpDo(t, s, `{"jsonrpc":"2.0","id":3,"method":"initialize","params":{"protocolVersion":"1999-01-01"}}`)
 	json.Unmarshal(rec.Body.Bytes(), &resp)
 	m, _ = resp.Result.(map[string]any)
@@ -116,7 +124,7 @@ func TestMCPToolsList(t *testing.T) {
 	if len(want) != 0 {
 		t.Errorf("tools missing from tools/list: %v", want)
 	}
-
+	// get_links (the future graph tool) must not be advertised yet
 	for _, raw := range tools {
 		if raw.(map[string]any)["name"] == "get_links" {
 			t.Errorf("get_links should not be listed until the graph table exists")
@@ -167,6 +175,8 @@ func TestMCPToolsCallUnknownTool(t *testing.T) {
 	}
 }
 
+// toolCallResult decodes a successful tools/call response's text content
+// (always one JSON object, per mcp.go) into v.
 func toolCallResult(t *testing.T, rec *httptest.ResponseRecorder, v any) (isError bool) {
 	t.Helper()
 	var resp rpcResponse
@@ -216,17 +226,23 @@ func TestMCPSearchLegislation(t *testing.T) {
 		t.Errorf("expected some hits for a common legal word")
 	}
 
+	// a bad "kind" is a tool-level error, not a crash or a silent empty result
 	rec = mcpDo(t, s, `{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"search_legislation","arguments":{"query":"x","kind":"bogus"}}}`)
 	if isErr := toolCallResult(t, rec, nil); !isErr {
 		t.Errorf("expected isError for an invalid kind")
 	}
 
+	// limit is clamped, not rejected
 	rec = mcpDo(t, s, `{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search_legislation","arguments":{"query":"قانون","limit":1000}}}`)
 	if isErr := toolCallResult(t, rec, &out); isErr {
 		t.Fatalf("search with an oversized limit returned a tool error")
 	}
 }
 
+// TestMCPGetLawArticleRuling walks search -> get_law -> get_article, and
+// get_ruling, the way a model would, checking every step carries a
+// canonical URL and the not-legal-advice line, and that article text is
+// verbatim (non-empty, not reshaped).
 func TestMCPGetLawArticleRuling(t *testing.T) {
 	s := testServer(t)
 	var search struct {
@@ -277,11 +293,13 @@ func TestMCPGetLawArticleRuling(t *testing.T) {
 		t.Errorf("article URL not canonical: %s", article.Result.URL)
 	}
 
+	// an id that does not exist is a tool error, not a 500 or a crash
 	rec = mcpDo(t, s, `{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"get_law","arguments":{"id":999999999}}}`)
 	if isErr := toolCallResult(t, rec, nil); !isErr {
 		t.Errorf("expected isError for an unknown law id")
 	}
 
+	// a missing/bad id is a tool error too, never an internal error
 	rec = mcpDo(t, s, `{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"get_ruling","arguments":{"id":-1}}}`)
 	if isErr := toolCallResult(t, rec, nil); !isErr {
 		t.Errorf("expected isError for an invalid id")

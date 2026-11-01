@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -28,7 +29,8 @@ func (s *Server) routes() {
 	})
 	m.HandleFunc("GET /{$}", s.home)
 	if s.isStatic {
-
+		// no server to filter or search: the lists are browsed by year and
+		// search runs in the browser over the titles
 		m.HandleFunc("GET /laws/{$}", s.yearIndex("laws"))
 		m.HandleFunc("GET /rulings/{$}", s.yearIndex("rulings"))
 		m.HandleFunc("GET /gazette/{$}", s.yearIndex("gazette"))
@@ -84,19 +86,26 @@ func (s *Server) routes() {
 		m.HandleFunc("GET /"+k+"/{id}/{$}", s.doc(kind))
 	}
 	s.topicRoutes()
+	s.blogRoutes()
 	m.HandleFunc("GET /.well-known/", probe404)
-
+	// A GET to /mcp gets the MCP server's answer (mcpGet), not a redirect to
+	// a 404 page; POST and OPTIONS are mcpRoutes'.
 	m.HandleFunc("GET /mcp", s.mcpGet)
 	m.HandleFunc("GET /mcp/", s.mcpGet)
 	m.HandleFunc("GET /ai/{$}", s.aiPage)
-
+	// the API's "docs" link, the README and the launch posts send developers
+	// here; /ai/ documents the JSON API and the MCP server, so serve it (its
+	// canonical stays /ai/)
 	m.HandleFunc("GET /developers/{$}", s.aiPage)
+	if !s.isStatic {
+		m.HandleFunc("POST /api/notify", s.notify)
+	}
 	m.HandleFunc("GET /data/{$}", s.data)
 	m.HandleFunc("GET /about/{$}", s.about)
 	m.HandleFunc("GET /contribute/{$}", s.contribute)
 	m.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		p := r.URL.EscapedPath()
-		if to := s.finalPath(r.Context(), p); to != p {
+		if to := s.finalPath(r.Context(), p); to != p { // /laws: to /laws/, in one hop to wherever it moved
 			movedTo(w, r, to)
 			return
 		}
@@ -113,6 +122,9 @@ func pathID(r *http.Request) (int, bool) {
 	return id, err == nil && id > 0
 }
 
+// ---------------------------------------------------------------- shared rows
+
+// LawRow is a text in a list.
 type LawRow struct {
 	ID       int
 	Kind     string
@@ -120,11 +132,11 @@ type LawRow struct {
 	Number   *string
 	IssuedOn *time.Time
 	Title    string
-	TitleEn  string
+	TitleEn  string // existing unofficial title, when English search matched
 	Status   string
 	Articles int
-	Snippet  string
-	Article  string
+	Snippet  string // search excerpt, with \x02 \x03 around matches
+	Article  string // search hits: the article that matched (Number stays the text's own number)
 	Code     *string
 }
 
@@ -139,10 +151,12 @@ func scanLawRows(rows pgx.Rows) ([]LawRow, error) {
 	})
 }
 
+// lawRowDest is where lawRowCols scan to.
 func lawRowDest(x *LawRow) []any {
 	return []any{&x.ID, &x.Kind, &x.KindEn, &x.Number, &x.IssuedOn, &x.Title, &x.Status, &x.Articles, &x.Code}
 }
 
+// Ident is how a text is identified in Lebanon: kind, number, date.
 func (l LawRow) Ident() string {
 	s := l.Kind
 	if l.Number != nil {
@@ -154,6 +168,8 @@ func (l LawRow) Ident() string {
 	return s
 }
 
+// CiteName is how its articles are cited: a code by its name, anything else
+// by kind, number and date.
 func (l LawRow) CiteName() string {
 	t := strings.TrimSpace(l.Title)
 	if f := strings.Fields(t); len(f) > 0 && len([]rune(t)) <= 60 {
@@ -165,6 +181,7 @@ func (l LawRow) CiteName() string {
 	return l.Ident()
 }
 
+// Stats are the corpus totals the home and about pages print.
 type Stats struct {
 	Laws, Rulings, Gazette, Opinions, Agreements, Doctrine, Articles, WithText int
 	Since                                                                      int
@@ -180,6 +197,8 @@ func (s *Server) stats(ctx context.Context) (Stats, error) {
 		Scan(&st.Laws, &st.Rulings, &st.Gazette, &st.Opinions, &st.Agreements, &st.Doctrine, &st.Articles, &st.WithText, &st.Since)
 	return st, err
 }
+
+// ---------------------------------------------------------------- home, lists
 
 func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := s.ctx(r)
@@ -220,10 +239,11 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 			"potentialAction": map[string]any{"@type": "SearchAction", "target": Base + "/search/?q={q}", "query-input": "required name=q"}},
 			map[string]any{"@context": "https://schema.org", "@type": "Organization", "@id": Base + "/#org", "name": "Lebanese Legislation",
 				"url": Base + "/", "logo": Base + "/assets/mark.png", "description": "A free public library of Lebanese law."}},
-		Data: map[string]any{"Stats": st, "Codes": codes, "Recent": recent},
+		Data: map[string]any{"Stats": st, "Codes": codes, "Recent": recent, "Topics": homeTopicRefs(s.lang(r))},
 	})
 }
 
+// CodeRow is a curated code.
 type CodeRow struct {
 	LawRow
 	Slug   string
@@ -276,13 +296,15 @@ func (s *Server) code(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, lawPath(id), http.StatusFound)
 }
 
+// Chip is a filter option.
 type Chip struct {
 	Value, Label string
 	Count        int
 }
 
+// List is a page of documents with its filters.
 type List struct {
-	Eyebrow, Heading string
+	Eyebrow, Heading string // when set, replace the page's default headings
 	Back, BackLabel  string
 	Q                url.Values
 	Total            int
@@ -290,14 +312,16 @@ type List struct {
 	Pages            int
 	Filters          [][]Chip
 	Selected         map[string]string
-	Params           []string
+	Params           []string // filter parameter per row of chips
 	Rows             any
-	Updated          *Updated
-	Base             string
+	Updated          *Updated // "Last updated": when the source records last changed
+	Base             string   // the list's path, when its pages are paths (/opinions/page/2/); empty: ?page=
 }
 
+// Path is page n's address when the list paginates by path.
 func (l List) Path(n int) string { return pagePath(l.Base, n) }
 
+// Query is page n's address when it paginates by ?page= (a filtered list).
 func (l List) Query(n int) template.URL { return query(l.Q, "page", strconv.Itoa(n)) }
 
 func pageNo(q url.Values) int {
@@ -333,7 +357,8 @@ func (s *Server) laws(w http.ResponseWriter, r *http.Request) {
 		s.fail(w, r, err)
 		return
 	}
-
+	// /laws/ is browsed by year (the years' lists are paged by path); its own
+	// pages stay ?page=, which robots.txt blocks: 2,500 deep pages cost seconds each
 	page := min(pageNo(q), max(1, (total+perPage-1)/perPage))
 	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind`+cond+
 		fmt.Sprintf(" ORDER BY l.issued_on DESC NULLS LAST, l.id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage), args...)
@@ -347,7 +372,7 @@ func (s *Server) laws(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	kindLabelSQL := "kind || coalesce(' · ' || k.name_en, '')"
-	if s.lang(r) == "ar" {
+	if s.lang(r) == "ar" { // the Arabic data already names the kind; no English needed too
 		kindLabelSQL = "kind"
 	}
 	kinds, err := s.chips(ctx, `SELECT kind, `+kindLabelSQL+`, count(*) FROM legislation l
@@ -389,48 +414,58 @@ func (s *Server) chips(ctx context.Context, sql string, args ...any) ([]Chip, er
 	})
 }
 
+// ---------------------------------------------------------------- one law
+
+// Section is a chapter heading in a law.
 type Section struct {
 	ID      int
 	Depth   int
 	Heading string
-	Note    *string
+	Note    *string // the Centre's editorial note ("اضيف هذا الجزء … بموجب …")
 }
 
+// Article is one article, ready to print.
 type Article struct {
 	Position    int
 	Number      string
-	SectionID   *int
+	SectionID   *int // the chapter it sits under
 	Note        *string
 	TextAr      string
 	TextFr      *string
 	Images      []string
 	From        *time.Time
-	Versions    []Version
-	Unsure      []Change
-	Added       bool
-	Links       []Link
-	Affected    []Affected
-	Rulings     []RulingRef
-	RulingCount int
+	Versions    []Version   // oldest first; none when never amended
+	Unsure      []Change    // changes that may predate the printed text or not: being checked
+	Added       bool        // only an amendment carries it, not the Centre
+	Links       []Link      // texts that changed it, with their wording (links.go)
+	Affected    []Affected  // general repeals that may touch it: to check
+	Rulings     []RulingRef // rulings that applied it, newest first (at most maxRulings)
+	RulingCount int         // how many rulings applied it
 	CentreError *CentreError
-	Council     []CouncilRuling
+	Council     []CouncilRuling // the Constitutional Council's decisions on this article
 }
 
+// CouncilRuling is a Constitutional Council decision on a text or one of
+// its articles (db/council_rulings.tsv). The wording stays as published.
 type CouncilRuling struct {
-	Number    string     `json:"article,omitempty"`
-	Effect    string     `json:"effect"`
-	Decision  string     `json:"decision"`
+	Number    string     `json:"article,omitempty"` // "" for the decision on the text as a whole
+	Effect    string     `json:"effect"`            // annulled, annulled_in_part, not_in_force, suspended, upheld
+	Decision  string     `json:"decision"`          // the Council's number, as "5/2025"
 	On        *time.Time `json:"-"`
 	SourceURL string     `json:"source_url"`
 	En        string     `json:"note_en"`
 	Ar        string     `json:"note_ar"`
 }
 
+// CouncilDecision is one decision on a law's page: the row for the text as
+// a whole and the articles it names.
 type CouncilDecision struct {
 	CouncilRuling
 	Articles []CouncilRuling
 }
 
+// Annulled reports whether a Constitutional Council decision annulled the
+// whole text.
 func (l *Law) Annulled() bool {
 	for _, d := range l.Council {
 		if d.Effect == "annulled" {
@@ -440,6 +475,9 @@ func (l *Law) Annulled() bool {
 	return false
 }
 
+// NotInForce reports whether the Constitutional Council declared the text
+// not in force: it found the text was never validly promulgated, so did not
+// rule on its content (as decision 5/2025 on Law 1/2025).
 func (l *Law) NotInForce() bool {
 	for _, d := range l.Council {
 		if d.Effect == "not_in_force" {
@@ -449,6 +487,8 @@ func (l *Law) NotInForce() bool {
 	return false
 }
 
+// AnnulledWhole reports whether a Constitutional Council decision annulled
+// the whole article.
 func (a *Article) AnnulledWhole() bool {
 	for _, c := range a.Council {
 		if c.Effect == "annulled" {
@@ -458,16 +498,20 @@ func (a *Article) AnnulledWhole() bool {
 	return false
 }
 
+// CentreError is an error in the Centre's own text of an article
+// (db/centre_errors.tsv), shown next to it.
 type CentreError struct {
 	En string `json:"en"`
 	Ar string `json:"ar"`
 }
 
+// Item is a chapter heading or an article, in the text's order.
 type Item struct {
 	Chapter *Section
 	Article *Article
 }
 
+// Law is everything on a law's page.
 type Law struct {
 	LawRow
 	GazetteNumber    *string
@@ -480,35 +524,38 @@ type Law struct {
 	Source           string
 	Sections         []Section
 	Items            []Item
-	List             []*Article
+	List             []*Article // the articles, in order (Articles is their count)
 	HasFr            bool
 	RepealedBy       []LawRow
-	RepealedByChange []Change
-	Changes          []Change
-	Links            []Link
-	Affected         []Affected
-	Amends           []Change
+	RepealedByChange []Change   // whole-text repeals read from the repealing texts
+	Changes          []Change   // to this text, by later texts (applied or in part)
+	Links            []Link     // texts that changed the text as a whole, with their wording (links.go)
+	Affected         []Affected // general repeals that may touch the text: to check
+	Amends           []Change   // this text's changes to others
 	CitedBy          []DocRow
 	CitedCount       int
-	Related          []LawRow
+	Related          []LawRow // same kind and year, nearest by date
 	CodeSlug         *string
-	TitleEn          *string
-	Answer           string
-	Scan             *Scan
+	TitleEn          *string // unofficial English title of the subject line (db/titles_en.tsv)
+	Answer           string  // the answer line at the top of the page, from record fields only
+	Scan             *Scan   // set when the text was read from Gazette scans
 	DateFixes        []DateFix
-	Council          []CouncilDecision
-	Part             int
-	Parts            []LawPart
-	SectionPart      map[int]int
+	Council          []CouncilDecision // the Constitutional Council's decisions on it, newest first
+	Part             int               // the part shown, when the text is cut into parts (lawparts.go)
+	Parts            []LawPart         // all of them; nil when one page holds the text
+	SectionPart      map[int]int       // chapter id -> the part it is in
 }
 
+// DateFix is a date the Centre printed wrong and what the text shows instead
+// (date_correction, internal/build/dates.go).
 type DateFix struct {
-	Field     string
+	Field     string // issued_on or gazette_date
 	Printed   *time.Time
 	Corrected *time.Time
-	Method    string
+	Method    string // signature, gazette-issue, year-typo, placeholder, model, guard
 }
 
+// DateFix returns the correction of one date field, or nil.
 func (l *Law) DateFix(field string) *DateFix {
 	for i := range l.DateFixes {
 		if l.DateFixes[i].Field == field {
@@ -518,6 +565,8 @@ func (l *Law) DateFix(field string) *DateFix {
 	return nil
 }
 
+// Scan describes a text read from scans of the Gazette's own pages, for one
+// the Lebanese University has not published yet (internal/build/scans.go).
 type Scan struct {
 	Source    string
 	SourceURL string
@@ -526,6 +575,7 @@ type Scan struct {
 	Flagged   int
 }
 
+// PageNumbers counts the page images, from 1, for the template.
 func (c *Scan) PageNumbers() []int {
 	ns := make([]int, c.Pages)
 	for i := range ns {
@@ -534,6 +584,7 @@ func (c *Scan) PageNumbers() []int {
 	return ns
 }
 
+// AgreementPct is the share of words both readings agree on, in percent.
 func (c *Scan) AgreementPct() string { return fmt.Sprintf("%.1f", 100*c.Agreement) }
 
 func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, error) {
@@ -549,10 +600,10 @@ func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, erro
 	if err != nil {
 		return nil, err
 	}
-	if strings.TrimSpace(l.Title) == "" {
+	if strings.TrimSpace(l.Title) == "" { // six texts have no title at the source
 		l.Title = l.Ident()
 	}
-
+	// An older database has no date_correction: the text shows without it.
 	if rows, err := s.db.Query(ctx, `SELECT field, printed, corrected, method FROM date_correction WHERE law_id = $1 ORDER BY field`, id); err == nil {
 		for rows.Next() {
 			var f DateFix
@@ -564,7 +615,7 @@ func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, erro
 	}
 	if l.ID >= scanIDBase {
 		c := &Scan{}
-
+		// An older database has no legislation_scan: the text shows without it.
 		if err := s.db.QueryRow(ctx, `SELECT source, source_url, pages, coalesce(agreement, 0), coalesce(flagged, 0)
 			FROM legislation_scan WHERE law_id = $1`, id).Scan(&c.Source, &c.SourceURL, &c.Pages, &c.Agreement, &c.Flagged); err == nil {
 			l.Scan = c
@@ -585,7 +636,8 @@ func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, erro
 	if err != nil {
 		return nil, err
 	}
-
+	// Chapters are printed where they begin: before the first article in
+	// them, along with any chapter between the previous article's and it.
 	printed := map[int]bool{}
 	order := map[int]int{}
 	for i, sec := range l.Sections {
@@ -616,7 +668,7 @@ func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, erro
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-
+	// An older database has no centre_error: the articles show without it.
 	if rows, err := s.db.Query(ctx, `SELECT number, note_en, note_ar FROM centre_error WHERE law_id = $1`, id); err == nil {
 		byNumber := map[string]*Article{}
 		for _, a := range l.List {
@@ -633,7 +685,7 @@ func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, erro
 		}
 		rows.Close()
 	}
-
+	// An older database has no council_ruling: the page shows without it.
 	if rows, err := s.db.Query(ctx, `SELECT number, effect, decision, decided_on, source_url, note_en, note_ar
 		FROM council_ruling WHERE law_id = $1 ORDER BY decided_on, decision, number = '' DESC, number`, id); err == nil {
 		var all []CouncilRuling
@@ -646,7 +698,7 @@ func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, erro
 		rows.Close()
 		l.attachCouncil(all)
 	}
-
+	// An older database has no legislation_title_en: the page shows without it.
 	var te string
 	if s.db.QueryRow(ctx, `SELECT title_en FROM legislation_title_en WHERE law_id = $1`, id).Scan(&te) == nil && te != "" {
 		l.TitleEn = &te
@@ -657,12 +709,15 @@ func (s *Server) loadLaw(ctx context.Context, id int, withText bool) (*Law, erro
 	return l, nil
 }
 
+// AmendedBy groups the changes to this text by amending text, newest first.
 func (l *Law) AmendedBy() []ChangeGroup { return group(l.Changes) }
 
+// AmendsGroups groups this text's changes to others by text.
 func (l *Law) AmendsGroups() []ChangeGroup { return group(l.Amends) }
 
 func (s *Server) law(w http.ResponseWriter, r *http.Request) { s.lawPage(w, r, 0) }
 
+// lawPage serves a text, or its part n when it is cut into parts (lawparts.go).
 func (s *Server) lawPage(w http.ResponseWriter, r *http.Request, part int) {
 	id, ok := pathID(r)
 	if !ok {
@@ -726,6 +781,7 @@ func (s *Server) lawPage(w http.ResponseWriter, r *http.Request, part int) {
 			return
 		}
 	}
+	s.trackRead(r, l, "")
 	bn := i18n.New(s.lang(r))
 	l.Answer = lawAnswer(bn, l)
 	ld := legislationLD(l, s.u(r, lawPath(l.ID)), l.Answer)
@@ -738,6 +794,11 @@ func (s *Server) lawPage(w http.ResponseWriter, r *http.Request, part int) {
 		Path: lawPath(l.ID), OGType: "article", LD: []any{ld, crumbs}, Data: l}, part)
 }
 
+// legislationLD describes a text as schema.org Legislation. path is the
+// page's own canonical address (with /en only on a page with English of its own); description is the
+// record-field answer line. legislationLegalForce is set only when the record
+// knows it: a repeal. "In force" is the absence of a recorded repeal, so it
+// is not claimed.
 func legislationLD(l *Law, path, description string) map[string]any {
 	langs := []string{"ar"}
 	if l.HasFr {
@@ -782,6 +843,7 @@ func legislationLD(l *Law, path, description string) map[string]any {
 	return ld
 }
 
+// breadcrumbs builds a BreadcrumbList from name, path pairs, after Home.
 func breadcrumbs(pairs ...string) map[string]any {
 	items := []any{map[string]any{"@type": "ListItem", "position": 1, "name": "Lebanese Legislation", "item": Base + "/"}}
 	for i := 0; i+1 < len(pairs); i += 2 {
@@ -817,12 +879,14 @@ func (s *Server) article(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		p := s.articlePage(r, l, i)
+		s.trackRead(r, l, a.Number)
 		p.NoIndex = s.noindexed(ctx, "article", l.ID, a.Position)
 		p.Data.(map[string]any)["Topics"] = s.topicsFor(r, l.ID, a.Number)
 		s.render(w, r, "article", 200, p)
 		return
 	}
-
+	// Another spelling of a number the text has ("12/1", "12.1", "٥", "12-bis"):
+	// to the address of the article it names.
 	numbers := make([]string, len(l.List))
 	for i, a := range l.List {
 		numbers[i] = a.Number
@@ -834,6 +898,10 @@ func (s *Server) article(w http.ResponseWriter, r *http.Request) {
 	s.notFound(w, r)
 }
 
+// articlePage is the page of article l.List[i], all but its noindex flag and
+// its topics, which read the database. It is a translation pair like the
+// text's own page: the English interface is self-canonical, and both name
+// each other with hreflang.
 func (s *Server) articlePage(r *http.Request, l *Law, i int) Page {
 	a := l.List[i]
 	var prev, next *Article
@@ -862,7 +930,7 @@ func (s *Server) articlePage(r *http.Request, l *Law, i int) Page {
 		ld["legislationDate"] = a.From.Format("2006-01-02")
 	}
 	text := a.Shown()
-	if strings.TrimSpace(text) == "" {
+	if strings.TrimSpace(text) == "" { // a repealed article: say what the Centre says, else the text it belongs to
 		if a.Note != nil && strings.TrimSpace(*a.Note) != "" {
 			text = *a.Note
 		} else {
@@ -875,12 +943,14 @@ func (s *Server) articlePage(r *http.Request, l *Law, i int) Page {
 		Data: map[string]any{"Law": l, "A": a, "Prev": prev, "Next": next, "Answer": answer}}
 }
 
+// articleNamed is the article of numbers that a spelling names (any the
+// Centre's numbers can be written as: amend.Canon), "" if none.
 func articleNamed(raw string, numbers []string) string {
 	set := make(map[string]bool, len(numbers))
 	for _, n := range numbers {
 		set[n] = true
 	}
-	for _, try := range []string{raw, strings.ReplaceAll(raw, "-", " ")} {
+	for _, try := range []string{raw, strings.ReplaceAll(raw, "-", " ")} { // an address is dashes for spaces
 		for _, n := range amend.Resolve(try, func(s string) bool { return set[s] }) {
 			if n.Found {
 				return n.Article
@@ -890,6 +960,9 @@ func articleNamed(raw string, numbers []string) string {
 	return ""
 }
 
+// gotoArticle answers the "go to article" form without JavaScript: it
+// redirects to the article on the law's page (exact number first, then the
+// first article whose number starts with the same digits).
 func (s *Server) gotoArticle(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	if !ok {
@@ -933,7 +1006,7 @@ func (s *Server) gotoArticle(w http.ResponseWriter, r *http.Request) {
 	dest := lawPath(id)
 	if target != "" {
 		dest += "#a-" + Slug(target)
-		if r.URL.Query().Get("s") == "1" {
+		if r.URL.Query().Get("s") == "1" { // a text read in parts: the article may be in another
 			dest = artPath(id, target)
 		}
 	}
@@ -951,6 +1024,8 @@ var (
 	dashes      = regexp.MustCompile(`\s*-\s*`)
 )
 
+// normalizeNumber reads an article number the way the go-to box does: Latin
+// digits, no "المادة", "bis" as مكرر, single spaces.
 func normalizeNumber(s string) string {
 	s = arabicDigits.Replace(s)
 	s = articleWord.ReplaceAllString(s, "")
@@ -969,6 +1044,8 @@ func leadDigits(s string) string {
 	return s[:i]
 }
 
+// articlesAr counts articles the way Arabic does: مادة واحدة، مادتان،
+// 3 to 10 مواد, then مادة again (11 مادة، 100 مادة).
 func articlesAr(n int) string {
 	switch {
 	case n == 1:
@@ -981,6 +1058,9 @@ func articlesAr(n int) string {
 	return thousands(n) + " مادة"
 }
 
+// attachCouncil groups Constitutional Council rows by decision, the text's
+// row first, and gives each named article its rows. all comes ordered by
+// date and decision, the text's row first in each.
 func (l *Law) attachCouncil(all []CouncilRuling) {
 	byNumber := map[string]*Article{}
 	for _, a := range l.List {
@@ -1001,5 +1081,16 @@ func (l *Law) attachCouncil(all []CouncilRuling) {
 		if a := byNumber[c.Number]; a != nil {
 			a.Council = append(a.Council, c)
 		}
+	}
+	// Group decisions and their article references before sorting for display.
+	sort.SliceStable(l.Council, func(i, j int) bool {
+		a, b := l.Council[i].On, l.Council[j].On
+		return a != nil && (b == nil || a.After(*b))
+	})
+	for _, article := range l.List {
+		sort.SliceStable(article.Council, func(i, j int) bool {
+			a, b := article.Council[i].On, article.Council[j].On
+			return a != nil && (b == nil || a.After(*b))
+		})
 	}
 }

@@ -1,5 +1,9 @@
 package site
 
+// Integration tests for the /api/v1/ handlers, against a built or restored
+// copy of the corpus named by LEBLEG_DSN. They skip, rather than fail,
+// without one, since CI and a fresh checkout have none.
+
 import (
 	"context"
 	"encoding/json"
@@ -19,7 +23,7 @@ func testServer(t *testing.T) *Server {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	dsn := os.Getenv("LEBLEG_DSN")
+	dsn := os.Getenv("LEBLEG_DSN") // a copy of the corpus
 	if dsn == "" {
 		t.Skip("LEBLEG_DSN not set")
 	}
@@ -27,7 +31,7 @@ func testServer(t *testing.T) *Server {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	// Match serve: short search queries should not pay JIT compilation costs.
 	cfg.ConnConfig.RuntimeParams["jit"] = "off"
 	pool, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
@@ -73,7 +77,7 @@ func TestAPIRoot(t *testing.T) {
 func TestAPISearch(t *testing.T) {
 	s := testServer(t)
 	var out apiSearchResult
-	resp := getJSON(t, s, "/api/v1/search/?q="+"%D9%85%D9%88%D8%AC%D8%A8%D8%A7%D8%AA", &out)
+	resp := getJSON(t, s, "/api/v1/search/?q="+"%D9%85%D9%88%D8%AC%D8%A8%D8%A7%D8%AA", &out) // موجبات
 	if resp.StatusCode != 200 {
 		t.Fatalf("status %d", resp.StatusCode)
 	}
@@ -86,19 +90,24 @@ func TestAPISearch(t *testing.T) {
 		}
 	}
 
+	// an empty query answers 200 with nothing, not an error
 	var empty apiSearchResult
 	resp = getJSON(t, s, "/api/v1/search/?q=", &empty)
 	if resp.StatusCode != 200 || empty.LawCount != 0 {
 		t.Errorf("empty query: status %d, %+v", resp.StatusCode, empty)
 	}
 
+	// type filter narrows to one category
 	var lawsOnly apiSearchResult
-	getJSON(t, s, "/api/v1/search/?q=%D9%82%D8%A7%D9%86%D9%88%D9%86&type=laws", &lawsOnly)
+	getJSON(t, s, "/api/v1/search/?q=%D9%82%D8%A7%D9%86%D9%88%D9%86&type=laws", &lawsOnly) // قانون
 	if len(lawsOnly.Rulings) != 0 || len(lawsOnly.Articles) != 0 || len(lawsOnly.Gazette) != 0 {
 		t.Errorf("type=laws returned other categories: %+v", lawsOnly)
 	}
 }
 
+// TestAPILawAndArticle walks from a search hit to its law and one article,
+// checking every response carries a canonical URL and the verbatim text is
+// non-empty where the law has articles at all.
 func TestAPILawAndArticle(t *testing.T) {
 	s := testServer(t)
 	var search apiSearchResult
@@ -142,7 +151,7 @@ func TestAPILawAndArticle(t *testing.T) {
 func TestAPIRuling(t *testing.T) {
 	s := testServer(t)
 	var search apiSearchResult
-	getJSON(t, s, "/api/v1/search/?q=%D9%85%D8%AD%D9%83%D9%85%D8%A9&type=rulings&limit=1", &search)
+	getJSON(t, s, "/api/v1/search/?q=%D9%85%D8%AD%D9%83%D9%85%D8%A9&type=rulings&limit=1", &search) // محكمة
 	if len(search.Rulings) == 0 {
 		t.Skip("no ruling hits in this database")
 	}
@@ -171,6 +180,9 @@ func TestAPICacheHeaders(t *testing.T) {
 	}
 }
 
+// An article an amendment replaced must come back in its new wording, with
+// the Centre's earlier one kept apart (Article 73 of the Code of Criminal
+// Procedure, law 244483, rewritten by Law 321/2023).
 func TestAPIArticleInForceWording(t *testing.T) {
 	s := testServer(t)
 	var article apiArticleDetail
@@ -192,10 +204,15 @@ func TestAPIArticleInForceWording(t *testing.T) {
 	}
 }
 
+// TestRulingJudgmentSearch writes a judgment into two rulings of the local
+// database (and takes it out again) to check what the rest only reads: a
+// ruling is found by words only its judgment holds, below the rulings whose
+// own title or summary matches; the API and the page show the scan and its
+// machine reading.
 func TestRulingJudgmentSearch(t *testing.T) {
 	s := testServer(t)
 	ctx := context.Background()
-
+	// Never on a read-only role: this test writes.
 	var ro string
 	if s.db.QueryRow(ctx, `SHOW transaction_read_only`).Scan(&ro) == nil && ro == "on" {
 		t.Skip("read-only database: this test writes; run it on a built database of your own")
@@ -206,7 +223,7 @@ func TestRulingJudgmentSearch(t *testing.T) {
 	if _, err := s.db.Exec(ctx, `SELECT 1 FROM ruling_page LIMIT 1`); err != nil {
 		t.Skipf("this database predates ruling_page (rebuild it): %v", err)
 	}
-
+	// Two rulings with no scan of their own: the clean-up deletes every page and file of a and b.
 	rows, err := s.db.Query(ctx, `SELECT id, title FROM ruling r WHERE text_ar IS NOT NULL
 		AND NOT EXISTS (SELECT 1 FROM ruling_page p WHERE p.ruling_id = r.id)
 		AND NOT EXISTS (SELECT 1 FROM ruling_file f WHERE f.ruling_id = r.id) ORDER BY id LIMIT 2`)
@@ -233,7 +250,8 @@ func TestRulingJudgmentSearch(t *testing.T) {
 	}
 	clean()
 	t.Cleanup(clean)
-
+	// A: a scan read in two pages ("٢٧١" with Arabic-Indic digits in the first).
+	// B: the word is in its title, so it matches as a summary would.
 	for _, q := range []string{
 		`INSERT INTO ruling_file (ruling_id, pages, bytes, sha256, fetched_at) VALUES (` + strconv.Itoa(a) + `, 3, 178874, 'x', now())`,
 		`INSERT INTO ruling_page (ruling_id, n, text_ar, model, read_at) VALUES (` + strconv.Itoa(a) + `, 1, 'قرار رقم ٢٧١ ` + word + `', 'gemini-test', now())`,
@@ -259,13 +277,13 @@ func TestRulingJudgmentSearch(t *testing.T) {
 	if !strings.Contains(out.Rulings[1].Snippet, word) {
 		t.Errorf("the judgment hit's excerpt should come from the page: %q", out.Rulings[1].Snippet)
 	}
-
+	// Offset skips the summary match; the judgment-only one is next.
 	out = apiSearchResult{}
 	getJSON(t, s, "/api/v1/search/?type=rulings&limit=1&offset=1&q="+word, &out)
 	if len(out.Rulings) != 1 || out.Rulings[0].ID != a {
 		t.Errorf("offset 1: %+v", out.Rulings)
 	}
-
+	// Western digits find the Arabic-Indic ones in a judgment.
 	out = apiSearchResult{}
 	getJSON(t, s, "/api/v1/search/?type=rulings&q=271+"+word, &out)
 	if len(out.Rulings) != 1 || out.Rulings[0].ID != a {
@@ -299,12 +317,16 @@ func TestRulingJudgmentSearch(t *testing.T) {
 			t.Errorf("ruling page (status %d) lacks %q", rec.Code, want)
 		}
 	}
-
+	// One PDF link, to the source; the page never names the models.
 	if strings.Contains(page, "/ruling-files/") || strings.Contains(strings.ToLower(page), "gemini-test") {
 		t.Error("the ruling page links our copy or names the model")
 	}
 }
 
+// TestKindNearAndLength: "مرسوم اشتراعي 1306" and "مرسوم 1306" mean the
+// Foreign Ministry's rules (law-by-decree 1306/1971), the oldest of ten texts
+// numbered 1306. They came last when the kind did not match and the newest
+// one-line notice won.
 func TestKindNearAndLength(t *testing.T) {
 	s := testServer(t)
 	for _, q := range []string{"مرسوم اشتراعي 1306", "مرسوم 1306", "المرسوم الاشتراعي رقم 1306"} {
@@ -317,7 +339,7 @@ func TestKindNearAndLength(t *testing.T) {
 			t.Errorf("%s: first is %q, want the Foreign Ministry's rules", q, out.Laws[0].Title)
 		}
 	}
-
+	// A decree-law is also a decree: it must not beat a plain law for "قانون".
 	var out apiSearchResult
 	getJSON(t, s, "/api/v1/search/?type=laws&q="+url.QueryEscape("ممارسة كتابة العدل القانون رقم 337"), &out)
 	if len(out.Laws) == 0 || !strings.Contains(out.Laws[0].Title, "الكتاب العدل") {
@@ -325,9 +347,11 @@ func TestKindNearAndLength(t *testing.T) {
 	}
 }
 
+// An English question that finds no Arabic title is read again, as the
+// search page does, and the response says what was searched instead.
 func TestAPISearchRescue(t *testing.T) {
 	s := testServer(t)
-	for i := 0; i < 100 && s.vocab.Load() == nil; i++ {
+	for i := 0; i < 100 && s.vocab.Load() == nil; i++ { // typos and Arabizi are mended once the vocabulary has loaded
 		time.Sleep(100 * time.Millisecond)
 	}
 	for _, c := range []struct{ q, via string }{
@@ -354,7 +378,7 @@ func TestAPISearchRescue(t *testing.T) {
 			t.Errorf("%q: searched_instead_kind empty", c.q)
 		}
 	}
-
+	// A query that finds something is left alone.
 	var plain apiSearchResult
 	getJSON(t, s, "/api/v1/search/?q=%D9%85%D9%88%D8%AC%D8%A8%D8%A7%D8%AA", &plain)
 	if plain.SearchedInstead != "" {
@@ -362,6 +386,8 @@ func TestAPISearchRescue(t *testing.T) {
 	}
 }
 
+// Laws carry title_en (unofficial, nullable) and an English query finds a
+// text by it, after the Arabic matches.
 func TestAPITitleEn(t *testing.T) {
 	s := testServer(t)
 	var te string

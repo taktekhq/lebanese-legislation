@@ -2,8 +2,10 @@
 <html lang="{{uilang}}" dir="{{dir}}">
 <head>
 <link rel="alternate" type="application/atom+xml" title="Changes to Lebanese law" href="/changes/feed.xml">
+<link rel="alternate" type="application/atom+xml" title="Project journal" href="{{u "/blog/feed.xml"}}">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{{if not static}}<script src="/language.js?v={{assetVersion}}"></script>{{end}}
 <title>{{.Title}}</title>
 <meta name="description" content="{{.Desc}}">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
@@ -26,11 +28,26 @@
 <meta property="og:locale:alternate" content="{{if eq (uilang) "ar"}}en_US{{else}}ar_LB{{end}}">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
-
+{{if eq (uilang) "ar"}}<link rel="preload" href="/assets/fonts/plex-arabic-400-arabic.woff2" as="font" type="font/woff2" crossorigin>
+{{else}}<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+{{end}}{{if eq .Lang "ar"}}<link rel="preload" href="/assets/fonts/naskh-arabic.woff2" as="font" type="font/woff2" crossorigin>
+{{end}}<style>
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:400;font-display:swap;src:url(/assets/fonts/plex-arabic-400-arabic.woff2) format('woff2');unicode-range:U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC7, U+10EC9-10EEE, U+10EF0-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:400;font-display:swap;src:url(/assets/fonts/plex-arabic-400-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:500;font-display:swap;src:url(/assets/fonts/plex-arabic-500-arabic.woff2) format('woff2');unicode-range:U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC7, U+10EC9-10EEE, U+10EF0-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:500;font-display:swap;src:url(/assets/fonts/plex-arabic-500-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:600;font-display:swap;src:url(/assets/fonts/plex-arabic-600-arabic.woff2) format('woff2');unicode-range:U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC7, U+10EC9-10EEE, U+10EF0-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:600;font-display:swap;src:url(/assets/fonts/plex-arabic-600-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 700;font-display:swap;src:url(/assets/fonts/inter-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:700;font-display:swap;src:url(/assets/fonts/jetbrains-mono-700-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Noto Naskh Arabic';font-style:normal;font-weight:400 600;font-display:swap;src:url(/assets/fonts/naskh-arabic.woff2) format('woff2');unicode-range:U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC7, U+10EC9-10EEE, U+10EF0-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1}
+@font-face{font-family:'Noto Naskh Arabic';font-style:normal;font-weight:400 600;font-display:swap;src:url(/assets/fonts/naskh-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+</style>
 <script>document.documentElement.classList.add("js");</script>
-<script defer src="/assets/load.js"></script>
-<link rel="stylesheet" href="/styles.css?v=2">
-<link rel="stylesheet" href="/legislation.css?v=4">
+{{if analytics}}<script defer src="/ga.js?v={{assetVersion}}"></script>
+<script defer src="/assets/load.js?v={{assetVersion}}"{{if not static}} data-ph="/ph.js?v={{assetVersion}}"{{end}}></script>
+{{end}}<link rel="stylesheet" href="/styles.css?v={{assetVersion}}">
+<link rel="stylesheet" href="/legislation.css?v={{assetVersion}}">
 {{range .LD}}<script type="application/ld+json">{{.}}</script>
 {{end}}</head>
 
@@ -38,7 +55,7 @@
 <a class="skip" href="#top">{{t "skip_link"}}</a>
 <header class="nav" id="nav">
   <div class="nav__inner">
-    <a class="lockup" href="{{u "/"}}" aria-label="{{t "lockup.aria"}}"><span class="lockup__firm"><span>Lebanese</span> Legislation</span><span class="lockup__by">{{t "lockup.by"}} <b>taktek</b></span></a>
+    <a class="lockup" href="{{u "/"}}"><span class="lockup__firm"><span>Lebanese</span> Legislation</span><span class="lockup__by">{{t "lockup.by"}} <b>taktek</b></span></a>
     <nav class="nav__links" aria-label="Primary">
       <a href="{{u "/laws/"}}">{{t "nav.legislation"}}</a>
       <a href="{{u "/codes/"}}">{{t "nav.codes"}}</a>
@@ -55,20 +72,21 @@
 </header>
 
 <main id="top">
-{{if eq (uilang) "ar"}}<div class="wrap lang-note"><a class="link" href="{{enPath .Path}}" hreflang="en" lang="en" dir="ltr">Read this page in English</a></div>
-{{end}}{{template "content" .}}
+{{if eq (uilang) "ar"}}<div class="wrap lang-note"><a class="link lang-switch" href="{{enPath .Path}}" hreflang="en" lang="en" dir="ltr">Read this page in English</a></div>{{end}}
+{{template "content" .}}
 </main>
 
 <footer class="footer">
   <div class="wrap">
     <div class="footer__top">
       <div>
-        <a class="lockup" href="{{u "/"}}" aria-label="{{t "lockup.aria"}}"><span class="lockup__firm"><span>Lebanese</span> Legislation</span><span class="lockup__by">{{t "lockup.by"}} <b>taktek</b></span></a>
+        <a class="lockup" href="{{u "/"}}"><span class="lockup__firm"><span>Lebanese</span> Legislation</span><span class="lockup__by">{{t "lockup.by"}} <b>taktek</b></span></a>
         <p class="tiny" style="margin-top:16px;max-width:34ch">{{t "footer.tagline"}}</p>
       </div>
-      <div><h4>{{t "footer.read_heading"}}</h4><ul><li><a href="{{u "/laws/"}}">{{t "footer.read.legislation"}}</a></li><li><a href="{{u "/codes/"}}">{{t "footer.read.codes"}}</a></li><li><a href="{{u "/changes/"}}">{{t "footer.read.changes"}}</a></li><li><a href="{{u "/rulings/"}}">{{t "footer.read.rulings"}}</a></li><li><a href="{{u "/gazette/"}}">{{t "footer.read.gazette"}}</a></li></ul></div>
-      <div><h4>{{t "footer.more_heading"}}</h4><ul><li><a href="{{u "/opinions/"}}">{{t "footer.more.opinions"}}</a></li><li><a href="{{u "/agreements/"}}">{{t "footer.more.agreements"}}</a></li><li><a href="{{u "/doctrine/"}}">{{t "footer.more.doctrine"}}</a></li><li><a href="{{u "/research/"}}">{{t "footer.more.research"}}</a></li></ul></div>
-      <div><h4>{{t "footer.use_heading"}}</h4><ul><li><a href="{{u "/data/"}}">{{t "footer.use.database"}}</a></li><li><a href="{{datasetURL}}" rel="noopener">{{t "footer.use.download"}}</a></li><li><a href="{{u "/ai/"}}">{{t "footer.use.ai"}}</a></li><li><a href="{{u "/about/"}}">{{t "footer.use.about"}}</a></li><li><a href="{{u "/contribute/"}}">{{t "contribute.title"}}</a></li></ul></div>
+      <div><h2>{{t "footer.read_heading"}}</h2><ul><li><a href="{{u "/laws/"}}">{{t "footer.read.legislation"}}</a></li><li><a href="{{u "/codes/"}}">{{t "footer.read.codes"}}</a></li><li><a href="{{u "/changes/"}}">{{t "footer.read.changes"}}</a></li><li><a href="{{u "/rulings/"}}">{{t "footer.read.rulings"}}</a></li><li><a href="{{u "/gazette/"}}">{{t "footer.read.gazette"}}</a></li></ul></div>
+      <div><h2>{{t "footer.more_heading"}}</h2><ul><li><a href="{{u "/opinions/"}}">{{t "footer.more.opinions"}}</a></li><li><a href="{{u "/agreements/"}}">{{t "footer.more.agreements"}}</a></li><li><a href="{{u "/doctrine/"}}">{{t "footer.more.doctrine"}}</a></li><li><a href="{{u "/research/"}}">{{t "footer.more.research"}}</a></li></ul></div>
+      <div><h2>{{t "footer.use_heading"}}</h2><ul><li><a href="https://github.com/taktekhq/lebanese-legislation">{{t "resources.github"}}</a></li><li><a href="{{u "/data/"}}">{{t "footer.use.database"}}</a></li><li><a href="{{datasetURL}}" rel="noopener" data-ga="dataset_download">{{t "footer.use.download"}}</a></li><li><a href="{{u "/ai/"}}">{{t "footer.use.ai"}}</a></li></ul></div>
+      <div><h2>{{t "footer.info_heading"}}</h2><ul><li><a href="{{u "/blog/"}}">{{if eq (uilang) "ar"}}سجل المشروع{{else}}Project journal{{end}}</a></li><li><a href="{{u "/about/"}}">{{t "footer.info.about"}}</a></li><li><a href="{{u "/contribute/"}}">{{t "contribute.title"}}</a></li></ul></div>
     </div>
     <div class="footer__legal footer__notice">
       <p class="tiny" lang="ar" dir="rtl">معلومات مأخوذة من نصوص رسمية منشورة، وليست استشارة قانونية. راجع الجريدة الرسمية أو استشر محامياً مؤهلاً في حالتك.</p>
@@ -78,7 +96,7 @@
     <div class="footer__legal"><p class="tiny">{{t "footer.credit" (safe "<a class=\"link\" href=\"https://taktek.io/\">Taktek, LLC</a>")}}</p></div>
   </div>
 </footer>
-<script defer src="/main.js"></script>
+<script defer src="/main.js?v={{assetVersion}}"></script>
 <script defer src="/legislation.js?v={{assetVersion}}"></script>
 </body>
 </html>
@@ -130,22 +148,34 @@
   {{if .Repealed}}{{if $last}}{{if eq $last.State "repealed"}}{{with $last.Change}}<p class="art__amend" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.repealed_word"}}</strong> {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a>{{with .Effective}}, {{t "art.from" (date .)}}{{end}}. {{t "art.its_last_wording"}}</p>{{end}}{{end}}{{end}}
   {{else}}
   {{if .Ahead}}{{with $cur.Change}}<p class="art__amend" lang="{{uilang}}" dir="{{dir}}"><strong>{{changeVerb .}}</strong> {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a>{{with .Effective}}, {{t "art.from" (date .)}}{{end}}. {{t "art.new_wording_note"}}</p>{{end}}{{end}}
-  {{with .Shown}}<div class="art__ar">{{range paras (ptr .)}}<p>{{marks .}}</p>{{end}}</div>{{end}}
+  {{$amounts := $law.ArticleAmounts .}}
+  {{with $amounts}}<p class="art__amend" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.amounts_updated"}}</strong> {{t "art.amounts_adjusted"}} <a class="link" href="{{artURL 330819 "1"}}">{{t "art.amounts_decree"}}</a>.</p>
+  <div class="art__ar" data-adjusted-amounts>{{range paras (ptr .Text)}}<p>{{marks .}}</p>{{end}}</div>
+  {{else}}{{with .Shown}}<div class="art__ar">{{range paras (ptr .)}}<p>{{marks .}}</p>{{end}}</div>{{end}}{{end}}
+  {{if $amounts}}<details class="art__history"><summary lang="{{uilang}}" dir="{{dir}}">{{t "art.amounts_original"}}</summary><div class="art__ar">{{range paras (ptr .Shown)}}<p>{{marks .}}</p>{{end}}</div></details>{{end}}
   {{if not .Ahead}}{{range .Images}}<p class="art__img"><a href="{{img .}}" rel="noopener"><img src="{{img .}}" alt="Text of the article as published, an image" loading="lazy"></a></p>{{end}}
   {{with .TextFr}}<div class="art__fr" lang="fr" dir="ltr">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}{{end}}
-  {{if not .Links}}{{range .Pending}}{{with .Change}}<div class="art__change"><p lang="{{uilang}}" dir="{{dir}}"><strong>{{changeVerb .}}</strong> {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a>{{with .Effective}}, {{t "art.from" (date .)}}{{end}}{{with .PartLabel}}: <bdi lang="ar">{{.}}</bdi>{{end}}. {{t "art.pending_note"}}</p>{{with .TextAr}}<div class="art__ar">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}</div>{{end}}{{end}}
-  {{range .Unsure}}<div class="art__change art__change--unsure"><p lang="{{uilang}}" dir="{{dir}}"><strong>{{changeVerb .}}</strong> {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a>{{with .Effective}}, {{t "art.from" (date .)}}{{end}} {{if .TextAr}}{{t "art.unsure_note_with"}}{{else}}{{t "art.unsure_note_without"}}{{end}}</p>{{with .TextAr}}<div class="art__ar">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}</div>{{end}}{{end}}
   {{range .Affected}}<p class="art__amend art__amend--check" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "law.possibly_affected"}}:</strong> <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a> {{t "art.affected_full"}}</p>{{end}}
   {{end}}
-  {{if .Versions}}<details class="art__history"{{if .Repealed}} open{{end}}><summary dir="{{dir}}">{{t "art.history"}} &middot; {{t "art.n_versions" (num (len .Versions))}}</summary>
-    <ol class="hist">{{range .Versions}}<li class="hist__v">
+  {{if or .Versions .Links .Pending .Unsure}}<details class="art__amendments">
+    <summary class="art__amendments-toggle" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.amendments_versions"}}</strong> <span class="art__expand">{{t "art.show_amendments"}}</span><span class="art__collapse">{{t "art.hide_amendments"}}</span></summary>
+    <div class="art__amendments-body">
+    <p class="art__amendments-note" lang="{{uilang}}" dir="{{dir}}">{{t "art.amendments_note"}}</p>
+  {{if not .Repealed}}
+  {{if not .Links}}{{range .Pending}}{{with .Change}}<div class="art__change"><p lang="{{uilang}}" dir="{{dir}}"><strong>{{changeVerb .}}</strong> {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a>{{with .Effective}}, {{t "art.from" (date .)}}{{end}}{{with .PartLabel}}: <bdi lang="ar">{{.}}</bdi>{{end}}. {{t "art.pending_note"}}</p>{{with .TextAr}}<div class="art__ar">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}</div>{{end}}{{end}}
+  {{range .Unsure}}<div class="art__change art__change--unsure"><p lang="{{uilang}}" dir="{{dir}}"><strong>{{changeVerb .}}</strong> {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a>{{with .Effective}}, {{t "art.from" (date .)}}{{end}} {{if .TextAr}}{{t "art.unsure_note_with"}}{{else}}{{t "art.unsure_note_without"}}{{end}}</p>{{with .TextAr}}<div class="art__ar">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}</div>{{end}}{{end}}
+  {{end}}
+  {{if .Versions}}<section class="art__history"><h4 class="art__links-head" lang="{{uilang}}" dir="{{dir}}">{{t "art.history"}} &middot; {{t "art.n_versions" (num (len .Versions))}}</h4>
+    <ol class="hist">{{range .History}}<li class="hist__v">
       <p class="hist__meta" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.version" .Label}}</strong> &middot; {{with .From}}{{t "art.from" (date .)}}{{else}}{{if and (eq .Major 1) (not .Change)}}{{t "art.earliest_wording"}}{{else}}{{t "art.date_not_known"}}{{end}}{{end}}{{with .To}}, {{t "art.until" (date .)}}{{end}}{{if eq .Minor 0}}{{with .Change}} &middot; {{changeVerb .}} {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.art_abbr" .ByArticle}}</a>{{end}}{{end}}{{if eq .Source "centre"}} &middot; {{t "art.src_centre"}}{{else if eq .Source "amendment"}} &middot; {{t "art.src_amendment"}}{{else if and (eq .Source "editorial") (gt .Minor 0)}} &middot; {{t "art.src_printed"}}{{else if eq .Source "editorial"}} &middot; {{t "art.src_editorial"}}{{end}}{{if and (eq .Source "centre") (not .Change) (gt .Major 1)}} &middot; {{t "art.src_later"}}{{end}}</p>
       {{if eq .State "repealed"}}<p class="hist__none" lang="{{uilang}}" dir="{{dir}}">{{t "art.repealed_full_stop"}}</p>{{else}}{{with .TextAr}}<div class="art__ar">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{else}}<p class="hist__none" lang="{{uilang}}" dir="{{dir}}">{{t "art.no_source_note"}}{{with .Change}}{{with .TextAr}} {{t "art.change_reads" ""}}<bdi lang="ar">{{.}}</bdi>{{end}}{{end}}</p>{{end}}{{end}}
     </li>{{end}}</ol>
-  </details>{{end}}
+  </section>{{end}}
   {{if .Links}}<section class="art__links" aria-label="{{t "art.changes_to_article"}}"><p class="art__links-head" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.changes_to_article"}}</strong> &middot; {{t "art.changes_meta" (num (len .Links))}}</p>
   {{range .Links}}<div class="art__change"><p lang="{{uilang}}" dir="{{dir}}"><strong>{{linkVerb .}}</strong>{{with .Part}} (<bdi lang="ar">{{.}}</bdi>){{end}} {{t "art.by"}} <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>{{with .ByArticle}}, {{t "art.article_label" .}}{{end}}</a>{{with .Effective}}, {{date .}}{{end}}</p>{{with .Text}}<div class="art__ar">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}</div>{{end}}
   </section>{{end}}
+    </div>
+  </details>{{end}}
   {{if .RulingCount}}{{if $.Standalone}}{{$extra := ""}}{{if gt .RulingCount (len .Rulings)}}{{$extra = t "art.most_recent" (num (len .Rulings))}}{{end}}<section class="art__rulings" aria-label="{{t "art.rulings_applied"}}"><p class="art__links-head" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.rulings_applied"}}</strong> &middot; {{t "art.rulings_meta" (num .RulingCount) $extra}}</p>
   <ul class="art__rulings-list">{{range .Rulings}}<li><a class="link" href="{{u (printf "/ruling/%d/" .ID)}}"><bdi lang="ar">{{.Court}}</bdi>{{with .Number}} <bdi>{{.}}</bdi>{{end}}{{with .Year}}<bdi>/{{.}}</bdi>{{end}}</a>{{with .On}} <span class="art__meta">{{date .}}</span>{{end}}</li>{{end}}</ul><p class="art__meta-line"><a class="link" href="{{rulingsURL $law.ID .Number}}">{{t "art.rulings_full_list"}}</a></p></section>
   {{else}}<p class="art__meta-line" lang="{{uilang}}" dir="{{dir}}"><a class="link" href="{{artURL $law.ID .Number}}">{{if gt .RulingCount 1}}{{t "art.applied_in_plural" (num .RulingCount)}}{{else}}{{t "art.applied_in" (num .RulingCount)}}{{end}}</a></p>{{end}}{{end}}

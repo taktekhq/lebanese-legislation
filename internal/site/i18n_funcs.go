@@ -6,20 +6,31 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/site/i18n"
 )
 
+// enBundle and arBundle are the two UI-string tables; see internal/site/i18n.
+// English pages and Arabic pages each get their own template.FuncMap bound
+// to one of these (site.go parses the templates once, then arabicFuncs()
+// is bound onto a Clone() for the Arabic set; see newServer).
 var (
 	enBundle = i18n.New("en")
 	arBundle = i18n.New("ar")
 )
 
+// arabicFuncs are the template funcs re-bound on the Arabic clone of every
+// page: UI strings
+// come from ar.json, and the handful of language-direction details (the
+// root lang/dir, the language switch, the back/forward arrows, and Arabic
+// numeral-noun agreement) flip for right-to-left.
 func arabicFuncs() template.FuncMap {
 	return template.FuncMap{
 		"t": func(key string, args ...any) template.HTML { return template.HTML(arBundle.T(key, args...)) },
-
+		// Arabic is the root: links need no prefix, so u, lawURL and artURL
+		// stay the shared ones (site.go), also on a page served under /ar/.
 		"uilang": func() string { return "ar" },
 		"dir":    func() string { return "rtl" },
-
+		// switchLabel names the OTHER language, in its own script, as is
+		// conventional for a language switcher.
 		"switchLabel": func() string { return "English" },
-		"altURL":      func(p string) string { return Base + "/en" + p },
+		"altURL":      func(p string) string { return Base + "/en" + p }, // the English version of this same page
 		"linkVerb":    func(k Link) template.HTML { return template.HTML(arBundle.T("verb." + k.VerbKey())) },
 		"changeVerb":  func(c *Change) template.HTML { return template.HTML(arBundle.T("cverb." + c.VerbKey())) },
 		"statusText": func(status string) template.HTML {
@@ -28,12 +39,15 @@ func arabicFuncs() template.FuncMap {
 			}
 			return template.HTML(arBundle.T("status.in_force"))
 		},
-		"backArrow": func() template.HTML { return "&rarr;" },
+		"backArrow": func() template.HTML { return "&rarr;" }, // points toward reading-start, now on the right
 		"fwdArrow":  func() template.HTML { return "&larr;" },
 		"plural":    func(n int, one, many string) string { return arBundle.PluralAr(n, one, many) },
 	}
 }
 
+// englishFuncs are the template funcs bound on the English set of every page
+// on the live site: internal links gain the /en prefix. The rest stay the
+// shared English defaults of site.go.
 func englishFuncs() template.FuncMap {
 	return template.FuncMap{
 		"u":          func(p string) string { return "/en" + p },

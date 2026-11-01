@@ -927,9 +927,10 @@ a { color: inherit; text-decoration: none; }
   /* The service pages carry a Contact column that the guide pages do not, so
      the track count follows the markup rather than being stated twice. */
   .footer__top:has(> :nth-child(4)) { grid-template-columns: 1.4fr 1fr 1fr 1fr; }
+  .footer__top:has(> :nth-child(5)) { grid-template-columns: 1.4fr repeat(4, 1fr); }
 }
 
-.footer h4 {
+.footer h2 {
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.09em;
@@ -2088,4 +2089,3 @@ table.ref .ar {
 .lockup__by b { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; letter-spacing: -0.045em; }
 
 /* the link to the English version, at the top of every Arabic page */
-.lang-note { display: flex; justify-content: flex-end; padding-block: 10px 0; font-size: 0.8125rem; }
