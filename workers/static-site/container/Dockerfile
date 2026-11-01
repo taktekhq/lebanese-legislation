@@ -38,7 +38,7 @@ psql -h /tmp -U postgres -v ON_ERROR_STOP=1 -c 'CREATE ROLE lebleg_web LOGIN' -c
 for db in lebleg lebleg_search; do
   createdb -h /tmp -U postgres -O lebleg "$db"
   psql -h /tmp -U postgres -d "$db" -v ON_ERROR_STOP=1 -c 'CREATE EXTENSION vector'
-  if ! pg_restore -h /tmp -U postgres --no-owner --role=lebleg -j 4 -d "$db" "/dumps/$db.dump" 2> /tmp/restore.log; then
+  if ! pg_restore -h /tmp -U postgres --no-owner --no-privileges --role=lebleg -j 4 -d "$db" "/dumps/$db.dump" 2> /tmp/restore.log; then
     cat /tmp/restore.log >&2
     # Only absent roles referenced by the dump's GRANTs may be ignored.
     awk '
