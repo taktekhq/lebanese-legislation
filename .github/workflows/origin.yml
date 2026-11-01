@@ -64,6 +64,14 @@ jobs:
           if [ -n "$GEMINI_API_KEY" ]; then
             echo "$GEMINI_API_KEY" | npx --yes wrangler@4.151.1 secret put GEMINI_API_KEY
           fi
+      - name: Set Vectorize secret
+        working-directory: workers/static-site
+        env:
+          LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+        run: |
+          if [ -n "$LEBLEG_VECTORIZE_TOKEN" ]; then
+            echo "$LEBLEG_VECTORIZE_TOKEN" | npx --yes wrangler@4.151.1 secret put LEBLEG_VECTORIZE_TOKEN
+          fi
       - name: Use the pushed image
         if: inputs.image != ''
         working-directory: workers/static-site

@@ -70,6 +70,8 @@ The server itself is [`web/`](../web/README.md) (with `api/` and `mcp/`); these 
 | --- | --- |
 | `usage-stats` | Adds up one day of the anonymous usage record the web server keeps with `-events`, as JSON. |
 | `journal-sitemap` | Prints the project journal's sitemap from the posts built into the site. No database. |
+| [`export-vectors`](export-vectors/) | Streams saved semantic chunks to NDJSON, including 768-dimensional vectors and stable chunk IDs. |
+| [`vectorize-sync`](vectorize-sync/) | Upserts changed vectors and deletes removed IDs in Cloudflare Vectorize, using an id/hash manifest. **key**: `LEBLEG_VECTORIZE_TOKEN`. |
 | `searchindex` | Builds the semantic search index in its own pgvector database (`GEMINI_API_KEY`). **key** |
 | `topicgen` | Writes and checks the topic pages with a model that sees only the cited articles (claude, codex or agy CLI). **key** |
 | `check-english` | Checks that English stays an unofficial aid: flagged surfaces, English titles for new texts, no Latin article bodies. |

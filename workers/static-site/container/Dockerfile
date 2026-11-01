@@ -25,6 +25,7 @@ COPY --from=pgvector-build /out/usr/lib/postgresql/18/lib/vector.so /usr/lib/pos
 COPY --from=pgvector-build /out/usr/share/postgresql/18/extension/vector* /usr/share/postgresql/18/extension/
 
 FROM pg AS origin
+ARG DROP_VECTORS="1"
 ENV PGDATA=/var/lib/postgresql/data
 COPY build/scans/ /scans/
 # The dumps are mounted for this step only, so they never become an image layer.
@@ -62,6 +63,18 @@ for db in lebleg lebleg_search; do
     -c 'GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO lebleg_web' \
     -c 'ANALYZE'
 done
+if [ "$DROP_VECTORS" = 1 ]; then
+  psql -h /tmp -U postgres -d lebleg_search -v ON_ERROR_STOP=1 \
+    -c 'DROP INDEX IF EXISTS public.semantic_chunks_embedding' \
+    -c 'ALTER TABLE public.semantic_chunks DROP COLUMN embedding'
+  # Separate invocation: VACUUM cannot run inside a transaction block.
+  psql -h /tmp -U postgres -d lebleg_search -v ON_ERROR_STOP=1 -c 'VACUUM FULL public.semantic_chunks'
+fi
+# Same UTF-8 ChunkID expression as internal/vectorize; keep row lookup indexed.
+psql -h /tmp -U postgres -d lebleg_search -v ON_ERROR_STOP=1 <<'SQL'
+CREATE INDEX IF NOT EXISTS semantic_chunks_vectorize_id ON public.semantic_chunks
+((CASE WHEN octet_length(model || ':' || kind || ':' || source_id::text || ':' || part || ':' || lang || ':' || hash || ':' || chunk_start::text) <= 64 THEN model || ':' || kind || ':' || source_id::text || ':' || part || ':' || lang || ':' || hash || ':' || chunk_start::text ELSE encode(substring(sha256(decode(replace(model || ':' || kind || ':' || source_id::text || ':' || part || ':' || lang || ':' || hash || ':' || chunk_start::text, chr(92), chr(92) || chr(92)), 'escape')) from 1 for 16), 'hex') END));
+SQL
 # Fast restore with a big WAL cap, then shrink pg_wal once before the image is saved.
 psql -h /tmp -U postgres -c "ALTER SYSTEM SET max_wal_size = '256MB'" -c "ALTER SYSTEM SET min_wal_size = '80MB'" -c "SELECT pg_reload_conf()" -c CHECKPOINT -c CHECKPOINT
 psql -h /tmp -U postgres -c "ALTER SYSTEM RESET max_wal_size" -c "ALTER SYSTEM RESET min_wal_size"
