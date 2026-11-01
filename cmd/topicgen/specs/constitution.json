@@ -1,0 +1,18 @@
+{
+  "slug": "constitution",
+  "title_en": "The Lebanese Constitution: structure, rights, institutions and amendment",
+  "title_ar": "الدستور اللبناني: بنيته وحقوقه ومؤسساته وتعديله",
+  "question_en": "What does the Lebanese Constitution say about rights, the president, parliament, the government and how it is amended?",
+  "question_ar": "ماذا يقول الدستور اللبناني عن الحقوق ورئيس الجمهورية ومجلس النواب والحكومة وتعديل الدستور؟",
+  "sub_questions": [
+    "What rights and freedoms does the Constitution guarantee?",
+    "How is the president elected and what are his powers?",
+    "What does the Council of Ministers do and who holds executive power?",
+    "How can the Constitution be amended?",
+    "Which articles were repealed or changed?"
+  ],
+  "notes": "Single law: the Constitution of 23 May 1926 in its current wording (id 244058), amended many times (among others the constitutional laws of 1927, 1943, 1976, 1990 (law 18 of 21 Sept 1990 implementing the Taif accord, id 189318), 1995, 1998 and 2004). The database numbers articles 1 to 102. Articles 90 to 94 and 96 to 100 are blank (repealed or removed), and art. 23 states its own repeal (by art. 50 of the constitutional law of 17 Oct 1927); art. 102 repeals contrary legislation. So about 92 numbered articles hold text, one of which (23) is repealed. The 1990 preamble (Taif) and the section headings are NOT in the database as articles, so the page must not quote the preamble. Art. 22 (Senate) has never been set up and is conditional on a non-sectarian parliament; art. 95 (gradual abolition of political sectarianism) is transitional. Art. 49 holds the 1995, 1998 and 2004 additions allowing a one-off re-election or extension; the long text is 1480 characters. Art. 53 and 56 cover the president's powers and promulgation (see the official-gazette topic). Art. 65 holds the Council of Ministers' competences and voting majorities; art. 69 holds the government's resignation cases. Amendment: art. 76 (initiative of the president), art. 77 (initiative of the Chamber, two thirds, with steps), art. 78 and 79 (two-thirds quorum and vote). Rights are in arts 7 to 15 (equality, personal liberty, belief, education, language, public office, expression, home, property). Art. 19 sets up the Constitutional Council and who may refer a law.",
+  "pack": [
+    {"law": 244058, "articles": ["1", "7", "8", "9", "12", "13", "14", "15", "16", "17", "19", "24", "49", "53", "56", "64", "65", "69", "73", "76", "77", "78", "79", "95"], "why": "Constitution: state, rights, legislature, Constitutional Council, president, prime minister, government, presidential election, amendment procedure, abolition of political sectarianism"}
+  ]
+}

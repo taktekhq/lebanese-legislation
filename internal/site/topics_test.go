@@ -10,7 +10,7 @@ import (
 
 func topicTestServer(t *testing.T) *Server {
 	t.Helper()
-	s, err := New(nil)
+	s, err := New(nil) // the topic pages read the embedded files; law names fall back without a database
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,7 +44,7 @@ func TestTopicsIndexAndPages(t *testing.T) {
 			c := tp.Lang(map[string]string{"/en": "en", "": "ar"}[prefix])
 			canon := path
 			for _, want := range []string{
-				`<link rel="canonical" href="` + Base + canon + `">`,
+				`<link rel="canonical" href="` + Base + canon + `">`, // self-canonical
 				`hreflang="en" href="` + Base + "/en/topic/" + tp.Slug + `/"`,
 				`hreflang="ar" href="` + Base + "/topic/" + tp.Slug + `/"`,
 				`hreflang="x-default" href="` + Base + "/topic/" + tp.Slug + `/"`,

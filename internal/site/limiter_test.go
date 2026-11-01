@@ -11,7 +11,7 @@ import (
 )
 
 func TestIPLimiterBurstThenThrottle(t *testing.T) {
-	l := newIPLimiter(60, 5)
+	l := newIPLimiter(60, 5) // 1/sec refill, burst 5
 	for i := 0; i < 5; i++ {
 		if _, ok := l.Allow("1.2.3.4"); !ok {
 			t.Fatalf("call %d within burst was throttled", i)
@@ -25,20 +25,21 @@ func TestIPLimiterBurstThenThrottle(t *testing.T) {
 		t.Errorf("expected a positive Retry-After, got %v", wait)
 	}
 
+	// a different client has its own bucket
 	if _, ok := l.Allow("5.6.7.8"); !ok {
 		t.Errorf("a different client was throttled by another client's bucket")
 	}
 }
 
 func TestIPLimiterRefills(t *testing.T) {
-	l := newIPLimiter(600, 1)
+	l := newIPLimiter(600, 1) // 10/sec refill, burst 1: fast enough to wait for real
 	if _, ok := l.Allow("1.1.1.1"); !ok {
 		t.Fatalf("first call was throttled")
 	}
 	if _, ok := l.Allow("1.1.1.1"); ok {
 		t.Fatalf("second call was allowed with no tokens left")
 	}
-	time.Sleep(150 * time.Millisecond)
+	time.Sleep(150 * time.Millisecond) // > 1/10s: one token back
 	if _, ok := l.Allow("1.1.1.1"); !ok {
 		t.Errorf("call after waiting for refill was still throttled")
 	}
@@ -74,7 +75,7 @@ func TestTTLCache(t *testing.T) {
 	if v, ok := c.get("search", a); !ok || v != "A" {
 		t.Errorf("get a: %v, %v", v, ok)
 	}
-
+	// a third distinct key evicts the oldest (FIFO)
 	c.set("search", json.RawMessage(`{"q":"c"}`), "C")
 	if _, ok := c.get("search", a); ok {
 		t.Errorf("oldest entry was not evicted")
@@ -105,7 +106,7 @@ func TestClientIP(t *testing.T) {
 
 func TestMCPRateLimitReturns429(t *testing.T) {
 	s := testServer(t)
-	s.ipLim = newIPLimiter(60, 1)
+	s.ipLim = newIPLimiter(60, 1) // force a tiny burst so the second call trips it
 	req := func() *httptest.ResponseRecorder {
 		r := httptest.NewRequest("POST", "/mcp", strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"ping"}`))
 		r.RemoteAddr = "9.9.9.9:1"

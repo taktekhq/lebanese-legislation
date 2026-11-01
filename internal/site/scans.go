@@ -12,12 +12,17 @@ import (
 	"strings"
 )
 
+// Texts the Lebanese University has not published yet, read from scans of
+// the Gazette's own pages (internal/build/scans.go). Their ids start here.
 const scanIDBase = 2_000_000_000
 
+// SetScans names the folder holding the page images: one subfolder per text,
+// named by its id at the source, with page-1.png … and source.pdf.
 func (s *Server) SetScans(dir string) { s.scanDir = dir }
 
 var scanFileName = regexp.MustCompile(`^(?:page-[0-9]{1,3}\.png|source\.pdf)$`)
 
+// scanFile serves a scanned text's page images and its PDF.
 func (s *Server) scanFile(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
 	file := r.PathValue("file")
@@ -41,6 +46,8 @@ func (s *Server) scanFile(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, path)
 }
 
+// aliasRedirect sends the old address of a scanned text, which the Centre
+// has since published, to the Centre's text. It says whether it did.
 func (s *Server) aliasRedirect(ctx context.Context, w http.ResponseWriter, r *http.Request, id int) bool {
 	p := r.URL.EscapedPath()
 	if q, ok := s.moveAlias(ctx, p); !ok || q == p {
@@ -50,6 +57,10 @@ func (s *Server) aliasRedirect(ctx context.Context, w http.ResponseWriter, r *ht
 	return true
 }
 
+// marks shows a paragraph of a scanned text. Where the two readings differ
+// (U+E000 one U+E001 two U+E002) both are shown, highlighted, so a word one
+// reader got wrong never passes for the text: the reader settles it against
+// the page image. Text without marks comes out as plain escaped text.
 func marks(p string) template.HTML {
 	if !strings.ContainsRune(p, '\uE000') {
 		return template.HTML(template.HTMLEscapeString(p))
@@ -83,6 +94,7 @@ func marks(p string) template.HTML {
 	return template.HTML(b.String())
 }
 
+// SourceName is the archive the scans came from, as people know it.
 func (c *Scan) SourceName() string {
 	switch c.Source {
 	case "saderlex":
@@ -91,8 +103,11 @@ func (c *Scan) SourceName() string {
 	return c.Source
 }
 
+// scanReadings writes a disputed span as ⟦one | two⟧ for the API, as the
+// MCP snapshot does (internal/snapshot).
 var scanReadings = strings.NewReplacer("\uE000", "⟦", "\uE001", " | ", "\uE002", "⟧").Replace
 
+// countScans is how many of the texts were read from Gazette scans.
 func countScans(laws []LawRow) int {
 	n := 0
 	for _, l := range laws {

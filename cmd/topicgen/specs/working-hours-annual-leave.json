@@ -1,0 +1,58 @@
+{
+  "slug": "working-hours-annual-leave",
+  "title_en": "Working hours, rest, leave and holidays in Lebanon",
+  "title_ar": "ساعات العمل والراحة والإجازات والعطل في لبنان",
+  "question_en": "How many hours can an employee be made to work in Lebanon, and what rest, annual leave, sick leave, maternity leave and public holidays does the law give?",
+  "question_ar": "كم ساعة يجوز تشغيل الأجير في لبنان، وما هي الراحة والإجازة السنوية والمرضية والأمومة والعطل الرسمية التي يقرها القانون؟",
+  "sub_questions": [
+    "What is the maximum working week and how is overtime paid?",
+    "How long must the daily break and the weekly rest be?",
+    "How many days of annual leave does an employee get?",
+    "How much paid and half-paid sick leave is there by length of service?",
+    "How long is maternity leave and who pays during it?",
+    "Which public holidays are days off, and what if the holiday falls on a Sunday?"
+  ],
+  "notes": "Labour Code art 31 sets the 48-hour week (not agricultural). Overtime pay: art 33 (50% more) applies to emergency cases up to 12 hours a day; the Code has no general overtime rate for ordinary work, so say so rather than invent one. Art 12-3 (added by the recent amendment on part-time work) gives 50% extra for overtime of part-time workers. Arts 12-1 to 12-8 cover compressed working weeks, part-time, seasonal and remote work. Annual leave: art 39 gives 15 days paid after one year in the establishment (the text is the original; the database has no amendment to 21 days). Sick leave: art 40 scale by service, art 41 allows employer to cut annual leave to 8 days if sick leave exceeds a month, art 42 bars dismissal during sick leave. Maternity: art 28 (ten weeks, as amended) and art 29 (full pay, no dismissal); the Social Security Law art 26 pays the maternity allowance to insured women for the ten weeks and art 23 pays sickness allowance (50% then 75% of daily earnings, from day 4). Public holidays: the Labour Code has no list; Decree 15215/2005 art 1 lists the holidays for public administrations and municipalities, and only says that private-sector establishments close the day after Labour Day if it falls on a Sunday; do not claim it binds private employers for other holidays (art 4 says a holiday on a Sunday is not replaced). Art 43 makes agreements below these minimums void.",
+  "pack": [
+    {
+      "law": 190374,
+      "articles": [
+        "12-1",
+        "12-2",
+        "12-3",
+        "12-8",
+        "28",
+        "29",
+        "31",
+        "32",
+        "33",
+        "34",
+        "36",
+        "37",
+        "38",
+        "39",
+        "40",
+        "41",
+        "42",
+        "43"
+      ],
+      "why": "Labour Code: working week, flexible/part-time work, overtime, breaks, weekly rest, bereavement and annual leave, sick leave, maternity leave, nullity of worse terms"
+    },
+    {
+      "law": 244971,
+      "articles": [
+        "23",
+        "26"
+      ],
+      "why": "Social Security Law: sickness allowance and maternity allowance paid by the Fund"
+    },
+    {
+      "law": 211715,
+      "articles": [
+        "1",
+        "4"
+      ],
+      "why": "Decree 15215/2005: official holidays (public administrations, with the Labour Day rule for private establishments)"
+    }
+  ]
+}

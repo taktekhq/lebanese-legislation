@@ -1,0 +1,43 @@
+{
+  "slug": "nssf-registration-contributions",
+  "title_en": "Registering with the NSSF and paying contributions",
+  "title_ar": "التسجيل في الصندوق الوطني للضمان الاجتماعي والاشتراكات",
+  "question_en": "Who must register with the National Social Security Fund in Lebanon, who pays which contributions, and what happens if the employer is late?",
+  "question_ar": "من يجب أن يسجل في الصندوق الوطني للضمان الاجتماعي في لبنان، ومن يدفع الاشتراكات، وما العقوبة عند التأخر؟",
+  "sub_questions": [
+    "Which employees must be declared to the NSSF?",
+    "What does the employer pay and what does the employee pay?",
+    "What income is the contribution based on, and is there a ceiling?",
+    "What are the deadlines to declare a new hire or a departure, and the fines for missing them?",
+    "What is the late-payment surcharge on unpaid contributions?",
+    "Which branches of cover does the NSSF run?"
+  ],
+  "notes": "The statute gives principles, not the percentage rates: art 71 says rates are set by Council of Ministers decree as a percentage of earnings; art 73 says work-accident, family allowance and end-of-service contributions are borne entirely by the employer, while sickness-maternity contributions are shared by employer, employee and State (State bears 25% of benefits). The database holds no decree with the current percentages, so the page must say rates are fixed by decree and not quote any figure. Ceiling: art 68 para 2 sets the ceiling as twice the official minimum wage unless changed by decree; the text has since been updated for the sickness and maternity branch (decree 11928 of 18/8/2023 set 216,000,000 LBP a year, then five times the monthly minimum wage) and for the family branch (1,500,000 LBP a month). The pension scheme (2023 amendment) has its own ceiling in art 54 (printed as 54-1: four times average declared wages). Branches are listed in art 7 (sickness and maternity, work accidents and occupational diseases, family and education allowances, pension). Art 9 in the database holds only the amended fragment on who benefits after a death, not the list of who must register; art 10 covers Lebanese wage earners; foreign wage earners only by the conditions in art 9 para 4, which is not in the database. Penalty amounts in art 80 are in the old nominal Lebanese lira (hundreds of lira), flag as symbolic. Late surcharge: art 79 (0.5 per thousand per day of delay) and art 54-2 (3% a month capped at 15%). Registration rules and procedures are for the Fund's board (art 76, which now also requires an online platform).",
+  "pack": [
+    {
+      "law": 244971,
+      "articles": [
+        "7",
+        "10",
+        "11",
+        "14",
+        "15",
+        "16",
+        "23",
+        "26",
+        "54",
+        "54-2",
+        "68",
+        "71",
+        "73",
+        "76",
+        "77",
+        "78",
+        "79",
+        "80",
+        "82"
+      ],
+      "why": "Social Security Law: branches, who is covered, family cover, sickness and maternity benefits, contribution base, ceiling, rates by decree, who pays, registration rules, inspection, declaration duties, penalties and late surcharges"
+    }
+  ]
+}

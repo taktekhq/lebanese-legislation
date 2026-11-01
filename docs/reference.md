@@ -107,7 +107,7 @@ Copy the optional settings from `.env.example`. `./start` creates required passw
 | `GEMINI_CONCURRENCY` | `2` | Provider calls at once, 1 to 16 |
 | `GEMINI_QUERY_CACHE_SIZE` | `256` | Cached answers per cache, up to 256; `0` turns caching off |
 | `GEMINI_QUERY_CACHE_TTL` | `3600` | Seconds an answer stays cached, up to 3600; `0` turns caching off |
-| `RATE_LIMIT_PER_MINUTE` | `0` | Requests a minute per client IP for the API and MCP; `0` is no limit. Set it when you host them publicly |
+| `RATE_LIMIT_PER_MINUTE` | `0` | Requests a minute per client IP for the API and MCP; `0` is no limit. Set it when you host them publicly. The images set `0`; the binary alone defaults to 60 |
 | `RATE_LIMIT_BURST` | `20` | Requests a client may send at once above that rate |
 | `MCP_ALLOWED_ORIGINS` | empty | Comma-separated browser origins the MCP server answers, beyond its own localhost address. Clients that send no `Origin` are always answered |
 | `GEMINI_SEARCH_MODEL` | `gemini-3.8-flash` | The model that rewrites questions on the website's search page |

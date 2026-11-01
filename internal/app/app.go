@@ -1,12 +1,19 @@
-// Package app runs one of the three public services from the same code:
-// the website, the REST API or the MCP server. web/, api/ and mcp/ each
-// build a binary that picks its mode; APP_MODE overrides it.
+// Package app runs one of the three services from the same code: the
+// website, the REST API or the MCP server. web/, api/ and mcp/ each build a
+// binary that picks its mode; APP_MODE overrides it.
+//
+// The binary's defaults are LebaneseLegislation.com's own (canonical links
+// to it, 60 API and MCP requests a minute per client, its browser
+// analytics). The published images set the local defaults instead
+// (PUBLIC_URL, no rate limit, ANALYTICS=off).
 package app
 
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -23,37 +30,100 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/site"
 )
 
-// Defaults for optional semantic search, used only when GEMINI_API_KEY is set.
+// Defaults for semantic search set up from GEMINI_API_KEY alone.
 const (
 	defaultSearchModel = "gemini-3.8-flash"
 	defaultDailyCalls  = 500
 )
 
-// Main runs mode, or with the single argument "healthcheck" asks the running
-// service for /healthz (the images have no shell or curl).
+// config is the command line. Every flag can be left out.
+type config struct {
+	mode        string
+	dsn         string // -db, or DATABASE_URL, or LEBLEG_DSN
+	addr        string // -addr, or LISTEN_ADDR, or the mode's usual port
+	authFile    string // -auth: a file holding user:password; every page asks for it
+	noindex     bool   // -noindex: keep the site out of search engines
+	events      string // -events: folder for the anonymous usage record
+	scans       string // -scans: page images of texts read from Gazette scans
+	official    string // -official: page images and PDFs of texts from official scans
+	rulingFiles string // -ruling-files: the judgment PDFs, served at /ruling-files/<id>.pdf
+}
+
+// Main runs mode. With the single argument "healthcheck" it asks the running
+// service for /healthz instead (the images have no shell or curl).
 func Main(mode string) {
+	log.SetFlags(0)
 	if m := os.Getenv("APP_MODE"); m != "" {
 		mode = m
 	}
-	if len(os.Args) == 2 && os.Args[1] == "healthcheck" {
+	args := os.Args[1:]
+	if len(args) == 1 && args[0] == "healthcheck" {
 		if err := healthcheck(listenAddr(mode)); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		return
 	}
-	if err := run(os.Getenv("DATABASE_URL"), mode); err != nil {
+	cfg, err := parseFlags(mode, args, os.Stderr)
+	if err != nil {
+		os.Exit(2)
+	}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	if err := run(ctx, cfg); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(databaseURL, mode string) error {
-	if databaseURL == "" {
+// parseFlags reads the command line. A leading "serve" is skipped, so the
+// command line of the former single binary ("serve -addr ... -db ...")
+// still works unchanged.
+func parseFlags(mode string, args []string, stderr io.Writer) (config, error) {
+	if len(args) > 0 && args[0] == "serve" {
+		args = args[1:]
+	}
+	cfg := config{mode: mode}
+	fs := flag.NewFlagSet(mode, flag.ContinueOnError)
+	fs.SetOutput(stderr)
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		dsn = os.Getenv("LEBLEG_DSN")
+	}
+	fs.StringVar(&cfg.dsn, "db", dsn, "PostgreSQL connection string (default $DATABASE_URL, then $LEBLEG_DSN)")
+	fs.StringVar(&cfg.addr, "addr", listenAddr(mode), "address to listen on (default $LISTEN_ADDR, then the mode's port on loopback)")
+	fs.StringVar(&cfg.authFile, "auth", "", "preview mode: a file holding user:password; every page then asks for it and is marked noindex")
+	fs.BoolVar(&cfg.noindex, "noindex", false, "keep the site out of search engines")
+	fs.StringVar(&cfg.events, "events", "", "keep the anonymous usage record (searches, reads, AI sign-ups) in this folder")
+	fs.StringVar(&cfg.scans, "scans", "", "page images of texts read from Gazette scans")
+	fs.StringVar(&cfg.official, "official", "", "folder of page images and PDFs for texts published from official scans")
+	fs.StringVar(&cfg.rulingFiles, "ruling-files", "", "folder of judgment PDFs, served at /ruling-files/<id>.pdf (empty: none)")
+	if err := fs.Parse(args); err != nil {
+		return config{}, err
+	}
+	if fs.NArg() > 0 {
+		fmt.Fprintf(stderr, "unexpected argument %q\n", fs.Arg(0))
+		fs.Usage()
+		return config{}, errors.New("unexpected arguments")
+	}
+	return cfg, nil
+}
+
+func run(ctx context.Context, cfg config) error {
+	if cfg.dsn == "" {
 		return errors.New("DATABASE_URL is required")
 	}
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-	pool, err := pgxpool.New(ctx, databaseURL)
+	if _, err := modeHandler(nil, cfg.mode); err != nil {
+		return err
+	}
+	pgcfg, err := pgxpool.ParseConfig(cfg.dsn)
+	if err != nil {
+		return errors.New("invalid database configuration")
+	}
+	pgcfg.MaxConns = 8
+	// JIT compiles each search's plan; on these short queries that costs more
+	// than it saves (a two-digit search took 903 ms with it, 134 ms without).
+	pgcfg.ConnConfig.RuntimeParams["jit"] = "off"
+	pool, err := pgxpool.NewWithConfig(ctx, pgcfg)
 	if err != nil {
 		return errors.New("invalid database configuration")
 	}
@@ -61,16 +131,27 @@ func run(databaseURL, mode string) error {
 	if err = pool.Ping(ctx); err != nil {
 		return errors.New("database unavailable")
 	}
-	handler, err := site.New(pool)
+	if base := os.Getenv("PUBLIC_URL"); base != "" {
+		site.Base = strings.TrimRight(base, "/")
+	}
+	site.OfficialDir = cfg.official
+	h, err := site.New(pool)
 	if err != nil {
 		return err
 	}
-	if err = enableSemanticSearch(handler, pool); err != nil {
+	h.SetScans(cfg.scans)
+	h.SetRulingFiles(cfg.rulingFiles)
+	// Server errors to PostHog's error tracking when POSTHOG_KEY is set. The
+	// browser analytics (LebaneseLegislation.com's own projects) are on
+	// unless ANALYTICS=off; the published images set it.
+	h.SetPostHog(os.Getenv("POSTHOG_KEY"), os.Getenv("POSTHOG_HOST"))
+	h.SetAnalytics(os.Getenv("ANALYTICS") != "off")
+	closeVectors, err := enableSearch(ctx, h, pool)
+	if err != nil {
 		return err
 	}
-	// Off by default, like the Python service: a service on your own machine
-	// should not throttle its owner. Set it when you host the API or MCP publicly.
-	perMinute, err := envInt("RATE_LIMIT_PER_MINUTE", 0, 0, 100000)
+	defer closeVectors()
+	perMinute, err := envInt("RATE_LIMIT_PER_MINUTE", 60, 0, 100000)
 	if err != nil {
 		return err
 	}
@@ -78,33 +159,130 @@ func run(databaseURL, mode string) error {
 	if err != nil {
 		return err
 	}
-	handler.SetRateLimit(perMinute, burst)
-	runtimeHandler, err := modeHandler(handler, mode)
+	h.SetRateLimit(perMinute, burst)
+	if cfg.events != "" {
+		ev, err := site.OpenEvents(cfg.events)
+		if err != nil {
+			return err
+		}
+		h.SetEvents(ev)
+	}
+	handler, err := modeHandler(site.Compress(h), cfg.mode)
 	if err != nil {
 		return err
 	}
-	addr := listenAddr(mode)
-	if base := os.Getenv("PUBLIC_URL"); base != "" {
-		site.Base = base
+	if cfg.noindex {
+		handler = site.NoIndex(handler)
 	}
-	srv := &http.Server{Addr: addr, Handler: runtimeHandler, ReadHeaderTimeout: 10 * time.Second, IdleTimeout: 60 * time.Second}
+	if cfg.authFile != "" {
+		b, err := os.ReadFile(cfg.authFile)
+		if err != nil {
+			return err
+		}
+		user, pass, ok := strings.Cut(strings.TrimSpace(string(b)), ":")
+		if !ok || user == "" || pass == "" {
+			return errors.New("auth file must hold user:password")
+		}
+		handler = site.Private(handler, user, pass)
+		log.Print("preview mode: password required, noindex")
+	}
+	return serve(ctx, cfg.addr, cfg.mode, handler)
+}
+
+// serve listens until ctx ends, then lets the requests in hand finish (for up
+// to 8 seconds, inside Docker's 10 second stop timeout).
+func serve(ctx context.Context, addr, mode string, handler http.Handler) error {
+	srv := &http.Server{Addr: addr, Handler: handler, ReadHeaderTimeout: 10 * time.Second,
+		WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second}
 	done := make(chan struct{})
 	go func() {
-		select {
-		case <-ctx.Done():
-			shutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer cancel()
-			_ = srv.Shutdown(shutdown)
-		case <-done:
+		defer close(done)
+		<-ctx.Done()
+		sctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
+		defer cancel()
+		if srv.Shutdown(sctx) != nil {
+			srv.Close()
 		}
 	}()
-	defer close(done)
-	log.Printf("%s listening on %s", mode, addr)
-	err = srv.ListenAndServe()
-	if errors.Is(err, http.ErrServerClosed) {
+	if mode == "" {
+		mode = "website"
+	}
+	log.Printf("%s listening on http://%s/", mode, addr)
+	if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+	<-done
+	return nil
+}
+
+// enableSearch turns on search by meaning. LEBLEG_SEARCH_PROVIDER picks the
+// provider (openai, gemini or claude) and LEBLEG_VECTOR_DSN a separate
+// database for the passage vectors; without them, GEMINI_API_KEY alone turns
+// on Gemini with the vectors in the main database (semantic_chunks).
+// Without either, exact and citation search still work. The returned func
+// closes what it opened.
+func enableSearch(ctx context.Context, h *site.Server, pool *pgxpool.Pool) (func(), error) {
+	if os.Getenv("LEBLEG_SEARCH_PROVIDER") == "" && os.Getenv("LEBLEG_VECTOR_DSN") == "" {
+		return func() {}, enableSemanticSearch(h, pool)
+	}
+	if err := enableProviderSearch(h); err != nil {
+		return nil, err
+	}
+	dsn := os.Getenv("LEBLEG_VECTOR_DSN")
+	if dsn == "" {
+		return func() {}, nil
+	}
+	cfg, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		return nil, errors.New("invalid vector database configuration")
+	}
+	cfg.MaxConns = 2
+	vectors, err := pgxpool.NewWithConfig(ctx, cfg)
+	if err != nil {
+		return nil, errors.New("cannot configure vector database")
+	}
+	model := os.Getenv("LEBLEG_EMBEDDING_MODEL")
+	if model == "" {
+		model = semantic.DefaultModel
+	}
+	embedder, err := semantic.NewGemini(os.Getenv("GEMINI_API_KEY"), model)
+	if err != nil {
+		vectors.Close()
+		return nil, errors.New("invalid embedding configuration")
+	}
+	h.SetVectorSearch(semantic.NewStore(vectors, embedder))
+	log.Printf("semantic retrieval enabled: %s", model)
+	return vectors.Close, nil
+}
+
+// enableProviderSearch reads LEBLEG_SEARCH_PROVIDER, LEBLEG_SEARCH_MODEL,
+// LEBLEG_SEARCH_SELECT_MODEL, LEBLEG_SEARCH_DAILY_LIMIT (1-10000, default
+// 500) and LEBLEG_SEARCH_SHARES_DATA, and the provider's own API key.
+func enableProviderSearch(h *site.Server) error {
+	provider := os.Getenv("LEBLEG_SEARCH_PROVIDER")
+	if provider == "" {
 		return nil
 	}
-	return err
+	keyVar := map[string]string{"openai": "OPENAI_API_KEY", "gemini": "GEMINI_API_KEY", "claude": "ANTHROPIC_API_KEY"}[provider]
+	labels := map[string]string{"openai": "OpenAI", "gemini": "Google Gemini", "claude": "Anthropic Claude"}
+	client, err := nlsearch.New(nlsearch.Config{Provider: provider, Model: os.Getenv("LEBLEG_SEARCH_MODEL"),
+		SelectModel: os.Getenv("LEBLEG_SEARCH_SELECT_MODEL"), Key: os.Getenv(keyVar)})
+	if err != nil {
+		return err
+	}
+	daily := defaultDailyCalls
+	if raw := os.Getenv("LEBLEG_SEARCH_DAILY_LIMIT"); raw != "" {
+		daily, err = strconv.Atoi(raw)
+		if err != nil || daily < 1 || daily > 10000 {
+			return errors.New("LEBLEG_SEARCH_DAILY_LIMIT must be 1-10000")
+		}
+	}
+	// OpenAI may keep what it is sent unless LEBLEG_SEARCH_SHARES_DATA=0 says
+	// the account does not; the search form names this.
+	shares := os.Getenv("LEBLEG_SEARCH_SHARES_DATA") == "1" || (provider == "openai" && os.Getenv("LEBLEG_SEARCH_SHARES_DATA") != "0")
+	h.SetMeaningSearch(client, labels[provider], shares, daily)
+	log.Printf("search by meaning: %s, %s, at most %d API calls a day", provider, os.Getenv("LEBLEG_SEARCH_MODEL"), daily)
+	return nil
 }
 
 // enableSemanticSearch turns on search by meaning when GEMINI_API_KEY is set:
@@ -201,7 +379,7 @@ func healthcheck(addr string) error {
 }
 
 // modeHandler exposes only the routes a mode serves. The website serves
-// everything, including /api/v1/ and /mcp, as LebaneseLegislation.com does.
+// everything, including /api/v1/ and /mcp.
 func modeHandler(next http.Handler, mode string) (http.Handler, error) {
 	switch mode {
 	case "", "website":

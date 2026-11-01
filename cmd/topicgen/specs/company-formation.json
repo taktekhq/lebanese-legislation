@@ -1,0 +1,67 @@
+{
+  "slug": "company-formation",
+  "title_en": "Forming a company in Lebanon (SARL and SAL)",
+  "title_ar": "تأسيس الشركات في لبنان (الشركة المحدودة المسؤولية والشركة المغفلة)",
+  "question_en": "What does Lebanese law require to form a limited liability company (SARL) or a joint-stock company (SAL)?",
+  "question_ar": "ما هي شروط تأسيس الشركة المحدودة المسؤولية والشركة المغفلة في القانون اللبناني؟",
+  "sub_questions": [
+    "How many founders or partners does a SARL or SAL need?",
+    "What is the minimum capital?",
+    "How is the company registered and what must be published?",
+    "Can a SARL have a single owner?",
+    "What are the founders' liabilities if the formation is defective?",
+    "What is a holding or offshore company?"
+  ],
+  "notes": "SARL is governed by legislative decree 35 of 5/8/1967 (id 244904), which is also added as a chapter to the Code of Commerce. SAL is governed by the Code of Commerce (id 244586) arts 78 to 101. The minimum capital figures in the texts are 5,000,000 LL for a SARL (decree 35, art 7) and 30,000,000 LL for a SAL (Code of Commerce art 83), stated in nominal pounds; the database shows no later increase, but the writer should say these are the figures in the text and that the Lira has lost most of its value, without stating real-value claims. SARL: one or more partners (art 5: a single partner is allowed; maximum 20, and above 30 conversion into a SAL within two years); SAL: at least three founders (art 79). Registration of a SARL in the commercial register is the only publicity (art 11); SAL statutes are deposited with a notary (art 80) and filed with the commercial register within a month (art 98). Holding companies (decree-law 45 of 1983, id 178917) must take SAL form; offshore companies (decree-law 46 of 1983, id 178916) are Lebanese SALs limited to activity abroad; only art 1 of that decree is in the pack. Law 772 of 2006 amended the holding decree and law 19 of 2008 the offshore one, the database shows the amended text. This pack does not cover the procedure at the commercial registry or fees, which are in decrees and ministerial decisions not in the pack.",
+  "pack": [
+    {
+      "law": 244904,
+      "articles": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "11",
+        "12",
+        "16",
+        "30"
+      ],
+      "why": "Decree-law 35/1967 on SARL: nature, number of partners, name, capital, contributions, registration, nullity, management, auditors"
+    },
+    {
+      "law": 244586,
+      "articles": [
+        "78",
+        "79",
+        "80",
+        "83",
+        "84",
+        "85",
+        "90",
+        "93",
+        "98"
+      ],
+      "why": "Code of Commerce on SAL: minimum founders, capital and shares, deposit of subscriptions, founding meeting, first board, deposit and registration"
+    },
+    {
+      "law": 178917,
+      "articles": [
+        "2",
+        "5"
+      ],
+      "why": "Holding companies decree: permitted activities, SAL form and exceptions"
+    },
+    {
+      "law": 178916,
+      "articles": [
+        "1"
+      ],
+      "why": "Offshore companies decree: scope of activities"
+    }
+  ]
+}

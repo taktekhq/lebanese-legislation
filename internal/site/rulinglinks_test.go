@@ -11,6 +11,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// TestRulingArticleLinksFixture checks both directions against graph edges
+// from a fixture on Arabic and English pages.
 func TestRulingArticleLinksFixture(t *testing.T) {
 	dsn := os.Getenv("LEBLEG_TEST_DSN")
 	if dsn == "" {
@@ -22,7 +24,7 @@ func TestRulingArticleLinksFixture(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	config.MaxConns = 1
+	config.MaxConns = 1 // Keep the fixture's temporary tables visible to every request.
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		t.Fatal(err)
@@ -93,7 +95,7 @@ func TestRulingArticleLinksFixture(t *testing.T) {
 		if code != 200 || !strings.Contains(body, `href="`+tc.prefix+`ruling/7002/"`) || !strings.Contains(body, `href="`+tc.prefix+`ruling/7003/"`) {
 			t.Errorf("%s: status=%d missing ruling links", tc.path, code)
 		}
-
+		// Each ruling is unique, and date order is newest first.
 		if strings.Count(body, `href="`+tc.prefix+`ruling/7002/"`) != 1 || strings.Count(body, `href="`+tc.prefix+`ruling/7003/"`) != 1 {
 			t.Errorf("%s: duplicate ruling links", tc.path)
 		}

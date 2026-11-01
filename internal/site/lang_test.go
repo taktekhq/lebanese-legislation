@@ -1,5 +1,10 @@
 package site
 
+// The language layout: Arabic at the root, English under /en/, and /ar/ a
+// 301 to the root. Each page kind is requested at the root and under /en/;
+// the table says what the html tag, the canonical, the hreflang set and the
+// language switcher must be.
+
 import (
 	"fmt"
 	"net/http"
@@ -11,10 +16,46 @@ import (
 
 var switchRe = regexp.MustCompile(`lang-switch" (?:dir="ltr" )?href="([^"]+)"`)
 
+func TestLanguagePreferenceLayout(t *testing.T) {
+	s, err := New(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, path := range []string{"/topics/", "/en/topics/"} {
+		rec := httptest.NewRecorder()
+		s.ServeHTTP(rec, httptest.NewRequest("GET", path, nil))
+		body := rec.Body.String()
+		if rec.Code != 200 || !strings.Contains(body, `<script src="/language.js?v=`) {
+			t.Fatalf("%s: status %d, missing language script", path, rec.Code)
+		}
+		hasNote := strings.Contains(body, `class="link lang-switch" href="/en/topics/" hreflang="en" lang="en" dir="ltr">Read this page in English</a>`)
+		if hasNote != (path == "/topics/") {
+			t.Errorf("%s: English note present=%v", path, hasNote)
+		}
+		if !switchRe.MatchString(body) {
+			t.Errorf("%s: missing header language switch", path)
+		}
+	}
+	rec := httptest.NewRecorder()
+	s.ServeHTTP(rec, httptest.NewRequest("GET", "/language.js", nil))
+	if rec.Code != 200 || !strings.Contains(rec.Body.String(), "lebleg-language") {
+		t.Fatal("language script not served")
+	}
+	static, err := NewStatic(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rec = httptest.NewRecorder()
+	static.ServeHTTP(rec, httptest.NewRequest("GET", "/topics/", nil))
+	if strings.Contains(rec.Body.String(), `<script src="/language.js`) {
+		t.Fatal("static copies must not redirect to unavailable language routes")
+	}
+}
+
 type langCase struct {
 	name string
-	path string
-	pair bool
+	path string // the root (Arabic) path, with the query if any
+	pair bool   // a real translation pair: hreflang, and the English page is its own canonical
 }
 
 func langCases(t *testing.T, s *Server) []langCase {
@@ -75,7 +116,7 @@ func TestLanguageLayoutTable(t *testing.T) {
 				if want := fmt.Sprintf(`<html lang="%s" dir="%s">`, v.lang, v.dir); !strings.Contains(body, want) {
 					t.Errorf("%s: missing %s", url, want)
 				}
-
+				// canonical: the root twin, except the English page of a pair
 				canon := path
 				if v.prefix == "/en" && c.pair {
 					canon = "/en" + path
@@ -88,7 +129,7 @@ func TestLanguageLayoutTable(t *testing.T) {
 				if c.pair {
 					assertHreflangPair(t, body, path, "/en"+path)
 				}
-
+				// the language switcher goes to the other interface
 				want := Base + "/en" + path
 				if v.prefix == "/en" {
 					want = Base + path
@@ -124,6 +165,9 @@ func firstTopicSlug(t *testing.T) string {
 	return m[1]
 }
 
+// /ar/... is a 301 to the same path at the root, query kept, for GET and HEAD,
+// in one hop to wherever that path has moved (redirect.go): /ar/laws to /laws/,
+// a text named with the wrong word to its own word.
 func TestArPrefixRedirectsToRoot(t *testing.T) {
 	s := testServer(t)
 	for _, c := range []struct{ from, to string }{
@@ -143,6 +187,8 @@ func TestArPrefixRedirectsToRoot(t *testing.T) {
 	}
 }
 
+// The notify form posts under the page's prefix; a POST under /ar/ is served,
+// not redirected (a 301 would turn it into a GET).
 func TestArPostIsNotRedirected(t *testing.T) {
 	s := testServer(t)
 	for prefix, want := range map[string]string{"/ar": "/ai/?notify=bad#notify", "": "/ai/?notify=bad#notify", "/en": "/en/ai/?notify=bad#notify"} {
@@ -173,7 +219,7 @@ func TestRobotsAndLlmsUseTheNewPaths(t *testing.T) {
 
 func TestEnglishFormAndRedirectsStayUnderEn(t *testing.T) {
 	s := testServer(t)
-
+	// the go-to-article box and the wrong-word redirect keep the interface
 	rec := httptest.NewRecorder()
 	s.ServeHTTP(rec, httptest.NewRequest("GET", "/en/laws", nil))
 	if loc := rec.Header().Get("Location"); rec.Code/100 != 3 || loc != "/en/laws/" {

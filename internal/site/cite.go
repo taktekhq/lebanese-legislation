@@ -12,11 +12,13 @@ var (
 	citeDate  = regexp.MustCompile(`\b(\d{1,2})\s*[/.\-]\s*(\d{1,2})\s*[/.\-]\s*((?:19|20)\d{2})\b`)
 	citeNumYr = regexp.MustCompile(`\b(\d{1,5})\s*/\s*((?:19|20)\d{2})\b`)
 	citeBare  = regexp.MustCompile(`\b\d{1,5}\b`)
-
+	// "4 aout 1967", "4 آب 1967": a day and a month word before a year.
 	citeWordDate = regexp.MustCompile(`\b\d{1,2}\s+(?:janvier|fevrier|février|mars|avril|mai|juin|juillet|aout|août|septembre|octobre|novembre|decembre|décembre|january|february|march|april|may|june|july|august|september|october|november|december|كانون الثاني|كانون الاول|كانون الأول|شباط|اذار|آذار|نيسان|ايار|أيار|حزيران|تموز|اب|آب|ايلول|أيلول|تشرين الاول|تشرين الأول|تشرين الثاني)\s+((?:19|20)\d{2})\b`)
 	citeNumber   = regexp.MustCompile(`(?:رقم|عدد|no\.?|n°|number)\s*(\d{1,5})\b`)
 )
 
+// parseCitation reads "decree 136 of 16/09/1983", "رقم 136 تاريخ 16/09/1983" or
+// "513/2005" (number/year) from a query. ok is false when no number and year can be found.
 func parseCitation(q string) (number string, year int, ok bool) {
 	q = strings.ToLower(arDigits.Replace(q))
 	if m := citeDate.FindStringSubmatch(q); m != nil {
@@ -24,7 +26,7 @@ func parseCitation(q string) (number string, year int, ok bool) {
 		if n := citeNumber.FindStringSubmatch(strings.Replace(q, m[0], " ", 1)); n != nil {
 			return n[1], year, true
 		}
-
+		// "قانون 337 تاريخ 8-6-1994": no "رقم", so take the one bare number left outside the date.
 		rest := strings.Replace(q, m[0], " ", 1)
 		if all := citeBare.FindAllString(rest, -1); len(all) == 1 {
 			return all[0], year, true
@@ -35,7 +37,7 @@ func parseCitation(q string) (number string, year int, ok bool) {
 		year, _ = strconv.Atoi(m[2])
 		return m[1], year, true
 	}
-
+	// "decret-loi n.34 du 4 aout 1967": a date written with a month word.
 	if m := citeWordDate.FindStringSubmatch(q); m != nil {
 		year, _ = strconv.Atoi(m[1])
 		rest := strings.Replace(q, m[0], " ", 1)
@@ -53,6 +55,8 @@ var (
 	artStop    = map[string]bool{"من": true, "في": true, "قانون": true, "ال": true, "of": true, "the": true, "code": true, "law": true}
 )
 
+// parseArticleRef reads "المادة 248 موجبات وعقود" or "216 من قانون الملكية العقارية":
+// the article number and the words naming the code. ok is false unless both are present.
 func parseArticleRef(q string) (number string, words []string, ok bool) {
 	q = strings.ToLower(arDigits.Replace(q))
 	rest := ""
@@ -61,7 +65,8 @@ func parseArticleRef(q string) (number string, words []string, ok bool) {
 	} else if m := artNumFrom.FindStringSubmatch(q); m != nil {
 		number, rest = m[1], strings.TrimPrefix(q, m[0])
 	} else if m := artNumLead.FindStringSubmatch(q); m != nil {
-
+		// "959 اصول محاكمات مدنيه": a bare number then a code name; the caller
+		// only jumps when one principal code matches every word.
 		number, rest = m[1], strings.TrimPrefix(q, m[0])
 	} else {
 		return "", nil, false

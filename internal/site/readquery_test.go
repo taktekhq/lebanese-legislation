@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// The searches below are ones people made on 20-21 Oct 2026 (PostHog).
 func TestReadQuery(t *testing.T) {
 	for _, c := range []struct {
 		q                   string
@@ -25,7 +26,7 @@ func TestReadQuery(t *testing.T) {
 		{q: "مرسوم اشتراعي 1306", num: 1306, kind: "decreelaw", lawCite: true},
 		{q: "المرسوم 398 تاريخ 29/11/1949", num: 398, year: 1949, date: "1949-11-29", kind: "decree", lawCite: true},
 		{q: "القرار رقم 122/ل.ر تاريخ 19/6/1939", num: 122, year: 1939, date: "1939-06-19", kind: "hc", lawCite: true},
-
+		// 22 Oct 2026.
 		{q: "القرار رقم 123/ل.ر", num: 123, kind: "hc", lawCite: true},
 		{q: "قرار المفوض السامي رقم 226", num: 226, kind: "hc", lawCite: true},
 		{q: "arrêté 16 L.R. de 1935", num: 16, year: 1935, kind: "hc", lawCite: true},
@@ -36,13 +37,13 @@ func TestReadQuery(t *testing.T) {
 		{q: "décret-loi n.34 du 4 aout 1967", num: 34, year: 1967, date: "1967-08-04", kind: "decreelaw", lawCite: true},
 		{q: "قرار رقم 50/2002 تميز جزائي ، غرفة سادسة ، الرئيس رالف رياشي", num: 50, year: 2002, kind: "decision", court: "تمييز جزائي", rulingCite: true},
 		{q: "محكمة التمييز الجزائية 2006", year: 2006, court: "تمييز جزائي", rulingCite: true},
-
+		// 26 Oct 2026: "year/number" for a ruling.
 		{q: "تمييز جزائي غرفة 2 قرار رقم 93/33تاريخ 19/1/1993", num: 33, year: 1993, date: "1993-01-19", kind: "decision", court: "تمييز جزائي", rulingCite: true},
 		{q: "قرار رقم 33/93 تاريخ 19/1/1993 تمييز جزائي", num: 33, year: 1993, date: "1993-01-19", kind: "decision", court: "تمييز جزائي", rulingCite: true},
-
+		// 23 Oct 2026: a short month, a comma after the number
 		{q: "decree 9341 17 nov 2012", num: 9341, year: 2012, date: "2012-11-17", kind: "decree", lawCite: true},
 		{q: "Decree 10897, Decision 1/1 (Food/Beverage Warehouses)", num: 10897, kind: "decree", lawCite: true},
-
+		// Not citations: searched by words, as before.
 		{q: "قانون الجنسية اللبنانية 1946", year: 1946, kind: "law"},
 		{q: "337", num: 337},
 		{q: "1930", year: 1930},
@@ -85,6 +86,7 @@ func TestReadQueryWords(t *testing.T) {
 	}
 }
 
+// The searches below were pasted into the box on 21-22 Oct 2026 (PostHog).
 func TestTidyQuery(t *testing.T) {
 	for _, c := range []struct {
 		q, want string
@@ -96,7 +98,7 @@ func TestTidyQuery(t *testing.T) {
 		{"قانون الغاباتت الصادر بتاريخ 7/1/1949 عدد الجريدة الرسمية 3 تاريخ النشر  19/1/1949 الصفحة 30-45", "قانون الغاباتت الصادر بتاريخ 7/1/1949", true},
 		{"The Forest Law issued on 07/01/1949, Official Gazette issue: 3 | Date of publication: 19/01/1949 | Pages: 30–54", "The Forest Law issued on 07/01/1949", true},
 		{"loi du 4 aout 1967 JO n 33", "loi du 4 aout 1967", true},
-		{"قانون الجريدة الرسمية", "قانون الجريدة الرسمية", false},
+		{"قانون الجريدة الرسمية", "قانون الجريدة الرسمية", false}, // no citation before it: a search for that law
 		{"القانون ٣٣٧", "القانون 337", false},
 		{"قرار رقم 122/ل.ر", "قرار رقم 122/ل.ر", false},
 		{"15-S", "15-S", false},

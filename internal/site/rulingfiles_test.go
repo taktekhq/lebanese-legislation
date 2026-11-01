@@ -15,7 +15,7 @@ func TestRulingFile(t *testing.T) {
 	dir := t.TempDir()
 	os.MkdirAll(filepath.Join(dir, "0005"), 0o755)
 	os.WriteFile(filepath.Join(dir, "0005", "5390.pdf"), []byte("%PDF-1.6 test"), 0o644)
-	os.MkdirAll(filepath.Join(dir, "0005", "5391.pdf"), 0o755)
+	os.MkdirAll(filepath.Join(dir, "0005", "5391.pdf"), 0o755) // a folder is not a file
 	os.WriteFile(filepath.Join(dir, "secret.pdf"), []byte("%PDF-1.6 secret"), 0o644)
 	s, err := New(nil)
 	if err != nil {
@@ -39,17 +39,17 @@ func TestRulingFile(t *testing.T) {
 		t.Errorf("headers: %v", rec.Header())
 	}
 	for _, path := range []string{
-		"/ruling-files/5391.pdf",
-		"/ruling-files/9999.pdf",
-		"/ruling-files/05390.pdf",
-		"/ruling-files/5390.html",
-		"/ruling-files/5390",
-		"/ruling-files/..%2Fsecret.pdf",
-		"/ruling-files/%2e%2e%2fsecret.pdf",
-		"/ruling-files/0005%2F5390.pdf",
-		"/ruling-files/..%5Csecret.pdf",
-		"/ruling-files/5390.pdf%00.pdf",
-		"/ruling-files/99999999999999999.pdf",
+		"/ruling-files/5391.pdf",              // a directory
+		"/ruling-files/9999.pdf",              // no such ruling file
+		"/ruling-files/05390.pdf",             // one address per file
+		"/ruling-files/5390.html",             // only the PDF
+		"/ruling-files/5390",                  // no extension
+		"/ruling-files/..%2Fsecret.pdf",       // traversal, encoded
+		"/ruling-files/%2e%2e%2fsecret.pdf",   // traversal, dots encoded
+		"/ruling-files/0005%2F5390.pdf",       // a path, not an id
+		"/ruling-files/..%5Csecret.pdf",       // backslash
+		"/ruling-files/5390.pdf%00.pdf",       // NUL
+		"/ruling-files/99999999999999999.pdf", // too long for an id
 	} {
 		if rec := get(path); rec.Code != 404 {
 			t.Errorf("GET %s: status %d, want 404", path, rec.Code)
@@ -61,6 +61,7 @@ func TestRulingFile(t *testing.T) {
 	}
 }
 
+// rulingPage renders a ruling's page from what the handler would hold, with no database.
 func rulingPage(t *testing.T, s *Server, lang string, j judgment, paras []string) string {
 	t.Helper()
 	r := httptest.NewRequest("GET", "/ruling/5390/", nil)
@@ -122,18 +123,18 @@ func TestRulingPageFileOnly(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	// The scan is held, its reading is not there yet.
 	got := rulingPage(t, s, "en", judgment{HasFile: true, Bytes: 5 << 20}, nil)
 	if !strings.Contains(got, `href="https://legallaw.ul.edu.lb/RulingFile.aspx?RuliID=5390&amp;type=list"`) || !strings.Contains(got, "5.0 MB") ||
 		!strings.Contains(got, "its text has not been read yet") || strings.Contains(got, "Machine reading") {
 		t.Error("a ruling with a scan and no reading should link the scan and say it is unread")
 	}
-
+	// Neither: the Centre's note, as before.
 	got = rulingPage(t, s, "en", judgment{}, nil)
 	if !strings.Contains(got, "as a file only; read it at the Lebanese University") || strings.Contains(got, "RulingFile.aspx") {
 		t.Error("a ruling with nothing held should keep the file-only note and show no link")
 	}
-
+	// The Centre's summary stays above the reading.
 	text := "ملخص الحكم"
 	j := judgment{HasFile: true, Bytes: 100, Model: "gemini-x", Pages: []DocPage{{N: 1, Paras: []string{"نص الصفحة"}}}}
 	got = rulingPage(t, s, "en", j, paras(&text))
@@ -171,7 +172,7 @@ func TestRulingPageExplainsHighlights(t *testing.T) {
 	without := judgment{HasFile: true, Bytes: 100, Pages: []DocPage{{N: 1, Text: plain, Paras: paras(&plain)}}}
 	en := rulingPage(t, s, "en", with, nil)
 	if !strings.Contains(en, "Highlighted words, like") || !strings.Contains(en, "neither is chosen") ||
-		strings.Count(en, `<mark class="unsure"`) != 2 {
+		strings.Count(en, `<mark class="unsure"`) != 2 { // the sample and the real one
 		t.Error("a reading with highlights should explain them with a sample")
 	}
 	if ar := rulingPage(t, s, "ar", with, nil); !strings.Contains(ar, "الكلمات المظلّلة، مثل") {

@@ -1,0 +1,49 @@
+{
+  "slug": "end-of-service-indemnity",
+  "title_en": "End-of-service indemnity in Lebanon",
+  "title_ar": "تعويض نهاية الخدمة في لبنان",
+  "question_en": "What notice and end-of-service indemnity is a worker owed in Lebanon, and does the new NSSF pension replace it?",
+  "question_ar": "ما هي مهلة الإنذار وتعويض الصرف أو نهاية الخدمة المستحق للأجير في لبنان، وهل يحل نظام التقاعد الجديد في الضمان الاجتماعي محله؟",
+  "sub_questions": [
+    "How much notice must an employer or a worker give before ending an open-ended contract?",
+    "How is the dismissal indemnity calculated, and is there a cap?",
+    "Which workers are entitled, and after how long in service?",
+    "When is a dismissal an abuse of right and what compensation follows?",
+    "What is the Social Security end-of-service fund, and when does the 2023 pension scheme replace it?"
+  ],
+  "notes": "Labour Code art 54 gives one month of wage per year of service (half a month if under one year), but it opens with 'until Social Security legislation is enacted'; for workers covered by the NSSF the end-of-service fund (Social Security Law arts 50-53 as they stood, contributions in art 73) pays the indemnity in practice. The Social Security Law was amended in 2023 (Law 319/2023, 'establishing the pension and social protection scheme'). Its art 49 (printed as 49-1) says the pension scheme 'replaces the end-of-service indemnity scheme in all its rights and obligations', but the old rules stay applicable transitionally to insured persons who choose to stay (art 49-4 para 2, option within one year of the scheme starting). Art 49-4 para 1 makes the pension compulsory for first-time entrants after the start date and for existing insured persons under 49 at that date. The start date is not in the articles: art 54-6 requires an implementing decree (contribution rates, transitional rules) within one year of publication, so the pages must say that whether the pension is already running depends on that decree, which the database does not contain. Database quirk: in the Social Security Law the numbers 49, 50, 51, 52, 54 now hold the new pension articles (the text of 'art 49' is headed 49-1, 'art 54' is headed 54-1; the old end-of-service articles on the indemnity amounts are no longer under those numbers), while art 53 and art 73 still hold the old wording. Labour Code art 50 (as amended 2000) holds notice periods (para c: 1, 2, 3 or 4 months by length of service) and abuse-of-right compensation (para a: 2 to 12 months wage for employer dismissals); art 74 lists dismissal without notice or indemnity; art 75-76 workers leaving for cause. Art 56 limits the indemnity to workers with at least one year of continuous service and sets a two-year limitation. The articles do not state a single indemnity formula for the NSSF fund; do not invent one.",
+  "pack": [
+    {
+      "law": 190374,
+      "articles": [
+        "50",
+        "51",
+        "52",
+        "53",
+        "54",
+        "55",
+        "56",
+        "57",
+        "58",
+        "59",
+        "74",
+        "75",
+        "76"
+      ],
+      "why": "Labour Code: notice, abuse of right, dismissal indemnity, who is entitled, wage basis, exceptions, dismissal for serious cause and resignation for cause"
+    },
+    {
+      "law": 244971,
+      "articles": [
+        "49",
+        "49-4",
+        "50-6",
+        "53",
+        "54-6",
+        "73",
+        "68"
+      ],
+      "why": "Social Security Law: pension scheme replacing the end-of-service fund (2023), who is under which scheme, transition, old end-of-service account rules, employer-borne contributions and the wage base"
+    }
+  ]
+}

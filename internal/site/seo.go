@@ -6,6 +6,15 @@ import (
 	"strings"
 )
 
+// What search engines and AI crawlers read: sitemaps for every document,
+// robots.txt, llms.txt and the IndexNow key. The sitemaps are in sitemap.go.
+
+const (
+	// IndexNow key shared by every Taktek site; the file proves we own the host.
+	indexNowKey = "ea77b6da080977a1becb866c3314f534"
+)
+
+// The crawlers that feed answer engines, welcomed by name (they also match "*").
 var aiCrawlers = []string{"GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot",
 	"Claude-User", "PerplexityBot", "Perplexity-User", "Google-Extended", "Applebot-Extended", "CCBot"}
 
@@ -13,13 +22,18 @@ func (s *Server) seoRoutes() {
 	m := s.mux
 	m.HandleFunc("GET /robots.txt", s.robots)
 	m.HandleFunc("GET /llms.txt", s.llms)
+	m.HandleFunc("GET /"+indexNowKey+".txt", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		fmt.Fprint(w, indexNowKey)
+	})
 	m.HandleFunc("GET /sitemap.xml", s.sitemapIndex)
 	m.HandleFunc("GET /sitemaps/{name}", s.sitemap)
 }
 
 func (s *Server) robots(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-
+	// short, so a change (like the noindex preview ending) reaches crawlers
+	// through Cloudflare's cache within minutes, not its default 4 hours
 	w.Header().Set("Cache-Control", "public, max-age=600")
 	rules := "Allow: /\nDisallow: /search/\nDisallow: /en/search/\nDisallow: /api/\nDisallow: /changes/review/\nDisallow: /en/changes/review/\nDisallow: /*?\n"
 	var b strings.Builder
@@ -30,6 +44,7 @@ func (s *Server) robots(w http.ResponseWriter, r *http.Request) {
 		b.WriteString("User-agent: " + bot + "\n" + rules + "\n")
 	}
 	b.WriteString("Sitemap: " + Base + "/sitemap.xml\n")
+	b.WriteString("Sitemap: " + Base + "/blog-sitemap.xml\n")
 	fmt.Fprint(w, b.String())
 }
 
@@ -59,10 +74,10 @@ func (s *Server) llms(w http.ResponseWriter, r *http.Request) {
 	b.WriteString("\n## Browse\n\n")
 	for _, l := range [][2]string{{"All legislation, by year", "/laws/years/"}, {"Court rulings, by year", "/rulings/years/"},
 		{"The Official Gazette, by year", "/gazette/years/"}, {"Legal opinions", "/opinions/"}, {"Agreements", "/agreements/"},
-		{"Doctrine", "/doctrine/"}, {"Latest changes (amendments, newest first)", "/changes/"}, {"The database (PostgreSQL)", "/data/"}, {"MCP server and JSON API", "/ai/"}} {
+		{"Doctrine", "/doctrine/"}, {"Latest changes (amendments, newest first)", "/changes/"}, {"The database (PostgreSQL)", "/data/"}, {"Lebanese law and AI (no AI answers yet; sign up to hear)", "/ai/"}} {
 		fmt.Fprintf(&b, "- [%s](%s%s)\n", l[0], Base, l[1])
 	}
-	b.WriteString("\n## For AI assistants\n\n- MCP server (search, get_law, get_article, get_ruling, get_gazette_issue; verbatim texts only): " + Base + "/mcp\n- Read-only JSON API: " + Base + "/ai/\n")
+	b.WriteString("\n## For AI assistants\n\n- MCP server (search, get_law, get_article, get_law_texts, get_ruling; verbatim texts only): " + Base + "/mcp\n- Read-only JSON API: " + Base + "/ai/\n")
 	b.WriteString("\n## Notes\n\n- Texts come from the Lebanese University's Centre for Legal Informatics; the Official Gazette is authoritative.\n- Nothing here is legal advice.\n")
 	fmt.Fprint(w, b.String())
 }

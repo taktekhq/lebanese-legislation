@@ -10,6 +10,8 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
+// TopicHit points to published explanatory content in the language that matched.
+// Snippet is copied from that content, never translated or generated.
 type TopicHit struct{ Slug, Title, Snippet, Lang string }
 
 func (h TopicHit) Path() string {
@@ -40,6 +42,8 @@ var topicStop = map[string]bool{
 	"le": true, "la": true, "les": true, "de": true, "du": true, "des": true, "et": true, "ou": true, "un": true, "une": true, "en": true, "au": true, "aux": true, "pour": true, "sur": true, "dans": true, "est": true, "que": true, "qu": true, "l": true, "d": true,
 }
 
+// searchTopics searches both published language versions, irrespective of the
+// interface language. Every significant query word must occur in one version.
 func searchTopics(q string) []TopicHit {
 	folded := topicFold(q)
 	var terms []string
@@ -96,7 +100,7 @@ func searchTopics(q string) []TopicHit {
 				score += 20
 			}
 			snippet, bestPart := "", -1
-
+			// Prefer an explanatory paragraph over a heading on otherwise equal scores.
 			for i, part := range parts {
 				normalized := " " + topicFold(part) + " "
 				partScore := 0
@@ -132,6 +136,8 @@ func searchTopics(q string) []TopicHit {
 	return out
 }
 
+// addEnglishTitles appends existing unofficial English-title matches after existing law hits.
+// Count uses a lower bound because unseen Arabic and English sets can overlap.
 func (s *Server) addEnglishTitles(ctx context.Context, res *Results) {
 	if res == nil {
 		return

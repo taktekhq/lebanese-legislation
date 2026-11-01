@@ -8,7 +8,7 @@
 </section>
 <section class="wrap" style="padding-bottom:var(--section-y)">
 {{if .MeaningUnavailable}}<p role="status" class="notice" style="margin-top:24px">{{t "search.meaning_unavailable"}}</p>{{end}}
-{{if .Download}}<div class="notice" style="max-width:70ch;margin-top:28px"><p>{{t "search.download"}}</p><div class="btn-row" style="margin-top:14px"><a class="btn btn--primary" href="{{datasetURL}}" rel="noopener">{{t "data.download_btn"}}</a><a class="btn btn--ghost" href="{{u "/data/"}}">{{t "search.download_tables"}}</a></div></div>{{end}}
+{{if .Download}}<div class="notice" style="max-width:70ch;margin-top:28px"><p>{{t "search.download"}}</p><div class="btn-row" style="margin-top:14px"><a class="btn btn--primary" href="{{datasetURL}}" rel="noopener" data-ga="dataset_download">{{t "data.download_btn"}}</a><a class="btn btn--ghost" href="{{u "/data/"}}">{{t "search.download_tables"}}</a></div></div>{{end}}
 {{if not .Q}}
   <p class="lead" style="margin-top:28px">{{t "search.hint"}}</p>
 {{else if and (not .Laws) (not .Articles) (not .Rulings) (not .Topics)}}

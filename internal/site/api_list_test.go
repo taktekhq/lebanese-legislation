@@ -75,13 +75,13 @@ func TestAPIListLaws(t *testing.T) {
 			t.Errorf("law %d has no url", l.ID)
 		}
 	}
-
+	// the next page continues where this one stopped, with no overlap
 	var next apiLawList
 	getJSON(t, s, "/api/v1/laws/?since=2025-01&limit=10&offset=10", &next)
 	if next.Total != all.Total || len(next.Laws) != 10 || next.Laws[0].ID == all.Laws[9].ID {
 		t.Errorf("page 2: total %d (want %d), %d laws", next.Total, all.Total, len(next.Laws))
 	}
-
+	// oldest first, bounded both sides, inclusive
 	var old apiLawList
 	getJSON(t, s, "/api/v1/laws/?since=2025-05-16&until=2025-05-16&order=oldest&limit=100", &old)
 	if old.Order != "oldest" || old.Total == 0 {
@@ -92,13 +92,13 @@ func TestAPIListLaws(t *testing.T) {
 			t.Errorf("law %d date %v outside the day", l.ID, l.Date)
 		}
 	}
-
+	// the last page has no next_offset
 	var last apiLawList
 	getJSON(t, s, "/api/v1/laws/?since=2025-05-16&until=2025-05-16&limit=100&offset="+itoa(old.Total-1), &last)
 	if len(last.Laws) != 1 || last.NextOffset != nil {
 		t.Errorf("last page: %d laws, next %v", len(last.Laws), last.NextOffset)
 	}
-
+	// scanned texts are included, with their Gazette issue
 	var scans apiLawList
 	getJSON(t, s, "/api/v1/laws/?since=2026&limit=100", &scans)
 	found := false
@@ -110,20 +110,21 @@ func TestAPIListLaws(t *testing.T) {
 	if !found {
 		t.Errorf("no scanned text with a gazette_issue_id among the 2026 texts")
 	}
-
+	// texts with no date are left out, as in the MCP Worker's list_legislation:
+	// no bound and an early bound give the same total
 	var none, dated apiLawList
 	getJSON(t, s, "/api/v1/laws/?limit=1", &none)
 	getJSON(t, s, "/api/v1/laws/?since=1800&limit=1", &dated)
 	if none.Total != dated.Total {
 		t.Errorf("total %d with no bound, %d since 1800: undated texts are counted", none.Total, dated.Total)
 	}
-
+	// bad input is a 400, not a 500
 	for _, q := range []string{"since=yesterday", "until=2025-13", "order=sideways"} {
 		if resp := getJSON(t, s, "/api/v1/laws/?"+q, nil); resp.StatusCode != 400 {
 			t.Errorf("%s: status %d, want 400", q, resp.StatusCode)
 		}
 	}
-
+	// limit is capped at 100
 	var big apiLawList
 	getJSON(t, s, "/api/v1/laws/?limit=5000", &big)
 	if len(big.Laws) != 100 {
@@ -170,7 +171,7 @@ func TestAPIListGazette(t *testing.T) {
 	if len(asc.Issues) != 3 || asc.NextOffset == nil || *asc.NextOffset != 3 {
 		t.Errorf("oldest: %d issues next %v", len(asc.Issues), asc.NextOffset)
 	}
-
+	// a scan issue's own page: texts, and the API detail says no source link
 	var one apiGazetteDetail
 	for _, g := range out.Issues {
 		if g.Source == "scans" {
@@ -199,7 +200,8 @@ func TestAPIListGazette(t *testing.T) {
 
 func TestAPILawAmendedBy(t *testing.T) {
 	s := testServer(t)
-
+	// Law 3/2025 inserts articles into the Labour Code (190374); the other
+	// side lists it, with the Labour Code articles it touches.
 	var law apiLawDetail
 	if resp := getJSON(t, s, "/api/v1/law/333455/", &law); resp.StatusCode != 200 {
 		t.Skipf("law 333455 not in this database: %d", resp.StatusCode)
@@ -224,7 +226,7 @@ func TestAPILawAmendedBy(t *testing.T) {
 	if back == nil || len(back.Articles) != len(labour.Articles) {
 		t.Fatalf("Labour Code amended_by lacks law 3/2025: %+v", code.AmendedBy)
 	}
-
+	// oldest first, one entry per relation and text
 	seen := map[string]bool{}
 	var prev time.Time
 	for _, c := range code.AmendedBy {
@@ -243,6 +245,8 @@ func TestAPILawAmendedBy(t *testing.T) {
 	}
 }
 
+// The law endpoint reads the link graph, as the MCP's get_law does: the
+// Labour Code lists every text that changes it, not just the parsed ones.
 func TestAPILawAmendedByFromGraph(t *testing.T) {
 	s := testServer(t)
 	var code apiLawDetail
@@ -282,7 +286,9 @@ func TestAPIPenalCodeAmendedBy(t *testing.T) {
 	if len(code.AmendedBy) < 64 {
 		t.Fatalf("Penal Code amended_by has %d entries, want at least 64", len(code.AmendedBy))
 	}
-
+	// The graph alone gives what the MCP's query gives on this database (63 to
+	// 64 on the databases and snapshot seen; it grows as texts are added); the
+	// amendment table adds pairs the graph lacks, never removes any.
 	start := time.Now()
 	g, err := s.lawLinks(context.Background(), 244611, true, nil)
 	t.Logf("graph amended_by: %d entries in %d ms", len(g), time.Since(start).Milliseconds())
@@ -298,7 +304,7 @@ func TestAPIPenalCodeAmendedBy(t *testing.T) {
 func TestAPILawAmendedFromGraph(t *testing.T) {
 	s := testServer(t)
 	var law apiLawDetail
-	const id = 2000200346
+	const id = 2000200346 // Law 68/2026
 	if resp := getJSON(t, s, "/api/v1/law/"+itoa(id)+"/", &law); resp.StatusCode != 200 {
 		t.Skip("Law 68/2026 not in this database")
 	}
@@ -319,6 +325,7 @@ func TestAPILawAmendedFromGraph(t *testing.T) {
 	}
 }
 
+// The Penal Code is the heaviest law page: three calls must stay quick.
 func TestAPILawTimingPenalCode(t *testing.T) {
 	s := testServer(t)
 	var code apiLawDetail
@@ -335,6 +342,9 @@ func TestAPILawTimingPenalCode(t *testing.T) {
 	}
 }
 
+// lawDetail loads only the outline (loadLawOutline); its answer must be the
+// one the full page load (loadLaw) gives, for the Penal Code, a text with an
+// article only an amendment carries, and a text repealed as a whole.
 func TestLawDetailOutlineMatchesFullLoad(t *testing.T) {
 	s := testServer(t)
 	ctx := context.Background()

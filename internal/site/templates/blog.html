@@ -1,0 +1,4 @@
+{{define "content"}}
+<section class="wrap page"><a class="back" href="{{u "/"}}">{{backArrow}} {{t "back.home"}}</a><h1 class="page__title">{{if eq (uilang) "ar"}}سجل المشروع{{else}}Project journal{{end}}</h1><p class="lead">{{.Desc}}</p><p><a class="link" href="{{u "/blog/feed.xml"}}">{{if eq (uilang) "ar"}}تابع خلاصة المقالات{{else}}Follow the journal feed{{end}}</a></p></section>
+<section class="wrap blog-list" aria-label="{{if eq (uilang) "ar"}}المقالات{{else}}Articles{{end}}">{{range .Data}}<article class="blog-entry"><p class="tiny"><time datetime="{{.Milestone}}">{{.Milestone}}</time></p><h2><a class="link" href="{{u (printf "/blog/%s/" .Slug)}}">{{.Title}}</a></h2><p>{{.Summary}}</p></article>{{end}}</section>
+{{end}}
