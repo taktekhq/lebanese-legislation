@@ -1,8 +1,13 @@
 name: data
 # The database in data/: load it into PostgreSQL from the text files, export the
 # Hugging Face Parquet tables, check the row counts, and compare with the dataset
-# on Hugging Face. Nothing is published yet; the Parquet tables are kept as an
-# artifact for a week.
+# on Hugging Face. The Parquet tables are kept as an artifact for a week.
+#
+# The publish job uploads them, with the dataset card, to Hugging Face. It runs
+# on main (push, or workflow_dispatch with publish=true) and only when the
+# HF_TOKEN secret is set; without it, it says so and uploads nothing. Run it on
+# your own machine with act (see docs/ci.md):
+#   act workflow_dispatch -W .github/workflows/data.yml --input publish=true -s HF_TOKEN
 on:
   pull_request:
     paths: ["data/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
@@ -10,6 +15,11 @@ on:
     branches: [main]
     paths: ["data/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Upload the tables to Hugging Face (needs the HF_TOKEN secret)
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -56,3 +66,37 @@ jobs:
           name: parquet
           path: ${{ runner.temp }}/parquet
           retention-days: 7
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.publish)
+    timeout-minutes: 30
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      HF_REPO: taktekhq/lebanese-legislation
+    steps:
+      - name: Need HF_TOKEN
+        id: token
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "No HF_TOKEN secret: nothing uploaded." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.token.outputs.ok == 'true'
+      - uses: actions/download-artifact@v4
+        if: steps.token.outputs.ok == 'true'
+        with:
+          name: parquet
+          path: ${{ runner.temp }}/out/data
+      - name: Upload to Hugging Face
+        if: steps.token.outputs.ok == 'true'
+        run: |
+          pip install --quiet "huggingface_hub==1.33.0"
+          curl -fsS "https://huggingface.co/datasets/$HF_REPO/raw/main/README.md" -o "$RUNNER_TEMP/live.md" || true
+          python3 .github/scripts/hf-card.py .github/huggingface/README.md "$RUNNER_TEMP/live.md" "$RUNNER_TEMP/out/README.md"
+          hf upload "$HF_REPO" "$RUNNER_TEMP/out" . --repo-type dataset \
+            --commit-message "Data from $(git rev-parse --short=12 HEAD), $(date -u +%F)"
+          echo "Published https://huggingface.co/datasets/$HF_REPO" | tee -a "$GITHUB_STEP_SUMMARY"
