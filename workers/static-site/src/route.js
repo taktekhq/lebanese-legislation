@@ -27,7 +27,9 @@ export function route(method, pathname, search) {
   if (ORIGIN_PREFIXES.some((p) => bare === p || bare.startsWith(p.endsWith("/") ? p : p + "/") || (p === "/official" && bare.startsWith("/official")))) {
     return "origin";
   }
-  // a filter, a search or a go-to-article box: the origin builds that page
+  // the search page is a static file that reads ?q= and calls the API itself
+  if (bare === "/search/") return "static";
+  // a filter or a go-to-article box: the origin builds that page
   if (hasRealQuery(search)) return "origin";
   return "static";
 }

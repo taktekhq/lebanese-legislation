@@ -75,6 +75,7 @@ jobs:
             -base https://lebaneselegislation.com \
             -workers 8 \
             -max-errors 200 \
+            -search-shell \
             -r2-bucket lebleg-site \
             -r2-endpoint https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
             -out site
