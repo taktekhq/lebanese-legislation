@@ -24,7 +24,8 @@ type meaningSearch struct {
 	mu          sync.Mutex
 	cache       map[[32]byte]meaningEntry
 	slots       chan struct{}
-	clients     *ipLimiter
+	clients     *ipLimiter // per IP: the old quote box, and the network cap
+	visitors    *ipLimiter // per browser cookie
 	selected    map[[32]byte]selectedEntry
 	composed    map[[32]byte]composedEntry
 	vectors     map[[32]byte]vectorEntry
@@ -36,8 +37,14 @@ type meaningSearch struct {
 
 // Defaults when SetMeaningLimits is not called: two provider calls at once,
 // and up to 1,000 answers per cache, each kept for an hour.
-// questionsPerHour is how many AI answers one visitor (IP) gets an hour.
-const questionsPerHour = 10
+// questionsPerHour is how many AI answers one visitor (one browser, by its
+// ll_ai cookie) gets an hour. ipQuestionsPerHour bounds one network, so a
+// bot that drops the cookie cannot get a fresh allowance each time; it is
+// loose because Lebanese mobile carriers put many people behind one IP.
+const (
+	questionsPerHour   = 10
+	ipQuestionsPerHour = 60
+)
 
 const (
 	defaultMeaningConcurrency = 2
@@ -65,7 +72,7 @@ func (s *Server) SetMeaningLimits(concurrency, cacheSize int, cacheTTL time.Dura
 
 func newMeaningSearch(rw QueryRewriter, provider string, shares bool, limit int) *meaningSearch {
 	return &meaningSearch{rw: rw, provider: provider, shares: shares, limit: limit, cache: make(map[[32]byte]meaningEntry),
-		slots: make(chan struct{}, defaultMeaningConcurrency), clients: newHourLimiter(questionsPerHour),
+		slots: make(chan struct{}, defaultMeaningConcurrency), clients: newHourLimiter(ipQuestionsPerHour), visitors: newHourLimiter(questionsPerHour),
 		cacheSize: defaultMeaningCacheSize, cacheTTL: defaultMeaningCacheTTL}
 }
 

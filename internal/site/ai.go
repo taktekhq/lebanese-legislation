@@ -2,7 +2,9 @@ package site
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -46,7 +48,9 @@ type aiView struct {
 	Results              *Results
 	Left, PerHour        int // questions this visitor may still ask this hour, of PerHour
 	Limited              bool
-	WaitMin              int // when Limited: minutes until the next question // what the meaning search found, when the page found nothing
+	Network              bool   // limited by the network (IP) cap, not the visitor's own
+	WaitMin              int    // when Limited: minutes until the next question
+	Question             string // when Limited: for the "email us" link // what the meaning search found, when the page found nothing
 }
 
 // composeAnswer is Compose with a content-keyed cache, the shared call budget
@@ -146,13 +150,21 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	view.Provider = s.meaning.provider
+	who := aiVisitor(w, r)
 	ip := clientIP(r)
-	if wait, ok := s.meaning.clients.Allow(ip); !ok {
+	wait, ok := s.meaning.visitors.Allow(who)
+	if ok {
+		if wait, ok = s.meaning.clients.Allow(ip); !ok {
+			view.Network = true
+		}
+	}
+	if !ok {
 		view.Limited, view.WaitMin = true, max(1, int((wait+time.Minute-1)/time.Minute))
+		view.Question = q
 		render()
 		return
 	}
-	view.Left = s.meaning.clients.Left(ip)
+	view.Left = min(s.meaning.visitors.Left(who), s.meaning.clients.Left(ip))
 	ctx, cancel := context.WithTimeout(ctx, 28*time.Second)
 	defer cancel()
 	res, err := s.SearchMeaning(ctx, q, s.meaning)
@@ -206,6 +218,21 @@ func (s *Server) aiAnswer(w http.ResponseWriter, r *http.Request) {
 	render()
 }
 
+// aiVisitor names the browser asking, by a random ll_ai cookie it is given
+// on its first question, so one visitor's limit never touches another's.
+// The cookie holds nothing but that random ID.
+func aiVisitor(w http.ResponseWriter, r *http.Request) string {
+	if c, err := r.Cookie("ll_ai"); err == nil && len(c.Value) == 32 && strings.Trim(c.Value, "0123456789abcdef") == "" {
+		return "v:" + c.Value
+	}
+	b := make([]byte, 16)
+	_, _ = rand.Read(b)
+	id := hex.EncodeToString(b)
+	http.SetCookie(w, &http.Cookie{Name: "ll_ai", Value: id, Path: "/", MaxAge: 365 * 24 * 3600,
+		HttpOnly: true, Secure: r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https", SameSite: http.SameSiteLaxMode})
+	return "v:" + id
+}
+
 // Gemini 3.8 Flash, USD per million tokens (ai.google.dev pricing, 30 Oct
 // 2026; it doubles on 1 Jan 2027). Only for the cost estimate in events.
 const (
@@ -249,6 +276,7 @@ func (s *Server) trackAI(r *http.Request, q string, v aiView, u *nlsearch.Usage,
 		"quotes":          quotes,
 		"questions_left":  v.Left,
 		"wait_minutes":    v.WaitMin,
+		"network_limited": v.Network,
 		"brought_results": v.Results != nil,
 		"bot":             IsBot(r),
 	}

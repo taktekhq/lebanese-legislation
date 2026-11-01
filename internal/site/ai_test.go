@@ -100,12 +100,53 @@ func TestAIAnswerCountsQuestionsAndSaysHowLongToWait(t *testing.T) {
 	if !strings.Contains(w.Body.String(), "9 of 10 AI questions left this hour") {
 		t.Fatalf("no counter: %.400s", w.Body.String())
 	}
-	for range 9 {
+	// aiRequest sends no cookie, so each call is a new browser: the
+	// network cap (60 an hour per IP) is what stops it.
+	for range 59 {
 		aiRequest(t, s, "How much annual leave does an employee get?", false)
 	}
 	w = aiRequest(t, s, "How much annual leave does an employee get?", false)
-	if body := w.Body.String(); !strings.Contains(body, "ask again in 6 minutes") || strings.Contains(body, "ai-box__text") {
-		t.Fatalf("no wait message: %.400s", body)
+	if body := w.Body.String(); !strings.Contains(body, "your network") || strings.Contains(body, "ai-box__text") {
+		t.Fatalf("no network limit: %.400s", body)
+	}
+}
+
+func TestAILimitIsPerBrowser(t *testing.T) {
+	s := testServer(t)
+	f := &composeFake{fakeRewrite: fakeRewrite{queries: []string{"الإجازة السنوية"}}}
+	s.SetMeaningSearch(f, "Google Gemini", false, 1000)
+	ask := func(cookie string) string {
+		r := httptest.NewRequest("POST", "/en/search/ai/", strings.NewReader(url.Values{"q": {"How much annual leave & pay does an employee get?"}}.Encode()))
+		r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		r.AddCookie(&http.Cookie{Name: "ll_ai", Value: cookie})
+		w := httptest.NewRecorder()
+		s.ServeHTTP(w, r)
+		return w.Body.String()
+	}
+	me, other := strings.Repeat("a", 32), strings.Repeat("b", 32)
+	for range 10 {
+		ask(me)
+	}
+	body := ask(me)
+	if !strings.Contains(body, "ask again in 6 minutes") || !strings.Contains(body, "mailto:taktekbot@taktek.io?subject=More%20AI%20questions") || !strings.Contains(body, "body=How%20much%20annual%20leave%20%26%20pay") {
+		t.Fatalf("no wait message or email link: %.600s", body)
+	}
+	if body := ask(other); !strings.Contains(body, "9 of 10 AI questions left") {
+		t.Fatalf("another visitor was limited too: %.400s", body)
+	}
+}
+
+func TestAIVisitorCookie(t *testing.T) {
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("POST", "/search/ai/", nil)
+	id := aiVisitor(w, r)
+	c := w.Result().Cookies()
+	if len(c) != 1 || c[0].Name != "ll_ai" || !c[0].HttpOnly || "v:"+c[0].Value != id {
+		t.Fatalf("cookie: %+v %s", c, id)
+	}
+	r.AddCookie(&http.Cookie{Name: "ll_ai", Value: "<script>"})
+	if got := aiVisitor(httptest.NewRecorder(), r); got == "v:<script>" {
+		t.Fatal("accepted a forged cookie value")
 	}
 }
 

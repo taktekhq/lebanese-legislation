@@ -594,6 +594,8 @@
   "search.ai_source": "Source %d",
   "search.ai_note": "Written by %s from the texts quoted above, all from our collection. AI can be wrong: read the sources before you rely on it. This is not legal advice.",
   "search.ai_limited": "You have asked your %d questions for this hour. You can ask again in %d minutes. The search results below still work.",
+  "search.ai_limited_network": "Many questions came from your network this hour. You can ask again in %d minutes. The search results below still work.",
+  "search.ai_more_email": "Need more questions urgently? Email us at %s with your question and we will raise your limit or answer it.",
   "search.ai_left": "%d of %d AI questions left this hour.",
   "search.ai_finding": "Looking for texts that answer your question…",
   "resources.heading": "Build with the public resources",

@@ -358,6 +358,8 @@ var baseFuncs = template.FuncMap{
 	"heading":  Heading,
 	"deref":    func(n *int) int { return *n },
 	"safe":     func(s string) template.HTML { return template.HTML(s) },
+	// pathq escapes text for a mailto: subject or body (%20, not +)
+	"pathq": func(s string) string { return strings.ReplaceAll(url.QueryEscape(cut(s, 300)), "+", "%20") },
 	// dict2 hands the shared article block its law, article and whether it
 	// stands alone on its own page.
 	"dict2": func(law any, a any, standalone bool) map[string]any {

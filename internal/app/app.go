@@ -33,7 +33,7 @@ import (
 // Defaults for semantic search set up from GEMINI_API_KEY alone.
 const (
 	defaultSearchModel = "gemini-3.8-flash"
-	defaultDailyCalls  = 500
+	defaultDailyCalls  = 4000 // about 2,000 AI answers, about $9 a day
 )
 
 // config is the command line. Every flag can be left out.

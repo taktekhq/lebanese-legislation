@@ -14,7 +14,8 @@
 {{define "ai_mark"}}<svg class="ai-box__mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.5 4.6 2.9 7 9.5 9.5-6.6 2.5-9 4.9-9.5 9.5-.5-4.6-2.9-7-9.5-9.5 6.6-2.5 9-4.9 9.5-9.5z" fill="currentColor"/></svg>{{end}}
 
 {{define "ai_answer"}}<div data-ai-box>
-{{if .Limited}}<p class="ai-box__limit">{{t "search.ai_limited" .PerHour .WaitMin}}</p>
+{{if .Limited}}<p class="ai-box__limit">{{if .Network}}{{t "search.ai_limited_network" .WaitMin}}{{else}}{{t "search.ai_limited" .PerHour .WaitMin}}{{end}}</p>
+<p class="tiny ai-box__note">{{t "search.ai_more_email" (safe (printf "<a class=\"link\" href=\"mailto:taktekbot@taktek.io?subject=%s&amp;body=%s\">taktekbot@taktek.io</a>" (pathq "More AI questions on Lebanese Legislation") (pathq .Question)))}}</p>
 {{else if .Unavailable}}<p class="tiny">{{t "search.ai_unavailable"}}</p>
 {{else if .Missing}}<p class="tiny">{{t "search.answer_missing"}}</p>
 {{else if .Paras}}{{$src := .Sources}}
