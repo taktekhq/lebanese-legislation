@@ -91,7 +91,7 @@ type noDB struct{}
 var errNoDB = errors.New("no database in this test")
 
 func (noDB) Query(context.Context, string, ...any) (pgx.Rows, error) { return nil, errNoDB }
-func (noDB) QueryRow(context.Context, string, ...any) pgx.Row       { return errRow{} }
+func (noDB) QueryRow(context.Context, string, ...any) pgx.Row        { return errRow{} }
 
 type errRow struct{}
 
