@@ -21,6 +21,9 @@ data/load.sh "dbname=lebleg"
 Needs only `psql` (PostgreSQL 16 or later). About six minutes, most of it
 building the search indexes.
 
+The nightly build writes each day's export here. Every law text in it is checked
+against its source page in [`archive/`](https://github.com/taktekhq/lebanese-legislation-archive).
+
 Every change to this folder runs [the data workflow](../.github/workflows/data.yml):
 it loads the database from these files, exports the Hugging Face Parquet
 tables and checks the row counts against `stats.json`.
