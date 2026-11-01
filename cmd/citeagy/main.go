@@ -2,7 +2,7 @@
 // Antigravity CLI (`agy`, Gemini on a Google AI subscription), the Claude
 // Code CLI (`claude -p`, on a Claude subscription) or the Claude API
 // (-api, paid, optionally as a Message Batch at half price), in batches, into
-// the same kind of citations file `lebleg cite` writes. Same prompt and
+// the same kind of citations file `cite` writes. Same prompt and
 // checks; see internal/cite.
 //
 //	go run ./cmd/citeagy -sample all -batch 25 -workers 2

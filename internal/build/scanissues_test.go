@@ -51,7 +51,7 @@ func TestScanIssueID(t *testing.T) {
 func TestScanGazetteStep(t *testing.T) {
 	dsn := os.Getenv("LEBLEG_DSN")
 	if dsn == "" {
-		t.Skip("no LEBLEG_DSN: a database built by lebleg build")
+		t.Skip("no LEBLEG_DSN: a database built by build-db")
 	}
 	ctx := context.Background()
 	conn, err := pgx.Connect(ctx, dsn)

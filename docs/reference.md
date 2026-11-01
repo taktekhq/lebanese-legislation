@@ -139,7 +139,7 @@ The DB and publisher images include PostgreSQL clients; the API, MCP and website
 Publisher work needs more memory and disk than consuming a release. Use a separate empty build database. Do not point this command at a production database. Install `pip install './tools[build]'`, download `data/*.parquet` from a pinned Hub commit, then:
 
 ```sh
-lebleg build --snapshot-dir ./snapshot/data --revision <40-character-source-commit> \
+build-db --snapshot-dir ./snapshot/data --revision <40-character-source-commit> \
   --release-id <new-release-id> --output-dir ./artifacts/release
 ```
 

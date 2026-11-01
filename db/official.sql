@@ -1,5 +1,5 @@
 -- Texts published from official page scans or PDFs before (or beside) the UL archive.
--- Applied on its own (lebleg official-load), so the big build is never touched.
+-- Applied on its own (load-official), so the big build is never touched.
 -- Rule (16 Oct 2026): the Lebanese University archive comes first. A text UL
 -- already has is served from UL; this table only fills what UL lacks, and a row is
 -- marked superseded the moment UL has the same kind + number + year.

@@ -1,6 +1,6 @@
 -- Amendments and article versions: the layer the build derives from the
 -- amending articles (internal/amend). Created after schema.sql, and again
--- on its own by "lebleg build -only amendments".
+-- on its own by "build-db -only amendments".
 
 DROP VIEW IF EXISTS legislation_version;
 DROP VIEW IF EXISTS article_in_force;

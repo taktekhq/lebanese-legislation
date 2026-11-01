@@ -41,7 +41,7 @@ var (
 // the folder, named after it (../lebgazette-bundle.manifest.tsv for
 // ../lebgazette-bundle). One line per file, its path inside the bundle and
 // the SHA-256 of its bytes, recorded the first time the nightly sees it
-// (lebleg provenance manifest, RecordManifest). It sits outside the folder
+// (record-scan-manifest, RecordManifest). It sits outside the folder
 // because the nightly replaces the folder with a fresh copy
 // every night: a manifest inside it would be lost with it, and its hashes
 // re-recorded from whatever bytes came next.

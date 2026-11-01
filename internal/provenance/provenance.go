@@ -77,7 +77,7 @@ type Violation struct {
 	Row       string
 }
 
-// ErrBlocked is what export, snapshot and lebleg provenance check return
+// ErrBlocked is what export, snapshot and check-wording return
 // when a text has no source: errors.Is(err, ErrBlocked), exit code 4.
 var ErrBlocked error = &BlockedError{}
 
@@ -124,10 +124,10 @@ func (e *BlockedError) Error() string {
 	if unchecked > 0 {
 		lines = append([]string{fmt.Sprintf("%d scanned texts unchecked: the SaderLex bundle has no manifest "+
 			"(<bundle>.manifest.tsv, beside it; the nightly records it after each copy: "+
-			"lebleg provenance manifest -scans <bundle>)", unchecked)}, lines...)
+			"record-scan-manifest -scans <bundle>)", unchecked)}, lines...)
 	}
 	if more := len(seen) - unchecked - min(20, len(seen)-unchecked); more > 0 {
-		lines = append(lines, fmt.Sprintf("... and %d more (lebleg provenance check --report)", more))
+		lines = append(lines, fmt.Sprintf("... and %d more (check-wording --report)", more))
 	}
 	return strings.Join(append([]string{head}, lines...), "\n")
 }
@@ -677,7 +677,7 @@ func loadVersions(ctx context.Context, conn *pgx.Conn, inferred bool) ([]Article
 	return out, nil
 }
 
-// Guard is what export, snapshot and lebleg provenance check run first.
+// Guard is what export, snapshot and check-wording run first.
 type Guard struct {
 	Sources SourceStore
 	Edits   ApprovedEdits
