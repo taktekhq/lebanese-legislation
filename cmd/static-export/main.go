@@ -109,7 +109,7 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 	if shards > 1 {
 		meta = fmt.Sprintf("_export/shard-%d-of-%d/", shard, shards)
 	}
-	if *r2bucket != "" && partial && !*dry {
+	if *r2bucket != "" && partial && shards <= 1 && !*dry { // a shard is whole for its own manifest
 		return errors.New("export: -r2-bucket needs a full export (no -paths, -sample or -limit) unless -dry-run, or the stored manifest would forget pages")
 	}
 	pcfg, err := pgxpool.ParseConfig(*dsn)
