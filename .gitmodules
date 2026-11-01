@@ -1,0 +1,5 @@
+[submodule "archive"]
+	path = archive
+	url = https://github.com/taktekhq/lebanese-legislation-archive.git
+	branch = main
+	ignore = all
