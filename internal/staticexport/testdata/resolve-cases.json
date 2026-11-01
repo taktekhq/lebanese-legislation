@@ -1,0 +1,28 @@
+{
+  "comment": "One table for both implementations of the redirect rules: Resolve in redirects.go (Go) and resolve() in workers/static-site/src/route.js. Both tests read it.",
+  "decree": [100, 5],
+  "text": [200, 2],
+  "aliases": [[900001, 101]],
+  "pages": ["/laws/", "/decree/101/", "/decree/101/article/3/", "/text/200/", "/law/7/"],
+  "cases": [
+    ["/ar/law/7/", "/law/7/"],
+    ["/ar", "/"],
+    ["/ar//evil.example/", "/evil.example/"],
+    ["/laws", "/laws/"],
+    ["/law/7", "/law/7/"],
+    ["/sitemap.xml", "/sitemap.xml"],
+    ["/healthz", "/healthz"],
+    ["/law/101/", "/decree/101/"],
+    ["/text/101/article/3/", "/decree/101/article/3/"],
+    ["/decree/200/", "/text/200/"],
+    ["/decree/7/", "/law/7/"],
+    ["/ar/law/101/article/3", "/decree/101/article/3/"],
+    ["/law/900001/", "/decree/101/"],
+    ["/decree/900001/article/4/", "/decree/101/article/4/"],
+    ["/decree/101/", "/decree/101/"],
+    ["/decree/101/article/%D9%A3/", "/decree/101/article/3/"],
+    ["/law/101/article/%D9%A3/", "/decree/101/article/3/"],
+    ["/decree/101/article/%D9%A9/", "/decree/101/article/%D9%A9/"],
+    ["/en/law/101/", "/en/law/101/"]
+  ]
+}
