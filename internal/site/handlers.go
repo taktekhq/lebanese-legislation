@@ -101,6 +101,7 @@ func (s *Server) routes() {
 	if !s.isStatic {
 		m.HandleFunc("POST /api/notify", s.notify)
 	}
+	m.HandleFunc("GET /run-it-yourself/{$}", s.localPage)
 	m.HandleFunc("GET /data/{$}", s.data)
 	m.HandleFunc("GET /about/{$}", s.about)
 	m.HandleFunc("GET /contribute/{$}", s.contribute)

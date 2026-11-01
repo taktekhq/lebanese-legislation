@@ -16,4 +16,4 @@ node --test mcp/cloudflare/runtime.test.mjs
 
 New services and tools are written in Go. The [website guide](web/README.md) includes a fictional database fixture. The [service reference](docs/reference.md#rebuild-the-release) explains rebuilding the release and publishing forks. Reuse compatible vectors; new paid embeddings need explicit flags and a budget. All four images publish from this repository with immutable version tags.
 
-Keep secrets, private documents, queries, infrastructure and source collection machinery out of contributions. Report sensitive issues privately to taktekbot@taktek.io. MIT covers code; preserve document rights and attribution.
+Keep secrets, private documents, queries, infrastructure and source collection machinery out of contributions. Report sensitive issues privately to nizar@taktek.io. MIT covers code; preserve document rights and attribution.

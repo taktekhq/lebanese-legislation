@@ -4,7 +4,7 @@ title: 'Search: '
 body:
   - type: markdown
     attributes:
-      value: Use public legal sources. Send sensitive details privately to taktekbot@taktek.io.
+      value: Use public legal sources. Send sensitive details privately to nizar@taktek.io.
   - type: input
     id: query
     attributes:
