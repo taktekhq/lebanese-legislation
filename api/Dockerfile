@@ -16,7 +16,7 @@ COPY --from=build /server /server
 COPY THIRD_PARTY_NOTICES.txt /THIRD_PARTY_NOTICES.txt
 LABEL org.opencontainers.image.source="https://github.com/taktekhq/lebanese-legislation"
 LABEL org.opencontainers.image.licenses="MIT"
-ENV LISTEN_ADDR=0.0.0.0:8000 RATE_LIMIT_PER_MINUTE=0
+ENV LISTEN_ADDR=0.0.0.0:8000 RATE_LIMIT_PER_MINUTE=0 PUBLIC_URL=http://localhost:8080
 EXPOSE 8000
 USER 65532:65532
 HEALTHCHECK --interval=10s --timeout=6s --retries=12 CMD ["/server", "healthcheck"]
