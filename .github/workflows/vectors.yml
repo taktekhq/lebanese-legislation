@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-24.04
     timeout-minutes: 300
     env:
@@ -20,12 +20,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       R2_ENDPOINT: https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
-      CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
-      LEBLEG_VECTORIZE_INDEX: lebleg-chunks
-      LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
       LEBLEG_VECTOR_DSN: postgresql://postgres:ci@127.0.0.1:5432/lebleg_search
-      HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      HF_REPO: taktekhq/lebanese-legislation
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -35,32 +30,10 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
           docker system prune -af
-      - name: Download vector database in the background
-        run: |
-          ( set +e
-            bash -e -o pipefail <<'TASK_VECTOR-DUMP' > "$RUNNER_TEMP/vector-dump.log" 2>&1
-          aws s3 cp s3://lebleg-site/_build/lebleg_search.dump "$RUNNER_TEMP/lebleg_search.dump" --endpoint-url "$R2_ENDPOINT"
-          TASK_VECTOR-DUMP
-            echo $? > "$RUNNER_TEMP/vector-dump.status"
-          ) &
+      - name: Download vector database
+        run: aws s3 cp s3://lebleg-site/_build/lebleg_search.dump "$RUNNER_TEMP/lebleg_search.dump" --endpoint-url "$R2_ENDPOINT"
       - name: Build PostgreSQL 18.6 with pgvector 0.8.2
         run: docker build --target postgres -f db/Dockerfile -t vectors-db .
-      - name: Start DuckDB installation
-        run: |
-          ( set +e
-            bash -e -o pipefail <<'TASK_DUCKDB' > "$RUNNER_TEMP/duckdb.log" 2>&1
-          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" https://github.com/duckdb/duckdb/releases/download/v1.5.6/duckdb_cli-linux-amd64.zip
-          unzip -q "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/bin"
-          TASK_DUCKDB
-            echo $? > "$RUNNER_TEMP/duckdb.status"
-          ) &
-      - name: Wait for vector database dump
-        run: |
-          failed=0
-          until [ -f "$RUNNER_TEMP/vector-dump.status" ]; do sleep 1; done
-          cat "$RUNNER_TEMP/vector-dump.log"
-          [ "$(cat "$RUNNER_TEMP/vector-dump.status")" -eq 0 ] || failed=1
-          [ "$failed" -eq 0 ]
       - name: Restore vector database
         run: |
           docker run -d --name vectors-db -e POSTGRES_PASSWORD=ci -e POSTGRES_DB=lebleg_search \
@@ -79,24 +52,43 @@ jobs:
             --section=pre-data --section=data -d lebleg_search /dump/lebleg_search.dump
       - name: Export vectors
         run: go run ./cmd/export-vectors -out "$RUNNER_TEMP/vectors.ndjson"
-      - name: Wait for DuckDB
+      - name: Install DuckDB 1.5.6
         run: |
-          failed=0
-          until [ -f "$RUNNER_TEMP/duckdb.status" ]; do sleep 1; done
-          cat "$RUNNER_TEMP/duckdb.log"
-          [ "$(cat "$RUNNER_TEMP/duckdb.status")" -eq 0 ] || failed=1
-          [ "$failed" -eq 0 ]
+          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" https://github.com/duckdb/duckdb/releases/download/v1.5.6/duckdb_cli-linux-amd64.zip
+          unzip -q "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/bin"
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
-      - name: Parquet and Hugging Face, in the background
+      - name: Convert to Parquet
         run: |
-          cat > "$RUNNER_TEMP/hf.sh" <<'HF'
-          set -eu
           mkdir -p "$RUNNER_TEMP/out/vectors"
           duckdb -c "SET memory_limit='2GB'; SET temp_directory='$RUNNER_TEMP/duckdb-tmp';
             COPY (SELECT id, document, model, hash, values::FLOAT[768] AS values
               FROM read_json('$RUNNER_TEMP/vectors.ndjson', format='newline_delimited',
                 columns={id: 'VARCHAR', document: 'VARCHAR', model: 'VARCHAR', hash: 'VARCHAR', values: 'FLOAT[768]'}))
             TO '$RUNNER_TEMP/out/vectors/vectors.parquet' (FORMAT parquet, COMPRESSION zstd);"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vectors-parquet
+          path: ${{ runner.temp }}/out/vectors/vectors.parquet
+          retention-days: 3
+          compression-level: 0
+      - name: Clean up database
+        if: always()
+        run: docker rm -f vectors-db >/dev/null 2>&1 || true
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      HF_REPO: taktekhq/lebanese-legislation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: vectors-parquet
+          path: ${{ runner.temp }}/out/vectors
+      - name: Upload to Hugging Face
+        run: |
           if [ -z "$HF_TOKEN" ]; then
             echo 'No HF_TOKEN secret: vectors.parquet not uploaded.' | tee -a "$GITHUB_STEP_SUMMARY"
           else
@@ -106,8 +98,32 @@ jobs:
             hf upload "$HF_REPO" "$RUNNER_TEMP/out" . --repo-type dataset \
               --commit-message "Vectors from $(git rev-parse --short=12 HEAD), $(date -u +%F)"
           fi
-          HF
-          ( bash "$RUNNER_TEMP/hf.sh" > "$RUNNER_TEMP/hf.log" 2>&1; echo $? > "$RUNNER_TEMP/hf.status" ) &
+  vectorize:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    env:
+      AWS_DEFAULT_REGION: auto
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_ENDPOINT: https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+      CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
+      LEBLEG_VECTORIZE_INDEX: lebleg-chunks
+      LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/download-artifact@v4
+        with:
+          name: vectors-parquet
+          path: ${{ runner.temp }}/out/vectors
+      - name: Install DuckDB 1.5.6
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" https://github.com/duckdb/duckdb/releases/download/v1.5.6/duckdb_cli-linux-amd64.zip
+          unzip -q "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/bin"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
       - name: Download previous manifest
         run: |
           if ! aws s3 cp s3://lebleg-site/_build/vectors-manifest.tsv "$RUNNER_TEMP/previous.tsv" \
@@ -122,15 +138,6 @@ jobs:
           fi
       - name: Sync Vectorize
         run: |
-          go run ./cmd/vectorize-sync -in "$RUNNER_TEMP/vectors.ndjson" \
+          go run ./cmd/vectorize-sync -in "$RUNNER_TEMP/out/vectors/vectors.parquet" \
             -prev "$RUNNER_TEMP/previous.tsv" -manifest "$RUNNER_TEMP/vectors-manifest.tsv"
           aws s3 cp "$RUNNER_TEMP/vectors-manifest.tsv" s3://lebleg-site/_build/vectors-manifest.tsv --endpoint-url "$R2_ENDPOINT"
-      - name: Wait for Parquet and Hugging Face
-        if: always()
-        run: |
-          until [ -f "$RUNNER_TEMP/hf.status" ]; do sleep 10; done
-          cat "$RUNNER_TEMP/hf.log"
-          exit "$(cat "$RUNNER_TEMP/hf.status")"
-      - name: Clean up database
-        if: always()
-        run: docker rm -f vectors-db >/dev/null 2>&1 || true
