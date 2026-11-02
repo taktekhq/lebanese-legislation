@@ -131,7 +131,7 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 	}
 	site.BuildID = *build
 	site.Base = strings.TrimRight(*base, "/")
-	srv, err := site.New(pool)
+	srv, err := newSite(pool, os.Getenv)
 	if err != nil {
 		return err
 	}
@@ -557,6 +557,18 @@ func loadTable(out string) (map[string]staticexport.Entry, *staticexport.Redirec
 		return nil, nil, fmt.Errorf("%w (a full export writes it)", err)
 	}
 	return m, d, nil
+}
+
+// newSite is the site the export renders. Its pages are what visitors read,
+// so they load the browser analytics (GA4, PostHog) exactly as the live
+// server does (internal/app): on unless ANALYTICS=off.
+func newSite(pool *pgxpool.Pool, getenv func(string) string) (*site.Server, error) {
+	srv, err := site.New(pool)
+	if err != nil {
+		return nil, err
+	}
+	srv.SetAnalytics(getenv("ANALYTICS") != "off")
+	return srv, nil
 }
 
 func envOr(name, def string) string {
