@@ -51,16 +51,35 @@ jobs:
             -c max_wal_size=8GB -c maintenance_work_mem=1GB
           for i in $(seq 60); do docker exec pg pg_isready -U postgres -d lebleg -q && break; sleep 1; done
           psql --version
-      - name: Load the database
-        run: time data/load.sh "$DATABASE_URL"
-      - name: Load official publications
-        run: psql "$DATABASE_URL" -f db/official.sql
       - uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
           cache: false
-      - name: Build static exporter
-        run: go build -o /tmp/static-export ./cmd/static-export
+      - name: Build static exporter while loading the database
+        run: |
+          ( set +e
+            bash -e -o pipefail <<'TASK_EXPORTER' > "$RUNNER_TEMP/exporter.log" 2>&1
+          go build -o /tmp/static-export ./cmd/static-export
+          TASK_EXPORTER
+            echo $? > "$RUNNER_TEMP/exporter.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_LOAD' > "$RUNNER_TEMP/load.log" 2>&1
+          time data/load.sh "$DATABASE_URL"
+          TASK_LOAD
+            echo $? > "$RUNNER_TEMP/load.status"
+          ) &
+          wait
+          failed=0
+          until [ -f "$RUNNER_TEMP/exporter.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/exporter.log"
+          [ "$(cat "$RUNNER_TEMP/exporter.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/load.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/load.log"
+          [ "$(cat "$RUNNER_TEMP/load.status")" -eq 0 ] || failed=1
+          [ "$failed" -eq 0 ]
+      - name: Load official publications
+        run: psql "$DATABASE_URL" -f db/official.sql
       - name: Render and upload shard
         env:
           SHARD: ${{ matrix.shard }}

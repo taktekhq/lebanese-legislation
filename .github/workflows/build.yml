@@ -57,8 +57,10 @@ jobs:
           for d in manual/scans manual/rulings; do
             [ -d "$d" ] || { echo "$d is missing; fill manual/ or run with without_manual=true" >&2; exit 1; }
           done
-      - name: Start PostgreSQL
+      - name: Start PostgreSQL and build the commands
         run: |
+          ( set +e
+            bash -e -o pipefail <<'TASK_POSTGRES' > "$RUNNER_TEMP/postgres.log" 2>&1
           command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client >/dev/null; }
           docker build -q -f db/Dockerfile --target postgres -t lebleg-build-postgres .
           docker rm -f lebleg-build-pg >/dev/null 2>&1 || true
@@ -66,12 +68,28 @@ jobs:
             --shm-size=2g lebleg-build-postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off \
             -c max_wal_size=8GB -c maintenance_work_mem=1GB
           for i in $(seq 60); do docker exec lebleg-build-pg pg_isready -U postgres -d lebleg -q && break; sleep 1; done
+          TASK_POSTGRES
+            echo $? > "$RUNNER_TEMP/postgres.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_COMMANDS' > "$RUNNER_TEMP/commands.log" 2>&1
+          mkdir -p bin && go build -o bin/ ./cmd/...
+          TASK_COMMANDS
+            echo $? > "$RUNNER_TEMP/commands.status"
+          ) &
+          wait
+          failed=0
+          until [ -f "$RUNNER_TEMP/postgres.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/postgres.log"
+          [ "$(cat "$RUNNER_TEMP/postgres.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/commands.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/commands.log"
+          [ "$(cat "$RUNNER_TEMP/commands.status")" -eq 0 ] || failed=1
+          [ "$failed" -eq 0 ]
       - name: Load the previous data
         # The build keeps graph_edge ids and page_state from the database it
         # replaces; starting from the last export keeps them stable.
         run: data/load.sh "$LEBLEG_DSN" | tail -1
-      - name: Build the commands
-        run: mkdir -p bin && go build -o bin/ ./cmd/...
       - name: Build the database
         run: |
           rc=0
@@ -83,19 +101,53 @@ jobs:
       - name: Indexing metadata
         continue-on-error: true
         run: bin/build-db -only indexing
-      - name: Check dates
-        run: bin/check-dates
-      - name: Check amounts
-        run: bin/check-amounts
-      - name: Check versions (advisory)
-        continue-on-error: true
-        run: bin/check-versions
-      - name: Check rulings (advisory)
-        continue-on-error: true
-        run: bin/check-rulings
-      - name: Check recall (advisory)
-        continue-on-error: true
-        run: bin/recall-report
+      - name: Run required and advisory checks
+        run: |
+          ( set +e
+            bash -e -o pipefail <<'TASK_DATES' > "$RUNNER_TEMP/dates.log" 2>&1
+          bin/check-dates
+          TASK_DATES
+            echo $? > "$RUNNER_TEMP/dates.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_AMOUNTS' > "$RUNNER_TEMP/amounts.log" 2>&1
+          bin/check-amounts
+          TASK_AMOUNTS
+            echo $? > "$RUNNER_TEMP/amounts.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_VERSIONS' > "$RUNNER_TEMP/versions.log" 2>&1
+          bin/check-versions
+          TASK_VERSIONS
+            echo $? > "$RUNNER_TEMP/versions.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_RULINGS' > "$RUNNER_TEMP/rulings.log" 2>&1
+          bin/check-rulings
+          TASK_RULINGS
+            echo $? > "$RUNNER_TEMP/rulings.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_RECALL' > "$RUNNER_TEMP/recall.log" 2>&1
+          bin/recall-report
+          TASK_RECALL
+            echo $? > "$RUNNER_TEMP/recall.status"
+          ) &
+          wait
+          failed=0
+          until [ -f "$RUNNER_TEMP/dates.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/dates.log"
+          [ "$(cat "$RUNNER_TEMP/dates.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/amounts.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/amounts.log"
+          [ "$(cat "$RUNNER_TEMP/amounts.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/versions.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/versions.log"
+          until [ -f "$RUNNER_TEMP/rulings.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/rulings.log"
+          until [ -f "$RUNNER_TEMP/recall.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/recall.log"
+          [ "$failed" -eq 0 ]
       - name: Export into data/
         run: |
           bin/export-data -out data

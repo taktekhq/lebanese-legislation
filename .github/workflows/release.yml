@@ -113,21 +113,37 @@ jobs:
             for i in $(seq 120); do docker exec "$PG-$db" pg_isready -h 127.0.0.1 -U postgres -d lebleg -q && break; sleep 1; done
           done
           mkdir -p .release/cache .release/budget && rm -rf .release/out
-      - name: Load data/
-        if: steps.name.outputs.todo == 'true'
-        run: |
-          docker run --rm --network "$NET" -v "$GITHUB_WORKSPACE:/work:ro" "$TOOLS" \
-            sh /work/data/load.sh "host=source user=postgres password=ci dbname=lebleg" | tail -n 3
-      - name: Restore the latest release to reuse its vectors
+      - name: Load data/ and restore the latest release to reuse its vectors
         id: reuse
         if: steps.name.outputs.todo == 'true'
         run: |
+          ( set +e
+            bash -e -o pipefail <<'TASK_LOAD' > "$RUNNER_TEMP/load.log" 2>&1
+          docker run --rm --network "$NET" -v "$GITHUB_WORKSPACE:/work:ro" "$TOOLS" \
+            sh /work/data/load.sh "host=source user=postgres password=ci dbname=lebleg" | tail -n 3
+          TASK_LOAD
+            echo $? > "$RUNNER_TEMP/load.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_REUSE' > "$RUNNER_TEMP/reuse.log" 2>&1
           docker run --rm --network "$NET" --user "$(id -u):$(id -g)" -v "$GITHUB_WORKSPACE:/work" -w /work "$TOOLS" \
             restore-release -db "host=reuse user=postgres password=ci dbname=lebleg" -reader-role "" \
             -repo "$HF_REPO" -cache-dir /work/.release/cache -web-sql /work/tools/src/lebleg/sql/web.sql
           previous=$(docker exec "$PG-reuse" psql -XtA -U postgres -d lebleg -c "SELECT release_id FROM lebleg_release")
           echo "previous=$previous" >> "$GITHUB_OUTPUT"
           echo "Reusing the vectors of $previous." | tee -a "$GITHUB_STEP_SUMMARY"
+          TASK_REUSE
+            echo $? > "$RUNNER_TEMP/reuse.status"
+          ) &
+          wait
+          failed=0
+          until [ -f "$RUNNER_TEMP/load.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/load.log"
+          [ "$(cat "$RUNNER_TEMP/load.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/reuse.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/reuse.log"
+          [ "$(cat "$RUNNER_TEMP/reuse.status")" -eq 0 ] || failed=1
+          [ "$failed" -eq 0 ]
       - name: Build the release
         if: steps.name.outputs.todo == 'true'
         env:

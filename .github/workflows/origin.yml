@@ -22,6 +22,7 @@ permissions:
 
 jobs:
   deploy:
+    needs: secrets
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
@@ -47,31 +48,43 @@ jobs:
           cp -R internal "$build/src/internal"
           cp web/main.go "$build/src/web/"
           endpoint=https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+          export build endpoint
+          ( set +e
+            bash -e -o pipefail <<'TASK_DUMP' > "$RUNNER_TEMP/dump.log" 2>&1
           aws s3 cp s3://lebleg-site/_build/lebleg.dump "$build/lebleg.dump" --endpoint-url "$endpoint"
+          TASK_DUMP
+            echo $? > "$RUNNER_TEMP/dump.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_SEARCH' > "$RUNNER_TEMP/search.log" 2>&1
           aws s3 cp s3://lebleg-site/_build/lebleg_search.dump "$build/lebleg_search.dump" --endpoint-url "$endpoint"
+          TASK_SEARCH
+            echo $? > "$RUNNER_TEMP/search.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_SCANS' > "$RUNNER_TEMP/scans.log" 2>&1
           aws s3 sync s3://lebleg-site/_build/scans "$build/scans" --endpoint-url "$endpoint"
+          TASK_SCANS
+            echo $? > "$RUNNER_TEMP/scans.status"
+          ) &
+          wait
+          failed=0
+          until [ -f "$RUNNER_TEMP/dump.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/dump.log"
+          [ "$(cat "$RUNNER_TEMP/dump.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/search.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/search.log"
+          [ "$(cat "$RUNNER_TEMP/search.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/scans.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/scans.log"
+          [ "$(cat "$RUNNER_TEMP/scans.status")" -eq 0 ] || failed=1
+          [ "$failed" -eq 0 ]
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Install dependencies
         working-directory: workers/static-site
         run: npm ci
-      - name: Set Gemini secret
-        working-directory: workers/static-site
-        env:
-          GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
-        run: |
-          if [ -n "$GEMINI_API_KEY" ]; then
-            echo "$GEMINI_API_KEY" | npx --yes wrangler@4.151.1 secret put GEMINI_API_KEY
-          fi
-      - name: Set Vectorize secret
-        working-directory: workers/static-site
-        env:
-          LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
-        run: |
-          if [ -n "$LEBLEG_VECTORIZE_TOKEN" ]; then
-            echo "$LEBLEG_VECTORIZE_TOKEN" | npx --yes wrangler@4.151.1 secret put LEBLEG_VECTORIZE_TOKEN
-          fi
       - name: Smoke-test the image on the runner
         if: inputs.image == ''
         env:
@@ -98,16 +111,6 @@ jobs:
         env:
           IMAGE: ${{ inputs.image }}
         run: sed -i "s#^image = .*#image = \"$IMAGE\"#" wrangler.toml && grep -n '^image' wrangler.toml
-      - name: Set origin test key
-        working-directory: workers/static-site
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
-          ORIGIN_TEST_KEY: ${{ secrets.ORIGIN_TEST_KEY }}
-        run: |
-          if [ -n "$ORIGIN_TEST_KEY" ]; then
-            echo "$ORIGIN_TEST_KEY" | npx --yes wrangler@4.151.1 secret put ORIGIN_TEST_KEY
-          fi
       - name: Deploy Worker and container
         working-directory: workers/static-site
         env:
@@ -124,3 +127,42 @@ jobs:
             fi
           done
           npx --yes wrangler@4.151.1 deploy "${args[@]}"
+  secrets:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        working-directory: workers/static-site
+        run: npm ci
+      - name: Set Gemini secret
+        working-directory: workers/static-site
+        env:
+          GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
+        run: |
+          if [ -n "$GEMINI_API_KEY" ]; then
+            echo "$GEMINI_API_KEY" | npx --yes wrangler@4.151.1 secret put GEMINI_API_KEY
+          fi
+      - name: Set Vectorize secret
+        working-directory: workers/static-site
+        env:
+          LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+        run: |
+          if [ -n "$LEBLEG_VECTORIZE_TOKEN" ]; then
+            echo "$LEBLEG_VECTORIZE_TOKEN" | npx --yes wrangler@4.151.1 secret put LEBLEG_VECTORIZE_TOKEN
+          fi
+      - name: Set origin test key
+        working-directory: workers/static-site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
+          ORIGIN_TEST_KEY: ${{ secrets.ORIGIN_TEST_KEY }}
+        run: |
+          if [ -n "$ORIGIN_TEST_KEY" ]; then
+            echo "$ORIGIN_TEST_KEY" | npx --yes wrangler@4.151.1 secret put ORIGIN_TEST_KEY
+          fi
