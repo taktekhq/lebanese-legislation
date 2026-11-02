@@ -50,6 +50,11 @@ const shownArticle = `SELECT a.law_id, a."position", coalesce(v.text_ar, a.text_
 	  ON v.law_id = a.law_id AND v.article_number = a.number`
 
 func (b *builder) indexing() error {
+	// A database made before the kind english existed: widen its check, so "-only indexing" runs on it.
+	if _, err := b.conn.Exec(b.ctx, `ALTER TABLE noindex_page DROP CONSTRAINT IF EXISTS noindex_page_kind_check,
+		ADD CONSTRAINT noindex_page_kind_check CHECK (kind IN ('article', 'ruling', 'opinion', 'agreement', 'doctrine', 'research', 'english'))`); err != nil {
+		return err
+	}
 	if _, err := b.conn.Exec(b.ctx, `TRUNCATE noindex_page`); err != nil {
 		return err
 	}
@@ -72,6 +77,9 @@ func (b *builder) indexing() error {
 			return err
 		}
 	}
+	if err := b.weakPages(); err != nil {
+		return err
+	}
 	if err := b.pageState(); err != nil {
 		return err
 	}
@@ -89,6 +97,24 @@ func (b *builder) indexing() error {
 		b.rep.note("noindex: %d %s pages (%s)", n, kind, reason)
 	}
 	return rows.Err()
+}
+
+// weakPages lists the English pages of every text that is not popular
+// (Options.PopularTexts), kept for visitors and hidden from search engines
+// (internal/indexing/weak.go).
+func (b *builder) weakPages() error {
+	if b.PopularTexts == "" {
+		b.rep.note("noindex: no popular texts list, English pages left open to search engines")
+		return nil
+	}
+	ids, err := indexing.ReadPopular(b.PopularTexts)
+	if err != nil {
+		return err
+	}
+	// One row per text covers its /en/ text page, parts and articles.
+	_, err = b.conn.Exec(b.ctx, `INSERT INTO noindex_page SELECT 'english', id, 0, '`+indexing.ReasonMachineEnglish+`'
+		FROM legislation WHERE id <> ALL($1::int[])`, ids)
+	return err
 }
 
 // thinArticles lists the article pages with nothing to index.

@@ -808,8 +808,10 @@ func (s *Server) lawPage(w http.ResponseWriter, r *http.Request, part int) {
 		y := l.IssuedOn.Year()
 		crumbs = breadcrumbs("Legislation", "/laws/", strconv.Itoa(y), fmt.Sprintf("/laws/year/%d/", y), cut(l.Title, 80), lawPath(l.ID))
 	}
-	s.serveLaw(w, r, l, Page{Title: lawTitle(bn, l), Desc: lawDesc(bn, l), Lang: "ar", Translated: true,
-		Path: lawPath(l.ID), OGType: "article", LD: []any{ld, crumbs}, Data: l}, part)
+	p := Page{Title: lawTitle(bn, l), Desc: lawDesc(bn, l), Lang: "ar", Translated: true,
+		Path: lawPath(l.ID), OGType: "article", LD: []any{ld, crumbs}, Data: l}
+	s.weakText(ctx, r, &p, l.ID)
+	s.serveLaw(w, r, l, p, part)
 }
 
 // legislationLD describes a text as schema.org Legislation. path is the
@@ -904,6 +906,7 @@ func (s *Server) article(w http.ResponseWriter, r *http.Request) {
 		p := s.articlePage(r, l, i)
 		s.trackRead(r, l, a.Number)
 		p.NoIndex = s.noindexed(ctx, "article", l.ID, a.Position)
+		s.weakText(ctx, r, &p, l.ID)
 		p.Data.(map[string]any)["Topics"] = s.topicsFor(r, l.ID, a.Number)
 		if l.CodeSlug != nil && !s.isStatic {
 			p.Data.(map[string]any)["Hub"] = codeHubPath(*l.CodeSlug, codeHubPage(i)) + "#a-" + Slug(a.Number)

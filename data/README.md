@@ -39,6 +39,7 @@ tables and checks the row counts against `stats.json`.
 | `shards.json` | the key range per file (fixed, so files never reshuffle) |
 | `stats.json` | rows per table |
 | `article_calculated_current.jsonl` | current monetary amounts calculated under decree 13909/2024 ([details](../docs/calculated-current-release.md)) |
+| `popular_texts.txt` | the texts whose English pages search engines may index (5+ views in 60 days); `build-db` reads it |
 
 Search vectors (`search_exact`, `search_stem`, `search_fr`) are generated
 columns: they are not in the files, Postgres computes them on load.

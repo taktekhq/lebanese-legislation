@@ -39,12 +39,16 @@ const (
 
 // sitemapShard is one numbered file of a family: its URL count, its newest
 // change, and its XML, rendered for the root (Arabic) addresses and, for the
-// laws family only, for the /en/ twins.
+// laws family only, for the /en/ twins that are open to search engines (enN
+// of them, the newest changed at enMod; a text whose English is hidden has
+// no /en/ entry).
 type sitemapShard struct {
-	n   int
-	mod time.Time
-	ar  []byte
-	en  []byte
+	n     int
+	mod   time.Time
+	ar    []byte
+	en    []byte
+	enN   int
+	enMod time.Time
 }
 
 type setEntry struct {
@@ -96,7 +100,11 @@ func newShardWriter(size int, withEN bool) *shardWriter {
 	return &shardWriter{size: size, withEN: withEN}
 }
 
-func (w *shardWriter) add(path string, mod time.Time) {
+func (w *shardWriter) add(path string, mod time.Time) { w.addTwin(path, mod, true) }
+
+// addTwin adds a page; en says whether its /en/ twin is listed too (only in
+// a family with English files).
+func (w *shardWriter) addTwin(path string, mod time.Time, en bool) {
 	if w.cur != nil && w.cur.n == w.size {
 		w.flush()
 	}
@@ -108,8 +116,12 @@ func (w *shardWriter) add(path string, mod time.Time) {
 		}
 	}
 	writeURL(&w.ar, "", path, mod)
-	if w.withEN {
+	if w.withEN && en {
 		writeURL(&w.en, "/en", path, mod)
+		w.cur.enN++
+		if mod.After(w.cur.enMod) {
+			w.cur.enMod = mod
+		}
 	}
 	w.cur.n++
 	if mod.After(w.cur.mod) {
@@ -149,7 +161,12 @@ func (s *Server) buildSetFromDB(ctx context.Context, set sitemapSet) ([]sitemapS
 	for rows.Next() {
 		var p string
 		var t *time.Time
-		if err := rows.Scan(&p, &t); err != nil {
+		en := true
+		dest := []any{&p, &t}
+		if set.name == "laws" { // a third column: is the text's English open to search engines
+			dest = append(dest, &en)
+		}
+		if err := rows.Scan(dest...); err != nil {
 			return nil, err
 		}
 		if set.name == "articles" { // law id and article number, joined by a unit separator
@@ -161,7 +178,7 @@ func (s *Server) buildSetFromDB(ctx context.Context, set sitemapSet) ([]sitemapS
 		if t != nil {
 			mod = *t
 		}
-		w.add(p, mod)
+		w.addTwin(p, mod, en)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
