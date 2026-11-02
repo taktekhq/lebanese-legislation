@@ -41,7 +41,8 @@ func run(ctx context.Context) error {
 	var f io.ReadCloser
 	var duckdb *exec.Cmd
 	if strings.HasSuffix(*input, ".parquet") {
-		query := "COPY (SELECT id, document, model, hash, values FROM read_parquet('" +
+		query := "SET memory_limit='2GB'; SET threads=2; SET preserve_insertion_order=false; " +
+			"COPY (SELECT id, document, model, hash, values FROM read_parquet('" +
 			strings.ReplaceAll(*input, "'", "''") + "')) TO '/dev/stdout' (FORMAT JSON, ARRAY false);"
 		duckdb = exec.CommandContext(ctx, "duckdb", "-batch", "-c", query)
 		duckdb.Stderr = os.Stderr
