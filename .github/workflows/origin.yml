@@ -14,6 +14,10 @@ name: origin
         description: Data image date tag
         type: string
         default: latest
+      deploy_site_worker:
+        description: Deploy the site Worker before staging (routes and mode apply only here)
+        type: boolean
+        default: false
       mode:
         description: Origin mode
         type: choice
@@ -77,9 +81,10 @@ jobs:
         docker build --build-arg DATA_TAG="$DATA_TAG" -t "$tag" workers/static-site/container
         (cd workers/static-site && npx --yes wrangler@4.151.1 containers push "$tag")
         echo "image=registry.cloudflare.com/$CLOUDFLARE_ACCOUNT_ID/$tag" >> "$GITHUB_OUTPUT"
-  stage:
+  site-worker:
     needs:
     - image
+    if: ${{ always() && inputs.deploy_site_worker && (needs.image.result == 'success' || needs.image.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -90,43 +95,35 @@ jobs:
     - name: Install dependencies
       working-directory: workers/static-site
       run: npm ci
-    - name: Set Gemini secret
-      working-directory: workers/static-site
-      env:
-        GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
-      run: |
-        if [ -n "$GEMINI_API_KEY" ]; then
-          echo "$GEMINI_API_KEY" | npx --yes wrangler@4.151.1 secret put GEMINI_API_KEY
-        fi
-    - name: Set Vectorize secret
-      working-directory: workers/static-site
-      env:
-        LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
-      run: |
-        if [ -n "$LEBLEG_VECTORIZE_TOKEN" ]; then
-          echo "$LEBLEG_VECTORIZE_TOKEN" | npx --yes wrangler@4.151.1 secret put LEBLEG_VECTORIZE_TOKEN
-        fi
-    - name: Set origin test key
-      working-directory: workers/static-site
-      env:
-        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
-        CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
-        ORIGIN_TEST_KEY: ${{ secrets.ORIGIN_TEST_KEY }}
-      run: |
-        if [ -n "$ORIGIN_TEST_KEY" ]; then
-          echo "$ORIGIN_TEST_KEY" | npx --yes wrangler@4.151.1 secret put ORIGIN_TEST_KEY
-        fi
+    - name: Deploy site Worker
+      run: python3 workers/static-site/scripts/origin-deploy.py site-worker
+  stage:
+    needs:
+    - image
+    - site-worker
+    if: ${{ always() && (needs.image.result == 'success' || needs.image.result == 'skipped') && (needs.site-worker.result == 'success' || needs.site-worker.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Install dependencies
+      working-directory: workers/origin
+      run: npm ci
     - name: Stage idle side
       id: stage
       env:
         IMAGE: ${{ inputs.image || needs.image.outputs.image }}
+        GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
+        LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
       run: python3 workers/static-site/scripts/origin-deploy.py stage
     - uses: actions/upload-artifact@v4
       with:
         name: origin-state
         path: origin-state.json
         retention-days: 3
-    if: ${{ always() && (needs.image.result == 'success' || needs.image.result == 'skipped') }}
   warm:
     needs:
     - stage
@@ -149,12 +146,6 @@ jobs:
     timeout-minutes: 15
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 22
-    - name: Install dependencies
-      working-directory: workers/static-site
-      run: npm ci
     - uses: actions/download-artifact@v4
       with:
         name: origin-state
@@ -186,12 +177,6 @@ jobs:
     timeout-minutes: 15
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 22
-    - name: Install dependencies
-      working-directory: workers/static-site
-      run: npm ci
     - uses: actions/download-artifact@v4
       with:
         name: origin-state

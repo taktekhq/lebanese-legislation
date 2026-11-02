@@ -33,6 +33,35 @@ Face and loads Vectorize. Later syncs upload only changed vectors.
 | [vectors.yml](../.github/workflows/vectors.yml) | `build` then `publish` and `vectorize`: `cmd/export-vectors` exports vectors, Hugging Face receives `vectors/vectors.parquet`, and `cmd/vectorize-sync` loads `lebleg-chunks`. |
 | [data.yml](../.github/workflows/data.yml) | `data/` to the source-table Parquet files on Hugging Face. |
 
+## Origin deployment
+
+`workers/static-site` serves R2 content and forwards origin requests through
+service bindings to `lebleg-origin-blue` or `lebleg-origin-green`.
+These are independent environments in `workers/origin`, each with its own
+`Origin` Durable Object and container instance named `main`. Origin Workers have
+no public routes. Deploying one side cannot restart the other side.
+
+The `origin` workflow builds the site image from the data image, reads
+`_build/live-side` from R2 (default blue), then deploys only the idle origin
+Worker and sets its Gemini and Vectorize secrets. Authenticated checks through
+the site Worker warm that side. Switching writes its name to the R2 flag and
+waits 20 seconds for the site Worker's 15 second memory cache. Verification
+failure writes the old name back; success stops the old container through the
+authenticated restart endpoint. Neither switch nor rollback deploys a Worker.
+The named probe User-Agent and public verification checks stay the same.
+
+`deploy_site_worker` defaults to false. When true, a separate job deploys the
+site Worker before staging, applying the `route` and `mode` inputs. The `image`
+and `data_tag` inputs control the image build as before.
+
+For the first migration, deploy both origin environments with the current image
+and set their secrets before deploying the new site Worker. Warm and check each
+through a temporary local probe using remote service bindings, set the R2 flag
+to blue, then deploy the site Worker with the existing routes and intended mode.
+The selected replacement must already be warm because that site deployment
+deletes the old container classes. See the [container deploy guide](../workers/static-site/container/README.md)
+for the job sequence and local checks.
+
 The [Hugging Face dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation)
 provides source tables, PostgreSQL releases and the openly published
 [vectors Parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet).

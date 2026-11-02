@@ -7,7 +7,6 @@ from pathlib import Path
 import re
 import subprocess
 import time
-import urllib.parse
 import urllib.request
 
 # Cloudflare refuses the default Python-urllib user agent (403).
@@ -20,20 +19,9 @@ def _request(*args, **kwargs):
 UA = "lebleg-origin-deploy/1 (+https://github.com/taktekhq/lebanese-legislation)"
 import urllib.error
 
-CONFIG = Path('workers/static-site/wrangler.toml')
+CONFIG = Path('workers/origin/wrangler.toml')
 STATE = Path('origin-state.json')
 CHECKS = ('/healthz', '/api/v1/search/?limit=1&q=law', '/laws/?year=2019')
-
-
-def api(path):
-    req = _request(
-        f'https://api.cloudflare.com/client/v4/accounts/{os.environ["CLOUDFLARE_ACCOUNT_ID"]}/{path}',
-        headers={'Authorization': 'Bearer ' + os.environ['CLOUDFLARE_API_TOKEN']})
-    with urllib.request.urlopen(req, timeout=60) as res:
-        data = json.load(res)
-    if not data['success']:
-        raise RuntimeError(data.get('errors'))
-    return data
 
 
 def marker(name, value=None):
@@ -51,57 +39,42 @@ def marker(name, value=None):
 
 
 def stage(image):
-    bindings = api('workers/scripts/lebleg-static-site/settings')['result']['bindings']
-    live = next((b['text'] for b in bindings if b['name'] == 'LIVE'), 'blue')
+    live = marker('live-side') or 'blue'
     if live not in ('blue', 'green'):
-        raise ValueError(f'Invalid deployed LIVE: {live}')
-    saved_side = marker('live-side')
-    old_image = marker('live-image') if saved_side == live else None
-    if not old_image:
-        # Bootstrap from the existing Origin class before the first blue/green deploy.
-        binding = next((b for b in bindings if b['name'] == 'ORIGIN_' + live.upper()), None)
-        if binding is None:
-            binding = next(b for b in bindings if b['name'] == 'ORIGIN')
-        apps = []
-        page = ''
-        while True:
-            data = api('containers/applications' + ('?page_token=' + urllib.parse.quote(page) if page else ''))
-            apps.extend(data['result'])
-            page = data.get('result_info', {}).get('next_page_token')
-            if not page:
-                break
-        app = next(a for a in apps if a.get('durable_objects', {}).get('namespace_id') == binding['namespace_id'])
-        old_image = app['configuration']['image']
-    if not old_image or '\n' in old_image or '\n' in image:
+        raise ValueError(f'Invalid live-side: {live}')
+    if not image or any(c in image for c in ('\n', '\r')):
         raise ValueError('Missing or invalid image reference')
     idle = 'green' if live == 'blue' else 'blue'
-    state = {'old': live, 'idle': idle, 'old_image': old_image, 'new_image': image,
-             'images': {live: old_image, idle: image}}
+    state = {'old': live, 'idle': idle, 'new_image': image}
+    text = CONFIG.read_text()
+    pattern = rf'(\[\[env\.{idle}\.containers\]\]\nclass_name = "Origin"\nimage = )[^\n]+'
+    text, count = re.subn(pattern, lambda m: m[1] + json.dumps(image), text)
+    if count != 1:
+        raise ValueError(f'Expected one container configuration for {idle}')
+    CONFIG.write_text(text)
     STATE.write_text(json.dumps(state, indent=2) + '\n')
-    marker('live-side', live)
-    marker('live-image', old_image)
-    configure(state, live)
     with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
         out.write(f'old={live}\nidle={idle}\n')
+    return state
 
 
-def configure(state, live):
-    text = CONFIG.read_text()
-    text = re.sub(r'LIVE = "(?:blue|green)"', f'LIVE = "{live}"', text)
-    for side, image in state['images'].items():
-        pattern = rf'(class_name = "Origin{side.title()}"\nimage = )[^\n]+'
-        text, count = re.subn(pattern, lambda m: m[1] + json.dumps(image), text)
-        if count != 1:
-            raise ValueError(f'Expected one container configuration for {side}')
-    CONFIG.write_text(text)
+def deploy_origin(side):
+    args = ['npx', '--yes', 'wrangler@4.151.1']
+    subprocess.run(args + ['deploy', '--env', side], cwd='workers/origin', check=True)
+    secrets = {key: os.environ[key] for key in ('GEMINI_API_KEY', 'LEBLEG_VECTORIZE_TOKEN')}
+    subprocess.run(args + ['secret', 'bulk', '--env', side], input=json.dumps(secrets),
+                   text=True, cwd='workers/origin', check=True)
 
 
-def deploy():
+def deploy_site_worker():
     args = ['npx', '--yes', 'wrangler@4.151.1', 'deploy', '--var', 'ORIGIN_MODE:' + os.environ['MODE']]
     for route in os.environ.get('ROUTES', '').split(','):
         if route.strip():
             args += ['--route', route.strip()]
     subprocess.run(args, cwd='workers/static-site', check=True)
+    subprocess.run(['npx', '--yes', 'wrangler@4.151.1', 'secret', 'put', 'ORIGIN_TEST_KEY'],
+                   input=os.environ['ORIGIN_TEST_KEY'] + '\n', text=True,
+                   cwd='workers/static-site', check=True)
 
 
 def check(seconds, side=None):
@@ -136,21 +109,27 @@ def check(seconds, side=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['stage', 'switch', 'rollback', 'warm', 'verify', 'retire'])
+    parser.add_argument('action', choices=['site-worker', 'stage', 'switch', 'rollback', 'warm', 'verify', 'retire'])
     args = parser.parse_args()
+    if args.action == 'site-worker':
+        if not os.environ.get('ORIGIN_TEST_KEY'):
+            raise ValueError('ORIGIN_TEST_KEY is required')
+        deploy_site_worker()
+        return
     if args.action == 'stage':
         if not os.environ.get('ORIGIN_TEST_KEY'):
             raise ValueError('ORIGIN_TEST_KEY is required before staging')
-        stage(os.environ['IMAGE'])
-        deploy()
+        for key in ('GEMINI_API_KEY', 'LEBLEG_VECTORIZE_TOKEN'):
+            if not os.environ.get(key):
+                raise ValueError(f'{key} is required before staging')
+        state = stage(os.environ['IMAGE'])
+        deploy_origin(state['idle'])
         return
     state = json.loads(STATE.read_text())
     if args.action in ('switch', 'rollback'):
         side = state['idle'] if args.action == 'switch' else state['old']
-        configure(state, side)
-        deploy()
         marker('live-side', side)
-        marker('live-image', state['images'][side])
+        time.sleep(20)  # Site Worker isolates cache the flag for 15 seconds.
     elif args.action == 'warm':
         check(1800, state['idle'])
     elif args.action == 'verify':

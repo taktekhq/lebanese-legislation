@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -12,51 +13,45 @@ spec.loader.exec_module(deploy)
 
 
 class DeploymentTests(unittest.TestCase):
-    def test_stage_pins_live_image_and_switch_and_rollback_keep_both_images(self):
+    def test_stage_changes_only_idle_environment_and_does_not_write_flag(self):
         original = deploy.CONFIG.read_text()
-        for live in ('blue', 'green'):
+        for live in ('blue', 'green', None):
             with self.subTest(live=live), tempfile.TemporaryDirectory() as tmp:
                 config, state = Path(tmp) / 'wrangler.toml', Path(tmp) / 'state.json'
                 config.write_text(original)
-                markers = {'live-side': live, 'live-image': 'registry/old:1'}
-                def marker(name, value=None):
-                    if value is not None:
-                        markers[name] = value
-                    return markers.get(name)
                 with patch.object(deploy, 'CONFIG', config), patch.object(deploy, 'STATE', state), \
-                     patch.object(deploy, 'api', return_value={'result': {'bindings': [{'name': 'LIVE', 'text': live}]}}), \
-                     patch.object(deploy, 'marker', side_effect=marker), \
+                     patch.object(deploy, 'marker', return_value=live) as marker, \
                      patch.dict(os.environ, {'GITHUB_OUTPUT': str(Path(tmp) / 'output')}):
-                    deploy.stage('registry/new:2')
-                    data = json.loads(state.read_text())
-                    self.assertEqual(data['images'][live], 'registry/old:1')
-                    self.assertEqual(data['images'][data['idle']], 'registry/new:2')
-                    for side in (data['idle'], live):
-                        deploy.configure(data, side)
-                        import tomllib
-                        parsed = tomllib.loads(config.read_text())
-                        self.assertEqual(parsed['vars']['LIVE'], side)
-                        self.assertEqual({c['class_name']: c['image'] for c in parsed['containers']},
-                                         {'Origin' + s.title(): i for s, i in data['images'].items()})
+                    result = deploy.stage('registry/new:2')
+                    old = live or 'blue'
+                    idle = 'green' if old == 'blue' else 'blue'
+                    self.assertEqual(result, {'old': old, 'idle': idle, 'new_image': 'registry/new:2'})
+                    self.assertEqual(json.loads(state.read_text()), result)
+                    marker.assert_called_once_with('live-side')
+                    before, after = tomllib.loads(original)['env'], tomllib.loads(config.read_text())['env']
+                    self.assertEqual(before[old], after[old])
+                    self.assertEqual(after[idle]['containers'][0]['image'], 'registry/new:2')
 
-    def test_bootstrap_uses_current_origin_application(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            config = Path(tmp) / 'wrangler.toml'
-            config.write_text(deploy.CONFIG.read_text())
-            responses = [{'result': {'bindings': [{'name': 'ORIGIN', 'namespace_id': 'old-ns'}]}},
-                         {'result': [{'durable_objects': {'namespace_id': 'old-ns'},
-                                      'configuration': {'image': 'registry/old:1'}}]}]
-            with patch.object(deploy, 'CONFIG', config), patch.object(deploy, 'STATE', Path(tmp) / 'state.json'), \
-                 patch.object(deploy, 'api', side_effect=responses), patch.object(deploy, 'marker', return_value=None), \
-                 patch.dict(os.environ, {'GITHUB_OUTPUT': str(Path(tmp) / 'output')}):
-                deploy.stage('registry/new:2')
-                state = json.loads(deploy.STATE.read_text())
-                self.assertEqual(state['old'], 'blue')
-                self.assertEqual(state['old_image'], 'registry/old:1')
+    def test_stage_deploys_and_sets_secrets_only_on_idle_side(self):
+        for live in ('blue', 'green'):
+            idle = 'green' if live == 'blue' else 'blue'
+            with self.subTest(live=live), \
+                 patch('sys.argv', ['origin-deploy.py', 'stage']), \
+                 patch.dict(os.environ, {'IMAGE': 'registry/new:2', 'ORIGIN_TEST_KEY': 'test',
+                                        'GEMINI_API_KEY': 'gemini', 'LEBLEG_VECTORIZE_TOKEN': 'vector'}), \
+                 patch.object(deploy, 'stage', return_value={'idle': idle}) as stage, \
+                 patch.object(deploy.subprocess, 'run') as run:
+                deploy.main()
+                stage.assert_called_once_with('registry/new:2')
+                self.assertEqual(len(run.call_args_list), 2)
+                self.assertEqual(run.call_args_list[0].args[0][-3:], ['deploy', '--env', idle])
+                self.assertEqual(run.call_args_list[1].args[0][-4:], ['secret', 'bulk', '--env', idle])
+                self.assertTrue(all(c.kwargs['cwd'] == 'workers/origin' for c in run.call_args_list))
+                self.assertEqual(json.loads(run.call_args_list[1].kwargs['input']),
+                                 {'GEMINI_API_KEY': 'gemini', 'LEBLEG_VECTORIZE_TOKEN': 'vector'})
 
-    def test_switch_and_rollback_deploy_before_updating_markers(self):
-        state = {'old': 'blue', 'idle': 'green',
-                 'images': {'blue': 'registry/old:1', 'green': 'registry/new:2'}}
+    def test_switch_and_rollback_only_write_flag_then_wait(self):
+        state = {'old': 'blue', 'idle': 'green', 'new_image': 'registry/new:2'}
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'state.json'
             path.write_text(json.dumps(state))
@@ -64,12 +59,30 @@ class DeploymentTests(unittest.TestCase):
                 events = []
                 with self.subTest(action=action), patch.object(deploy, 'STATE', path), \
                      patch('sys.argv', ['origin-deploy.py', action]), \
-                     patch.object(deploy, 'configure', side_effect=lambda data, live: events.append(('configure', live))), \
-                     patch.object(deploy, 'deploy', side_effect=lambda: events.append(('deploy',))), \
-                     patch.object(deploy, 'marker', side_effect=lambda key, value: events.append((key, value))):
+                     patch.object(deploy.subprocess, 'run') as run, \
+                     patch.object(deploy.time, 'sleep', side_effect=lambda n: events.append(('wait', n))), \
+                     patch.object(deploy, 'marker', side_effect=lambda k, v: events.append((k, v))):
                     deploy.main()
-                    self.assertEqual(events, [('configure', side), ('deploy',),
-                                              ('live-side', side), ('live-image', state['images'][side])])
+                    self.assertEqual(events, [('live-side', side), ('wait', 20)])
+                    run.assert_not_called()
+
+    def test_invalid_live_side_or_image_fails_before_config_change(self):
+        for live, image in [('red', 'registry/new:2'), ('blue', ''), ('green', 'bad\nimage')]:
+            with patch.object(deploy, 'marker', return_value=live), patch.object(deploy, 'CONFIG') as config:
+                with self.assertRaises(ValueError):
+                    deploy.stage(image)
+                config.write_text.assert_not_called()
+
+    def test_site_worker_keeps_routes_mode_and_test_key(self):
+        with patch.dict(os.environ, {'MODE': 'container', 'ROUTES': 'example.com/*, example.org/api/*',
+                                    'ORIGIN_TEST_KEY': 'test'}), patch.object(deploy.subprocess, 'run') as run:
+            deploy.deploy_site_worker()
+            self.assertEqual(run.call_args_list[0].args[0][-6:],
+                             ['--var', 'ORIGIN_MODE:container', '--route', 'example.com/*', '--route', 'example.org/api/*'])
+            self.assertTrue(all(c.kwargs['cwd'] == 'workers/static-site' for c in run.call_args_list))
+
+    def test_probe_preserves_named_user_agent(self):
+        self.assertEqual(deploy._request('https://example.com').get_header('User-agent'), deploy.UA)
 
 
 if __name__ == '__main__':
