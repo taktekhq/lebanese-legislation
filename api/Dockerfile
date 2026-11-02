@@ -9,9 +9,12 @@ COPY internal/ ./internal/
 COPY api/main.go ./api/
 ARG TARGETOS
 ARG TARGETARCH
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags='-s -w' -o /server ./api
+ARG GIT_SHA=unknown
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags="-s -w -X github.com/taktekhq/lebanese-legislation/internal/site.BuildID=${GIT_SHA}" -o /server ./api
 
 FROM gcr.io/distroless/static-debian12:nonroot
+ARG GIT_SHA=unknown
+LABEL org.opencontainers.image.revision="${GIT_SHA}"
 COPY --from=build /server /server
 COPY THIRD_PARTY_NOTICES.txt /THIRD_PARTY_NOTICES.txt
 LABEL org.opencontainers.image.source="https://github.com/taktekhq/lebanese-legislation"

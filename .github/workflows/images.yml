@@ -138,10 +138,11 @@ jobs:
         with:
           context: .
           file: api/Dockerfile
+          build-args: GIT_SHA=${{ github.event.workflow_run.head_sha || github.sha }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
-          labels: org.opencontainers.image.revision=${{ github.sha }}
+          labels: org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha || github.sha }}
       - name: Verify both architectures
         env:
           API_IMAGE: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
@@ -178,10 +179,11 @@ jobs:
         with:
           context: .
           file: mcp/Dockerfile
+          build-args: GIT_SHA=${{ github.event.workflow_run.head_sha || github.sha }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
-          labels: org.opencontainers.image.revision=${{ github.sha }}
+          labels: org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha || github.sha }}
       - name: Verify both architectures
         env:
           MCP_IMAGE: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
@@ -224,7 +226,10 @@ jobs:
             ghcr.io/taktekhq/lebanese-legislation-all:${{ steps.tags.outputs.date }}
             ghcr.io/taktekhq/lebanese-legislation-all:latest
             ghcr.io/taktekhq/lebanese-legislation-all:${{ steps.tags.outputs.sha }}
-          build-args: DATA_TAG=latest
+          build-args: |
+            DATA_TAG=latest
+            GIT_SHA=${{ github.event.workflow_run.head_sha || github.sha }}
+          labels: org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha || github.sha }}
   vectors:
     needs: changes
     if: ${{ needs.changes.outputs.vectors == 'true' }}
