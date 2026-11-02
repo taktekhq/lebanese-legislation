@@ -50,7 +50,7 @@ export default {
         headers: { ...SECURITY_HEADERS, Location: "https://lebaneselegislation.com" + url.pathname + url.search },
       });
     }
-    const postAllowed = /^(?:\/(?:en|ar))?\/(?:search\/|search\/answer\/)$/.test(url.pathname)
+    const postAllowed = /^(?:\/(?:en|ar))?\/(?:search\/|search\/answer\/|search\/ai\/|search\/ai\/deep\/)$/.test(url.pathname)
       || url.pathname.startsWith("/ph/");
     if (request.method !== "GET" && request.method !== "HEAD" && !(request.method === "POST" && postAllowed)) {
       return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: postAllowed ? "GET, HEAD, POST" : "GET, HEAD" } });

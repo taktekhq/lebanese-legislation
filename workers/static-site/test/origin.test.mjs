@@ -1,8 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { register } from 'node:module';
 
 import { originFetch } from '../src/origin.js';
-import worker from '../src/index.js';
+
+// Node has no Workers runtime; these tests only need its empty base class.
+register('./workers-loader.mjs', import.meta.url);
+const { default: worker } = await import('../src/index.js');
 
 function fixture(live = 'blue') {
   const calls = [];
@@ -21,6 +25,39 @@ function fixture(live = 'blue') {
   return { calls, reads, env };
 }
 const req = (path, headers = {}) => new Request('https://example.com' + path, { headers });
+
+for (const path of [
+  '/search/ai/', '/en/search/ai/', '/ar/search/ai/',
+  '/search/ai/deep/', '/en/search/ai/deep/', '/ar/search/ai/deep/',
+]) {
+  test(`POST ${path} reaches the origin`, async () => {
+    const { env, calls } = fixture();
+    env.ORIGIN_BLUE.fetch = async request => {
+      calls.push([request.method, new URL(request.url).pathname, await request.text()]);
+      return new Response('AI answer');
+    };
+    const response = await worker.fetch(new Request('https://example.com' + path, {
+      method: 'POST', body: 'question',
+    }), env);
+    assert.equal(response.status, 200);
+    assert.equal(await response.text(), 'AI answer');
+    assert.deepEqual(calls, [['POST', path, 'question']]);
+  });
+}
+
+for (const path of [
+  '/api/v1/x', '/search/ai/other/', '/en/search/ai/other/', '/ar/search/ai/other/',
+  '/search/ai/deep/other/', '/search/ai', '/search/ai/deep', '/fr/search/ai/',
+]) {
+  test(`POST ${path} is rejected before reaching the origin`, async () => {
+    const { env, calls, reads } = fixture();
+    const response = await worker.fetch(new Request('https://example.com' + path, { method: 'POST' }), env);
+    assert.equal(response.status, 405);
+    assert.equal(response.headers.get('Allow'), 'GET, HEAD');
+    assert.deepEqual(calls, []);
+    assert.deepEqual(reads, []);
+  });
+}
 
 test('visitors use the R2 flag and cannot choose a side without the secret', async () => {
   for (const live of ['blue', 'green']) {
