@@ -88,11 +88,16 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 	r2endpoint := fs.String("r2-endpoint", os.Getenv("R2_ENDPOINT"), "R2 endpoint, https://<account-id>.r2.cloudflarestorage.com (default $R2_ENDPOINT)")
 	r2workers := fs.Int("r2-workers", 96, "uploads in flight")
 	maxErrors := fs.Int("max-errors", 0, "pages that may fail before the export counts as failed")
+	exchangeTimeout := fs.Duration("exchange-timeout", 30*time.Minute, "maximum wait for shards in each path exchange round (does not limit rendering)")
+	exchangeID := fs.String("exchange-id", "", "unique coordinated crawl run id shared by every shard (default GitHub run id and attempt; requires R2)")
 	shardArg := fs.String("shard", "", "render only slice i of n of the site, as i/n (for splitting a full export across jobs)")
 	meaningNotice := fs.Bool("meaning-notice", false, "render the search forms as the live site does when search by meaning is on (the notice under the box); no request is ever sent to the provider")
 	dry := fs.Bool("dry-run", false, "with -r2-bucket: render everything and count what would be uploaded, send nothing")
 	if err := fs.Parse(args); err != nil {
 		return err
+	}
+	if *exchangeTimeout <= 0 {
+		return errors.New("export: -exchange-timeout must be positive")
 	}
 	if *out == "" || *dsn == "" {
 		return errors.New("export: -out and -db (or $LEBLEG_DSN) are required")
@@ -103,6 +108,18 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 			return fmt.Errorf("export: -shard wants i/n with 0 <= i < n and n >= 2, got %q", *shardArg)
 		}
 	}
+	exchangePrefix := ""
+	if shards > 1 && *crawl && *paths == "" && *sampleN == 0 {
+		id := *exchangeID
+		if id == "" && os.Getenv("GITHUB_RUN_ID") != "" && os.Getenv("GITHUB_RUN_ATTEMPT") != "" {
+			id = os.Getenv("GITHUB_RUN_ID") + "-" + os.Getenv("GITHUB_RUN_ATTEMPT")
+		}
+		if *r2bucket == "" || id == "" || *dry || *limit > 0 {
+			return errors.New("sharded crawl requires R2, no page limit or dry run, and a fresh shared -exchange-id (automatic in GitHub Actions); use -crawl=false for independent sitemap-only shards")
+		}
+		exchangePrefix = fmt.Sprintf("_export/discovery/%s/of-%d", id, shards)
+	}
+
 	partial := *paths != "" || *sampleN > 0 || *limit > 0 || shards > 1
 	// Each shard keeps its own manifest in the bucket, so shards never overwrite one another's.
 	meta := "_export/"
@@ -180,6 +197,9 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 					return err
 				}
 			}
+		}
+		if exchangePrefix != "" {
+			o.Exchange = r2.PathExchange(exchangePrefix, shard, shards, *exchangeTimeout)
 		}
 		up = staticexport.NewUploader(ctx, r2, *r2workers)
 		up.DryRun = *dry || r2 == nil

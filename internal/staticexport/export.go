@@ -60,7 +60,7 @@ type Options struct {
 	Crawl bool
 	// Limit stops after this many pages (0: all).
 	Limit int
-	// Extra paths always rendered (/robots.txt, /llms.txt, the home pages).
+	// Extra paths rendered by their owner (/robots.txt, /llms.txt, home pages).
 	Extra []string
 	// Assets, when set, is copied to the root: stylesheets, scripts, images.
 	Assets fs.FS
@@ -71,10 +71,14 @@ type Options struct {
 	// Files are extra files to write, by path under Out (the search script).
 	Files map[string][]byte
 	// Shard and Shards split a full export across jobs: this run renders the
-	// sitemap paths whose hash falls in its slice (Shard of Shards), and the
-	// pages it finds by crawling that no sitemap lists. Shards <= 1 means the
-	// whole site. Deletions are left to the job that merges the shards.
+	// paths whose hash falls in its slice (Shard of Shards), including crawl
+	// paths and Extra. Shards <= 1 means the whole site. Deletions are left to the job that merges the shards.
 	Shard, Shards int
+	// Exchange is required for a sharded crawl. Each round publishes foreign
+	// links after local work drains, waits for every shard, and returns this
+	// shard's incoming paths and whether any shard published links. All shards
+	// must participate, even when idle. An empty global round ends the crawl.
+	Exchange func(ctx context.Context, round int, paths []string) (incoming []string, active bool, err error)
 	// Sink, when set, receives each new or changed page instead of a file
 	// being written for it (the upload to R2). Pages whose hash equals the
 	// previous manifest's are not sent.
@@ -132,6 +136,14 @@ type KindStats struct {
 
 // Run exports the site served by h.
 func Run(ctx context.Context, h http.Handler, o Options) (*Stats, error) {
+	if o.Shards > 1 && o.Crawl && len(o.Paths) == 0 && o.Sample == 0 {
+		if o.Exchange == nil {
+			return nil, fmt.Errorf("staticexport: sharded crawl requires a path exchange")
+		}
+		if o.Limit > 0 {
+			return nil, fmt.Errorf("staticexport: sharded crawl cannot use a page limit: every shard must finish discovery")
+		}
+	}
 	if o.Out == "" {
 		return nil, fmt.Errorf("staticexport: no output directory")
 	}
@@ -175,7 +187,7 @@ func Run(ctx context.Context, h http.Handler, o Options) (*Stats, error) {
 			return ex.st, err
 		}
 	}
-	if len(o.Paths) == 0 && o.Sample == 0 && o.Limit == 0 { // the page the edge serves for a path nothing answers
+	if len(o.Paths) == 0 && o.Sample == 0 && o.Limit == 0 && (o.Shards <= 1 || o.Shard == 0) { // the page the edge serves for a path nothing answers
 		if rec := ex.get("/__static-export-not-found__/"); rec.Code == http.StatusNotFound {
 			if err := writeFile(filepath.Join(o.Out, "404.html"), rec.Body.Bytes()); err != nil {
 				return ex.st, err
@@ -203,8 +215,9 @@ type exporter struct {
 	st   *Stats
 
 	start     time.Time
-	crawling  bool  // follow links: Crawl, and not a fixed list or a sample
-	inSitemap *seen // with shards: every sitemap path, so a link to one is left to its owner
+	crawling  bool     // follow links: Crawl, and not a fixed list or a sample
+	foreign   []string // discovered paths waiting to be sent to their owners
+	inSitemap *seen    // seeds already scheduled by their owners, no exchange needed
 
 	removedMu sync.Mutex
 	removed   []string // pages that were files and no longer are
@@ -279,29 +292,25 @@ func (ex *exporter) run(ctx context.Context) error {
 	if len(ex.o.Paths) > 0 {
 		seeds = ex.o.Paths
 	} else {
-		if ex.o.Shards <= 1 || ex.o.Shard == 0 {
-			seeds = append(seeds, ex.o.Extra...)
-		}
+		seeds = append(seeds, ex.o.Extra...)
 		sm, err := ex.sitemapPaths(ctx)
 		if err != nil {
 			shutdown()
 			return err
 		}
+		seeds = append(seeds, sm...)
 		if ex.o.Shards > 1 {
 			ex.inSitemap = newSeen()
-			mine := sm[:0:0]
-			for _, p := range sm {
+			for _, p := range seeds {
 				ex.inSitemap.add(p)
-				if Owner(p, ex.o.Shards) == ex.o.Shard {
-					mine = append(mine, p)
-				}
 			}
-			sm = mine
 		}
-		seeds = append(seeds, sm...)
 	}
 	stopped := false
 	for _, p := range seeds {
+		if ex.o.Shards > 1 && Owner(p, ex.o.Shards) != ex.o.Shard {
+			continue
+		}
 		if !ex.claim(p) {
 			continue
 		}
@@ -310,13 +319,38 @@ func (ex *exporter) run(ctx context.Context) error {
 			break
 		}
 	}
-	// The crawl: links found in rendered pages that nothing has listed yet.
-	for ex.crawling && !stopped {
-		next, more := ex.nextQueued()
-		if !more || !dispatch(next) {
+	// Owners exchange discoveries rather than rendering foreign pages to read
+	// their links. Rounds let a path cross any number of shard boundaries,
+	// including cycles and redirects, while each page is rendered only once.
+	for round := 0; ex.crawling && !stopped; round++ {
+		for {
+			next, more := ex.nextQueued()
+			if !more {
+				break
+			}
+			if !dispatch(next) {
+				stopped = true
+				break
+			}
+		}
+		if stopped || ex.o.Shards <= 1 {
 			break
 		}
+		ex.mu.Lock()
+		foreign := ex.foreign
+		ex.foreign = nil
+		ex.mu.Unlock()
+		incoming, active, err := ex.o.Exchange(ctx, round, foreign)
+		if err != nil {
+			shutdown()
+			return err
+		}
+		if !active {
+			break
+		}
+		ex.queueNew(incoming)
 	}
+
 	shutdown()
 	if err := mf.Close(); err != nil {
 		return err
@@ -350,11 +384,18 @@ func (ex *exporter) queueNew(links []string) {
 	var fresh []string
 	for _, l := range links {
 		if ex.inSitemap != nil && ex.inSitemap.has(l) {
-			continue // a sitemap page belongs to the shard its hash names
+			continue
 		}
-		if ex.seen.add(l) {
-			fresh = append(fresh, l)
+		if !ex.seen.add(l) {
+			continue
 		}
+		if ex.o.Shards > 1 && Owner(l, ex.o.Shards) != ex.o.Shard {
+			ex.mu.Lock()
+			ex.foreign = append(ex.foreign, l)
+			ex.mu.Unlock()
+			continue
+		}
+		fresh = append(fresh, l)
 	}
 	if len(fresh) == 0 {
 		return
@@ -731,6 +772,9 @@ func (ex *exporter) finish(partial bool) error {
 	}
 	if partial { // a partial run must not forget the paths it did not visit
 		for p, e := range ex.prev {
+			if ex.o.Shards > 1 && Owner(p, ex.o.Shards) != ex.o.Shard {
+				continue
+			}
 			if _, ok := cur[p]; !ok {
 				cur[p] = e
 			}
@@ -787,7 +831,7 @@ func (ex *exporter) watchMemory() func() {
 	return func() { close(stop); <-done }
 }
 
-// Owner is the shard, of n, that renders a sitemap path.
+// Owner is the shard, of n, that renders a path, whether listed or crawled.
 func Owner(p string, n int) int {
 	h := fnv.New64a()
 	_, _ = io.WriteString(h, p)
