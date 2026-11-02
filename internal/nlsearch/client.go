@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -126,6 +127,7 @@ func (c *Client) Rewrite(ctx context.Context, q string) (Plan, error) {
 	}
 	resp, err := c.http.Do(req)
 	if err != nil {
+		log.Printf("AI search request failed: %v", err)
 		return Plan{}, errors.New("AI search unavailable")
 	}
 	defer func() { _ = resp.Body.Close() }()
