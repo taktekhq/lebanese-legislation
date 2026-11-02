@@ -21,6 +21,8 @@ The PostgreSQL dump lives only on Hugging Face, in the dataset's [`releases/` fo
 
 Use [LebaneseLegislation.com](https://lebaneselegislation.com/) for the public library, the [Parquet dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation) for portable tables, and the [collection](https://huggingface.co/collections/taktekhq/lebanese-legislation) for related scans and the handwriting demo. The code is MIT licensed; source texts retain their separate dataset terms, rights and attribution.
 
+The hosted API description is available as [OpenAPI 3.1](https://lebaneselegislation.com/api/v1/openapi.json).
+
 ## Start locally
 
 Install Docker with Compose. Allow at least 4 GB of available memory and 30 GB of free disk space; 8 GB of memory is recommended. The first start copies the image's baked databases into an empty volume.

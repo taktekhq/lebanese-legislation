@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+
+	"github.com/taktekhq/lebanese-legislation/internal/indexing"
 )
 
 // The sitemaps list what is worth indexing, and say when it last changed.
@@ -202,23 +204,12 @@ func (c *memoCache) getVersioned(key, ver string, ttl time.Duration, fn func() (
 	return v, nil
 }
 
-// firstFetch is the day the scraper first fetched the Centre's pages: no page
-// here existed, so none changed, before it.
-var firstFetch = time.Date(2026, 9, 25, 0, 0, 0, 0, time.UTC)
-
 // lastmod is t as a sitemap date, or "" when t cannot be when the page last
 // changed: unknown, before the page existed (a text's own date, which Search
-// Console counted as 113,297 errors on 28 Oct 2026) or after today.
-func lastmod(t time.Time) string {
-	if t.IsZero() || t.Before(firstFetch) {
-		return ""
-	}
-	d := t.UTC().Format("2006-01-02")
-	if d > time.Now().UTC().Format("2006-01-02") {
-		return ""
-	}
-	return d
-}
+// Console counted as 113,297 errors on 28 Oct 2026) or after today. The rule
+// is indexing.ChangedOn, shared with the pages' "Last updated" line and the
+// API's updated_at.
+func lastmod(t time.Time) string { return indexing.ChangedOn(t, time.Now()) }
 
 func (s *Server) sitemapIndex(w http.ResponseWriter, r *http.Request) {
 	out, err := s.buildIndex(r.Context())

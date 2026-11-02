@@ -527,6 +527,8 @@ type Law struct {
 	Sections         []Section
 	Items            []Item
 	List             []*Article // the articles, in order (Articles is their count)
+	Changed          *time.Time // when its pages last changed (page_state), nil when not known
+	Updated          *Updated   // the page's "Last updated" line, set by the handler
 	HasFr            bool
 	RepealedBy       []LawRow
 	RepealedByChange []Change   // whole-text repeals read from the repealing texts
@@ -613,6 +615,7 @@ func (s *Server) loadLawWith(ctx context.Context, id int, withText, rulings bool
 	if strings.TrimSpace(l.Title) == "" { // six texts have no title at the source
 		l.Title = l.Ident()
 	}
+	l.Changed = s.changedOn(ctx, "law", id)
 	// An older database has no date_correction: the text shows without it.
 	if rows, err := s.db.Query(ctx, `SELECT field, printed, corrected, method FROM date_correction WHERE law_id = $1 ORDER BY field`, id); err == nil {
 		for rows.Next() {
@@ -798,6 +801,7 @@ func (s *Server) lawPage(w http.ResponseWriter, r *http.Request, part int) {
 	s.trackRead(r, l, "")
 	bn := i18n.New(s.lang(r))
 	l.Answer = lawAnswer(bn, l)
+	l.Updated = s.pageUpdated(r, l.Changed, l.lastAmendment())
 	ld := legislationLD(l, s.u(r, lawPath(l.ID)), l.Answer)
 	crumbs := breadcrumbs("Legislation", "/laws/", cut(l.Title, 80), lawPath(l.ID))
 	if l.IssuedOn != nil {
@@ -853,6 +857,7 @@ func legislationLD(l *Law, path, description string) map[string]any {
 	if l.GazetteDate != nil {
 		ld["datePublished"] = l.GazetteDate.Format("2006-01-02")
 	}
+	setModified(ld, l.Changed)
 	if l.Source == "" {
 		delete(ld, "isBasedOn")
 	}
@@ -953,6 +958,7 @@ func (s *Server) articlePage(r *http.Request, l *Law, i int) Page {
 	if a.From != nil {
 		ld["legislationDate"] = a.From.Format("2006-01-02")
 	}
+	setModified(ld, l.Changed)
 	text := a.Shown()
 	if strings.TrimSpace(text) == "" { // a repealed article: say what the Centre says, else the text it belongs to
 		if a.Note != nil && strings.TrimSpace(*a.Note) != "" {
@@ -963,8 +969,9 @@ func (s *Server) articlePage(r *http.Request, l *Law, i int) Page {
 	}
 	desc := articleDesc(bn, l, a.Number, strings.ReplaceAll(text, "\n", " "))
 	return Page{Title: artTitle(bn, l, a.Number), Desc: desc, Path: path, OGType: "article", Lang: "ar", Translated: true,
-		LD:   []any{ld, breadcrumbs(cut(l.Title, 80), lawPath(l.ID), "المادة "+a.Number, path)},
-		Data: map[string]any{"Law": l, "A": a, "Prev": prev, "Next": next, "Answer": answer}}
+		LD: []any{ld, breadcrumbs(cut(l.Title, 80), lawPath(l.ID), "المادة "+a.Number, path)},
+		Data: map[string]any{"Law": l, "A": a, "Prev": prev, "Next": next, "Answer": answer,
+			"Updated": s.pageUpdated(r, l.Changed, lastArticleAmendment(a))}}
 }
 
 // articleNamed is the article of numbers that a spelling names (any the

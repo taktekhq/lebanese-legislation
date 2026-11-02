@@ -33,6 +33,13 @@ test("only GET and HEAD for a page without a real query are served from files", 
   assert.equal(hasRealQuery("?page=2"), true);
 });
 
+test("the OpenAPI description is a file from the bucket, like llms.txt", () => {
+  for (const p of ["/openapi.json", "/llms.txt", "/robots.txt"]) {
+    assert.equal(route("GET", p, ""), "static", p);
+  }
+  assert.equal(keyFor("/openapi.json"), "openapi.json");
+});
+
 test("keys: pages are index.html, files keep their name, _export is private", () => {
   assert.equal(keyFor("/"), "index.html");
   assert.equal(keyFor("/law/12/"), "law/12/index.html");

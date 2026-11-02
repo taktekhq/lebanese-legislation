@@ -22,6 +22,7 @@ func (s *Server) seoRoutes() {
 	m := s.mux
 	m.HandleFunc("GET /robots.txt", s.robots)
 	m.HandleFunc("GET /llms.txt", s.llms)
+	m.HandleFunc("GET /openapi.json", s.openapi)
 	m.HandleFunc("GET /"+indexNowKey+".txt", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		fmt.Fprint(w, indexNowKey)
@@ -77,7 +78,7 @@ func (s *Server) llms(w http.ResponseWriter, r *http.Request) {
 		{"Doctrine", "/doctrine/"}, {"Latest changes (amendments, newest first)", "/changes/"}, {"The database (PostgreSQL)", "/data/"}, {"Lebanese law and AI (no AI answers yet; sign up to hear)", "/ai/"}} {
 		fmt.Fprintf(&b, "- [%s](%s%s)\n", l[0], Base, l[1])
 	}
-	b.WriteString("\n## For AI assistants\n\n- MCP server (search, get_law, get_article, get_law_texts, get_ruling; verbatim texts only): " + Base + "/mcp\n- Read-only JSON API: " + Base + "/ai/\n")
+	b.WriteString("\n## For AI assistants\n\n- MCP server (search, get_law, get_article, get_law_texts, get_ruling; verbatim texts only): " + Base + "/mcp\n- Read-only JSON API: " + Base + "/ai/\n- The JSON API as OpenAPI 3.1: " + Base + "/api/v1/openapi.json\n")
 	b.WriteString("\n## Notes\n\n- Texts come from the Lebanese University's Centre for Legal Informatics; the Official Gazette is authoritative.\n- Nothing here is legal advice.\n")
 	fmt.Fprint(w, b.String())
 }

@@ -9,6 +9,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/taktekhq/lebanese-legislation/internal/indexing"
 )
 
 type urlset_ struct {
@@ -133,7 +135,7 @@ func TestSitemapLastmodIsWhenThePageChanged(t *testing.T) {
 	s := indexedServer(t)
 	index, files, _ := fetchAll(t, s)
 	today := time.Now().UTC().Format("2006-01-02")
-	first := firstFetch.Format("2006-01-02")
+	first := indexing.FirstFetch.Format("2006-01-02")
 	bad := 0
 	check := func(where, m string) {
 		if m != "" && (m < first || m > today) {
@@ -164,7 +166,7 @@ func TestSitemapLastmodIsWhenThePageChanged(t *testing.T) {
 	// a database built before the build raised old dates to the day the page
 	// first existed still holds them; the sitemaps leave those out
 	var old int
-	if err := s.db.QueryRow(context.Background(), `SELECT count(*) FROM page_state WHERE changed_at < $1`, firstFetch).Scan(&old); err != nil {
+	if err := s.db.QueryRow(context.Background(), `SELECT count(*) FROM page_state WHERE changed_at < $1`, indexing.FirstFetch).Scan(&old); err != nil {
 		t.Fatal(err)
 	}
 	if float64(with) < 0.99*float64(total) {

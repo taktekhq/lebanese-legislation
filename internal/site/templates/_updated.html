@@ -1,0 +1,3 @@
+{{/* When the page's content last changed (lastchanged.go): a row of a facts list, or a line under the heading. Nothing when the date is not known. */}}
+{{define "updated-row"}}{{with .}}<div><dt>{{t "page.updated"}}</dt><dd><time datetime="{{.ISO}}">{{.Date}}</time>{{with .By}}<br><bdi>{{t "page.last_amended_by"}}</bdi> <a class="link" href="{{lawURL .ID}}" lang="ar">{{.Ident}}</a>{{end}}</dd></div>{{end}}{{end}}
+{{define "updated-line"}}{{with .}}<p class="updated" lang="{{uilang}}" dir="{{dir}}"><time datetime="{{.ISO}}">{{.Label}}</time>{{with .By}} &middot; <bdi>{{t "page.last_amended_by"}}</bdi> <a class="link" href="{{lawURL .ID}}" lang="ar">{{.Ident}}</a>{{end}}</p>{{end}}{{end}}

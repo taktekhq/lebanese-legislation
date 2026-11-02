@@ -129,7 +129,8 @@ func (s *Server) codeHub(w http.ResponseWriter, r *http.Request) {
 		s.fail(w, r, err)
 		return
 	}
-	c.List = List{Total: c.Total, Page: page, Pages: pages, Base: listBase}
+	c.List = List{Total: c.Total, Page: page, Pages: pages, Base: listBase,
+		Updated: s.pageUpdated(r, s.changedOn(ctx, "law", c.LawID), nil)}
 	name := c.NameEn
 	if s.lang(r) == "ar" {
 		name = cut(c.Title, 36)
@@ -241,7 +242,7 @@ func (s *Server) yearKindHub(w http.ResponseWriter, r *http.Request) {
 		Desc: s.trOr(r, fmt.Sprintf("The %s %s issued in Lebanon in %s, newest first, each linked to its text. Free.", thousands(total), lowerFirst(enKind), label),
 			"hub.year.desc", thousands(total), kind, label),
 		LD: []any{breadcrumbs("Legislation", "/laws/", label, fmt.Sprintf("/laws/year/%d/", y), enKind, base)},
-		Data: List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase,
+		Data: List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase, Updated: s.pageUpdated(r, s.latestChange(ctx, cond, y, word), nil),
 			Back: fmt.Sprintf("/laws/year/%d/", y), BackLabel: s.trOr(r, "All texts of "+label, "hub.year.back", label),
 			Eyebrow: s.trOr(r, "Legislation · "+label, "years.legislation_of", label), Heading: title + "."}})
 }

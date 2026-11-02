@@ -150,10 +150,7 @@ func topicDate(lang, iso string) string {
 	if err != nil {
 		return iso
 	}
-	if lang == "ar" {
-		return fmt.Sprintf("%d %s %d", t.Day(), arMonths[t.Month()-1], t.Year())
-	}
-	return fmt.Sprintf("%d %s %d", t.Day(), enMonths[t.Month()-1], t.Year())
+	return longDate(lang, t)
 }
 
 func (s *Server) topic(w http.ResponseWriter, r *http.Request) {

@@ -432,6 +432,7 @@ func (s *Server) getArticle(ctx context.Context, a args) (toolResult, error) {
 	o.set("possibly_affected_by", affected)
 	o.set("url", articleURL(int(lawID), number, l.Kind))
 	o.str("source_url", l.SourceURL)
+	o.changed(l.Changed) // an article belongs to its text's page
 	return ok(o), nil
 }
 
@@ -591,6 +592,11 @@ func (s *Server) getRuling(ctx context.Context, a args) (toolResult, error) {
 		o.set("pdf_url", pdfURL(r.id))
 	}
 	o.nonEmpty("source_url", r.srcURL)
+	changed, err := s.pageChanged(ctx, "ruling", r.id)
+	if err != nil {
+		return toolResult{}, err
+	}
+	o.changed(changed)
 	rows, err := s.db.Query(ctx, `SELECT n, text_ar, low_confidence FROM ruling_page WHERE ruling_id = $1 ORDER BY n`, id)
 	if err != nil {
 		return toolResult{}, err
@@ -665,6 +671,11 @@ func (s *Server) getGazetteIssue(ctx context.Context, a args) (toolResult, error
 	o.set("texts", texts)
 	o.set("url", fmt.Sprintf("%s/gazette/%d/", Base, gid))
 	o.str("source_url", src)
+	changed, err := s.pageChanged(ctx, "gazette", gid)
+	if err != nil {
+		return toolResult{}, err
+	}
+	o.changed(changed)
 	return ok(o), nil
 }
 

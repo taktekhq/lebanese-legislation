@@ -11,4 +11,4 @@ VALUES ('synthetic-library',1,'Synthetic library example','Exemple fictif',1);
 INSERT INTO gazette_issue (id,number,published_on) VALUES (1,'DEMO','2024-01-01');
 INSERT INTO gazette_entry (issue_id,law_id,pages) VALUES (1,1,'1');
 INSERT INTO page_state (kind,id,content_hash,changed_at)
-VALUES ('law',1,'synthetic','2024-01-01'),('gazette',1,'synthetic','2024-01-01');
+VALUES ('law',1,'synthetic','2026-10-30'),('gazette',1,'synthetic','2024-01-01');

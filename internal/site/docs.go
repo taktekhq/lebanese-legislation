@@ -185,6 +185,7 @@ func (s *Server) doc(k docKind) http.HandlerFunc {
 		defer cancel()
 		d := Doc{Crumb: s.trOr(r, k.title, k.key+".list_title"), CrumbURL: "/" + k.list + "/"}
 		var text *string
+		var published *time.Time // the day the document itself was issued or published, for datePublished
 		var err error
 		switch k.key {
 		case "opinion":
@@ -198,6 +199,7 @@ func (s *Server) doc(k docKind) http.HandlerFunc {
 				d.Note = *subj
 			}
 			d.Kicker = []string{s.trOr(r, "Legal opinion", "opinion.kicker"), dmy(on)}
+			published = on
 			d.Facts = [][2]any{{s.trOr(r, "Number", "opinion.fact_number"), str(num) + "/" + intStr(year)},
 				{s.trOr(r, "Date", "opinion.fact_date"), dmy(on)}, {s.trOr(r, "Requested by", "opinion.fact_requester"), str(req)},
 				{s.trOr(r, "File", "opinion.fact_file"), strings.Trim(str(fileNo)+"/"+intStr(fileYear), "/")}}
@@ -234,6 +236,7 @@ func (s *Server) doc(k docKind) http.HandlerFunc {
 			err = s.db.QueryRow(ctx, `SELECT title, author, published_on, text_ar FROM research WHERE id = $1`, id).
 				Scan(&d.Title, &author, &on, &text)
 			d.Kicker = []string{s.trOr(r, "Study", "research.kicker"), str(author), dmy(on)}
+			published = on
 			d.Facts = [][2]any{{s.trOr(r, "Author", "research.fact_author"), str(author)}, {s.trOr(r, "Published", "research.fact_published"), dmy(on)}}
 			d.Cite = str(author) + "، " + d.Title
 		}
@@ -259,13 +262,19 @@ func (s *Server) doc(k docKind) http.HandlerFunc {
 			return
 		}
 		path := fmt.Sprintf("/%s/%d/", k.key, id)
+		changed := s.changedOn(ctx, k.key, id)
+		d.Facts = append(d.Facts, s.updatedFact(r, s.pageUpdated(r, changed, nil)))
+		ld := map[string]any{"@context": "https://schema.org", "@type": "CreativeWork", "@id": Base + path, "name": d.Title,
+			"inLanguage": "ar", "url": Base + path, "isBasedOn": d.Source, "isAccessibleForFree": true}
+		if published != nil {
+			ld["datePublished"] = published.Format("2006-01-02")
+		}
+		setModified(ld, changed)
 		s.render(w, r, "doc", 200, Page{Lang: "ar", NoIndex: s.noindexed(ctx, k.key, id, 0), Title: s.brandTitle(r, cutWords(d.Title, 60)), Path: path,
 			Desc:   cut(d.Title, 150),
 			OGType: "article",
-			LD: []any{map[string]any{"@context": "https://schema.org", "@type": "CreativeWork", "@id": Base + path, "name": d.Title,
-				"inLanguage": "ar", "url": Base + path, "isBasedOn": d.Source, "isAccessibleForFree": true},
-				breadcrumbs(k.title, "/"+k.list+"/", cut(d.Title, 80), path)},
-			Data: d})
+			LD:     []any{ld, breadcrumbs(k.title, "/"+k.list+"/", cut(d.Title, 80), path)},
+			Data:   d})
 	}
 }
 
@@ -389,10 +398,14 @@ func (s *Server) ruling(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	path := fmt.Sprintf("/ruling/%d/", id)
+	changed := s.changedOn(ctx, "ruling", id)
+	d.Facts = append(d.Facts, s.updatedFact(r, s.pageUpdated(r, changed, nil)))
+	ld := rulingLD(d, path, on, court, year)
+	setModified(ld, changed)
 	s.render(w, r, "doc", 200, Page{Lang: "ar", NoIndex: rulingsHidden || s.noindexed(ctx, "ruling", id, 0), Title: s.brandTitle(r, cutWords(d.Title, 60)), Path: path,
 		Desc:   cut(strings.TrimSuffix(d.Title+": "+orStr(strings.Join(d.Paras, " "), d.Reading.firstText()), ": "), 155),
 		OGType: "article",
-		LD:     []any{rulingLD(d, path, on, court, year), breadcrumbs("Rulings", "/rulings/", orStr(intStr(year), "Undated"), fmt.Sprintf("/rulings/year/%s/", orStr(intStr(year), "0")), cut(d.Title, 80), path)},
+		LD:     []any{ld, breadcrumbs("Rulings", "/rulings/", orStr(intStr(year), "Undated"), fmt.Sprintf("/rulings/year/%s/", orStr(intStr(year), "0")), cut(d.Title, 80), path)},
 		Data:   d})
 }
 
@@ -507,9 +520,32 @@ func (s *Server) gazette(w http.ResponseWriter, r *http.Request) {
 			d.Note = s.trOr(r, fmt.Sprintf("%d of these texts are ones we read from the scans of the Gazette's pages, not from the Centre.", n), "gazette.scan_some_note", n)
 		}
 	}
-	s.render(w, r, "doc", 200, Page{Lang: "ar", Title: s.brandTitle(r, d.Title+" "+dmy(on)), Path: fmt.Sprintf("/gazette/%d/", id),
+	path := fmt.Sprintf("/gazette/%d/", id)
+	changed := s.changedOn(ctx, "gazette", id)
+	d.Facts = append(d.Facts, s.updatedFact(r, s.pageUpdated(r, changed, nil)))
+	s.render(w, r, "doc", 200, Page{Lang: "ar", Title: s.brandTitle(r, d.Title+" "+dmy(on)), Path: path,
 		Desc: s.trOr(r, fmt.Sprintf("Official Gazette issue %s of %s: the %d texts it published.", str(number), dmy(on), len(laws)),
-			"gazette.issue_desc", str(number), dmy(on), len(laws)), Data: d})
+			"gazette.issue_desc", str(number), dmy(on), len(laws)),
+		LD:   []any{gazetteLD(d, path, number, on, changed), breadcrumbs("Official Gazette", "/gazette/", cut(d.Title, 80), path)},
+		Data: d})
+}
+
+// gazetteLD describes an Official Gazette issue as schema.org PublicationIssue.
+func gazetteLD(d Doc, path string, number *string, on, changed *time.Time) map[string]any {
+	ld := map[string]any{"@context": "https://schema.org", "@type": "PublicationIssue", "@id": Base + path, "url": Base + path,
+		"name": d.Title, "inLanguage": "ar", "isAccessibleForFree": true,
+		"isPartOf": map[string]any{"@type": "Periodical", "name": "الجريدة الرسمية", "alternateName": "Official Gazette of Lebanon"}}
+	if number != nil && *number != "" {
+		ld["issueNumber"] = *number
+	}
+	if on != nil {
+		ld["datePublished"] = on.Format("2006-01-02")
+	}
+	if d.Source != "" {
+		ld["isBasedOn"] = d.Source
+	}
+	setModified(ld, changed)
+	return ld
 }
 
 // ---------------------------------------------------------------- search

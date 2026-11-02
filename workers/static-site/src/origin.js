@@ -14,6 +14,35 @@ function originService(env, side) {
   return side === "green" ? env.ORIGIN_GREEN : env.ORIGIN_BLUE;
 }
 
+function requestKind(url) {
+  const path = url.pathname.replace(/^\/(en|ar)(?=\/)/, "");
+  if (path.startsWith("/api/")) return "api";
+  if (path === "/mcp" || path.startsWith("/mcp/")) return "mcp";
+  if (/^\/search\/(answer|ai)(\/|$)/.test(path)) return "answer";
+  if (path.startsWith("/search/") && url.searchParams.get("q")) return "search";
+  if (path.startsWith("/scan/")) return "scan";
+  return "page";
+}
+
+function originEvent(request, env, ctx, side, status, duration_ms, cache) {
+  // Telemetry is best effort, including synchronous scheduling failures.
+  try {
+    if (!env.POSTHOG_KEY || !ctx?.waitUntil) return;
+    const kind = requestKind(new URL(request.url));
+    const sample_rate = status >= 500 || duration_ms >= 2000 || kind === "mcp" || kind === "answer" ? 1 : 0.1;
+    if (sample_rate !== 1 && Math.random() >= sample_rate) return;
+    ctx.waitUntil(Promise.resolve().then(() => fetch("https://eu.i.posthog.com/i/v0/e/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key: env.POSTHOG_KEY, event: "origin_request", distinct_id: "lebleg-origin",
+        properties: { kind, status, duration_ms, side, cache, colo: request.cf?.colo,
+          method: request.method, $lib: "lebleg-static-site-worker", sample_rate },
+      }),
+    })).catch(() => {}));
+  } catch {}
+}
+
 export async function originFetch(request, env, ctx) {
   const url = new URL(request.url);
   if (url.pathname.startsWith("/ph/")) {
@@ -54,10 +83,14 @@ export async function originFetch(request, env, ctx) {
   // endpoints to the old origin. Remove it once Hetzner is retired.
   const aiPath = /^\/(en\/|ar\/)?search\/(answer|ai)(\/|$)/.test(url.pathname);
   if ((env.ORIGIN_MODE === "hetzner" || (env.AI_TO_HETZNER === "1" && aiPath)) && !testing) return fetch(request);
+  let side, started;
   try {
-    const side = selected || await liveSide(env);
+    side = selected || await liveSide(env);
     if (testing && admin) {
+      started = Date.now();
       const res = await originService(env, side).fetch(request);
+      originEvent(request, env, ctx, side, res.status, Date.now() - started, "miss");
+      started = undefined;
       const headers = new Headers(res.headers);
       for (const [key, value] of Object.entries(SECURITY_HEADERS)) headers.set(key, value);
       return new Response(res.body, { status: res.status, headers });
@@ -68,19 +101,27 @@ export async function originFetch(request, env, ctx) {
     const cacheURL = new URL(url);
     cacheURL.searchParams.set("__origin_side", side);
     const cacheKey = new Request(cacheURL.toString(), { method: "GET" });
+    const cacheStarted = Date.now();
     let res = cacheable ? await caches.default.match(cacheKey) : undefined;
+    const cache = res ? "hit" : "miss";
+    let duration = Date.now() - cacheStarted;
     if (!res) {
+      started = Date.now();
       res = await originService(env, side).fetch(request);
+      duration = Date.now() - started;
+      started = undefined;
       if (cacheable && res.status === 200 && !/no-store|private/.test(res.headers.get("Cache-Control") || "")) {
         ctx?.waitUntil(caches.default.put(cacheKey, res.clone()));
       }
     }
+    originEvent(request, env, ctx, side, res.status, duration, cache);
     const headers = new Headers(res.headers);
     for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
       if (!headers.has(key)) headers.set(key, value);
     }
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
   } catch (err) {
+    if (started !== undefined) originEvent(request, env, ctx, side, 503, Date.now() - started, "miss");
     console.error("container origin:", err && err.message);
     return new Response(testing ? "container error: " + (err && err.stack || err) : "Service unavailable", {
       status: 503,
