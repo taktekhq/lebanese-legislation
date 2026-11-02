@@ -22,7 +22,7 @@ PostgreSQL into Vectorize.
 
 `data/` is the input for the site build. GitHub Actions renders about 760,000
 static pages through `cmd/static-export` in 8 parallel shards and uploads them
-to `lebleg-site`. The images workflow publishes containers; origin deploys the published `-all`.
+to `lebleg-site`. Each producing workflow publishes its image; origin deploys the published `-all`.
 The vectors workflow filters the public vectors to IDs generated from current `data/`,
 publishes Parquet on Hugging Face and loads Vectorize through the vectors image.
 Later syncs upload changed vectors and delete IDs absent from the current set.
@@ -32,7 +32,7 @@ archive IDs found in the comparison are included in the deletion baseline.
 | Workflow | Output |
 | --- | --- |
 | [static-site.yml](../.github/workflows/static-site.yml) | `data/` to static pages in R2, using `cmd/static-export` and 8 parallel shards. |
-| [images.yml](../.github/workflows/images.yml) | Publishes all six images, with path selection and independent jobs. Scans and static pages come from R2. |
+| [images.yml](../.github/workflows/images.yml) | Manual button to publish one selected image through `build-image.yml`. |
 | [origin.yml](../.github/workflows/origin.yml) | Container image with the database and Go website server, deployed to Cloudflare Containers. |
 | [vectors.yml](../.github/workflows/vectors.yml) | `build` then `vectorize` and `publish`: current chunk IDs filter the public Parquet, Hugging Face receives `vectors/vectors.parquet`, and the vectors image syncs `lebleg-chunks`. |
 | [data.yml](../.github/workflows/data.yml) | `data/` to the source-table Parquet files on Hugging Face. |
@@ -88,11 +88,26 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 | `-vectors` | `vectorize-sync`, `export-vectors`, DuckDB 1.5.6; downloads Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
 | `-site` | R2 `lebleg-site` static pages, assets, `404.html`, redirect data and a stdlib Go server | Static mirrors without a database |
 
-Only `.github/workflows/images.yml` publishes these images. Each has its own
-job; `-all` waits for `-db` when both are selected. All receive UTC date and
-`latest` tags; `-all` also receives the git short SHA. Dispatch `which: all` or
-a full image name. Pushes to main select images by their input paths. Successful
-`static-site` and `vectors` runs refresh `-site` and `-vectors`, respectively.
+Image builds use the reusable `build-image.yml` workflow. Each image has its own
+`images-<name>` job concurrency group across callers; pushes cancel an older
+build of that image. Producer jobs have separate locks, so a slow image never
+holds a workflow-wide lock. Scans and static pages come from R2.
+
+| Image | Built in workflow | When |
+| --- | --- | --- |
+| `-db` | `data.yml` | After `publish` succeeds on main. |
+| `-api` | `ci.yml` (`checks`) | After `ci-ok` succeeds on a push to main. |
+| `-mcp` | `ci.yml` (`checks`) | After `ci-ok` succeeds on a push to main. |
+| `-all` | `data.yml`, `ci.yml` | After `-db` succeeds, or after `ci-ok` on a push to main. Always pulls `-db:latest`. |
+| `-vectors` | `vectors.yml` | After `publish` succeeds on main. |
+| `-site` | `static-site.yml` | After all render shards and generation succeed on main, syncing R2 into the build context. |
+
+`images.yml` has only a manual dispatch with an `image` suffix choice; it builds
+one selected image. Images receive UTC date and `latest` tags; `-all` also gets
+the git short SHA. API and MCP retain candidate checks and release promotion.
+Successful main runs of `checks` and `data` automatically start origin's existing
+blue/green deployment only when their `all / image-all` job succeeded. Manual
+origin dispatch still accepts an image or tag, defaulting to `-all:latest`.
 Publishing of `-web` and `-data` has stopped; existing registry packages remain.
 Compose builds the website service from `web/Dockerfile` locally.
 

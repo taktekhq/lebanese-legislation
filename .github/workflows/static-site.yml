@@ -23,12 +23,12 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: static-site
-  cancel-in-progress: false
 
 jobs:
   render:
+    concurrency:
+      group: static-site-render-${{ github.ref }}-${{ matrix.shard }}
+      cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 340
@@ -118,6 +118,9 @@ jobs:
 
 
   generation:
+    concurrency:
+      group: static-site-generation-${{ github.ref }}
+      cancel-in-progress: false
     # Last: the Worker keys its page cache by this value, so the new pages
     # show at once instead of after the 12-hour edge cache runs out. Written
     # when shards failed too, since the others already uploaded new pages.
@@ -135,3 +138,23 @@ jobs:
           aws s3 cp generation s3://lebleg-site/_export/generation \
             --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
             --content-type text/plain
+  site:
+    needs: [render, generation]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    with:
+      image: site
+      context: .
+      dockerfile: workers/static-site/container/site.Dockerfile
+      tags: |
+        ghcr.io/taktekhq/lebanese-legislation-site:latest
+      free_disk: true
+      pre_build: |
+        mkdir -p site-content
+        aws s3 sync s3://lebleg-site site-content --exclude '_build/*' --exclude '_export/*' --include '_export/redirects.json' --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+        test -s site-content/_export/redirects.json
+        df -h .
