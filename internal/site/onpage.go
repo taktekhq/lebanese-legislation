@@ -329,10 +329,13 @@ var dataDateSQL = map[string]string{
 	"official": `SELECT max(loaded_at) FROM official_text WHERE superseded_by_law_id IS NULL`,
 }
 
-// Updated is the "Last updated <date>" line of a list page.
+// Updated is the "Last updated <date>" line of a list page, or of a single
+// page (lastchanged.go), which also sets Date and By.
 type Updated struct {
-	Label string // "Last updated 20 Oct 2026"
-	ISO   string // 2026-10-20, for <time datetime>
+	Label string  // "Last updated 20 Oct 2026"
+	ISO   string  // 2026-10-20, for <time datetime>
+	Date  string  // the date alone, "20 October 2026", for a facts row
+	By    *LawRow // the text that last amended the page's text, when known
 }
 
 // updated builds a list page's "Last updated" line from the date the archive

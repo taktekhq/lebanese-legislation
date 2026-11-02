@@ -560,6 +560,8 @@
   "seo.title_ar_label": "Official title, in Arabic",
   "seo.title_en_note": "The Arabic title and text are the official version, and the more accurate one. This English title is a machine translation to help you find the text.",
   "seo.updated": "Last updated %s",
+  "page.updated": "Last updated",
+  "page.last_amended_by": "Last amended by",
   "seo.h2_filters": "Filter the list",
   "seo.h2_texts": "Texts, newest first",
   "seo.h2_codes": "The principal codes",

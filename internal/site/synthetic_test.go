@@ -42,6 +42,12 @@ func TestSyntheticServing(t *testing.T) {
 		{"/styles.css", "body"},
 		{"/contribute/", "ساهم"},
 		{"/en/contribute/", "Improve search and code"},
+		// when the content last changed (page_state), on the page and in its JSON-LD
+		{"/law/1/", `<time datetime="2026-10-30">30 تشرين الأول 2026</time>`},
+		{"/en/law/1/", `"dateModified":"2026-10-30"`},
+		{"/en/law/1/article/1/", `Last updated 30 October 2026`},
+		{"/codes/synthetic-library/", `<time datetime="2026-10-30">`},
+		{"/en/laws/year/2024/law/", `Last updated 30 October 2026`},
 	} {
 		t.Run(tc.path, func(t *testing.T) {
 			rec := httptest.NewRecorder()
@@ -50,6 +56,13 @@ func TestSyntheticServing(t *testing.T) {
 				t.Fatalf("GET %s: %d, missing %q; body %.700s", tc.path, rec.Code, tc.want, rec.Body.String())
 			}
 		})
+	}
+	// The Gazette issue's page_state date is before the site existed (an old
+	// build's seed): no date at all, rather than a false one.
+	rec := httptest.NewRecorder()
+	s.ServeHTTP(rec, httptest.NewRequest("GET", "/en/gazette/1/", nil))
+	if rec.Code != 200 || strings.Contains(rec.Body.String(), "Last updated") || strings.Contains(rec.Body.String(), "dateModified") {
+		t.Fatalf("/en/gazette/1/: %d, shows a date it does not have", rec.Code)
 	}
 	for _, body := range []string{
 		`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}`,
