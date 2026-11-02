@@ -21,6 +21,10 @@
       {
         "Heading": "One public repository.",
         "Body": "The code that used to live in a private repository, including the scraper, the build pipeline, the website and the MCP server, is now in github.com/taktekhq/lebanese-legislation. The workflows that build the pages, the container and the search vectors are there too, so anyone can see how the site is made and rebuild it."
+      },
+      {
+        "Heading": "What stays the same",
+        "Body": "Every address still works, and old addresses still redirect to the right page. The API, the MCP server at lebaneselegislation.com/mcp and the open data on Hugging Face keep the same formats. If a page looks wrong or a search finds less than before, tell us through the contribute page."
       }
     ],
     "SectionsAr": [
@@ -35,6 +39,10 @@
       {
         "Heading": "مستودع عام واحد.",
         "Body": "أصبحت الشيفرة التي كانت في مستودع خاص، بما فيها أداة جمع البيانات ومسار البناء والموقع وخادم MCP، متاحة في github.com/taktekhq/lebanese-legislation. وتوجد فيه أيضاً مسارات العمل التي تبني الصفحات والحاوية ومتجهات البحث، ليتمكّن أي شخص من معرفة كيفية بناء الموقع وإعادة بنائه."
+      },
+      {
+        "Heading": "ما الذي لم يتغيّر",
+        "Body": "ما زالت كل العناوين تعمل، وما زالت العناوين القديمة تحوّل إلى الصفحة الصحيحة. وتحتفظ واجهة API وخادم MCP على العنوان lebaneselegislation.com/mcp والبيانات المفتوحة على Hugging Face بالصيغ نفسها. إذا بدت صفحة غير صحيحة أو أعاد البحث نتائج أقل من قبل، فأخبرونا عبر صفحة المساهمة."
       }
     ],
     "Action": "Read the developer documentation",
@@ -78,6 +86,10 @@
       {
         "Heading": "Kept in step.",
         "Body": "A GitHub workflow exports the vectors, publishes the Parquet file and updates Vectorize. Later runs send only the passages that changed, so the open file and the live search always come from the same export."
+      },
+      {
+        "Heading": "How to use it",
+        "Body": "DuckDB can read the file straight from Hugging Face without downloading it first: select from read_parquet with the file's address, and filter by document or model. To search by meaning, embed your question with gemini-embedding-001 in 768 dimensions and compare it with the values column by cosine similarity. The file is free to reuse; the source texts keep their own rights and attribution."
       }
     ],
     "SectionsAr": [
@@ -92,6 +104,10 @@
       {
         "Heading": "تحديثات متزامنة.",
         "Body": "يصدّر مسار عمل على GitHub المتجهات وينشر ملف Parquet ويحدّث Vectorize. وفي التشغيلات اللاحقة، لا يرسل إلا المقاطع التي تغيّرت، ليبقى الملف المفتوح والبحث المباشر مستندَين دائماً إلى التصدير نفسه."
+      },
+      {
+        "Heading": "طريقة الاستخدام",
+        "Body": "يستطيع DuckDB قراءة الملف مباشرة من Hugging Face من دون تنزيله أولاً: استخدموا read_parquet مع عنوان الملف، وصفّوا النتائج بحسب المستند أو النموذج. وللبحث بالمعنى، حوّلوا سؤالكم إلى متجه بالنموذج gemini-embedding-001 بـ768 بُعداً، وقارنوه بعمود values بقياس تشابه جيب التمام. يمكن إعادة استخدام الملف مجاناً، وتحتفظ النصوص الأصلية بحقوقها ونسبتها."
       }
     ],
     "Action": "Explore the open data",
