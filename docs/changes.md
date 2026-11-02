@@ -47,7 +47,7 @@ The API and MCP images now run the same Go code as the website, which is the cod
 
 ## 0.3.0
 
-- New image: `ghcr.io/taktekhq/lebanese-legislation-web`, the website from `web/`. `./start` runs it at http://localhost:8080 next to the API and MCP.
+- The former standalone website image is retired. `./start` now uses `ghcr.io/taktekhq/lebanese-legislation-all:latest` at http://localhost:8080 next to the API and MCP.
 - The DB image adds what the website reads and the public dump lacks ([`db/web.sql`](../db/web.sql)): three text functions, six generated search columns, two views, four empty tables and 24 indexes. It runs once after the first restore and adds a few minutes to it.
 - The DB health check now also requires that step. On a database restored by 0.2.0 or older, run it once: `docker compose exec db bash /opt/lebleg/db/web-schema.sh`.
 

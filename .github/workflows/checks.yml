@@ -156,9 +156,84 @@ jobs:
           WEB_IMAGE: lebleg-test-web
           SMOKE_ARCHITECTURES: amd64
         run: bash .github/scripts/smoke-images.sh
+  serving:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: legislation
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d legislation"
+          --health-interval 2s --health-timeout 2s --health-retries 30
+    env:
+      DEMO_DATABASE_URL: postgres://postgres@localhost:5432/legislation?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build service images in the background
+        run: |
+          ( set +e
+            bash -e -o pipefail <<'TASK_WEB' > "$RUNNER_TEMP/web.log" 2>&1
+          docker build -f web/Dockerfile -t lebleg-test-web .
+          TASK_WEB
+            echo $? > "$RUNNER_TEMP/web.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_API' > "$RUNNER_TEMP/api.log" 2>&1
+          docker build -f api/Dockerfile -t lebleg-test-api .
+          TASK_API
+            echo $? > "$RUNNER_TEMP/api.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_MCP' > "$RUNNER_TEMP/mcp.log" 2>&1
+          docker build -f mcp/Dockerfile -t lebleg-test-mcp .
+          TASK_MCP
+            echo $? > "$RUNNER_TEMP/mcp.status"
+          ) &
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Load fictional fixture
+        run: |
+          for schema in web/schema/schema.sql web/schema/graph.sql web/schema/amendments.sql web/schema/official.sql web/schema/indexes.sql web/testdata/synthetic.sql; do
+            psql "$DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -q -f "$schema"
+          done
+      - run: go vet ./...
+      - name: Remaining Go tests with the fictional database
+        # Other jobs run these excluded packages with release/database fixtures.
+        run: |
+          packages=$(go list ./... | grep -Ev '/internal/(release|embedding|hfhub|releasedb)(/|$)|/cmd/(restore-release|check-release|build-release|publish-release)$')
+          go test -count=1 $packages
+      - run: go build ./web ./api ./mcp
+      - name: Wait for service images
+        run: |
+          failed=0
+          until [ -f "$RUNNER_TEMP/web.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/web.log"
+          [ "$(cat "$RUNNER_TEMP/web.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/api.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/api.log"
+          [ "$(cat "$RUNNER_TEMP/api.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/mcp.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/mcp.log"
+          [ "$(cat "$RUNNER_TEMP/mcp.status")" -eq 0 ] || failed=1
+          [ "$failed" -eq 0 ]
+  node:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test mcp/cloudflare/runtime.test.mjs
   ci-ok:
     runs-on: ubuntu-latest
-    needs: [scraper, go-unit, postgres, release-commands, images]
+    needs: [scraper, go-unit, postgres, release-commands, images, serving, node]
     if: always()
     steps:
       - name: Require every check to succeed

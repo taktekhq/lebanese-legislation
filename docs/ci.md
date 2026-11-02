@@ -28,8 +28,8 @@ act workflow_dispatch -W .github/workflows/data.yml --input publish=true \
 
 | Workflow | What it does | Secrets |
 | --- | --- | --- |
+| `release.yml` | Builds and checks a PostgreSQL release after successful `data` runs on main or manual dispatch. Missing Gemini keys skip the build; missing HF tokens skip publishing. | `GEMINI_API_KEY`, `HF_TOKEN` |
 | `data.yml` | Loads `data/` into PostgreSQL, exports and checks the Parquet tables, and (job `publish`) uploads them to Hugging Face. | `HF_TOKEN` (write token for the dataset) |
-| `build.yml` | Brings `archive/` to its latest main, loads the last `data/`, rebuilds the database from `archive/` and `manual/`, runs the gates, exports into `data/`, and (with `push=true`) commits and pushes it. Needs `manual/` filled unless `without_manual=true`. | `GITHUB_TOKEN` that can push to this repository |
 
 On GitHub, `HF_TOKEN` lives only in the `huggingface` environment, which
 deploys from `main` only, and the token can write to the
@@ -42,9 +42,11 @@ Under act, run it from a checkout whose git objects are all its own (no
 Files it writes in the checkout belong to root afterwards; give them back with
 `docker run --rm -v "$PWD:/d" alpine chown -R "$(id -u):$(id -g)" /d`.
 
-Other workflows listen to the `data/` commit: a push to `main` touching
-`data/**`, and `workflow_run` on `build` (a push made with GitHub's own token
-does not start other workflows, so `workflow_run` covers that case).
+The XPS scrape-build-and-PR job rebuilds and proposes changes to `data/`.
+The `checks.yml` workflow runs on pushes and pull requests; its final `ci-ok`
+job requires all seven parallel check jobs to succeed. After `data` completes
+successfully on `main`, `release.yml` builds and checks the release, then
+publishes it when its keys are available. Manual dispatch remains available.
 
 ## Cloudflare hosting and vectors
 

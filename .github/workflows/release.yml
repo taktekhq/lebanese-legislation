@@ -32,10 +32,10 @@ on:
       max_input_tokens:
         description: Input token budget for this run (empty for none; the $1 a day cap still applies)
         default: ""
-  # Later, to release after every data change on main:
-  # push:
-  #   branches: [main]
-  #   paths: ["data/**"]
+  workflow_run:
+    workflows: [data]
+    types: [completed]
+    branches: [main]
 permissions:
   contents: read
 concurrency:
@@ -43,6 +43,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   release:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-24.04
     # HF_TOKEN lives only in the huggingface environment, which deploys from main
     # only; on other branches the job runs without it and builds without publishing.
@@ -78,6 +79,8 @@ jobs:
           fi
       - uses: actions/checkout@v4
         if: steps.keys.outputs.build == 'true'
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - name: Name the release
         id: name
         if: steps.keys.outputs.build == 'true'

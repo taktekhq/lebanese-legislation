@@ -161,14 +161,14 @@ Every image builds from the repository root:
 docker build -f db/Dockerfile -t lebleg-db-local .
 docker build -f api/Dockerfile -t lebleg-api-local .
 docker build -f mcp/Dockerfile -t lebleg-mcp-local .
-docker build -f web/Dockerfile -t lebleg-web-local .
+docker build -f workers/static-site/container/Dockerfile -t ghcr.io/taktekhq/lebanese-legislation-all:latest .
 # Maintainers and contributors only: optional snapshot publisher dependencies.
 docker build -f db/Dockerfile --target publisher -t lebleg-publisher-local .
 go vet ./... && go test ./...
 cd tools && pip install '.[build,test]' && pytest -q && ruff check src tests
 ```
 
-Go tests that need a database use the fictional fixture in [`web/`](../web/README.md). Python tests that need PostgreSQL create and remove uniquely named databases when `LEBLEG_TEST_ADMIN_DSN` is set. Container tests run when `LEBLEG_TEST_IMAGE` is set, and the Compose test when the four `LEBLEG_TEST_*_IMAGE` variables are set. They never use your existing database. See the [checks workflow](../.github/workflows/ci.yml) for a disposable setup. `docker build -f db/Dockerfile --target postgres` gives a plain PostgreSQL with pgvector for those tests.
+Go tests that need a database use the fictional fixture in [`web/`](../web/README.md). Python tests that need PostgreSQL create and remove uniquely named databases when `LEBLEG_TEST_ADMIN_DSN` is set. Container tests run when `LEBLEG_TEST_IMAGE` is set, and the Compose test when the four `LEBLEG_TEST_*_IMAGE` variables are set. They never use your existing database. See the [checks workflow](../.github/workflows/checks.yml) for a disposable setup. `docker build -f db/Dockerfile --target postgres` gives a plain PostgreSQL with pgvector for those tests.
 
 The DB image pins the official `postgres:18.6` base by digest and verifies the pgvector source checksum. The image publication workflow builds the four images for `linux/amd64,linux/arm64`, checks each one on both platforms against a fictional database, and refuses to overwrite version tags. The optional publisher stays separate.
 

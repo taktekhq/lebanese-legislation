@@ -84,7 +84,7 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 | `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings, optional scans | Compose, database users and the base of `-all` |
 | `-api` | Standalone API server, unchanged Dockerfile and amd64/arm64 support | Compose and API users with a separate database |
 | `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
-| `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Cloudflare Containers and self-hosted sites |
+| `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
 | `-vectors` | `vectorize-sync`, `export-vectors`, DuckDB 1.5.6; downloads Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
 | `-site` | R2 `lebleg-site` static pages, assets, `404.html`, redirect data and a stdlib Go server | Static mirrors without a database |
 
@@ -94,7 +94,7 @@ job; `-all` waits for `-db` when both are selected. All receive UTC date and
 a full image name. Pushes to main select images by their input paths. Successful
 `static-site` and `vectors` runs refresh `-site` and `-vectors`, respectively.
 Publishing of `-web` and `-data` has stopped; existing registry packages remain.
-Compose builds the website service from `web/Dockerfile` locally.
+Compose pulls `ghcr.io/taktekhq/lebanese-legislation-all:latest` for the website, including its database, API and MCP.
 
 The site image syncs every R2 key except `_build/` and `_export/`, retaining
 `_export/redirects.json` privately for redirects. Its server uses the Worker's
