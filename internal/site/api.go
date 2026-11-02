@@ -81,6 +81,7 @@ type apiEndpoint struct {
 func (s *Server) apiEndpoints() []apiEndpoint {
 	return []apiEndpoint{
 		{"/api/v1/", s.apiRoot},
+		{"/api/v1/openapi.json", s.openapi},
 		{"/api/v1/search/", s.apiLimited(s.apiSearch)},
 		{"/api/v1/law/{id}/", s.apiLimited(s.apiLaw)},
 		{"/api/v1/law/{id}/calculated-current/", s.apiLimited(s.apiCalculatedCurrent)},
@@ -97,7 +98,11 @@ func (s *Server) apiRoutes() {
 		return
 	}
 	for _, e := range s.apiEndpoints() {
-		s.mux.HandleFunc("GET "+e.path+"{$}", e.h)
+		pattern := e.path
+		if strings.HasSuffix(pattern, "/") {
+			pattern += "{$}"
+		}
+		s.mux.HandleFunc("GET "+pattern, e.h)
 	}
 }
 
@@ -129,17 +134,20 @@ func (s *Server) apiFail(w http.ResponseWriter, r *http.Request, err error) {
 }
 
 func (s *Server) apiRoot(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Link", `<`+Base+`/api/v1/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"`)
 	s.writeJSON(w, 200, map[string]any{
 		"name":       "Lebanese Legislation API",
 		"version":    "v1",
 		"docs":       Base + "/developers/",
-		"openapi":    Base + "/openapi.json",
+		"openapi":    Base + "/api/v1/openapi.json",
 		"mcp":        Base + "/mcp",
 		"not_advice": notLegalAdvice,
 		"notes":      []string{titleEnNote, updatedAtNote, "search: when q finds nothing it is read again (English and French terms to Arabic, names, a year, a typo) and searched_instead says what was searched."},
 		"endpoints": []string{
 			"GET /api/v1/search/?q=&type=laws|rulings|gazette|articles&year=&limit=&offset=",
 			"GET /api/v1/law/{id}/",
+			"GET /api/v1/law/{id}/calculated-current/",
+			"GET /api/v1/openapi.json",
 			"GET /api/v1/law/{id}/article/{n}/",
 			"GET /api/v1/ruling/{id}/",
 			"GET /api/v1/gazette/{id}/",

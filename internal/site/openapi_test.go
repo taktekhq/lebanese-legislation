@@ -2,6 +2,7 @@ package site
 
 import (
 	"encoding/json"
+	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"slices"
@@ -131,5 +132,34 @@ func TestOpenAPIServed(t *testing.T) {
 	s.ServeHTTP(rec, httptest.NewRequest("GET", "/openapi.json", nil))
 	if rec.Code != 200 || !strings.HasPrefix(rec.Header().Get("Content-Type"), "application/json") || rec.Body.String() != string(openapiJSON) {
 		t.Fatalf("GET /openapi.json: %d %q", rec.Code, rec.Header().Get("Content-Type"))
+	}
+}
+
+func TestOpenAPIServingAndDiscovery(t *testing.T) {
+	s := &Server{mux: http.NewServeMux()}
+	s.apiRoutes()
+	w := httptest.NewRecorder()
+	s.mux.ServeHTTP(w, httptest.NewRequest("GET", "/api/v1/openapi.json", nil))
+	if w.Code != 200 || w.Header().Get("Cache-Control") != apiCacheControl || !strings.HasPrefix(w.Header().Get("Content-Type"), "application/json") {
+		t.Fatalf("spec response: %d %v", w.Code, w.Header())
+	}
+	var doc map[string]any
+	if err := json.Unmarshal(w.Body.Bytes(), &doc); err != nil {
+		t.Fatal(err)
+	}
+	w = httptest.NewRecorder()
+	s.mux.ServeHTTP(w, httptest.NewRequest("GET", "/api/v1/", nil))
+	if w.Code != 200 {
+		t.Fatalf("root status %d", w.Code)
+	}
+	if !strings.Contains(w.Header().Get("Link"), `<`+Base+`/api/v1/openapi.json>; rel="service-desc"`) {
+		t.Errorf("missing service description link: %v", w.Header())
+	}
+	var root map[string]any
+	if err := json.Unmarshal(w.Body.Bytes(), &root); err != nil {
+		t.Fatal(err)
+	}
+	if root["openapi"] != Base+"/api/v1/openapi.json" {
+		t.Errorf("missing root discovery: %v", root)
 	}
 }
