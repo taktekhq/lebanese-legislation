@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"sort"
@@ -133,11 +134,13 @@ func (s *Server) answer(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if s.meaning == nil {
+		log.Printf("answer unavailable: meaning search: %v", errors.New("AI search is off"))
 		view.Unavailable = true
 		render()
 		return
 	}
 	if _, ok := s.meaning.clients.Allow(clientIP(r)); !ok {
+		log.Printf("answer unavailable: limiter: %v", errors.New("client rate limit reached"))
 		view.Unavailable = true
 		render()
 		return
@@ -146,6 +149,7 @@ func (s *Server) answer(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 	res, err := s.SearchMeaning(ctx, q, s.meaning)
 	if err != nil {
+		log.Printf("answer unavailable: SearchMeaning: %v", err)
 		view.Unavailable = true
 		render()
 		return
@@ -157,6 +161,7 @@ func (s *Server) answer(w http.ResponseWriter, r *http.Request) {
 	}
 	sources, err := s.answerSources(ctx, q, res)
 	if err != nil {
+		log.Printf("answer unavailable: answerSources: %v", err)
 		view.Unavailable = true
 		render()
 		return
@@ -178,6 +183,7 @@ func (s *Server) answer(w http.ResponseWriter, r *http.Request) {
 	}
 	qs, err := s.meaning.selectEvidence(ctx, q, passages)
 	if err != nil {
+		log.Printf("answer unavailable: selectEvidence: %v", err)
 		view.Unavailable = true
 		render()
 		return
