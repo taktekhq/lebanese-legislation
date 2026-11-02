@@ -966,7 +966,7 @@ func (s *Server) articlePage(r *http.Request, l *Law, i int) Page {
 	}
 	desc := articleDesc(bn, l, a.Number, strings.ReplaceAll(text, "\n", " "))
 	return Page{Title: artTitle(bn, l, a.Number), Desc: desc, Path: path, OGType: "article", Lang: "ar", Translated: true,
-		LD:   []any{ld, breadcrumbs(cut(l.Title, 80), lawPath(l.ID), "المادة "+a.Number, path)},
+		LD: []any{ld, breadcrumbs(cut(l.Title, 80), lawPath(l.ID), "المادة "+a.Number, path)},
 		Data: map[string]any{"Law": l, "A": a, "Prev": prev, "Next": next, "Answer": answer,
 			"Updated": s.pageUpdated(r, l.Changed, lastArticleAmendment(a))}}
 }

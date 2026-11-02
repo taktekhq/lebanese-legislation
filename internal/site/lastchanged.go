@@ -6,6 +6,7 @@ import (
 	"html"
 	"html/template"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/taktekhq/lebanese-legislation/internal/indexing"
@@ -148,4 +149,63 @@ func lastArticleAmendment(a *Article) *LawRow {
 		by, at = &row, *k.Effective
 	}
 	return by
+}
+
+// pageDates holds the usable page_state dates in memory for the JSON API: a
+// search or a list names up to 50 texts, rulings or issues, and each carries
+// its updated_at; one map lookup beats one query per row. Like titlesEn it is
+// reloaded when an hour old, so a nightly load shows within the hour (a
+// single text, ruling or issue asked for by id reads page_state directly).
+// An older database without the table gives no dates.
+type pageDates struct {
+	mu   sync.Mutex
+	at   time.Time
+	days map[pageKey]int32 // days since 1970-01-01
+}
+
+type pageKey struct {
+	kind string
+	id   int32
+}
+
+// listedChange is when page kind/id last changed, as updated_at, from the
+// hourly copy; nil when not known.
+func (s *Server) listedChange(ctx context.Context, kind string, id int) *string {
+	d := &s.pageDates
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.days == nil || time.Since(d.at) > time.Hour {
+		if s.db == nil {
+			return nil
+		}
+		rows, err := s.db.Query(ctx, `SELECT kind, id, changed_at FROM page_state WHERE changed_at >= $1`, indexing.FirstFetch)
+		if err != nil {
+			return nil
+		}
+		m := map[pageKey]int32{}
+		kinds := map[string]string{} // one copy of each kind's name
+		for rows.Next() {
+			var k string
+			var i int32
+			var t time.Time
+			if rows.Scan(&k, &i, &t) != nil {
+				continue
+			}
+			if kinds[k] == "" {
+				kinds[k] = k
+			}
+			m[pageKey{kinds[k], i}] = int32(t.Unix() / 86400)
+		}
+		rows.Close()
+		if rows.Err() != nil {
+			return nil // the request ended: none this time, ask again next time
+		}
+		d.days, d.at = m, time.Now()
+	}
+	v, ok := d.days[pageKey{kind, int32(id)}]
+	if !ok {
+		return nil
+	}
+	t := time.Unix(int64(v)*86400, 0).UTC()
+	return changedISO(&t)
 }

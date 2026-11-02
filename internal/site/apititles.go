@@ -52,6 +52,7 @@ func (t *titlesEn) get(ctx context.Context, s *Server, id int) string {
 // lawSum is lawSummary with the unofficial English title added.
 func (s *Server) lawSum(ctx context.Context, l LawRow, sourceURL string) apiLawSummary {
 	out := lawSummary(l, sourceURL)
+	out.UpdatedAt = s.listedChange(ctx, "law", l.ID)
 	if te := s.titles.get(ctx, s, l.ID); te != "" {
 		out.TitleEn = &te
 	}

@@ -134,7 +134,8 @@ func (s *Server) apiRescue(ctx context.Context, q, typ string, year, offset int,
 	if typ == "" || typ == "rulings" {
 		out.RulCount = alt.RulCount
 		for _, r := range alt.Rulings[:min(limit, len(alt.Rulings))] {
-			h := apiRulingHit{ID: r.ID, Title: r.Title, Snippet: stripMarks(r.Snippet), URL: Base + "/ruling/" + strconv.Itoa(r.ID) + "/"}
+			h := apiRulingHit{ID: r.ID, Title: r.Title, Snippet: stripMarks(r.Snippet), URL: Base + "/ruling/" + strconv.Itoa(r.ID) + "/",
+				UpdatedAt: s.listedChange(ctx, "ruling", r.ID)}
 			if r.Date != nil {
 				h.DecidedOn = r.Date.Format("2006-01-02")
 			}

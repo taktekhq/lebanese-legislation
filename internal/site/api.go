@@ -149,6 +149,10 @@ type apiLawSummary struct {
 	Code         *string `json:"code,omitempty"` // the curated code's short name, e.g. "Code of Obligations and Contracts"
 	URL          string  `json:"url"`
 	SourceURL    string  `json:"source_url,omitempty"`
+	// UpdatedAt is the day the text's page last changed here (page_state):
+	// an amendment in force, a correction. Never the text's own date; absent
+	// when not known.
+	UpdatedAt *string `json:"updated_at,omitempty"`
 }
 
 func ymd(t *time.Time) *string {
@@ -202,14 +206,16 @@ type apiRulingHit struct {
 	PDFURL string `json:"pdf_url,omitempty"`
 	// JudgmentPage is set when only the machine reading of the scanned
 	// judgment matched, not the title or summary: the page the snippet is from.
-	JudgmentPage int `json:"judgment_page,omitempty"`
+	JudgmentPage int     `json:"judgment_page,omitempty"`
+	UpdatedAt    *string `json:"updated_at,omitempty"` // the day its page last changed here, when known
 }
 
 type apiGazetteHit struct {
-	ID          int    `json:"id"`
-	Number      string `json:"number,omitempty"`
-	PublishedOn string `json:"published_on,omitempty"`
-	URL         string `json:"url"`
+	ID          int     `json:"id"`
+	Number      string  `json:"number,omitempty"`
+	PublishedOn string  `json:"published_on,omitempty"`
+	URL         string  `json:"url"`
+	UpdatedAt   *string `json:"updated_at,omitempty"` // the day its page last changed here, when known
 }
 
 type apiSearchResult struct {
@@ -624,7 +630,7 @@ func (s *Server) apiFindRulings(ctx context.Context, q string, limit, offset int
 	}
 	for _, r := range hits {
 		h := apiRulingHit{ID: r.ID, Title: r.Title, Court: r.Court, Snippet: stripMarks(r.Snippet),
-			URL: Base + "/ruling/" + strconv.Itoa(r.ID) + "/", JudgmentPage: r.Page}
+			URL: Base + "/ruling/" + strconv.Itoa(r.ID) + "/", JudgmentPage: r.Page, UpdatedAt: s.listedChange(ctx, "ruling", r.ID)}
 		if withFile[r.ID] {
 			h.PDFURL = ULRulingPDF(r.ID)
 		}
@@ -656,7 +662,7 @@ func (s *Server) apiFindGazette(ctx context.Context, q string, limit, offset int
 		if err := rows.Scan(&id, &number, &on); err != nil {
 			return err
 		}
-		h := apiGazetteHit{ID: id, URL: Base + "/gazette/" + strconv.Itoa(id) + "/"}
+		h := apiGazetteHit{ID: id, URL: Base + "/gazette/" + strconv.Itoa(id) + "/", UpdatedAt: s.listedChange(ctx, "gazette", id)}
 		if number != nil {
 			h.Number = *number
 		}
@@ -776,6 +782,7 @@ func (s *Server) lawDetailOf(ctx context.Context, l *Law) (apiLawDetail, error) 
 	out := apiLawDetail{apiLawSummary: s.lawSum(ctx, l.LawRow, s.source(ctx, "law", id)),
 		GazetteNumber: l.GazetteNumber, Preamble: l.Preamble, ExplanatoryNote: l.ExplanatoryNote, Closing: l.Closing,
 		GazetteIssueID: l.GazetteIssue, NotLegalAdvice: notLegalAdvice}
+	out.UpdatedAt = changedISO(l.Changed) // read now, not the hourly copy lawSum used
 	out.GazetteDate = ymd(l.GazetteDate)
 	// From the link graph, as the MCP's get_law does; the amendment table adds
 	// what the graph lacks (see mergeAmendments).
@@ -891,7 +898,10 @@ type apiArticleDetail struct {
 	Rulings           []apiRulingRef            `json:"rulings,omitempty"`
 	URL               string                    `json:"url"`
 	SourceURL         string                    `json:"source_url,omitempty"`
-	NotLegalAdvice    string                    `json:"not_legal_advice"`
+	// UpdatedAt is the day the page of the article's text last changed here:
+	// an article belongs to its text, and they change together.
+	UpdatedAt      *string `json:"updated_at,omitempty"`
+	NotLegalAdvice string  `json:"not_legal_advice"`
 }
 
 // articleDetail loads a law and finds one article in it, by its printed
@@ -912,7 +922,8 @@ func (s *Server) articleDetail(ctx context.Context, lawID int, number string) (l
 		out = apiArticleDetail{Law: s.lawSum(ctx, l.LawRow, sourceURL), Number: a.Number, Note: a.Note, CentreError: a.CentreError,
 			TextAr: a.TextAr, TextFr: a.TextFr, InForceFrom: ymd(a.From),
 			URL:       Base + artPath(lawID, a.Number),
-			SourceURL: sourceURL, NotLegalAdvice: notLegalAdvice}
+			SourceURL: sourceURL, UpdatedAt: changedISO(l.Changed), NotLegalAdvice: notLegalAdvice}
+		out.Law.UpdatedAt = out.UpdatedAt
 		for _, v := range a.Versions {
 			out.Versions = append(out.Versions, apiArticleVersion{Major: v.Major, Minor: v.Minor,
 				ValidFrom: ymd(v.From), ValidTo: ymd(v.To), State: v.State, TextAr: v.TextAr,
@@ -997,6 +1008,7 @@ type apiRulingDetail struct {
 	PageCount      int             `json:"page_count,omitempty"`  // pages in the scan
 	Pages          []apiRulingPage `json:"pages,omitempty"`
 	PagesNote      string          `json:"pages_note,omitempty"`
+	UpdatedAt      *string         `json:"updated_at,omitempty"` // the day its page last changed here (page_state), when known
 	NotLegalAdvice string          `json:"not_legal_advice"`
 }
 
@@ -1023,7 +1035,8 @@ func (s *Server) rulingDetail(ctx context.Context, id int) (apiRulingDetail, err
 	}
 	out := apiRulingDetail{ID: id, Court: court, CourtEn: courtEn, Number: number, Year: year, DecidedOn: ymd(on),
 		Title: title, President: president, Members: members, TextAr: text,
-		URL: Base + "/ruling/" + strconv.Itoa(id) + "/", SourceURL: s.source(ctx, "ruling", id), NotLegalAdvice: notLegalAdvice}
+		URL: Base + "/ruling/" + strconv.Itoa(id) + "/", SourceURL: s.source(ctx, "ruling", id),
+		UpdatedAt: changedISO(s.changedOn(ctx, "ruling", id)), NotLegalAdvice: notLegalAdvice}
 	if text == nil {
 		out.Note = "The Centre holds this judgment as a file only, not as typed text."
 	}
@@ -1086,6 +1099,7 @@ type apiGazetteDetail struct {
 	Texts     []apiLawSummary `json:"texts"`
 	URL       string          `json:"url"`
 	SourceURL string          `json:"source_url,omitempty"`
+	UpdatedAt *string         `json:"updated_at,omitempty"` // the day its page last changed here (page_state), when known
 }
 
 func (s *Server) gazetteDetail(ctx context.Context, id int) (apiGazetteDetail, error) {
@@ -1104,7 +1118,8 @@ func (s *Server) gazetteDetail(ctx context.Context, id int) (apiGazetteDetail, e
 		return apiGazetteDetail{}, err
 	}
 	out := apiGazetteDetail{ID: id, Number: number, Published: ymd(on),
-		URL: Base + "/gazette/" + strconv.Itoa(id) + "/", SourceURL: s.source(ctx, "journal", id)}
+		URL: Base + "/gazette/" + strconv.Itoa(id) + "/", SourceURL: s.source(ctx, "journal", id),
+		UpdatedAt: changedISO(s.changedOn(ctx, "gazette", id))}
 	for _, l := range laws {
 		out.Texts = append(out.Texts, s.lawSum(ctx, l, s.source(ctx, "law", l.ID)))
 	}

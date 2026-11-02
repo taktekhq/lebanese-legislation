@@ -48,6 +48,11 @@ func TestSyntheticServing(t *testing.T) {
 		{"/en/law/1/article/1/", `Last updated 30 October 2026`},
 		{"/codes/synthetic-library/", `<time datetime="2026-10-30">`},
 		{"/en/laws/year/2024/law/", `Last updated 30 October 2026`},
+		// and the same date as the API's updated_at
+		{"/api/v1/law/1/", `"updated_at":"2026-10-30"`},
+		{"/api/v1/law/1/article/1/", `"updated_at":"2026-10-30","not_legal_advice"`},
+		{"/api/v1/search/?q=المكتبة&type=laws", `"updated_at":"2026-10-30"`},
+		{"/api/v1/laws/", `"updated_at":"2026-10-30"`},
 	} {
 		t.Run(tc.path, func(t *testing.T) {
 			rec := httptest.NewRecorder()
@@ -63,6 +68,19 @@ func TestSyntheticServing(t *testing.T) {
 	s.ServeHTTP(rec, httptest.NewRequest("GET", "/en/gazette/1/", nil))
 	if rec.Code != 200 || strings.Contains(rec.Body.String(), "Last updated") || strings.Contains(rec.Body.String(), "dateModified") {
 		t.Fatalf("/en/gazette/1/: %d, shows a date it does not have", rec.Code)
+	}
+	for _, path := range []string{"/api/v1/gazette/1/", "/api/v1/gazette/"} {
+		rec := httptest.NewRecorder()
+		s.ServeHTTP(rec, httptest.NewRequest("GET", path, nil))
+		var issue struct {
+			UpdatedAt *string `json:"updated_at"`
+			Issues    []struct {
+				UpdatedAt *string `json:"updated_at"`
+			} `json:"issues"`
+		}
+		if rec.Code != 200 || json.Unmarshal(rec.Body.Bytes(), &issue) != nil || issue.UpdatedAt != nil || (len(issue.Issues) > 0 && issue.Issues[0].UpdatedAt != nil) {
+			t.Fatalf("GET %s: %d, an updated_at the issue does not have: %s", path, rec.Code, rec.Body.String())
+		}
 	}
 	for _, body := range []string{
 		`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}`,
@@ -81,6 +99,9 @@ func TestSyntheticServing(t *testing.T) {
 		}
 		if rec.Code != 200 || json.Unmarshal(rec.Body.Bytes(), &result) != nil || len(result.Error) > 0 || len(result.Result) == 0 || strings.Contains(rec.Body.String(), `"isError":true`) {
 			t.Fatalf("MCP %s: %d %s", body, rec.Code, rec.Body.String())
+		}
+		if strings.Contains(body, "get_law") && !strings.Contains(rec.Body.String(), `updated_at\":\"2026-10-30`) {
+			t.Fatalf("MCP get_law: no updated_at: %s", rec.Body.String())
 		}
 	}
 }
