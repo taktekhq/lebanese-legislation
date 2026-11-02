@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       shards:
-        description: Shard divisor (the matrix always runs shards 0 through 7)
+        description: Shard divisor (the matrix always runs shards 0 through 23)
         type: number
-        default: 8
+        default: 24
       full:
         description: Unused for now; a shard re-renders only pages whose hash changed
         type: boolean
@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     env:
       DATABASE_URL: postgresql://postgres:ci@127.0.0.1:5432/lebleg
       LEBLEG_DSN: postgresql://postgres:ci@127.0.0.1:5432/lebleg
@@ -89,7 +89,7 @@ jobs:
       - name: Render and upload shard
         env:
           SHARD: ${{ matrix.shard }}
-          DIVISOR: ${{ inputs.shards || 8 }}
+          DIVISOR: ${{ inputs.shards || 24 }}
           FULL: ${{ inputs.full || false }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}

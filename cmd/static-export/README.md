@@ -70,7 +70,20 @@ them on disk (64 to 128 uploads in flight, retries, nothing written to the
 runner's disk), `-dry-run` counts what would be sent, `-shard i/n` renders one
 slice of the site so the work can be split across jobs. The keys are
 `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` in the environment, never flags.
-The [static-site workflow](../../.github/workflows/static-site.yml) runs 8 parallel shards to render about 760,000 pages from `data/` into R2 bucket `lebleg-site`. The JavaScript Worker in `workers/static-site` serves the files and ruling PDFs; dynamic requests go to one Cloudflare Container. See [architecture](../../docs/architecture.md).
+The [static-site workflow](../../.github/workflows/static-site.yml) runs 24 parallel shards to render about 760,000 pages from `data/` into R2 bucket `lebleg-site`. The JavaScript Worker in `workers/static-site` serves the files and ruling PDFs; dynamic requests go to one Cloudflare Container. See [architecture](../../docs/architecture.md).
+
+Crawling shards exchange discovered paths in R2 after each round of owned
+pages. Every shard must run together with the same database, shard count and
+fresh `-exchange-id`; GitHub Actions supplies the run id and attempt automatically.
+The runner concurrency allowance must accommodate all shards together; after a
+failed attempt, rerun all render jobs with a fresh id, including previously
+successful shards. A shard only renders and records paths assigned to it by `Owner`, including
+extra paths. The exchange continues until every shard has no new foreign links,
+so paths reached through other owners, redirects and cycles are included once.
+Coordination objects live under `_export/discovery/<id>/of-<n>/`.
+Local independent shards can use `-crawl=false` for sitemap-only exports;
+coordinated crawling requires R2 and cannot use `-dry-run` or `-limit`.
+At about 760,000 pages, 24 shards average about 31,667 pages each.
 
 ## Tests
 

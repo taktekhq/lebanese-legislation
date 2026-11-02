@@ -3,12 +3,16 @@ package staticexport
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
+	"sync"
 	"testing"
 	"testing/fstest"
+	"time"
 )
 
 // fakeSite is a handler shaped like the live site: sitemaps, pages that link
@@ -265,7 +269,7 @@ func TestShardsPartitionTheSitemapPaths(t *testing.T) {
 	})
 	all := map[string]bool{}
 	for i := 0; i < 3; i++ {
-		_, out := run(t, h, Options{Crawl: true, Extra: []string{"/"}, Shard: i, Shards: 3})
+		_, out := run(t, h, Options{Extra: []string{"/"}, Shard: i, Shards: 3})
 		m, _ := ReadManifest(filepath.Join(out, ".export", "manifest.jsonl"))
 		for p, e := range m {
 			if strings.HasPrefix(p, "/law/") && strings.Count(p, "/") == 3 && e.Status == 200 {
@@ -282,6 +286,124 @@ func TestShardsPartitionTheSitemapPaths(t *testing.T) {
 	for _, p := range []string{"/law/1/", "/law/2/", "/law/3/", "/law/4/"} {
 		if !all[p] {
 			t.Errorf("%s rendered by no shard", p)
+		}
+	}
+}
+
+// A chain deliberately crosses owners at every hop, including a redirect.
+// Filtering foreign links without exchanging them loses the rest of the chain.
+func TestShardsPartitionCrossOwnerCrawl(t *testing.T) {
+	const shards = 3
+	paths := []string{"/law/1/"}
+	for i := 1; i < 8; i++ {
+		for n := 0; ; n++ {
+			p := fmt.Sprintf("/crawl-%d-%d/", i, n)
+			if Owner(p, shards) == (Owner(paths[i-1], shards)+1)%shards {
+				paths = append(paths, p)
+				break
+			}
+		}
+	}
+	pages := site()
+	for i, p := range paths {
+		next := paths[(i+1)%len(paths)] // cycle and duplicate links must not rerender
+		pages[p] = fmt.Sprintf(`<a href="%s">next</a><a href="%s">again</a>`, next, next)
+	}
+	var mu sync.Mutex
+	calls := map[string]int{}
+	base := fakeSite(pages)
+	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		calls[r.URL.EscapedPath()]++
+		mu.Unlock()
+		if r.URL.EscapedPath() == paths[3] {
+			http.Redirect(w, r, paths[4], http.StatusMovedPermanently)
+			return
+		}
+		base.ServeHTTP(w, r)
+	})
+	_, out := run(t, h, Options{Crawl: true, Extra: []string{"/"}})
+	want, err := ReadManifest(filepath.Join(out, ".export", "manifest.jsonl"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range paths {
+		if _, ok := want[p]; !ok {
+			t.Fatalf("fixture did not reach %s", p)
+		}
+	}
+	calls = map[string]int{}
+
+	// Use the actual R2 exchange against an in-memory HTTP object store.
+	var storeMu sync.Mutex
+	objects := map[string][]byte{}
+	r2 := fakeR2(t, func(w http.ResponseWriter, r *http.Request) {
+		storeMu.Lock()
+		defer storeMu.Unlock()
+		if r.Method == http.MethodPut {
+			b, _ := io.ReadAll(r.Body)
+			objects[r.URL.Path] = b
+			return
+		}
+		b, ok := objects[r.URL.Path]
+		if !ok {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		w.Write(b)
+	})
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	type result struct {
+		manifest map[string]Entry
+		err      error
+	}
+	results := make(chan result, shards)
+	for shard := 0; shard < shards; shard++ {
+		out := t.TempDir()
+		go func(shard int, out string) {
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				p := r.URL.EscapedPath()
+				if p != "/sitemap.xml" && p != "/sitemaps/a.xml" && p != "/__static-export-not-found__/" && Owner(p, shards) != shard {
+					t.Errorf("handler rendered foreign %s on shard %d", p, shard)
+				}
+				h.ServeHTTP(w, r)
+			})
+			_, err := Run(ctx, handler, Options{Out: out, Crawl: true, Extra: []string{"/"}, Shard: shard, Shards: shards,
+				Exchange: r2.PathExchange("test-run", shard, shards)})
+			if err != nil {
+				results <- result{err: err}
+				return
+			}
+			got, err := ReadManifest(filepath.Join(out, ".export", "manifest.jsonl"))
+			for p := range got {
+				if Owner(p, shards) != shard {
+					t.Errorf("manifest has foreign %s on shard %d", p, shard)
+				}
+			}
+			results <- result{got, err}
+		}(shard, out)
+	}
+	union := map[string]Entry{}
+	for shard := 0; shard < shards; shard++ {
+		result := <-results
+		if result.err != nil {
+			t.Fatal(result.err)
+		}
+		for p, e := range result.manifest {
+			if _, exists := union[p]; exists {
+				t.Errorf("duplicate render: %s", p)
+			}
+			union[p] = e
+		}
+	}
+
+	if !reflect.DeepEqual(union, want) {
+		t.Errorf("sharded union differs: got %v, want %v", union, want)
+	}
+	for _, p := range paths {
+		if calls[p] != 1 {
+			t.Errorf("%s rendered %d times, want 1", p, calls[p])
 		}
 	}
 }
