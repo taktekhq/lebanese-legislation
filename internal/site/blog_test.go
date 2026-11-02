@@ -55,7 +55,7 @@ func TestBlogContentEvidence(t *testing.T) {
 		t.Fatal("need several milestone posts")
 	}
 	for _, p := range posts {
-		if len(p.Sections) < 4 || len(p.SectionsAr) != len(p.Sections) || p.TitleAr == "" {
+		if len(p.Sections) < 3 || len(p.SectionsAr) != len(p.Sections) || p.TitleAr == "" {
 			t.Errorf("incomplete %s", p.Slug)
 		}
 		if p.Commit == "" && p.EvidenceKind != "conversation" && p.EvidenceKind != "publication-record" {

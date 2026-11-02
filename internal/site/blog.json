@@ -1,5 +1,119 @@
 [
   {
+    "Slug": "site-on-cloudflare",
+    "Milestone": "2026-11-02",
+    "Published": "2026-11-02",
+    "Commit": "4b7bd9425f1a",
+    "EvidenceKind": "public-commit",
+    "Title": "The site now runs on Cloudflare",
+    "TitleAr": "الموقع يعمل الآن على Cloudflare",
+    "Summary": "Every law, ruling and gazette page is now a static file served from Cloudflare's network. Search, the API and filters run in one container next to it. The whole build lives in the public repository.",
+    "SummaryAr": "أصبحت كل صفحة قانون أو حكم أو جريدة رسمية ملفاً ثابتاً يُقدَّم من شبكة Cloudflare. ويعمل البحث وواجهة البرمجة وأدوات التصفية في حاوية واحدة إلى جانبها. ويضم المستودع العام جميع ملفات البناء.",
+    "Sections": [
+      {
+        "Heading": "About 760,000 pages, built from the open data.",
+        "Body": "The pages you read are no longer rendered by a server on every visit. A GitHub workflow builds them from the data/ folder of the public repository, in 8 parallel jobs, and stores them in Cloudflare R2. A small Cloudflare Worker serves each page from the nearest Cloudflare location and answers old addresses with one redirect. Court ruling PDFs are served the same way."
+      },
+      {
+        "Heading": "Search and the API in one container.",
+        "Body": "Anything that needs a database, such as search, the JSON API at /api/v1/, filtered lists and gazette scans, goes to one Cloudflare Container. It holds PostgreSQL with the database built in and the same Go server as before. Repeated API requests are answered from Cloudflare's cache, and a rate limit per address keeps one client from slowing it down for everyone."
+      },
+      {
+        "Heading": "One public repository.",
+        "Body": "The code that used to live in a private repository, including the scraper, the build pipeline, the website and the MCP server, is now in github.com/taktekhq/lebanese-legislation. The workflows that build the pages, the container and the search vectors are there too, so anyone can see how the site is made and rebuild it."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "نحو 760,000 صفحة مبنية من البيانات المفتوحة.",
+        "Body": "لم يعد الخادم يولّد الصفحات التي تقرأها عند كل زيارة. يبنيها مسار عمل على GitHub من مجلد data/ في المستودع العام، عبر 8 مهام متوازية، ويحفظها في Cloudflare R2. ويقدّم Cloudflare Worker صغير كل صفحة من أقرب موقع لشبكة Cloudflare، ويستجيب للعناوين القديمة بإعادة توجيه واحدة. وتُقدَّم ملفات PDF للأحكام القضائية بالطريقة نفسها."
+      },
+      {
+        "Heading": "البحث وواجهة البرمجة في حاوية واحدة.",
+        "Body": "كل ما يحتاج إلى قاعدة بيانات، مثل البحث وواجهة JSON البرمجية على /api/v1/ والقوائم المصفّاة ومسوح الجريدة الرسمية، يُوجَّه إلى حاوية Cloudflare واحدة. تضم الحاوية PostgreSQL مع قاعدة البيانات المدمجة فيها وخادم Go نفسه المستخدم سابقاً. وتُجاب طلبات واجهة البرمجة المتكرّرة من ذاكرة Cloudflare المؤقتة، ويمنع حدّ للطلبات لكل عنوان أي عميل واحد من إبطاء الخدمة على الجميع."
+      },
+      {
+        "Heading": "مستودع عام واحد.",
+        "Body": "أصبحت الشيفرة التي كانت في مستودع خاص، بما فيها أداة جمع البيانات ومسار البناء والموقع وخادم MCP، متاحة في github.com/taktekhq/lebanese-legislation. وتوجد فيه أيضاً مسارات العمل التي تبني الصفحات والحاوية ومتجهات البحث، ليتمكّن أي شخص من معرفة كيفية بناء الموقع وإعادة بنائه."
+      }
+    ],
+    "Action": "Read the developer documentation",
+    "ActionPath": "/developers/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation",
+        "Label": "Public source on GitHub",
+        "LabelAr": "الشيفرة العامة على GitHub"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/commit/4b7bd9425f1a",
+        "Label": "Cloudflare site migration commit",
+        "LabelAr": "تغيير نقل الموقع إلى Cloudflare"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation",
+    "ResourceLabel": "View the source on GitHub",
+    "ResourceLabelAr": "افتح الشيفرة على GitHub",
+    "Updated": "2026-11-02"
+  },
+  {
+    "Slug": "search-vectors-open-data",
+    "Milestone": "2026-11-02",
+    "Published": "2026-11-02",
+    "Commit": "b090576bbfe4",
+    "EvidenceKind": "public-commit",
+    "Title": "Our search vectors are now open data",
+    "TitleAr": "متجهات البحث لدينا أصبحت بيانات مفتوحة",
+    "Summary": "The 1,547,937 passage vectors behind meaning search are published as one Parquet file on Hugging Face. The site now reads them from Cloudflare Vectorize.",
+    "SummaryAr": "نُشرت متجهات المقاطع البالغ عددها 1,547,937، التي يستند إليها البحث بالمعنى، في ملف Parquet واحد على Hugging Face. ويقرأها الموقع الآن من Cloudflare Vectorize.",
+    "Sections": [
+      {
+        "Heading": "What the file holds.",
+        "Body": "vectors/vectors.parquet in the Hugging Face dataset taktekhq/lebanese-legislation has one row per passage of a law, article or ruling: an id, the document it comes from, the embedding model (gemini-embedding-001), a hash of the text and 768 numbers. It is 2.7 GB. You can query it directly with DuckDB or load it into any vector database."
+      },
+      {
+        "Heading": "Why we moved them.",
+        "Body": "The vectors and their index took about 7 GB of our 10 GB database. Moving them to Cloudflare Vectorize made the search database small enough to ship inside one container image, and Vectorize answers a nearest-passage query in a fraction of a second."
+      },
+      {
+        "Heading": "Kept in step.",
+        "Body": "A GitHub workflow exports the vectors, publishes the Parquet file and updates Vectorize. Later runs send only the passages that changed, so the open file and the live search always come from the same export."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "ما يحتويه الملف.",
+        "Body": "يضم ملف vectors/vectors.parquet في مجموعة البيانات taktekhq/lebanese-legislation على Hugging Face صفاً لكل مقطع من قانون أو مادة أو حكم: معرّفاً، والوثيقة التي أُخذ منها، ونموذج التضمين (gemini-embedding-001)، وبصمة للنص و768 رقماً. يبلغ حجمه 2.7 غيغابايت. يمكنك الاستعلام عنه مباشرة باستخدام DuckDB أو تحميله في أي قاعدة بيانات للمتجهات."
+      },
+      {
+        "Heading": "لماذا نقلنا المتجهات.",
+        "Body": "كانت المتجهات وفهرسها تشغل نحو 7 غيغابايت من قاعدة بياناتنا البالغ حجمها 10 غيغابايت. وأدّى نقلها إلى Cloudflare Vectorize إلى تقليص قاعدة بيانات البحث بما يكفي لتوزيعها داخل صورة حاوية واحدة، ويجيب Vectorize عن استعلام لأقرب مقطع في جزء من الثانية."
+      },
+      {
+        "Heading": "تحديثات متزامنة.",
+        "Body": "يصدّر مسار عمل على GitHub المتجهات وينشر ملف Parquet ويحدّث Vectorize. وفي التشغيلات اللاحقة، لا يرسل إلا المقاطع التي تغيّرت، ليبقى الملف المفتوح والبحث المباشر مستندَين دائماً إلى التصدير نفسه."
+      }
+    ],
+    "Action": "Explore the open data",
+    "ActionPath": "/data/",
+    "Sources": [
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+        "Label": "Open dataset on Hugging Face",
+        "LabelAr": "مجموعة البيانات المفتوحة على Hugging Face"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/commit/b090576bbfe4",
+        "Label": "Search vector export commit",
+        "LabelAr": "تغيير تصدير متجهات البحث"
+      }
+    ],
+    "ResourceURL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation/blob/main/vectors/vectors.parquet",
+    "ResourceLabel": "Open the vectors Parquet file on Hugging Face",
+    "ResourceLabelAr": "افتح ملف المتجهات بصيغة Parquet على Hugging Face",
+    "Updated": "2026-11-02"
+  },
+  {
     "Slug": "public-website-source-and-demo",
     "Milestone": "2026-10-30",
     "Published": "2026-10-30",
