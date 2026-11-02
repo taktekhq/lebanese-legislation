@@ -253,7 +253,7 @@ CREATE TABLE source_page (
 
 
 CREATE TABLE noindex_page (
-  kind      text NOT NULL CHECK (kind IN ('article', 'ruling', 'opinion', 'agreement', 'doctrine', 'research')),
+  kind      text NOT NULL CHECK (kind IN ('article', 'ruling', 'opinion', 'agreement', 'doctrine', 'research', 'english')),
   id        integer NOT NULL,             
   position  integer NOT NULL DEFAULT 0,   
   reason    text NOT NULL,                

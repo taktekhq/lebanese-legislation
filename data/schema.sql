@@ -350,12 +350,15 @@ CREATE TABLE source_page (
 -- entry in the sitemaps. The page stays reachable and linked. Written by the
 -- build (internal/indexing): an article whose text is under 25 words and only
 -- a publication, commencement, notification or repeal clause (or is empty), a
--- document with a placeholder title or no text.
+-- document with a placeholder title or no text, and, as kind english, a text
+-- whose machine-translated /en/ pages (text, parts, articles) are hidden
+-- because it is not in data/popular_texts.txt. Topic and ruling pages are
+-- hidden whole by the site (internal/site/indexing.go) and have no rows.
 CREATE TABLE noindex_page (
-  kind      text NOT NULL CHECK (kind IN ('article', 'ruling', 'opinion', 'agreement', 'doctrine', 'research')),
-  id        integer NOT NULL,             -- the text's id for an article, else the document's id
-  position  integer NOT NULL DEFAULT 0,   -- an article's position in its text; 0 for a document
-  reason    text NOT NULL,                -- empty, boilerplate, placeholder
+  kind      text NOT NULL CHECK (kind IN ('article', 'ruling', 'opinion', 'agreement', 'doctrine', 'research', 'english')),
+  id        integer NOT NULL,             -- the text's id for an article or english, else the document's id
+  position  integer NOT NULL DEFAULT 0,   -- an article's position in its text; 0 for a document or english
+  reason    text NOT NULL,                -- empty, boilerplate, placeholder, machine_english
   PRIMARY KEY (kind, id, position)
 );
 

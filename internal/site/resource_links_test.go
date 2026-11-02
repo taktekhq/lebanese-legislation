@@ -23,19 +23,19 @@ func TestPublicResourcesAreDirectAndBilingual(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, dest := range []string{"https://github.com/taktekhq/lebanese-legislation", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/data", "https://huggingface.co/datasets/taktekhq/lebanese-court-scans", "https://huggingface.co/collections/taktekhq/lebanese-legislation", prefix + "/run-it-yourself/"} {
+		for _, dest := range []string{"https://github.com/taktekhq/lebanese-legislation", "https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/data", "https://huggingface.co/datasets/taktekhq/lebanese-court-scans", "https://huggingface.co/collections/taktekhq/lebanese-legislation", prefix + "/run-it-yourself/"} {
 			if !strings.Contains(body, `href="`+dest+`"`) {
 				t.Errorf("%s resource hub missing direct %s", lang, dest)
 			}
 		}
-		if strings.Contains(body, "github.com/taktekhq/lebanese-legislation/releases") {
-			t.Errorf("%s resource hub links a GitHub data release; the dump lives on Hugging Face", lang)
+		if strings.Contains(body, "github.com/taktekhq/lebanese-legislation/releases") || strings.Contains(body, "/releases/") || strings.Contains(body, "corpus.dump") {
+			t.Errorf("%s resource hub links a retired data release", lang)
 		}
 		body, err = s.execute(r, "local", Page{Path: "/run-it-yourself/"})
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, image := range []string{"db", "api", "mcp", "web"} {
+		for _, image := range []string{"db", "api", "mcp", "all"} {
 			if !strings.Contains(body, `href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-`+image+`"`) {
 				t.Errorf("%s run-it-yourself page misses image %s", lang, image)
 			}
@@ -71,7 +71,7 @@ func TestEveryJournalResourceUsesPublicCurrentDestinations(t *testing.T) {
 			urls = append(urls, source.URL)
 		}
 		for _, u := range urls {
-			// The dump is published only on Hugging Face; GitHub releases are code versions.
+			// Portable data is on Hugging Face; GitHub releases are code versions.
 			// The only GitHub repository a post links to is this public one.
 			public := u == "https://github.com/taktekhq/lebanese-legislation" || strings.HasPrefix(u, "https://github.com/taktekhq/lebanese-legislation/") ||
 				strings.HasPrefix(u, "https://github.com/taktekhq/lebanese-legislation#")

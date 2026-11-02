@@ -26,10 +26,11 @@ func main() {
 	rulingCitations := flag.String("ruling-citations", modelout.DefaultRulingCitations, "the model's reading of rulings, comma-separated files: the texts each applies, cites or interprets (citeagy -source rulings)")
 	scans := flag.String("scans", "manual/scans", "texts the Centre has not published yet, read from Gazette scans (a lebgazette sader-bundle folder; skipped when absent)")
 	rulingFiles := flag.String("ruling-files", "manual/rulings", "the folder ruling-files fills: judgment PDFs' index and the machine readings (skipped when absent)")
+	popular := flag.String("popular", "data/popular_texts.txt", "texts whose English pages search engines may index; every other text's /en/ pages are noindex (skipped when absent: all open)")
 	flag.Parse()
-	*scans, *rulingFiles = cli.IfExists(*scans), cli.IfExists(*rulingFiles)
+	*scans, *rulingFiles, *popular = cli.IfExists(*scans), cli.IfExists(*rulingFiles), cli.IfExists(*popular)
 	rep, err := build.Run(ctx, build.Options{Archive: archive.Archive{Dir: *dir}, DSN: *dsn,
-		Workers: *workers, Only: *only, Citations: *citations, RulingCitations: *rulingCitations, Scans: *scans, RulingFiles: *rulingFiles, Log: func(f string, a ...any) { log.Printf(f, a...) }})
+		Workers: *workers, Only: *only, Citations: *citations, RulingCitations: *rulingCitations, Scans: *scans, RulingFiles: *rulingFiles, PopularTexts: *popular, Log: func(f string, a ...any) { log.Printf(f, a...) }})
 	if rep != nil {
 		fmt.Println()
 		rep.Write(os.Stdout)

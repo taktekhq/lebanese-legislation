@@ -24,6 +24,17 @@ import (
 //     to wherever the address has moved since (redirect.go).
 //   - A page with nothing to index (noindex_page, written by the build) is
 //     `noindex, follow`: reachable and linked, not offered.
+//   - Weak pages are hidden the same way (issue #86, internal/indexing/weak.go):
+//     every court ruling page and list of rulings (rulingsHidden); the
+//     /en/ pages of every text not in data/popular_texts.txt (kind english:
+//     the text page, its parts and its articles; the Arabic pages stay
+//     open); and every generated topic page, /topics/ and /topic/<slug>/ in
+//     both languages (topics.go). The English home, list pages, code and
+//     year hubs and info pages stay open.
+//   - A page that is noindex, or whose twin in the other language is, names
+//     no hreflang (Page.Hreflang): hreflang never points at a hidden page. A
+//     hidden English text page stays its own canonical: a noindex page whose
+//     canonical names another address sends Google two signals.
 
 // canonical is the page's canonical path (with /en for the English interface;
 // Arabic is the root) and whether the en and ar versions are a translation pair.
@@ -39,11 +50,39 @@ func (s *Server) canonical(r *http.Request, p Page) (string, bool) {
 
 // noindexed reports whether the build listed a page as having nothing to
 // index: kind is article (id the text, pos the article's position),
-// ruling, opinion, agreement, doctrine or research (pos 0). A database from
-// before the table has none.
+// ruling, opinion, agreement, doctrine or research (pos 0), or english (id
+// the text, pos 0: all of its /en/ pages). A database from before the table
+// has none.
 func (s *Server) noindexed(ctx context.Context, kind string, id, pos int) bool {
 	var one int
 	return s.db.QueryRow(ctx, `SELECT 1 FROM noindex_page WHERE kind = $1 AND id = $2 AND position = $3`, kind, id, pos).Scan(&one) == nil
+}
+
+// rulingsHidden: every court ruling page and every list of rulings (/rulings/,
+// /rulings/years/, /rulings/year/N/, an article's /rulings/ list), in both
+// languages, is noindex, follow and in no sitemap. Rulings name people
+// (parties, lawyers, judges); CanLII and AustLII keep theirs out of search
+// engines too (Nizar, 2 Nov 2026, issue #86). The pages stay for visitors
+// and the laws keep linking to them.
+const rulingsHidden = true
+
+// englishHidden reports whether a text's machine-translated /en/ pages are
+// hidden from search engines (it is not a popular text).
+func (s *Server) englishHidden(ctx context.Context, id int) bool {
+	return s.db != nil && s.noindexed(ctx, "english", id, 0)
+}
+
+// weakText marks a text's page (or one of its articles) for its English
+// twin: noindex on the /en/ address of a text that is not popular, and no
+// hreflang on either address.
+func (s *Server) weakText(ctx context.Context, r *http.Request, p *Page, id int) {
+	if !s.englishHidden(ctx, id) {
+		return
+	}
+	p.TwinHidden = true
+	if s.lang(r) != "ar" {
+		p.NoIndex = true
+	}
 }
 
 // ---------------------------------------------------------------- pagination

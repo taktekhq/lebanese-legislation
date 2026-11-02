@@ -104,10 +104,12 @@ func (s *Server) articleRulings(w http.ResponseWriter, r *http.Request) {
 	}
 	list = unique
 	title := fmt.Sprintf("%s · %s", s.trOr(r, "Rulings citing article", "art.rulings_full_title"), article.Number)
-	s.render(w, r, "list", 200, Page{Title: s.brandTitle(r, title), Path: artPath(id, article.Number) + "rulings/",
+	p := Page{Title: s.brandTitle(r, title), Path: artPath(id, article.Number) + "rulings/",
 		Desc: s.trOr(r, "Every ruling in the graph that cites this article, newest first.", "art.rulings_full_desc"),
 		Data: map[string]any{"Kind": map[string]string{
 			"Back": lawPath(id), "BackLabel": l.Ident(), "Eyebrow": s.trOr(r, "Case law", "law.case_law_eyebrow"),
 			"H1": s.trOr(r, "Rulings citing article", "art.rulings_full_title"), "Noun": s.trOr(r, "ruling", "rulings.noun"),
-			"Many": s.trOr(r, "rulings", "rulings.many")}, "List": List{Total: len(list), Rows: list}}})
+			"Many": s.trOr(r, "rulings", "rulings.many")}, "List": List{Total: len(list), Rows: list}}}
+	p.NoIndex = rulingsHidden // a list of rulings: hidden like the rulings (indexing.go)
+	s.render(w, r, "list", 200, p)
 }

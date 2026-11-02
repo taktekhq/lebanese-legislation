@@ -157,6 +157,6 @@ func TestPagesMeetAuditWithDatabase(t *testing.T) {
 			checkAudit(t, path, body)
 			pages[i] = hreflangs(body)
 		}
-		checkHreflangPair(t, root, pages[0], pages[1], c.pair)
+		checkHreflangPair(t, root, pages[0], pages[1], c.pair && !c.hidden)
 	}
 }

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
-# The separate website service for local builds. The published site image is -all.
-# Build from the repository root: docker build -f web/Dockerfile -t lebanese-legislation-web .
+# Test-only website image for checks.yml and the fictional database smoke checks.
+# Compose and published websites use the all-in-one image.
 FROM --platform=$BUILDPLATFORM golang:1.27.1-bookworm AS build
 WORKDIR /src
 COPY go.mod go.sum ./

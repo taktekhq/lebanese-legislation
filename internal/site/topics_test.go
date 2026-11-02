@@ -1,6 +1,7 @@
 package site
 
 import (
+	"context"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -35,6 +36,9 @@ func TestTopicsIndexAndPages(t *testing.T) {
 		if code != 200 || !strings.Contains(body, `href="`+link+`"`) {
 			t.Fatalf("%s/topics/: %d, links the first topic: %v", prefix, code, strings.Contains(body, link))
 		}
+		if !strings.Contains(body, `<meta name="robots" content="noindex, follow">`) {
+			t.Errorf("%s/topics/ is offered to search engines", prefix)
+		}
 		for _, tp := range all {
 			path := prefix + "/topic/" + tp.Slug + "/"
 			code, body := topicGet(s, path)
@@ -45,9 +49,7 @@ func TestTopicsIndexAndPages(t *testing.T) {
 			canon := path
 			for _, want := range []string{
 				`<link rel="canonical" href="` + Base + canon + `">`, // self-canonical
-				`hreflang="en" href="` + Base + "/en/topic/" + tp.Slug + `/"`,
-				`hreflang="ar" href="` + Base + "/topic/" + tp.Slug + `/"`,
-				`hreflang="x-default" href="` + Base + "/topic/" + tp.Slug + `/"`,
+				`<meta name="robots" content="noindex, follow">`,     // generated: kept for visitors, hidden from search (#86)
 				`"dateModified":"` + tp.Updated + `"`,
 				`"@type":"Article"`,
 				`<blockquote lang="ar" dir="rtl">`,
@@ -58,6 +60,9 @@ func TestTopicsIndexAndPages(t *testing.T) {
 			}
 			if !strings.Contains(body, strings.ReplaceAll(c.Answer.Text, "'", "&#39;")) && !strings.Contains(body, c.Answer.Text) {
 				t.Errorf("%s does not print its answer", path)
+			}
+			if strings.Contains(body, `rel="alternate" hreflang=`) {
+				t.Errorf("%s: a hidden page names hreflang", path)
 			}
 			if strings.Contains(body, "FAQPage") {
 				t.Errorf("%s: FAQPage markup is not a citation lever and is not used", path)
@@ -98,10 +103,21 @@ func TestExplainedInPartial(t *testing.T) {
 	}
 }
 
-func TestTopicSitemapPaths(t *testing.T) {
-	paths := topicSitemapPaths()
-	if paths[0] != "/topics/" || len(paths) != len(topics.All())+1 {
-		t.Errorf("paths = %v", paths)
+// The topic pages are not in the sitemaps: no addition to core.xml lists
+// them. (The hubs need the database and are skipped here; the database test
+// checks the files themselves, TestWeakPagesHidden.)
+func TestTopicsNotInSitemap(t *testing.T) {
+	for _, fn := range topicTestServer(t).coreExtra {
+		urls := func() (urls []SitemapURL) {
+			defer func() { recover() }() // no database
+			urls, _ = fn(context.Background())
+			return
+		}()
+		for _, u := range urls {
+			if strings.HasPrefix(u.Path, "/topic") {
+				t.Errorf("core sitemap lists %s", u.Path)
+			}
+		}
 	}
 }
 

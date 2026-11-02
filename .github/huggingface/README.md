@@ -86,7 +86,7 @@ Use it to search texts, follow amendments or build legal research tools. This is
 
 ## Download options and related projects
 
-The PostgreSQL dump with saved search vectors is in [`releases/`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases). Each release folder holds `corpus.dump` and a `manifest.json` with its SHA-256; `releases/latest.json` points to the newest. Dataset versions are separate from software and container versions.
+Download the Parquet tables from this dataset. For PostgreSQL, use the [`-db` or `-all` image](https://github.com/taktekhq/lebanese-legislation#images), with both databases baked from the source tables.
 
 For local services, use the [canonical code repository](https://github.com/taktekhq/lebanese-legislation) and its [Docker image links](https://github.com/taktekhq/lebanese-legislation#run-the-services-locally). Browse the [public library](https://lebaneselegislation.com/), inspect [court scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans), or try the [local handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting). [Dactelo](https://dactelo.com/) is the related Arabic handwriting project. Code licensing does not replace this dataset’s source rights and attribution.
 
