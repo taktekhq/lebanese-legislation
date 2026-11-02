@@ -5,8 +5,8 @@ name: data
 #
 # The publish job uploads them, with the dataset card, to Hugging Face. It runs
 # on main (push, or workflow_dispatch with publish=true) and only when the
-# HF_TOKEN secret is set; without it, it says so and uploads nothing. Run it on
-# your own machine with act (see docs/ci.md):
+# HF_TOKEN secret (in the huggingface environment) is set; without it, it says
+# so and uploads nothing. Run it on your own machine with act (see docs/ci.md):
 #   act workflow_dispatch -W .github/workflows/data.yml --input publish=true -s HF_TOKEN
 on:
   pull_request:
@@ -96,6 +96,9 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.publish)
+    # HF_TOKEN lives only in this environment, which deploys from main only. The
+    # token is scoped on Hugging Face to write on this one dataset.
+    environment: huggingface
     timeout-minutes: 30
     env:
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
