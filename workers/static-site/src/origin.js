@@ -22,12 +22,12 @@ export class Origin extends Container {
   // A cold start opens a 10 GB database and warms the server's caches before it
   // listens, which takes longer than the library's default 20 seconds.
   async fetch(request) {
-    if (!this.ctx.container?.running) {
-      await this.startAndWaitForPorts({
-        ports: [this.defaultPort],
-        cancellationOptions: { instanceGetTimeoutMS: 120_000, portReadyTimeoutMS: 660_000 },
-      });
-    }
+    // Also when the container is already running: it may still be opening
+    // Postgres, and the library's own wait gives up after about 20 to 48 s.
+    await this.startAndWaitForPorts({
+      ports: [this.defaultPort],
+      cancellationOptions: { instanceGetTimeoutMS: 120_000, portReadyTimeoutMS: 660_000 },
+    });
     return super.fetch(request);
   }
 }
