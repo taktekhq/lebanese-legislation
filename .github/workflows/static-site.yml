@@ -97,6 +97,7 @@ jobs:
           # Each shard reads and writes its own manifest under _export/shard-<i>-of-<n>/.
           /tmp/static-export export \
             -shard "$SHARD/$DIVISOR" \
+            -exchange-timeout 30m \
             -base https://lebaneselegislation.com \
             -workers 8 \
             -max-errors 200 \

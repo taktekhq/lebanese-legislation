@@ -80,6 +80,8 @@ failed attempt, rerun all render jobs with a fresh id, including previously
 successful shards. A shard only renders and records paths assigned to it by `Owner`, including
 extra paths. The exchange continues until every shard has no new foreign links,
 so paths reached through other owners, redirects and cycles are included once.
+`-exchange-timeout` (default `30m`) bounds each exchange wait, not rendering.
+If it expires, the error lists the shards that have not reported for that round.
 Coordination objects live under `_export/discovery/<id>/of-<n>/`.
 Local independent shards can use `-crawl=false` for sitemap-only exports;
 coordinated crawling requires R2 and cannot use `-dry-run` or `-limit`.

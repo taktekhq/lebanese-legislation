@@ -370,7 +370,7 @@ func TestShardsPartitionCrossOwnerCrawl(t *testing.T) {
 				h.ServeHTTP(w, r)
 			})
 			_, err := Run(ctx, handler, Options{Out: out, Crawl: true, Extra: []string{"/"}, Shard: shard, Shards: shards,
-				Exchange: r2.PathExchange("test-run", shard, shards)})
+				Exchange: r2.PathExchange("test-run", shard, shards, time.Minute)})
 			if err != nil {
 				results <- result{err: err}
 				return
