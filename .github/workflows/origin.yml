@@ -7,11 +7,11 @@ name: origin
         type: string
         default: ''
       image:
-        description: Deploy this already pushed Cloudflare registry image instead of building
+        description: Deploy this already pushed Cloudflare registry image instead of copying from GHCR
         type: string
         default: ''
-      data_tag:
-        description: Data image date tag
+      tag:
+        description: Published lebanese-legislation-all tag
         type: string
         default: latest
       deploy_site_worker:
@@ -65,20 +65,14 @@ jobs:
       run: |
         sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
         docker system prune -af
-    - name: Prepare code build context
-      run: |
-        build=workers/static-site/container/build
-        mkdir -p "$build/src/web"
-        cp go.mod go.sum THIRD_PARTY_NOTICES.txt "$build/src/"
-        cp -R internal "$build/src/internal"
-        cp web/main.go "$build/src/web/"
-    - name: Build and push site image
+    - name: Copy published all-in-one image to Cloudflare
       id: image
       env:
-        DATA_TAG: ${{ inputs.data_tag }}
+        IMAGE_TAG: ${{ inputs.tag }}
       run: |
         tag="lebleg-static-site-origin:${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-        docker build --build-arg DATA_TAG="$DATA_TAG" -t "$tag" workers/static-site/container
+        docker pull "ghcr.io/taktekhq/lebanese-legislation-all:$IMAGE_TAG"
+        docker tag "ghcr.io/taktekhq/lebanese-legislation-all:$IMAGE_TAG" "$tag"
         (cd workers/static-site && npx --yes wrangler@4.151.1 containers push "$tag")
         echo "image=registry.cloudflare.com/$CLOUDFLARE_ACCOUNT_ID/$tag" >> "$GITHUB_OUTPUT"
   site-worker:

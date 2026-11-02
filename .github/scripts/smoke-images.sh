@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
-# Release checks for the four images on each platform, before version tags move.
+# Release checks for the requested images on each platform, before tags move.
 # The services run against a throwaway PostgreSQL holding the website's
 # fictional fixture (web/schema, web/testdata/synthetic.sql), never real data.
 set -euo pipefail
-: "${DB_IMAGE:?Set DB_IMAGE}"
-: "${API_IMAGE:?Set API_IMAGE}"
-: "${MCP_IMAGE:?Set MCP_IMAGE}"
-: "${WEB_IMAGE:?Set WEB_IMAGE}"
+[ -n "${API_IMAGE:-}${MCP_IMAGE:-}" ] || { echo "Set API_IMAGE or MCP_IMAGE" >&2; exit 1; }
 root=$(cd "$(dirname "$0")/../.." && pwd)
 net=lebleg-smoke-$$
 pg=lebleg-smoke-pg-$$
@@ -32,14 +29,17 @@ expect() { [ "$2" = "$3" ] || { echo "$platform: $1 returned $2, want $3" >&2; e
 
 for architecture in ${SMOKE_ARCHITECTURES:-amd64 arm64}; do
   platform="linux/$architecture"
-  for command in restore-release check-release; do
-    docker run --rm --platform "$platform" "$DB_IMAGE" "$command" -h >/dev/null 2>&1 \
-      || { echo "$platform: $command does not run in the db image" >&2; exit 1; }
-  done
-  docker run --rm --platform "$platform" --entrypoint bash "$DB_IMAGE" -n /opt/lebleg/db/web-schema.sh
+  if [ -n "${DB_IMAGE:-}" ]; then
+    for command in restore-release check-release; do
+      docker run --rm --platform "$platform" "$DB_IMAGE" "$command" -h >/dev/null 2>&1 \
+        || { echo "$platform: $command does not run in the db image" >&2; exit 1; }
+    done
+    docker run --rm --platform "$platform" --entrypoint bash "$DB_IMAGE" -n /opt/lebleg/db/web-schema.sh
+
+  fi
 
   declare -A url=()
-  for service in api mcp web; do
+  for service in ${API_IMAGE:+api} ${MCP_IMAGE:+mcp} ${WEB_IMAGE:+web}; do
     image_var="${service^^}_IMAGE"
     port=8080; [ "$service" = api ] && port=8000
     name="lebleg-smoke-$service-$architecture-$$"
@@ -51,20 +51,27 @@ for architecture in ${SMOKE_ARCHITECTURES:-amd64 arm64}; do
     docker exec "$name" /server healthcheck >/dev/null || { docker logs "$name" >&2; exit 1; }
   done
 
-  expect "api /api/v1/law/1/" "$(status "${url[api]}/api/v1/law/1/")" 200
-  expect "api /mcp" "$(status "${url[api]}/mcp")" 404
-  expect "api /" "$(status "${url[api]}/")" 404
-  init=$(mcp "${url[mcp]}" '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}')
-  grep -q '"serverInfo"' <<<"$init" || { echo "$platform: MCP initialize failed: $init" >&2; exit 1; }
-  tools=$(mcp "${url[mcp]}" '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}')
-  for tool in search_legislation get_law get_article get_ruling get_gazette_issue; do
-    grep -q "\"$tool\"" <<<"$tools" || { echo "$platform: MCP is missing $tool" >&2; exit 1; }
-  done
-  expect "mcp /api/v1/" "$(status "${url[mcp]}/api/v1/")" 404
-  expect "web /" "$(status -L "${url[web]}/")" 200
-  expect "web /law/1/" "$(status -L "${url[web]}/law/1/")" 200
+  if [ -n "${API_IMAGE:-}" ]; then
+    expect "api /api/v1/law/1/" "$(status "${url[api]}/api/v1/law/1/")" 200
+    expect "api /mcp" "$(status "${url[api]}/mcp")" 404
+    expect "api /" "$(status "${url[api]}/")" 404
+  fi
+  if [ -n "${MCP_IMAGE:-}" ]; then
+    init=$(mcp "${url[mcp]}" '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}')
+    grep -q '"serverInfo"' <<<"$init" || { echo "$platform: MCP initialize failed: $init" >&2; exit 1; }
+    tools=$(mcp "${url[mcp]}" '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}')
+    for tool in search_legislation get_law get_article get_ruling get_gazette_issue; do
+      grep -q "\"$tool\"" <<<"$tools" || { echo "$platform: MCP is missing $tool" >&2; exit 1; }
+    done
+    expect "mcp /api/v1/" "$(status "${url[mcp]}/api/v1/")" 404
+  fi
+  if [ -n "${WEB_IMAGE:-}" ]; then
+    expect "web /" "$(status -L "${url[web]}/")" 200
+    expect "web /law/1/" "$(status -L "${url[web]}/law/1/")" 200
+
+  fi
 
   docker rm -f "${services[@]}" >/dev/null
   services=()
-  echo "$platform: db, api, mcp and web checks passed"
+  echo "$platform: requested image checks passed"
 done

@@ -30,3 +30,6 @@ scraper/data/
 workers/mcp/node_modules/
 
 workers/static-site/container/build/
+
+# R2 pages downloaded only by the site image job.
+/site-content/

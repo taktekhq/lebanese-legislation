@@ -2,80 +2,94 @@ name: publish images
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: Package version to publish from this ref
-        required: true
-        default: 0.4.0
+      which:
+        description: Image to publish
+        type: choice
+        default: all
+        options: [all, lebanese-legislation-db, lebanese-legislation-api, lebanese-legislation-mcp, lebanese-legislation-all, lebanese-legislation-vectors, lebanese-legislation-site]
   push:
-    tags: ['v*']
+    branches: [main]
+    paths: [".github/scripts/**", "LICENSE", "THIRD_PARTY_NOTICES.txt", ".dockerignore", ".github/workflows/images.yml", "api/**", "cmd/build-search/**", "cmd/restore-release/**", "cmd/check-release/**", "cmd/build-release/**", "cmd/publish-release/**", "cmd/export-vectors/**", "cmd/static-serve/**", "cmd/vectorize-sync/**", "data/**", "db/**", "db/*.go", "db/*.sql", "db/model/**", "go.mod", "go.sum", "internal/**", "internal/semantic/**", "internal/vectorize/**", "mcp/**", "tools/src/lebleg/sql/web.sql", "vectors/**", "web/**", "workers/static-site/container/Dockerfile", "workers/static-site/container/site.Dockerfile", "workers/static-site/container/start.sh", "workers/static-site/src/headers.js", "workers/static-site/src/route.js"]
+  workflow_run:
+    workflows: [static-site, vectors]
+    types: [completed]
+    branches: [main]
 permissions:
   contents: read
   packages: write
 concurrency:
-  group: publish-container-package
+  group: publish-images
   cancel-in-progress: false
 jobs:
-  validate:
+  changes:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.version }}
-      build_db: ${{ steps.version.outputs.build_db }}
-      build_api: ${{ steps.version.outputs.build_api }}
-      build_mcp: ${{ steps.version.outputs.build_mcp }}
-      build_web: ${{ steps.version.outputs.build_web }}
+      db: ${{ steps.select.outputs.db }}
+      api: ${{ steps.select.outputs.api }}
+      mcp: ${{ steps.select.outputs.mcp }}
+      all: ${{ steps.select.outputs.all }}
+      vectors: ${{ steps.select.outputs.vectors }}
+      site: ${{ steps.select.outputs.site }}
     steps:
       - uses: actions/checkout@v4
-      - name: Validate immutable image versions
-        id: version
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+      - id: select
         env:
-          REQUESTED_VERSION: ${{ inputs.version }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT: ${{ github.event_name }}
+          WHICH: ${{ inputs.which }}
+          UPSTREAM: ${{ github.event.workflow_run.name }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
         run: |
-          VERSION=$(cat internal/release/VERSION)
-          if [ "$GITHUB_EVENT_NAME" = push ]; then
-            test "$GITHUB_REF_NAME" = "v$VERSION"
-          else
-            test "$REQUESTED_VERSION" = "$VERSION"
-          fi
-          export VERSION
           python3 - <<'PYCODE'
-          import json, os, urllib.request, urllib.error
-          version = os.environ['VERSION']
-          source_tag = 'source-' + os.environ['GITHUB_SHA']
-          builds = {}
-          for service in ('db', 'api', 'mcp', 'web'):
-              package = 'lebanese-legislation-' + service
-              builds[service] = True
-              for page in range(1, 101):
-                  url = f'https://api.github.com/orgs/taktekhq/packages/container/{package}/versions?per_page=100&page={page}'
-                  request = urllib.request.Request(url, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'], 'Accept':'application/vnd.github+json'})
-                  try:
-                      with urllib.request.urlopen(request, timeout=30) as response:
-                          versions = json.load(response)
-                  except urllib.error.HTTPError as error:
-                      if error.code == 404 and page == 1:
-                          break
-                      raise
-                  occupied = [item for item in versions if version in item['metadata']['container']['tags']]
-                  if occupied:
-                      if len(occupied) != 1 or source_tag not in occupied[0]['metadata']['container']['tags']:
-                          raise SystemExit(f'Refusing to replace published {package}:{version} from another source')
-                      builds[service] = False
-                      break
-                  if len(versions) < 100:
-                      break
+          import fnmatch, json, os, subprocess
+          paths = {'db': ['data/**', 'db/**', 'cmd/build-search/**', 'cmd/restore-release/**', 'cmd/check-release/**', 'cmd/build-release/**', 'cmd/publish-release/**', 'internal/**', 'tools/src/lebleg/sql/web.sql'], 'api': ['api/**', 'internal/**', 'db/*.go', 'db/*.sql', 'db/model/**'], 'mcp': ['mcp/**', 'internal/**', 'db/*.go', 'db/*.sql', 'db/model/**'], 'all': ['web/**', 'internal/**', 'workers/static-site/container/Dockerfile', 'workers/static-site/container/start.sh'], 'vectors': ['vectors/**', 'cmd/vectorize-sync/**', 'cmd/export-vectors/**', 'internal/**', 'db/*.go', 'db/*.sql', 'db/model/**'], 'site': ['cmd/static-serve/**', 'workers/static-site/src/route.js', 'workers/static-site/src/headers.js', 'workers/static-site/container/site.Dockerfile']}
+          common = ['go.mod', 'go.sum', '.dockerignore', '.github/workflows/images.yml', '.github/scripts/**', 'LICENSE', 'THIRD_PARTY_NOTICES.txt']
+          event = os.environ['EVENT']
+          changed = []
+          if event == 'push':
+              before = os.environ['BEFORE']
+              if set(before) == {'0'}:
+                  changed = subprocess.check_output(['git','ls-files'], text=True).splitlines()
               else:
-                  raise SystemExit('Package version listing exceeded safety bound')
+                  changed = subprocess.check_output(['git','diff','--name-only',before,os.environ['AFTER']], text=True).splitlines()
+          selected = {}
+          for name, patterns in paths.items():
+              if event == 'workflow_dispatch':
+                  selected[name] = os.environ['WHICH'] in ('all', 'lebanese-legislation-' + name)
+              elif event == 'workflow_run':
+                  selected[name] = (name, os.environ['UPSTREAM']) in (('site','static-site'), ('vectors','vectors'))
+              else:
+                  selected[name] = any(fnmatch.fnmatch(p, pattern) for p in changed for pattern in patterns + common)
+          if event == 'push' and selected['db']:
+              selected['all'] = True
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
-              out.write('version='+version+'\n')
-              for service, build in builds.items():
-                  out.write('build_'+service+'='+str(build).lower()+'\n')
+              for name, value in selected.items():
+                  print(f'{name}={str(value).lower()}', file=out)
           PYCODE
-  build-db:
-    needs: validate
+  db:
+    needs: changes
+    if: ${{ needs.changes.outputs.db == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Free runner disk
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          docker system prune -af
+      - name: Sync R2 build inputs
+        env:
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 sync s3://lebleg-site/_build/scans db/scans --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
@@ -83,22 +97,30 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build database candidate
-        if: needs.validate.outputs.build_db == 'true'
+      - name: Image tags
+        id: tags
+        run: |
+          echo "date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Build and push db
         uses: docker/build-push-action@v6
         with:
           context: .
           file: db/Dockerfile
-          target: db
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
-          tags: ghcr.io/taktekhq/lebanese-legislation-db:source-${{ github.sha }}
-          labels: org.opencontainers.image.revision=${{ github.sha }}
-  build-api:
-    needs: validate
+          tags: |
+            ghcr.io/taktekhq/lebanese-legislation-db:${{ steps.tags.outputs.date }}
+            ghcr.io/taktekhq/lebanese-legislation-db:latest
+  api:
+    needs: changes
+    if: ${{ needs.changes.outputs.api == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
@@ -106,8 +128,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build API candidate
-        if: needs.validate.outputs.build_api == 'true'
+      - name: Image tags
+        id: tags
+        run: |
+          echo "date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Build and push api
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -116,11 +142,25 @@ jobs:
           push: true
           tags: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
-  build-mcp:
-    needs: validate
+      - name: Verify both architectures
+        env:
+          API_IMAGE: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
+        run: bash .github/scripts/smoke-images.sh
+      - name: Promote verified image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMAGE_SERVICE: api
+          DATE_TAG: ${{ steps.tags.outputs.date }}
+        run: python3 .github/scripts/promote-image.py
+  mcp:
+    needs: changes
+    if: ${{ needs.changes.outputs.mcp == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
@@ -128,8 +168,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build MCP candidate
-        if: needs.validate.outputs.build_mcp == 'true'
+      - name: Image tags
+        id: tags
+        run: |
+          echo "date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Build and push mcp
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -138,11 +182,25 @@ jobs:
           push: true
           tags: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
-  build-web:
-    needs: validate
+      - name: Verify both architectures
+        env:
+          MCP_IMAGE: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
+        run: bash .github/scripts/smoke-images.sh
+      - name: Promote verified image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMAGE_SERVICE: mcp
+          DATE_TAG: ${{ steps.tags.outputs.date }}
+        run: python3 .github/scripts/promote-image.py
+  all:
+    needs: [changes, db]
+    if: ${{ always() && needs.changes.result == 'success' && needs.changes.outputs.all == 'true' && (needs.db.result == 'success' || needs.db.result == 'skipped') }}
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
@@ -150,21 +208,32 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build website candidate
-        if: needs.validate.outputs.build_web == 'true'
+      - name: Image tags
+        id: tags
+        run: |
+          echo "date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Build and push all
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: web/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          file: workers/static-site/container/Dockerfile
+          platforms: linux/amd64
           push: true
-          tags: ghcr.io/taktekhq/lebanese-legislation-web:source-${{ github.sha }}
-          labels: org.opencontainers.image.revision=${{ github.sha }}
-  publish:
-    needs: [validate, build-db, build-api, build-mcp, build-web]
+          tags: |
+            ghcr.io/taktekhq/lebanese-legislation-all:${{ steps.tags.outputs.date }}
+            ghcr.io/taktekhq/lebanese-legislation-all:latest
+            ghcr.io/taktekhq/lebanese-legislation-all:${{ steps.tags.outputs.sha }}
+          build-args: DATA_TAG=latest
+  vectors:
+    needs: changes
+    if: ${{ needs.changes.outputs.vectors == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
@@ -172,31 +241,63 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check all four images on both architectures before release tags
-        env:
-          DB_IMAGE: ghcr.io/taktekhq/lebanese-legislation-db:source-${{ github.sha }}
-          API_IMAGE: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
-          MCP_IMAGE: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
-          WEB_IMAGE: ghcr.io/taktekhq/lebanese-legislation-web:source-${{ github.sha }}
-        run: bash .github/scripts/smoke-images.sh
-
-      - name: Promote verified immutable versions
-        env:
-          VERSION: ${{ needs.validate.outputs.version }}
-          SOURCE_SHA: ${{ github.sha }}
-          BUILD_DB: ${{ needs.validate.outputs.build_db }}
-          BUILD_API: ${{ needs.validate.outputs.build_api }}
-          BUILD_MCP: ${{ needs.validate.outputs.build_mcp }}
-          BUILD_WEB: ${{ needs.validate.outputs.build_web }}
+      - name: Image tags
+        id: tags
         run: |
-          for service in db api mcp web; do
-            image="ghcr.io/taktekhq/lebanese-legislation-$service"
-            build_var="BUILD_${service^^}"
-            if [ "${!build_var}" = true ]; then
-              docker buildx imagetools create --tag "$image:$VERSION" "$image:source-$SOURCE_SHA"
-            fi
-          done
-          for service in db api mcp web; do
-            image="ghcr.io/taktekhq/lebanese-legislation-$service"
-            docker buildx imagetools create --tag "$image:latest" "$image:$VERSION"
-          done
+          echo "date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Build and push vectors
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: vectors/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/taktekhq/lebanese-legislation-vectors:${{ steps.tags.outputs.date }}
+            ghcr.io/taktekhq/lebanese-legislation-vectors:latest
+  site:
+    needs: changes
+    if: ${{ needs.changes.outputs.site == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Free runner disk
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          docker system prune -af
+      - name: Sync R2 build inputs
+        env:
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          mkdir -p site-content
+          aws s3 sync s3://lebleg-site site-content --exclude '_build/*' --exclude '_export/*' --include '_export/redirects.json' --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+          test -s site-content/_export/redirects.json
+          df -h .
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Image tags
+        id: tags
+        run: |
+          echo "date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Build and push site
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: workers/static-site/container/site.Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/taktekhq/lebanese-legislation-site:${{ steps.tags.outputs.date }}
+            ghcr.io/taktekhq/lebanese-legislation-site:latest

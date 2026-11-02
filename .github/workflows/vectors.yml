@@ -1,87 +1,78 @@
 name: vectors
-
 on:
   workflow_dispatch:
     inputs:
       only_vectorize:
-        description: Skip build and publish; load Vectorize from the vectors.parquet already on Hugging Face
+        description: Filter the public vectors to current data and sync without publishing to Hugging Face
         type: boolean
         default: false
-
+  push:
+    branches: [main]
+    paths: ['vectors/**', 'cmd/vectorize-sync/**', 'cmd/export-vectors/**', 'internal/vectorize/**', 'data/**', 'internal/semantic/**', '.github/workflows/vectors.yml']
 permissions:
   contents: read
-
-# A manifest must describe the last completed sync, so never overlap runs.
+  packages: read
 concurrency:
   group: vectors
   cancel-in-progress: false
-
 jobs:
   build:
-    if: ${{ !inputs.only_vectorize }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 300
+    timeout-minutes: 120
+    services:
+      postgres:
+        image: postgres:18.6-trixie
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ['5432:5432']
+        options: --shm-size=2g --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
     env:
-      AWS_DEFAULT_REGION: auto
-      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-      R2_ENDPOINT: https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
-      LEBLEG_VECTOR_DSN: postgresql://postgres:ci@127.0.0.1:5432/lebleg_search
+      PGHOST: localhost
+      PGUSER: postgres
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
       - name: Free disk
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
           docker system prune -af
-      - name: Download vector database
-        run: aws s3 cp s3://lebleg-site/_build/lebleg_search.dump "$RUNNER_TEMP/lebleg_search.dump" --endpoint-url "$R2_ENDPOINT"
-      - name: Build PostgreSQL 18.6 with pgvector 0.8.2
-        run: docker build --target postgres -f db/Dockerfile -t vectors-db .
-      - name: Restore vector database
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Generate current chunk IDs from data
         run: |
-          docker run -d --name vectors-db -e POSTGRES_PASSWORD=ci -e POSTGRES_DB=lebleg_search \
-            -p 127.0.0.1:5432:5432 --shm-size=1g \
-            -v "$RUNNER_TEMP/lebleg_search.dump:/dump/lebleg_search.dump:ro" \
-            vectors-db -c fsync=off -c synchronous_commit=off -c full_page_writes=off \
-            -c max_wal_size=8GB -c maintenance_work_mem=1GB
-          ready=0
-          for i in $(seq 60); do
-            if docker exec vectors-db pg_isready -U postgres -d lebleg_search -q; then ready=1; break; fi
-            sleep 1
-          done
-          [ "$ready" = 1 ] || { docker logs vectors-db; exit 1; }
-          # Data only, no indexes: the export reads the table once in order.
-          docker exec vectors-db pg_restore -U postgres --no-owner --no-privileges -j 4 \
-            --section=pre-data --section=data -d lebleg_search /dump/lebleg_search.dump
-      - name: Export vectors
-        run: go run ./cmd/export-vectors -out "$RUNNER_TEMP/vectors.ndjson"
-      - name: Install DuckDB 1.5.6
+          createdb lebleg
+          createdb lebleg_search
+          sh data/load.sh 'host=localhost user=postgres dbname=lebleg'
+          psql -v ON_ERROR_STOP=1 -d lebleg -f db/official.sql -f tools/src/lebleg/sql/web.sql
+          go run ./cmd/build-search -corpus-dsn 'host=localhost user=postgres dbname=lebleg' -index-dsn 'host=localhost user=postgres dbname=lebleg_search' -ids-out "$RUNNER_TEMP/current.csv"
+      - name: Download public vectors
         run: |
-          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" https://github.com/duckdb/duckdb/releases/download/v1.5.6/duckdb_cli-linux-amd64.zip
-          unzip -q "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/bin"
-          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
-      - name: Convert to Parquet
+          curl -fL --retry 3 -o "$RUNNER_TEMP/published.parquet" \
+            https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet
+      - name: Filter to current IDs, refusing missing embeddings
+        env:
+          IMAGE: ghcr.io/taktekhq/lebanese-legislation-vectors:latest
         run: |
           mkdir -p "$RUNNER_TEMP/out/vectors"
-          duckdb -c "SET memory_limit='2GB'; SET temp_directory='$RUNNER_TEMP/duckdb-tmp';
-            COPY (SELECT id, document, model, hash, values::FLOAT[768] AS values
-              FROM read_json('$RUNNER_TEMP/vectors.ndjson', format='newline_delimited',
-                columns={id: 'VARCHAR', document: 'VARCHAR', model: 'VARCHAR', hash: 'VARCHAR', values: 'FLOAT[768]'}))
-            TO '$RUNNER_TEMP/out/vectors/vectors.parquet' (FORMAT parquet, COMPRESSION zstd);"
+          docker run --rm --entrypoint duckdb -v "$RUNNER_TEMP:/work" "$IMAGE" -batch -bail -c "
+            SET memory_limit='2GB'; SET temp_directory='/work/duckdb-tmp';
+            CREATE VIEW current AS SELECT * FROM read_csv('/work/current.csv', all_varchar=true);
+            CREATE VIEW published AS SELECT * FROM read_parquet('/work/published.parquet');
+            SELECT CASE WHEN count(*)=0 THEN true ELSE error('Current chunks lack published vectors; run the release workflow to embed them first') END
+              FROM current c ANTI JOIN published p ON c.id=p.id AND c.hash=p.hash;
+            COPY (SELECT p.* FROM published p JOIN current c ON c.id=p.id AND c.hash=p.hash)
+              TO '/work/out/vectors/vectors.parquet' (FORMAT parquet, COMPRESSION zstd);
+            COPY (SELECT id,hash FROM published) TO '/work/out/vectors/archive-manifest.tsv' (FORMAT CSV, DELIMITER '\t', HEADER false, QUOTE '');"
       - uses: actions/upload-artifact@v4
         with:
           name: vectors-parquet
-          path: ${{ runner.temp }}/out/vectors/vectors.parquet
+          path: ${{ runner.temp }}/out/vectors/
           retention-days: 3
           compression-level: 0
-      - name: Clean up database
-        if: always()
-        run: docker rm -f vectors-db >/dev/null 2>&1 || true
   publish:
-    needs: build
+    # Keep the archive deletion baseline public until sync and its manifest succeed.
+    needs: [build, vectorize]
+    if: ${{ !inputs.only_vectorize }}
     runs-on: ubuntu-24.04
     # HF_TOKEN lives only in the huggingface environment, which deploys from main
     # only; on other branches it runs without it and uploads nothing.
@@ -96,6 +87,8 @@ jobs:
         with:
           name: vectors-parquet
           path: ${{ runner.temp }}/out/vectors
+      - name: Remove sync baseline from publication
+        run: rm -f "$RUNNER_TEMP/out/vectors/archive-manifest.tsv"
       - name: Upload to Hugging Face
         run: |
           if [ -z "$HF_TOKEN" ]; then
@@ -109,7 +102,6 @@ jobs:
           fi
   vectorize:
     needs: build
-    if: ${{ always() && (needs.build.result == 'success' || inputs.only_vectorize) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 300
     env:
@@ -121,40 +113,41 @@ jobs:
       LEBLEG_VECTORIZE_INDEX: lebleg-chunks
       LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
       - uses: actions/download-artifact@v4
-        if: ${{ !inputs.only_vectorize }}
         with:
           name: vectors-parquet
           path: ${{ runner.temp }}/out/vectors
-      - name: Download vectors.parquet from Hugging Face
-        if: ${{ inputs.only_vectorize }}
-        run: |
-          mkdir -p "$RUNNER_TEMP/out/vectors"
-          curl -fsSL --retry 3 -o "$RUNNER_TEMP/out/vectors/vectors.parquet" \
-            https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet
-      - name: Install DuckDB 1.5.6
-        run: |
-          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" https://github.com/duckdb/duckdb/releases/download/v1.5.6/duckdb_cli-linux-amd64.zip
-          unzip -q "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/bin"
-          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
       - name: Download previous manifest
         run: |
           if ! aws s3 cp s3://lebleg-site/_build/vectors-manifest.tsv "$RUNNER_TEMP/previous.tsv" \
               --endpoint-url "$R2_ENDPOINT" 2> "$RUNNER_TEMP/manifest-download.log"; then
             if grep -Eq '\(404\)|NoSuchKey|Not Found' "$RUNNER_TEMP/manifest-download.log"; then
               rm -f "$RUNNER_TEMP/previous.tsv"
-              echo 'No previous manifest: first sync.'
             else
               cat "$RUNNER_TEMP/manifest-download.log" >&2
               exit 1
             fi
           fi
-      - name: Sync Vectorize
+      - name: Include stale archive IDs in the deletion baseline
         run: |
-          go run ./cmd/vectorize-sync -in "$RUNNER_TEMP/out/vectors/vectors.parquet" \
-            -prev "$RUNNER_TEMP/previous.tsv" -manifest "$RUNNER_TEMP/vectors-manifest.tsv"
+          python3 - <<'PYCODE'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP'])
+          rows = {}
+          for path in (root/'out/vectors/archive-manifest.tsv', root/'previous.tsv'):
+              if path.exists():
+                  for line in path.read_text().splitlines():
+                      key, value = line.split('\t')
+                      rows[key] = value
+          (root/'previous.tsv').write_text(''.join(f'{k}\t{v}\n' for k,v in rows.items()))
+          PYCODE
+      - name: Sync Vectorize using the vectors image
+        env:
+          IMAGE: ghcr.io/taktekhq/lebanese-legislation-vectors:latest
+        run: |
+          docker run --rm -v "$RUNNER_TEMP:/work" \
+            -e CLOUDFLARE_ACCOUNT_ID -e LEBLEG_VECTORIZE_TOKEN -e LEBLEG_VECTORIZE_INDEX \
+            -e VECTORS_INPUT=/work/out/vectors/vectors.parquet -e VECTORS_PREVIOUS=/work/previous.tsv \
+            "$IMAGE"
           aws s3 cp "$RUNNER_TEMP/vectors-manifest.tsv" s3://lebleg-site/_build/vectors-manifest.tsv --endpoint-url "$R2_ENDPOINT"

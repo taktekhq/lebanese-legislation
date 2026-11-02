@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:1
-# PostgreSQL 18.6 with pgvector 0.8.2. On first start with an empty volume it
-# downloads, verifies and restores the public database release (restore-release).
+# PostgreSQL 18.6 with pgvector 0.8.2 and both databases baked from data/.
 # Build from the repository root: docker build -f db/Dockerfile -t lebanese-legislation-db .
 # PostgreSQL and extension source versions are pinned for reproducible restores.
 ARG POSTGRES_BASE=postgres:18.6-trixie@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
@@ -32,13 +31,16 @@ WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY internal/ ./internal/
+COPY db/*.go db/*.sql db/*.tsv ./db/
+COPY db/model/judgements.jsonl ./db/model/
 COPY cmd/restore-release/ ./cmd/restore-release/
 COPY cmd/check-release/ ./cmd/check-release/
 COPY cmd/build-release/ ./cmd/build-release/
 COPY cmd/publish-release/ ./cmd/publish-release/
+COPY cmd/build-search/ ./cmd/build-search/
 ARG TARGETOS
 ARG TARGETARCH
-RUN for c in restore-release check-release build-release publish-release; do \
+RUN for c in restore-release check-release build-release publish-release build-search; do \
       CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags='-s -w' -o /out/$c ./cmd/$c || exit 1; \
     done
 
@@ -58,10 +60,30 @@ FROM backend AS publisher
 COPY --from=commands /out/build-release /out/publish-release /usr/local/bin/
 CMD ["build-release", "-h"]
 
-# Default target, published as ghcr.io/taktekhq/lebanese-legislation-db.
+# Both databases are generated from the checkout, without embedding calls.
+FROM backend AS baked
+ENV PGDATA=/var/lib/postgresql/18/docker
+COPY --from=commands /out/build-search /usr/local/bin/
+COPY db/health.sh db/web-schema.sh tools/src/lebleg/sql/web.sql db/official.sql /opt/lebleg/db/
+COPY db/bake.sh /opt/lebleg/db/bake.sh
+# Optional scans are supplied by images.yml. No database dumps enter the build.
+COPY db/scans/ /scans/
+RUN --mount=type=bind,source=data,target=/input/data bash /opt/lebleg/db/bake.sh
+# This is a new, cleanly stopped cluster with no replicas or consumers. Reset
+# its WAL without -f (unclean shutdowns are refused), discarding preallocated
+# future segments left by the bulk load. Copy only the resulting files into
+# the final image so discarded WAL is absent from every published layer.
+RUN gosu postgres pg_resetwal -D /opt/lebleg/seed
+
 FROM backend AS db
-COPY db/health.sh db/web-schema.sh tools/src/lebleg/sql/web.sql ./db/
-COPY db/init-release.sh /docker-entrypoint-initdb.d/30-lebleg-release.sh
-HEALTHCHECK --interval=10s --timeout=10s --start-period=2h --retries=3 CMD ["bash", "/opt/lebleg/db/health.sh"]
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENV PGDATA=/var/lib/postgresql/18/docker
+COPY --from=baked --chown=postgres:postgres /opt/lebleg/seed /opt/lebleg/seed
+COPY --from=baked /opt/lebleg/vector-ids.csv /opt/lebleg/vector-ids.csv
+COPY --from=baked /opt/lebleg/db/ /opt/lebleg/db/
+COPY --from=baked /scans/ /scans/
+COPY --from=commands /out/build-search /usr/local/bin/
+COPY --chmod=0755 db/start.sh /usr/local/bin/lebleg-db-start
+RUN chmod 0700 /opt/lebleg/seed
+HEALTHCHECK --interval=10s --timeout=10s --start-period=5m --retries=3 CMD ["bash", "/opt/lebleg/db/health.sh"]
+ENTRYPOINT ["lebleg-db-start"]
 CMD ["postgres"]

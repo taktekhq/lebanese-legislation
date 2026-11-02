@@ -6,7 +6,10 @@ Restore the public [Lebanese Legislation dataset](https://huggingface.co/dataset
 
 The existing Parquet dataset remains the portable data distribution. This project adds a PostgreSQL snapshot and reusable search service. No model training is required.
 
-Four images target Linux AMD64 and ARM64: `lebanese-legislation-db`, `lebanese-legislation-api`, `lebanese-legislation-mcp` and `lebanese-legislation-web`. The website, API and MCP are one Go codebase ([`internal/`](../internal/)) built as three binaries ([`web/`](../web/), [`api/`](../api/), [`mcp/`](../mcp/)). The release commands in [`cmd/`](../cmd/README.md#the-postgresql-release) restore, rebuild and publish the database.
+The [Images table](../README.md#images) lists the database, all-in-one and vectors
+images. API and MCP images remain available for separate Compose services; the
+website service builds locally. Both databases are baked into `-db` from `data/`.
+Public PostgreSQL release downloads remain available as a separate distribution.
 
 The hosted site uses Cloudflare R2, a Worker and one Container, with semantic
 vectors in Vectorize. See [architecture](architecture.md). The pgvector
@@ -20,7 +23,7 @@ Use [LebaneseLegislation.com](https://lebaneselegislation.com/) for the public l
 
 ## Start locally
 
-Install Docker with Compose. Allow at least 4 GB of available memory and 30 GB of free disk space; 8 GB of memory is recommended. The first start downloads the full release and rebuilds its indexes, which can take a while.
+Install Docker with Compose. Allow at least 4 GB of available memory and 30 GB of free disk space; 8 GB of memory is recommended. The first start copies the image's baked databases into an empty volume.
 
 ```sh
 git clone https://github.com/taktekhq/lebanese-legislation.git
@@ -28,15 +31,12 @@ cd lebanese-legislation
 ./start
 ```
 
-`./start` generates separate random owner and reader passwords in a private `.env` file. On an empty volume the DB image resolves the selected release, verifies its checksum and restores through the existing verified importer. API and MCP start only after the DB has a compatible restore receipt. Existing credentials are preserved.
-
-Default startup follows the published `releases/latest.json` pointer. To use a prepared local release, place its valid `manifest.json` and referenced dump in a directory, create `.env` with `POSTGRES_PASSWORD` and `READER_PASSWORD` (or run `./start` once), then run:
-
-```sh
-LEBLEG_RELEASE_DIR=/absolute/path/to/release docker compose -f compose.yaml -f compose.local.yaml up -d --wait --wait-timeout 7200
-```
-
-For a published release, set `DATASET_REVISION=<artifact-commit>` and `MANIFEST_PATH=releases/<release-id>/manifest.json` in `.env` before startup. No data, embeddings or dump is baked into these images.
+`./start` generates separate random owner and reader passwords in a private `.env`
+file. On an empty volume the DB image copies its baked cluster and sets these
+passwords. API and MCP wait for both serving databases to be ready. Existing
+volumes and credentials are preserved. Select a database image by date with
+`DB_IMAGE=ghcr.io/taktekhq/lebanese-legislation-db:YYYY-MM-DD`. A new image needs
+a fresh volume to replace the dataset; back up data you need first.
 
 Open the website at <http://localhost:8080>, the API at <http://localhost:8000/api/v1/>, connect an MCP client to <http://localhost:8001/mcp>, or search:
 
@@ -44,7 +44,7 @@ Open the website at <http://localhost:8080>, the API at <http://localhost:8000/a
 curl --get 'http://localhost:8000/api/v1/search/' --data-urlencode 'q=قانون العمل'
 ```
 
-Exact text and citation searches work without an AI key. To turn on search by meaning, add your own `GEMINI_API_KEY` to `.env`, then run:
+Exact text and citation searches work without an AI key. To turn on search by meaning, [load vectors](../vectors/README.md), set your Gemini key and configure `LEBLEG_VECTOR_DSN` for `lebleg_search` in the service environment, then run:
 
 ```sh
 docker compose up -d --force-recreate api mcp web
@@ -56,7 +56,6 @@ All published ports bind to your own computer. The API has no user authenticatio
 
 Stop services with `docker compose down`. This preserves the database and its release cache. Volume lifecycle belongs to the operator. There is no automatic refresh. Use a different Compose project and fresh volumes to select a new snapshot.
 
-A failed first import never creates a readiness receipt. Restarting an initialized volume does not rerun init scripts or make a partial import healthy. After correcting a missing artifact or other restore error, an operator can explicitly retry the same selected release with `docker compose exec --user postgres db bash /docker-entrypoint-initdb.d/30-lebleg-release.sh`. The importer refuses unrelated occupied databases. Never delete a volume containing data you need.
 
 ## What you get
 
@@ -66,14 +65,14 @@ A failed first import never creates a readiness receipt. Restarting an initializ
 | `releases/<release-id>/corpus.dump` | PostgreSQL custom-format snapshot, public tables, normalized documents and saved vectors |
 | `releases/<release-id>/manifest.json` | Source commit, counts, embedding settings, versions, licence and SHA-256 |
 | `releases/latest.json` | Pointer to the latest verified database release |
-| `ghcr.io/taktekhq/lebanese-legislation-db:0.4.0` | PostgreSQL 18.6, pgvector 0.8.2 and first-boot restore |
+| `ghcr.io/taktekhq/lebanese-legislation-db:latest` | PostgreSQL 18.6, pgvector 0.8.2 and both databases baked from `data/` |
 | `ghcr.io/taktekhq/lebanese-legislation-api:0.4.0` | The REST API (`/api/v1/`) |
 | `ghcr.io/taktekhq/lebanese-legislation-mcp:0.4.0` | The MCP server (`/mcp`) |
-| `ghcr.io/taktekhq/lebanese-legislation-web:0.4.0` | The website |
+| `ghcr.io/taktekhq/lebanese-legislation-all:latest` | Both databases and the website, API and MCP |
 
 Older version tags stay published. See [changes](changes.md).
 
-For the local service images, database data is downloaded separately. The hosted Cloudflare container has its database baked into the image. The dump stores index definitions; PostgreSQL constructs the HNSW index during restore. It does not contain a portable copy of PostgreSQL's physical index files.
+The local database and hosted Cloudflare container share the same baked database image. The dump stores index definitions; PostgreSQL constructs the HNSW index during restore. It does not contain a portable copy of PostgreSQL's physical index files.
 
 The release is built only from the public tables of [`data/`](../data/) at a pinned commit, the same tables as the Parquet dataset. It does not contain private website tables, user queries, analytics, credentials or website-only explanations. Exported views become snapshot tables. `source_documents` is a derived read model for this immutable snapshot; editing raw tables does not automatically update it or its vectors. Article retrieval follows the exported in-force view at the stated date; the raw tables retain the wider historical corpus.
 
@@ -103,9 +102,6 @@ Copy the optional settings from `.env.example`. `./start` creates required passw
 | `WEB_PORT` | `8080` | Loopback website port |
 | `PUBLIC_URL` | `http://localhost:$WEB_PORT` | The website's absolute links; set it when you host the site publicly |
 | `DB_MEMORY` | `3g` | Database container cap; index construction needs headroom |
-| `DATASET_REPO` | `taktekhq/lebanese-legislation` | Public Hub dataset repository |
-| `DATASET_REVISION` | `main` | Resolved once to an immutable artifact commit |
-| `MANIFEST_PATH` | `releases/latest.json` | Pointer or versioned manifest path |
 | `GEMINI_API_KEY` | empty | Your key; turns on search by meaning |
 | `GEMINI_MAX_CALLS_PER_DAY` | `500` | Provider calls per UTC day for each service; `0` turns search by meaning off |
 | `GEMINI_CONCURRENCY` | `2` | Provider calls at once, 1 to 16 |
@@ -119,7 +115,7 @@ Copy the optional settings from `.env.example`. `./start` creates required passw
 
 The daily cap, the cache and the concurrency limit live in each service process. Restarting resets the counter, and API, MCP and website each have their own. Use provider billing limits for a durable spending ceiling.
 
-To pin a release, set `MANIFEST_PATH=releases/<release-id>/manifest.json` and `DATASET_REVISION=<artifact-commit>` before the first start. Updating those settings does not replace an already restored database. Use a separate Compose project and fresh volumes for a new snapshot.
+To pin the baked dataset, select a dated `DB_IMAGE` and use a fresh volume.
 
 ## Use your own PostgreSQL
 

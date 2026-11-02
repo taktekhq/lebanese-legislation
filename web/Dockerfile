@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# The LebaneseLegislation.com website, published as ghcr.io/taktekhq/lebanese-legislation-web.
+# The separate website service for local builds. The published site image is -all.
 # Build from the repository root: docker build -f web/Dockerfile -t lebanese-legislation-web .
 FROM --platform=$BUILDPLATFORM golang:1.27.1-bookworm AS build
 WORKDIR /src
