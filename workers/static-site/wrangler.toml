@@ -7,29 +7,15 @@ compatibility_date = "2026-10-01"
 # the live origin. Keep any `routes = [...]` above the first [table].
 workers_dev = true
 
-vars = { LIVE = "blue", LEBLEG_VECTORIZE_INDEX = "lebleg-chunks", CLOUDFLARE_ACCOUNT_ID = "5f012a200d9622ea6aecef1a02693e26", ORIGIN_MODE = "hetzner", POSTHOG_KEY = "phc_pTpSY5wVsQrG8LN58z4zWXdMWjvqR6uPCY2eXV25sBV5", LEBLEG_SEARCH_PROVIDER = "gemini", LEBLEG_SEARCH_MODEL = "gemini-3.1-flash-lite", LEBLEG_SEARCH_SELECT_MODEL = "gemini-3.8-flash", LEBLEG_SEARCH_DAILY_LIMIT = "4000", LEBLEG_SEARCH_SHARES_DATA = "0" }
+vars = { ORIGIN_MODE = "hetzner" }
 
-[[containers]]
-class_name = "OriginBlue"
-image = "./container/Dockerfile"
-image_build_context = "./container"
-max_instances = 1
-instance_type = "standard-4"
+[[services]]
+binding = "ORIGIN_BLUE"
+service = "lebleg-origin-blue"
 
-[[durable_objects.bindings]]
-name = "ORIGIN_BLUE"
-class_name = "OriginBlue"
-
-[[containers]]
-class_name = "OriginGreen"
-image = "./container/Dockerfile"
-image_build_context = "./container"
-max_instances = 1
-instance_type = "standard-4"
-
-[[durable_objects.bindings]]
-name = "ORIGIN_GREEN"
-class_name = "OriginGreen"
+[[services]]
+binding = "ORIGIN_GREEN"
+service = "lebleg-origin-green"
 
 [[migrations]]
 tag = "v1"
@@ -38,6 +24,10 @@ new_sqlite_classes = ["Origin"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["OriginBlue", "OriginGreen"]
+
+[[migrations]]
+tag = "v3"
+deleted_classes = ["OriginBlue", "OriginGreen", "Origin"]
 
 [[r2_buckets]]
 binding = "SITE"

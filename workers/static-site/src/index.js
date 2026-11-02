@@ -10,7 +10,6 @@
 import { route, keyFor, resolve, indexRedirectData } from "./route.js";
 import { SECURITY_HEADERS } from "./headers.js";
 import { originFetch } from "./origin.js";
-export { Origin, OriginBlue, OriginGreen } from "./origin.js";
 
 const REDIRECT_DATA_TTL_MS = 10 * 60 * 1000;
 let redirects = { at: 0, data: null };
