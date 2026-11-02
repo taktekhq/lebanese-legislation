@@ -12,6 +12,8 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags=
 
 FROM ghcr.io/taktekhq/lebanese-legislation-data:${DATA_TAG}
 COPY --from=web /server /usr/local/bin/lebleg-web
+# The Postgres base has no CA bundle; the server calls Gemini and Vectorize over HTTPS.
+COPY --from=web /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY build/src/THIRD_PARTY_NOTICES.txt /THIRD_PARTY_NOTICES.txt
 COPY --chmod=0755 start.sh /usr/local/bin/start
 EXPOSE 8080 8081

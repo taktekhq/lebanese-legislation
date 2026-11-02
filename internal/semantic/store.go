@@ -88,11 +88,15 @@ func (s *Store) EnsureSchema(ctx context.Context) error {
 // EnsureStorage creates storage without creating or dropping an ANN index.
 // Initial offline loads can defer ANN construction until their vectors are saved.
 func (s *Store) EnsureStorage(ctx context.Context) error {
-	_, err := s.db.Exec(ctx, `CREATE EXTENSION IF NOT EXISTS vector;
+	extension, embedding := "CREATE EXTENSION IF NOT EXISTS vector;", "embedding halfvec(768) NOT NULL,"
+	if s.vectorize != nil {
+		extension, embedding = "", ""
+	}
+	_, err := s.db.Exec(ctx, extension+`
  CREATE TABLE IF NOT EXISTS public.semantic_chunks (
  model text NOT NULL,kind text NOT NULL,source_id integer NOT NULL,part text NOT NULL,lang text NOT NULL,
  title text NOT NULL,text text NOT NULL,hash text NOT NULL,chunk_start integer NOT NULL,chunk_end integer NOT NULL,
- embedding halfvec(768) NOT NULL,updated_at timestamptz NOT NULL DEFAULT now(),
+ `+embedding+`updated_at timestamptz NOT NULL DEFAULT now(),
  PRIMARY KEY(model,kind,source_id,part,lang,hash,chunk_start),
  CHECK(chunk_start>=0 AND chunk_end>chunk_start AND chunk_end-chunk_start<=900));
  CREATE TABLE IF NOT EXISTS public.semantic_documents (
@@ -102,6 +106,9 @@ func (s *Store) EnsureStorage(ctx context.Context) error {
  CREATE INDEX IF NOT EXISTS semantic_chunks_source ON public.semantic_chunks(model,kind,source_id,part,lang);`)
 	if err != nil {
 		return err
+	}
+	if s.vectorize != nil {
+		return nil
 	}
 	var storage string
 	if err = s.db.QueryRow(ctx, `SELECT format_type(atttypid,atttypmod) FROM pg_attribute WHERE attrelid='public.semantic_chunks'::regclass AND attname='embedding' AND NOT attisdropped`).Scan(&storage); err != nil {
@@ -124,6 +131,10 @@ func (e *StorageError) Error() string {
 
 // BuildIndex creates the serving ANN index if absent. It never drops an index.
 func (s *Store) BuildIndex(ctx context.Context) error {
+	if s.vectorize != nil {
+		_, err := s.db.Exec(ctx, `CREATE INDEX IF NOT EXISTS semantic_chunks_vectorize_id ON public.semantic_chunks (`+vectorize.ChunkIDSQL+`)`)
+		return err
+	}
 	_, err := s.db.Exec(ctx, `CREATE INDEX IF NOT EXISTS semantic_chunks_embedding ON public.semantic_chunks USING hnsw(embedding halfvec_cosine_ops)`)
 	return err
 }

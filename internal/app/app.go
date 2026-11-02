@@ -227,7 +227,12 @@ func enableSearch(ctx context.Context, h *site.Server, pool *pgxpool.Pool) (func
 	if os.Getenv("LEBLEG_SEARCH_PROVIDER") == "" && os.Getenv("LEBLEG_VECTOR_DSN") == "" {
 		return func() {}, enableSemanticSearch(h, pool)
 	}
-	if err := enableProviderSearch(h); err != nil {
+	if os.Getenv("LEBLEG_SEARCH_PROVIDER") == "" && os.Getenv("LEBLEG_VECTORIZE_INDEX") != "" {
+		// A separate Vectorize metadata DSN must not disable automatic Gemini answers.
+		if err := enableSemanticSearch(h, pool); err != nil {
+			return nil, err
+		}
+	} else if err := enableProviderSearch(h); err != nil {
 		return nil, err
 	}
 	dsn := os.Getenv("LEBLEG_VECTOR_DSN")
