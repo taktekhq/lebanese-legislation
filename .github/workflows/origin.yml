@@ -89,12 +89,14 @@ jobs:
         if: inputs.image == ''
         env:
           GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
+          LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
         run: |
           docker build -t lebleg-origin-smoke workers/static-site/container
           docker run -d --name smoke -p 8080:8080 -e GEMINI_API_KEY \
             -e LEBLEG_SEARCH_PROVIDER=gemini -e LEBLEG_SEARCH_MODEL=gemini-3.1-flash-lite \
             -e LEBLEG_SEARCH_SELECT_MODEL=gemini-3.8-flash -e LEBLEG_SEARCH_DAILY_LIMIT=500 \
-            -e LEBLEG_SEARCH_SHARES_DATA=0 lebleg-origin-smoke
+            -e LEBLEG_SEARCH_SHARES_DATA=0 -e LEBLEG_VECTORIZE_TOKEN -e LEBLEG_VECTORIZE_INDEX=lebleg-chunks \
+            -e CLOUDFLARE_ACCOUNT_ID=5f012a200d9622ea6aecef1a02693e26 lebleg-origin-smoke
           ok=0
           for i in $(seq 100); do
             if curl -fsS -o /dev/null -m 5 http://127.0.0.1:8080/healthz; then ok=1; echo "up after $((i*3)) s"; break; fi
@@ -103,6 +105,14 @@ jobs:
           done
           docker logs smoke 2>&1 | tail -80
           [ "$ok" = 1 ] && curl -s -o /dev/null -w 'search %{http_code} %{time_total}s\n' 'http://127.0.0.1:8080/api/v1/search/?limit=1&q=tax'
+          if [ "$ok" = 1 ]; then
+            curl -s -o "$RUNNER_TEMP/answer.html" -w 'answer %{http_code} %{time_total}s\n' -X POST \
+              -H 'Origin: http://127.0.0.1:8080' -H 'Referer: http://127.0.0.1:8080/search/' \
+              --data-urlencode 'q=هل يمكن للمدعي اللجوء الى القضاء المدني لمطالبة المدعى عليه بالتعويض بعد البراءة؟' \
+              http://127.0.0.1:8080/search/answer/
+            sed -e 's/<[^>]*>/ /g' "$RUNNER_TEMP/answer.html" | tr -s ' \n' ' ' | head -c 600; echo
+            docker logs smoke 2>&1 | tail -40
+          fi
           docker rm -f smoke >/dev/null
           [ "$ok" = 1 ]
       - name: Use the pushed image
