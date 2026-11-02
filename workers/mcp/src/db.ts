@@ -26,6 +26,9 @@ export interface LegislationRow {
   code_slug: string | null;
   code_name_en: string | null;
   source_url: string | null;
+  // The day the text's page last changed on the site (page_state), never the
+  // text's own date. Absent on a snapshot older than the column.
+  updated_at?: string | null;
 }
 
 export interface LawSummary {
@@ -41,6 +44,7 @@ export interface LawSummary {
   code?: string;
   url: string;
   source_url?: string;
+  updated_at?: string;
 }
 
 export function lawSummary(l: LegislationRow): LawSummary {
@@ -58,6 +62,7 @@ export function lawSummary(l: LegislationRow): LawSummary {
   if (l.issued_on) out.issued_on = l.issued_on;
   if (l.code_name_en) out.code = l.code_name_en;
   if (l.source_url) out.source_url = l.source_url;
+  if (l.updated_at) out.updated_at = l.updated_at;
   return out;
 }
 

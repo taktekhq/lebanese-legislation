@@ -858,6 +858,7 @@ export async function getArticle(db: D1Database, args: { law_id?: number; number
     possibly_affected_by: affected,
     url: articleURL(lawID, number, l.kind),
     source_url: l.source_url ?? undefined,
+    updated_at: l.updated_at ?? undefined, // an article belongs to its text's page
   });
 }
 
@@ -938,7 +939,7 @@ export async function getRuling(db: D1Database, args: { id?: number }): Promise<
   const r = await db.prepare("SELECT * FROM ruling WHERE id = ?").bind(id).first<{
     id: number; court: string | null; court_en: string | null; number: string | null; year: number | null;
     decided_on: string | null; title: string; president: string | null; members: string | null;
-    text_ar: string | null; source_url: string | null; pdf_url?: string | null;
+    text_ar: string | null; source_url: string | null; pdf_url?: string | null; updated_at?: string | null;
   }>();
   if (!r) return err(`ruling ${id} not found`);
   const out: Record<string, unknown> = {
@@ -965,6 +966,7 @@ export async function getRuling(db: D1Database, args: { id?: number }): Promise<
   // the original is the reference, so every answer carries it.
   if (r.pdf_url) out.pdf_url = r.pdf_url;
   if (r.source_url) out.source_url = r.source_url;
+  if (r.updated_at) out.updated_at = r.updated_at; // absent on a snapshot older than the column
   // Older snapshots have no ruling_page table, just as some lack pdf_url.
   const pages = await tolerant(async () => (await db.prepare(
     "SELECT n, text_ar, low_confidence FROM ruling_page WHERE ruling_id = ? ORDER BY n"
@@ -989,7 +991,7 @@ export async function getGazetteIssue(db: D1Database, args: { id?: number }): Pr
   const id = args.id;
   if (!id || id <= 0) return err("id must be a positive integer");
   const g = await db.prepare("SELECT * FROM gazette_issue WHERE id = ?").bind(id)
-    .first<{ id: number; number: string | null; published_on: string | null; source_url: string | null }>();
+    .first<{ id: number; number: string | null; published_on: string | null; source_url: string | null; updated_at?: string | null }>();
   if (!g) return err(`gazette issue ${id} not found`);
   const texts = await db.prepare(
     "SELECT l.* FROM gazette_entry e JOIN legislation l ON l.id = e.law_id WHERE e.issue_id = ? ORDER BY l.id"
@@ -1001,6 +1003,7 @@ export async function getGazetteIssue(db: D1Database, args: { id?: number }): Pr
     texts: texts.results.map(lawSummary),
     url: `${BASE}/gazette/${g.id}/`,
     source_url: g.source_url ?? undefined,
+    updated_at: g.updated_at ?? undefined,
   });
 }
 
