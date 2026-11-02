@@ -87,7 +87,9 @@ jobs:
           context: ${{ inputs.context }}
           file: ${{ inputs.dockerfile }}
           platforms: ${{ inputs.platforms }}
-          build-args: ${{ inputs.build_args }}
+          build-args: |
+            ${{ inputs.build_args }}
+            GIT_SHA=${{ github.sha }}
           push: true
           pull: true
           tags: ${{ steps.tags.outputs.tags }}

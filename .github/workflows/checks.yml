@@ -117,19 +117,19 @@ jobs:
           ) &
           ( set +e
             bash -e -o pipefail <<'TASK_API' > "$RUNNER_TEMP/api.log" 2>&1
-          docker build -f api/Dockerfile -t lebleg-test-api .
+          docker build --build-arg GIT_SHA=${{ github.sha }} -f api/Dockerfile -t lebleg-test-api .
           TASK_API
             echo $? > "$RUNNER_TEMP/api.status"
           ) &
           ( set +e
             bash -e -o pipefail <<'TASK_MCP' > "$RUNNER_TEMP/mcp.log" 2>&1
-          docker build -f mcp/Dockerfile -t lebleg-test-mcp .
+          docker build --build-arg GIT_SHA=${{ github.sha }} -f mcp/Dockerfile -t lebleg-test-mcp .
           TASK_MCP
             echo $? > "$RUNNER_TEMP/mcp.status"
           ) &
           ( set +e
             bash -e -o pipefail <<'TASK_WEB' > "$RUNNER_TEMP/web.log" 2>&1
-          docker build -f web/Dockerfile -t lebleg-test-web .
+          docker build --build-arg GIT_SHA=${{ github.sha }} -f web/Dockerfile -t lebleg-test-web .
           TASK_WEB
             echo $? > "$RUNNER_TEMP/web.status"
           ) &
@@ -178,19 +178,19 @@ jobs:
         run: |
           ( set +e
             bash -e -o pipefail <<'TASK_WEB' > "$RUNNER_TEMP/web.log" 2>&1
-          docker build -f web/Dockerfile -t lebleg-test-web .
+          docker build --build-arg GIT_SHA=${{ github.sha }} -f web/Dockerfile -t lebleg-test-web .
           TASK_WEB
             echo $? > "$RUNNER_TEMP/web.status"
           ) &
           ( set +e
             bash -e -o pipefail <<'TASK_API' > "$RUNNER_TEMP/api.log" 2>&1
-          docker build -f api/Dockerfile -t lebleg-test-api .
+          docker build --build-arg GIT_SHA=${{ github.sha }} -f api/Dockerfile -t lebleg-test-api .
           TASK_API
             echo $? > "$RUNNER_TEMP/api.status"
           ) &
           ( set +e
             bash -e -o pipefail <<'TASK_MCP' > "$RUNNER_TEMP/mcp.log" 2>&1
-          docker build -f mcp/Dockerfile -t lebleg-test-mcp .
+          docker build --build-arg GIT_SHA=${{ github.sha }} -f mcp/Dockerfile -t lebleg-test-mcp .
           TASK_MCP
             echo $? > "$RUNNER_TEMP/mcp.status"
           ) &

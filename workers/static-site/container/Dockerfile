@@ -8,9 +8,12 @@ COPY internal/ ./internal/
 COPY web/main.go ./web/
 ARG TARGETOS
 ARG TARGETARCH
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags='-s -w' -o /server ./web
+ARG GIT_SHA=unknown
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags="-s -w -X github.com/taktekhq/lebanese-legislation/internal/site.BuildID=${GIT_SHA}" -o /server ./web
 
 FROM ghcr.io/taktekhq/lebanese-legislation-db:${DATA_TAG}
+ARG GIT_SHA=unknown
+LABEL org.opencontainers.image.revision="${GIT_SHA}"
 ENV PGDATA=/opt/lebleg/seed MCP_SHARED_SERVER=1
 COPY --from=web /server /usr/local/bin/lebleg-web
 COPY --from=web /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt

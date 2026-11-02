@@ -38,6 +38,17 @@ def marker(name, value=None):
     return res.stdout.strip()
 
 
+def image_build(image, revision=''):
+    """Use the pulled image's revision label, or an immutable full-commit tag."""
+    if not revision:
+        tag = image.rsplit('/', 1)[-1].split(':', 1)[-1]
+        match = re.fullmatch(r'(?:source-)?([0-9a-f]{40})(?:-\d+-\d+)?', tag)
+        revision = match[1] if match else ''
+    if not re.fullmatch(r'[0-9a-f]{40}', revision):
+        raise ValueError(f'Image {image} has no full git commit revision label or tag')
+    return revision
+
+
 def stage(image):
     live = marker('live-side') or 'blue'
     if live not in ('blue', 'green'):
@@ -45,7 +56,8 @@ def stage(image):
     if not image or any(c in image for c in ('\n', '\r')):
         raise ValueError('Missing or invalid image reference')
     idle = 'green' if live == 'blue' else 'blue'
-    state = {'old': live, 'idle': idle, 'new_image': image}
+    state = {'old': live, 'idle': idle, 'new_image': image,
+             'expected_build': image_build(image, os.environ.get('EXPECTED_BUILD', ''))}
     text = CONFIG.read_text()
     pattern = rf'(\[\[env\.{idle}\.containers\]\]\nclass_name = "Origin"\nimage = )[^\n]+'
     text, count = re.subn(pattern, lambda m: m[1] + json.dumps(image), text)
@@ -100,7 +112,9 @@ def deploy_site_worker():
                    cwd='workers/static-site', check=True)
 
 
-def check(seconds, side=None):
+def check(seconds, expected_build, side=None):
+    expected_build = image_build('', expected_build)
+    seen_build = '<no response>'
     deadline = time.monotonic() + seconds
     headers = {'Cache-Control': 'no-cache'}
     if side:
@@ -118,16 +132,28 @@ def check(seconds, side=None):
                 req = _request('https://lebaneselegislation.com' + path, headers=headers)
                 with urllib.request.urlopen(req, timeout=min(remaining, 30)) as res:
                     status = res.status
+                    if path == '/healthz':
+                        try:
+                            body = json.load(res)
+                            seen_build = body.get('build') if isinstance(body, dict) else None
+                        except (ValueError, UnicodeError):
+                            seen_build = '<invalid JSON>'
+                        print(f'/healthz build seen: {seen_build!r}, expected: {expected_build}', flush=True)
+                        if seen_build != expected_build:
+                            ok = False
                 print(f'{path}: {status}', flush=True)
                 if status != 200:
                     ok = False
             except (urllib.error.URLError, TimeoutError) as err:
+                if path == '/healthz':
+                    seen_build = f'<unavailable: {err}>'
                 print(f'{path}: {err}', flush=True)
                 ok = False
         if ok and time.monotonic() <= deadline:
             return
         time.sleep(min(5, max(0, deadline - time.monotonic())))
-    raise SystemExit(f'Origin checks did not pass within {seconds} seconds')
+    raise SystemExit(f'Origin checks did not pass within {seconds} seconds: '
+                     f'/healthz build seen {seen_build!r}, expected {expected_build}')
 
 
 def main():
@@ -154,14 +180,14 @@ def main():
         marker('live-side', side)
         time.sleep(20)  # Site Worker isolates cache the flag for 15 seconds.
     elif args.action == 'warm':
-        check(1800, state['idle'])
+        check(1800, state['expected_build'], state['idle'])
     elif args.action == 'verify':
         # A late restart of the new side shows up within minutes, not seconds:
         # check now, then twice more two minutes apart.
         for i in range(3):
             if i:
                 time.sleep(120)
-            check(60)
+            check(60, state['expected_build'])
     elif args.action == 'retire':
         req = _request('https://lebaneselegislation.com/_origin/restart?side=' + state['old'],
                                      headers={'x-origin-test': os.environ['ORIGIN_TEST_KEY']})

@@ -11,7 +11,7 @@ name: origin
         type: string
         default: ''
       image:
-        description: Deploy this already pushed Cloudflare registry image instead of copying from GHCR
+        description: Deploy an already pushed Cloudflare image tagged with its full build commit
         type: string
         default: ''
       tag:
@@ -76,6 +76,7 @@ jobs:
     timeout-minutes: 120
     outputs:
       image: ${{ steps.image.outputs.image }}
+      build: ${{ steps.image.outputs.build }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -98,11 +99,23 @@ jobs:
       env:
         IMAGE_TAG: ${{ inputs.tag || 'latest' }}
       run: |
-        tag="lebleg-static-site-origin:${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
         docker pull "ghcr.io/taktekhq/lebanese-legislation-all:$IMAGE_TAG"
+        revision=$(docker image inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "ghcr.io/taktekhq/lebanese-legislation-all:$IMAGE_TAG")
+        export REVISION="$revision"
+        build=$(python3 - <<'PYBUILD'
+        import os, runpy
+        deploy = runpy.run_path('workers/static-site/scripts/origin-deploy.py')
+        revision = os.environ['REVISION']
+        if revision == '<no value>':
+            revision = ''
+        print(deploy['image_build']('ghcr.io/taktekhq/lebanese-legislation-all:' + os.environ['IMAGE_TAG'], revision))
+        PYBUILD
+        )
+        tag="lebleg-static-site-origin:${build}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
         docker tag "ghcr.io/taktekhq/lebanese-legislation-all:$IMAGE_TAG" "$tag"
         (cd workers/static-site && npx --yes wrangler@4.151.1 containers push "$tag")
         echo "image=registry.cloudflare.com/$CLOUDFLARE_ACCOUNT_ID/$tag" >> "$GITHUB_OUTPUT"
+        echo "build=$build" >> "$GITHUB_OUTPUT"
   site-worker:
     needs:
     - image
@@ -139,6 +152,7 @@ jobs:
       id: stage
       env:
         IMAGE: ${{ inputs.image || needs.image.outputs.image }}
+        EXPECTED_BUILD: ${{ inputs.image == '' && needs.image.outputs.build || '' }}
         GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
         LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
       run: python3 workers/static-site/scripts/origin-deploy.py stage
