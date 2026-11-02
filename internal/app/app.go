@@ -334,6 +334,7 @@ func enableSemanticSearch(s *site.Server, pool *pgxpool.Pool) error {
 	if err != nil {
 		return err
 	}
+	go probeOutbound()
 	rewriter, err := nlsearch.New(nlsearch.Config{Provider: "gemini", Model: model, Key: key})
 	if err != nil {
 		return err
@@ -433,4 +434,19 @@ func semanticStore(pool *pgxpool.Pool, embedder semantic.Embedder) (*semantic.St
 		store.WithVectorize(client)
 	}
 	return store, nil
+}
+
+// probeOutbound logs once whether the server can reach the HTTPS services it
+// depends on, so a blocked or broken outbound path shows in the start log.
+func probeOutbound() {
+	client := &http.Client{Timeout: 10 * time.Second}
+	for _, u := range []string{"https://generativelanguage.googleapis.com/", "https://api.cloudflare.com/client/v4/"} {
+		resp, err := client.Get(u)
+		if err != nil {
+			log.Printf("outbound probe %s: %v", u, err)
+			continue
+		}
+		_ = resp.Body.Close()
+		log.Printf("outbound probe %s: HTTP %d", u, resp.StatusCode)
+	}
 }
