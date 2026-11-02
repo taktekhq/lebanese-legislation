@@ -64,6 +64,29 @@ def deploy_origin(side):
     secrets = {key: os.environ[key] for key in ('GEMINI_API_KEY', 'LEBLEG_VECTORIZE_TOKEN')}
     subprocess.run(args + ['secret', 'bulk', '--env', side], input=json.dumps(secrets),
                    text=True, cwd='workers/origin', check=True)
+    wait_rollout(side)
+
+
+def wait_rollout(side, seconds=1800):
+    # Cloudflare replaces a side's container instances after a deploy (a rollout).
+    # Warming before it ends warms an instance that is about to be replaced.
+    name = f'lebleg-origin-{side}-origin-{side}'
+    args = ['npx', '--yes', 'wrangler@4.151.1', 'containers']
+    deadline = time.time() + seconds
+    while time.time() < deadline:
+        apps = json.loads(subprocess.run(args + ['list', '--json'], cwd='workers/origin', check=True,
+                                         capture_output=True, text=True).stdout)
+        app = next((a for a in apps if a.get('name') == name), None)
+        if app:
+            info = json.loads(subprocess.run(args + ['info', app['id']], cwd='workers/origin', check=True,
+                                             capture_output=True, text=True).stdout)
+            starting = (info.get('health') or {}).get('instances', {}).get('starting', 0)
+            if not info.get('active_rollout_id') and not starting:
+                print(f'{name}: rollout finished')
+                return
+            print(f'{name}: rollout {info.get("active_rollout_id")}, starting {starting}')
+        time.sleep(30)
+    raise RuntimeError(f'{name}: rollout did not finish in {seconds} s')
 
 
 def deploy_site_worker():
@@ -133,7 +156,12 @@ def main():
     elif args.action == 'warm':
         check(1800, state['idle'])
     elif args.action == 'verify':
-        check(60)
+        # A late restart of the new side shows up within minutes, not seconds:
+        # check now, then twice more two minutes apart.
+        for i in range(3):
+            if i:
+                time.sleep(120)
+            check(60)
     elif args.action == 'retire':
         req = _request('https://lebaneselegislation.com/_origin/restart?side=' + state['old'],
                                      headers={'x-origin-test': os.environ['ORIGIN_TEST_KEY']})

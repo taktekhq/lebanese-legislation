@@ -22,9 +22,9 @@ name: origin
         description: Origin mode
         type: choice
         options:
-        - hetzner
         - container
-        default: hetzner
+        - hetzner
+        default: container
 permissions:
   contents: read
   packages: read
