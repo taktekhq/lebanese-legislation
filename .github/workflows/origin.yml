@@ -1,178 +1,216 @@
 name: origin
-
-on:
+'on':
   workflow_dispatch:
     inputs:
       route:
         description: Optional comma-separated Worker routes
         type: string
-        default: ""
+        default: ''
       image:
-        description: Deploy this already pushed image instead of building one (e.g. registry.cloudflare.com/<account>/lebleg-static-site-origin:<tag>)
+        description: Deploy this already pushed Cloudflare registry image instead of building
         type: string
-        default: ""
+        default: ''
+      data_tag:
+        description: Data image date tag
+        type: string
+        default: latest
       mode:
         description: Origin mode
         type: choice
-        options: [hetzner, container]
+        options:
+        - hetzner
+        - container
         default: hetzner
-
 permissions:
   contents: read
-
+  packages: read
+concurrency:
+  group: origin
+  cancel-in-progress: false
+env:
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
+  AWS_DEFAULT_REGION: auto
+  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  R2_ENDPOINT: https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+  ORIGIN_TEST_KEY: ${{ secrets.ORIGIN_TEST_KEY }}
+  MODE: ${{ inputs.mode }}
+  ROUTES: ${{ inputs.route }}
 jobs:
-  deploy:
-    needs: secrets
+  image:
+    if: inputs.image == ''
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
+    outputs:
+      image: ${{ steps.image.outputs.image }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Free disk
-        if: inputs.image == ''
-        run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-          docker system prune -af
-      - name: Prepare container build context
-        if: inputs.image == ''
-        env:
-          AWS_DEFAULT_REGION: auto
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: |
-          build=workers/static-site/container/build
-          mkdir -p "$build/src/web"
-          cp go.mod go.sum THIRD_PARTY_NOTICES.txt "$build/src/"
-          cp -R internal "$build/src/internal"
-          cp web/main.go "$build/src/web/"
-          endpoint=https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
-          export build endpoint
-          ( set +e
-            bash -e -o pipefail <<'TASK_DUMP' > "$RUNNER_TEMP/dump.log" 2>&1
-          aws s3 cp s3://lebleg-site/_build/lebleg.dump "$build/lebleg.dump" --endpoint-url "$endpoint"
-          TASK_DUMP
-            echo $? > "$RUNNER_TEMP/dump.status"
-          ) &
-          ( set +e
-            bash -e -o pipefail <<'TASK_SEARCH' > "$RUNNER_TEMP/search.log" 2>&1
-          aws s3 cp s3://lebleg-site/_build/lebleg_search.dump "$build/lebleg_search.dump" --endpoint-url "$endpoint"
-          TASK_SEARCH
-            echo $? > "$RUNNER_TEMP/search.status"
-          ) &
-          ( set +e
-            bash -e -o pipefail <<'TASK_SCANS' > "$RUNNER_TEMP/scans.log" 2>&1
-          aws s3 sync s3://lebleg-site/_build/scans "$build/scans" --endpoint-url "$endpoint"
-          TASK_SCANS
-            echo $? > "$RUNNER_TEMP/scans.status"
-          ) &
-          wait
-          failed=0
-          until [ -f "$RUNNER_TEMP/dump.status" ]; do sleep 1; done
-          cat "$RUNNER_TEMP/dump.log"
-          [ "$(cat "$RUNNER_TEMP/dump.status")" -eq 0 ] || failed=1
-          until [ -f "$RUNNER_TEMP/search.status" ]; do sleep 1; done
-          cat "$RUNNER_TEMP/search.log"
-          [ "$(cat "$RUNNER_TEMP/search.status")" -eq 0 ] || failed=1
-          until [ -f "$RUNNER_TEMP/scans.status" ]; do sleep 1; done
-          cat "$RUNNER_TEMP/scans.log"
-          [ "$(cat "$RUNNER_TEMP/scans.status")" -eq 0 ] || failed=1
-          [ "$failed" -eq 0 ]
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install dependencies
-        working-directory: workers/static-site
-        run: npm ci
-      - name: Smoke-test the image on the runner
-        if: inputs.image == ''
-        env:
-          GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
-          LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
-        run: |
-          docker build -t lebleg-origin-smoke workers/static-site/container
-          docker run -d --name smoke -p 8080:8080 -e GEMINI_API_KEY \
-            -e LEBLEG_SEARCH_PROVIDER=gemini -e LEBLEG_SEARCH_MODEL=gemini-3.1-flash-lite \
-            -e LEBLEG_SEARCH_SELECT_MODEL=gemini-3.8-flash -e LEBLEG_SEARCH_DAILY_LIMIT=500 \
-            -e LEBLEG_SEARCH_SHARES_DATA=0 -e LEBLEG_VECTORIZE_TOKEN -e LEBLEG_VECTORIZE_INDEX=lebleg-chunks \
-            -e CLOUDFLARE_ACCOUNT_ID=5f012a200d9622ea6aecef1a02693e26 lebleg-origin-smoke
-          ok=0
-          for i in $(seq 100); do
-            if curl -fsS -o /dev/null -m 5 http://127.0.0.1:8080/healthz; then ok=1; echo "up after $((i*3)) s"; break; fi
-            [ "$(docker inspect -f '{{.State.Running}}' smoke)" = true ] || { echo "container exited: $(docker inspect -f '{{.State.ExitCode}}' smoke)"; break; }
-            sleep 3
-          done
-          docker logs smoke 2>&1 | tail -80
-          [ "$ok" = 1 ] && curl -s -o /dev/null -w 'search %{http_code} %{time_total}s\n' 'http://127.0.0.1:8080/api/v1/search/?limit=1&q=tax'
-          if [ "$ok" = 1 ]; then
-            curl -s -o "$RUNNER_TEMP/answer.html" -w 'answer %{http_code} %{time_total}s\n' -X POST \
-              -H 'Origin: http://127.0.0.1:8080' -H 'Referer: http://127.0.0.1:8080/search/' \
-              --data-urlencode 'q=هل يمكن للمدعي اللجوء الى القضاء المدني لمطالبة المدعى عليه بالتعويض بعد البراءة؟' \
-              http://127.0.0.1:8080/search/answer/
-            sed -e 's/<[^>]*>/ /g' "$RUNNER_TEMP/answer.html" | tr -s ' \n' ' ' | head -c 600; echo
-            docker logs smoke 2>&1 | tail -40
-          fi
-          docker rm -f smoke >/dev/null
-          [ "$ok" = 1 ]
-      - name: Use the pushed image
-        if: inputs.image != ''
-        working-directory: workers/static-site
-        env:
-          IMAGE: ${{ inputs.image }}
-        run: sed -i "s#^image = .*#image = \"$IMAGE\"#" wrangler.toml && grep -n '^image' wrangler.toml
-      - name: Deploy Worker and container
-        working-directory: workers/static-site
-        env:
-          MODE: ${{ inputs.mode }}
-          ROUTES: ${{ inputs.route }}
-        run: |
-          args=(--var "ORIGIN_MODE:$MODE")
-          IFS=',' read -r -a routes <<< "$ROUTES"
-          for route in "${routes[@]}"; do
-            route="${route#"${route%%[![:space:]]*}"}"
-            route="${route%"${route##*[![:space:]]}"}"
-            if [ -n "$route" ]; then
-              args+=(--route "$route")
-            fi
-          done
-          npx --yes wrangler@4.151.1 deploy "${args[@]}"
-  secrets:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Install dependencies
+      working-directory: workers/static-site
+      run: npm ci
+    - uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Free disk
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+        docker system prune -af
+    - name: Prepare code build context
+      run: |
+        build=workers/static-site/container/build
+        mkdir -p "$build/src/web"
+        cp go.mod go.sum THIRD_PARTY_NOTICES.txt "$build/src/"
+        cp -R internal "$build/src/internal"
+        cp web/main.go "$build/src/web/"
+    - name: Build and push site image
+      id: image
+      env:
+        DATA_TAG: ${{ inputs.data_tag }}
+      run: |
+        tag="lebleg-static-site-origin:${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+        docker build --build-arg DATA_TAG="$DATA_TAG" -t "$tag" workers/static-site/container
+        (cd workers/static-site && npx --yes wrangler@4.151.1 containers push "$tag")
+        echo "image=registry.cloudflare.com/$CLOUDFLARE_ACCOUNT_ID/$tag" >> "$GITHUB_OUTPUT"
+  stage:
+    needs:
+    - image
     runs-on: ubuntu-latest
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install dependencies
-        working-directory: workers/static-site
-        run: npm ci
-      - name: Set Gemini secret
-        working-directory: workers/static-site
-        env:
-          GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
-        run: |
-          if [ -n "$GEMINI_API_KEY" ]; then
-            echo "$GEMINI_API_KEY" | npx --yes wrangler@4.151.1 secret put GEMINI_API_KEY
-          fi
-      - name: Set Vectorize secret
-        working-directory: workers/static-site
-        env:
-          LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
-        run: |
-          if [ -n "$LEBLEG_VECTORIZE_TOKEN" ]; then
-            echo "$LEBLEG_VECTORIZE_TOKEN" | npx --yes wrangler@4.151.1 secret put LEBLEG_VECTORIZE_TOKEN
-          fi
-      - name: Set origin test key
-        working-directory: workers/static-site
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
-          ORIGIN_TEST_KEY: ${{ secrets.ORIGIN_TEST_KEY }}
-        run: |
-          if [ -n "$ORIGIN_TEST_KEY" ]; then
-            echo "$ORIGIN_TEST_KEY" | npx --yes wrangler@4.151.1 secret put ORIGIN_TEST_KEY
-          fi
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Install dependencies
+      working-directory: workers/static-site
+      run: npm ci
+    - name: Set Gemini secret
+      working-directory: workers/static-site
+      env:
+        GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
+      run: |
+        if [ -n "$GEMINI_API_KEY" ]; then
+          echo "$GEMINI_API_KEY" | npx --yes wrangler@4.151.1 secret put GEMINI_API_KEY
+        fi
+    - name: Set Vectorize secret
+      working-directory: workers/static-site
+      env:
+        LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+      run: |
+        if [ -n "$LEBLEG_VECTORIZE_TOKEN" ]; then
+          echo "$LEBLEG_VECTORIZE_TOKEN" | npx --yes wrangler@4.151.1 secret put LEBLEG_VECTORIZE_TOKEN
+        fi
+    - name: Set origin test key
+      working-directory: workers/static-site
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+        CLOUDFLARE_ACCOUNT_ID: 5f012a200d9622ea6aecef1a02693e26
+        ORIGIN_TEST_KEY: ${{ secrets.ORIGIN_TEST_KEY }}
+      run: |
+        if [ -n "$ORIGIN_TEST_KEY" ]; then
+          echo "$ORIGIN_TEST_KEY" | npx --yes wrangler@4.151.1 secret put ORIGIN_TEST_KEY
+        fi
+    - name: Stage idle side
+      id: stage
+      env:
+        IMAGE: ${{ inputs.image || needs.image.outputs.image }}
+      run: python3 workers/static-site/scripts/origin-deploy.py stage
+    - uses: actions/upload-artifact@v4
+      with:
+        name: origin-state
+        path: origin-state.json
+        retention-days: 3
+    if: ${{ always() && (needs.image.result == 'success' || needs.image.result == 'skipped') }}
+  warm:
+    needs:
+    - stage
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v4
+      with:
+        name: origin-state
+        path: .
+    - name: Warm origin
+      run: python3 workers/static-site/scripts/origin-deploy.py warm
+    if: ${{ !cancelled() && needs.stage.result == 'success' }}
+  switch:
+    needs:
+    - stage
+    - warm
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Install dependencies
+      working-directory: workers/static-site
+      run: npm ci
+    - uses: actions/download-artifact@v4
+      with:
+        name: origin-state
+        path: .
+    - name: Switch origin
+      run: python3 workers/static-site/scripts/origin-deploy.py switch
+    if: ${{ !cancelled() && needs.stage.result == 'success' && needs.warm.result == 'success' }}
+  verify:
+    needs:
+    - stage
+    - switch
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v4
+      with:
+        name: origin-state
+        path: .
+    - name: Verify origin
+      run: python3 workers/static-site/scripts/origin-deploy.py verify
+    if: ${{ !cancelled() && needs.stage.result == 'success' && needs.switch.result == 'success' }}
+  rollback:
+    needs:
+    - stage
+    - switch
+    - verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Install dependencies
+      working-directory: workers/static-site
+      run: npm ci
+    - uses: actions/download-artifact@v4
+      with:
+        name: origin-state
+        path: .
+    - name: Rollback origin
+      run: python3 workers/static-site/scripts/origin-deploy.py rollback
+    if: ${{ always() && needs.stage.result == 'success' && needs.switch.result == 'success' && needs.verify.result == 'failure' }}
+  retire:
+    needs:
+    - stage
+    - verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v4
+      with:
+        name: origin-state
+        path: .
+    - name: Retire origin
+      run: python3 workers/static-site/scripts/origin-deploy.py retire
+    if: ${{ !cancelled() && needs.stage.result == 'success' && needs.verify.result == 'success' }}
