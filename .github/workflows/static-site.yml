@@ -51,7 +51,7 @@ jobs:
             -c max_wal_size=8GB -c maintenance_work_mem=1GB
           for i in $(seq 60); do docker exec pg pg_isready -U postgres -d lebleg -q && break; sleep 1; done
           psql --version
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false

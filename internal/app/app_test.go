@@ -164,3 +164,14 @@ func TestEnvIntBounds(t *testing.T) {
 		t.Fatalf("top of the range: %d %v", n, err)
 	}
 }
+
+func TestMetadataDSNWithoutGeminiKey(t *testing.T) {
+	t.Setenv("GEMINI_API_KEY", "")
+	t.Setenv("LEBLEG_SEARCH_PROVIDER", "")
+	t.Setenv("LEBLEG_VECTOR_DSN", "host=unused dbname=lebleg_search")
+	close, err := enableSearch(t.Context(), nil, nil)
+	if err != nil {
+		t.Fatalf("optional semantic search prevents startup: %v", err)
+	}
+	close()
+}

@@ -1,14 +1,21 @@
 # Origin images and deployment
 
-`data.Dockerfile` restores the two database dumps, prepares the search index,
-shrinks the WAL and includes scans. The `data-image` workflow downloads its inputs
-from R2 and publishes `ghcr.io/taktekhq/lebanese-legislation-data:YYYY-MM-DD` and
-`:latest` on demand or after a successful `vectors` run.
+`db/Dockerfile` builds both databases from `data/` with the existing chunker,
+without embedding calls or database dumps. The `images` workflow downloads
+scans from R2 and publishes `-db:<YYYY-MM-DD>` and `:latest` on demand or on
+changes to `data/` on main.
 
-`Dockerfile` builds the Go server and adds it and `start.sh` to the data image.
-The `origin` workflow takes `data_tag` (default `latest`), or an already pushed
-Cloudflare registry `image` to skip building. Each built site image has a unique
-commit, run and attempt tag. Runs are serialized.
+`Dockerfile` builds the Go server and adds it and `start.sh` to `-db` at
+`DATA_TAG`. Build from the repository root with
+`docker build -f workers/static-site/container/Dockerfile --build-arg DATA_TAG=latest .`.
+The server serves dynamic pages, `/api/v1/`, and the ten-tool
+`internal/mcpserver` handler at `/mcp` over the same canonical database.
+Cloudflare MCP and badge routes remain unchanged pending issue #51.
+
+The `origin` workflow takes `tag` (default `latest`) and pulls the published
+GHCR `-all` image, then copies it to the Cloudflare registry with a unique
+commit, run and attempt tag. An already pushed Cloudflare registry `image`
+skips that copy. Origin does not build images. Runs are serialized.
 
 The site Worker has service bindings to `lebleg-origin-blue` and
 `lebleg-origin-green`, the two environments of `workers/origin`. Each owns one
@@ -17,7 +24,7 @@ or a workers.dev address. Deploying an origin Worker only restarts its own side.
 
 The workflow runs these jobs:
 
-1. `image` builds and pushes the site image from the data image, unless `image`
+1. `image` copies the published all-in-one image to Cloudflare, unless `image`
    was supplied.
 2. `site-worker` optionally deploys `workers/static-site` when
    `deploy_site_worker` is true (default false). Only this job applies the `route`
@@ -40,8 +47,8 @@ and the new image. Switch and rollback only need the side names.
 The workflow requires `CLOUDFLARE_WORKERS_TOKEN`, `R2_ACCESS_KEY_ID`,
 `R2_SECRET_ACCESS_KEY`, `ORIGIN_TEST_KEY` and `LEBLEG_GEMINI_API_KEY`.
 The Vectorize token uses `CLOUDFLARE_WORKERS_TOKEN`. Origin secrets are set per
-environment. The data workflow uses `GITHUB_TOKEN` with packages write
-permission. The site build uses packages read permission to pull the data image.
+environment. The database and origin workflows use `GITHUB_TOKEN` with packages write
+permission to publish their GHCR images.
 
 ## First production migration
 
@@ -69,3 +76,36 @@ An authenticated `x-origin-test` request can choose `x-origin-side: blue|green`.
 These requests bypass static pages and API caches. The log and restart endpoints
 use `?side=blue|green` with the same secret header. Normal visitors follow the R2
 flag. API edge cache keys include the selected side.
+
+## Images
+
+All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
+
+| Image | Holds | Used by |
+| --- | --- | --- |
+| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings, optional scans | Compose, database users and the base of `-all` |
+| `-api` | Standalone API server, unchanged Dockerfile and amd64/arm64 support | Compose and API users with a separate database |
+| `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
+| `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Cloudflare Containers and self-hosted sites |
+| `-vectors` | `vectorize-sync`, `export-vectors`, DuckDB 1.5.6; downloads Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
+| `-site` | R2 `lebleg-site` static pages, assets, `404.html`, redirect data and a stdlib Go server | Static mirrors without a database |
+
+Only `.github/workflows/images.yml` publishes these images. Each has its own
+job; `-all` waits for `-db` when both are selected. All receive UTC date and
+`latest` tags; `-all` also receives the git short SHA. Dispatch `which: all` or
+a full image name. Pushes to main select images by their input paths. Successful
+`static-site` and `vectors` runs refresh `-site` and `-vectors`, respectively.
+Publishing of `-web` and `-data` has stopped; existing registry packages remain.
+Compose builds the website service from `web/Dockerfile` locally.
+
+The site image syncs every R2 key except `_build/` and `_export/`, retaining
+`_export/redirects.json` privately for redirects. Its server uses the Worker's
+escaped path mapping and security headers, and serves `404.html` for misses.
+It listens on port 8080. It does not answer dynamic routes. Put a reverse proxy
+in front and route `/api/`, `/mcp`, query-bearing requests such as `/search/?q=`,
+and the other origin prefixes in `workers/static-site/src/route.js` to `-all:8080`.
+API and MCP candidates are smoke-tested on both architectures before promotion;
+existing immutable release versions are retained and new versions are added when free.
+Tracking-only queries can stay on `-site`. No proxy or database credentials are
+embedded in the static image. The runner frees disk before syncing the roughly
+14 GB bucket; no local image build is required.

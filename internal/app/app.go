@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/taktekhq/lebanese-legislation/internal/mcpserver"
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 	"github.com/taktekhq/lebanese-legislation/internal/semantic"
 	"github.com/taktekhq/lebanese-legislation/internal/site"
@@ -173,6 +174,12 @@ func run(ctx context.Context, cfg config) error {
 	if err != nil {
 		return err
 	}
+	// The origin shares the canonical pool with the ten-tool MCP server.
+	if os.Getenv("MCP_SHARED_SERVER") == "1" {
+		mcp := mcpserver.New(pool, mcpserver.ConfigFromEnv(nil))
+		defer mcp.Flush()
+		handler = withMCP(handler, mcp)
+	}
 	if cfg.noindex {
 		handler = site.NoIndex(handler)
 	}
@@ -236,7 +243,7 @@ func enableSearch(ctx context.Context, h *site.Server, pool *pgxpool.Pool) (func
 		return nil, err
 	}
 	dsn := os.Getenv("LEBLEG_VECTOR_DSN")
-	if dsn == "" {
+	if dsn == "" || os.Getenv("GEMINI_API_KEY") == "" {
 		return func() {}, nil
 	}
 	cfg, err := pgxpool.ParseConfig(dsn)
@@ -449,4 +456,14 @@ func probeOutbound() {
 		_ = resp.Body.Close()
 		log.Printf("outbound probe %s: HTTP %d", u, resp.StatusCode)
 	}
+}
+
+func withMCP(next, mcp http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/mcp" || r.URL.Path == "/mcp/" || strings.HasPrefix(r.URL.Path, "/badge/") {
+			mcp.ServeHTTP(w, r)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
