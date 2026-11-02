@@ -1,4 +1,4 @@
-import { Container, getContainer } from "@cloudflare/containers";
+import { Container } from "@cloudflare/containers";
 import { SECURITY_HEADERS } from "./headers.js";
 
 export class Origin extends Container {
@@ -24,12 +24,32 @@ export class Origin extends Container {
   async fetch(request) {
     // Also when the container is already running: it may still be opening
     // Postgres, and the library's own wait gives up after about 20 to 48 s.
-    await this.startAndWaitForPorts({
-      ports: [this.defaultPort],
-      cancellationOptions: { instanceGetTimeoutMS: 120_000, portReadyTimeoutMS: 660_000 },
-    });
-    return super.fetch(request);
+    // Wait for the port once per start; checking it on every request added
+    // about 1.5 s to each response.
+    if (!this.portReady) {
+      await this.startAndWaitForPorts({
+        ports: [this.defaultPort],
+        cancellationOptions: { instanceGetTimeoutMS: 120_000, portReadyTimeoutMS: 660_000 },
+      });
+      this.portReady = true;
+    }
+    try {
+      return await super.fetch(request);
+    } catch (err) {
+      this.portReady = false;
+      throw err;
+    }
   }
+
+  onStop() {
+    this.portReady = false;
+  }
+}
+
+// A Durable Object stays where it is first created; the first "main" landed in
+// Dallas. "eu-1" is created with a Western Europe hint.
+function originStub(env) {
+  return env.ORIGIN.get(env.ORIGIN.idFromName("eu-1"), { locationHint: "weur" });
 }
 
 export async function originFetch(request, env) {
@@ -63,12 +83,14 @@ export async function originFetch(request, env) {
   const testing = env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY;
   if (testing && new URL(request.url).pathname === "/_origin/restart") {
     // Stops the container so the next request starts it with the current settings.
-    await getContainer(env.ORIGIN, "main").destroy();
+    await originStub(env).destroy();
+    // the first instance, in Dallas, until it is gone
+    await env.ORIGIN.get(env.ORIGIN.idFromName("main")).destroy().catch(() => {});
     return new Response("container stopped\n", { headers: SECURITY_HEADERS });
   }
   if (env.ORIGIN_MODE === "hetzner" && !testing) return fetch(request);
   try {
-    const res = await getContainer(env.ORIGIN, "main").fetch(request);
+    const res = await originStub(env).fetch(request);
     const headers = new Headers(res.headers);
     for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
       if (!headers.has(key)) headers.set(key, value);
