@@ -22,7 +22,7 @@ test("only GET and HEAD for a page without a real query are served from files", 
   assert.equal(route("GET", "/law/1/", "?utm_source=chatgpt.com"), "static", "ChatGPT referrals stay off the origin");
   assert.equal(route("GET", "/law/1/", "?utm_source=chatgpt.com&gclid=x"), "static");
   assert.equal(route("GET", "/laws/", "?kind=decree"), "origin", "a filter is built by the origin");
-  assert.equal(route("GET", "/search/", "?q=labour"), "static", "the search page is a static file that calls the API itself");
+  assert.equal(route("GET", "/search/", "?q=labour"), "origin", "a search with a query is answered by the server page (issue 43)");
   assert.equal(route("GET", "/law/1/go/", "?n=5"), "origin");
   for (const p of ["/api/v1/search/", "/ph/e/", "/ph", "/mcp", "/healthz", "/.well-known/x", "/ul/uploads/images/a.png",
     "/scan/1/a.png", "/ruling-files/9.pdf", "/official/", "/en/official/3/", "/official-files/1/a"]) {

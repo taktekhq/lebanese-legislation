@@ -3,10 +3,6 @@ import { SECURITY_HEADERS } from "./headers.js";
 
 export class Origin extends Container {
   defaultPort = 8080;
-  // The image's own start script waits 60 s for Postgres; a cold start on
-  // Cloudflare needs longer (the container exited after about 63 s each time).
-  // Same script, with a 10 minute wait and progress lines.
-  entrypoint = ["/bin/sh", "-c", "exec > /tmp/start.log 2>&1\nset -u\nreport() {\n  echo \"start: $(date -u +%T) $1\"; ls -la \"$PGDATA\" | head -5; df -h / /tmp; free -m; id\n  exec perl -MIO::Socket::INET -e '$s=IO::Socket::INET->new(LocalPort=>8080,Listen=>5,ReuseAddr=>1) or die $!; while($c=$s->accept){local $/; open F,\"/tmp/start.log\"; $b=<F>; close F; print $c \"HTTP/1.0 503 Service Unavailable\\r\\nContent-Type: text/plain\\r\\nContent-Length: \".length($b).\"\\r\\n\\r\\n\".$b; close $c}'\n}\nperl -MIO::Socket::INET -e '$s=IO::Socket::INET->new(LocalPort=>8081,Listen=>5,ReuseAddr=>1) or die $!; while($c=$s->accept){local $/; open F,\"/tmp/start.log\"; $b=<F>; close F; print $c \"HTTP/1.0 200 OK\\r\\nContent-Type: text/plain\\r\\nContent-Length: \".length($b).\"\\r\\n\\r\\n\".$b; close $c}' &\nexport LEBLEG_VECTOR_DSN=\"${LEBLEG_VECTOR_DSN:-host=127.0.0.1 user=lebleg_web dbname=lebleg_search}\"\necho \"start: $(date -u +%T) postgres starting\"\nls -ld /var/run /run /var/run/postgresql 2>&1 || true\ngosu postgres postgres -D \"$PGDATA\" -c listen_addresses=127.0.0.1 -c unix_socket_directories=/tmp -c shared_buffers=1GB -c max_connections=50 -c default_transaction_read_only=on &\nPG=$!\n# A stop from Cloudflare (deploy, move, sleep) is not a failure: stop both and exit.\ntrap 'echo \"start: $(date -u +%T) stop signal\"; kill -TERM ${WEB:-} $PG 2>/dev/null; wait; exit 0' TERM INT\ni=0\nuntil pg_isready -h 127.0.0.1 -U lebleg_web -d lebleg -q; do\n  kill -0 \"$PG\" 2>/dev/null || report \"postgres exited\"\n  i=$((i+1)); [ \"$i\" -lt 600 ] || report \"postgres not ready after 300 s\"\n  [ $((i % 15)) -eq 0 ] && echo \"start: waiting for postgres, $i s\"\n  sleep 1\ndone\necho \"start: $(date -u +%T) postgres ready after $i s\"\ninstall -d -o 65532 -g 65532 /tmp/lebleg-events\ngosu 65532:65532 /usr/local/bin/lebleg-web -addr 0.0.0.0:8080 -events /tmp/lebleg-events -scans /scans -db \"host=127.0.0.1 user=lebleg_web dbname=lebleg\" &\nWEB=$!\nwait $WEB\ncode=$?\n[ \"$code\" -eq 0 ] && exit 0\nreport \"web server exited with $code\""];
   sleepAfter = "72h";
 
   constructor(ctx, env) {
@@ -46,10 +42,14 @@ export class Origin extends Container {
   }
 }
 
+export class OriginBlue extends Origin {}
+export class OriginGreen extends Origin {}
+
 // A Durable Object stays where it is first created; the first "main" landed in
 // Dallas. "eu-1" is created with a Western Europe hint.
-function originStub(env) {
-  return env.ORIGIN.get(env.ORIGIN.idFromName("eu-1"), { locationHint: "weur" });
+function originStub(env, side) {
+  const namespace = side === "green" ? env.ORIGIN_GREEN : env.ORIGIN_BLUE;
+  return namespace.get(namespace.idFromName("eu-1"), { locationHint: "weur" });
 }
 
 export async function originFetch(request, env, ctx) {
@@ -81,15 +81,20 @@ export async function originFetch(request, env, ctx) {
   // A request with the secret test header reaches the container whatever the mode,
   // so the container can be checked before traffic moves to it.
   const testing = env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY;
-  if (testing && new URL(request.url).pathname === "/_origin/log") {
+  const live = env.LIVE === "green" ? "green" : "blue";
+  const admin = url.pathname === "/_origin/log" || url.pathname === "/_origin/restart";
+  const selected = testing ? (admin ? url.searchParams.get("side") : request.headers.get("x-origin-side")) : null;
+  if (selected !== null && selected !== "blue" && selected !== "green") {
+    return new Response("invalid origin side\n", { status: 400, headers: SECURITY_HEADERS });
+  }
+  const side = selected || live;
+  if (testing && url.pathname === "/_origin/log") {
     // The container's start log (Postgres and the server write to it), served on port 8081.
-    return originStub(env).containerFetch("http://container/log", 8081);
+    return originStub(env, side).containerFetch("http://container/log", 8081);
   }
   if (testing && new URL(request.url).pathname === "/_origin/restart") {
     // Stops the container so the next request starts it with the current settings.
-    await originStub(env).destroy();
-    // the first instance, in Dallas, until it is gone
-    await env.ORIGIN.get(env.ORIGIN.idFromName("main")).destroy().catch(() => {});
+    await originStub(env, side).destroy();
     return new Response("container stopped\n", { headers: SECURITY_HEADERS });
   }
   // Until the container's AI answer works, AI_TO_HETZNER sends the AI answer
@@ -99,11 +104,13 @@ export async function originFetch(request, env, ctx) {
   try {
     // API answers are public and say how long they keep (Cache-Control), so
     // repeats are served from the edge and never reach Postgres.
-    const cacheable = request.method === "GET" && /^\/(en\/)?api\/v1\//.test(url.pathname);
-    const cacheKey = new Request(url.toString(), { method: "GET" });
+    const cacheable = !testing && request.method === "GET" && /^\/(en\/)?api\/v1\//.test(url.pathname);
+    const cacheURL = new URL(url);
+    cacheURL.searchParams.set("__origin_side", side);
+    const cacheKey = new Request(cacheURL.toString(), { method: "GET" });
     let res = cacheable ? await caches.default.match(cacheKey) : undefined;
     if (!res) {
-      res = await originStub(env).fetch(request);
+      res = await originStub(env, side).fetch(request);
       if (cacheable && res.status === 200 && !/no-store|private/.test(res.headers.get("Cache-Control") || "")) {
         ctx?.waitUntil(caches.default.put(cacheKey, res.clone()));
       }

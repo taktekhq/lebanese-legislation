@@ -10,7 +10,7 @@
 import { route, keyFor, resolve, indexRedirectData } from "./route.js";
 import { SECURITY_HEADERS } from "./headers.js";
 import { originFetch } from "./origin.js";
-export { Origin } from "./origin.js";
+export { Origin, OriginBlue, OriginGreen } from "./origin.js";
 
 const REDIRECT_DATA_TTL_MS = 10 * 60 * 1000;
 let redirects = { at: 0, data: null };
@@ -52,6 +52,9 @@ export default {
       return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: postAllowed ? "GET, HEAD, POST" : "GET, HEAD" } });
     }
     if (/shapbot/i.test(request.headers.get("User-Agent") || "")) return new Response(null, { status: 429 }); // as Caddy does
+    if (env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY) {
+      return originFetch(request, env, ctx);
+    }
     if (route(request.method, url.pathname, url.search) === "origin") return originFetch(request, env, ctx);
 
     try {

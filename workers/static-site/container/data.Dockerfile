@@ -1,0 +1,74 @@
+# syntax=docker/dockerfile:1
+FROM postgres:18.6-trixie@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4 AS pgvector-build
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends build-essential ca-certificates curl postgresql-server-dev-18="$PG_VERSION" \
+ && rm -rf /var/lib/apt/lists/*
+WORKDIR /build
+RUN curl -fsSL --retry 3 https://github.com/pgvector/pgvector/archive/refs/tags/v0.8.2.tar.gz -o pgvector.tar.gz \
+ && echo '69f4019389af05dc1c9548deb8628e62878e6e207c03907f2b8af2016472cdaa  pgvector.tar.gz' | sha256sum -c - \
+ && tar -xzf pgvector.tar.gz \
+ && make -C pgvector-0.8.2 PG_CONFIG=/usr/lib/postgresql/18/bin/pg_config OPTFLAGS= \
+ && make -C pgvector-0.8.2 PG_CONFIG=/usr/lib/postgresql/18/bin/pg_config DESTDIR=/out install
+
+FROM postgres:18.6-trixie@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4 AS pg
+COPY --from=pgvector-build /out/usr/lib/postgresql/18/lib/vector.so /usr/lib/postgresql/18/lib/vector.so
+COPY --from=pgvector-build /out/usr/share/postgresql/18/extension/vector* /usr/share/postgresql/18/extension/
+
+FROM pg AS origin
+ARG DROP_VECTORS="1"
+ENV PGDATA=/var/lib/postgresql/data
+COPY build/scans/ /scans/
+# The dumps are mounted for this step only, so they never become an image layer.
+RUN --mount=type=bind,source=build,target=/dumps <<'SH'
+set -eu
+install -d -o postgres -g postgres -m 0700 "$PGDATA"
+gosu postgres initdb -D "$PGDATA"
+printf 'local all all trust\nhost all all 127.0.0.1/32 trust\n' > "$PGDATA/pg_hba.conf"
+gosu postgres pg_ctl -D "$PGDATA" -o "-c listen_addresses='' -c unix_socket_directories=/tmp -c maintenance_work_mem=2GB -c max_parallel_maintenance_workers=4 -c dynamic_shared_memory_type=mmap -c fsync=off -c full_page_writes=off -c max_wal_size=8GB -c wal_level=minimal -c max_wal_senders=0" -w start
+psql -h /tmp -U postgres -v ON_ERROR_STOP=1 -c 'CREATE ROLE lebleg_web LOGIN' -c 'CREATE ROLE lebleg'
+for db in lebleg lebleg_search; do
+  createdb -h /tmp -U postgres -O lebleg "$db"
+  if ! pg_restore -h /tmp -U postgres --no-owner --no-privileges -j 4 -d "$db" "/dumps/$db.dump" 2> /tmp/restore.log; then
+    cat /tmp/restore.log >&2
+    # Only absent roles referenced by the dump's GRANTs may be ignored.
+    awk '
+      /^pg_restore: error:/ {
+        errors++
+        if ($0 !~ /could not execute query: ERROR:  role ".*" does not exist/) bad=1
+        grant=0
+        while ((getline line) > 0) {
+          if (line ~ /^Command was: GRANT /) { grant=1; break }
+          if (line ~ /^Command was:/) break
+        }
+        if (!grant) bad=1
+      }
+      END { exit (bad || !errors) }
+    ' /tmp/restore.log
+  fi
+  psql -h /tmp -U postgres -d "$db" -v ON_ERROR_STOP=1 \
+    -c "GRANT CONNECT ON DATABASE $db TO lebleg_web" \
+    -c 'GRANT USAGE ON SCHEMA public TO lebleg_web' \
+    -c 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO lebleg_web' \
+    -c 'GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO lebleg_web' \
+    -c 'GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO lebleg_web' \
+    -c 'ANALYZE'
+done
+if [ "$DROP_VECTORS" = 1 ]; then
+  psql -h /tmp -U postgres -d lebleg_search -v ON_ERROR_STOP=1 \
+    -c 'DROP INDEX IF EXISTS public.semantic_chunks_embedding' \
+    -c 'ALTER TABLE public.semantic_chunks DROP COLUMN embedding'
+  # Separate invocation: VACUUM cannot run inside a transaction block.
+  psql -h /tmp -U postgres -d lebleg_search -v ON_ERROR_STOP=1 -c 'VACUUM FULL public.semantic_chunks'
+fi
+# Same UTF-8 ChunkID expression as internal/vectorize; keep row lookup indexed.
+psql -h /tmp -U postgres -d lebleg_search -v ON_ERROR_STOP=1 <<'SQL'
+CREATE INDEX IF NOT EXISTS semantic_chunks_vectorize_id ON public.semantic_chunks
+((CASE WHEN octet_length(model || ':' || kind || ':' || source_id::text || ':' || part || ':' || lang || ':' || hash || ':' || chunk_start::text) <= 64 THEN model || ':' || kind || ':' || source_id::text || ':' || part || ':' || lang || ':' || hash || ':' || chunk_start::text ELSE encode(substring(sha256(decode(replace(model || ':' || kind || ':' || source_id::text || ':' || part || ':' || lang || ':' || hash || ':' || chunk_start::text, chr(92), chr(92) || chr(92)), 'escape')) from 1 for 16), 'hex') END));
+SQL
+# Fast restore with a big WAL cap, then shrink pg_wal once before the image is saved.
+psql -h /tmp -U postgres -c "ALTER SYSTEM SET max_wal_size = '256MB'" -c "ALTER SYSTEM SET min_wal_size = '80MB'" -c "SELECT pg_reload_conf()" -c CHECKPOINT -c CHECKPOINT
+psql -h /tmp -U postgres -c "ALTER SYSTEM RESET max_wal_size" -c "ALTER SYSTEM RESET min_wal_size"
+gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
+du -sh "$PGDATA" "$PGDATA/pg_wal" /scans
+rm -f /tmp/restore.log
+SH
