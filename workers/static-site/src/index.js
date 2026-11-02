@@ -52,7 +52,7 @@ export default {
       return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: postAllowed ? "GET, HEAD, POST" : "GET, HEAD" } });
     }
     if (/shapbot/i.test(request.headers.get("User-Agent") || "")) return new Response(null, { status: 429 }); // as Caddy does
-    if (route(request.method, url.pathname, url.search) === "origin") return originFetch(request, env);
+    if (route(request.method, url.pathname, url.search) === "origin") return originFetch(request, env, ctx);
 
     try {
       const key = keyFor(url.pathname);
@@ -82,6 +82,6 @@ export default {
     } catch (err) {
       console.error("static site: falling back to the origin:", err && err.message);
     }
-    return originFetch(request, env);
+    return originFetch(request, env, ctx);
   },
 };
