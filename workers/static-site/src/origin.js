@@ -92,7 +92,10 @@ export async function originFetch(request, env, ctx) {
     await env.ORIGIN.get(env.ORIGIN.idFromName("main")).destroy().catch(() => {});
     return new Response("container stopped\n", { headers: SECURITY_HEADERS });
   }
-  if (env.ORIGIN_MODE === "hetzner" && !testing) return fetch(request);
+  // Until the container's AI answer works, AI_TO_HETZNER sends the AI answer
+  // endpoints to the old origin. Remove it once Hetzner is retired.
+  const aiPath = /^\/(en\/|ar\/)?search\/(answer|ai)(\/|$)/.test(url.pathname);
+  if ((env.ORIGIN_MODE === "hetzner" || (env.AI_TO_HETZNER === "1" && aiPath)) && !testing) return fetch(request);
   try {
     // API answers are public and say how long they keep (Cache-Control), so
     // repeats are served from the edge and never reach Postgres.
