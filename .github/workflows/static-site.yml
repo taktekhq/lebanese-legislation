@@ -116,3 +116,22 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
 
+
+  generation:
+    # Last: the Worker keys its page cache by this value, so the new pages
+    # show at once instead of after the 12-hour edge cache runs out. Written
+    # when shards failed too, since the others already uploaded new pages.
+    needs: render
+    if: ${{ !cancelled() && needs.render.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark the new export generation
+        env:
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          echo "${{ github.run_id }}-${{ github.run_attempt }}" > generation
+          aws s3 cp generation s3://lebleg-site/_export/generation \
+            --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
+            --content-type text/plain

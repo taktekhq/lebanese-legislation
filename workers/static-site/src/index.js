@@ -16,6 +16,19 @@ import { route, keyFor, resolve, indexRedirectData } from "./route.js";
 import { SECURITY_HEADERS } from "./headers.js";
 import { originFetch } from "./origin.js";
 
+// The export generation (the workflow run that last finished uploading) is
+// part of the page cache key: pages are cached for 12 hours, and CI cannot
+// purge, so without it a new build stays hidden behind the old copies.
+const GENERATION_TTL_MS = 60 * 1000;
+let generation = { at: 0, value: "" };
+
+async function exportGeneration(env) {
+  if (generation.at && Date.now() - generation.at < GENERATION_TTL_MS) return generation.value;
+  const obj = await env.SITE.get("_export/generation");
+  generation = { at: Date.now(), value: obj ? (await obj.text()).trim() : "" };
+  return generation.value;
+}
+
 const REDIRECT_DATA_TTL_MS = 10 * 60 * 1000;
 let redirects = { at: 0, data: null };
 
@@ -65,7 +78,8 @@ export default {
       const key = keyFor(url.pathname);
       if (key) {
         const cache = caches.default;
-        const cacheKey = new Request(url.origin + url.pathname, { method: "GET" });
+        const gen = await exportGeneration(env);
+        const cacheKey = new Request(url.origin + url.pathname + (gen ? "?__export=" + encodeURIComponent(gen) : ""), { method: "GET" });
         const hit = await cache.match(cacheKey);
         if (hit && request.method === "GET") return hit;
         const obj = await env.SITE.get(key);
