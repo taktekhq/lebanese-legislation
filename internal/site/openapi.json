@@ -1,0 +1,2339 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Lebanese Legislation API",
+    "version": "v1",
+    "description": "Public read-only access to Lebanese legislation and legal sources. No authentication required. Not legal advice. Source texts come from the Lebanese University's Centre for Research and Studies in Legal Informatics. English discovery titles and machine readings are unofficial. DB-backed routes are rate limited and may return 429 or 503 as plain text. Successful responses use public, max-age=60, stale-while-revalidate=300, except calculated-current which has no cache header. JSON errors use no-store. Paths include their trailing slash where registered."
+  },
+  "servers": [
+    {
+      "url": "https://lebaneselegislation.com"
+    }
+  ],
+  "paths": {
+    "/api/v1/": {
+      "get": {
+        "operationId": "apiRoot",
+        "summary": "Discover the API",
+        "description": "Public API entry point and links. No authentication required.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIRoot"
+                },
+                "example": {
+                  "name": "Lebanese Legislation API",
+                  "version": "v1",
+                  "docs": "https://lebaneselegislation.com/developers/",
+                  "openapi": "https://lebaneselegislation.com/api/v1/openapi.json",
+                  "mcp": "https://lebaneselegislation.com/mcp",
+                  "not_advice": "Not legal advice.",
+                  "notes": [
+                    "English titles are unofficial."
+                  ],
+                  "endpoints": [
+                    "GET /api/v1/search/?q="
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "public, max-age=60, stale-while-revalidate=300"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/openapi.json": {
+      "get": {
+        "operationId": "openAPI",
+        "summary": "Read this OpenAPI document",
+        "description": "Machine-readable API description. No database required.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAPIDocument"
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "public, max-age=60, stale-while-revalidate=300"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/search/": {
+      "get": {
+        "operationId": "search",
+        "summary": "Search legislation, articles, rulings and gazette issues",
+        "description": "Exact text and citation results, with optional related passages. Counts are totals before pagination. The year filter applies to laws. Missing or malformed integer parameters use their defaults.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Words, citation or question to search. Empty or 200 or more Unicode characters returns empty results. No matches may trigger a translated or adjusted search.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "قانون العمل"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "Restrict results to one collection. Empty or unrecognized values search all four.",
+            "schema": {
+              "type": "string",
+              "examples": [
+                "laws",
+                "articles",
+                "rulings",
+                "gazette"
+              ]
+            },
+            "example": "laws"
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "description": "Issue year filter for laws; 0 means no year filter. Integers are clamped.",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "maximum": 2100
+            },
+            "example": 2023
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum results per collection; integers are clamped.",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "example": 5
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Result offset; integers are clamped.",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "example": 0
+          },
+          {
+            "name": "semantic",
+            "in": "query",
+            "required": false,
+            "description": "Set exactly true for related source passages at offset zero. Ordinary search remains available if semantic retrieval fails.",
+            "schema": {
+              "type": "string",
+              "default": "false"
+            },
+            "example": "true"
+          },
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "description": "Set exactly true with semantic=true to select related passages using a model.",
+            "schema": {
+              "type": "string",
+              "default": "false"
+            },
+            "example": "true"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiSearchResult"
+                },
+                "example": {
+                  "q": "قانون العمل",
+                  "laws": [
+                    {
+                      "id": 244565,
+                      "kind": "قانون",
+                      "title": "أصول المحاكمات المدنية",
+                      "status": "نافذ",
+                      "article_count": 1033,
+                      "url": "https://lebaneselegislation.com/law/244565/"
+                    }
+                  ],
+                  "law_count": 1,
+                  "article_count": 0,
+                  "ruling_count": 0,
+                  "gazette_count": 0
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "public, max-age=60, stale-while-revalidate=300"
+              }
+            }
+          },
+          "429": {
+            "description": "Client rate limit exceeded.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "too many requests, slow down\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "503": {
+            "description": "Database queue is full or the request was cancelled.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "the server is busy, try again shortly\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal retrieval error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "internal error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/law/{id}/": {
+      "get": {
+        "operationId": "getLaw",
+        "summary": "Read a law and its outline",
+        "description": "Metadata, table of contents, article links and amendment relationships. English titles are unofficial. Text fields preserve source wording.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Positive database identifier. Invalid or missing records return 404.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 244565
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiLawDetail"
+                },
+                "example": {
+                  "id": 244565,
+                  "kind": "قانون",
+                  "title": "أصول المحاكمات المدنية",
+                  "status": "نافذ",
+                  "article_count": 1033,
+                  "url": "https://lebaneselegislation.com/law/244565/",
+                  "not_legal_advice": "Not legal advice."
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "public, max-age=60, stale-while-revalidate=300"
+              }
+            }
+          },
+          "429": {
+            "description": "Client rate limit exceeded.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "too many requests, slow down\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "503": {
+            "description": "Database queue is full or the request was cancelled.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "the server is busy, try again shortly\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal retrieval error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "internal error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such record or invalid identifier.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "law not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/law/{id}/article/{n}/": {
+      "get": {
+        "operationId": "getArticle",
+        "summary": "Read one article",
+        "description": "Returns current displayed wording, source wording when different, versions, amendments and ruling links. Calculated monetary wording is a separate optional object.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Positive database identifier. Invalid or missing records return 404.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 244565
+          },
+          {
+            "name": "n",
+            "in": "path",
+            "required": true,
+            "description": "Printed article number or its URL slug, not the position in the law.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "86"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiArticleDetail"
+                },
+                "example": {
+                  "law": {
+                    "id": 244565,
+                    "kind": "قانون",
+                    "title": "أصول المحاكمات المدنية",
+                    "status": "نافذ",
+                    "article_count": 1033,
+                    "url": "https://lebaneselegislation.com/law/244565/"
+                  },
+                  "number": "86",
+                  "text_ar": "تحدد قيمة الدعوى وفقاً للأصول.",
+                  "url": "https://lebaneselegislation.com/law/244565/article/86/",
+                  "not_legal_advice": "Not legal advice."
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "public, max-age=60, stale-while-revalidate=300"
+              }
+            }
+          },
+          "429": {
+            "description": "Client rate limit exceeded.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "too many requests, slow down\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "503": {
+            "description": "Database queue is full or the request was cancelled.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "the server is busy, try again shortly\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal retrieval error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "internal error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such record or invalid identifier.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "law not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/law/{id}/calculated-current/": {
+      "get": {
+        "operationId": "getCalculatedCurrent",
+        "summary": "Read reviewed calculated monetary wording",
+        "description": "Only law 244565 is supported. Articles are keyed by printed article number. Returns an empty object when the law or eligible derived records are absent. Original published text stays separate. This handler does not set Cache-Control.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Only law 244565 is supported. Other identifiers return 404.",
+            "schema": {
+              "type": "integer",
+              "const": 244565
+            },
+            "example": 244565
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalculatedCollection"
+                },
+                "example": {
+                  "law_id": 244565,
+                  "articles": {}
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client rate limit exceeded.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "too many requests, slow down\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "503": {
+            "description": "Database queue unavailable or current law cannot be loaded. Load failure does not set Retry-After.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "cannot load current law\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "404": {
+            "description": "No such record or invalid identifier.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "404 page not found\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ruling/{id}/": {
+      "get": {
+        "operationId": "getRuling",
+        "summary": "Read a court ruling",
+        "description": "Metadata and typed text where available, plus original PDF and machine-read pages when held. Machine readings may contain errors; consult the scan.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Positive database identifier. Invalid or missing records return 404.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 12345
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiRulingDetail"
+                },
+                "example": {
+                  "id": 12345,
+                  "title": "قرار قضائي",
+                  "url": "https://lebaneselegislation.com/ruling/12345/",
+                  "not_legal_advice": "Not legal advice."
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "public, max-age=60, stale-while-revalidate=300"
+              }
+            }
+          },
+          "429": {
+            "description": "Client rate limit exceeded.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "too many requests, slow down\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "503": {
+            "description": "Database queue is full or the request was cancelled.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "the server is busy, try again shortly\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal retrieval error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "internal error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such record or invalid identifier.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "law not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gazette/{id}/": {
+      "get": {
+        "operationId": "getGazette",
+        "summary": "Read one Official Gazette issue",
+        "description": "Issue identity and its legislation summaries. Texts may be null when the issue has no linked legislation.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Positive database identifier. Invalid or missing records return 404.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 123
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiGazetteDetail"
+                },
+                "example": {
+                  "id": 123,
+                  "number": "12",
+                  "published_on": "2025-03-20",
+                  "texts": [
+                    {
+                      "id": 244565,
+                      "kind": "قانون",
+                      "title": "أصول المحاكمات المدنية",
+                      "status": "نافذ",
+                      "article_count": 1033,
+                      "url": "https://lebaneselegislation.com/law/244565/"
+                    }
+                  ],
+                  "url": "https://lebaneselegislation.com/gazette/123/"
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "public, max-age=60, stale-while-revalidate=300"
+              }
+            }
+          },
+          "429": {
+            "description": "Client rate limit exceeded.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "too many requests, slow down\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "503": {
+            "description": "Database queue is full or the request was cancelled.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "the server is busy, try again shortly\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal retrieval error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "internal error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such record or invalid identifier.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "law not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/laws/": {
+      "get": {
+        "operationId": "listLaws",
+        "summary": "List legislation by date",
+        "description": "Uses gazette date, falling back to issue date. Undated texts are excluded. next_offset is absent on the last page. Malformed integer parameters use defaults.",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "description": "Inclusive start bound: YYYY, YYYY-MM or YYYY-MM-DD. Uses the first or last day of the period.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2025-01"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "description": "Inclusive end bound: YYYY, YYYY-MM or YYYY-MM-DD. Uses the first or last day of the period.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2025-01"
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "description": "Date order. Other values return 400.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "newest",
+                "oldest"
+              ],
+              "default": "newest"
+            },
+            "example": "newest"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Page size; integers are clamped.",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "example": 10
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Result offset; integers are clamped.",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "maximum": 1073741824
+            },
+            "example": 0
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "description": "Exact Arabic kind or case-insensitive English kind.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "decree"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiLawList"
+                },
+                "example": {
+                  "since": "2025-01",
+                  "until": null,
+                  "kind": null,
+                  "order": "newest",
+                  "total": 1,
+                  "offset": 0,
+                  "laws": [
+                    {
+                      "id": 244565,
+                      "kind": "قانون",
+                      "title": "أصول المحاكمات المدنية",
+                      "status": "نافذ",
+                      "article_count": 1033,
+                      "url": "https://lebaneselegislation.com/law/244565/",
+                      "date": "2025-01-10"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "public, max-age=60, stale-while-revalidate=300"
+              }
+            }
+          },
+          "429": {
+            "description": "Client rate limit exceeded.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "too many requests, slow down\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "503": {
+            "description": "Database queue is full or the request was cancelled.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "the server is busy, try again shortly\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal retrieval error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "internal error"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid date or order.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "order is newest or oldest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gazette/": {
+      "get": {
+        "operationId": "listGazette",
+        "summary": "List Official Gazette issues",
+        "description": "Lists by publication date. Undated issues can appear without a date filter. Source is centre or scans. next_offset is absent on the last page. Malformed integer parameters use defaults. The shared parser accepts kind but this listing ignores it.",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "description": "Inclusive start bound: YYYY, YYYY-MM or YYYY-MM-DD. Uses the first or last day of the period.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2025-01"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "description": "Inclusive end bound: YYYY, YYYY-MM or YYYY-MM-DD. Uses the first or last day of the period.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2025-01"
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "description": "Date order. Other values return 400.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "newest",
+                "oldest"
+              ],
+              "default": "newest"
+            },
+            "example": "newest"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Page size; integers are clamped.",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "example": 10
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Result offset; integers are clamped.",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "maximum": 1073741824
+            },
+            "example": 0
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "description": "Accepted by the shared parser but ignored for gazette issues.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "decree"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiIssueList"
+                },
+                "example": {
+                  "since": null,
+                  "until": null,
+                  "order": "newest",
+                  "total": 1,
+                  "offset": 0,
+                  "issues": [
+                    {
+                      "id": 123,
+                      "number": "12",
+                      "published_on": "2025-03-20",
+                      "text_count": 5,
+                      "source": "centre",
+                      "url": "https://lebaneselegislation.com/gazette/123/"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "public, max-age=60, stale-while-revalidate=300"
+              }
+            }
+          },
+          "429": {
+            "description": "Client rate limit exceeded.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "too many requests, slow down\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "503": {
+            "description": "Database queue is full or the request was cancelled.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "the server is busy, try again shortly\n"
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before retrying.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "2"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal retrieval error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "internal error"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid date or order.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/apiErrorBody"
+                },
+                "example": {
+                  "error": "order is newest or oldest"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "apiErrorBody": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "apiLawSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "kind_en": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "issued_on": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "Official Arabic title."
+          },
+          "title_en": {
+            "type": "string",
+            "description": "Unofficial English discovery title."
+          },
+          "status": {
+            "type": "string",
+            "description": "Status recorded by the source."
+          },
+          "article_count": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string",
+            "description": "the curated code's short name, e.g. \"Code of Obligations and Contracts\""
+          },
+          "url": {
+            "type": "string",
+            "description": "Canonical website URL."
+          },
+          "source_url": {
+            "type": "string",
+            "description": "Original Centre source page, when known."
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "status",
+          "article_count",
+          "url"
+        ]
+      },
+      "apiArticleHit": {
+        "type": "object",
+        "properties": {
+          "calculated_current": {
+            "$ref": "#/components/schemas/Record"
+          },
+          "law": {
+            "$ref": "#/components/schemas/apiLawSummary"
+          },
+          "article_number": {
+            "type": "string"
+          },
+          "snippet": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "matched_calculated_current": {
+            "type": "boolean"
+          },
+          "cited": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "law",
+          "article_number",
+          "snippet",
+          "url"
+        ]
+      },
+      "apiRulingHit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "court": {
+            "type": "string"
+          },
+          "decided_on": {
+            "type": "string"
+          },
+          "snippet": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "pdf_url": {
+            "type": "string"
+          },
+          "judgment_page": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "url"
+        ]
+      },
+      "apiGazetteHit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "number": {
+            "type": "string"
+          },
+          "published_on": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url"
+        ]
+      },
+      "apiSearchResult": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string"
+          },
+          "laws": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiLawSummary"
+            }
+          },
+          "law_count": {
+            "type": "integer"
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiArticleHit"
+            }
+          },
+          "article_count": {
+            "type": "integer"
+          },
+          "rulings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiRulingHit"
+            }
+          },
+          "ruling_count": {
+            "type": "integer"
+          },
+          "gazette": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiGazetteHit"
+            }
+          },
+          "gazette_count": {
+            "type": "integer"
+          },
+          "searched_instead": {
+            "type": "string",
+            "description": "Replacement search terms after the original query found nothing."
+          },
+          "searched_instead_kind": {
+            "type": "string",
+            "description": "translated or adjusted."
+          },
+          "related": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiPassage"
+            }
+          },
+          "semantic": {
+            "type": "string",
+            "description": "ok or unavailable; present for requested semantic retrieval at offset zero."
+          },
+          "selection": {
+            "type": "string",
+            "description": "ok or unavailable when passage selection is attempted."
+          }
+        },
+        "required": [
+          "q",
+          "law_count",
+          "article_count",
+          "ruling_count",
+          "gazette_count"
+        ]
+      },
+      "apiPassage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "lang": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "unofficial": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "text",
+          "url"
+        ]
+      },
+      "apiSection": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "depth": {
+            "type": "integer"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "description": "the Centre's editorial note on the chapter"
+          }
+        },
+        "required": [
+          "id",
+          "depth",
+          "heading"
+        ]
+      },
+      "apiArticleRef": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "integer"
+          },
+          "number": {
+            "type": "string"
+          },
+          "section_id": {
+            "type": "integer",
+            "description": "the table_of_contents entry it sits under"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "position",
+          "number",
+          "url"
+        ]
+      },
+      "apiLawDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "kind_en": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "issued_on": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "title_en": {
+            "type": "string",
+            "description": "unofficial English title (a model's rendering of the Arabic one); the Arabic title is official and more accurate"
+          },
+          "status": {
+            "type": "string"
+          },
+          "article_count": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string",
+            "description": "the curated code's short name, e.g. \"Code of Obligations and Contracts\""
+          },
+          "url": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "gazette_number": {
+            "type": "string"
+          },
+          "gazette_date": {
+            "type": "string"
+          },
+          "gazette_issue_id": {
+            "type": "integer"
+          },
+          "preamble": {
+            "type": "string"
+          },
+          "explanatory_note": {
+            "type": "string"
+          },
+          "closing": {
+            "type": "string"
+          },
+          "table_of_contents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiSection"
+            }
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiArticleRef"
+            }
+          },
+          "amended_by": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiLawChange"
+            }
+          },
+          "amended": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiLawChange"
+            }
+          },
+          "not_legal_advice": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "status",
+          "article_count",
+          "url",
+          "not_legal_advice"
+        ]
+      },
+      "apiArticleVersion": {
+        "type": "object",
+        "properties": {
+          "major": {
+            "type": "integer"
+          },
+          "minor": {
+            "type": "integer"
+          },
+          "valid_from": {
+            "type": "string"
+          },
+          "valid_to": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "text_ar": {
+            "type": "string"
+          },
+          "text_source": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "major",
+          "minor",
+          "state",
+          "text_source"
+        ]
+      },
+      "apiChange": {
+        "type": "object",
+        "properties": {
+          "relation": {
+            "type": "string"
+          },
+          "part": {
+            "type": "string"
+          },
+          "by": {
+            "$ref": "#/components/schemas/apiLawSummary"
+          },
+          "by_article": {
+            "type": "string"
+          },
+          "effective_on": {
+            "type": "string"
+          },
+          "text_ar": {
+            "type": "string"
+          },
+          "found_by": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "relation",
+          "by",
+          "found_by",
+          "url"
+        ]
+      },
+      "apiAffected": {
+        "type": "object",
+        "properties": {
+          "by": {
+            "$ref": "#/components/schemas/apiLawSummary"
+          },
+          "by_article": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "by",
+          "by_article",
+          "url"
+        ]
+      },
+      "apiRulingRef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "court": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "decided_on": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "court",
+          "url"
+        ]
+      },
+      "apiArticleDetail": {
+        "type": "object",
+        "properties": {
+          "calculated_current": {
+            "$ref": "#/components/schemas/Record",
+            "description": "Reviewed monetary adjustment, separate from published wording; omitted unless eligibility checks pass."
+          },
+          "law": {
+            "$ref": "#/components/schemas/apiLawSummary"
+          },
+          "number": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "centre_error": {
+            "$ref": "#/components/schemas/CentreError"
+          },
+          "text_ar": {
+            "type": "string",
+            "description": "Wording shown as in force today. May contain marked disputed scan readings."
+          },
+          "text_fr": {
+            "type": "string"
+          },
+          "centre_text_ar": {
+            "type": "string",
+            "description": "Earlier Centre wording when an amendment replaces it."
+          },
+          "centre_text_fr": {
+            "type": "string"
+          },
+          "in_force_from": {
+            "type": "string"
+          },
+          "versions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiArticleVersion"
+            }
+          },
+          "repealed": {
+            "type": "boolean"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiChange"
+            }
+          },
+          "possibly_affected_by": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiAffected"
+            },
+            "description": "General repeals to check, not findings that this article was repealed."
+          },
+          "rulings_count": {
+            "type": "integer"
+          },
+          "rulings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiRulingRef"
+            }
+          },
+          "url": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "not_legal_advice": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "law",
+          "number",
+          "text_ar",
+          "url",
+          "not_legal_advice"
+        ]
+      },
+      "apiRulingDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "court": {
+            "type": "string"
+          },
+          "court_en": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "decided_on": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "president": {
+            "type": "string"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "text_ar": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "description": "set when the Centre holds only the judgment's file"
+          },
+          "url": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "pages_model": {
+            "type": "string",
+            "description": "which models read the pages, as in the dataset"
+          },
+          "pdf_url": {
+            "type": "string",
+            "description": "Original judgment scan to cite with answers about the ruling."
+          },
+          "page_count": {
+            "type": "integer",
+            "description": "pages in the scan"
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/apiRulingPage"
+            },
+            "description": "Machine reading of the scanned judgment, potentially incorrect. Consult pdf_url."
+          },
+          "pages_note": {
+            "type": "string"
+          },
+          "not_legal_advice": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "url",
+          "not_legal_advice"
+        ]
+      },
+      "apiRulingPage": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "integer"
+          },
+          "text_ar": {
+            "type": "string"
+          },
+          "low_confidence": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "n",
+          "text_ar"
+        ]
+      },
+      "apiGazetteDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "number": {
+            "type": "string"
+          },
+          "published_on": {
+            "type": "string"
+          },
+          "texts": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/apiLawSummary"
+            }
+          },
+          "url": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "texts",
+          "url"
+        ]
+      },
+      "apiListedLaw": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "kind_en": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "issued_on": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "title_en": {
+            "type": "string",
+            "description": "unofficial English title (a model's rendering of the Arabic one); the Arabic title is official and more accurate"
+          },
+          "status": {
+            "type": "string"
+          },
+          "article_count": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string",
+            "description": "the curated code's short name, e.g. \"Code of Obligations and Contracts\""
+          },
+          "url": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "gazette_number": {
+            "type": "string"
+          },
+          "gazette_date": {
+            "type": "string"
+          },
+          "gazette_issue_id": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string",
+            "description": "coalesce(gazette_date, issued_on): what since, until and the order use"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "status",
+          "article_count",
+          "url"
+        ]
+      },
+      "apiLawList": {
+        "type": "object",
+        "properties": {
+          "since": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "until": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "order": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "next_offset": {
+            "type": "integer"
+          },
+          "laws": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/apiListedLaw"
+            }
+          }
+        },
+        "required": [
+          "since",
+          "until",
+          "kind",
+          "order",
+          "total",
+          "offset",
+          "laws"
+        ]
+      },
+      "apiIssueRow": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "number": {
+            "type": "string"
+          },
+          "published_on": {
+            "type": "string"
+          },
+          "text_count": {
+            "type": "integer"
+          },
+          "source": {
+            "type": "string",
+            "description": "\"centre\", or \"scans\" for an issue made for texts read from the Gazette's scanned pages"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text_count",
+          "source",
+          "url"
+        ]
+      },
+      "apiIssueList": {
+        "type": "object",
+        "properties": {
+          "since": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "until": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "order": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "next_offset": {
+            "type": "integer"
+          },
+          "issues": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/apiIssueRow"
+            }
+          }
+        },
+        "required": [
+          "since",
+          "until",
+          "order",
+          "total",
+          "offset",
+          "issues"
+        ]
+      },
+      "apiLawChange": {
+        "type": "object",
+        "properties": {
+          "relation": {
+            "type": "string"
+          },
+          "verb": {
+            "type": "string"
+          },
+          "law": {
+            "$ref": "#/components/schemas/apiLawSummary"
+          },
+          "effective_on": {
+            "type": "string"
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "relation",
+          "verb",
+          "law"
+        ]
+      },
+      "CentreError": {
+        "type": "object",
+        "properties": {
+          "en": {
+            "type": "string"
+          },
+          "ar": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "en",
+          "ar"
+        ]
+      },
+      "Authority": {
+        "type": "object",
+        "properties": {
+          "law_id": {
+            "type": "integer"
+          },
+          "article": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "effective_on": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "law_id",
+          "article",
+          "url",
+          "effective_on"
+        ]
+      },
+      "Record": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "text_ar": {
+            "type": "string"
+          },
+          "source_text_ar": {
+            "type": "string"
+          },
+          "source_sha256": {
+            "type": "string",
+            "description": "SHA-256 of the eligible original article text."
+          },
+          "is_published_wording": {
+            "type": "boolean",
+            "description": "False for calculated wording. The original remains in source_text_ar."
+          },
+          "multiplier": {
+            "type": "integer"
+          },
+          "authority": {
+            "$ref": "#/components/schemas/Authority"
+          }
+        },
+        "required": [
+          "kind",
+          "text_ar",
+          "source_text_ar",
+          "source_sha256",
+          "is_published_wording",
+          "multiplier",
+          "authority"
+        ]
+      },
+      "APIRoot": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "docs": {
+            "type": "string"
+          },
+          "openapi": {
+            "type": "string"
+          },
+          "mcp": {
+            "type": "string"
+          },
+          "not_advice": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "endpoints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "docs",
+          "openapi",
+          "mcp",
+          "not_advice",
+          "notes",
+          "endpoints"
+        ]
+      },
+      "CalculatedCollection": {
+        "type": "object",
+        "properties": {
+          "law_id": {
+            "type": "integer",
+            "const": 244565
+          },
+          "articles": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Record"
+            }
+          }
+        },
+        "required": [
+          "law_id",
+          "articles"
+        ]
+      },
+      "OpenAPIDocument": {
+        "type": "object",
+        "required": [
+          "openapi",
+          "info",
+          "servers",
+          "paths"
+        ],
+        "properties": {
+          "openapi": {
+            "type": "string",
+            "const": "3.1.0"
+          },
+          "info": {
+            "type": "object"
+          },
+          "servers": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "paths": {
+            "type": "object"
+          },
+          "components": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

@@ -15,6 +15,7 @@ package site
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"errors"
 	"log"
@@ -29,6 +30,9 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/calculatedcurrent"
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 )
+
+//go:embed openapi.json
+var openAPIDocument []byte
 
 const apiCacheControl = "public, max-age=60, stale-while-revalidate=300"
 
@@ -75,6 +79,7 @@ func (s *Server) apiRoutes() {
 	}
 	m := s.mux
 	m.HandleFunc("GET /api/v1/{$}", s.apiRoot)
+	m.HandleFunc("GET /api/v1/openapi.json", s.apiOpenAPI)
 	m.HandleFunc("GET /api/v1/search/{$}", s.apiLimited(s.apiSearch))
 	m.HandleFunc("GET /api/v1/law/{id}/{$}", s.apiLimited(s.apiLaw))
 	m.HandleFunc("GET /api/v1/law/{id}/calculated-current/{$}", s.apiLimited(s.apiCalculatedCurrent))
@@ -112,17 +117,27 @@ func (s *Server) apiFail(w http.ResponseWriter, r *http.Request, err error) {
 	s.writeJSON(w, http.StatusInternalServerError, apiErrorBody{Error: "internal error"})
 }
 
+func (s *Server) apiOpenAPI(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Cache-Control", apiCacheControl)
+	w.Write(openAPIDocument)
+}
+
 func (s *Server) apiRoot(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Link", `<`+Base+`/api/v1/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"`)
 	s.writeJSON(w, 200, map[string]any{
 		"name":       "Lebanese Legislation API",
 		"version":    "v1",
 		"docs":       Base + "/developers/",
+		"openapi":    Base + "/api/v1/openapi.json",
 		"mcp":        Base + "/mcp",
 		"not_advice": notLegalAdvice,
 		"notes":      []string{titleEnNote, "search: when q finds nothing it is read again (English and French terms to Arabic, names, a year, a typo) and searched_instead says what was searched."},
 		"endpoints": []string{
 			"GET /api/v1/search/?q=&type=laws|rulings|gazette|articles&year=&limit=&offset=",
 			"GET /api/v1/law/{id}/",
+			"GET /api/v1/law/{id}/calculated-current/",
+			"GET /api/v1/openapi.json",
 			"GET /api/v1/law/{id}/article/{n}/",
 			"GET /api/v1/ruling/{id}/",
 			"GET /api/v1/gazette/{id}/",

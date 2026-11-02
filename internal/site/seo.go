@@ -78,6 +78,7 @@ func (s *Server) llms(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(&b, "- [%s](%s%s)\n", l[0], Base, l[1])
 	}
 	b.WriteString("\n## For AI assistants\n\n- MCP server (search, get_law, get_article, get_law_texts, get_ruling; verbatim texts only): " + Base + "/mcp\n- Read-only JSON API: " + Base + "/ai/\n")
+	b.WriteString("OpenAPI: " + Base + "/api/v1/openapi.json\n")
 	b.WriteString("\n## Notes\n\n- Texts come from the Lebanese University's Centre for Legal Informatics; the Official Gazette is authoritative.\n- Nothing here is legal advice.\n")
 	fmt.Fprint(w, b.String())
 }
