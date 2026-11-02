@@ -55,7 +55,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/out/vectors"
           docker run --rm --entrypoint duckdb -v "$RUNNER_TEMP:/work" "$IMAGE" -batch -bail -c "
-            SET memory_limit='2GB'; SET temp_directory='/work/duckdb-tmp';
+            SET memory_limit='8GB'; SET threads=2; SET preserve_insertion_order=false; SET temp_directory='/work/duckdb-tmp';
             CREATE VIEW current AS SELECT * FROM read_csv('/work/current.csv', all_varchar=true);
             CREATE VIEW published AS SELECT * FROM read_parquet('/work/published.parquet');
             SELECT CASE WHEN count(*)=0 THEN true ELSE error('Current chunks lack published vectors; run the release workflow to embed them first') END
