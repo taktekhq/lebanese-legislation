@@ -77,6 +77,9 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-24.04
+    # HF_TOKEN lives only in the huggingface environment, which deploys from main
+    # only; on other branches it runs without it and uploads nothing.
+    environment: ${{ github.ref == 'refs/heads/main' && 'huggingface' || '' }}
     timeout-minutes: 300
     env:
       HF_TOKEN: ${{ secrets.HF_TOKEN }}

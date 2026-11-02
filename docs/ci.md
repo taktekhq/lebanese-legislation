@@ -31,6 +31,12 @@ act workflow_dispatch -W .github/workflows/data.yml --input publish=true \
 | `data.yml` | Loads `data/` into PostgreSQL, exports and checks the Parquet tables, and (job `publish`) uploads them to Hugging Face. | `HF_TOKEN` (write token for the dataset) |
 | `build.yml` | Brings `archive/` to its latest main, loads the last `data/`, rebuilds the database from `archive/` and `manual/`, runs the gates, exports into `data/`, and (with `push=true`) commits and pushes it. Needs `manual/` filled unless `without_manual=true`. | `GITHUB_TOKEN` that can push to this repository |
 
+On GitHub, `HF_TOKEN` lives only in the `huggingface` environment, which
+deploys from `main` only, and the token can write to the
+`taktekhq/lebanese-legislation` dataset and nothing else. Jobs that publish
+(`data.yml` publish, `release.yml`, `vectors.yml` publish) use that environment
+on `main`; on other branches they run without the token and upload nothing.
+
 Under act, run it from a checkout whose git objects are all its own (no
 `--reference` alternates): the container cannot see paths outside the checkout.
 Files it writes in the checkout belong to root afterwards; give them back with

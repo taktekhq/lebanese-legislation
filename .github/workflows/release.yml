@@ -44,6 +44,9 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-24.04
+    # HF_TOKEN lives only in the huggingface environment, which deploys from main
+    # only; on other branches the job runs without it and builds without publishing.
+    environment: ${{ github.ref == 'refs/heads/main' && 'huggingface' || '' }}
     timeout-minutes: 600
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
