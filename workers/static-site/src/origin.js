@@ -61,6 +61,11 @@ export async function originFetch(request, env) {
   // A request with the secret test header reaches the container whatever the mode,
   // so the container can be checked before traffic moves to it.
   const testing = env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY;
+  if (testing && new URL(request.url).pathname === "/_origin/restart") {
+    // Stops the container so the next request starts it with the current settings.
+    await getContainer(env.ORIGIN, "main").destroy();
+    return new Response("container stopped\n", { headers: SECURITY_HEADERS });
+  }
   if (env.ORIGIN_MODE === "hetzner" && !testing) return fetch(request);
   try {
     const res = await getContainer(env.ORIGIN, "main").fetch(request);
