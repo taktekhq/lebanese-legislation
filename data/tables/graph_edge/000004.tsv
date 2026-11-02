@@ -3380,8 +3380,6 @@
 23379	law/182617/art/2	law/180480	cites	model	linked	legislation	182617	2	180480	\N	lb/decision/1933-10-03/141-LR	الفقرات من الفقرة الاولى الى الفقرة السادسة	number and date	الفقرات من الفقرة الاولى الى الفقرة السادسة من هذا القرار	gemini-3.8-flash
 23380	law/182617/art/3	law/180480	replace	model	linked	legislation	182617	3	180480	\N	lb/decision/1933/141-LR	\N	number and year	عدلت المادة 4 من القرار نفسه	gemini-3.8-flash
 23381	law/182617/art/3	law/180480	cites	model	linked	legislation	182617	3	180480	\N	lb/decision/1933/141-LR	\N	number and year	المادة الثالثة في فقرتها الخامسة	gemini-3.8-flash
-23382	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المادة 27 من القرار عدد 16 -ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:Gemini 3.8 Flash (Low)
-23383	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16	دفتر الشروط الملحق، المادة 4 الفقرة 3	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:Gemini 3.8 Flash (Low)
 23384	law/182618/art/49	law/172846	note_amended_by	model	linked	legislation	182618	49	172846	\N	lb/decree-law/1977-06-27/76	\N	number and date	تعدلت بالمرسوم الاشتراعي رقم 76 تاريخ 27/6/1977	gemini-3.8-flash
 23385	law/182618/art/80	\N	note_amended_by	model	unresolved	legislation	182618	80	\N	6	lb/decision/1935-04-13/74/art/6	\N	several texts with that number	المعدلة بالمادة 6 من القرار 74 تاريخ 13 نيسان سنة 1935	gemini-3.8-flash
 23386	law/182618/art/80	law/185361/art/2	note_amended_by	model	linked	legislation	182618	80	185361	2	lb/decision/1937-07-16/106/art/2	\N	number and date	بالمادة 2 من القرار 106 تاريخ 16 تموز سنة 1937	gemini-3.8-flash

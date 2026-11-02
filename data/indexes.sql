@@ -25,6 +25,8 @@ CREATE INDEX section_law    ON legislation_section (law_id, position);
 CREATE INDEX ruling_exact   ON ruling USING gin (search_exact);
 CREATE INDEX ruling_stem    ON ruling USING gin (search_stem);
 CREATE INDEX ruling_court   ON ruling (court, decided_on DESC);
+-- a year's list of rulings (/rulings/year/N/): its count and its page, in order, without reading the table
+CREATE INDEX ruling_year    ON ruling (coalesce(year, 0), decided_on DESC NULLS LAST, id DESC);
 
 CREATE INDEX opinion_stem   ON opinion USING gin (to_tsvector('arabic', ar_light(coalesce(subject, '') || ' ' || coalesce(text_ar, ''))));
 CREATE INDEX gazette_entry_law ON gazette_entry (law_id);
