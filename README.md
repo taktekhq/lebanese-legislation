@@ -26,7 +26,7 @@ See [architecture](docs/architecture.md) for the request and build paths.
 | Read the laws | [LebaneseLegislation.com](https://lebaneselegislation.com/) |
 | Connect an AI assistant | The free MCP server at `https://lebaneselegislation.com/mcp`. [Setup](docs/mcp.md) |
 | The data as tables | [Parquet files on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation) |
-| The data as a PostgreSQL database | The [6.4 GB dump on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases), with search vectors. The `-db` image below builds both databases from `data/` instead. |
+| The data as a PostgreSQL database | The `-db` or `-all` image below, with both databases baked from `data/`. |
 | Semantic search vectors | [vectors/vectors.parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet), 1,547,937 chunks, 768 dimensions, `gemini-embedding-001`. [Read with DuckDB](docs/reference.md#vectors). |
 | The original court scans | [Court scans on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-court-scans) |
 | Everything on your own machine | [Run the services locally](#run-the-services-locally) |
@@ -41,7 +41,7 @@ cd lebanese-legislation
 ./start
 ```
 
-You need Docker Compose, 4 GB of free memory and 30 GB of free disk. The database image already holds both databases. The first start copies them into an empty volume; later starts reuse it. The website binary is built locally.
+You need Docker Compose, 8 GB of free memory and 30 GB of free disk. The database image already holds both databases. The first start copies them into an empty volume; later starts reuse it. The website uses the all-in-one image with its own baked database.
 
 Then open the website at http://localhost:8080, the API at http://localhost:8000/api/v1/, or point an MCP client at http://localhost:8001/mcp. Exact and citation search need no AI key. For search by meaning, configure your own Gemini key and Vectorize index, or load the public vectors into pgvector in `lebleg_search`. See [loading vectors](vectors/README.md).
 
@@ -54,7 +54,7 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 | `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings, optional scans | Compose, database users and the base of `-all` |
 | `-api` | Standalone API server, unchanged Dockerfile and amd64/arm64 support | Compose and API users with a separate database |
 | `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
-| `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Cloudflare Containers and self-hosted sites |
+| `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
 | `-vectors` | `vectorize-sync`, `export-vectors`, DuckDB 1.5.6; downloads Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
 | `-site` | R2 `lebleg-site` static pages, assets, `404.html`, redirect data and a stdlib Go server | Static mirrors without a database |
 
@@ -64,7 +64,7 @@ job; `-all` waits for `-db` when both are selected. All receive UTC date and
 a full image name. Pushes to main select images by their input paths. Successful
 `static-site` and `vectors` runs refresh `-site` and `-vectors`, respectively.
 Publishing of `-web` and `-data` has stopped; existing registry packages remain.
-Compose builds the website service from `web/Dockerfile` locally.
+Compose pulls `ghcr.io/taktekhq/lebanese-legislation-all:latest` for the website, including its database, API and MCP.
 
 The site image syncs every R2 key except `_build/` and `_export/`, retaining
 `_export/redirects.json` privately for redirects. Its server uses the Worker's
@@ -87,13 +87,13 @@ embedded in the static image. The runner frees disk before syncing the roughly
 | [`data/`](data/) | The database as text: one folder per table, rows sorted by key, so `git log -p` shows what changed. `data/load.sh` builds it in PostgreSQL. |
 | [`archive/`](https://github.com/taktekhq/lebanese-legislation-archive) | Every source page as the Centre's site served it, with its change history: [its own repository](https://github.com/taktekhq/lebanese-legislation-archive), mounted here as a submodule. A plain clone skips its 606,000 files; `git submodule update --init archive` fetches them. |
 | [`db/`](db/) | The database's schema and the build's curated inputs (the Go package `db`), and the PostgreSQL image, built with pgvector on the official `postgres:18.6` image. |
-| [`web/`](web/) | The website: its `main.go`, Dockerfile, SQL schema and a fictional test database. |
+| [`web/`](web/) | The website: its `main.go`, test-only Dockerfile, SQL schema and a fictional test database. |
 | [`api/`](api/) | The REST API: its `main.go` and Dockerfile. |
 | [`mcp/`](mcp/) | The MCP server: its `main.go`, Dockerfile and a Cloudflare Containers template. |
 | [`internal/`](internal/) | The Go code: what the three services share (pages, API, MCP tools, search) and the build that makes the database from the source pages (`internal/build`, with parsing, amendments, citations, the wording guard in `internal/provenance`, the export and the MCP snapshot). |
 | [`scraper/`](scraper/) | The crawler that reads the Lebanese University's site into the archive, and the scripts that publish the archive. |
-| [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and the PostgreSQL release (restore, build, publish). [Listed here](cmd/README.md). |
-| [`tools/`](tools/) | Only `tools/src/lebleg/sql/web.sql` now: what the website, API and MCP read beyond the release dump, applied by `restore-release`. |
+| [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and local services. [Listed here](cmd/README.md). |
+| [`tools/`](tools/) | Only `tools/src/lebleg/sql/web.sql` now: the serving schema the database image applies for the website, API and MCP. |
 | [`docs/`](docs/) | Architecture, service reference, MCP setup, CI and changes. |
 | [`workers/`](workers/) | Cloudflare Workers, including the static-site router and its dynamic container. |
 

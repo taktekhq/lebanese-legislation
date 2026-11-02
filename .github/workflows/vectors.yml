@@ -12,11 +12,11 @@ on:
 permissions:
   contents: read
   packages: read
-concurrency:
-  group: vectors
-  cancel-in-progress: false
 jobs:
   build:
+    concurrency:
+      group: vectors-build-${{ github.ref }}
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     services:
@@ -70,6 +70,9 @@ jobs:
           retention-days: 3
           compression-level: 0
   publish:
+    concurrency:
+      group: vectors-publish-${{ github.ref }}
+      cancel-in-progress: false
     # Keep the archive deletion baseline public until sync and its manifest succeed.
     needs: [build, vectorize]
     if: ${{ !inputs.only_vectorize }}
@@ -101,6 +104,9 @@ jobs:
               --commit-message "Vectors from $(git rev-parse --short=12 HEAD), $(date -u +%F)"
           fi
   vectorize:
+    concurrency:
+      group: vectors-vectorize-${{ github.ref }}
+      cancel-in-progress: false
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 300
@@ -151,3 +157,17 @@ jobs:
             -e VECTORS_INPUT=/work/out/vectors/vectors.parquet -e VECTORS_PREVIOUS=/work/previous.tsv \
             "$IMAGE"
           aws s3 cp "$RUNNER_TEMP/vectors-manifest.tsv" s3://lebleg-site/_build/vectors-manifest.tsv --endpoint-url "$R2_ENDPOINT"
+  vectors:
+    needs: publish
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    with:
+      image: vectors
+      context: .
+      dockerfile: vectors/Dockerfile
+      tags: |
+        ghcr.io/taktekhq/lebanese-legislation-vectors:latest

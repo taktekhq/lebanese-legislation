@@ -1,6 +1,6 @@
 # Website
 
-The Go website behind [LebaneseLegislation.com](https://lebaneselegislation.com/), with Arabic and English pages and search. It is published as `ghcr.io/taktekhq/lebanese-legislation-web`, and `./start` at the repository root runs it on port 8080 against the public database. The code is shared with the [API](../api/) and the [MCP server](../mcp/) in [`internal/`](../internal/).
+The Go website behind [LebaneseLegislation.com](https://lebaneselegislation.com/), with Arabic and English pages and search. It is published as `ghcr.io/taktekhq/lebanese-legislation-all:latest`, and `./start` at the repository root runs it on port 8080 against the public database. The code is shared with the [API](../api/) and the [MCP server](../mcp/) in [`internal/`](../internal/).
 
 Cloudflare serves about 760,000 static pages rendered from `data/` by
 [`static-site.yml`](../.github/workflows/static-site.yml) and `cmd/static-export`
@@ -68,7 +68,7 @@ The database needs the tables in [`schema/`](schema/). A restore of the public d
 Build the image from the repository root:
 
 ```sh
-docker build -f web/Dockerfile -t lebanese-legislation-web .
+docker build -f workers/static-site/container/Dockerfile -t ghcr.io/taktekhq/lebanese-legislation-all:latest .
 ```
 
 ## Try it on fictional data
