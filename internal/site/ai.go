@@ -187,6 +187,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 	}
 	if s.meaning == nil {
 		view.Unavailable, reason = true, errors.New("AI search is off")
+		log.Printf("answer unavailable: meaning search: %v", reason)
 		render()
 		return
 	}
@@ -247,6 +248,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 		view.Results = &res
 	}
 	if err != nil {
+		log.Printf("answer unavailable: SearchMeaning: %v", err)
 		view.Unavailable, reason = true, err
 		render()
 		return
@@ -258,6 +260,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 	}
 	terms, err := s.answerSources(ctx, q, res)
 	if err != nil {
+		log.Printf("answer unavailable: answerSources: %v", err)
 		view.Unavailable, reason = true, err
 		render()
 		return
@@ -293,6 +296,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 	}
 	paras, err := s.meaning.composeAnswer(ctx, q, passages, mode)
 	if err != nil {
+		log.Printf("answer unavailable: composeAnswer: %v", err)
 		view.Unavailable, reason = true, err
 		render()
 		return
