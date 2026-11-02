@@ -3,6 +3,10 @@ import { SECURITY_HEADERS } from "./headers.js";
 
 export class Origin extends Container {
   defaultPort = 8080;
+  // The image's own start script waits 60 s for Postgres; a cold start on
+  // Cloudflare needs longer (the container exited after about 63 s each time).
+  // Same script, with a 10 minute wait and progress lines.
+  entrypoint = ["/bin/sh", "-c", "set -eu\nexport LEBLEG_VECTOR_DSN=\"${LEBLEG_VECTOR_DSN:-host=127.0.0.1 user=lebleg_web dbname=lebleg_search}\"\necho \"start: $(date -u +%T) postgres starting\"\ngosu postgres postgres -D \"$PGDATA\" -c listen_addresses=127.0.0.1 -c shared_buffers=1GB -c max_connections=50 -c default_transaction_read_only=on &\ni=0\nuntil pg_isready -h 127.0.0.1 -U lebleg_web -d lebleg -q; do\n  i=$((i+1)); [ \"$i\" -lt 600 ] || { echo \"start: postgres not ready after 600 s\"; exit 1; }\n  [ $((i % 15)) -eq 0 ] && echo \"start: waiting for postgres, $i s\"\n  sleep 1\ndone\necho \"start: $(date -u +%T) postgres ready after $i s\"\ninstall -d -o 65532 -g 65532 /tmp/lebleg-events\nexec gosu 65532:65532 /usr/local/bin/lebleg-web -addr 0.0.0.0:8080 -events /tmp/lebleg-events -scans /scans -db \"host=127.0.0.1 user=lebleg_web dbname=lebleg\""];
   sleepAfter = "72h";
 
   constructor(ctx, env) {
@@ -21,7 +25,7 @@ export class Origin extends Container {
     if (!this.ctx.container?.running) {
       await this.startAndWaitForPorts({
         ports: [this.defaultPort],
-        cancellationOptions: { instanceGetTimeoutMS: 120_000, portReadyTimeoutMS: 300_000 },
+        cancellationOptions: { instanceGetTimeoutMS: 120_000, portReadyTimeoutMS: 660_000 },
       });
     }
     return super.fetch(request);
