@@ -65,7 +65,9 @@ export default {
     }
     const postAllowed = /^(?:\/(?:en|ar))?\/(?:search\/|search\/answer\/|search\/ai\/|search\/ai\/deep\/)$/.test(url.pathname)
       || url.pathname.startsWith("/ph/");
-    if (request.method !== "GET" && request.method !== "HEAD" && !(request.method === "POST" && postAllowed)) {
+    // MCP (streamable HTTP) uses POST, GET, DELETE and OPTIONS; the server checks them itself.
+    const mcpPath = url.pathname === "/mcp" || url.pathname === "/mcp/";
+    if (!mcpPath && request.method !== "GET" && request.method !== "HEAD" && !(request.method === "POST" && postAllowed)) {
       return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: postAllowed ? "GET, HEAD, POST" : "GET, HEAD" } });
     }
     if (/shapbot/i.test(request.headers.get("User-Agent") || "")) return new Response(null, { status: 429 }); // as Caddy does
