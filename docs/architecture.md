@@ -67,7 +67,7 @@ deletes the old container classes. See the [container deploy guide](../workers/s
 for the job sequence and local checks.
 
 The [Hugging Face dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation)
-provides source tables, PostgreSQL releases and the openly published
+provides source tables as Parquet and the openly published
 [vectors Parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet).
 The vectors file has columns `id`, `document`, `model`, `hash` and `values`
 (`FLOAT[768]`). See the [service reference](reference.md#vectors) for a DuckDB

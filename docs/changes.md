@@ -11,6 +11,8 @@ See [architecture](architecture.md) and the [vectors example](reference.md#vecto
 
 ## Unreleased
 
+- Data is distributed as [Parquet on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation) and the [`-db` and `-all` images](../README.md#images).
+
 The website is now the code LebaneseLegislation.com runs, not a copy from 30 October.
 
 - New on the website: the project journal (`/blog/`), topics on the home page, self-hosted fonts and the `-events` usage record with its `/ai/` sign-up form. The contribute page stays at `/contribute/`.
@@ -23,10 +25,6 @@ The website is now the code LebaneseLegislation.com runs, not a copy from 30 Oct
 
 The data tools are Go commands now, one per job; the Python package in `tools/` is gone.
 
-- `restore-release` replaces `lebleg restore` (the db image runs it on first start), `check-release` the image's health check, `build-release` `lebleg build` and `publish-release` `lebleg publish`. Manifest format, checksums, release ids, the Hugging Face layout, vector reuse, the embedding settings and the budget caps are unchanged.
-- `build-release` reads the public tables from a database loaded from `data/` (`data/load.sh`) instead of Parquet files.
-- `publish-release` also writes the release block of the dataset card in the same commit, and reads the release back anonymously to check it.
-- The release runs as a workflow, [`release.yml`](../.github/workflows/release.yml), today on our own machine with `act` and the `GEMINI_API_KEY` and `HF_TOKEN` secrets. `lebleg pipeline` (its detect, approve, tick and retry states) and `lebleg seed` are gone: the workflow, its run history and re-runs replace the first, and the second filled an index outside this repository.
 - The version lives in `internal/release/VERSION`.
 
 ## 0.4.0
@@ -48,7 +46,7 @@ The API and MCP images now run the same Go code as the website, which is the cod
 ## 0.3.0
 
 - The former standalone website image is retired. `./start` now uses `ghcr.io/taktekhq/lebanese-legislation-all:latest` at http://localhost:8080 next to the API and MCP.
-- The DB image adds what the website reads and the public dump lacks ([`db/web.sql`](../db/web.sql)): three text functions, six generated search columns, two views, four empty tables and 24 indexes. It runs once after the first restore and adds a few minutes to it.
+- The DB image adds the website serving schema ([`db/web.sql`](../db/web.sql)): three text functions, six generated search columns, two views, four empty tables and 24 indexes. It runs once after the first restore and adds a few minutes to it.
 - The DB health check now also requires that step. On a database restored by 0.2.0 or older, run it once: `docker compose exec db bash /opt/lebleg/db/web-schema.sh`.
 
 ## 0.2.0
@@ -60,13 +58,12 @@ The repository now has one folder per part: [`db/`](../db/), [`server/`](../serv
 - Inside the images, files moved from `/opt/starter` to `/opt/lebleg`. The DB restore script is `/opt/lebleg/db/release.py`.
 - `compose.yaml` takes the DB health check from the image, so it works with any image tag.
 - The Compose project is now `lebanese-legislation` (was `lebleg-starter`). Its volume name changes with it. To keep a database restored by 0.1.x, set `COMPOSE_PROJECT_NAME=lebleg-starter` in `.env`.
-- The PostgreSQL dump is linked only from Hugging Face. The GitHub data release is gone; GitHub releases are code versions.
 
 ## 0.1.6
 
 Calculated-text lookup is restricted to original Arabic articles of Civil Procedure law 244565. Other sources still match their original titles and text. This bound lets PostgreSQL use the existing source key and trigram indexes for literal amount searches. No dataset or embedding change is required.
 
-The [image workflow](https://github.com/taktekhq/lebanese-legislation/actions/workflows/images.yml) builds and checks DB, API and MCP for AMD64 and ARM64 before promoting their immutable version tags. A retry reuses a version only when it belongs to the same source commit. Existing versions are never replaced. Release 2026-10-30.2 retains its truthful builder version 0.1.5; runtime 0.1.6 consumes that same verified dump.
+The [image workflow](https://github.com/taktekhq/lebanese-legislation/actions/workflows/images.yml) builds and checks DB, API and MCP for AMD64 and ARM64 before promoting their immutable version tags. A retry reuses a version only when it belongs to the same source commit. Existing versions are never replaced.
 
 ## 0.1.4
 

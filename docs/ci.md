@@ -28,13 +28,12 @@ act workflow_dispatch -W .github/workflows/data.yml --input publish=true \
 
 | Workflow | What it does | Secrets |
 | --- | --- | --- |
-| `release.yml` | Builds and checks a PostgreSQL release after successful `data` runs on main or manual dispatch. Missing Gemini keys skip the build; missing HF tokens skip publishing. | `GEMINI_API_KEY`, `HF_TOKEN` |
 | `data.yml` | Loads `data/` into PostgreSQL, exports and checks the Parquet tables, and (job `publish`) uploads them to Hugging Face. | `HF_TOKEN` (write token for the dataset) |
 
 On GitHub, `HF_TOKEN` lives only in the `huggingface` environment, which
 deploys from `main` only, and the token can write to the
 `taktekhq/lebanese-legislation` dataset and nothing else. Jobs that publish
-(`data.yml` publish, `release.yml`, `vectors.yml` publish) use that environment
+(`data.yml` publish, `vectors.yml` publish) use that environment
 on `main`; on other branches they run without the token and upload nothing.
 
 Under act, run it from a checkout whose git objects are all its own (no
@@ -44,9 +43,8 @@ Files it writes in the checkout belong to root afterwards; give them back with
 
 The XPS scrape-build-and-PR job rebuilds and proposes changes to `data/`.
 The `checks.yml` workflow runs on pushes and pull requests; its final `ci-ok`
-job requires all seven parallel check jobs to succeed. After `data` completes
-successfully on `main`, `release.yml` builds and checks the release, then
-publishes it when its keys are available. Manual dispatch remains available.
+job requires all seven parallel check jobs to succeed. `data.yml` publishes Parquet tables on Hugging Face. PostgreSQL is distributed
+in the [`-db` and `-all` images](../README.md#images).
 
 ## Cloudflare hosting and vectors
 

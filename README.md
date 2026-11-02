@@ -26,7 +26,7 @@ See [architecture](docs/architecture.md) for the request and build paths.
 | Read the laws | [LebaneseLegislation.com](https://lebaneselegislation.com/) |
 | Connect an AI assistant | The free MCP server at `https://lebaneselegislation.com/mcp`. [Setup](docs/mcp.md) |
 | The data as tables | [Parquet files on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation) |
-| The data as a PostgreSQL database | The [6.4 GB dump on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases), with search vectors. The `-db` image below builds both databases from `data/` instead. |
+| The data as a PostgreSQL database | The `-db` or `-all` image below, with both databases baked from `data/`. |
 | Semantic search vectors | [vectors/vectors.parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet), 1,547,937 chunks, 768 dimensions, `gemini-embedding-001`. [Read with DuckDB](docs/reference.md#vectors). |
 | The original court scans | [Court scans on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-court-scans) |
 | Everything on your own machine | [Run the services locally](#run-the-services-locally) |
@@ -92,8 +92,8 @@ embedded in the static image. The runner frees disk before syncing the roughly
 | [`mcp/`](mcp/) | The MCP server: its `main.go`, Dockerfile and a Cloudflare Containers template. |
 | [`internal/`](internal/) | The Go code: what the three services share (pages, API, MCP tools, search) and the build that makes the database from the source pages (`internal/build`, with parsing, amendments, citations, the wording guard in `internal/provenance`, the export and the MCP snapshot). |
 | [`scraper/`](scraper/) | The crawler that reads the Lebanese University's site into the archive, and the scripts that publish the archive. |
-| [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and the PostgreSQL release (restore, build, publish). [Listed here](cmd/README.md). |
-| [`tools/`](tools/) | Only `tools/src/lebleg/sql/web.sql` now: what the website, API and MCP read beyond the release dump, applied by `restore-release`. |
+| [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and local services. [Listed here](cmd/README.md). |
+| [`tools/`](tools/) | Only `tools/src/lebleg/sql/web.sql` now: the serving schema the database image applies for the website, API and MCP. |
 | [`docs/`](docs/) | Architecture, service reference, MCP setup, CI and changes. |
 | [`workers/`](workers/) | Cloudflare Workers, including the static-site router and its dynamic container. |
 
