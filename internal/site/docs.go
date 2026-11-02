@@ -319,7 +319,7 @@ func (s *Server) rulings(w http.ResponseWriter, r *http.Request) {
 	s.render(w, r, "list", 200, Page{
 		Title:   s.brandTitle(r, s.trOr(r, "Lebanese court rulings", "rulings.title_suffix")),
 		Path:    "/rulings/",
-		NoIndex: r.URL.RawQuery != "",
+		NoIndex: rulingsHidden || r.URL.RawQuery != "",
 		Desc: s.trOr(r, fmt.Sprintf("%s rulings of the Lebanese courts: Cassation, the State Council, the Constitutional Council and more. Free.", thousands(total)),
 			"rulings.desc", thousands(total)),
 		Data: map[string]any{"Kind": map[string]string{
@@ -389,7 +389,7 @@ func (s *Server) ruling(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	path := fmt.Sprintf("/ruling/%d/", id)
-	s.render(w, r, "doc", 200, Page{Lang: "ar", NoIndex: s.noindexed(ctx, "ruling", id, 0), Title: s.brandTitle(r, cutWords(d.Title, 60)), Path: path,
+	s.render(w, r, "doc", 200, Page{Lang: "ar", NoIndex: rulingsHidden || s.noindexed(ctx, "ruling", id, 0), Title: s.brandTitle(r, cutWords(d.Title, 60)), Path: path,
 		Desc:   cut(strings.TrimSuffix(d.Title+": "+orStr(strings.Join(d.Paras, " "), d.Reading.firstText()), ": "), 155),
 		OGType: "article",
 		LD:     []any{rulingLD(d, path, on, court, year), breadcrumbs("Rulings", "/rulings/", orStr(intStr(year), "Undated"), fmt.Sprintf("/rulings/year/%s/", orStr(intStr(year), "0")), cut(d.Title, 80), path)},
@@ -982,7 +982,7 @@ var tableNotes = map[string]string{
 	"legislation_scan":     "Texts the Lebanese University has not published yet, read by machine from scans of the Gazette's pages: where the scans came from, how many pages, and how far the two readings agree. Words they disagree on are marked in the text: U+E000 reading one, U+E001 reading two, U+E002.",
 	"legislation_alias":    "The old address of a scanned text the Lebanese University has since published, and the text it now points to.",
 	"centre_error":         "Errors in the Lebanese University's own text of an article (one article repeating another, a stray letter), noted next to the article and never corrected in it. Where a person read the right wording from the printed edition, it is a minor version in article_version.",
-	"noindex_page":         "Pages kept out of search results and the sitemaps, with the reason: articles that are only a publication or repeal clause, documents with no title or no text. They stay on the site and linked.",
+	"noindex_page":         "Pages kept out of search results and the sitemaps, with the reason: articles that are only a publication or repeal clause, documents with no title or no text, and, as kind english, texts whose machine-translated English pages are hidden because they are not among the popular texts (machine_english). They stay on the site and linked.",
 	"page_state":           "When each text, ruling, Gazette issue and document last changed, with a hash of what its page shows: the date the sitemaps give as lastmod.",
 	"legislation_title_en": "An unofficial English rendering of each text's subject line, written by a model (Claude Sonnet) from the Arabic title alone and labelled unofficial on the site. The Arabic title and text are the official version and the more accurate one; the English is there to help people and search engines find a text, and the text itself is never translated.",
 	"date_correction":      "Dates the Lebanese University printed wrong (a text signed after its own publication, a year typo, a placeholder): the printed date, the corrected one, how it was settled and the evidence.",

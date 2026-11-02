@@ -56,16 +56,19 @@ type langCase struct {
 	name string
 	path string // the root (Arabic) path, with the query if any
 	pair bool   // a real translation pair: hreflang, and the English page is its own canonical
+	// hidden: noindex in both languages (search, the generated topics), so
+	// the pair names no hreflang: hreflang never points at a hidden page
+	hidden bool
 }
 
 func langCases(t *testing.T, s *Server) []langCase {
 	t.Helper()
 	ctx := t.Context()
 	cases := []langCase{
-		{"home", "/", true}, {"laws list", "/laws/", true}, {"codes", "/codes/", true},
-		{"rulings list", "/rulings/", true}, {"opinions page 2", "/opinions/page/2/", true},
-		{"year list", "/laws/year/2005/", true}, {"data", "/data/", true}, {"about", "/about/", true},
-		{"search", "/search/?q=tax", true},
+		{"home", "/", true, false}, {"laws list", "/laws/", true, false}, {"codes", "/codes/", true, false},
+		{"rulings list", "/rulings/", true, true}, {"opinions page 2", "/opinions/page/2/", true, false},
+		{"year list", "/laws/year/2005/", true, false}, {"data", "/data/", true, false}, {"about", "/about/", true, false},
+		{"search", "/search/?q=tax", true, true},
 	}
 	one := func(name, sql string, f func(id int, num string) langCase) {
 		var id int
@@ -76,31 +79,40 @@ func langCases(t *testing.T, s *Server) []langCase {
 		}
 		cases = append(cases, f(id, num))
 	}
+	// a text whose English is open (popular: noindex_page has no english row)
 	one("law", `SELECT l.id, '' FROM legislation l WHERE NOT EXISTS (SELECT 1 FROM code c WHERE c.law_id = l.id)
+		AND NOT EXISTS (SELECT 1 FROM noindex_page n WHERE n.kind = 'english' AND n.id = l.id)
 		AND EXISTS (SELECT 1 FROM legislation_article a WHERE a.law_id = l.id) ORDER BY l.id LIMIT 1`,
-		func(id int, _ string) langCase { return langCase{"law", lawPath(id), true} })
+		func(id int, _ string) langCase { return langCase{"law", lawPath(id), true, false} })
 	one("article", `SELECT a.law_id, a.number FROM legislation_article a WHERE NOT EXISTS (SELECT 1 FROM code c WHERE c.law_id = a.law_id)
+		AND NOT EXISTS (SELECT 1 FROM noindex_page n WHERE (n.kind = 'english' AND n.id = a.law_id) OR (n.kind = 'article' AND n.id = a.law_id AND n.position = a.position))
 		ORDER BY a.law_id, a.position LIMIT 1`,
-		func(id int, n string) langCase { return langCase{"article", artPath(id, n), true} })
+		func(id int, n string) langCase { return langCase{"article", artPath(id, n), true, false} })
 	one("code", `SELECT law_id, '' FROM code ORDER BY position LIMIT 1`,
-		func(id int, _ string) langCase { return langCase{"code", lawPath(id), true} })
+		func(id int, _ string) langCase { return langCase{"code", lawPath(id), true, false} })
 	one("code hub", `SELECT 0, slug FROM code ORDER BY position LIMIT 1`,
-		func(_ int, slug string) langCase { return langCase{"code hub", "/codes/" + slug + "/", true} })
+		func(_ int, slug string) langCase { return langCase{"code hub", "/codes/" + slug + "/", true, false} })
 	one("kind-year hub", `SELECT 2005, 'decree'`,
-		func(y int, w string) langCase { return langCase{"kind-year hub", kindYearPath(y, w), true} })
+		func(y int, w string) langCase { return langCase{"kind-year hub", kindYearPath(y, w), true, false} })
 	one("ruling", `SELECT id, '' FROM ruling ORDER BY id LIMIT 1`,
-		func(id int, _ string) langCase { return langCase{"ruling", fmt.Sprintf("/ruling/%d/", id), false} })
+		func(id int, _ string) langCase {
+			return langCase{"ruling", fmt.Sprintf("/ruling/%d/", id), false, false}
+		})
 	one("gazette", `SELECT id, '' FROM gazette_issue ORDER BY id LIMIT 1`,
-		func(id int, _ string) langCase { return langCase{"gazette", fmt.Sprintf("/gazette/%d/", id), false} })
+		func(id int, _ string) langCase {
+			return langCase{"gazette", fmt.Sprintf("/gazette/%d/", id), false, false}
+		})
 	one("opinion", `SELECT id, '' FROM opinion ORDER BY id LIMIT 1`,
-		func(id int, _ string) langCase { return langCase{"opinion", fmt.Sprintf("/opinion/%d/", id), false} })
+		func(id int, _ string) langCase {
+			return langCase{"opinion", fmt.Sprintf("/opinion/%d/", id), false, false}
+		})
 	return cases
 }
 
 func TestLanguageLayoutTable(t *testing.T) {
 	s := testServer(t)
 	cases := langCases(t, s)
-	cases = append(cases, langCase{"topic", "/topic/" + firstTopicSlug(t) + "/", true})
+	cases = append(cases, langCase{"topic", "/topic/" + firstTopicSlug(t) + "/", true, true})
 	for _, c := range cases {
 		path, query, _ := strings.Cut(c.path, "?")
 		if query != "" {
@@ -127,10 +139,10 @@ func TestLanguageLayoutTable(t *testing.T) {
 				}
 				if got, _, hl := head(body); got != Base+canon {
 					t.Errorf("%s: canonical %q, want %q", url, got, Base+canon)
-				} else if c.pair && hl != 3 || !c.pair && hl != 0 {
-					t.Errorf("%s: %d hreflang links, pair=%v", url, hl, c.pair)
+				} else if hreflang := c.pair && !c.hidden; hreflang && hl != 3 || !hreflang && hl != 0 {
+					t.Errorf("%s: %d hreflang links, pair=%v hidden=%v", url, hl, c.pair, c.hidden)
 				}
-				if c.pair {
+				if c.pair && !c.hidden {
 					assertHreflangPair(t, body, path, "/en"+path)
 				}
 				// the language switcher goes to the other interface

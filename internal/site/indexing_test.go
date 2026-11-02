@@ -228,25 +228,43 @@ func head(body string) (canon, robots string, hreflang int) {
 // root names the same hreflang set. The pages under a text stay on the root.
 func TestLawPagesArePairs(t *testing.T) {
 	s := indexedServer(t)
-	_, en := get(t, s, "/en/decree/193806/")
+	_, en := get(t, s, "/en/decree/9440/")
 	canon, robots, hl := head(en)
-	if canon != Base+"/en/decree/193806/" || hl != 3 || !strings.HasPrefix(robots, "index") {
+	if canon != Base+"/en/decree/9440/" || hl != 3 || !strings.HasPrefix(robots, "index") {
 		t.Errorf("English decree page: canonical %q, %d hreflang, robots %q", canon, hl, robots)
 	}
-	for _, h := range []string{`hreflang="en" href="` + Base + `/en/decree/193806/"`, `hreflang="ar" href="` + Base + `/decree/193806/"`, `hreflang="x-default" href="` + Base + `/decree/193806/"`} {
+	for _, h := range []string{`hreflang="en" href="` + Base + `/en/decree/9440/"`, `hreflang="ar" href="` + Base + `/decree/9440/"`, `hreflang="x-default" href="` + Base + `/decree/9440/"`} {
 		if !strings.Contains(en, h) {
 			t.Errorf("English decree page lacks %s", h)
 		}
 	}
-	_, ar := get(t, s, "/decree/193806/")
-	if canon, _, hl := head(ar); canon != Base+"/decree/193806/" || hl != 3 {
+	_, ar := get(t, s, "/decree/9440/")
+	if canon, _, hl := head(ar); canon != Base+"/decree/9440/" || hl != 3 {
 		t.Errorf("Arabic decree page: canonical %q, %d hreflang", canon, hl)
 	}
 	if !strings.Contains(ar, `<html lang="ar" dir="rtl">`) {
-		t.Error("/decree/193806/ is not the Arabic interface")
+		t.Error("/decree/9440/ is not the Arabic interface")
 	}
 	if !strings.Contains(en, `<html lang="en"`) || !strings.Contains(en, "Legislation") {
 		t.Error("the English page lost its English interface")
+	}
+}
+
+// A text that is not popular keeps its Arabic pages open; its English pages
+// are noindex, follow, still their own canonical, and no page of the pair
+// names hreflang (issue #86). Needs a database built with the popular list.
+func TestUnpopularEnglishIsHidden(t *testing.T) {
+	s := indexedServer(t)
+	if !s.englishHidden(context.Background(), 193806) {
+		t.Skip("decree 193806's English is not hidden in this database (built before the popular list)")
+	}
+	for path, want := range map[string]string{"/decree/193806/": "index", "/en/decree/193806/": "noindex, follow",
+		"/decree/193806/article/1/": "index", "/en/decree/193806/article/1/": "noindex, follow"} {
+		_, body := get(t, s, path)
+		canon, robots, hl := head(body)
+		if !strings.HasPrefix(robots, want) || canon != Base+path || hl != 0 {
+			t.Errorf("%s: robots %q, canonical %q, %d hreflang", path, robots, canon, hl)
+		}
 	}
 }
 
@@ -254,16 +272,16 @@ func TestLawPagesArePairs(t *testing.T) {
 // address is self-canonical and both name the same hreflang set.
 func TestArticlePagesArePairs(t *testing.T) {
 	s := indexedServer(t)
-	_, en := get(t, s, "/en/decree/193806/article/1/")
-	if canon, _, hl := head(en); canon != Base+"/en/decree/193806/article/1/" || hl != 3 {
+	_, en := get(t, s, "/en/decree/9440/article/1/")
+	if canon, _, hl := head(en); canon != Base+"/en/decree/9440/article/1/" || hl != 3 {
 		t.Errorf("English article page: canonical %q, %d hreflang", canon, hl)
 	}
-	assertHreflangPair(t, en, "/decree/193806/article/1/", "/en/decree/193806/article/1/")
-	_, ar := get(t, s, "/decree/193806/article/1/")
-	if canon, _, hl := head(ar); canon != Base+"/decree/193806/article/1/" || hl != 3 {
+	assertHreflangPair(t, en, "/decree/9440/article/1/", "/en/decree/9440/article/1/")
+	_, ar := get(t, s, "/decree/9440/article/1/")
+	if canon, _, hl := head(ar); canon != Base+"/decree/9440/article/1/" || hl != 3 {
 		t.Errorf("Arabic article page: canonical %q, %d hreflang", canon, hl)
 	}
-	assertHreflangPair(t, ar, "/decree/193806/article/1/", "/en/decree/193806/article/1/")
+	assertHreflangPair(t, ar, "/decree/9440/article/1/", "/en/decree/9440/article/1/")
 }
 
 func TestCodeKeepsItsEnglishPair(t *testing.T) {

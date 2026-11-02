@@ -48,6 +48,10 @@ type Options struct {
 	// machine reading of it, loaded into ruling_file and ruling_page
 	// (internal/modelout). Empty: none.
 	RulingFiles string
+	// PopularTexts is the list of texts whose English pages stay open to
+	// search engines (data/popular_texts.txt); every other text's /en/ pages
+	// are noindex (indexing.go). Empty: no list, every English page open.
+	PopularTexts string
 }
 
 type builder struct {
