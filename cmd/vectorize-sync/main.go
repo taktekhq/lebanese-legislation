@@ -1,4 +1,4 @@
-// vectorize-sync applies an NDJSON export using a hash manifest.
+// vectorize-sync applies an NDJSON or Parquet export using a hash manifest.
 package main
 
 import (
@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -26,7 +27,7 @@ type job struct {
 }
 
 func run(ctx context.Context) error {
-	input := flag.String("in", "vectors.ndjson", "input NDJSON file")
+	input := flag.String("in", "vectors.ndjson", "input NDJSON or Parquet file (Parquet requires DuckDB)")
 	prev := flag.String("prev", "", "previous id<TAB>hash manifest (missing file means first run)")
 	manifest := flag.String("manifest", "vectors-manifest.tsv", "new manifest output")
 	dry := flag.Bool("dry-run", false, "print counts without changing Vectorize or writing a manifest")
@@ -35,9 +36,35 @@ func run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	f, err := os.Open(*input)
-	if err != nil {
-		return err
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	var f io.ReadCloser
+	var duckdb *exec.Cmd
+	if strings.HasSuffix(*input, ".parquet") {
+		query := "COPY (SELECT id, document, model, hash, values FROM read_parquet('" +
+			strings.ReplaceAll(*input, "'", "''") + "')) TO '/dev/stdout' (FORMAT JSON, ARRAY false);"
+		duckdb = exec.CommandContext(ctx, "duckdb", "-batch", "-c", query)
+		duckdb.Stderr = os.Stderr
+		f, err = duckdb.StdoutPipe()
+		if err != nil {
+			return err
+		}
+		if err = duckdb.Start(); err != nil {
+			f.Close()
+			return err
+		}
+		defer func() {
+			if duckdb.ProcessState == nil {
+				cancel()
+				f.Close()
+				duckdb.Wait()
+			}
+		}()
+	} else {
+		f, err = os.Open(*input)
+		if err != nil {
+			return err
+		}
 	}
 	defer f.Close()
 	var client *vectorize.Client
@@ -47,8 +74,6 @@ func run(ctx context.Context) error {
 			return err
 		}
 	}
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
 	jobs := make(chan job, 4)
 	var wg sync.WaitGroup
 	var once sync.Once
@@ -143,6 +168,11 @@ func run(ctx context.Context) error {
 				return err
 			}
 			batch = nil
+		}
+	}
+	if duckdb != nil {
+		if err = duckdb.Wait(); err != nil {
+			return fmt.Errorf("read Parquet: %w", err)
 		}
 	}
 	if len(batch) > 0 {
