@@ -24,7 +24,7 @@ The [vectors workflow](../../.github/workflows/vectors.yml) runs `build`, then
 `publish` and `vectorize`. It exports the saved vectors with `cmd/export-vectors`,
 publishes `vectors/vectors.parquet` openly to Hugging Face and loads Vectorize
 index `lebleg-chunks`. Later runs upload only changed vectors. The published file
-has 1,433,051 chunks, 768 dimensions, model `gemini-embedding-001`, and columns
+has 1,547,937 chunks, 768 dimensions, model `gemini-embedding-001`, and columns
 `id`, `document`, `model`, `hash`, `values` (`FLOAT[768]`). See the
 [DuckDB example](../../docs/reference.md#vectors).
 

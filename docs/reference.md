@@ -186,7 +186,7 @@ The dataset has its own licence, `other: public-texts-credit-the-centre`. Credit
 
 ## Vectors
 
-[`vectors/vectors.parquet`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet) contains 1,433,051 semantic search chunks,
+[`vectors/vectors.parquet`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet) contains 1,547,937 semantic search chunks,
 embedded with `gemini-embedding-001` in 768 dimensions. Columns: `id`,
 `document`, `model`, `hash`, `values` (`FLOAT[768]`). The file is published openly
 in the `taktekhq/lebanese-legislation` Hugging Face dataset.

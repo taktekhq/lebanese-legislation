@@ -14,7 +14,7 @@ Container. Ruling PDFs are also served from R2 by the same Worker.
 Search pages, `/api/v1/`, filters and Gazette scans go to the container.
 Its [Dockerfile](../workers/static-site/container/Dockerfile) packages
 PostgreSQL 18.6 with the database baked into the image and the Go website server.
-Semantic search uses Cloudflare Vectorize index `lebleg-chunks`: 1,433,051 chunks,
+Semantic search uses Cloudflare Vectorize index `lebleg-chunks`: 1,547,937 chunks,
 768 dimensions, model `gemini-embedding-001`. The vectors have moved out of
 PostgreSQL into Vectorize.
 

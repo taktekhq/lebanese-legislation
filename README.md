@@ -27,7 +27,7 @@ See [architecture](docs/architecture.md) for the request and build paths.
 | Connect an AI assistant | The free MCP server at `https://lebaneselegislation.com/mcp`. [Setup](docs/mcp.md) |
 | The data as tables | [Parquet files on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation) |
 | The data as a PostgreSQL database | The [6.4 GB dump on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases), with search vectors. The `-db` image below loads it for you. |
-| Semantic search vectors | [vectors/vectors.parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet), 1,433,051 chunks, 768 dimensions, `gemini-embedding-001`. [Read with DuckDB](docs/reference.md#vectors). |
+| Semantic search vectors | [vectors/vectors.parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet), 1,547,937 chunks, 768 dimensions, `gemini-embedding-001`. [Read with DuckDB](docs/reference.md#vectors). |
 | The original court scans | [Court scans on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-court-scans) |
 | Everything on your own machine | [Run the services locally](#run-the-services-locally) |
 
