@@ -139,6 +139,12 @@ func Run(ctx context.Context, o Options) (*Report, error) {
 			name string
 			fn   func() error
 		}{"indexing", b.indexing})
+	} else if o.Only == "english" {
+		steps = steps[:0]
+		steps = append(steps, struct {
+			name string
+			fn   func() error
+		}{"english pages", b.englishOnly})
 	} else if o.Only == "scan-gazette" {
 		steps = steps[:0]
 		steps = append(steps, struct {

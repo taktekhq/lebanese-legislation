@@ -60,6 +60,7 @@ jobs:
           ( set +e
             bash -e -o pipefail <<'TASK_EXPORTER' > "$RUNNER_TEMP/exporter.log" 2>&1
           go build -o /tmp/static-export ./cmd/static-export
+          go build -o /tmp/build-db ./cmd/build-db
           TASK_EXPORTER
             echo $? > "$RUNNER_TEMP/exporter.status"
           ) &
@@ -80,6 +81,11 @@ jobs:
           [ "$failed" -eq 0 ]
       - name: Load official publications
         run: psql "$DATABASE_URL" -f db/official.sql
+      # data/ comes from a nightly built without the popular list, so it holds
+      # no english rows: add them here, or every /en/ page stays indexable
+      # (issue #86). Only those rows change; page dates stay as data/ has them.
+      - name: Hide machine English of unpopular texts
+        run: /tmp/build-db -db "$DATABASE_URL" -only english -popular data/popular_texts.txt
       - name: Render and upload shard
         env:
           SHARD: ${{ matrix.shard }}

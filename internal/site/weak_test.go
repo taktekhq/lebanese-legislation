@@ -57,6 +57,20 @@ var altLinkRe = regexp.MustCompile(`rel="alternate" hreflang="[^"]+" href="([^"]
 // schema and the fixture, and runs the build's indexing step on it.
 func weakDB(t *testing.T) string {
 	t.Helper()
+	own, popular := weakFixtureDB(t)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	if _, err := build.Run(ctx, build.Options{Archive: archive.Archive{Dir: t.TempDir()}, DSN: own, Only: "indexing",
+		PopularTexts: popular, Log: func(string, ...any) {}}); err != nil {
+		t.Fatal(err)
+	}
+	return own
+}
+
+// weakFixtureDB makes the database with the schema and the fixture and writes
+// a popular list holding text 101, without running any build step.
+func weakFixtureDB(t *testing.T) (own, popular string) {
+	t.Helper()
 	dsn := os.Getenv("LEBLEG_TEST_DSN")
 	if dsn == "" {
 		t.Skip("set LEBLEG_TEST_DSN to a disposable Postgres database")
@@ -79,7 +93,7 @@ func weakDB(t *testing.T) string {
 			c.Close(context.Background())
 		}
 	})
-	own := replaceDB(dsn, name)
+	own = replaceDB(dsn, name)
 	conn, err := pgx.Connect(ctx, own)
 	if err != nil {
 		t.Fatal(err)
@@ -90,15 +104,11 @@ func weakDB(t *testing.T) string {
 			t.Fatal(err)
 		}
 	}
-	popular := filepath.Join(t.TempDir(), "popular.txt")
+	popular = filepath.Join(t.TempDir(), "popular.txt")
 	if err := os.WriteFile(popular, []byte("# test\n101\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := build.Run(ctx, build.Options{Archive: archive.Archive{Dir: t.TempDir()}, DSN: own, Only: "indexing",
-		PopularTexts: popular, Log: func(string, ...any) {}}); err != nil {
-		t.Fatal(err)
-	}
-	return own
+	return own, popular
 }
 
 // replaceDB points a DSN (URL or key=value) at another database.
@@ -240,6 +250,71 @@ func TestWeakPagesHidden(t *testing.T) {
 	for _, path := range []string{"/sitemaps/laws-1.xml"} {
 		if _, b := get(t, s, path); strings.Contains(b, "/en/law/102/") || !strings.Contains(b, "/en/law/101/") {
 			t.Errorf("%s: %s", path, b)
+		}
+	}
+}
+
+// "-only english" on a database built without the popular list (what the
+// nightly writes to data/) adds the english rows alone: the other rows stay,
+// a second run changes nothing, and the unpopular English pages turn noindex.
+func TestEnglishOnlyStep(t *testing.T) {
+	own, popular := weakFixtureDB(t)
+	ctx := context.Background()
+	run := func(only, list string) error {
+		_, err := build.Run(ctx, build.Options{Archive: archive.Archive{Dir: t.TempDir()}, DSN: own, Only: only,
+			PopularTexts: list, Log: func(string, ...any) {}})
+		return err
+	}
+	if err := run("indexing", ""); err != nil {
+		t.Fatal(err)
+	}
+	pool, err := pgxpool.New(ctx, own)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer pool.Close()
+	rowsOf := func() (english, other string) {
+		t.Helper()
+		var e, o string
+		if err := pool.QueryRow(ctx, `SELECT coalesce(string_agg(kind || ' ' || id || ' ' || reason, ', ' ORDER BY id) FILTER (WHERE kind = 'english'), ''),
+			coalesce(string_agg(kind || ' ' || id || ' ' || position || ' ' || reason, ', ' ORDER BY kind, id, position) FILTER (WHERE kind <> 'english'), '')
+			FROM noindex_page`).Scan(&e, &o); err != nil {
+			t.Fatal(err)
+		}
+		return e, o
+	}
+	english, before := rowsOf()
+	if english != "" {
+		t.Fatalf("a build without the list wrote english rows: %s", english)
+	}
+	if err := run("english", ""); err == nil {
+		t.Error("-only english without a list should fail, not leave every English page open")
+	}
+	const want = "english 102 machine_english, english 103 machine_english"
+	for i := range 2 {
+		if err := run("english", popular); err != nil {
+			t.Fatal(err)
+		}
+		english, other := rowsOf()
+		if english != want {
+			t.Errorf("run %d: english rows %q, want %q", i+1, english, want)
+		}
+		if other != before {
+			t.Errorf("run %d: other rows changed:\n%s\nwant\n%s", i+1, other, before)
+		}
+	}
+
+	s, err := New(pool)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for path, want := range map[string]string{
+		"/en/law/101/": "index, follow, max-image-preview:large", "/law/102/": "index, follow, max-image-preview:large",
+		"/en/law/102/": "noindex, follow", "/en/decree/103/article/2/": "noindex, follow",
+	} {
+		code, body, _ := getHTML(t, s, path)
+		if _, robots, _ := head(body); code != 200 || robots != want {
+			t.Errorf("%s: %d %q, want %q", path, code, robots, want)
 		}
 	}
 }
