@@ -3,10 +3,7 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
-  # The release commands (cmd/*-release, internal/release*, internal/embedding,
-  # internal/hfhub) against a throwaway pgvector PostgreSQL, the db image's
-  # first boot, the scraper, and the four images.
-  test:
+  scraper:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
@@ -18,7 +15,52 @@ jobs:
         run: |
           python -m compileall -q scraper/ulscrape
           bash scraper/bin/check-archive_test.sh
-      - run: docker build -f db/Dockerfile --target postgres -t lebleg-test-postgres .
+  go-unit:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Go tests without a database
+        run: |
+          go test -count=1 ./internal/release/... ./internal/embedding/... ./internal/hfhub/...
+  postgres:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Start independent PostgreSQL image builds
+        run: |
+          ( set +e
+            bash -e -o pipefail <<'TASK_POSTGRES' > "$RUNNER_TEMP/postgres.log" 2>&1
+          docker build -f db/Dockerfile --target postgres -t lebleg-test-postgres .
+          TASK_POSTGRES
+            echo $? > "$RUNNER_TEMP/postgres.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_DB' > "$RUNNER_TEMP/db.log" 2>&1
+          docker build -f db/Dockerfile --target db -t lebleg-test-db .
+          TASK_DB
+            echo $? > "$RUNNER_TEMP/db.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_PUBLISHER' > "$RUNNER_TEMP/publisher.log" 2>&1
+          docker build -f db/Dockerfile --target publisher -t lebleg-test-publisher .
+          TASK_PUBLISHER
+            echo $? > "$RUNNER_TEMP/publisher.status"
+          ) &
+      - name: Wait for PostgreSQL image
+        run: |
+          failed=0
+          until [ -f "$RUNNER_TEMP/postgres.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/postgres.log"
+          [ "$(cat "$RUNNER_TEMP/postgres.status")" -eq 0 ] || failed=1
+          [ "$failed" -eq 0 ]
       - name: Start disposable PostgreSQL
         run: |
           docker run -d --name lebleg-test -p 127.0.0.1:55433:5432 -e POSTGRES_USER=lebleg -e POSTGRES_PASSWORD=test -e POSTGRES_DB=lebleg lebleg-test-postgres
@@ -29,18 +71,83 @@ jobs:
             printf '#!/bin/sh\nexec docker run --rm -i --network host -v /tmp:/tmp -e PGHOST -e PGPORT -e PGUSER -e PGDATABASE -e PGSSLMODE -e PGPASSWORD -e PGOPTIONS --entrypoint %s lebleg-test-postgres "$@"\n' "$client" > "/tmp/pg18-bin/$client"
             chmod +x "/tmp/pg18-bin/$client"
           done
-      - run: docker build -f db/Dockerfile --target db -t lebleg-test-db .
-      - run: docker build -f db/Dockerfile --target publisher -t lebleg-test-publisher .
-      - name: Release command tests
-        run: go test -count=1 ./internal/release/... ./internal/releasedb/... ./internal/embedding/... ./internal/hfhub/... ./cmd/restore-release ./cmd/check-release ./cmd/build-release ./cmd/publish-release
+      - name: Wait for database and publisher images
+        run: |
+          failed=0
+          until [ -f "$RUNNER_TEMP/db.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/db.log"
+          [ "$(cat "$RUNNER_TEMP/db.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/publisher.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/publisher.log"
+          [ "$(cat "$RUNNER_TEMP/publisher.status")" -eq 0 ] || failed=1
+          [ "$failed" -eq 0 ]
+      - name: PostgreSQL and first-boot tests
+        run: go test -count=1 ./internal/releasedb/...
         env:
           LEBLEG_RELEASE_TEST_DSN: postgres://lebleg:test@127.0.0.1:55433/lebleg
           LEBLEG_TEST_PGDUMP: /tmp/pg18-bin/pg_dump
           LEBLEG_TEST_PGRESTORE: /tmp/pg18-bin/pg_restore
           LEBLEG_TEST_DB_IMAGE: lebleg-test-db
-      - run: docker build -f api/Dockerfile -t lebleg-test-api .
-      - run: docker build -f mcp/Dockerfile -t lebleg-test-mcp .
-      - run: docker build -f web/Dockerfile -t lebleg-test-web .
+  release-commands:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Release command tests
+        run: |
+          go test -count=1 ./cmd/restore-release ./cmd/check-release ./cmd/build-release ./cmd/publish-release
+  images:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build independent smoke images
+        run: |
+          ( set +e
+            bash -e -o pipefail <<'TASK_DB' > "$RUNNER_TEMP/db.log" 2>&1
+          docker build -f db/Dockerfile --target db -t lebleg-test-db .
+          TASK_DB
+            echo $? > "$RUNNER_TEMP/db.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_API' > "$RUNNER_TEMP/api.log" 2>&1
+          docker build -f api/Dockerfile -t lebleg-test-api .
+          TASK_API
+            echo $? > "$RUNNER_TEMP/api.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_MCP' > "$RUNNER_TEMP/mcp.log" 2>&1
+          docker build -f mcp/Dockerfile -t lebleg-test-mcp .
+          TASK_MCP
+            echo $? > "$RUNNER_TEMP/mcp.status"
+          ) &
+          ( set +e
+            bash -e -o pipefail <<'TASK_WEB' > "$RUNNER_TEMP/web.log" 2>&1
+          docker build -f web/Dockerfile -t lebleg-test-web .
+          TASK_WEB
+            echo $? > "$RUNNER_TEMP/web.status"
+          ) &
+          wait
+          failed=0
+          until [ -f "$RUNNER_TEMP/db.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/db.log"
+          [ "$(cat "$RUNNER_TEMP/db.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/api.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/api.log"
+          [ "$(cat "$RUNNER_TEMP/api.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/mcp.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/mcp.log"
+          [ "$(cat "$RUNNER_TEMP/mcp.status")" -eq 0 ] || failed=1
+          until [ -f "$RUNNER_TEMP/web.status" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/web.log"
+          [ "$(cat "$RUNNER_TEMP/web.status")" -eq 0 ] || failed=1
+          [ "$failed" -eq 0 ]
       - name: Image smoke checks
         env:
           DB_IMAGE: lebleg-test-db
@@ -49,3 +156,15 @@ jobs:
           WEB_IMAGE: lebleg-test-web
           SMOKE_ARCHITECTURES: amd64
         run: bash .github/scripts/smoke-images.sh
+  ci-ok:
+    runs-on: ubuntu-latest
+    needs: [scraper, go-unit, postgres, release-commands, images]
+    if: always()
+    steps:
+      - name: Require every check to succeed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          for result in $RESULTS; do
+            [ "$result" = success ] || exit 1
+          done

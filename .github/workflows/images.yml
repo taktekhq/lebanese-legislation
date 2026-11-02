@@ -15,17 +15,16 @@ concurrency:
   group: publish-container-package
   cancel-in-progress: false
 jobs:
-  publish:
+  validate:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      build_db: ${{ steps.version.outputs.build_db }}
+      build_api: ${{ steps.version.outputs.build_api }}
+      build_mcp: ${{ steps.version.outputs.build_mcp }}
+      build_web: ${{ steps.version.outputs.build_web }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Validate immutable image versions
         id: version
         env:
@@ -72,8 +71,20 @@ jobs:
               for service, build in builds.items():
                   out.write('build_'+service+'='+str(build).lower()+'\n')
           PYCODE
+  build-db:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build database candidate
-        if: steps.version.outputs.build_db == 'true'
+        if: needs.validate.outputs.build_db == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -83,8 +94,20 @@ jobs:
           push: true
           tags: ghcr.io/taktekhq/lebanese-legislation-db:source-${{ github.sha }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
+  build-api:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build API candidate
-        if: steps.version.outputs.build_api == 'true'
+        if: needs.validate.outputs.build_api == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -93,8 +116,20 @@ jobs:
           push: true
           tags: ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
+  build-mcp:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build MCP candidate
-        if: steps.version.outputs.build_mcp == 'true'
+        if: needs.validate.outputs.build_mcp == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -103,8 +138,20 @@ jobs:
           push: true
           tags: ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
+  build-web:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build website candidate
-        if: steps.version.outputs.build_web == 'true'
+        if: needs.validate.outputs.build_web == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -113,6 +160,18 @@ jobs:
           push: true
           tags: ghcr.io/taktekhq/lebanese-legislation-web:source-${{ github.sha }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
+  publish:
+    needs: [validate, build-db, build-api, build-mcp, build-web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Check all four images on both architectures before release tags
         env:
           DB_IMAGE: ghcr.io/taktekhq/lebanese-legislation-db:source-${{ github.sha }}
@@ -123,12 +182,12 @@ jobs:
 
       - name: Promote verified immutable versions
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.validate.outputs.version }}
           SOURCE_SHA: ${{ github.sha }}
-          BUILD_DB: ${{ steps.version.outputs.build_db }}
-          BUILD_API: ${{ steps.version.outputs.build_api }}
-          BUILD_MCP: ${{ steps.version.outputs.build_mcp }}
-          BUILD_WEB: ${{ steps.version.outputs.build_web }}
+          BUILD_DB: ${{ needs.validate.outputs.build_db }}
+          BUILD_API: ${{ needs.validate.outputs.build_api }}
+          BUILD_MCP: ${{ needs.validate.outputs.build_mcp }}
+          BUILD_WEB: ${{ needs.validate.outputs.build_web }}
         run: |
           for service in db api mcp web; do
             image="ghcr.io/taktekhq/lebanese-legislation-$service"
