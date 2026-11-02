@@ -9,6 +9,15 @@ import subprocess
 import time
 import urllib.parse
 import urllib.request
+
+# Cloudflare refuses the default Python-urllib user agent (403).
+def _request(*args, **kwargs):
+    req = urllib.request.Request(*args, **kwargs)
+    req.add_header("User-Agent", UA)
+    return req
+
+
+UA = "lebleg-origin-deploy/1 (+https://github.com/taktekhq/lebanese-legislation)"
 import urllib.error
 
 CONFIG = Path('workers/static-site/wrangler.toml')
@@ -17,7 +26,7 @@ CHECKS = ('/healthz', '/api/v1/search/?limit=1&q=law', '/laws/?year=2019')
 
 
 def api(path):
-    req = urllib.request.Request(
+    req = _request(
         f'https://api.cloudflare.com/client/v4/accounts/{os.environ["CLOUDFLARE_ACCOUNT_ID"]}/{path}',
         headers={'Authorization': 'Bearer ' + os.environ['CLOUDFLARE_API_TOKEN']})
     with urllib.request.urlopen(req, timeout=60) as res:
@@ -110,7 +119,7 @@ def check(seconds, side=None):
                 ok = False
                 break
             try:
-                req = urllib.request.Request('https://lebaneselegislation.com' + path, headers=headers)
+                req = _request('https://lebaneselegislation.com' + path, headers=headers)
                 with urllib.request.urlopen(req, timeout=min(remaining, 30)) as res:
                     status = res.status
                 print(f'{path}: {status}', flush=True)
@@ -147,7 +156,7 @@ def main():
     elif args.action == 'verify':
         check(60)
     elif args.action == 'retire':
-        req = urllib.request.Request('https://lebaneselegislation.com/_origin/restart?side=' + state['old'],
+        req = _request('https://lebaneselegislation.com/_origin/restart?side=' + state['old'],
                                      headers={'x-origin-test': os.environ['ORIGIN_TEST_KEY']})
         with urllib.request.urlopen(req, timeout=60) as res:
             if res.status != 200 or res.read() != b'container stopped\n':
