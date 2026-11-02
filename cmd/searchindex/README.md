@@ -1,5 +1,11 @@
 # searchindex
 
+This command builds the PostgreSQL source index for export or local pgvector use.
+Hosted semantic search uses Cloudflare Vectorize index `lebleg-chunks`. The
+[vectors workflow](../../.github/workflows/vectors.yml) exports and publishes
+`vectors/vectors.parquet` on Hugging Face and syncs Vectorize with only changed
+vectors uploaded on later runs. See [architecture](../../docs/architecture.md).
+
 Build a multilingual semantic search index from the canonical LebaneseLegislation corpus. The corpus stays authoritative. The index lives in a separate PostgreSQL database with pgvector 0.8 or newer, so a nightly corpus database replacement preserves vectors. Embeddings retain 768 dimensions and are validated and normalized as float32 before storage. PostgreSQL stores them as `halfvec(768)` with `halfvec_cosine_ops`, reducing the size of stored vectors and the ANN index without another embedding API call.
 
 Build from the repository root:

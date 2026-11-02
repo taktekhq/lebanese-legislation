@@ -2,6 +2,23 @@
 
 The code and data behind [LebaneseLegislation.com](https://lebaneselegislation.com/): 103,118 laws, 389,078 articles, 47,657 court rulings and 6,851 Official Gazette issues, with search, a REST API and an MCP server.
 
+The former private `taktekhq/lebaneselegislation` repository is folded into this
+one: code, scraper, build pipeline, website and MCP.
+
+## Hosting
+
+Cloudflare serves about 760,000 static pages from the R2 bucket `lebleg-site`
+through the JavaScript Worker in [`workers/static-site`](workers/static-site/).
+The same Worker serves ruling PDFs from R2. Search pages, `/api/v1/`, filters
+and Gazette scans go to one Cloudflare Container with PostgreSQL 18.6, the
+database baked into the image and the Go website server.
+
+[static-site.yml](.github/workflows/static-site.yml) renders `data/` with
+`cmd/static-export` in 8 parallel shards. [origin.yml](.github/workflows/origin.yml)
+deploys the container. [vectors.yml](.github/workflows/vectors.yml) exports and
+publishes vectors and loads Cloudflare Vectorize index `lebleg-chunks`.
+See [architecture](docs/architecture.md) for the request and build paths.
+
 ## Where everything is
 
 | You want | Go to |
@@ -10,6 +27,7 @@ The code and data behind [LebaneseLegislation.com](https://lebaneselegislation.c
 | Connect an AI assistant | The free MCP server at `https://lebaneselegislation.com/mcp`. [Setup](docs/mcp.md) |
 | The data as tables | [Parquet files on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation) |
 | The data as a PostgreSQL database | The [6.4 GB dump on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases), with search vectors. The `-db` image below loads it for you. |
+| Semantic search vectors | [vectors/vectors.parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet), 1,547,937 chunks, 768 dimensions, `gemini-embedding-001`. [Read with DuckDB](docs/reference.md#vectors). |
 | The original court scans | [Court scans on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-court-scans) |
 | Everything on your own machine | [Run the services locally](#run-the-services-locally) |
 
@@ -34,7 +52,7 @@ Then open the website at http://localhost:8080, the API at http://localhost:8000
 | [`ghcr.io/taktekhq/lebanese-legislation-mcp:0.4.0`](https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-mcp) | The same data and search over MCP, for AI assistants. |
 | [`ghcr.io/taktekhq/lebanese-legislation-web:0.4.0`](https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-web) | The website, in Arabic and English, with keyword search. |
 
-All four run on Linux AMD64 and ARM64. Nothing is baked into the images: the data comes from Hugging Face.
+All four local service images run on Linux AMD64 and ARM64 and download their data from Hugging Face. The hosted Cloudflare container instead has its database baked into the image.
 
 ```
 Hugging Face releases/latest.json --> db  (restores once into a volume)
@@ -60,10 +78,9 @@ Hugging Face releases/latest.json --> db  (restores once into a volume)
 | [`scraper/`](scraper/) | The crawler that reads the Lebanese University's site into the archive, and the scripts that publish the archive. |
 | [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and the PostgreSQL release (restore, build, publish). [Listed here](cmd/README.md). |
 | [`tools/`](tools/) | Only `tools/src/lebleg/sql/web.sql` now: what the website, API and MCP read beyond the release dump, applied by `restore-release`. |
-| [`docs/`](docs/) | Service reference, MCP setup, CI and changes. |
-| [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and the website's tools. [Listed here](cmd/README.md). |
-| [`tools/`](tools/) | The Python data tools: restore, rebuild and publish the dump, and the update pipeline. |
-| [`docs/`](docs/) | Service reference, MCP setup, the data update pipeline and changes. |
+| [`docs/`](docs/) | Architecture, service reference, MCP setup, CI and changes. |
+| [`workers/`](workers/) | Cloudflare Workers, including the static-site router and its dynamic container. |
+
 
 `compose.yaml` runs the four images. `compose.build.yaml` builds them from this checkout instead. `compose.local.yaml` loads a dump you already downloaded. `server.json` is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry and `.mcp.json` the client configuration for the hosted server.
 

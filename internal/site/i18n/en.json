@@ -688,5 +688,8 @@
   "local.more_h2": "More",
   "local.back_ai": "Connect an AI assistant to the public server instead",
   "ai.follow_h2": "Hear about changes",
-  "ai.follow_p": "Watch the repository on %s for new releases, or follow taktekhq on %s for new data."
+  "ai.follow_p": "Watch the repository on %s for new releases, or follow taktekhq on %s for new data.",
+  "resources.vectors": "Download the semantic search vectors on Hugging Face (Parquet)",
+  "resources.vectors_note": "vectors/vectors.parquet contains 1,547,937 chunks embedded with gemini-embedding-001 in 768 dimensions. Columns: id, document, model, hash and values (FLOAT[768]). Hosted semantic search uses Cloudflare Vectorize.",
+  "about.infrastructure_p": "Cloudflare serves about 760,000 static pages and ruling PDFs from R2 through a JavaScript Worker. Search pages, the API, filters and Gazette scans go to one Cloudflare Container with PostgreSQL 18.6 and the Go website server. Semantic search vectors are stored in Cloudflare Vectorize and published openly on Hugging Face."
 }

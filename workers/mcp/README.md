@@ -52,3 +52,13 @@ exact current source and SHA-256. It suppresses stale, malformed, repealed,
 annulled, pending or future records. Older snapshots without the optional
 column still work and return no calculated claim. Arithmetic and reviewed
 Arabic spellings live in the shared Go exporter, never in Worker code.
+
+## Code and datasets
+
+The former private `taktekhq/lebaneselegislation` code, scraper, build pipeline,
+website and MCP are now in [this public repository](https://github.com/taktekhq/lebanese-legislation).
+See [architecture](../../docs/architecture.md) for the website's Cloudflare
+Worker, R2 and container setup. Hosted semantic search uses Vectorize index
+`lebleg-chunks`; the vectors are openly available as
+[`vectors/vectors.parquet`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet). See the
+[DuckDB example](../../docs/reference.md#vectors).

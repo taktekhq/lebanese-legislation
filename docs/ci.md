@@ -1,7 +1,7 @@
 # Workflows that need keys
 
-Some jobs need a secret: an upload token, a model API key, or the server's
-SSH key. Each is a GitHub Actions workflow in `.github/workflows/` that does
+Some jobs need a secret: an upload token, a model API key, or Cloudflare
+credentials. Each is a GitHub Actions workflow in `.github/workflows/` that does
 nothing harmful without its secret: it says which secret is missing and stops.
 
 Until the secrets live in GitHub, we run these workflows on our own machine
@@ -46,3 +46,12 @@ Other workflows listen to the `data/` commit: a push to `main` touching
 `data/**`, and `workflow_run` on `build` (a push made with GitHub's own token
 does not start other workflows, so `workflow_run` covers that case).
 
+## Cloudflare hosting and vectors
+
+See [architecture](architecture.md) for the current request and build paths.
+
+| Workflow | What it does |
+| --- | --- |
+| [static-site.yml](../.github/workflows/static-site.yml) | Renders about 760,000 pages from `data/` with `cmd/static-export`, in 8 parallel shards, into R2 bucket `lebleg-site`. |
+| [origin.yml](../.github/workflows/origin.yml) | Deploys one Cloudflare Container with PostgreSQL 18.6, a baked-in database and the Go website server. |
+| [vectors.yml](../.github/workflows/vectors.yml) | `build` then `publish` and `vectorize`: exports vectors, publishes `vectors/vectors.parquet` to Hugging Face and loads Vectorize index `lebleg-chunks`. Later syncs upload only changed vectors. |

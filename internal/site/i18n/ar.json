@@ -688,5 +688,8 @@
   "local.more_h2": "المزيد",
   "local.back_ai": "اربط مساعد ذكاء اصطناعي بالخادم العام بدلاً من ذلك",
   "ai.follow_h2": "تابع التغييرات",
-  "ai.follow_p": "تابع المستودع على %s لمعرفة الإصدارات الجديدة، أو تابع taktekhq على %s للبيانات الجديدة."
+  "ai.follow_p": "تابع المستودع على %s لمعرفة الإصدارات الجديدة، أو تابع taktekhq على %s للبيانات الجديدة.",
+  "resources.vectors": "تنزيل متجهات البحث الدلالي من Hugging Face بصيغة Parquet",
+  "resources.vectors_note": "يحتوي ملف vectors/vectors.parquet على 1,547,937 مقطعاً، بمتجهات من النموذج gemini-embedding-001 ذات 768 بُعداً. الأعمدة: id وdocument وmodel وhash وvalues من النوع FLOAT[768]. يستخدم البحث الدلالي في الموقع Cloudflare Vectorize.",
+  "about.infrastructure_p": "تقدّم Cloudflare نحو 760,000 صفحة ثابتة وملفات الأحكام بصيغة PDF من R2 عبر Worker مكتوب بلغة JavaScript. تُوجَّه صفحات البحث وواجهة البرمجة وطلبات التصفية وصور الجريدة الرسمية إلى حاوية واحدة على Cloudflare تضم PostgreSQL 18.6 وخادم الموقع المكتوب بلغة Go. تُحفَظ متجهات البحث الدلالي في Cloudflare Vectorize وتُنشر للجميع على Hugging Face."
 }

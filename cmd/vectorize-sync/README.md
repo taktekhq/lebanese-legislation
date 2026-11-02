@@ -20,9 +20,13 @@ Vectorize applies accepted mutations asynchronously.
 uploading or writing a manifest. Defaults: `-in vectors.ndjson`, no `-prev`,
 `-manifest vectors-manifest.tsv`.
 
-The `vectors` GitHub Actions workflow restores the R2 search dump, publishes
-`vectors/vectors.parquet` to Hugging Face when `HF_TOKEN` is set, then syncs
-Vectorize and saves the manifest in R2. It runs only with `workflow_dispatch`.
+The [vectors workflow](../../.github/workflows/vectors.yml) runs `build`, then
+`publish` and `vectorize`. It exports the saved vectors with `cmd/export-vectors`,
+publishes `vectors/vectors.parquet` openly to Hugging Face and loads Vectorize
+index `lebleg-chunks`. Later runs upload only changed vectors. The published file
+has 1,547,937 chunks, 768 dimensions, model `gemini-embedding-001`, and columns
+`id`, `document`, `model`, `hash`, `values` (`FLOAT[768]`). See the
+[DuckDB example](../../docs/reference.md#vectors).
 
 To serve queries through Vectorize, set the three environment variables above
 with a token that permits reads. Unset `LEBLEG_VECTORIZE_INDEX` to use pgvector.
