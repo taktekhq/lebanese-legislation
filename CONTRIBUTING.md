@@ -7,7 +7,7 @@ Describe the change and the checks you ran:
 ```sh
 # Go: internal/, cmd/ and the web/, api/ and mcp/ services
 go vet ./... && go test ./...
-# The release commands against a throwaway pgvector PostgreSQL (see .github/workflows/ci.yml)
+# The release commands against a throwaway pgvector PostgreSQL (see .github/workflows/checks.yml)
 docker build -f db/Dockerfile --target postgres -t lebleg-test-postgres .
 LEBLEG_RELEASE_TEST_DSN=postgres://... go test ./internal/releasedb/
 # mcp/cloudflare/

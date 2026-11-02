@@ -54,8 +54,7 @@ COPY LICENSE THIRD_PARTY_NOTICES.txt ./
 COPY --from=commands /out/restore-release /out/check-release /usr/local/bin/
 LABEL org.opencontainers.image.licenses="MIT"
 
-# Contributor tools: build and publish a release. The workflow in
-# .github/workflows/release.yml runs them here, beside pg_dump 18.6.
+# Legacy contributor tools, retained for image checks beside pg_dump 18.6.
 FROM backend AS publisher
 COPY --from=commands /out/build-release /out/publish-release /usr/local/bin/
 CMD ["build-release", "-h"]

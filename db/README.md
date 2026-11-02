@@ -31,8 +31,8 @@ into an empty `PGDATA` volume and configures `POSTGRES_USER`,
 A new image does not overwrite a populated volume. Back up changes and use a
 fresh volume when replacing the dataset. No release download happens at startup.
 
-`Dockerfile` retains the `postgres` target for tests and `publisher` for the
-public release workflow. Those targets have no baked data. The default `db`
+`Dockerfile` retains the `postgres` target for tests and `publisher` for
+legacy contributor tools and image checks. Those targets have no baked data. The default `db`
 target includes the data and runs `ANALYZE`. After a clean shutdown, the build
 resets WAL on this new cluster without forcing it, then copies only the finished
 cluster into the final image. This excludes the bulk load's spare WAL segments
@@ -46,5 +46,5 @@ docker run --rm -p 127.0.0.1:5433:5432 -e POSTGRES_PASSWORD=local lebanese-legis
 ```
 
 Read [loading vectors](../vectors/README.md) to add semantic search to your own
-Vectorize index or to pgvector. The `restore-release` command remains available
-for users who explicitly want a separate public PostgreSQL release.
+Vectorize index or to pgvector. Portable source tables are available as
+[Parquet on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation).
