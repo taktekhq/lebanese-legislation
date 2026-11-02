@@ -36,6 +36,7 @@ class DeploymentTests(unittest.TestCase):
         for live in ('blue', 'green'):
             idle = 'green' if live == 'blue' else 'blue'
             with self.subTest(live=live), \
+                 patch.object(deploy, 'wait_rollout'), \
                  patch('sys.argv', ['origin-deploy.py', 'stage']), \
                  patch.dict(os.environ, {'IMAGE': 'registry/new:2', 'ORIGIN_TEST_KEY': 'test',
                                         'GEMINI_API_KEY': 'gemini', 'LEBLEG_VECTORIZE_TOKEN': 'vector'}), \
