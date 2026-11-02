@@ -243,3 +243,49 @@ jobs:
           for result in $RESULTS; do
             [ "$result" = success ] || exit 1
           done
+  api:
+    needs: ci-ok
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    with:
+      image: api
+      context: .
+      dockerfile: api/Dockerfile
+      tags: |
+        ghcr.io/taktekhq/lebanese-legislation-api:source-${{ github.sha }}
+      platforms: linux/amd64,linux/arm64
+  mcp:
+    needs: ci-ok
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    with:
+      image: mcp
+      context: .
+      dockerfile: mcp/Dockerfile
+      tags: |
+        ghcr.io/taktekhq/lebanese-legislation-mcp:source-${{ github.sha }}
+      platforms: linux/amd64,linux/arm64
+  all:
+    needs: ci-ok
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    with:
+      image: all
+      context: .
+      dockerfile: workers/static-site/container/Dockerfile
+      tags: |
+        ghcr.io/taktekhq/lebanese-legislation-all:latest
+      build_args: |
+        DATA_TAG=latest
