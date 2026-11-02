@@ -15,7 +15,6 @@ package site
 
 import (
 	"context"
-	_ "embed"
 	"encoding/json"
 	"errors"
 	"log"
@@ -30,9 +29,6 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/calculatedcurrent"
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 )
-
-//go:embed openapi.json
-var openAPIDocument []byte
 
 const apiCacheControl = "public, max-age=60, stale-while-revalidate=300"
 
@@ -73,21 +69,41 @@ func (s *Server) apiLimited(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// apiEndpoint is one GET route of the API: its path as /openapi.json names
+// it (openapi.go), and its handler.
+type apiEndpoint struct {
+	path string
+	h    http.HandlerFunc
+}
+
+// apiEndpoints are every route of /api/v1/. openapi.json describes each one;
+// a test holds them to it.
+func (s *Server) apiEndpoints() []apiEndpoint {
+	return []apiEndpoint{
+		{"/api/v1/", s.apiRoot},
+		{"/api/v1/openapi.json", s.openapi},
+		{"/api/v1/search/", s.apiLimited(s.apiSearch)},
+		{"/api/v1/law/{id}/", s.apiLimited(s.apiLaw)},
+		{"/api/v1/law/{id}/calculated-current/", s.apiLimited(s.apiCalculatedCurrent)},
+		{"/api/v1/law/{id}/article/{n}/", s.apiLimited(s.apiArticle)},
+		{"/api/v1/ruling/{id}/", s.apiLimited(s.apiRuling)},
+		{"/api/v1/gazette/{id}/", s.apiLimited(s.apiGazette)},
+		{"/api/v1/laws/", s.apiLimited(s.apiLaws)},
+		{"/api/v1/gazette/", s.apiLimited(s.apiGazettes)},
+	}
+}
+
 func (s *Server) apiRoutes() {
 	if s.isStatic {
 		return
 	}
-	m := s.mux
-	m.HandleFunc("GET /api/v1/{$}", s.apiRoot)
-	m.HandleFunc("GET /api/v1/openapi.json", s.apiOpenAPI)
-	m.HandleFunc("GET /api/v1/search/{$}", s.apiLimited(s.apiSearch))
-	m.HandleFunc("GET /api/v1/law/{id}/{$}", s.apiLimited(s.apiLaw))
-	m.HandleFunc("GET /api/v1/law/{id}/calculated-current/{$}", s.apiLimited(s.apiCalculatedCurrent))
-	m.HandleFunc("GET /api/v1/law/{id}/article/{n}/{$}", s.apiLimited(s.apiArticle))
-	m.HandleFunc("GET /api/v1/ruling/{id}/{$}", s.apiLimited(s.apiRuling))
-	m.HandleFunc("GET /api/v1/gazette/{id}/{$}", s.apiLimited(s.apiGazette))
-	m.HandleFunc("GET /api/v1/laws/{$}", s.apiLimited(s.apiLaws))
-	m.HandleFunc("GET /api/v1/gazette/{$}", s.apiLimited(s.apiGazettes))
+	for _, e := range s.apiEndpoints() {
+		pattern := e.path
+		if strings.HasSuffix(pattern, "/") {
+			pattern += "{$}"
+		}
+		s.mux.HandleFunc("GET "+pattern, e.h)
+	}
 }
 
 type apiErrorBody struct {
@@ -117,12 +133,6 @@ func (s *Server) apiFail(w http.ResponseWriter, r *http.Request, err error) {
 	s.writeJSON(w, http.StatusInternalServerError, apiErrorBody{Error: "internal error"})
 }
 
-func (s *Server) apiOpenAPI(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Cache-Control", apiCacheControl)
-	w.Write(openAPIDocument)
-}
-
 func (s *Server) apiRoot(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Link", `<`+Base+`/api/v1/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"`)
 	s.writeJSON(w, 200, map[string]any{
@@ -132,7 +142,7 @@ func (s *Server) apiRoot(w http.ResponseWriter, r *http.Request) {
 		"openapi":    Base + "/api/v1/openapi.json",
 		"mcp":        Base + "/mcp",
 		"not_advice": notLegalAdvice,
-		"notes":      []string{titleEnNote, "search: when q finds nothing it is read again (English and French terms to Arabic, names, a year, a typo) and searched_instead says what was searched."},
+		"notes":      []string{titleEnNote, updatedAtNote, "search: when q finds nothing it is read again (English and French terms to Arabic, names, a year, a typo) and searched_instead says what was searched."},
 		"endpoints": []string{
 			"GET /api/v1/search/?q=&type=laws|rulings|gazette|articles&year=&limit=&offset=",
 			"GET /api/v1/law/{id}/",
@@ -164,6 +174,10 @@ type apiLawSummary struct {
 	Code         *string `json:"code,omitempty"` // the curated code's short name, e.g. "Code of Obligations and Contracts"
 	URL          string  `json:"url"`
 	SourceURL    string  `json:"source_url,omitempty"`
+	// UpdatedAt is the day the text's page last changed here (page_state):
+	// an amendment in force, a correction. Never the text's own date; absent
+	// when not known.
+	UpdatedAt *string `json:"updated_at,omitempty"`
 }
 
 func ymd(t *time.Time) *string {
@@ -217,14 +231,16 @@ type apiRulingHit struct {
 	PDFURL string `json:"pdf_url,omitempty"`
 	// JudgmentPage is set when only the machine reading of the scanned
 	// judgment matched, not the title or summary: the page the snippet is from.
-	JudgmentPage int `json:"judgment_page,omitempty"`
+	JudgmentPage int     `json:"judgment_page,omitempty"`
+	UpdatedAt    *string `json:"updated_at,omitempty"` // the day its page last changed here, when known
 }
 
 type apiGazetteHit struct {
-	ID          int    `json:"id"`
-	Number      string `json:"number,omitempty"`
-	PublishedOn string `json:"published_on,omitempty"`
-	URL         string `json:"url"`
+	ID          int     `json:"id"`
+	Number      string  `json:"number,omitempty"`
+	PublishedOn string  `json:"published_on,omitempty"`
+	URL         string  `json:"url"`
+	UpdatedAt   *string `json:"updated_at,omitempty"` // the day its page last changed here, when known
 }
 
 type apiSearchResult struct {
@@ -639,7 +655,7 @@ func (s *Server) apiFindRulings(ctx context.Context, q string, limit, offset int
 	}
 	for _, r := range hits {
 		h := apiRulingHit{ID: r.ID, Title: r.Title, Court: r.Court, Snippet: stripMarks(r.Snippet),
-			URL: Base + "/ruling/" + strconv.Itoa(r.ID) + "/", JudgmentPage: r.Page}
+			URL: Base + "/ruling/" + strconv.Itoa(r.ID) + "/", JudgmentPage: r.Page, UpdatedAt: s.listedChange(ctx, "ruling", r.ID)}
 		if withFile[r.ID] {
 			h.PDFURL = ULRulingPDF(r.ID)
 		}
@@ -671,7 +687,7 @@ func (s *Server) apiFindGazette(ctx context.Context, q string, limit, offset int
 		if err := rows.Scan(&id, &number, &on); err != nil {
 			return err
 		}
-		h := apiGazetteHit{ID: id, URL: Base + "/gazette/" + strconv.Itoa(id) + "/"}
+		h := apiGazetteHit{ID: id, URL: Base + "/gazette/" + strconv.Itoa(id) + "/", UpdatedAt: s.listedChange(ctx, "gazette", id)}
 		if number != nil {
 			h.Number = *number
 		}
@@ -791,6 +807,7 @@ func (s *Server) lawDetailOf(ctx context.Context, l *Law) (apiLawDetail, error) 
 	out := apiLawDetail{apiLawSummary: s.lawSum(ctx, l.LawRow, s.source(ctx, "law", id)),
 		GazetteNumber: l.GazetteNumber, Preamble: l.Preamble, ExplanatoryNote: l.ExplanatoryNote, Closing: l.Closing,
 		GazetteIssueID: l.GazetteIssue, NotLegalAdvice: notLegalAdvice}
+	out.UpdatedAt = changedISO(l.Changed) // read now, not the hourly copy lawSum used
 	out.GazetteDate = ymd(l.GazetteDate)
 	// From the link graph, as the MCP's get_law does; the amendment table adds
 	// what the graph lacks (see mergeAmendments).
@@ -906,7 +923,10 @@ type apiArticleDetail struct {
 	Rulings           []apiRulingRef            `json:"rulings,omitempty"`
 	URL               string                    `json:"url"`
 	SourceURL         string                    `json:"source_url,omitempty"`
-	NotLegalAdvice    string                    `json:"not_legal_advice"`
+	// UpdatedAt is the day the page of the article's text last changed here:
+	// an article belongs to its text, and they change together.
+	UpdatedAt      *string `json:"updated_at,omitempty"`
+	NotLegalAdvice string  `json:"not_legal_advice"`
 }
 
 // articleDetail loads a law and finds one article in it, by its printed
@@ -927,7 +947,8 @@ func (s *Server) articleDetail(ctx context.Context, lawID int, number string) (l
 		out = apiArticleDetail{Law: s.lawSum(ctx, l.LawRow, sourceURL), Number: a.Number, Note: a.Note, CentreError: a.CentreError,
 			TextAr: a.TextAr, TextFr: a.TextFr, InForceFrom: ymd(a.From),
 			URL:       Base + artPath(lawID, a.Number),
-			SourceURL: sourceURL, NotLegalAdvice: notLegalAdvice}
+			SourceURL: sourceURL, UpdatedAt: changedISO(l.Changed), NotLegalAdvice: notLegalAdvice}
+		out.Law.UpdatedAt = out.UpdatedAt
 		for _, v := range a.Versions {
 			out.Versions = append(out.Versions, apiArticleVersion{Major: v.Major, Minor: v.Minor,
 				ValidFrom: ymd(v.From), ValidTo: ymd(v.To), State: v.State, TextAr: v.TextAr,
@@ -1012,6 +1033,7 @@ type apiRulingDetail struct {
 	PageCount      int             `json:"page_count,omitempty"`  // pages in the scan
 	Pages          []apiRulingPage `json:"pages,omitempty"`
 	PagesNote      string          `json:"pages_note,omitempty"`
+	UpdatedAt      *string         `json:"updated_at,omitempty"` // the day its page last changed here (page_state), when known
 	NotLegalAdvice string          `json:"not_legal_advice"`
 }
 
@@ -1038,7 +1060,8 @@ func (s *Server) rulingDetail(ctx context.Context, id int) (apiRulingDetail, err
 	}
 	out := apiRulingDetail{ID: id, Court: court, CourtEn: courtEn, Number: number, Year: year, DecidedOn: ymd(on),
 		Title: title, President: president, Members: members, TextAr: text,
-		URL: Base + "/ruling/" + strconv.Itoa(id) + "/", SourceURL: s.source(ctx, "ruling", id), NotLegalAdvice: notLegalAdvice}
+		URL: Base + "/ruling/" + strconv.Itoa(id) + "/", SourceURL: s.source(ctx, "ruling", id),
+		UpdatedAt: changedISO(s.changedOn(ctx, "ruling", id)), NotLegalAdvice: notLegalAdvice}
 	if text == nil {
 		out.Note = "The Centre holds this judgment as a file only, not as typed text."
 	}
@@ -1101,6 +1124,7 @@ type apiGazetteDetail struct {
 	Texts     []apiLawSummary `json:"texts"`
 	URL       string          `json:"url"`
 	SourceURL string          `json:"source_url,omitempty"`
+	UpdatedAt *string         `json:"updated_at,omitempty"` // the day its page last changed here (page_state), when known
 }
 
 func (s *Server) gazetteDetail(ctx context.Context, id int) (apiGazetteDetail, error) {
@@ -1119,7 +1143,8 @@ func (s *Server) gazetteDetail(ctx context.Context, id int) (apiGazetteDetail, e
 		return apiGazetteDetail{}, err
 	}
 	out := apiGazetteDetail{ID: id, Number: number, Published: ymd(on),
-		URL: Base + "/gazette/" + strconv.Itoa(id) + "/", SourceURL: s.source(ctx, "journal", id)}
+		URL: Base + "/gazette/" + strconv.Itoa(id) + "/", SourceURL: s.source(ctx, "journal", id),
+		UpdatedAt: changedISO(s.changedOn(ctx, "gazette", id))}
 	for _, l := range laws {
 		out.Texts = append(out.Texts, s.lawSum(ctx, l, s.source(ctx, "law", l.ID)))
 	}

@@ -148,7 +148,8 @@ func (s *Server) lawsYear(w http.ResponseWriter, r *http.Request) {
 		Path:  pagePath(base, page),
 		Desc: s.trOr(r, fmt.Sprintf("The %s Lebanese laws, decrees and decisions issued in %s. Free.", thousands(total), label),
 			"years.laws_of_desc", thousands(total), label),
-		Data: List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase, Subhubs: subhubs, Back: "/laws/years/", BackLabel: s.trOr(r, "All years", "years.all_years"),
+		Data: List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase, Subhubs: subhubs, Back: "/laws/years/",
+			Updated: s.pageUpdated(r, s.latestChange(ctx, cond, args...), nil), BackLabel: s.trOr(r, "All years", "years.all_years"),
 			Eyebrow: s.trOr(r, "Legislation · "+label, "years.legislation_of", label), Heading: s.trOr(r, "Texts of "+label+".", "years.texts_of", label)}})
 }
 

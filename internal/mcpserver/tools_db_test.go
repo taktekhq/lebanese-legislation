@@ -108,6 +108,17 @@ func TestGetLaw(t *testing.T) {
 	if got := fmt.Sprint(pairs); got != "[[6 41] [7 42] [7-1 42]]" {
 		t.Errorf("sections: %s", got)
 	}
+	// updated_at is when the page last changed (page_state); none when unknown
+	if r := call(t, s, "get_law", map[string]any{"id": 100}).result; r["updated_at"] != "2026-10-30" {
+		t.Errorf("law 100 updated_at %v", r["updated_at"])
+	}
+	if r := call(t, s, "get_law", map[string]any{"id": 200}).result; r["updated_at"] != nil {
+		t.Errorf("law 200 has no page_state row, updated_at %v", r["updated_at"])
+	}
+	if r := call(t, s, "get_article", map[string]any{"law_id": 100, "number": "5"}).result; r["updated_at"] != "2026-10-30" ||
+		r["law"].(map[string]any)["updated_at"] != "2026-10-30" {
+		t.Errorf("article 5 of law 100: updated_at %v, law %v", r["updated_at"], r["law"])
+	}
 	if !call(t, s, "get_law", map[string]any{"id": 999999}).isError {
 		t.Error("a missing law is an error")
 	}
@@ -230,6 +241,12 @@ func TestGetRulingAndGazette(t *testing.T) {
 	g := call(t, s, "get_gazette_issue", map[string]any{"id": 500}).result
 	if g["number"] != "123" || !containsInt(ids(g["texts"]), 100) {
 		t.Errorf("gazette 500: %v", g)
+	}
+	if r := call(t, s, "get_ruling", map[string]any{"id": 9000}).result; r["updated_at"] != "2026-10-30" {
+		t.Errorf("ruling 9000 updated_at %v", r["updated_at"])
+	}
+	if g["updated_at"] != nil {
+		t.Errorf("gazette 500: updated_at %v from a date before the site existed", g["updated_at"])
 	}
 }
 

@@ -4,6 +4,7 @@
   <p class="eyebrow" data-reveal>{{t "hub.code.eyebrow"}}</p>
   <h1 class="page__title" data-reveal style="--d:60ms">{{.Heading}}</h1>
   <p class="lead" data-reveal style="--d:120ms">{{.Lead}}</p>
+  {{template "updated-line" .Updated}}
   <p><a class="link" href="{{lawURL $law}}">{{t "hub.code.read_text"}}</a> <span lang="ar">&middot; {{.Title}}</span></p>
 </section>
 <section class="wrap">

@@ -32,6 +32,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/taktekhq/lebanese-legislation/internal/calculatedcurrent"
+	"github.com/taktekhq/lebanese-legislation/internal/indexing"
 	"github.com/taktekhq/lebanese-legislation/internal/provenance"
 )
 
@@ -208,7 +209,10 @@ CREATE TABLE legislation (
   -- Unofficial English rendering of the title (legislation_title_en), written
   -- by a model from the Arabic title alone. The Arabic title is the official,
   -- more accurate one. NULL when none exists.
-  title_en         TEXT
+  title_en         TEXT,
+  -- The day the text's page last changed on the site (page_state), never the
+  -- text's own date; NULL when not known (indexing.ChangedOn).
+  updated_at       TEXT
 );
 CREATE INDEX idx_legislation_status ON legislation(status);
 CREATE INDEX idx_legislation_gazette_date ON legislation(gazette_date);
@@ -269,7 +273,8 @@ CREATE TABLE gazette_issue (
   id           INTEGER PRIMARY KEY,
   number       TEXT,
   published_on TEXT,
-  source_url   TEXT
+  source_url   TEXT,
+  updated_at   TEXT -- the day its page last changed on the site (page_state), NULL when not known
 );
 
 CREATE TABLE gazette_entry (
@@ -293,7 +298,8 @@ CREATE TABLE ruling (
   text_ar    TEXT,
   text_norm  TEXT NOT NULL,
   source_url TEXT,
-  pdf_url    TEXT -- the judgment's scan on the Lebanese University's site, when it has one
+  pdf_url    TEXT, -- the judgment's scan on the Lebanese University's site, when it has one
+  updated_at TEXT  -- the day its page last changed on the site (page_state), NULL when not known
 );
 CREATE INDEX idx_ruling_decided ON ruling(decided_on);
 
@@ -361,12 +367,13 @@ func exportLegislation(ctx context.Context, pool *pgxpool.Pool, ch *chunker, _ *
 		       (SELECT min(ge.issue_id) FROM gazette_entry ge WHERE ge.law_id = l.id),
 		       (SELECT count(*) FROM legislation_article a WHERE a.law_id = l.id),
 		       c.slug, c.name_en, c.name_fr,
-		       sp.url, te.title_en
+		       sp.url, te.title_en, ps.changed_at
 		FROM legislation l
 		JOIN legislation_kind k ON k.name_ar = l.kind
 		LEFT JOIN code c ON c.law_id = l.id
 		LEFT JOIN source_page sp ON sp.doc_type = 'law' AND sp.centre_id = l.id
 		LEFT JOIN legislation_title_en te ON te.law_id = l.id
+		LEFT JOIN page_state ps ON ps.kind = 'law' AND ps.id = l.id
 		ORDER BY l.id`)
 	if err != nil {
 		return 0, err
@@ -374,24 +381,25 @@ func exportLegislation(ctx context.Context, pool *pgxpool.Pool, ch *chunker, _ *
 	defer rows.Close()
 
 	b := newBatcher(ch, "legislation",
-		"id,kind,kind_en,number,issued_on,title,title_norm,status,gazette_number,gazette_date,gazette_issue_id,article_count,code_slug,code_name_en,code_name_fr,source_url,title_en")
+		"id,kind,kind_en,number,issued_on,title,title_norm,status,gazette_number,gazette_date,gazette_issue_id,article_count,code_slug,code_name_en,code_name_fr,source_url,title_en,updated_at")
 	n := 0
 	for rows.Next() {
 		var id int
 		var kind, title, status string
 		var kindEn, number, codeSlug, codeNameEn, codeNameFr, sourceURL, titleEn *string
-		var issuedOn, gazetteDate *time.Time
+		var issuedOn, gazetteDate, changed *time.Time
 		var gazetteNumber *string
 		var gazetteIssueID *int
 		var articleCount int
 		if err := rows.Scan(&id, &kind, &kindEn, &number, &issuedOn, &title, &status,
-			&gazetteNumber, &gazetteDate, &gazetteIssueID, &articleCount, &codeSlug, &codeNameEn, &codeNameFr, &sourceURL, &titleEn); err != nil {
+			&gazetteNumber, &gazetteDate, &gazetteIssueID, &articleCount, &codeSlug, &codeNameEn, &codeNameFr, &sourceURL, &titleEn, &changed); err != nil {
 			return n, err
 		}
 		tuple := "(" + strings.Join([]string{
 			sqlInt(id), sqlStr(kind), sqlNullStr(kindEn), sqlNullStr(number), sqlDate(issuedOn),
 			sqlStr(title), sqlStr(arNorm(title)), sqlStr(status), sqlNullStr(gazetteNumber), sqlDate(gazetteDate),
 			sqlNullInt(gazetteIssueID), sqlInt(articleCount), sqlNullStr(codeSlug), sqlNullStr(codeNameEn), sqlNullStr(codeNameFr), sqlNullStr(sourceURL), sqlNullStr(titleEn),
+			sqlNullStr(changedOn(changed)),
 		}, ",") + ")"
 		if err := b.add(tuple); err != nil {
 			return n, err
@@ -537,23 +545,24 @@ func exportArticleRows(rows pgx.Rows, ch *chunker, ov *oversizeWriter) (int, err
 
 func exportGazetteIssues(ctx context.Context, pool *pgxpool.Pool, ch *chunker, _ *oversizeWriter) (int, error) {
 	rows, err := pool.Query(ctx, `
-		SELECT g.id, g.number, g.published_on, sp.url
+		SELECT g.id, g.number, g.published_on, sp.url, ps.changed_at
 		FROM gazette_issue g LEFT JOIN source_page sp ON sp.doc_type = 'journal' AND sp.centre_id = g.id
+		LEFT JOIN page_state ps ON ps.kind = 'gazette' AND ps.id = g.id
 		ORDER BY g.id`)
 	if err != nil {
 		return 0, err
 	}
 	defer rows.Close()
-	b := newBatcher(ch, "gazette_issue", "id,number,published_on,source_url")
+	b := newBatcher(ch, "gazette_issue", "id,number,published_on,source_url,updated_at")
 	n := 0
 	for rows.Next() {
 		var id int
 		var number, sourceURL *string
-		var publishedOn *time.Time
-		if err := rows.Scan(&id, &number, &publishedOn, &sourceURL); err != nil {
+		var publishedOn, changed *time.Time
+		if err := rows.Scan(&id, &number, &publishedOn, &sourceURL, &changed); err != nil {
 			return n, err
 		}
-		tuple := "(" + strings.Join([]string{sqlInt(id), sqlNullStr(number), sqlDate(publishedOn), sqlNullStr(sourceURL)}, ",") + ")"
+		tuple := "(" + strings.Join([]string{sqlInt(id), sqlNullStr(number), sqlDate(publishedOn), sqlNullStr(sourceURL), sqlNullStr(changedOn(changed))}, ",") + ")"
 		if err := b.add(tuple); err != nil {
 			return n, err
 		}
@@ -592,17 +601,18 @@ func exportGazetteEntries(ctx context.Context, pool *pgxpool.Pool, ch *chunker, 
 func exportRulings(ctx context.Context, pool *pgxpool.Pool, ch *chunker, ov *oversizeWriter) (int, error) {
 	rows, err := pool.Query(ctx, `
 		SELECT r.id, r.court, c.name_en, r.number, r.year, r.decided_on, r.title, r.president, r.members, r.text_ar, sp.url,
-		       rf.ruling_id IS NOT NULL
+		       rf.ruling_id IS NOT NULL, ps.changed_at
 		FROM ruling r
 		LEFT JOIN court c ON c.name_ar = r.court
 		LEFT JOIN source_page sp ON sp.doc_type = 'ruling' AND sp.centre_id = r.id
 		LEFT JOIN ruling_file rf ON rf.ruling_id = r.id
+		LEFT JOIN page_state ps ON ps.kind = 'ruling' AND ps.id = r.id
 		ORDER BY r.id`)
 	if err != nil {
 		return 0, err
 	}
 	defer rows.Close()
-	rCols := []string{"id", "court", "court_en", "number", "year", "decided_on", "title", "president", "members", "text_ar", "text_norm", "source_url", "pdf_url"}
+	rCols := []string{"id", "court", "court_en", "number", "year", "decided_on", "title", "president", "members", "text_ar", "text_norm", "source_url", "pdf_url", "updated_at"}
 	searchCols := []string{"ruling_id", "text_norm"}
 	bR := newBatcher(ch, "ruling", strings.Join(rCols, ","))
 	bSearch := newBatcher(ch, "ruling_search", strings.Join(searchCols, ","))
@@ -611,11 +621,11 @@ func exportRulings(ctx context.Context, pool *pgxpool.Pool, ch *chunker, ov *ove
 		var id int
 		var court, courtEn, number, president, textAr, sourceURL *string
 		var year *int
-		var decidedOn *time.Time
+		var decidedOn, changed *time.Time
 		var title string
 		var members []string
 		var hasFile bool
-		if err := rows.Scan(&id, &court, &courtEn, &number, &year, &decidedOn, &title, &president, &members, &textAr, &sourceURL, &hasFile); err != nil {
+		if err := rows.Scan(&id, &court, &courtEn, &number, &year, &decidedOn, &title, &president, &members, &textAr, &sourceURL, &hasFile, &changed); err != nil {
 			return n, err
 		}
 		var pdfURL *string
@@ -627,7 +637,7 @@ func exportRulings(ctx context.Context, pool *pgxpool.Pool, ch *chunker, ov *ove
 		tuple := "(" + strings.Join([]string{
 			sqlInt(id), sqlNullStr(court), sqlNullStr(courtEn), sqlNullStr(number), sqlNullInt(year), sqlDate(decidedOn),
 			sqlStr(title), sqlNullStr(president), sqlJSONStrings(members), sqlNullStr(textAr), sqlStr(norm), sqlNullStr(sourceURL),
-			sqlNullStr(pdfURL),
+			sqlNullStr(pdfURL), sqlNullStr(changedOn(changed)),
 		}, ",") + ")"
 		searchTuple := "(" + sqlInt(id) + "," + sqlStr(norm) + ")"
 
@@ -640,6 +650,7 @@ func exportRulings(ctx context.Context, pool *pgxpool.Pool, ch *chunker, ov *ove
 			if err := ov.write("ruling", rCols, []any{
 				id, derefAny(court), derefAny(courtEn), derefAny(number), intAny(year), dateAny(decidedOn),
 				title, derefAny(president), membersJSON, derefAny(textAr), norm, derefAny(sourceURL), derefAny(pdfURL),
+				derefAny(changedOn(changed)),
 			}); err != nil {
 				return n, err
 			}
@@ -799,6 +810,20 @@ func sqlDate(t *time.Time) string {
 		return "NULL"
 	}
 	return sqlStr(t.Format("2006-01-02"))
+}
+
+// changedOn is a page_state date as the snapshot's updated_at, nil when
+// indexing.ChangedOn does not accept it (unknown, the text's own date seeded
+// by an old build, after today).
+func changedOn(t *time.Time) *string {
+	if t == nil {
+		return nil
+	}
+	d := indexing.ChangedOn(*t, time.Now())
+	if d == "" {
+		return nil
+	}
+	return &d
 }
 
 func sqlJSONStrings(a []string) string {

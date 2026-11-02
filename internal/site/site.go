@@ -55,6 +55,7 @@ type Server struct {
 	rulingDir     string                // the judgment PDFs, one per ruling: see rulingfiles.go
 	ph            *phClient             // server errors to PostHog: see phcapture.go
 	titles        titlesEn              // unofficial English titles for the JSON API: see apititles.go
+	pageDates     pageDates             // page_state dates for the JSON API's lists: see lastchanged.go
 	vocab         atomic.Pointer[vocab] // the title words, for typos and Latin spellings: see vocab.go
 
 	// Protection against overload (limiter.go), shared by /mcp (not wired
