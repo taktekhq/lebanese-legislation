@@ -127,3 +127,23 @@ Source text, machine readings and editorial corrections have different provenanc
 The structured dataset is rebuilt nightly. Individual tables can be incomplete. Judgment reading is still under way. Original court PDFs are available separately in [Lebanese Court Scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans).
 
 You can also use the [JSON API](https://lebaneselegislation.com/developers/) or [MCP server](https://lebaneselegislation.com/ai/). This dataset is not legal advice. Send corrections to nizar@taktek.io.
+
+## Vectors
+
+[`vectors/vectors.parquet`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet) contains 1,433,051 semantic search chunks,
+embedded with `gemini-embedding-001` in 768 dimensions. Columns: `id`,
+`document`, `model`, `hash`, `values` (`FLOAT[768]`). The file is published openly
+in the `taktekhq/lebanese-legislation` Hugging Face dataset.
+
+Read it directly with DuckDB:
+
+```sql
+SELECT id, document, model, hash, values
+FROM read_parquet('https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet')
+LIMIT 5;
+```
+
+The hosted search uses Cloudflare Vectorize index `lebleg-chunks` instead of
+storing vectors in PostgreSQL. The [vectors workflow](https://github.com/taktekhq/lebanese-legislation/blob/main/.github/workflows/vectors.yml)
+runs `build`, then `publish` and `vectorize`. `cmd/export-vectors` exports the
+chunks; `cmd/vectorize-sync` uploads only changed vectors on later runs.

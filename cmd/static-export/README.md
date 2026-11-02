@@ -3,8 +3,7 @@
 Writes the Lebanese Legislation website as plain files and checks the result
 against a live site. It does not render anything itself: it calls the site's own
 handler (`internal/site`) in process, against a PostgreSQL database, so an
-exported page is the page that handler serves. The design, the measurements and
-the open decisions are in [docs/static-export.md](../../docs/static-export.md).
+exported page is the page that handler serves. The deployed setup is described in [docs/static-export.md](../../docs/static-export.md).
 
 ```sh
 # 1. a database, from this repository's own data/ (about 6 minutes, psql only)
@@ -64,14 +63,14 @@ go run ./cmd/static-export old-urls  -out site -n 400 > old.txt
 go run ./cmd/static-export check-old -out site -live https://example.org -paths old.txt
 ```
 
-## Upload and shards (later phase)
+## Upload and shards
 
 `-r2-bucket` uploads changed pages to a Cloudflare R2 bucket instead of keeping
 them on disk (64 to 128 uploads in flight, retries, nothing written to the
 runner's disk), `-dry-run` counts what would be sent, `-shard i/n` renders one
 slice of the site so the work can be split across jobs. The keys are
 `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` in the environment, never flags.
-Nothing in this repository runs them yet.
+The [static-site workflow](../../.github/workflows/static-site.yml) runs 8 parallel shards to render about 760,000 pages from `data/` into R2 bucket `lebleg-site`. The JavaScript Worker in `workers/static-site` serves the files and ruling PDFs; dynamic requests go to one Cloudflare Container. See [architecture](../../docs/architecture.md).
 
 ## Tests
 

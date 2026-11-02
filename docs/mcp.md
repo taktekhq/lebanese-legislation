@@ -72,3 +72,13 @@ Clients that only run local servers can bridge with `mcp-remote`:
 ## Limits
 
 60 requests a minute per client IP.
+
+## Code and datasets
+
+The former private `taktekhq/lebaneselegislation` code, scraper, build pipeline,
+website and MCP are now in [this public repository](https://github.com/taktekhq/lebanese-legislation).
+See [architecture](architecture.md) for the website's Cloudflare
+Worker, R2 and container setup. Hosted semantic search uses Vectorize index
+`lebleg-chunks`; the vectors are openly available as
+[`vectors/vectors.parquet`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet). See the
+[DuckDB example](reference.md#vectors).

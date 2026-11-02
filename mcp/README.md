@@ -22,3 +22,13 @@ It listens on `127.0.0.1:8080` (`LISTEN_ADDR` changes it). In Compose it is on h
 
 - [`cloudflare/`](cloudflare/): run this image on Cloudflare Containers.
 - [`server.json`](../server.json) at the repository root is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry for the hosted server, and [`.mcp.json`](../.mcp.json) the client configuration.
+
+## Code and datasets
+
+The former private `taktekhq/lebaneselegislation` code, scraper, build pipeline,
+website and MCP are now in [this public repository](https://github.com/taktekhq/lebanese-legislation).
+See [architecture](../docs/architecture.md) for the website's Cloudflare
+Worker, R2 and container setup. Hosted semantic search uses Vectorize index
+`lebleg-chunks`; the vectors are openly available as
+[`vectors/vectors.parquet`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet). See the
+[DuckDB example](../docs/reference.md#vectors).

@@ -1,5 +1,14 @@
 # Changes
 
+## 1-2 November 2026
+
+- Cloudflare now serves the website: about 760,000 static pages from R2 bucket `lebleg-site`, rendered from `data/` by [static-site.yml](../.github/workflows/static-site.yml) with `cmd/static-export` in 8 parallel shards. The JavaScript Worker in `workers/static-site` also serves ruling PDFs from R2.
+- Search pages, `/api/v1/`, filters and Gazette scans go to one Cloudflare Container with PostgreSQL 18.6, a baked-in database and the Go website server. [origin.yml](../.github/workflows/origin.yml) deploys it.
+- Semantic vectors moved out of PostgreSQL into Cloudflare Vectorize index `lebleg-chunks`: 1,433,051 chunks, 768 dimensions, `gemini-embedding-001`. [vectors.yml](../.github/workflows/vectors.yml) runs `build` then `publish` and `vectorize`, using `cmd/export-vectors` and `cmd/vectorize-sync`. The vectors are openly published as `vectors/vectors.parquet` on Hugging Face; later syncs upload only changed vectors.
+- The former private `taktekhq/lebaneselegislation` repository is folded into this one: code, scraper, build pipeline, website and MCP.
+
+See [architecture](architecture.md) and the [vectors example](reference.md#vectors).
+
 ## Unreleased
 
 The website is now the code LebaneseLegislation.com runs, not a copy from 30 October.

@@ -8,6 +8,10 @@ The existing Parquet dataset remains the portable data distribution. This projec
 
 Four images target Linux AMD64 and ARM64: `lebanese-legislation-db`, `lebanese-legislation-api`, `lebanese-legislation-mcp` and `lebanese-legislation-web`. The website, API and MCP are one Go codebase ([`internal/`](../internal/)) built as three binaries ([`web/`](../web/), [`api/`](../api/), [`mcp/`](../mcp/)). The release commands in [`cmd/`](../cmd/README.md#the-postgresql-release) restore, rebuild and publish the database.
 
+The hosted site uses Cloudflare R2, a Worker and one Container, with semantic
+vectors in Vectorize. See [architecture](architecture.md). The pgvector
+instructions below describe local services and downloadable release snapshots.
+
 ## Public downloads and related resources
 
 The PostgreSQL dump lives only on Hugging Face, in the dataset's [`releases/` folder](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases). Each release is `releases/<release-id>/corpus.dump` with its `manifest.json`, which records the SHA-256, counts and versions. `releases/latest.json` points to the newest verified release. Dataset release IDs such as `2026-10-30.2` and software versions such as `0.2.0` are separate.
@@ -69,7 +73,7 @@ A failed first import never creates a readiness receipt. Restarting an initializ
 
 Older version tags stay published. See [changes](changes.md).
 
-Database data is downloaded separately, not baked into the Docker image. The dump stores index definitions; PostgreSQL constructs the HNSW index during restore. It does not contain a portable copy of PostgreSQL's physical index files.
+For the local service images, database data is downloaded separately. The hosted Cloudflare container has its database baked into the image. The dump stores index definitions; PostgreSQL constructs the HNSW index during restore. It does not contain a portable copy of PostgreSQL's physical index files.
 
 The release is built only from the public tables of [`data/`](../data/) at a pinned commit, the same tables as the Parquet dataset. It does not contain private website tables, user queries, analytics, credentials or website-only explanations. Exported views become snapshot tables. `source_documents` is a derived read model for this immutable snapshot; editing raw tables does not automatically update it or its vectors. Article retrieval follows the exported in-force view at the stated date; the raw tables retain the wider historical corpus.
 
@@ -78,7 +82,7 @@ When present, `GET /api/v1/law/{id}/article/{number}/` and MCP `get_article` inc
 ## How retrieval works
 
 1. Search matches original text, titles and explicit citations in PostgreSQL first: `GET /api/v1/search/` and MCP `search_legislation`.
-2. With `semantic=true` (API) or `semantic: true` (MCP), and a `GEMINI_API_KEY` on the server, Gemini embeds the question with `gemini-embedding-001` (768 dimensions) and PostgreSQL compares it with the saved passage vectors in `semantic_chunks` (`halfvec(768)`). Found passages come back as `related`. Without a key the result says `"semantic": "unavailable"`. Adding `select=true` lets Gemini keep only the passages that answer the question; it returns passage IDs, never wording.
+2. With `semantic=true` (API) or `semantic: true` (MCP), and a `GEMINI_API_KEY` on the server, Gemini embeds the question with `gemini-embedding-001` (768 dimensions) and the hosted service searches Cloudflare Vectorize index `lebleg-chunks`. Local pgvector services compare against `semantic_chunks` (`halfvec(768)`). Found passages come back as `related`. Without a key the result says `"semantic": "unavailable"`. Adding `select=true` lets Gemini keep only the passages that answer the question; it returns passage IDs, never wording.
 3. Every passage is reloaded from the source text and hash-checked before it is returned, with a link to its source. The website's search page also uses Gemini to rewrite a question into Arabic search terms.
 
 A missing explicit citation is not silently replaced with a nearby semantic match. An absent or failed provider leaves ordinary search available. Retrieval can miss relevant material or return irrelevant passages. Source links and exact quotations make checking possible; they do not establish legal correctness or current legal status. Scanned ruling pages keep their extraction provenance and confidence fields. OCR can contain errors; consult the linked originals.
@@ -179,3 +183,23 @@ Set `LEBLEG_TEST_DB_IMAGE` to a locally built DB target to run the synthetic fir
 Code: [MIT](../LICENSE), copyright Taktek and Nizar Mahmoud.
 
 The dataset has its own licence, `other: public-texts-credit-the-centre`. Credit the **Centre for Research and Studies in Legal Informatics, Lebanese University** for the legal texts. Dataset structure: Taktek, LLC. The code's MIT licence does not replace the dataset's terms. Preserve source provenance and the distinction between Arabic legal texts and unofficial discovery aids.
+
+## Vectors
+
+[`vectors/vectors.parquet`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet) contains 1,433,051 semantic search chunks,
+embedded with `gemini-embedding-001` in 768 dimensions. Columns: `id`,
+`document`, `model`, `hash`, `values` (`FLOAT[768]`). The file is published openly
+in the `taktekhq/lebanese-legislation` Hugging Face dataset.
+
+Read it directly with DuckDB:
+
+```sql
+SELECT id, document, model, hash, values
+FROM read_parquet('https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet')
+LIMIT 5;
+```
+
+The hosted search uses Cloudflare Vectorize index `lebleg-chunks` instead of
+storing vectors in PostgreSQL. The [vectors workflow](https://github.com/taktekhq/lebanese-legislation/blob/main/.github/workflows/vectors.yml)
+runs `build`, then `publish` and `vectorize`. `cmd/export-vectors` exports the
+chunks; `cmd/vectorize-sync` uploads only changed vectors on later runs.

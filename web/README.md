@@ -2,7 +2,20 @@
 
 The Go website behind [LebaneseLegislation.com](https://lebaneselegislation.com/), with Arabic and English pages and search. It is published as `ghcr.io/taktekhq/lebanese-legislation-web`, and `./start` at the repository root runs it on port 8080 against the public database. The code is shared with the [API](../api/) and the [MCP server](../mcp/) in [`internal/`](../internal/).
 
-This is the code LebaneseLegislation.com runs, with its project journal, topic pages and usage record.
+Cloudflare serves about 760,000 static pages rendered from `data/` by
+[`static-site.yml`](../.github/workflows/static-site.yml) and `cmd/static-export`
+in 8 parallel shards. The JavaScript Worker in `workers/static-site` serves the
+pages and ruling PDFs from R2 bucket `lebleg-site`. Search pages, `/api/v1/`,
+filters and Gazette scans go to one Cloudflare Container with PostgreSQL 18.6,
+a baked-in database and this Go website server. The
+[origin workflow](../.github/workflows/origin.yml) deploys it.
+
+Hosted semantic vectors are in Cloudflare Vectorize index `lebleg-chunks`.
+The [vectors workflow](../.github/workflows/vectors.yml) publishes them openly
+as [`vectors/vectors.parquet`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet)
+on Hugging Face. See [architecture](../docs/architecture.md) and the
+[DuckDB example](../docs/reference.md#vectors). The pgvector settings below
+remain available for local services.
 
 Run it from the repository root with Go 1.27.1 or newer:
 
