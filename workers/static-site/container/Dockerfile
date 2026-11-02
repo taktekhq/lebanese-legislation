@@ -83,6 +83,8 @@ du -sh "$PGDATA" "$PGDATA/pg_wal" /scans
 rm -f /tmp/restore.log
 SH
 COPY --from=web /server /usr/local/bin/lebleg-web
+# The Postgres base has no CA bundle; the server calls Gemini and Vectorize over HTTPS.
+COPY --from=web /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY build/src/THIRD_PARTY_NOTICES.txt /THIRD_PARTY_NOTICES.txt
 RUN <<'SH'
 set -eu
