@@ -25,10 +25,6 @@ new_sqlite_classes = ["Origin"]
 tag = "v2"
 new_sqlite_classes = ["OriginBlue", "OriginGreen"]
 
-[[migrations]]
-tag = "v3"
-deleted_classes = ["OriginBlue", "OriginGreen", "Origin"]
-
 [[r2_buckets]]
 binding = "SITE"
 bucket_name = "lebleg-site"

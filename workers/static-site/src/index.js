@@ -1,3 +1,8 @@
+import { DurableObject } from "cloudflare:workers";
+// Empty placeholders for the old container classes until their migration can delete them.
+export class Origin extends DurableObject {}
+export class OriginBlue extends DurableObject {}
+export class OriginGreen extends DurableObject {}
 // lebaneselegislation.com from files in R2.
 //
 // A request is answered from the bucket when it is a GET or HEAD for a page
