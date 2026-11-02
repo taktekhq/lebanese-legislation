@@ -52,7 +52,7 @@ function originStub(env) {
   return env.ORIGIN.get(env.ORIGIN.idFromName("eu-1"), { locationHint: "weur" });
 }
 
-export async function originFetch(request, env) {
+export async function originFetch(request, env, ctx) {
   const url = new URL(request.url);
   if (url.pathname.startsWith("/ph/")) {
     const host = url.pathname.startsWith("/ph/static/")
@@ -94,7 +94,17 @@ export async function originFetch(request, env) {
   }
   if (env.ORIGIN_MODE === "hetzner" && !testing) return fetch(request);
   try {
-    const res = await originStub(env).fetch(request);
+    // API answers are public and say how long they keep (Cache-Control), so
+    // repeats are served from the edge and never reach Postgres.
+    const cacheable = request.method === "GET" && /^\/(en\/)?api\/v1\//.test(url.pathname);
+    const cacheKey = new Request(url.toString(), { method: "GET" });
+    let res = cacheable ? await caches.default.match(cacheKey) : undefined;
+    if (!res) {
+      res = await originStub(env).fetch(request);
+      if (cacheable && res.status === 200 && !/no-store|private/.test(res.headers.get("Cache-Control") || "")) {
+        ctx?.waitUntil(caches.default.put(cacheKey, res.clone()));
+      }
+    }
     const headers = new Headers(res.headers);
     for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
       if (!headers.has(key)) headers.set(key, value);
