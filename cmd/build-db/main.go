@@ -21,7 +21,7 @@ func main() {
 	dsn := flag.String("db", cli.DefaultDSN(), "Postgres connection string")
 	dir := flag.String("archive", "archive", "the git-tracked archive directory")
 	workers := flag.Int("workers", 4, "parallel parsers (keep low on a small machine)")
-	only := flag.String("only", "", `rerun one step on the database as it is ("amendments", "graph", "ruling-files", "scan-gazette", "indexing")`)
+	only := flag.String("only", "", `rerun one step on the database as it is ("amendments", "graph", "ruling-files", "scan-gazette", "indexing", "english")`)
 	citations := flag.String("citations", "db/model/citations.jsonl", "the model's citations (the cite command)")
 	rulingCitations := flag.String("ruling-citations", modelout.DefaultRulingCitations, "the model's reading of rulings, comma-separated files: the texts each applies, cites or interprets (citeagy -source rulings)")
 	scans := flag.String("scans", "manual/scans", "texts the Centre has not published yet, read from Gazette scans (a lebgazette sader-bundle folder; skipped when absent)")
