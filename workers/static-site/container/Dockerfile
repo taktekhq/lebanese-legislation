@@ -90,6 +90,8 @@ cat > /usr/local/bin/start <<'START'
 #!/bin/sh
 set -eu
 export LEBLEG_VECTOR_DSN="${LEBLEG_VECTOR_DSN:-host=127.0.0.1 user=lebleg_web dbname=lebleg_search}"
+# /var/run starts empty on Cloudflare (Docker keeps the image's copy).
+install -d -o postgres -g postgres -m 2775 /var/run/postgresql
 gosu postgres postgres -D "$PGDATA" \
   -c listen_addresses=127.0.0.1 -c shared_buffers=1GB \
   -c max_connections=50 -c default_transaction_read_only=on &
