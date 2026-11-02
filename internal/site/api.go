@@ -69,20 +69,36 @@ func (s *Server) apiLimited(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// apiEndpoint is one GET route of the API: its path as /openapi.json names
+// it (openapi.go), and its handler.
+type apiEndpoint struct {
+	path string
+	h    http.HandlerFunc
+}
+
+// apiEndpoints are every route of /api/v1/. openapi.json describes each one;
+// a test holds them to it.
+func (s *Server) apiEndpoints() []apiEndpoint {
+	return []apiEndpoint{
+		{"/api/v1/", s.apiRoot},
+		{"/api/v1/search/", s.apiLimited(s.apiSearch)},
+		{"/api/v1/law/{id}/", s.apiLimited(s.apiLaw)},
+		{"/api/v1/law/{id}/calculated-current/", s.apiLimited(s.apiCalculatedCurrent)},
+		{"/api/v1/law/{id}/article/{n}/", s.apiLimited(s.apiArticle)},
+		{"/api/v1/ruling/{id}/", s.apiLimited(s.apiRuling)},
+		{"/api/v1/gazette/{id}/", s.apiLimited(s.apiGazette)},
+		{"/api/v1/laws/", s.apiLimited(s.apiLaws)},
+		{"/api/v1/gazette/", s.apiLimited(s.apiGazettes)},
+	}
+}
+
 func (s *Server) apiRoutes() {
 	if s.isStatic {
 		return
 	}
-	m := s.mux
-	m.HandleFunc("GET /api/v1/{$}", s.apiRoot)
-	m.HandleFunc("GET /api/v1/search/{$}", s.apiLimited(s.apiSearch))
-	m.HandleFunc("GET /api/v1/law/{id}/{$}", s.apiLimited(s.apiLaw))
-	m.HandleFunc("GET /api/v1/law/{id}/calculated-current/{$}", s.apiLimited(s.apiCalculatedCurrent))
-	m.HandleFunc("GET /api/v1/law/{id}/article/{n}/{$}", s.apiLimited(s.apiArticle))
-	m.HandleFunc("GET /api/v1/ruling/{id}/{$}", s.apiLimited(s.apiRuling))
-	m.HandleFunc("GET /api/v1/gazette/{id}/{$}", s.apiLimited(s.apiGazette))
-	m.HandleFunc("GET /api/v1/laws/{$}", s.apiLimited(s.apiLaws))
-	m.HandleFunc("GET /api/v1/gazette/{$}", s.apiLimited(s.apiGazettes))
+	for _, e := range s.apiEndpoints() {
+		s.mux.HandleFunc("GET "+e.path+"{$}", e.h)
+	}
 }
 
 type apiErrorBody struct {
@@ -117,9 +133,10 @@ func (s *Server) apiRoot(w http.ResponseWriter, r *http.Request) {
 		"name":       "Lebanese Legislation API",
 		"version":    "v1",
 		"docs":       Base + "/developers/",
+		"openapi":    Base + "/openapi.json",
 		"mcp":        Base + "/mcp",
 		"not_advice": notLegalAdvice,
-		"notes":      []string{titleEnNote, "search: when q finds nothing it is read again (English and French terms to Arabic, names, a year, a typo) and searched_instead says what was searched."},
+		"notes":      []string{titleEnNote, updatedAtNote, "search: when q finds nothing it is read again (English and French terms to Arabic, names, a year, a typo) and searched_instead says what was searched."},
 		"endpoints": []string{
 			"GET /api/v1/search/?q=&type=laws|rulings|gazette|articles&year=&limit=&offset=",
 			"GET /api/v1/law/{id}/",

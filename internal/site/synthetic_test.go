@@ -104,4 +104,24 @@ func TestSyntheticServing(t *testing.T) {
 			t.Fatalf("MCP get_law: no updated_at: %s", rec.Body.String())
 		}
 	}
+	// Every path /openapi.json describes is a JSON route of the server.
+	var spec struct {
+		Paths map[string]any `json:"paths"`
+	}
+	if err := json.Unmarshal(openapiJSON, &spec); err != nil {
+		t.Fatal(err)
+	}
+	for p := range spec.Paths {
+		path := strings.NewReplacer("{id}", "1", "{n}", "1").Replace(p)
+		if strings.Contains(p, "calculated-current") {
+			path = "/api/v1/law/244565/calculated-current/"
+		}
+		rec := httptest.NewRecorder()
+		req := httptest.NewRequest("GET", path+"?q=x", nil)
+		req.Header.Set("CF-Connecting-IP", "198.51.100.7") // a client of its own: the earlier requests used up the default one's allowance
+		s.ServeHTTP(rec, req)
+		if (rec.Code != 200 && rec.Code != 404) || !strings.HasPrefix(rec.Header().Get("Content-Type"), "application/json") || !json.Valid(rec.Body.Bytes()) {
+			t.Errorf("GET %s: %d %q, not a JSON answer", path, rec.Code, rec.Header().Get("Content-Type"))
+		}
+	}
 }

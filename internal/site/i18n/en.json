@@ -461,6 +461,8 @@
   "ai.list_p": "Everything published since January 2025: since=2025-01. since and until take YYYY, YYYY-MM or YYYY-MM-DD, inclusive. Up to 100 a page; follow next_offset while it is there. The MCP tools list_legislation and list_gazette_issues take the same parameters.",
   "ai.links_p": "get_links takes offset, order (newest or oldest) and, for a law, scope: \"all\" (the default) adds the links of its articles, \"law\" is the law alone. It answers with total and next_offset.",
   "ai.amended_p": "In get_law and /api/v1/law/{id}/, amended_by and amended list each text with its relation, its date and articles: the articles of this law it changes (of the other text, for amended). No articles means the change is to the text as a whole.",
+  "ai.openapi_p": "The whole API, every endpoint, parameter and field, as an OpenAPI 3.1 description for code generators and AI agents:",
+  "ai.updated_p": "updated_at is the day a record's page last changed on this site: an amendment in force, a ruling's reading, a correction. It is never the text's own date, and it is absent when we do not know it.",
   "ai.json_api_h2": "The JSON API",
   "ai.json_api_p": "The same data, over plain HTTP, for anything that isn't an MCP client:",
   "ai.limits_h2": "Limits",

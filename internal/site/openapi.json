@@ -1,0 +1,497 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Lebanese Legislation API",
+    "version": "v1",
+    "summary": "Read-only JSON API over every Lebanese law, decree, article, court ruling and Official Gazette issue.",
+    "description": "Free, no key. Every text field is copied from the source as the Lebanese University's Centre for Research and Studies in Legal Informatics published it; nothing is paraphrased. Not legal advice. updated_at is the day a record's page last changed on the site (an amendment in force, a ruling's reading, a correction), never the text's own date; it is absent when not known. title_en is an unofficial English rendering of the Arabic title, written by a model; the Arabic title is official. Responses are cached for 60 seconds. Each client may make a limited number of requests a minute: on 429 wait for Retry-After.",
+    "license": { "name": "MIT (code); texts keep their own rights and attribution", "identifier": "MIT" },
+    "contact": { "name": "Lebanese Legislation", "url": "https://lebaneselegislation.com/developers/", "email": "nizar@taktek.io" }
+  },
+  "servers": [{ "url": "https://lebaneselegislation.com" }],
+  "externalDocs": { "description": "Developer guide, and the MCP server at /mcp", "url": "https://lebaneselegislation.com/developers/" },
+  "paths": {
+    "/api/v1/": {
+      "get": {
+        "operationId": "apiRoot",
+        "summary": "What the API offers: its endpoints, docs and MCP server.",
+        "responses": {
+          "200": { "description": "The API's index.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Root" } } } }
+        }
+      }
+    },
+    "/api/v1/search/": {
+      "get": {
+        "operationId": "search",
+        "summary": "Search laws, articles, rulings and Gazette issues by keyword or citation.",
+        "description": "When q finds nothing it is read again (English and French terms to Arabic, names, a year, a typo) and searched_instead says what was searched.",
+        "parameters": [
+          { "name": "q", "in": "query", "required": true, "description": "The words or citation to find, under 200 characters.", "schema": { "type": "string", "maxLength": 199 }, "example": "قانون العمل" },
+          { "name": "type", "in": "query", "description": "Search one kind only; all four when absent.", "schema": { "type": "string", "enum": ["laws", "articles", "rulings", "gazette"] } },
+          { "name": "year", "in": "query", "description": "Only texts of this year (laws).", "schema": { "type": "integer", "minimum": 0, "maximum": 2100 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 50, "default": 10 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0, "maximum": 10000, "default": 0 } },
+          { "name": "semantic", "in": "query", "description": "true adds passages related by meaning (related), copied from the source texts.", "schema": { "type": "boolean", "default": false } },
+          { "name": "select", "in": "query", "description": "With semantic, keep only the related passages that answer q.", "schema": { "type": "boolean", "default": false } }
+        ],
+        "responses": {
+          "200": { "description": "What was found.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SearchResult" } } } },
+          "429": { "$ref": "#/components/responses/TooMany" },
+          "503": { "$ref": "#/components/responses/Busy" }
+        }
+      }
+    },
+    "/api/v1/law/{id}/": {
+      "get": {
+        "operationId": "getLaw",
+        "summary": "A law, decree or other text: its metadata, outline and amendments.",
+        "parameters": [{ "$ref": "#/components/parameters/LawID" }],
+        "responses": {
+          "200": { "description": "The text.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LawDetail" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/TooMany" },
+          "503": { "$ref": "#/components/responses/Busy" }
+        }
+      }
+    },
+    "/api/v1/law/{id}/calculated-current/": {
+      "get": {
+        "operationId": "getCalculatedCurrent",
+        "summary": "The Code of Civil Procedure's monetary amounts as calculated under decree 13909/2024 (law 244565 only).",
+        "description": "A calculation, not published wording: cite its authority.",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "const": 244565 }, "example": 244565 }],
+        "responses": {
+          "200": { "description": "The calculated articles, by number; empty when none applies.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CalculatedCurrentList" } } } },
+          "404": { "description": "Any other text." },
+          "429": { "$ref": "#/components/responses/TooMany" },
+          "503": { "description": "The text could not be loaded, or the server is busy." }
+        }
+      }
+    },
+    "/api/v1/law/{id}/article/{n}/": {
+      "get": {
+        "operationId": "getArticle",
+        "summary": "One article's text in force, its versions, the texts that changed it and the rulings that cite it.",
+        "parameters": [
+          { "$ref": "#/components/parameters/LawID" },
+          { "name": "n", "in": "path", "required": true, "description": "The article's number as printed, spaces as hyphens (\"12-مكرر\").", "schema": { "type": "string" }, "example": "1" }
+        ],
+        "responses": {
+          "200": { "description": "The article.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ArticleDetail" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/TooMany" },
+          "503": { "$ref": "#/components/responses/Busy" }
+        }
+      }
+    },
+    "/api/v1/ruling/{id}/": {
+      "get": {
+        "operationId": "getRuling",
+        "summary": "A court ruling: its text, or the machine reading of its scanned judgment, page by page.",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "minimum": 1 }, "example": 1 }],
+        "responses": {
+          "200": { "description": "The ruling.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RulingDetail" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/TooMany" },
+          "503": { "$ref": "#/components/responses/Busy" }
+        }
+      }
+    },
+    "/api/v1/gazette/{id}/": {
+      "get": {
+        "operationId": "getGazetteIssue",
+        "summary": "An Official Gazette issue and the texts it published.",
+        "parameters": [{ "$ref": "#/components/parameters/IssueID" }],
+        "responses": {
+          "200": { "description": "The issue.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GazetteDetail" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/TooMany" },
+          "503": { "$ref": "#/components/responses/Busy" }
+        }
+      }
+    },
+    "/api/v1/laws/": {
+      "get": {
+        "operationId": "listLaws",
+        "summary": "Texts by date (Gazette date, else the text's date), newest first by default.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Since" },
+          { "$ref": "#/components/parameters/Until" },
+          { "name": "kind", "in": "query", "description": "The kind, in Arabic (\"قانون\") or English (\"Law\").", "schema": { "type": "string" } },
+          { "$ref": "#/components/parameters/Order" },
+          { "$ref": "#/components/parameters/ListLimit" },
+          { "$ref": "#/components/parameters/Offset" }
+        ],
+        "responses": {
+          "200": { "description": "One page of texts.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LawList" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "429": { "$ref": "#/components/responses/TooMany" },
+          "503": { "$ref": "#/components/responses/Busy" }
+        }
+      }
+    },
+    "/api/v1/gazette/": {
+      "get": {
+        "operationId": "listGazetteIssues",
+        "summary": "Official Gazette issues by date, newest first by default.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Since" },
+          { "$ref": "#/components/parameters/Until" },
+          { "$ref": "#/components/parameters/Order" },
+          { "$ref": "#/components/parameters/ListLimit" },
+          { "$ref": "#/components/parameters/Offset" }
+        ],
+        "responses": {
+          "200": { "description": "One page of issues.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/IssueList" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "429": { "$ref": "#/components/responses/TooMany" },
+          "503": { "$ref": "#/components/responses/Busy" }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "LawID": { "name": "id", "in": "path", "required": true, "description": "The text's id, as in its address (/law/{id}/).", "schema": { "type": "integer", "minimum": 1 }, "example": 1 },
+      "IssueID": { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "minimum": 1 }, "example": 1 },
+      "Since": { "name": "since", "in": "query", "description": "From this day, month or year (YYYY, YYYY-MM or YYYY-MM-DD), inclusive.", "schema": { "type": "string" }, "example": "2024" },
+      "Until": { "name": "until", "in": "query", "description": "To this day, month or year, inclusive.", "schema": { "type": "string" } },
+      "Order": { "name": "order", "in": "query", "schema": { "type": "string", "enum": ["newest", "oldest"], "default": "newest" } },
+      "ListLimit": { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } },
+      "Offset": { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0, "default": 0 } }
+    },
+    "responses": {
+      "NotFound": { "description": "No such record.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "BadRequest": { "description": "A parameter could not be read.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "TooMany": { "description": "Too many requests from this client: wait for Retry-After seconds.", "headers": { "Retry-After": { "schema": { "type": "integer" } } }, "content": { "text/plain": { "schema": { "type": "string" } } } },
+      "Busy": { "description": "The server is busy: try again shortly.", "headers": { "Retry-After": { "schema": { "type": "integer" } } }, "content": { "text/plain": { "schema": { "type": "string" } } } }
+    },
+    "schemas": {
+      "Date": { "type": "string", "format": "date", "examples": ["2026-11-02"] },
+      "UpdatedAt": { "type": "string", "format": "date", "description": "The day the record's page last changed on the site (page_state): an amendment in force, a ruling's reading, a correction. Never the text's own date. Absent when not known." },
+      "Error": { "type": "object", "required": ["error"], "properties": { "error": { "type": "string" } } },
+      "Root": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "docs": { "type": "string", "format": "uri" },
+          "openapi": { "type": "string", "format": "uri" },
+          "mcp": { "type": "string", "format": "uri" },
+          "not_advice": { "type": "string" },
+          "notes": { "type": "array", "items": { "type": "string" } },
+          "endpoints": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "LawSummary": {
+        "type": "object",
+        "description": "A text's identity, without its text.",
+        "required": ["id", "kind", "title", "status", "article_count", "url"],
+        "properties": {
+          "id": { "type": "integer" },
+          "kind": { "type": "string", "description": "In Arabic, as the Centre names it." },
+          "kind_en": { "type": "string" },
+          "number": { "type": "string" },
+          "issued_on": { "$ref": "#/components/schemas/Date" },
+          "title": { "type": "string", "description": "The official Arabic title." },
+          "title_en": { "type": "string", "description": "Unofficial English title, written by a model from the Arabic title." },
+          "status": { "type": "string", "enum": ["in_force", "repealed"] },
+          "article_count": { "type": "integer" },
+          "code": { "type": "string", "description": "The curated code's short name, e.g. \"Code of Obligations and Contracts\"." },
+          "url": { "type": "string", "format": "uri" },
+          "source_url": { "type": "string", "format": "uri" },
+          "updated_at": { "$ref": "#/components/schemas/UpdatedAt" }
+        }
+      },
+      "ArticleHit": {
+        "type": "object",
+        "required": ["law", "article_number", "snippet", "url"],
+        "properties": {
+          "calculated_current": { "$ref": "#/components/schemas/CalculatedCurrent" },
+          "law": { "$ref": "#/components/schemas/LawSummary" },
+          "article_number": { "type": "string" },
+          "snippet": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "matched_calculated_current": { "type": "boolean" },
+          "cited": { "type": "boolean", "description": "The query cites this article, so it comes first." }
+        }
+      },
+      "RulingHit": {
+        "type": "object",
+        "required": ["id", "title", "url"],
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "court": { "type": "string" },
+          "decided_on": { "$ref": "#/components/schemas/Date" },
+          "snippet": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "pdf_url": { "type": "string", "format": "uri", "description": "The judgment's scan on the Lebanese University's site." },
+          "judgment_page": { "type": "integer", "description": "Only the machine reading matched: the page the snippet is from." },
+          "updated_at": { "$ref": "#/components/schemas/UpdatedAt" }
+        }
+      },
+      "GazetteHit": {
+        "type": "object",
+        "required": ["id", "url"],
+        "properties": {
+          "id": { "type": "integer" },
+          "number": { "type": "string" },
+          "published_on": { "$ref": "#/components/schemas/Date" },
+          "url": { "type": "string", "format": "uri" },
+          "updated_at": { "$ref": "#/components/schemas/UpdatedAt" }
+        }
+      },
+      "Passage": {
+        "type": "object",
+        "required": ["id", "title", "text", "url"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "text": { "type": "string" },
+          "lang": { "type": "string" },
+          "status": { "type": "string" },
+          "unofficial": { "type": "boolean" },
+          "url": { "type": "string", "format": "uri" }
+        }
+      },
+      "SearchResult": {
+        "type": "object",
+        "required": ["q", "law_count", "article_count", "ruling_count", "gazette_count"],
+        "properties": {
+          "q": { "type": "string" },
+          "laws": { "type": "array", "items": { "$ref": "#/components/schemas/LawSummary" } },
+          "law_count": { "type": "integer" },
+          "articles": { "type": "array", "items": { "$ref": "#/components/schemas/ArticleHit" } },
+          "article_count": { "type": "integer" },
+          "rulings": { "type": "array", "items": { "$ref": "#/components/schemas/RulingHit" } },
+          "ruling_count": { "type": "integer" },
+          "gazette": { "type": "array", "items": { "$ref": "#/components/schemas/GazetteHit" } },
+          "gazette_count": { "type": "integer" },
+          "searched_instead": { "type": "string" },
+          "searched_instead_kind": { "type": "string", "enum": ["translated", "adjusted"] },
+          "related": { "type": "array", "items": { "$ref": "#/components/schemas/Passage" } },
+          "semantic": { "type": "string", "enum": ["ok", "unavailable"] },
+          "selection": { "type": "string", "enum": ["ok", "unavailable"] }
+        }
+      },
+      "LawChange": {
+        "type": "object",
+        "required": ["relation", "verb", "law"],
+        "properties": {
+          "relation": { "type": "string" },
+          "verb": { "type": "string" },
+          "law": { "$ref": "#/components/schemas/LawSummary" },
+          "effective_on": { "$ref": "#/components/schemas/Date" },
+          "articles": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "LawDetail": {
+        "allOf": [
+          { "$ref": "#/components/schemas/LawSummary" },
+          {
+            "type": "object",
+            "required": ["not_legal_advice"],
+            "properties": {
+              "gazette_number": { "type": "string" },
+              "gazette_date": { "$ref": "#/components/schemas/Date" },
+              "gazette_issue_id": { "type": "integer" },
+              "preamble": { "type": "string" },
+              "explanatory_note": { "type": "string" },
+              "closing": { "type": "string" },
+              "table_of_contents": {
+                "type": "array",
+                "items": { "type": "object", "required": ["id", "depth", "heading"], "properties": { "id": { "type": "integer" }, "depth": { "type": "integer" }, "heading": { "type": "string" }, "note": { "type": "string" } } }
+              },
+              "articles": {
+                "type": "array",
+                "items": { "type": "object", "required": ["position", "number", "url"], "properties": { "position": { "type": "integer" }, "number": { "type": "string" }, "section_id": { "type": "integer" }, "url": { "type": "string", "format": "uri" } } }
+              },
+              "amended_by": { "type": "array", "items": { "$ref": "#/components/schemas/LawChange" } },
+              "amended": { "type": "array", "items": { "$ref": "#/components/schemas/LawChange" } },
+              "not_legal_advice": { "type": "string" }
+            }
+          }
+        ]
+      },
+      "CalculatedCurrent": {
+        "type": "object",
+        "description": "A monetary amount calculated under decree 13909/2024 (multiplier 50, effective 2024-09-19). Not published wording: cite authority.url.",
+        "additionalProperties": true
+      },
+      "CalculatedCurrentList": {
+        "type": "object",
+        "required": ["law_id", "articles"],
+        "properties": {
+          "law_id": { "type": "integer" },
+          "articles": { "type": "object", "additionalProperties": { "$ref": "#/components/schemas/CalculatedCurrent" } }
+        }
+      },
+      "ArticleDetail": {
+        "type": "object",
+        "required": ["law", "number", "text_ar", "url", "not_legal_advice"],
+        "properties": {
+          "calculated_current": { "$ref": "#/components/schemas/CalculatedCurrent" },
+          "law": { "$ref": "#/components/schemas/LawSummary" },
+          "number": { "type": "string" },
+          "note": { "type": "string" },
+          "centre_error": { "type": "object", "properties": { "en": { "type": "string" }, "ar": { "type": "string" } } },
+          "text_ar": { "type": "string", "description": "The wording in force today, as the page prints it." },
+          "text_fr": { "type": "string" },
+          "centre_text_ar": { "type": "string", "description": "The Centre's wording, when an amendment replaced it." },
+          "centre_text_fr": { "type": "string" },
+          "in_force_from": { "$ref": "#/components/schemas/Date" },
+          "versions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["major", "minor", "state", "text_source"],
+              "properties": {
+                "major": { "type": "integer" },
+                "minor": { "type": "integer" },
+                "valid_from": { "$ref": "#/components/schemas/Date" },
+                "valid_to": { "$ref": "#/components/schemas/Date" },
+                "state": { "type": "string" },
+                "text_ar": { "type": "string" },
+                "text_source": { "type": "string" },
+                "note": { "type": "string" }
+              }
+            }
+          },
+          "repealed": { "type": "boolean" },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["relation", "by", "found_by", "url"],
+              "properties": {
+                "relation": { "type": "string" },
+                "part": { "type": "string" },
+                "by": { "$ref": "#/components/schemas/LawSummary" },
+                "by_article": { "type": "string" },
+                "effective_on": { "$ref": "#/components/schemas/Date" },
+                "text_ar": { "type": "string" },
+                "found_by": { "type": "array", "items": { "type": "string" } },
+                "url": { "type": "string", "format": "uri" }
+              }
+            }
+          },
+          "possibly_affected_by": {
+            "type": "array",
+            "description": "General repeals that may touch the article: leads to check, never findings.",
+            "items": { "type": "object", "required": ["by", "by_article", "url"], "properties": { "by": { "$ref": "#/components/schemas/LawSummary" }, "by_article": { "type": "string" }, "url": { "type": "string", "format": "uri" } } }
+          },
+          "rulings_count": { "type": "integer" },
+          "rulings": {
+            "type": "array",
+            "items": { "type": "object", "required": ["id", "court", "url"], "properties": { "id": { "type": "integer" }, "court": { "type": "string" }, "number": { "type": "string" }, "year": { "type": "integer" }, "decided_on": { "$ref": "#/components/schemas/Date" }, "url": { "type": "string", "format": "uri" } } }
+          },
+          "url": { "type": "string", "format": "uri" },
+          "source_url": { "type": "string", "format": "uri" },
+          "updated_at": { "$ref": "#/components/schemas/UpdatedAt" },
+          "not_legal_advice": { "type": "string" }
+        }
+      },
+      "RulingDetail": {
+        "type": "object",
+        "required": ["id", "title", "url", "not_legal_advice"],
+        "properties": {
+          "id": { "type": "integer" },
+          "court": { "type": "string" },
+          "court_en": { "type": "string" },
+          "number": { "type": "string" },
+          "year": { "type": "integer" },
+          "decided_on": { "$ref": "#/components/schemas/Date" },
+          "title": { "type": "string" },
+          "president": { "type": "string" },
+          "members": { "type": "array", "items": { "type": "string" } },
+          "text_ar": { "type": "string" },
+          "note": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "source_url": { "type": "string", "format": "uri" },
+          "pages_model": { "type": "string" },
+          "pdf_url": { "type": "string", "format": "uri", "description": "The judgment's scan on the Lebanese University's site: the reference." },
+          "page_count": { "type": "integer" },
+          "pages": {
+            "type": "array",
+            "items": { "type": "object", "required": ["n", "text_ar"], "properties": { "n": { "type": "integer" }, "text_ar": { "type": "string" }, "low_confidence": { "type": "boolean" } } }
+          },
+          "pages_note": { "type": "string" },
+          "updated_at": { "$ref": "#/components/schemas/UpdatedAt" },
+          "not_legal_advice": { "type": "string" }
+        }
+      },
+      "GazetteDetail": {
+        "type": "object",
+        "required": ["id", "texts", "url"],
+        "properties": {
+          "id": { "type": "integer" },
+          "number": { "type": "string" },
+          "published_on": { "$ref": "#/components/schemas/Date" },
+          "texts": { "type": "array", "items": { "$ref": "#/components/schemas/LawSummary" } },
+          "url": { "type": "string", "format": "uri" },
+          "source_url": { "type": "string", "format": "uri" },
+          "updated_at": { "$ref": "#/components/schemas/UpdatedAt" }
+        }
+      },
+      "LawList": {
+        "type": "object",
+        "required": ["since", "until", "kind", "order", "total", "offset", "laws"],
+        "properties": {
+          "since": { "type": ["string", "null"] },
+          "until": { "type": ["string", "null"] },
+          "kind": { "type": ["string", "null"] },
+          "order": { "type": "string", "enum": ["newest", "oldest"] },
+          "total": { "type": "integer" },
+          "offset": { "type": "integer" },
+          "next_offset": { "type": "integer" },
+          "laws": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                { "$ref": "#/components/schemas/LawSummary" },
+                {
+                  "type": "object",
+                  "properties": {
+                    "gazette_number": { "type": "string" },
+                    "gazette_date": { "$ref": "#/components/schemas/Date" },
+                    "gazette_issue_id": { "type": "integer" },
+                    "date": { "$ref": "#/components/schemas/Date", "description": "The Gazette date, else the text's date: what since, until and order use." }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "IssueList": {
+        "type": "object",
+        "required": ["since", "until", "order", "total", "offset", "issues"],
+        "properties": {
+          "since": { "type": ["string", "null"] },
+          "until": { "type": ["string", "null"] },
+          "order": { "type": "string", "enum": ["newest", "oldest"] },
+          "total": { "type": "integer" },
+          "offset": { "type": "integer" },
+          "next_offset": { "type": "integer" },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "text_count", "source", "url"],
+              "properties": {
+                "id": { "type": "integer" },
+                "number": { "type": "string" },
+                "published_on": { "$ref": "#/components/schemas/Date" },
+                "text_count": { "type": "integer" },
+                "source": { "type": "string", "enum": ["centre", "scans"], "description": "scans: an issue made for texts read from the Gazette's scanned pages." },
+                "url": { "type": "string", "format": "uri" },
+                "updated_at": { "$ref": "#/components/schemas/UpdatedAt" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
