@@ -63,7 +63,12 @@ checkout root. Add Go and PostgreSQL tools to `PATH` when using a scheduler.
 | `LEBLEG_TIMEZONE` | `UTC` | Time zone for the date in the branch name |
 | `LEBLEG_SCRAPE_MINUTES` | `180` | Daily scraper budget |
 | `LEBLEG_ARTICLE_MINUTES` | `30` | Full-text scraper budget |
-| `LEBLEG_OMIT` | unset | Optional advisory checks to omit: `versions,rulings` |
+| `LEBLEG_AGY` | empty | Path to signed-in agy CLI; empty disables Gemini reading |
+| `LEBLEG_CLAUDE` | empty | Path to signed-in Claude CLI; empty disables Claude reading |
+| `LEBLEG_AI_REMOTE` | empty | Optional SSH host where both CLI paths run; empty runs locally |
+| `LEBLEG_JUDGE_MODEL` | `gemini-4-argon-medium` | Gemini model for judge and citation reader |
+| `LEBLEG_CLAUDE_MODEL` | `sonnet` | Claude model for judge and citation reader |
+| `LEBLEG_OMIT` | unset | Optional steps to omit: `amendments,versions,rulings` |
 | `LEBLEG_OMIT_FILE` | `$LEBLEG_STORE/omit-next` | Same omissions, one ID per line, consumed once |
 | `LEBLEG_OMIT_ONCE_FILE` | under the store logs | Snapshot of that one-night omission file |
 | `LEBLEG_DNS_SKIP` | `0` | Set to `1` to skip the DNS wait |
@@ -88,8 +93,15 @@ It only reads public Hugging Face metadata. It never uploads anything.
 3. Build the public Go commands. Record the scan manifest, then run `build-db`.
    Preserve the original build-report, date and amount gates, and advisory
    English, version and ruling checks. Local bundles replace remote transfers.
-   Checked-in model judgements and citations are loaded; remote judge/cite jobs
-   and private model pushes are excluded. Those model jobs remain manual.
+   Checked-in model judgements and citations are loaded. After the build gates
+   pass, step 7 judges amendments, then reads article citations with the configured
+   agy CLI. A quota or limit failure falls back to Claude when configured;
+   citation exit 3 also triggers fallback. With only Claude configured, both
+   commands use it directly. With neither CLI configured, step 7 is marked skipped.
+   `LEBLEG_OMIT=amendments` omits both commands without a mark. Only new inputs
+   are read. Failures retain partial answers and never block export. Changed
+   judgements rebuild amendments; either changed model file rebuilds the graph
+   before indexing and export.
 4. Always run `build-db -only indexing`, using `data/popular_texts.txt`.
    A missing list or failed indexing stops export. This keeps `noindex_page`
    rows of kind `english` required by [issue #99](https://github.com/taktekhq/lebanese-legislation/issues/99).
@@ -98,17 +110,19 @@ It only reads public Hugging Face metadata. It never uploads anything.
    preserve stable IDs and file ranges. A blocked gate stops publication.
 6. Fetch the base branch into a clean temporary git worktree. Mirror only the
    generated data files, including removed table shards; keep curated files
-   such as `popular_texts.txt`, README and `load.sh`. If unchanged, stop.
-   Otherwise commit `data/YYYY-MM-DD` with the diff summary, retry a failed
-   push up to three times, and open a PR. Cleanup removes the worktree even
-   on failure. The local branch and commit remain available for recovery.
+   such as `popular_texts.txt`, README and `load.sh`.
+   Copy `db/model/judgements.jsonl` and `db/model/citations.jsonl` into the same
+   worktree and stage them with `data/`. If neither changed, stop. Otherwise commit
+   `data/YYYY-MM-DD` with the `data/` diff summary and restore the clone's model files from Git after
+   committing, in both dry and real runs. Retry a failed push up to three times,
+   and open a PR. Cleanup removes the worktree even on failure. The local branch and commit remain available for recovery.
 
 This retains the private nightly's order and error handling for the surviving
 steps. `flock` replaces its private pipeline lock, and local marks replace
 private pipeline reporting. The imported helpers are `check-build-report.sh`
 and `check-data-age.sh`. All other retained operations use this repo's commands.
 Hetzner delivery, D1/MCP snapshots, Hugging Face upload, private repository
-pushes, remote host integrations and private notifications are absent.
+pushes and private notifications are absent.
 
 ## First-run checks from issue #99
 
