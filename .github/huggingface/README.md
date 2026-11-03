@@ -80,15 +80,15 @@ configs:
 
 # Lebanese Legislation
 
-Lebanese law in Parquet: over 100,000 laws, decrees and decisions, about 390,000 articles, 47,000 court rulings, 6,800 Official Gazette issues and 270,000 links between texts. Coverage runs from 1904 to 2026, in Arabic and French where published.
+Lebanese law in Parquet: over 100,000 laws, decrees and decisions, about 390,000 articles, 47,000 court rulings, 6,800 Official Gazette issues and about 370,000 links between texts. Coverage runs from 1904 to 2026, in Arabic and French where published.
 
-Use it to search texts, follow amendments or build legal research tools. This is the dataset behind [lebaneselegislation.com](https://lebaneselegislation.com), maintained by [Taktek](https://taktek.io). Browse both datasets in the [collection](https://huggingface.co/collections/taktekhq/lebanese-legislation).
+Use it to search texts, follow amendments or build legal research tools. This is the dataset behind [lebaneselegislation.com](https://lebaneselegislation.com), maintained by [Taktek](https://taktek.io). Browse the related datasets and the handwriting demo in the [collection](https://huggingface.co/collections/taktekhq/lebanese-legislation).
 
 ## Download options and related projects
 
-Download the Parquet tables from this dataset. For PostgreSQL, use the [`-db` or `-all` image](https://github.com/taktekhq/lebanese-legislation#images), with both databases baked from the source tables.
+Download the Parquet tables from this dataset. For PostgreSQL, pull `ghcr.io/taktekhq/lebanese-legislation-db:latest`, or `ghcr.io/taktekhq/lebanese-legislation-all:latest` for the database with the website, API and MCP server in one image ([images](https://github.com/taktekhq/lebanese-legislation#images)). Both have the databases baked from the same source tables, and `latest` always follows the newest data.
 
-For local services, use the [canonical code repository](https://github.com/taktekhq/lebanese-legislation) and its [Docker image links](https://github.com/taktekhq/lebanese-legislation#run-the-services-locally). Browse the [public library](https://lebaneselegislation.com/), inspect [court scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans), or try the [local handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting). [Dactelo](https://dactelo.com/) is the related Arabic handwriting project. Code licensing does not replace this dataset’s source rights and attribution.
+For local services, use the [canonical code repository](https://github.com/taktekhq/lebanese-legislation) and its [Docker image links](https://github.com/taktekhq/lebanese-legislation#run-the-services-locally). Browse the [public library](https://lebaneselegislation.com/), inspect [court scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans), read every original source page in the [archive dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation-archive), or try the [local handwriting demo](https://huggingface.co/spaces/taktekhq/lebanese-legal-handwriting). [Dactelo](https://dactelo.com/) is the related Arabic handwriting project. Code licensing does not replace this dataset’s source rights and attribution.
 
 ## Start here
 
@@ -127,6 +127,8 @@ Source text, machine readings and editorial corrections have different provenanc
 The structured dataset is rebuilt nightly. Individual tables can be incomplete. Judgment reading is still under way. Original court PDFs are available separately in [Lebanese Court Scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans).
 
 You can also use the [JSON API](https://lebaneselegislation.com/developers/) or [MCP server](https://lebaneselegislation.com/ai/). This dataset is not legal advice. Send corrections to nizar@taktek.io.
+
+Studying law or political science at a Lebanese university? We pay current students to study with the site and tell us what to fix, instead of spending on ads: [the student program](https://lebaneselegislation.com/contribute/#students).
 
 ## Vectors
 

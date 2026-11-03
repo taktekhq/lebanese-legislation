@@ -22,6 +22,7 @@ COPY --from=commands /out/ /usr/local/bin/
 COPY --chmod=0755 vectors/start.sh /usr/local/bin/load-vectors
 COPY LICENSE THIRD_PARTY_NOTICES.txt /opt/lebleg/
 LABEL org.opencontainers.image.source="https://github.com/taktekhq/lebanese-legislation"
+LABEL org.opencontainers.image.description="Loads the open Lebanese Legislation search vectors (1,547,937 chunks on Hugging Face) into Cloudflare Vectorize or pgvector."
 LABEL org.opencontainers.image.licenses="MIT"
 WORKDIR /work
 ENTRYPOINT ["load-vectors"]
