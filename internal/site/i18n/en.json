@@ -139,7 +139,7 @@
   "law.scan_body": "The Lebanese University has not published this text yet, so we transcribed it by machine from images of the Official Gazette's pages. Two separate readings were compared word by word. Where they differ, both readings are shown, highlighted: check the original PDF below. This copy is unofficial. The official text is the one published in the Official Gazette.",
   "law.scan_pages_eyebrow": "Source",
   "law.scan_pages_title": "Original Gazette PDF",
-  "law.scan_credit": "Page scans from the %s archive. The two readings agree on %s%% of the words.",
+  "law.scan_credit": "Read from the Official Gazette PDF in the %s archive. The two readings agree on %s%% of the words.",
   "law.date_unknown": "Not known",
   "law.date_printed": "the Lebanese University prints %s",
   "datefix.signature": "corrected from the text's own signing line",
