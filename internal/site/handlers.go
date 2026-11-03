@@ -104,6 +104,8 @@ func (s *Server) routes() {
 	m.HandleFunc("GET /data/{$}", s.data)
 	m.HandleFunc("GET /about/{$}", s.about)
 	m.HandleFunc("GET /contribute/{$}", s.contribute)
+	m.HandleFunc("GET /privacy/{$}", s.privacy)
+	m.HandleFunc("GET /terms/{$}", s.terms)
 	m.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		p := r.URL.EscapedPath()
 		if to := s.finalPath(r.Context(), p); to != p { // /laws: to /laws/, in one hop to wherever it moved

@@ -1,0 +1,17 @@
+{{define "content"}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <h1 class="page__title">{{t "privacy.title"}}</h1>
+  <p class="lead">{{t "privacy.lead"}}</p>
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <article class="prose">
+    <h2>{{t "privacy.collect_h2"}}</h2>
+    <p>{{if analytics}}{{t "about.privacy_p1"}}{{else}}{{t "about.privacy_p1_off"}}{{end}}</p>
+    <p>{{t "about.hosting_p"}}</p>
+    <h2>{{t "privacy.choices_h2"}}</h2>
+    <p>{{t "privacy.choices_p" (safe "<a class=\"link\" href=\"mailto:nizar@taktek.io\">nizar@taktek.io</a>")}}</p>
+    <p class="tiny">{{t "legal.updated"}}</p>
+  </article>
+</section>
+{{end}}
