@@ -80,7 +80,9 @@ configs:
 
 # Lebanese Legislation
 
-Lebanese law in Parquet: over 100,000 laws, decrees and decisions, about 390,000 articles, 47,000 court rulings, 6,800 Official Gazette issues and about 370,000 links between texts. Coverage runs from 1904 to 2026, in Arabic and French where published.
+[![Legislation](https://lebaneselegislation.com/badge/legislation.svg?src=hf)](https://lebaneselegislation.com/laws/) [![Articles](https://lebaneselegislation.com/badge/articles.svg)](https://lebaneselegislation.com/laws/) [![Court rulings](https://lebaneselegislation.com/badge/rulings.svg)](https://lebaneselegislation.com/rulings/) [![Last updated](https://lebaneselegislation.com/badge/updated.svg)](https://huggingface.co/datasets/taktekhq/lebanese-legislation/commits/main) [![MCP server](https://lebaneselegislation.com/badge/mcp.svg)](https://lebaneselegislation.com/ai/) [![GitHub](https://img.shields.io/badge/code-GitHub-181717?logo=github)](https://github.com/taktekhq/lebanese-legislation)
+
+Lebanese law in Parquet: laws, decrees and decisions with their articles, court rulings, Official Gazette issues and the links between texts (amendments, repeals, citations). Coverage runs from 1904 to today, in Arabic and French where published. The badges above show the current counts.
 
 Use it to search texts, follow amendments or build legal research tools. This is the dataset behind [lebaneselegislation.com](https://lebaneselegislation.com), maintained by [Taktek](https://taktek.io). Browse the related datasets and the handwriting demo in the [collection](https://huggingface.co/collections/taktekhq/lebanese-legislation).
 
@@ -132,7 +134,7 @@ Studying law or political science at a Lebanese university? We pay current stude
 
 ## Vectors
 
-[`vectors/vectors.parquet`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet) contains 1,547,937 semantic search chunks,
+[`vectors/vectors.parquet`](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet) contains every semantic search chunk,
 embedded with `gemini-embedding-001` in 768 dimensions. Columns: `id`,
 `document`, `model`, `hash`, `values` (`FLOAT[768]`). The file is published openly
 in the `taktekhq/lebanese-legislation` Hugging Face dataset.

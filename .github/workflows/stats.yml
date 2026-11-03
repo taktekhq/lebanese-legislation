@@ -1,0 +1,29 @@
+name: stats
+# Once a day: GitHub stars and traffic, Hugging Face downloads and likes, to
+# PostHog (events github_repo_stats, github_traffic_day, github_referrer_14d,
+# hf_dataset_stats). README and dataset card views are counted by the site's
+# badges instead.
+on:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  stats:
+    if: github.repository == 'taktekhq/lebanese-legislation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Send the counters to PostHog
+        env:
+          # The project's public capture key (it is in the site's pages too).
+          POSTHOG_KEY: phc_pTpSY5wVsQrG8LN58z4zWXdMWjvqR6uPCY2eXV25sBV5
+          # Fine-grained, read-only administration on the two repositories, for traffic.
+          GITHUB_TOKEN: ${{ secrets.GH_STATS_TOKEN }}
+        run: go run ./cmd/repo-stats

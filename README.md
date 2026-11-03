@@ -1,24 +1,112 @@
-# Lebanese Legislation
+<p align="center">
+  <a href="https://lebaneselegislation.com/"><img src="internal/site/static/assets/mark.png" width="88" alt="Lebanese Legislation"></a>
+</p>
 
-The code and data behind [LebaneseLegislation.com](https://lebaneselegislation.com/): 103,117 laws, 389,078 articles, 47,657 court rulings and 6,851 Official Gazette issues, with search, a REST API and an MCP server. Everything is open: the code here, the data on [Hugging Face](https://huggingface.co/taktekhq), and the images on GitHub Container Registry.
+<h1 align="center">Lebanese Legislation</h1>
 
-The former private `taktekhq/lebaneselegislation` repository is folded into this
-one: code, scraper, build pipeline, website and MCP.
+<p align="center">
+  <b>Every Lebanese law, one search away.</b><br>
+  The open code and data behind <a href="https://lebaneselegislation.com/">LebaneseLegislation.com</a>: laws, decrees, court rulings and the Official Gazette, in Arabic and French, with search, a JSON API and an MCP server for AI assistants.
+</p>
 
-## Hosting
+<p align="center">
+  <a href="https://lebaneselegislation.com/laws/"><img src="https://lebaneselegislation.com/badge/legislation.svg?src=gh" alt="Legislation"></a>
+  <a href="https://lebaneselegislation.com/laws/"><img src="https://lebaneselegislation.com/badge/articles.svg" alt="Articles"></a>
+  <a href="https://lebaneselegislation.com/rulings/"><img src="https://lebaneselegislation.com/badge/rulings.svg" alt="Court rulings"></a>
+  <a href="https://huggingface.co/datasets/taktekhq/lebanese-legislation"><img src="https://lebaneselegislation.com/badge/downloads.svg" alt="Hugging Face downloads"></a>
+  <a href="https://huggingface.co/datasets/taktekhq/lebanese-legislation"><img src="https://lebaneselegislation.com/badge/updated.svg" alt="Data last updated"></a>
+  <a href="https://lebaneselegislation.com/ai/"><img src="https://lebaneselegislation.com/badge/mcp.svg" alt="MCP server"></a>
+</p>
 
-Cloudflare serves about 760,000 static pages from the R2 bucket `lebleg-site`
-through the JavaScript Worker in [`workers/static-site`](workers/static-site/).
-The same Worker serves ruling PDFs from R2. Search pages, `/api/v1/`, filters,
-Gazette scans and `/mcp` go through `workers/origin` to the live blue/green
-Cloudflare Container, running the `-all` image with PostgreSQL 18.6, the
-database baked into the image and the Go website server.
+<p align="center">
+  <a href="https://github.com/taktekhq/lebanese-legislation/actions/workflows/checks.yml"><img src="https://img.shields.io/github/actions/workflow/status/taktekhq/lebanese-legislation/checks.yml?branch=main&label=checks" alt="Checks"></a>
+  <a href="https://github.com/taktekhq/lebanese-legislation/releases"><img src="https://img.shields.io/github/v/release/taktekhq/lebanese-legislation?label=release" alt="Release"></a>
+  <a href="go.mod"><img src="https://img.shields.io/github/go-mod/go-version/taktekhq/lebanese-legislation" alt="Go version"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/code-MIT-blue" alt="MIT licence"></a>
+  <a href="https://github.com/taktekhq/lebanese-legislation/stargazers"><img src="https://img.shields.io/github/stars/taktekhq/lebanese-legislation?style=flat" alt="Stars"></a>
+</p>
 
-[static-site.yml](.github/workflows/static-site.yml) renders `data/` with
-`cmd/static-export` in 24 parallel shards. [origin.yml](.github/workflows/origin.yml)
-deploys the container. [vectors.yml](.github/workflows/vectors.yml) exports and
-publishes vectors and loads Cloudflare Vectorize index `lebleg-chunks`.
-See [architecture](docs/architecture.md) for the request and build paths.
+<p align="center">
+  <a href="https://lebaneselegislation.com/">Website</a> ·
+  <a href="https://lebaneselegislation.com/ai/">AI and MCP</a> ·
+  <a href="https://lebaneselegislation.com/developers/">API</a> ·
+  <a href="https://huggingface.co/taktekhq">Data on Hugging Face</a> ·
+  <a href="https://lebaneselegislation.com/blog/">Journal</a> ·
+  <a href="#students-get-paid-to-study-with-it">Students</a>
+</p>
+
+<p align="center">
+  <a href="https://lebaneselegislation.com/"><img src="docs/assets/home.png" width="820" alt="The LebaneseLegislation.com home page"></a>
+</p>
+
+## Why
+
+The texts of Lebanese law are public, but hard to read online. LebaneseLegislation.com puts every law, decree, ruling and Gazette issue on its own page, links each article to the texts that amend it and the rulings that apply it, and gives developers and AI assistants the same data through an API, an MCP server and open downloads. Every page links back to its source at the Lebanese University's Centre for Research and Studies in Legal Informatics.
+
+## Start in one minute
+
+**Read and search** at [lebaneselegislation.com](https://lebaneselegislation.com/). Questions get a short answer written only from the library's own texts, with a link to each source.
+
+**Connect your AI assistant.** The MCP server is free, needs no key, and returns the texts word for word:
+
+```sh
+claude mcp add --transport http lebanese-legislation https://lebaneselegislation.com/mcp
+```
+
+Claude, ChatGPT, Cursor and Gemini setup: [lebaneselegislation.com/ai](https://lebaneselegislation.com/ai/) and [docs/mcp.md](docs/mcp.md).
+
+**Call the API.** No key, JSON, described by [`/openapi.json`](https://lebaneselegislation.com/openapi.json):
+
+```sh
+curl -G 'https://lebaneselegislation.com/api/v1/search/' --data-urlencode 'q=قانون العمل'
+```
+
+**Load the data.** One Parquet file per table on Hugging Face:
+
+```python
+from datasets import load_dataset
+articles = load_dataset("taktekhq/lebanese-legislation", "legislation_article", split="train")
+```
+
+**Run the whole site yourself.** One image holds the database, the website, the API and the MCP server:
+
+```sh
+git clone https://github.com/taktekhq/lebanese-legislation.git && cd lebanese-legislation
+./setup && docker compose --profile all up -d all   # then open http://localhost:8080
+```
+
+## Where everything is
+
+| You want | Go to |
+| --- | --- |
+| Read the laws | [LebaneseLegislation.com](https://lebaneselegislation.com/) |
+| Connect an AI assistant | The free MCP server at `https://lebaneselegislation.com/mcp`. [Setup](docs/mcp.md) |
+| The data as tables | [Parquet files on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation) |
+| The data as a PostgreSQL database | The [`-db` or `-all` image](#images), with the databases baked from `data/` |
+| Semantic search vectors | [vectors/vectors.parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet), embedded with `gemini-embedding-001` in 768 dimensions. [Read with DuckDB](docs/reference.md#vectors) |
+| The original court scans | [Court scans on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-court-scans) |
+| Every source page as it was served | [Archive dataset on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation-archive) and [its repository](https://github.com/taktekhq/lebanese-legislation-archive) |
+| What changed and why | The [project journal](https://lebaneselegislation.com/blog/) and [docs/changes.md](docs/changes.md) |
+| Get paid to study with it (students in Lebanon) | [The student program](#students-get-paid-to-study-with-it) |
+
+Data lives on Hugging Face. Code and Docker images live here. Each GitHub release is a code version, never a data download.
+
+## How it runs
+
+```mermaid
+flowchart LR
+  UL[Lebanese University<br>source pages] -->|scraper| A[archive/]
+  A -->|build-db| D[data/<br>tables as text]
+  D -->|data workflow| HF[Hugging Face<br>Parquet + vectors]
+  D -->|static-site workflow| R2[(Cloudflare R2<br>static pages)]
+  D -->|data workflow| IMG[-db and -all images]
+  IMG -->|origin workflow| C[Cloudflare Container<br>PostgreSQL + Go server]
+  R2 --> W{Worker}
+  C --> W
+  W --> U[Readers, AI assistants,<br>API clients]
+```
+
+Cloudflare serves the static pages and ruling PDFs from R2 through the Worker in [`workers/static-site`](workers/static-site/). Search, `/api/v1/`, filters, scans and `/mcp` go through `workers/origin` to a blue/green Cloudflare Container running the `-all` image. [static-site.yml](.github/workflows/static-site.yml) renders `data/` with `cmd/static-export` in parallel shards, only the pages that changed. [vectors.yml](.github/workflows/vectors.yml) publishes the vectors and loads Cloudflare Vectorize. See [architecture](docs/architecture.md).
 
 ## Update the data yourself
 
@@ -32,23 +120,6 @@ authenticated GitHub CLI. Set `LEBLEG_DSN` to a dedicated rebuild database;
 `LEBLEG_REPO` selects the target repository. Maintainers merge the PR, then
 the workflows publish everything. See [Update the data](docs/update-data.md)
 for requirements, every step, configuration and a nightly user systemd timer.
-
-## Where everything is
-
-| You want | Go to |
-| --- | --- |
-| Read the laws | [LebaneseLegislation.com](https://lebaneselegislation.com/) |
-| Connect an AI assistant | The free MCP server at `https://lebaneselegislation.com/mcp`. [Setup](docs/mcp.md) |
-| The data as tables | [Parquet files on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation) |
-| The data as a PostgreSQL database | The `-db` or `-all` image below, with both databases baked from `data/`. |
-| Semantic search vectors | [vectors/vectors.parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet), 1,547,937 chunks, 768 dimensions, `gemini-embedding-001`. [Read with DuckDB](docs/reference.md#vectors). |
-| The original court scans | [Court scans on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-court-scans) |
-| Every source page as it was served | [Archive dataset on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation-archive) and [its repository](https://github.com/taktekhq/lebanese-legislation-archive) |
-| What changed and why | The [project journal](https://lebaneselegislation.com/blog/) and [docs/changes.md](docs/changes.md) |
-| Get paid to study with it (students in Lebanon) | [The student program](#students-get-paid-to-study-with-it) |
-| Everything on your own machine | [Run the services locally](#run-the-services-locally) |
-
-Data lives on Hugging Face. Code and Docker images live here. Each GitHub release is a code version, never a data download.
 
 ## Production and development
 
@@ -87,7 +158,7 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 | `-api` | Standalone API server, unchanged Dockerfile and amd64/arm64 support | Compose and API users with a separate database |
 | `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
 | `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
-| `-vectors` | `vectorize-sync`, `export-vectors`, DuckDB 1.5.6; downloads Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
+| `-vectors` | `vectorize-sync`, `export-vectors` and DuckDB; downloads the Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
 
 Each image is built by the workflow that produces its inputs: the
 [checks](.github/workflows/checks.yml) workflow publishes `-api`, `-mcp` and
@@ -109,7 +180,7 @@ existing immutable release versions are retained and new versions are added when
 | Folder | What it is |
 | --- | --- |
 | [`data/`](data/) | The database as text: one folder per table, rows sorted by key, so `git log -p` shows what changed. `data/load.sh` builds it in PostgreSQL. |
-| [`archive/`](https://github.com/taktekhq/lebanese-legislation-archive) | Every source page as the Centre's site served it, with its change history: [its own repository](https://github.com/taktekhq/lebanese-legislation-archive), mounted here as a submodule. A plain clone skips its 606,000 files; `git submodule update --init archive` fetches them. |
+| [`archive/`](https://github.com/taktekhq/lebanese-legislation-archive) | Every source page as the Centre's site served it, with its change history: [its own repository](https://github.com/taktekhq/lebanese-legislation-archive), mounted here as a submodule. A plain clone skips it; `git submodule update --init archive` fetches them. |
 | [`db/`](db/) | The database's schema and the build's curated inputs (the Go package `db`), and the PostgreSQL image, built with pgvector on the official `postgres:18.6` image. |
 | [`web/`](web/) | The website: its `main.go`, test-only Dockerfile, SQL schema and a fictional test database. |
 | [`api/`](api/) | The REST API: its `main.go` and Dockerfile. |

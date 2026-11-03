@@ -577,6 +577,13 @@ func TestBadges(t *testing.T) {
 	if len(ph) != 1 || ph[0]["event"] != "$pageview" || ph[0]["properties"].(map[string]any)["$current_url"] != "https://huggingface.co/datasets/taktekhq/lebanese-legislation" {
 		t.Errorf("$pageview: %v", ph)
 	}
+	ghrt := &recorder{}
+	gh := trackedServer(ghrt)
+	get(gh, "/badge/legislation.svg?src=gh", map[string]string{"User-Agent": "github-camo (876de43e)"})
+	gh.Flush()
+	if ph := phEvents(ghrt); len(ph) != 1 || ph[0]["properties"].(map[string]any)["$current_url"] != "https://github.com/taktekhq/lebanese-legislation" {
+		t.Errorf("README view: %v", ph)
+	}
 	if !isBot("") || isBot(browserUA) {
 		t.Error("isBot")
 	}
@@ -596,6 +603,10 @@ func TestBadges(t *testing.T) {
 		return jsonResponse(r, 200, `{"id":"taktekhq/lebanese-legislation","lastModified":"2026-10-20T14:31:53.000Z"}`)
 	}}
 	up := trackedServer(hf)
+	dl := trackedServer(&recorder{answer: func(r *http.Request) *http.Response { return jsonResponse(r, 200, `{"downloadsAllTime":12345}`) }})
+	if rec := get(dl, "/badge/downloads.svg", nil); !strings.Contains(rec.Body.String(), `aria-label="Hugging Face downloads: 12,345"`) {
+		t.Errorf("downloads: %s", rec.Body.String())
+	}
 	if rec := get(up, "/badge/updated.svg", nil); !strings.Contains(rec.Body.String(), `aria-label="last updated: 20 Oct 2026"`) {
 		t.Errorf("HF up: %s", rec.Body.String())
 	}
