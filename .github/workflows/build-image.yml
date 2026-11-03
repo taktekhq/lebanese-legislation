@@ -3,7 +3,7 @@ on:
   workflow_call:
     inputs:
       image:
-        description: 'Image suffix: db, api, mcp, all, vectors, site'
+        description: 'Image suffix: db, api, mcp, all, vectors'
         required: true
         type: string
       context:

@@ -21,8 +21,11 @@ PostgreSQL into Vectorize.
 ## Build path
 
 `data/` is the input for the site build. GitHub Actions renders about 760,000
-static pages through `cmd/static-export` in 8 parallel shards and uploads them
-to `lebleg-site`. Each producing workflow publishes its image; origin deploys the published `-all`.
+static pages through `cmd/static-export` in 24 parallel shards and uploads them
+to `lebleg-site`. Nightly runs render only paths affected by changed table rows;
+full runs render the whole corpus. See [static export](static-export.md) for the
+R2 commit baseline, dependency mapping and local rendering instructions.
+Image-producing workflows publish their own images; origin deploys `-all`.
 The vectors workflow filters the public vectors to IDs generated from current `data/`,
 publishes Parquet on Hugging Face and loads Vectorize through the vectors image.
 Later syncs upload changed vectors and delete IDs absent from the current set.
@@ -31,7 +34,7 @@ archive IDs found in the comparison are included in the deletion baseline.
 
 | Workflow | Output |
 | --- | --- |
-| [static-site.yml](../.github/workflows/static-site.yml) | `data/` to static pages in R2, using `cmd/static-export` and 8 parallel shards. |
+| [static-site.yml](../.github/workflows/static-site.yml) | `data/` to static pages in R2, using `cmd/static-export` and 24 parallel shards. |
 | [images.yml](../.github/workflows/images.yml) | Manual button to publish one selected image through `build-image.yml`. |
 | [origin.yml](../.github/workflows/origin.yml) | Container image with the database and Go website server, deployed to Cloudflare Containers. |
 | [vectors.yml](../.github/workflows/vectors.yml) | `build` then `vectorize` and `publish`: current chunk IDs filter the public Parquet, Hugging Face receives `vectors/vectors.parquet`, and the vectors image syncs `lebleg-chunks`. |
@@ -86,12 +89,11 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 | `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
 | `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
 | `-vectors` | `vectorize-sync`, `export-vectors`, DuckDB 1.5.6; downloads Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
-| `-site` | R2 `lebleg-site` static pages, assets, `404.html`, redirect data and a stdlib Go server | Static mirrors without a database |
 
 Image builds use the reusable `build-image.yml` workflow. Each image has its own
 `images-<name>` job concurrency group across callers; pushes cancel an older
 build of that image. Producer jobs have separate locks, so a slow image never
-holds a workflow-wide lock. Scans and static pages come from R2.
+holds a workflow-wide lock. Scans come from R2.
 
 | Image | Built in workflow | When |
 | --- | --- | --- |
@@ -100,7 +102,6 @@ holds a workflow-wide lock. Scans and static pages come from R2.
 | `-mcp` | `checks.yml` (`checks`) | After `ci-ok` succeeds on a push to main. |
 | `-all` | `data.yml`, `checks.yml` | After `-db` succeeds, or after `ci-ok` on a push to main. Always pulls `-db:latest`. |
 | `-vectors` | `vectors.yml` | After `publish` succeeds on main. |
-| `-site` | `static-site.yml` | After all render shards and generation succeed on main, syncing R2 into the build context. |
 
 `images.yml` has only a manual dispatch with an `image` suffix choice; it builds
 one selected image. Images receive UTC date and `latest` tags; `-all` also gets
@@ -111,14 +112,5 @@ origin dispatch still accepts an image or tag, defaulting to `-all:latest`.
 Publishing of `-web` and `-data` has stopped; existing registry packages remain.
 Compose pulls `ghcr.io/taktekhq/lebanese-legislation-all:latest` for the website, including its database, API and MCP.
 
-The site image syncs every R2 key except `_build/` and `_export/`, retaining
-`_export/redirects.json` privately for redirects. Its server uses the Worker's
-escaped path mapping and security headers, and serves `404.html` for misses.
-It listens on port 8080. It does not answer dynamic routes. Put a reverse proxy
-in front and route `/api/`, `/mcp`, query-bearing requests such as `/search/?q=`,
-and the other origin prefixes in `workers/static-site/src/route.js` to `-all:8080`.
 API and MCP candidates are smoke-tested on both architectures before promotion;
 existing immutable release versions are retained and new versions are added when free.
-Tracking-only queries can stay on `-site`. No proxy or database credentials are
-embedded in the static image. The runner frees disk before syncing the roughly
-14 GB bucket; no local image build is required.

@@ -50,7 +50,7 @@ type Options struct {
 	Workers int    // pages rendered in parallel (default 4)
 
 	// Paths, when set, are the only paths rendered: no sitemap, no crawl. The
-	// manifest then covers just these paths.
+	// manifest preserves unvisited entries. A non-nil empty slice is a no-op.
 	Paths []string
 	// Sample keeps a random Sample of the sitemap paths (Seed makes it
 	// repeatable); the crawl is off, because it would grow the set again.
@@ -72,7 +72,7 @@ type Options struct {
 	Files map[string][]byte
 	// Shard and Shards split a full export across jobs: this run renders the
 	// paths whose hash falls in its slice (Shard of Shards), including crawl
-	// paths and Extra. Shards <= 1 means the whole site. Deletions are left to the job that merges the shards.
+	// paths and Extra. Shards <= 1 means the whole site. Each owner deletes its removed files.
 	Shard, Shards int
 	// Exchange is required for a sharded crawl. Each round publishes foreign
 	// links after local work drains, waits for every shard, and returns this
@@ -136,7 +136,7 @@ type KindStats struct {
 
 // Run exports the site served by h.
 func Run(ctx context.Context, h http.Handler, o Options) (*Stats, error) {
-	if o.Shards > 1 && o.Crawl && len(o.Paths) == 0 && o.Sample == 0 {
+	if o.Shards > 1 && o.Crawl && o.Paths == nil && o.Sample == 0 {
 		if o.Exchange == nil {
 			return nil, fmt.Errorf("staticexport: sharded crawl requires a path exchange")
 		}
@@ -159,7 +159,7 @@ func Run(ctx context.Context, h http.Handler, o Options) (*Stats, error) {
 	}
 	start := time.Now()
 	ex := &exporter{h: h, o: o, logf: logf, seen: newSeen(), st: &Stats{ByKind: map[string]*KindStats{}}, start: start,
-		crawling: o.Crawl && len(o.Paths) == 0 && o.Sample == 0}
+		crawling: o.Crawl && o.Paths == nil && o.Sample == 0}
 	if err := os.MkdirAll(filepath.Join(o.Out, ".export"), 0o755); err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func Run(ctx context.Context, h http.Handler, o Options) (*Stats, error) {
 			return ex.st, err
 		}
 	}
-	if len(o.Paths) == 0 && o.Sample == 0 && o.Limit == 0 && (o.Shards <= 1 || o.Shard == 0) { // the page the edge serves for a path nothing answers
+	if o.Paths == nil && o.Sample == 0 && o.Limit == 0 && (o.Shards <= 1 || o.Shard == 0) { // the page the edge serves for a path nothing answers
 		if rec := ex.get("/__static-export-not-found__/"); rec.Code == http.StatusNotFound {
 			if err := writeFile(filepath.Join(o.Out, "404.html"), rec.Body.Bytes()); err != nil {
 				return ex.st, err
@@ -199,7 +199,7 @@ func Run(ctx context.Context, h http.Handler, o Options) (*Stats, error) {
 			return ex.st, err
 		}
 	}
-	partial := len(o.Paths) > 0 || o.Sample > 0 || o.Limit > 0 || o.Shards > 1
+	partial := o.Paths != nil || o.Sample > 0 || o.Limit > 0
 	if err := ex.finish(partial); err != nil {
 		return ex.st, err
 	}
@@ -289,7 +289,7 @@ func (ex *exporter) run(ctx context.Context) error {
 	}
 
 	var seeds []string
-	if len(ex.o.Paths) > 0 {
+	if ex.o.Paths != nil {
 		seeds = ex.o.Paths
 	} else {
 		seeds = append(seeds, ex.o.Extra...)
@@ -441,7 +441,7 @@ func (ex *exporter) page(p string) error {
 		rec = ex.get(p)
 	}
 	e := Entry{Path: p, Status: rec.Code, Type: rec.Header().Get("Content-Type"), Cache: rec.Header().Get("Cache-Control")}
-	if rec.Code != http.StatusOK {
+	if rec.Code >= 300 && rec.Code < 400 || rec.Code == http.StatusNotFound || rec.Code == http.StatusGone {
 		ex.dropFile(p) // it was a page last time; the old file must not keep answering
 	}
 	switch {
@@ -475,7 +475,7 @@ func (ex *exporter) dropFile(p string) {
 	if !ok || old.Status != http.StatusOK || old.File == "" {
 		return
 	}
-	if ex.o.Shards > 1 { // the job that merges the shards decides what is gone
+	if ex.o.Shards > 1 && Owner(p, ex.o.Shards) != ex.o.Shard {
 		return
 	}
 	ex.removedMu.Lock()
@@ -779,8 +779,11 @@ func (ex *exporter) finish(partial bool) error {
 				cur[p] = e
 			}
 		}
-	} else if ex.o.Shards <= 1 { // a full run: what was a page and was not visited is gone too
+	} else { // a full owned run: absent pages are gone too
 		for p, e := range ex.prev {
+			if ex.o.Shards > 1 && Owner(p, ex.o.Shards) != ex.o.Shard {
+				continue
+			}
 			if _, ok := cur[p]; !ok && e.Status == http.StatusOK && e.File != "" {
 				if ex.o.Sink == nil {
 					_ = os.Remove(filepath.Join(ex.o.Out, filepath.FromSlash(e.File)))

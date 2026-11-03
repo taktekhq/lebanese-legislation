@@ -88,24 +88,14 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 | `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
 | `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
 | `-vectors` | `vectorize-sync`, `export-vectors`, DuckDB 1.5.6; downloads Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
-| `-site` | R2 `lebleg-site` static pages, assets, `404.html`, redirect data and a stdlib Go server | Static mirrors without a database |
 
 Only `.github/workflows/images.yml` publishes these images. Each has its own
 job; `-all` waits for `-db` when both are selected. All receive UTC date and
 `latest` tags; `-all` also receives the git short SHA. Dispatch `which: all` or
 a full image name. Pushes to main select images by their input paths. Successful
-`static-site` and `vectors` runs refresh `-site` and `-vectors`, respectively.
+`vectors` runs refresh `-vectors`. Static pages are published directly to R2.
 Publishing of `-web` and `-data` has stopped; existing registry packages remain.
 Compose pulls `ghcr.io/taktekhq/lebanese-legislation-all:latest` for the website, including its database, API and MCP.
 
-The site image syncs every R2 key except `_build/` and `_export/`, retaining
-`_export/redirects.json` privately for redirects. Its server uses the Worker's
-escaped path mapping and security headers, and serves `404.html` for misses.
-It listens on port 8080. It does not answer dynamic routes. Put a reverse proxy
-in front and route `/api/`, `/mcp`, query-bearing requests such as `/search/?q=`,
-and the other origin prefixes in `workers/static-site/src/route.js` to `-all:8080`.
 API and MCP candidates are smoke-tested on both architectures before promotion;
 existing immutable release versions are retained and new versions are added when free.
-Tracking-only queries can stay on `-site`. No proxy or database credentials are
-embedded in the static image. The runner frees disk before syncing the roughly
-14 GB bucket; no local image build is required.

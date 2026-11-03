@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       shards:
-        description: Shard divisor (the matrix always runs shards 0 through 23)
+        description: Shard divisor (must be 24, matching the matrix and stored manifests)
         type: number
         default: 24
       full:
-        description: Unused for now; a shard re-renders only pages whose hash changed
+        description: Render the whole site, ignoring the last rendered commit
         type: boolean
         default: false
       route:
@@ -20,16 +20,59 @@ on:
     types: [completed]
     branches: [main]
 
+concurrency:
+  group: static-site
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
 
 jobs:
-  render:
-    concurrency:
-      group: static-site-render-${{ github.ref }}-${{ matrix.shard }}
-      cancel-in-progress: false
+  plan:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Pin the render commit
+        id: commit
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Read last successful render and map changed rows
+        env:
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          FULL: ${{ inputs.full || false }}
+        run: |
+          endpoint=https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+          # Only a missing key means first render. Authentication/network errors fail.
+          if aws s3api get-object --bucket lebleg-site --key _export/rendered-commit \
+              --endpoint-url "$endpoint" rendered-commit 2>read-error; then
+            previous=$(cat rendered-commit)
+          elif grep -Eq 'NoSuchKey|\(404\)' read-error; then
+            previous=""
+          else
+            cat read-error >&2
+            exit 1
+          fi
+          go run ./cmd/static-export changes -since "$previous" -full="$FULL" -out plan
+      - uses: actions/upload-artifact@v4
+        with:
+          name: render-plan
+          path: plan
+          if-no-files-found: error
+
+  render:
+    needs: plan
     runs-on: ubuntu-latest
     timeout-minutes: 340
     strategy:
@@ -41,6 +84,16 @@ jobs:
       LEBLEG_DSN: postgresql://postgres:ci@127.0.0.1:5432/lebleg
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.commit }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: render-plan
+          path: plan
+      - name: Check shard divisor
+        env:
+          DIVISOR: ${{ inputs.shards || 24 }}
+        run: test "$DIVISOR" = 24
       - name: Start PostgreSQL 18.6
         run: |
           # GitHub's runner has psql; act's smaller image does not.
@@ -90,17 +143,20 @@ jobs:
         env:
           SHARD: ${{ matrix.shard }}
           DIVISOR: ${{ inputs.shards || 24 }}
-          FULL: ${{ inputs.full || false }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           # Each shard reads and writes its own manifest under _export/shard-<i>-of-<n>/.
-          /tmp/static-export export \
+          args=()
+          if [ "$(cat plan/mode)" = paths ]; then
+            args=(-paths plan/paths.txt -crawl=false)
+          fi
+          /tmp/static-export export "${args[@]}" \
             -shard "$SHARD/$DIVISOR" \
             -exchange-timeout 30m \
             -base https://lebaneselegislation.com \
             -workers 8 \
-            -max-errors 200 \
+            -max-errors 0 \
             -search-shell \
             -r2-bucket lebleg-site \
             -r2-endpoint https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
@@ -125,14 +181,8 @@ jobs:
 
 
   generation:
-    concurrency:
-      group: static-site-generation-${{ github.ref }}
-      cancel-in-progress: false
-    # Last: the Worker keys its page cache by this value, so the new pages
-    # show at once instead of after the 12-hour edge cache runs out. Written
-    # when shards failed too, since the others already uploaded new pages.
-    needs: render
-    if: ${{ !cancelled() && needs.render.result != 'skipped' }}
+    # Commit the baseline last, after every shard and cache generation succeed.
+    needs: [plan, render]
     runs-on: ubuntu-latest
     steps:
       - name: Mark the new export generation
@@ -145,26 +195,17 @@ jobs:
           aws s3 cp generation s3://lebleg-site/_export/generation \
             --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
             --content-type text/plain
-  site:
-    needs: [render, generation]
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      packages: write
-    uses: ./.github/workflows/build-image.yml
-    secrets: inherit
-    with:
-      image: site
-      context: .
-      dockerfile: workers/static-site/container/site.Dockerfile
-      tags: |
-        ghcr.io/taktekhq/lebanese-legislation-site:latest
-      free_disk: true
-      pre_build: |
-        mkdir -p site-content
-        # 760,000 small files: the CLI's default of 10 parallel downloads took about 20 minutes.
-        aws configure set default.s3.max_concurrent_requests 256
-        aws configure set default.s3.max_queue_size 20000
-        aws s3 sync --only-show-errors s3://lebleg-site site-content --exclude '_build/*' --exclude '_export/*' --include '_export/redirects.json' --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
-        test -s site-content/_export/redirects.json
-        df -h .
+  rendered-commit:
+    needs: [plan, render, generation]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record the successfully rendered commit
+        env:
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          echo "${{ needs.plan.outputs.commit }}" > rendered-commit
+          aws s3 cp rendered-commit s3://lebleg-site/_export/rendered-commit \
+            --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
+            --content-type text/plain
