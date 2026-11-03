@@ -20,6 +20,19 @@ deploys the container. [vectors.yml](.github/workflows/vectors.yml) exports and
 publishes vectors and loads Cloudflare Vectorize index `lebleg-chunks`.
 See [architecture](docs/architecture.md) for the request and build paths.
 
+## Update the data yourself
+
+Run `scripts/nightly.sh` on your own machine to scrape, rebuild, check and
+export the data, then open a data-only pull request. Use `--dry-run` to do the
+work locally without pushing or opening a PR. GitHub Actions cannot run it.
+
+You need Bash, flock, Git, rsync, curl, Python 3, Go, PostgreSQL and an
+authenticated GitHub CLI. Set `LEBLEG_DSN` to a dedicated rebuild database;
+`LEBLEG_STORE`, `LEBLEG_DATA` and `LEBLEG_LOCK_FILE` override local paths.
+`LEBLEG_REPO` selects the target repository. Maintainers merge the PR, then
+the workflows publish everything. See [Update the data](docs/update-data.md)
+for requirements, every step, configuration and a nightly user systemd timer.
+
 ## Where everything is
 
 | You want | Go to |

@@ -1,0 +1,11 @@
+[Unit]
+Description=Nightly Lebanese Legislation data update
+
+[Timer]
+OnCalendar=*-*-* 05:00:00
+Persistent=true
+RandomizedDelaySec=15m
+Unit=lebleg-nightly.service
+
+[Install]
+WantedBy=timers.target
