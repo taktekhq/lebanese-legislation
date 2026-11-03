@@ -148,8 +148,6 @@ jobs:
       tags: |
         ghcr.io/taktekhq/lebanese-legislation-db:latest
       free_disk: true
-      pre_build: |
-        aws s3 sync s3://lebleg-site/_build/scans db/scans --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
   all:
     needs: db
     permissions:

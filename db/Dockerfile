@@ -66,8 +66,6 @@ ENV PGDATA=/var/lib/postgresql/18/docker
 COPY --from=commands /out/build-search /usr/local/bin/
 COPY db/health.sh db/web-schema.sh tools/src/lebleg/sql/web.sql db/official.sql /opt/lebleg/db/
 COPY db/bake.sh /opt/lebleg/db/bake.sh
-# Optional scans are synced from R2 before the image build. No database dumps enter the build.
-COPY db/scans/ /scans/
 RUN --mount=type=bind,source=data,target=/input/data bash /opt/lebleg/db/bake.sh
 # This is a new, cleanly stopped cluster with no replicas or consumers. Reset
 # its WAL without -f (unclean shutdowns are refused), discarding preallocated
@@ -80,7 +78,6 @@ ENV PGDATA=/var/lib/postgresql/18/docker
 COPY --from=baked --chown=postgres:postgres /opt/lebleg/seed /opt/lebleg/seed
 COPY --from=baked /opt/lebleg/vector-ids.csv /opt/lebleg/vector-ids.csv
 COPY --from=baked /opt/lebleg/db/ /opt/lebleg/db/
-COPY --from=baked /scans/ /scans/
 COPY --from=commands /out/build-search /usr/local/bin/
 COPY --chmod=0755 db/start.sh /usr/local/bin/lebleg-db-start
 RUN chmod 0700 /opt/lebleg/seed

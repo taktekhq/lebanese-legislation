@@ -1,8 +1,8 @@
 # Origin images and deployment
 
 `db/Dockerfile` builds both databases from `data/` with the existing chunker,
-without embedding calls or database dumps. The `images` workflow downloads
-scans from R2 and publishes `-db:<YYYY-MM-DD>` and `:latest` on demand or on
+without embedding calls or database dumps. The `images` workflow
+publishes `-db:<YYYY-MM-DD>` and `:latest` on demand or on
 changes to `data/` on main.
 
 `Dockerfile` builds the Go server and adds it and `start.sh` to `-db` at
@@ -83,7 +83,7 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 
 | Image | Holds | Used by |
 | --- | --- | --- |
-| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings, optional scans | Compose, database users and the base of `-all` |
+| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings | Compose, database users and the base of `-all` |
 | `-api` | Standalone API server, unchanged Dockerfile and amd64/arm64 support | Compose and API users with a separate database |
 | `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
 | `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
