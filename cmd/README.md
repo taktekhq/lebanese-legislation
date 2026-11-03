@@ -61,6 +61,7 @@ The server itself is [`web/`](../web/README.md) (with `api/` and `mcp/`); these 
 | Command | What it does |
 | --- | --- |
 | `usage-stats` | Adds up one day of the anonymous usage record the web server keeps with `-events`, as JSON. |
+| `repo-stats` | Sends GitHub stars, views, clones and referrers and Hugging Face downloads and likes to PostHog, daily from [stats.yml](../.github/workflows/stats.yml). |
 | `journal-sitemap` | Prints the project journal's sitemap from the posts built into the site. No database. |
 | [`export-vectors`](export-vectors/) | Streams saved semantic chunks to NDJSON, including 768-dimensional vectors and stable chunk IDs. |
 | [`vectorize-sync`](vectorize-sync/) | Upserts changed vectors and deletes removed IDs in Cloudflare Vectorize, using an id/hash manifest. **key**: `LEBLEG_VECTORIZE_TOKEN`. |
