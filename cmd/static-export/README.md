@@ -28,6 +28,7 @@ stylesheets and scripts, and `.export/`:
 | `manifest.jsonl` | one line per path: status, SHA-256, size, content type, file, `Cache-Control`, redirect target |
 | `redirects.json` | what an edge needs to answer old addresses in one hop (see below) |
 | `removed.txt` | pages the previous export had and this one does not |
+| `changed.txt` | HTML pages new or different since the previous export, for IndexNow |
 | `stats.json` | pages, bytes (raw and gzip), time, peak memory, size by kind of page |
 | `server.log` | what the site logged while rendering (slow pages, errors) |
 
@@ -35,6 +36,14 @@ For a changed-page CI render, `go run ./cmd/static-export changes -since COMMIT 
 latter to `export -paths plan/paths.txt -crawl=false` when mode is `paths`.
 An empty path file renders no pages. See [changed-page renders](../../docs/static-export.md#changed-page-renders-in-ci)
 for dependency mapping, deletion and baseline rules.
+
+After a render, `go run ./cmd/static-export indexnow DIR...` sends to IndexNow
+(api.indexnow.org, which passes it on to Bing, Yandex, Naver and Seznam) the
+changed pages that a live sitemap lists, plus the removed ones; each DIR holds
+one export's `changed.txt` and `removed.txt`. `-dry-run` prints the URLs.
+`indexnow -all` sends every sitemap URL in sitemap order, for a first backfill
+(`-skip N -max M` to spread it over days). The key is the one the site serves at
+`/<key>.txt`.
 
 A second run reads the previous manifest and rewrites only the pages whose hash
 changed; pages that stopped existing are deleted. Pages are found from the

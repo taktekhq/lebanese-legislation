@@ -232,6 +232,7 @@ type exporter struct {
 
 	removedMu sync.Mutex
 	removed   []string // pages that were files and no longer are
+	changed   []string // HTML pages new or different since the previous manifest, for IndexNow
 
 	mu      sync.Mutex
 	entries chan Entry // collected by the manifest writer
@@ -535,6 +536,11 @@ func (ex *exporter) ok(p string, rec *httptest.ResponseRecorder, e Entry) error 
 			return err
 		}
 		atomic.AddInt64(&ex.st.Written, 1)
+		if strings.HasPrefix(e.Type, "text/html") {
+			ex.removedMu.Lock()
+			ex.changed = append(ex.changed, p)
+			ex.removedMu.Unlock()
+		}
 	}
 	gz := gzipSize(body)
 	n := atomic.AddInt64(&ex.st.Pages, 1)
@@ -819,6 +825,10 @@ func (ex *exporter) finish(partial bool) error {
 	sort.Strings(ex.removed)
 	ex.st.Removed = int64(len(ex.removed))
 	if err := os.WriteFile(filepath.Join(dir, "removed.txt"), []byte(strings.Join(ex.removed, "\n")+"\n"), 0o644); err != nil {
+		return err
+	}
+	sort.Strings(ex.changed)
+	if err := os.WriteFile(filepath.Join(dir, "changed.txt"), []byte(strings.Join(ex.changed, "\n")+"\n"), 0o644); err != nil {
 		return err
 	}
 	if err := WriteManifest(filepath.Join(dir, "manifest.jsonl"), cur); err != nil {

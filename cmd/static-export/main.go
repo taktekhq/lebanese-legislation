@@ -8,6 +8,7 @@
 //	static-export redirects  -out DIR [-db DSN]
 //	static-export old-urls   -out DIR -n N [-seed S] > old.txt
 //	static-export check-old  -out DIR -live URL -paths old.txt
+//	static-export indexnow   [-all] [-max N] [-dry-run] [CHANGED_DIR...]
 //
 // See docs/static-export.md for the design and the measured results.
 package main
@@ -54,7 +55,7 @@ func main() {
 
 func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 	if len(args) == 0 {
-		return errors.New("usage: static-export export|changes|sample|compare|redirects|old-urls|check-old [flags]")
+		return errors.New("usage: static-export export|changes|sample|compare|redirects|old-urls|check-old|indexnow [flags]")
 	}
 	switch args[0] {
 	case "changes":
@@ -71,6 +72,8 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 		return oldURLs(args[1:], stdout)
 	case "check-old":
 		return checkOld(ctx, args[1:], stdout)
+	case "indexnow":
+		return indexNow(ctx, args[1:], stdout, stderr)
 	}
 	return fmt.Errorf("unknown command %q", args[0])
 }
@@ -793,4 +796,90 @@ func changes(ctx context.Context, args []string, stdout, stderr io.Writer) error
 	}
 	fmt.Fprintf(stdout, "%s: %d paths\n", mode, len(p.Paths))
 	return nil
+}
+
+// indexNow submits to IndexNow the pages one render changed. Each argument is
+// a directory holding an export's changed.txt and removed.txt (one per shard
+// artifact). With -all it submits every URL in the live sitemaps instead,
+// sitemap order (core pages first), for a first backfill.
+func indexNow(ctx context.Context, args []string, stdout, stderr io.Writer) error {
+	fs := flag.NewFlagSet("indexnow", flag.ContinueOnError)
+	fs.SetOutput(stderr)
+	base := fs.String("base", "https://lebaneselegislation.com", "the live site")
+	endpoint := fs.String("endpoint", "https://api.indexnow.org/indexnow", "IndexNow endpoint")
+	key := fs.String("key", site.IndexNowKey, "IndexNow key, served at BASE/KEY.txt")
+	all := fs.Bool("all", false, "submit every sitemap URL, not the changed pages")
+	skip := fs.Int("skip", 0, "with -all, leave out the first N sitemap URLs (sent on an earlier day)")
+	max := fs.Int("max", 50000, "submit at most this many URLs (0 means no limit)")
+	dry := fs.Bool("dry-run", false, "print the URLs, send nothing")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	host, err := staticexport.HostOf(*base)
+	if err != nil {
+		return err
+	}
+	client := &http.Client{Timeout: 2 * time.Minute}
+	get := func(ctx context.Context, u string) ([]byte, error) {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("GET %s: status %d", u, resp.StatusCode)
+		}
+		return io.ReadAll(resp.Body)
+	}
+	listed, err := staticexport.SitemapURLs(ctx, strings.TrimRight(*base, "/")+"/sitemap.xml", get)
+	if err != nil {
+		return err
+	}
+	var urls []string
+	if *all {
+		urls = listed[min(*skip, len(listed)):]
+		if *max > 0 && len(urls) > *max {
+			urls = urls[:*max]
+		}
+	} else {
+		inSitemap := make(map[string]bool, len(listed))
+		for _, u := range listed {
+			inSitemap[u] = true
+		}
+		var changed, removed []string
+		for _, dir := range fs.Args() {
+			for name, dst := range map[string]*[]string{"changed.txt": &changed, "removed.txt": &removed} {
+				lines, err := readLines(filepath.Join(dir, name))
+				if err != nil && !errors.Is(err, os.ErrNotExist) {
+					return err
+				}
+				*dst = append(*dst, lines...)
+			}
+		}
+		sort.Strings(changed)
+		sort.Strings(removed)
+		urls = staticexport.IndexNowURLs(*base, changed, removed, inSitemap, *max)
+		fmt.Fprintf(stderr, "indexnow: %d changed pages, %d removed, %d in the sitemaps\n", len(changed), len(removed), len(listed))
+	}
+	if *dry {
+		for _, u := range urls {
+			fmt.Fprintln(stdout, u)
+		}
+		return nil
+	}
+	n := &staticexport.IndexNow{Endpoint: *endpoint, Host: host, Key: *key, Client: client}
+	results, err := n.Submit(ctx, urls)
+	sent := 0
+	for _, r := range results {
+		fmt.Fprintf(stdout, "indexnow %d urls status %d tries %d %s\n", r.URLs, r.Status, r.Tries, r.Body)
+		if r.Status == http.StatusOK || r.Status == http.StatusAccepted {
+			sent += r.URLs
+		}
+	}
+	fmt.Fprintf(stdout, "indexnow: sent %d of %d URLs\n", sent, len(urls))
+	return err
 }

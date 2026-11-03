@@ -122,6 +122,9 @@ func TestSecondRunRewritesOnlyWhatChanged(t *testing.T) {
 	if !strings.Contains(string(b), "/en/law/1/") {
 		t.Errorf("removed.txt = %q", b)
 	}
+	if b, _ := os.ReadFile(filepath.Join(out, ".export", "changed.txt")); string(b) != "/hidden/\n" {
+		t.Errorf("changed.txt = %q, want only the edited page", b)
+	}
 	if _, err := os.Stat(filepath.Join(out, "en", "law", "1", "index.html")); err == nil {
 		t.Error("the file of a page that now answers 404 is still there")
 	}
