@@ -28,7 +28,7 @@ import (
 	"strconv"
 	"strings"
 
-	lsite "github.com/taktekhq/lebanese-legislation/internal/site"
+	"github.com/taktekhq/lebanese-legislation/internal/layoutframe"
 )
 
 // PartsMagic starts every page stored in parts. No HTML page starts so.
@@ -39,12 +39,12 @@ const LayoutPointerKey = "_export/layout.json"
 
 // Layout is the frames an export splits its pages with.
 type Layout struct {
-	Frames []lsite.LayoutFrame
+	Frames []layoutframe.Frame
 }
 
 // NewLayout checks the frames: each piece of frame between two holes must
 // be there to find, or a page could not be cut.
-func NewLayout(frames []lsite.LayoutFrame) (*Layout, error) {
+func NewLayout(frames []layoutframe.Frame) (*Layout, error) {
 	for _, f := range frames {
 		if len(f.Text) != len(f.Slots)+1 || f.Lang == "" || f.Schema == "" {
 			return nil, fmt.Errorf("layout %s: malformed frame", f.Lang)
@@ -101,7 +101,7 @@ func (l *Layout) Split(body []byte) ([]byte, string, bool) {
 // and attributes that cannot hold the next piece (each starts with < or "),
 // so the first match is the piece; the last part, the page's content, runs
 // to the frame's closing piece at the very end.
-func cut(f *lsite.LayoutFrame, body []byte) ([][]byte, bool) {
+func cut(f *layoutframe.Frame, body []byte) ([][]byte, bool) {
 	n := len(f.Slots)
 	if !bytes.HasPrefix(body, []byte(f.Text[0])) || !bytes.HasSuffix(body, []byte(f.Text[n])) {
 		return nil, false
@@ -147,7 +147,7 @@ func PartsHeader(obj []byte) (lang, schema string, lens []int, rest []byte, err 
 }
 
 // joinParts puts a page in parts back into its frame.
-func joinParts(f *lsite.LayoutFrame, obj []byte) ([]byte, error) {
+func joinParts(f *layoutframe.Frame, obj []byte) ([]byte, error) {
 	lang, schema, lens, rest, err := PartsHeader(obj)
 	if err != nil {
 		return nil, err
@@ -199,7 +199,7 @@ type frameObject struct {
 
 // FrameObject is the stored form of a frame and its id, the key being
 // _layout/<id>.json. The id changes whenever a byte of the frame does.
-func FrameObject(f lsite.LayoutFrame) (body []byte, id string) {
+func FrameObject(f layoutframe.Frame) (body []byte, id string) {
 	var b bytes.Buffer
 	enc := json.NewEncoder(&b)
 	enc.SetEscapeHTML(false)
@@ -212,15 +212,15 @@ func FrameObject(f lsite.LayoutFrame) (body []byte, id string) {
 func FrameKey(id string) string { return "_layout/" + id + ".json" }
 
 // ParseFrameObject reads a stored frame back.
-func ParseFrameObject(b []byte) (lsite.LayoutFrame, error) {
+func ParseFrameObject(b []byte) (layoutframe.Frame, error) {
 	var o frameObject
 	if err := json.Unmarshal(b, &o); err != nil {
-		return lsite.LayoutFrame{}, err
+		return layoutframe.Frame{}, err
 	}
 	if len(o.Text) != len(o.Slots)+1 {
-		return lsite.LayoutFrame{}, errors.New("frame object: text and slots do not match")
+		return layoutframe.Frame{}, errors.New("frame object: text and slots do not match")
 	}
-	return lsite.LayoutFrame{Lang: o.Lang, Schema: o.Schema, Slots: o.Slots, Text: o.Text}, nil
+	return layoutframe.Frame{Lang: o.Lang, Schema: o.Schema, Slots: o.Slots, Text: o.Text}, nil
 }
 
 // LayoutPointer is _export/layout.json: the frame id of each lang/schema,

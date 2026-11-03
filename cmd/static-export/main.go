@@ -43,6 +43,7 @@ import (
 )
 
 func main() {
+	staticexport.LayoutSchemas = site.LayoutSchemas
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	if err := run(ctx, os.Args[1:], os.Stdout, os.Stderr); err != nil {

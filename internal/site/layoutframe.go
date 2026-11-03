@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/taktekhq/lebanese-legislation/internal/layoutframe"
 	"html/template"
 	"io/fs"
 	"regexp"
@@ -24,15 +25,7 @@ import (
 // templates of _page.html, which hold every use of the Page. The frame is
 // rendered with no Page at all, so a field used outside a "page:" template
 // fails here instead of being frozen into every page.
-type LayoutFrame struct {
-	Lang string // "ar" (the root) or "en"
-	// Schema names the holes and how each is escaped where it stands. A page
-	// split under one schema fits any frame of the same schema; a change to
-	// it is a change to every page.
-	Schema string
-	Text   []string // len(Slots)+1 pieces of shared HTML
-	Slots  []string // the "page:" template of each hole, in order
-}
+type LayoutFrame = layoutframe.Frame
 
 // slotMark stands in for a hole while the frame is rendered. It holds no
 // character html/template escapes, so it comes out as written in any context.

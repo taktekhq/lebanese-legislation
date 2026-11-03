@@ -16,7 +16,6 @@ import (
 	"strconv"
 	"strings"
 
-	lsite "github.com/taktekhq/lebanese-legislation/internal/site"
 	"github.com/taktekhq/lebanese-legislation/internal/site/topics"
 )
 
@@ -212,13 +211,22 @@ const layoutFile = "internal/site/templates/layout.html"
 // what they were, and the run only has to publish the new frame, which each
 // export with the edge layout does. Anything else, including a version that
 // is not a frame (every one before the edge layout), renders everything.
+// LayoutSchemas reads the frame schemas of a version of layout.html
+// (internal/site.LayoutSchemas). The command sets it; this package does not
+// import the site, which reads the database. Unset, every layout change
+// renders everything.
+var LayoutSchemas func(src string) (map[string]string, error)
+
 func frameOnlyChange(ctx context.Context, dir, since string) bool {
 	schemas := func(rev string) map[string]string {
 		b, e := gitOutput(ctx, dir, "show", rev+":"+layoutFile)
 		if e != nil {
 			return nil
 		}
-		s, e := lsite.LayoutSchemas(string(b))
+		if LayoutSchemas == nil {
+			return nil
+		}
+		s, e := LayoutSchemas(string(b))
 		if e != nil {
 			return nil
 		}

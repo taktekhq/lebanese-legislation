@@ -16,6 +16,9 @@ import (
 )
 
 // edgeSite is the real site with no database: the pages that need none.
+// The command sets this; the tests use the same reader.
+func init() { LayoutSchemas = lsite.LayoutSchemas }
+
 func edgeSite(t *testing.T) (*lsite.Server, *Layout) {
 	t.Helper()
 	s, err := lsite.New(nil)
