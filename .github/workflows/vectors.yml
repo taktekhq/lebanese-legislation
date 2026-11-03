@@ -226,6 +226,9 @@ jobs:
             -e CLOUDFLARE_ACCOUNT_ID -e LEBLEG_VECTORIZE_TOKEN -e LEBLEG_VECTORIZE_INDEX \
             -e VECTORS_INPUT=/work/out/vectors/vectors.parquet -e VECTORS_PREVIOUS=/work/previous.tsv \
             "$IMAGE"
+          # Images built before c22f2cf write the manifest 0600 as root; this job runs
+          # the previous :latest, which is rebuilt only after a successful sync.
+          sudo chmod a+r "$RUNNER_TEMP/vectors-manifest.tsv"
           aws s3 cp "$RUNNER_TEMP/vectors-manifest.tsv" s3://lebleg-site/_build/vectors-manifest.tsv --endpoint-url "$R2_ENDPOINT"
   vectors:
     needs: publish
