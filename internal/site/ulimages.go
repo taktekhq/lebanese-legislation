@@ -13,12 +13,18 @@ import (
 // and marks them cacheable for a year: Cloudflare keeps them, UL is asked once.
 const ulImages = "https://legallaw.ul.edu.lb/uploads/images/"
 
+// A few UL records point their pictures at the Centre's internal address,
+// which no reader can reach. The same files are on the public server.
+const ulInternalImages = "http://10.135.0.250/uploads/images/"
+
 var ulClient = &http.Client{Timeout: 30 * time.Second}
 
 // imageURL maps a stored picture address to the one pages use.
 func imageURL(u string) string {
-	if strings.HasPrefix(u, ulImages) {
-		return "/ul/uploads/images/" + strings.TrimPrefix(u, ulImages)
+	for _, prefix := range []string{ulImages, ulInternalImages} {
+		if strings.HasPrefix(u, prefix) {
+			return "/ul/uploads/images/" + strings.TrimPrefix(u, prefix)
+		}
 	}
 	return u
 }

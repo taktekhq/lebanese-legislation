@@ -986,11 +986,12 @@ func (s *Server) data(w http.ResponseWriter, r *http.Request) {
 		"keywords":    []string{"Lebanon", "Lebanese law", "legislation", "case law", "Official Gazette", "التشريعات اللبنانية", "القانون اللبناني", "législation libanaise"},
 		"inLanguage":  []string{"ar", "fr", "en"}, "isAccessibleForFree": true,
 		"spatialCoverage": map[string]any{"@type": "Place", "name": "Lebanon"}, "temporalCoverage": "1904/..",
-		"creator":          map[string]any{"@type": "Organization", "name": "Taktek, LLC", "url": "https://taktek.io/"},
-		"isBasedOn":        map[string]any{"@type": "Organization", "name": "Centre for Research and Studies in Legal Informatics, Lebanese University", "url": "https://legallaw.ul.edu.lb/"},
-		"license":          Base + "/data/#license",
-		"creditText":       "Source: Centre for Research and Studies in Legal Informatics, Lebanese University",
-		"variableMeasured": []string{"legislation", "legislation_article", "ruling", "gazette_issue", "opinion", "agreement", "reference"}}
+		"creator":            map[string]any{"@type": "Organization", "name": "Taktek, LLC", "url": "https://taktek.io/"},
+		"isBasedOn":          map[string]any{"@type": "WebSite", "name": "Lebanese legislation database of the Centre for Research and Studies in Legal Informatics", "url": "https://legallaw.ul.edu.lb/"},
+		"sourceOrganization": map[string]any{"@type": "Organization", "name": "Centre for Research and Studies in Legal Informatics, Lebanese University", "url": "https://legallaw.ul.edu.lb/"},
+		"license":            Base + "/data/#license",
+		"creditText":         "Source: Centre for Research and Studies in Legal Informatics, Lebanese University",
+		"variableMeasured":   []string{"legislation", "legislation_article", "ruling", "gazette_issue", "opinion", "agreement", "reference"}}
 	s.render(w, r, "data", 200, Page{Title: s.brandTitle(r, s.trOr(r, "The database", "data.title_suffix")), Path: "/data/", LD: []any{ds},
 		Desc: s.trOr(r, "All of Lebanese law as one relational PostgreSQL database: its tables, row counts and example queries.", "data.desc"), Data: tables})
 }

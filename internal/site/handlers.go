@@ -239,7 +239,9 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 			"publisher":       map[string]any{"@type": "Organization", "name": "Taktek, LLC", "url": "https://taktek.io/"},
 			"potentialAction": map[string]any{"@type": "SearchAction", "target": Base + "/search/?q={q}", "query-input": "required name=q"}},
 			map[string]any{"@context": "https://schema.org", "@type": "Organization", "@id": Base + "/#org", "name": "Lebanese Legislation",
-				"url": Base + "/", "logo": Base + "/assets/mark.png", "description": "A free public library of Lebanese law."}},
+				"url": Base + "/", "logo": Base + "/assets/mark.png", "description": "A free public library of Lebanese law.",
+				"parentOrganization": map[string]any{"@type": "Organization", "name": "Taktek, LLC", "url": "https://taktek.io/"},
+				"sameAs":             []string{"https://github.com/taktekhq/lebanese-legislation", "https://huggingface.co/datasets/taktekhq/lebanese-legislation"}}},
 		Data: map[string]any{"Stats": st, "Codes": codes, "Recent": recent, "Topics": homeTopicRefs(s.lang(r))},
 	})
 }
