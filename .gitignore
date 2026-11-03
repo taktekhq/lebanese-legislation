@@ -33,3 +33,6 @@ workers/static-site/container/build/
 
 # R2 pages downloaded only by the site image job.
 /site-content/
+
+# go build ./cmd/static-export at the root
+/static-export
