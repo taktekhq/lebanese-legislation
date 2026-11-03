@@ -1,12 +1,12 @@
 // Package provenance is the wording guard: no model-written law reaches the
-// site, the D1 snapshot or the public dataset.
+// site or the public dataset.
 //
 // Every law text in the database (legislation_article.text_ar and text_fr,
 // article_version.text_ar) carries the source it was read from, written with
 // it: source_kind and source_id, never a hash. An amendment's wordings
 // (amendment.text_ar and old_text_ar) are read from the amending article,
-// which the row itself names (by_law_id, by_article). Before export,
-// snapshot and the Hugging Face upload, Check reads each source from the raw
+// which the row itself names (by_law_id, by_article). Before export or
+// the Hugging Face upload, Check reads each source from the raw
 // archive the fetchers stored (verified against the fetchers' own SHA-256,
 // or for the Gazette scans the bundle manifest's), and a text passes only
 // when, normalized, it is a contiguous span of its source that starts and
@@ -77,7 +77,7 @@ type Violation struct {
 	Row       string
 }
 
-// ErrBlocked is what export, snapshot and check-wording return
+// ErrBlocked is what export and check-wording return
 // when a text has no source: errors.Is(err, ErrBlocked), exit code 4.
 var ErrBlocked error = &BlockedError{}
 
@@ -677,7 +677,7 @@ func loadVersions(ctx context.Context, conn *pgx.Conn, inferred bool) ([]Article
 	return out, nil
 }
 
-// Guard is what export, snapshot and check-wording run first.
+// Guard is what export and check-wording run first.
 type Guard struct {
 	Sources SourceStore
 	Edits   ApprovedEdits
@@ -746,7 +746,7 @@ var internalCols = map[string]bool{
 }
 
 // Internal says whether a table's column is a provenance column, which
-// export, snapshot and hf.sh leave out.
+// export and hf.sh leave out.
 func Internal(table, column string) bool { return internalCols[table+"."+column] }
 
 // StripInternal drops the provenance columns (lines ending with Marker,

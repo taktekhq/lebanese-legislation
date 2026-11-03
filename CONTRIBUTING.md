@@ -10,8 +10,8 @@ go vet ./... && go test ./...
 # The release commands against a throwaway pgvector PostgreSQL (see .github/workflows/checks.yml)
 docker build -f db/Dockerfile --target postgres -t lebleg-test-postgres .
 LEBLEG_RELEASE_TEST_DSN=postgres://... go test ./internal/releasedb/
-# mcp/cloudflare/
-node --test mcp/cloudflare/runtime.test.mjs
+# Cloudflare Workers
+node --test workers/static-site/test/*.test.mjs workers/origin/test/*.test.mjs
 ```
 
 New services and tools are written in Go. The [website guide](web/README.md) includes a fictional database fixture. The [service reference](docs/reference.md#rebuild-the-release) explains rebuilding the release and publishing forks. Reuse compatible vectors; new paid embeddings need explicit flags and a budget. All four images publish from this repository with immutable version tags.

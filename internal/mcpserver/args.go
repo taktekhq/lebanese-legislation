@@ -91,8 +91,7 @@ func strArg(v any) (string, error) {
 	return "", errArgType
 }
 
-// idArg reads a positive id the way `if (!id || id <= 0)` and a bound D1
-// parameter did: bad is true for a missing, zero, negative or non-numeric
+// idArg reads a positive id: bad is true for a missing, zero, negative or non-numeric
 // falsy value (a tool error); otherwise id is the integer to look up, or 0
 // when nothing can match (a fraction, a word), and shown is how the
 // argument reads in a "not found" message.

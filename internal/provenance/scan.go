@@ -92,7 +92,7 @@ var modelImports = []string{
 //     (const table = "amendment"), or an UPDATE of a text table whose
 //     columns are joined on later ("UPDATE article_version SET " + col).
 //     These are not flagged in a package that reads no model output: the
-//     snapshot and the export name the text tables to read them;
+//     export names the text tables to read them;
 //   - an exported function or method of a decision package that returns
 //     free text.
 func ScanWriters(root string) []Finding {
@@ -384,7 +384,7 @@ func scanGoFile(path string) *goFile {
 	}
 	// A regular expression's pattern names paths to match them, not to read
 	// them: this package's own patterns name db/model/, and the packages
-	// that import it (export, snapshot) read no model output for that.
+	// that import it (export) read no model output for that.
 	pattern := map[ast.Node]bool{}
 	ast.Inspect(f, func(n ast.Node) bool {
 		switch x := n.(type) {

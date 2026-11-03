@@ -12,9 +12,9 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/calculatedcurrent"
 )
 
-// articleRow is the snapshot's legislation_article row: the Centre's text
+// articleRow combines the Centre's legislation_article text
 // plus the in-force fields of article_in_force (db/amendments.sql) and the
-// calculated current amounts, computed here the way internal/snapshot does.
+// calculated current amounts verified by internal/calculatedcurrent.
 type articleRow struct {
 	LawID       int
 	Position    int
@@ -85,8 +85,7 @@ func (s *Server) queryArticles(ctx context.Context, where string, args ...any) (
 	return out, rows.Err()
 }
 
-// finish derives the snapshot's columns from the raw ones, as
-// internal/snapshot's exportArticleRows does.
+// finish derives the response columns from the raw article fields.
 func (a *articleRow) finish(current *string, inForce, validFrom *time.Time, annulled bool) {
 	// Only carry the in-force wording when it differs from the Centre's.
 	if a.Version == "1.0" || (current != nil && *current == a.TextAr) {

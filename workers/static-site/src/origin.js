@@ -69,8 +69,8 @@ export async function originFetch(request, env, ctx) {
     }
   }
 
-  // A request with the secret test header reaches the container whatever the mode,
-  // so the container can be checked before traffic moves to it.
+  // A request with the secret test header can select the idle container
+  // so it can be checked before traffic moves to it.
   const testing = env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY;
   const admin = url.pathname === "/_origin/log" || url.pathname === "/_origin/restart";
   const selected = testing ? (admin ? url.searchParams.get("side") : request.headers.get("x-origin-side")) : null;
@@ -79,10 +79,6 @@ export async function originFetch(request, env, ctx) {
   }
   // Only authenticated requests may invoke the service's container controls.
   if (admin && !testing) return new Response(null, { status: 404, headers: SECURITY_HEADERS });
-  // Until the container's AI answer works, AI_TO_HETZNER sends the AI answer
-  // endpoints to the old origin. Remove it once Hetzner is retired.
-  const aiPath = /^\/(en\/|ar\/)?search\/(answer|ai)(\/|$)/.test(url.pathname);
-  if ((env.ORIGIN_MODE === "hetzner" || (env.AI_TO_HETZNER === "1" && aiPath)) && !testing) return fetch(request);
   let side, started;
   try {
     side = selected || await liveSide(env);

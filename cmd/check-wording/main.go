@@ -1,6 +1,6 @@
 // Command check-wording is the wording guard: it checks that every law text
 // in the database is a span of its archived source (internal/provenance).
-// export-data, mcp-snapshot and the Hugging Face release run the same check
+// export-data and the Hugging Face release run the same check
 // before they write anything.
 //
 //	check-wording [-db dsn] [-report] [-archive dir] [-scans dir] [-manifest file] [-edits files] [-known file]

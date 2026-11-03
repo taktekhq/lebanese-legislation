@@ -1,8 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { route, keyFor, resolve, indexRedirectData, hasRealQuery } from "../src/route.js";
-import { CSP } from "../src/headers.js";
 
 const cases = JSON.parse(readFileSync(new URL("../../../internal/staticexport/testdata/resolve-cases.json", import.meta.url)));
 
@@ -48,14 +47,4 @@ test("keys: pages are index.html, files keep their name, _export is private", ()
   assert.equal(keyFor("/en/"), "en/index.html");
   assert.equal(keyFor("/_export/manifest.jsonl"), null);
   assert.equal(keyFor("/a/../b/"), null);
-});
-
-// The Caddyfile lives in the deployment repo; where it is not checked out the
-// comparison is skipped, and it must be run before a Worker release.
-const CADDYFILE = process.env.CADDYFILE || new URL("../../../deploy/hetzner/caddy/Caddyfile", import.meta.url);
-test("the Content-Security-Policy is the Caddyfile's", { skip: !existsSync(CADDYFILE) && "no Caddyfile here (set CADDYFILE=path)" }, () => {
-  const caddy = readFileSync(CADDYFILE, "utf8");
-  const m = caddy.match(/Content-Security-Policy "([^"]+)"/);
-  assert.ok(m, "no CSP in the Caddyfile");
-  assert.equal(CSP, m[1]);
 });

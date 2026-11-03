@@ -19,16 +19,9 @@ name: origin
         type: string
         default: latest
       deploy_site_worker:
-        description: Deploy the site Worker before staging (routes and mode apply only here)
+        description: Deploy the site Worker before staging (routes apply only here)
         type: boolean
         default: false
-      mode:
-        description: Origin mode
-        type: choice
-        options:
-        - container
-        - hetzner
-        default: container
 permissions:
   contents: read
   actions: read
@@ -44,7 +37,6 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
   R2_ENDPOINT: https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
   ORIGIN_TEST_KEY: ${{ secrets.ORIGIN_TEST_KEY }}
-  MODE: ${{ inputs.mode || 'container' }}
   ROUTES: ${{ inputs.route }}
 jobs:
   eligible:

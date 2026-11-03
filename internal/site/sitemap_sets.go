@@ -13,7 +13,7 @@ import (
 
 // The shard files (ar-articles-4.xml and the others) used to run
 // "ORDER BY ... LIMIT 45000 OFFSET n" on every request that missed the edge:
-// 4.4 s each on average on the Hetzner box (100 of them in three days, 439 s
+// 4.4 s each on average on the former server (100 of them in three days, 439 s
 // of Postgres between them), and the cold /sitemap.xml ran five more passes
 // to count the rows (34 and 39 s on 1 Nov 2026). A crawler asking for the
 // whole index at once pinned both CPUs.

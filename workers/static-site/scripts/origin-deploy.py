@@ -102,7 +102,7 @@ def wait_rollout(side, seconds=1800):
 
 
 def deploy_site_worker():
-    args = ['npx', '--yes', 'wrangler@4.151.1', 'deploy', '--var', 'ORIGIN_MODE:' + os.environ['MODE']]
+    args = ['npx', '--yes', 'wrangler@4.151.1', 'deploy']
     for route in os.environ.get('ROUTES', '').split(','):
         if route.strip():
             args += ['--route', route.strip()]

@@ -70,7 +70,7 @@ export default {
     if (!mcpPath && request.method !== "GET" && request.method !== "HEAD" && !(request.method === "POST" && postAllowed)) {
       return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: postAllowed ? "GET, HEAD, POST" : "GET, HEAD" } });
     }
-    if (/shapbot/i.test(request.headers.get("User-Agent") || "")) return new Response(null, { status: 429 }); // as Caddy does
+    if (/shapbot/i.test(request.headers.get("User-Agent") || "")) return new Response(null, { status: 429 });
     if (env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY) {
       return originFetch(request, env, ctx);
     }

@@ -275,9 +275,9 @@ func guardPaths() provenance.Paths {
 
 // The fixture dump loads, passes, exports with no provenance column; one
 // article rewritten as a model would, by an UPDATE that keeps its source,
-// blocks export and snapshot with exit 4, names the article, and writes no
+// blocks export with exit 4, names the article, and writes no
 // file.
-func TestDBModelRewriteBlocksExportAndSnapshot(t *testing.T) {
+func TestDBModelRewriteBlocksExport(t *testing.T) {
 	p := postgres(t)
 	dsn := p.database(t, "fixture")
 	schema(t, dsn)
@@ -307,19 +307,6 @@ func TestDBModelRewriteBlocksExportAndSnapshot(t *testing.T) {
 	if b, _ := os.ReadFile(filepath.Join(clean, "data/legislation_scan/COLUMNS")); !bytes.Contains(b, []byte("source_id")) {
 		t.Errorf("export dropped legislation_scan's own source_id: %q", b)
 	}
-	snap := filepath.Join(tmp, "snapshot")
-	if code, _, stderr := run(t, "snapshot", "-db", dsn, "-out", snap); code != 0 {
-		t.Fatalf("clean snapshot: exit %d\n%s", code, stderr)
-	}
-	files, _ := filepath.Glob(filepath.Join(snap, "*.sql"))
-	if len(files) < 2 {
-		t.Fatalf("clean snapshot wrote %v", files)
-	}
-	for _, f := range files {
-		if b, _ := os.ReadFile(f); bytes.Contains(b, []byte("source_kind")) || bytes.Contains(b, []byte("lawtext/")) {
-			t.Errorf("snapshot %s carries provenance", filepath.Base(f))
-		}
-	}
 	hfColumns(t, dsn)
 
 	// The model's rewrite: one word of law 8225's article 1, source kept.
@@ -339,7 +326,7 @@ func TestDBModelRewriteBlocksExportAndSnapshot(t *testing.T) {
 	}
 	conn.Close(context.Background())
 
-	for _, c := range []struct{ name, out string }{{"export", filepath.Join(tmp, "blocked-export")}, {"snapshot", filepath.Join(tmp, "blocked-snapshot")}} {
+	for _, c := range []struct{ name, out string }{{"export", filepath.Join(tmp, "blocked-export")}} {
 		code, _, stderr := run(t, c.name, "-db", dsn, "-out", c.out)
 		if code != 4 {
 			t.Errorf("%s: exit %d, want 4\n%s", c.name, code, stderr)

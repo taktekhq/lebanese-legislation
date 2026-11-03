@@ -8,10 +8,8 @@ package site
 // canonical URL and the not-legal-advice line (notLegalAdvice, api.go).
 //
 // The -mcp image serves it (internal/app, mode mcp) and so does the website.
-// LebaneseLegislation.com answers /mcp from a separate server at the edge
-// that reads a nightly snapshot, so the site's own database never carries
-// that traffic; a request that still reaches the origin gets these same
-// tools. routes() (handlers.go) registers GET /mcp and GET /mcp/, which
+// LebaneseLegislation.com routes /mcp through Cloudflare to the live
+// origin container. routes() (handlers.go) registers GET /mcp and GET /mcp/, which
 // answer 405 (mcpGet) so a client probing the address gets no 404 page;
 // mcpRoutes adds POST and OPTIONS.
 //

@@ -1,6 +1,6 @@
 // Package patternonly is a fixture: it names model output only in a regular
 // expression's pattern (as the guard's own scanner does) and names a text
-// table to read it (as the snapshot does). It reads no model output, so
+// table to read it (as the export does). It reads no model output, so
 // ScanWriters leaves it alone.
 package patternonly
 

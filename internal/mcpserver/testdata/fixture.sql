@@ -1,6 +1,6 @@
 -- A tiny corpus for the DB tests, in the real schema (db/schema.sql,
--- db/amendments.sql, db/graph.sql): the rows the Worker's test fixture
--- held in its D1 shape, written as the Postgres tables they come from.
+-- db/amendments.sql, db/graph.sql), using the Postgres tables queried
+-- by the tools.
 --
 -- Law 100 (article 5), amending decree 200 (article 1, which amends law
 -- 100's article 5), a general-repeal law 300 that possibly affects law 100,

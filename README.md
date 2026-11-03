@@ -9,8 +9,9 @@ one: code, scraper, build pipeline, website and MCP.
 
 Cloudflare serves about 760,000 static pages from the R2 bucket `lebleg-site`
 through the JavaScript Worker in [`workers/static-site`](workers/static-site/).
-The same Worker serves ruling PDFs from R2. Search pages, `/api/v1/`, filters
-and Gazette scans go to one Cloudflare Container with PostgreSQL 18.6, the
+The same Worker serves ruling PDFs from R2. Search pages, `/api/v1/`, filters,
+Gazette scans and `/mcp` go through `workers/origin` to the live blue/green
+Cloudflare Container, running the `-all` image with PostgreSQL 18.6, the
 database baked into the image and the Go website server.
 
 [static-site.yml](.github/workflows/static-site.yml) renders `data/` with
@@ -89,8 +90,8 @@ embedded in the static image. The runner frees disk before syncing the roughly
 | [`db/`](db/) | The database's schema and the build's curated inputs (the Go package `db`), and the PostgreSQL image, built with pgvector on the official `postgres:18.6` image. |
 | [`web/`](web/) | The website: its `main.go`, test-only Dockerfile, SQL schema and a fictional test database. |
 | [`api/`](api/) | The REST API: its `main.go` and Dockerfile. |
-| [`mcp/`](mcp/) | The MCP server: its `main.go`, Dockerfile and a Cloudflare Containers template. |
-| [`internal/`](internal/) | The Go code: what the three services share (pages, API, MCP tools, search) and the build that makes the database from the source pages (`internal/build`, with parsing, amendments, citations, the wording guard in `internal/provenance`, the export and the MCP snapshot). |
+| [`mcp/`](mcp/) | The MCP server: its `main.go` and Dockerfile. |
+| [`internal/`](internal/) | The Go code: what the three services share (pages, API, MCP tools, search) and the build that makes the database from the source pages (`internal/build`, with parsing, amendments, citations, the wording guard in `internal/provenance`, and the export). |
 | [`scraper/`](scraper/) | The crawler that reads the Lebanese University's site into the archive, and the scripts that publish the archive. |
 | [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and local services. [Listed here](cmd/README.md). |
 | [`tools/`](tools/) | Only `tools/src/lebleg/sql/web.sql` now: the serving schema the database image applies for the website, API and MCP. |

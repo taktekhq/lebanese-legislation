@@ -7,7 +7,7 @@ compatibility_date = "2026-10-01"
 # the live origin. Keep any `routes = [...]` above the first [table].
 workers_dev = true
 
-vars = { ORIGIN_MODE = "container", POSTHOG_KEY = "phc_pTpSY5wVsQrG8LN58z4zWXdMWjvqR6uPCY2eXV25sBV5" }
+vars = { POSTHOG_KEY = "phc_pTpSY5wVsQrG8LN58z4zWXdMWjvqR6uPCY2eXV25sBV5" }
 
 [[services]]
 binding = "ORIGIN_BLUE"

@@ -3,11 +3,9 @@
 // ten read-only tools over the corpus in Postgres, and the live stat badges
 // for the Hugging Face dataset card.
 //
-// It is a port of the Cloudflare Worker that served
-// https://lebaneselegislation.com/mcp from a D1 (SQLite) snapshot of the
-// corpus: the same protocol behaviour, methods, server name and version,
-// tool names, descriptions, input schemas and answers, read from Postgres
-// directly instead of from the snapshot. Nothing here writes.
+// The hosted endpoint is https://lebaneselegislation.com/mcp, routed by
+// Cloudflare to the live origin container. All tools read Postgres directly.
+// Nothing here writes.
 package mcpserver
 
 import (

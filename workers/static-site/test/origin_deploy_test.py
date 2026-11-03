@@ -78,12 +78,12 @@ class DeploymentTests(unittest.TestCase):
                     deploy.stage(image)
                 config.write_text.assert_not_called()
 
-    def test_site_worker_keeps_routes_mode_and_test_key(self):
-        with patch.dict(os.environ, {'MODE': 'container', 'ROUTES': 'example.com/*, example.org/api/*',
+    def test_site_worker_keeps_routes_and_test_key(self):
+        with patch.dict(os.environ, {'ROUTES': 'example.com/*, example.org/api/*',
                                     'ORIGIN_TEST_KEY': 'test'}), patch.object(deploy.subprocess, 'run') as run:
             deploy.deploy_site_worker()
-            self.assertEqual(run.call_args_list[0].args[0][-6:],
-                             ['--var', 'ORIGIN_MODE:container', '--route', 'example.com/*', '--route', 'example.org/api/*'])
+            self.assertEqual(run.call_args_list[0].args[0],
+                             ['npx', '--yes', 'wrangler@4.151.1', 'deploy', '--route', 'example.com/*', '--route', 'example.org/api/*'])
             self.assertTrue(all(c.kwargs['cwd'] == 'workers/static-site' for c in run.call_args_list))
 
     def test_image_build_uses_revision_or_commit_tag_and_rejects_unknown(self):

@@ -5,7 +5,7 @@ import { originFetch } from '../src/origin.js';
 register('./workers-loader.mjs', import.meta.url);
 const { default: worker } = await import('../src/index.js');
 
-async function run(t, { path = '/healthz', duration = 0, random = 0.9, status = 200, hit = false, fail = false, mode, r2 = false, staticPage = false, serviceFail = false } = {}) {
+async function run(t, { path = '/healthz', duration = 0, random = 0.9, status = 200, hit = false, fail = false, r2 = false, staticPage = false, serviceFail = false } = {}) {
   let now = 100_000;
   const events = [], pending = [];
   t.mock.method(Date, 'now', () => now);
@@ -24,7 +24,7 @@ async function run(t, { path = '/healthz', duration = 0, random = 0.9, status = 
   } };
   t.after(() => { globalThis.caches = saved; });
   const service = { fetch: async () => { now += duration; if (serviceFail) throw Error('offline'); return new Response('origin', { status }); } };
-  const env = { POSTHOG_KEY: 'test-key', ORIGIN_MODE: mode,
+  const env = { POSTHOG_KEY: 'test-key',
     SITE: { get: async key => key === '_export/generation' ? null : key === '_build/live-side' ? { text: async () => 'green' }
       : (r2 || staticPage) ? { body: 'file', httpEtag: '"x"' } : null },
     ORIGIN_BLUE: service, ORIGIN_GREEN: service };
@@ -73,7 +73,7 @@ test('edge cache hits are marked and timed', async t => {
   assert.equal(events[0].properties.cache, 'hit');
   assert.equal(events[0].properties.duration_ms, 5);
 });
-for (const options of [{ path: '/ruling-files/9.pdf', r2: true }, { path: '/law/1/', staticPage: true }, { path: '/ph/e/' }, { mode: 'hetzner' }]) {
+for (const options of [{ path: '/ruling-files/9.pdf', r2: true }, { path: '/law/1/', staticPage: true }, { path: '/ph/e/' }]) {
   test(`no events for ${JSON.stringify(options)}`, async t => {
     const { events } = await run(t, options);
     assert.deepEqual(events, []);

@@ -222,18 +222,9 @@ jobs:
           cat "$RUNNER_TEMP/mcp.log"
           [ "$(cat "$RUNNER_TEMP/mcp.status")" -eq 0 ] || failed=1
           [ "$failed" -eq 0 ]
-  node:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: node --test mcp/cloudflare/runtime.test.mjs
   ci-ok:
     runs-on: ubuntu-latest
-    needs: [scraper, go-unit, postgres, release-commands, images, serving, node]
+    needs: [scraper, go-unit, postgres, release-commands, images, serving]
     if: always()
     steps:
       - name: Require every check to succeed

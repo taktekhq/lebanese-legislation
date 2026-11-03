@@ -9,7 +9,6 @@ import (
 
 	"github.com/taktekhq/lebanese-legislation/internal/export"
 	"github.com/taktekhq/lebanese-legislation/internal/provenance"
-	"github.com/taktekhq/lebanese-legislation/internal/snapshot"
 )
 
 // No file in the repository writes law text but the build's writers, and
@@ -194,7 +193,7 @@ func (b *builder) fix() { b.conn.Exec(b.ctx, "UPDATE legislation_article SET tex
 	}
 }
 
-// Export, the Parquet export's column query and the snapshot's schema list no
+// Export and the Parquet export's column query list no
 // provenance column; legislation_scan's own source_id stays public.
 func TestNoProvenanceColumnPublished(t *testing.T) {
 	got := export.Public("legislation_article", []string{"law_id", "text_ar", "source_kind", "source_id"})
@@ -203,10 +202,6 @@ func TestNoProvenanceColumnPublished(t *testing.T) {
 	}
 	if got := export.Public("legislation_scan", []string{"law_id", "source", "source_id"}); len(got) != 3 {
 		t.Errorf("export drops legislation_scan's source_id: %v", got)
-	}
-	d1 := snapshot.Schema()
-	if strings.Contains(d1, "source_kind") || strings.Contains(d1, "source_id") {
-		t.Error("the D1 snapshot schema has a provenance column")
 	}
 	hf, err := os.ReadFile("../../.github/scripts/data-parquet.sh")
 	if err != nil {
