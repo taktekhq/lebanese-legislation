@@ -6,7 +6,7 @@ on:
         description: Image to publish
         type: choice
         default: all
-        options: [db, api, mcp, all, vectors, site]
+        options: [db, api, mcp, all, vectors]
 permissions:
   contents: read
   packages: write
@@ -83,22 +83,3 @@ jobs:
       dockerfile: vectors/Dockerfile
       tags: |
         ghcr.io/taktekhq/lebanese-legislation-vectors:latest
-  site:
-    if: inputs.image == 'site'
-    permissions:
-      contents: read
-      packages: write
-    uses: ./.github/workflows/build-image.yml
-    secrets: inherit
-    with:
-      image: site
-      context: .
-      dockerfile: workers/static-site/container/site.Dockerfile
-      tags: |
-        ghcr.io/taktekhq/lebanese-legislation-site:latest
-      free_disk: true
-      pre_build: |
-        mkdir -p site-content
-        aws s3 sync s3://lebleg-site site-content --exclude '_build/*' --exclude '_export/*' --include '_export/redirects.json' --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
-        test -s site-content/_export/redirects.json
-        df -h .

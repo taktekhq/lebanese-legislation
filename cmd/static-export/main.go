@@ -51,9 +51,11 @@ func main() {
 
 func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 	if len(args) == 0 {
-		return errors.New("usage: static-export export|sample|compare|old-urls|check-old [flags]")
+		return errors.New("usage: static-export export|changes|sample|compare|redirects|old-urls|check-old [flags]")
 	}
 	switch args[0] {
+	case "changes":
+		return changes(ctx, args[1:], stdout, stderr)
 	case "export":
 		return export(ctx, args[1:], stdout, stderr)
 	case "sample":
@@ -126,8 +128,8 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 	if shards > 1 {
 		meta = fmt.Sprintf("_export/shard-%d-of-%d/", shard, shards)
 	}
-	if *r2bucket != "" && partial && shards <= 1 && !*dry { // a shard is whole for its own manifest
-		return errors.New("export: -r2-bucket needs a full export (no -paths, -sample or -limit) unless -dry-run, or the stored manifest would forget pages")
+	if *r2bucket != "" && (*sampleN > 0 || *limit > 0) && shards <= 1 && !*dry { // a shard is whole for its own manifest
+		return errors.New("export: unsharded -r2-bucket does not support -sample or -limit unless -dry-run")
 	}
 	pcfg, err := pgxpool.ParseConfig(*dsn)
 	if err != nil {
@@ -200,6 +202,12 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 		}
 		if exchangePrefix != "" {
 			o.Exchange = r2.PathExchange(exchangePrefix, shard, shards, *exchangeTimeout)
+		}
+		if *paths != "" {
+			o.Paths, err = staticexport.ExpandChangedPaths(srv, o.Paths, o.PrevEntries)
+			if err != nil {
+				return err
+			}
 		}
 		up = staticexport.NewUploader(ctx, r2, *r2workers)
 		up.DryRun = *dry || r2 == nil
@@ -604,7 +612,7 @@ func readLines(file string) ([]string, error) {
 		return nil, err
 	}
 	defer f.Close()
-	var out []string
+	out := []string{}
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		if l := strings.TrimSpace(sc.Text()); l != "" {
@@ -612,4 +620,39 @@ func readLines(file string) ([]string, error) {
 		}
 	}
 	return out, sc.Err()
+}
+
+// changes writes a reusable plan; no database or R2 access is required.
+func changes(ctx context.Context, args []string, stdout, stderr io.Writer) error {
+	fs := flag.NewFlagSet("changes", flag.ContinueOnError)
+	fs.SetOutput(stderr)
+	since := fs.String("since", "", "last successfully rendered git commit; empty means full")
+	full := fs.Bool("full", false, "force a full render")
+	out := fs.String("out", "plan", "plan directory")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	p, err := staticexport.PlanChanges(ctx, ".", strings.TrimSpace(*since), *full)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(*out, 0755); err != nil {
+		return err
+	}
+	mode := "paths"
+	if p.Full {
+		mode = "full"
+	}
+	if err := os.WriteFile(filepath.Join(*out, "mode"), []byte(mode+"\n"), 0644); err != nil {
+		return err
+	}
+	body := strings.Join(p.Paths, "\n")
+	if len(p.Paths) > 0 {
+		body += "\n"
+	}
+	if err := os.WriteFile(filepath.Join(*out, "paths.txt"), []byte(body), 0644); err != nil {
+		return err
+	}
+	fmt.Fprintf(stdout, "%s: %d paths\n", mode, len(p.Paths))
+	return nil
 }

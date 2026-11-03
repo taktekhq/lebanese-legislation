@@ -52,7 +52,7 @@ See [architecture](architecture.md) for the current request and build paths.
 
 | Workflow | What it does |
 | --- | --- |
-| [static-site.yml](../.github/workflows/static-site.yml) | Renders about 760,000 pages from `data/` with `cmd/static-export`, in 8 parallel shards, into R2 bucket `lebleg-site`. |
+| [static-site.yml](../.github/workflows/static-site.yml) | Renders about 760,000 pages from `data/` with `cmd/static-export`, in 24 parallel shards, into R2 bucket `lebleg-site`. |
 | [origin.yml](../.github/workflows/origin.yml) | Deploys one Cloudflare Container with PostgreSQL 18.6, a baked-in database and the Go website server. |
 | [vectors.yml](../.github/workflows/vectors.yml) | `build` then `publish` and `vectorize`: exports vectors, publishes `vectors/vectors.parquet` to Hugging Face and loads Vectorize index `lebleg-chunks`. Later syncs upload only changed vectors. |
 
@@ -91,16 +91,14 @@ pushes tags and records the digest in its job summary.
 | `-mcp` | `checks.yml` (`checks`) | Push to main after `ci-ok` succeeds. |
 | `-all` | `data.yml`, `checks.yml` | After `-db`, or push to main after `ci-ok`. Pulls `-db:latest`. |
 | `-vectors` | `vectors.yml` | After `publish` succeeds on main. |
-| `-site` | `static-site.yml` | After render shards and generation succeed on main. R2 supplies pages. |
 
 Each image uses its own `images-<name>` job concurrency group, shared across
 callers, with cancellation for pushes. There is no workflow-wide image lock.
-Producer jobs keep separate concurrency groups. A long `-site` build cannot
-hold up another image. API and MCP still pass smoke checks on amd64 and arm64
+Producer jobs keep separate concurrency groups. API and MCP still pass smoke checks on amd64 and arm64
 before promotion to date, latest and available immutable release tags.
 
 [images.yml](../.github/workflows/images.yml) is a manual button only. Select
-one suffix with its `image` input: `db`, `api`, `mcp`, `all`, `vectors` or `site`.
+one suffix with its `image` input: `db`, `api`, `mcp`, `all` or `vectors`.
 It has no push or workflow completion triggers and no changes-selection job.
 
 [origin.yml](../.github/workflows/origin.yml) listens for successful `checks`

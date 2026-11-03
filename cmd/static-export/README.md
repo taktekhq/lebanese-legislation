@@ -31,6 +31,11 @@ stylesheets and scripts, and `.export/`:
 | `stats.json` | pages, bytes (raw and gzip), time, peak memory, size by kind of page |
 | `server.log` | what the site logged while rendering (slow pages, errors) |
 
+For a changed-page CI render, `go run ./cmd/static-export changes -since COMMIT -out plan` writes `plan/mode` (`full` or `paths`) and `plan/paths.txt`. Pass the
+latter to `export -paths plan/paths.txt -crawl=false` when mode is `paths`.
+An empty path file renders no pages. See [changed-page renders](../../docs/static-export.md#changed-page-renders-in-ci)
+for dependency mapping, deletion and baseline rules.
+
 A second run reads the previous manifest and rewrites only the pages whose hash
 changed; pages that stopped existing are deleted. Pages are found from the
 site's own sitemaps, then by following the internal links in the pages it
