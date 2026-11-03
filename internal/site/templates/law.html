@@ -77,8 +77,7 @@
 
 {{with .Scan}}
 <section class="wrap sec" id="pages">
-  <div class="sec__head"><div><p class="eyebrow">{{t "law.scan_pages_eyebrow"}}</p><h2 class="sec__title">{{t "law.scan_pages_title"}}</h2></div><a class="sec__more" href="/scan/{{$law.ID}}/source.pdf" rel="noopener">PDF</a></div>
-  <div class="scanpages">{{range .PageNumbers}}<a href="/scan/{{$law.ID}}/page-{{.}}.png" rel="noopener"><img src="/scan/{{$law.ID}}/page-{{.}}.png" alt="{{t "law.scan_page_alt" (num .)}}" loading="lazy"></a>{{end}}</div>
+  <div class="sec__head"><div><p class="eyebrow">{{t "law.scan_pages_eyebrow"}}</p><h2 class="sec__title"><a class="link" href="{{.SourceURL}}" rel="noopener" dir="ltr">{{.SourceName}} <span aria-hidden="true">&nearr;</span></a></h2></div></div>
   <p class="scancredit" lang="{{uilang}}" dir="{{dir}}">{{t "law.scan_credit" .SourceName .AgreementPct}}</p>
 </section>
 {{end}}

@@ -6,6 +6,7 @@
 // Addresses the origin answers by itself: the API, the analytics proxy, the MCP
 // endpoint, files read from disk, the pages that need a database.
 const ORIGIN_PREFIXES = [
+  "/scan/",
   "/api/", "/ph/", "/ph", "/mcp", "/healthz", "/.well-known/", "/ul/",
   "/ruling-files/", "/official", "/official-files/",
 ];

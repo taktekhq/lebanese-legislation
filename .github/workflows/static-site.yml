@@ -161,7 +161,7 @@ jobs:
             -r2-bucket lebleg-site \
             -r2-endpoint https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
             -out site
-      - name: Redirect and scan data for the Worker (shard 0 only)
+      - name: Redirect data for the Worker (shard 0 only)
         if: matrix.shard == 0
         env:
           AWS_DEFAULT_REGION: auto
@@ -169,12 +169,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           /tmp/static-export redirects -out site -db "$LEBLEG_DSN"
-          psql "$DATABASE_URL" -At -v ON_ERROR_STOP=1 \
-            -c "SELECT COALESCE(json_object_agg(law_id, source_id), '{}'::json) FROM legislation_scan" \
-            > site/.export/scans.json
-          aws s3 cp site/.export/scans.json s3://lebleg-site/_export/scans.json \
-            --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
-            --content-type application/json
           aws s3 cp site/.export/redirects.json s3://lebleg-site/_export/redirects.json \
             --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
             --content-type application/json

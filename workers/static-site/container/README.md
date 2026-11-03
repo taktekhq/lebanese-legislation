@@ -10,7 +10,8 @@ changes to `data/` on main.
 `docker build -f workers/static-site/container/Dockerfile --build-arg DATA_TAG=latest .`.
 The server serves dynamic pages, `/api/v1/`, and the ten-tool
 `internal/mcpserver` handler at `/mcp` over the same canonical database.
-The site Worker routes MCP and badge requests to the live origin container.
+The site Worker routes MCP, badge and old `/scan/` requests to the live origin container.
+Old scan file URLs redirect to the original PDF on SaderLex; scan files are not hosted.
 
 The `origin` workflow takes `tag` (default `latest`) and pulls the published
 GHCR `-all` image, then copies it to the Cloudflare registry with a unique

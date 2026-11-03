@@ -51,7 +51,6 @@ type Server struct {
 	ev            *Events
 	analytics     bool                  // load the browser analytics (ga.js, ph.js): SetAnalytics
 	mcpRegistered bool                  // mcpRoutes has run
-	scanDir       string                // page images of texts read from Gazette scans: see scans.go
 	rulingDir     string                // the judgment PDFs, one per ruling: see rulingfiles.go
 	ph            *phClient             // server errors to PostHog: see phcapture.go
 	titles        titlesEn              // unofficial English titles for the JSON API: see apititles.go

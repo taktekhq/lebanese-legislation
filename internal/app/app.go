@@ -46,7 +46,6 @@ type config struct {
 	authFile    string // -auth: a file holding user:password; every page asks for it
 	noindex     bool   // -noindex: keep the site out of search engines
 	events      string // -events: folder for the anonymous usage record
-	scans       string // -scans: page images of texts read from Gazette scans
 	official    string // -official: page images and PDFs of texts from official scans
 	rulingFiles string // -ruling-files: the judgment PDFs, served at /ruling-files/<id>.pdf
 }
@@ -96,7 +95,6 @@ func parseFlags(mode string, args []string, stderr io.Writer) (config, error) {
 	fs.StringVar(&cfg.authFile, "auth", "", "preview mode: a file holding user:password; every page then asks for it and is marked noindex")
 	fs.BoolVar(&cfg.noindex, "noindex", false, "keep the site out of search engines")
 	fs.StringVar(&cfg.events, "events", "", "keep the anonymous usage record (searches, reads, AI sign-ups) in this folder")
-	fs.StringVar(&cfg.scans, "scans", "", "page images of texts read from Gazette scans")
 	fs.StringVar(&cfg.official, "official", "", "folder of page images and PDFs for texts published from official scans")
 	fs.StringVar(&cfg.rulingFiles, "ruling-files", "", "folder of judgment PDFs, served at /ruling-files/<id>.pdf (empty: none)")
 	if err := fs.Parse(args); err != nil {
@@ -141,7 +139,6 @@ func run(ctx context.Context, cfg config) error {
 	if err != nil {
 		return err
 	}
-	h.SetScans(cfg.scans)
 	h.SetRulingFiles(cfg.rulingFiles)
 	// Server errors to PostHog's error tracking when POSTHOG_KEY is set. The
 	// browser analytics (LebaneseLegislation.com's own projects) are on

@@ -40,16 +40,6 @@ async function redirectData(env) {
   return redirects.data;
 }
 
-let scans = { at: 0, data: null };
-
-async function scanData(env) {
-  if (scans.data && Date.now() - scans.at < REDIRECT_DATA_TTL_MS) return scans.data;
-  const obj = await env.SITE.get("_export/scans.json");
-  if (!obj) return null;
-  scans = { at: Date.now(), data: await obj.json() };
-  return scans.data;
-}
-
 function withHeaders(obj, request) {
   const h = new Headers(SECURITY_HEADERS);
   h.set("Content-Type", obj.httpMetadata?.contentType || "application/octet-stream");
@@ -85,27 +75,6 @@ export default {
       return originFetch(request, env, ctx);
     }
     try {
-      if (url.pathname.startsWith("/scan/")) {
-        // Keep the filename rule in sync with scanFileName in internal/site/scans.go.
-        const scan = /^\/scan\/([0-9]+)\/(page-[0-9]{1,3}\.png|source\.pdf)$/.exec(url.pathname);
-        if (scan) {
-          const data = await scanData(env);
-          const source = data?.[scan[1]];
-          if (source !== undefined) {
-            const obj = await env.SITE.get(`_build/scans/${source}/${scan[2]}`);
-            if (obj) {
-              return new Response(request.method === "HEAD" ? null : obj.body, {
-                headers: {
-                  ...SECURITY_HEADERS,
-                  "Content-Type": obj.httpMetadata?.contentType || "application/octet-stream",
-                  "Cache-Control": "public, max-age=86400",
-                },
-              });
-            }
-          }
-        }
-        return originFetch(request, env, ctx);
-      }
       if (route(request.method, url.pathname, url.search) === "origin") return originFetch(request, env, ctx);
       const key = keyFor(url.pathname);
       if (key) {
