@@ -1,0 +1,47 @@
+name: ai-answer-check
+'on':
+  schedule:
+    - cron: '47 5 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: ai-answer-check
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check live AI answers
+        id: smoke
+        run: bash scripts/check-ai-answer.sh 2>&1 | tee "$RUNNER_TEMP/ai-answer-check.log"
+      - name: Report failure or recovery
+        if: ${{ !cancelled() && (steps.smoke.outcome == 'success' || steps.smoke.outcome == 'failure') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          CHECK_OUTCOME: ${{ steps.smoke.outcome }}
+        run: |
+          title='AI answer check failed'
+          issue=$(gh issue list --state open --search "\"$title\" in:title" \
+            --json number,title --jq '.[] | select(.title == "AI answer check failed") | .number' | head -n 1)
+          if [ "$CHECK_OUTCOME" = failure ]; then
+            body="$RUNNER_TEMP/ai-answer-issue.md"
+            {
+              printf 'Run: %s/%s/actions/runs/%s\n\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+              printf '```text\n'
+              cat "$RUNNER_TEMP/ai-answer-check.log"
+              printf '```\n'
+            } > "$body"
+            if [ -n "$issue" ]; then
+              gh issue comment "$issue" --body-file "$body"
+            else
+              gh issue create --title "$title" --body-file "$body"
+            fi
+          elif [ -n "$issue" ]; then
+            gh issue comment "$issue" --body 'Recovered'
+            gh issue close "$issue"
+          fi

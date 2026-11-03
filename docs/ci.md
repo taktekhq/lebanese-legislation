@@ -56,6 +56,27 @@ See [architecture](architecture.md) for the current request and build paths.
 | [origin.yml](../.github/workflows/origin.yml) | Deploys one Cloudflare Container with PostgreSQL 18.6, a baked-in database and the Go website server. |
 | [vectors.yml](../.github/workflows/vectors.yml) | `build` then `publish` and `vectorize`: exports vectors, publishes `vectors/vectors.parquet` to Hugging Face and loads Vectorize index `lebleg-chunks`. Later syncs upload only changed vectors. |
 
+## Daily live AI answer check
+
+[ai-answer-check.yml](../.github/workflows/ai-answer-check.yml) runs daily at
+05:47 UTC and supports manual runs. It checks Arabic and English AI answers
+for answer text and references, rejects a plain law lookup with HTTP 400 and
+no AI box, and checks that an API POST returns HTTP 405. It never calls
+`/deep/` and costs about $0.01 a day. Failures open or update one GitHub issue;
+a successful run comments `Recovered` and closes it.
+
+Run it locally with Bash, curl and grep:
+
+```sh
+bash scripts/check-ai-answer.sh
+# Optional: check another deployment
+BASE_URL=https://your-deployment.example bash scripts/check-ai-answer.sh
+```
+
+Each check prints its HTTP status and elapsed seconds. Any failure exits 1
+with a reason. The workflow uses GitHub's token to manage issues and needs
+no model API key.
+
 ## Image publication
 
 Each producer calls [build-image.yml](../.github/workflows/build-image.yml) as a
