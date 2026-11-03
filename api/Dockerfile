@@ -18,6 +18,7 @@ LABEL org.opencontainers.image.revision="${GIT_SHA}"
 COPY --from=build /server /server
 COPY THIRD_PARTY_NOTICES.txt /THIRD_PARTY_NOTICES.txt
 LABEL org.opencontainers.image.source="https://github.com/taktekhq/lebanese-legislation"
+LABEL org.opencontainers.image.description="The Lebanese Legislation JSON API (/api/v1/) in Go, read-only on the -db image. Pull :latest."
 LABEL org.opencontainers.image.licenses="MIT"
 ENV LISTEN_ADDR=0.0.0.0:8000 RATE_LIMIT_PER_MINUTE=0 PUBLIC_URL=http://localhost:8080 ANALYTICS=off
 EXPOSE 8000

@@ -41,12 +41,12 @@ curl --get 'http://localhost:8000/api/v1/search/' --data-urlencode 'q=قانون
 Exact text and citation searches work without an AI key. To turn on search by meaning, [load vectors](../vectors/README.md), set your Gemini key and configure `LEBLEG_VECTOR_DSN` for `lebleg_search` in the service environment, then run:
 
 ```sh
-docker compose up -d --force-recreate api mcp web
+docker compose up -d --force-recreate api mcp
 ```
 
 Arabic, English and French queries can retrieve multilingual source passages. English discovery titles are unofficial aids, not authoritative translations. Availability of a language depends on the source material.
 
-All published ports bind to your own computer. The API has no user authentication and is meant for local use. Before exposing it publicly, set `RATE_LIMIT_PER_MINUTE` (LebaneseLegislation.com uses 60) or limit at your reverse proxy, and add HTTPS and an appropriate cost limit.
+All published ports bind to your own computer. The API has no user authentication and is meant for local use. Before exposing it publicly, set `RATE_LIMIT_PER_MINUTE` or limit at your reverse proxy (LebaneseLegislation.com limits each address at Cloudflare: 30 requests in 10 seconds on /api/, /mcp and /search/), and add HTTPS and an appropriate cost limit.
 
 Stop services with `docker compose down`. This preserves the database volume. Volume lifecycle belongs to the operator. There is no automatic refresh. Use a different Compose project and fresh volumes to select a new snapshot.
 
@@ -57,8 +57,8 @@ Stop services with `docker compose down`. This preserves the database volume. Vo
 | --- | --- |
 | Existing `data/*.parquet` on Hugging Face | Portable source tables for analysis and other databases |
 | `ghcr.io/taktekhq/lebanese-legislation-db:latest` | PostgreSQL 18.6, pgvector 0.8.2 and both databases baked from `data/` |
-| `ghcr.io/taktekhq/lebanese-legislation-api:0.4.0` | The REST API (`/api/v1/`) |
-| `ghcr.io/taktekhq/lebanese-legislation-mcp:0.4.0` | The MCP server (`/mcp`) |
+| `ghcr.io/taktekhq/lebanese-legislation-api:latest` | The REST API (`/api/v1/`) |
+| `ghcr.io/taktekhq/lebanese-legislation-mcp:latest` | The MCP server (`/mcp`) |
 | `ghcr.io/taktekhq/lebanese-legislation-all:latest` | Both databases and the website, API and MCP |
 
 Older version tags stay published. See [changes](changes.md).
@@ -90,8 +90,9 @@ Copy the optional settings from `.env.example`. `./setup` creates required passw
 | `DB_PORT` | `5433` | Loopback PostgreSQL port |
 | `API_PORT` | `8000` | Loopback API port |
 | `MCP_PORT` | `8001` | Loopback MCP port |
-| `WEB_PORT` | `8080` | Loopback website port |
-| `PUBLIC_URL` | `http://localhost:$WEB_PORT` | The website's absolute links; set it when you host the site publicly |
+| `ALL_PORT` | `8080` | Loopback port of the all-in-one image (website, API and MCP) |
+| `ALL_IMAGE` | `ghcr.io/taktekhq/lebanese-legislation-all:latest` | The all-in-one image |
+| `PUBLIC_URL` | `http://localhost:8080` | The website's absolute links; set it when you host the site publicly |
 | `DB_MEMORY` | `3g` | Database container cap; index construction needs headroom |
 | `GEMINI_API_KEY` | empty | Your key; turns on search by meaning |
 | `GEMINI_MAX_CALLS_PER_DAY` | `500` | Provider calls per UTC day for each service; `0` turns search by meaning off |
@@ -125,12 +126,11 @@ docker build -f api/Dockerfile -t lebleg-api-local .
 docker build -f mcp/Dockerfile -t lebleg-mcp-local .
 docker build -f workers/static-site/container/Dockerfile -t ghcr.io/taktekhq/lebanese-legislation-all:latest .
 go vet ./... && go test ./...
-cd tools && pip install '.[build,test]' && pytest -q && ruff check src tests
 ```
 
-Go tests that need a database use the fictional fixture in [`web/`](../web/README.md). Python tests that need PostgreSQL create and remove uniquely named databases when `LEBLEG_TEST_ADMIN_DSN` is set. Container tests run when `LEBLEG_TEST_IMAGE` is set, and the Compose test when the four `LEBLEG_TEST_*_IMAGE` variables are set. They never use your existing database. See the [checks workflow](../.github/workflows/checks.yml) for a disposable setup. `docker build -f db/Dockerfile --target postgres` gives a plain PostgreSQL with pgvector for those tests.
+Go tests that need a database use the fictional fixture in [`web/`](../web/README.md). Container tests run when `LEBLEG_TEST_IMAGE` is set, and the Compose test when the four `LEBLEG_TEST_*_IMAGE` variables are set. They never use your existing database. See the [checks workflow](../.github/workflows/checks.yml) for a disposable setup. `docker build -f db/Dockerfile --target postgres` gives a plain PostgreSQL with pgvector for those tests.
 
-The DB image pins the official `postgres:18.6` base by digest and verifies the pgvector source checksum. The image publication workflow builds the four images for `linux/amd64,linux/arm64`, checks each one on both platforms against a fictional database, and refuses to overwrite version tags.
+The DB image pins the official `postgres:18.6` base by digest and verifies the pgvector source checksum. The [images workflow](../.github/workflows/images.yml) publishes every image with a `latest` tag that follows the newest build, plus a dated tag. The API and MCP images are built for `linux/amd64,linux/arm64`; the database and all-in-one images, which carry the data, for `linux/amd64`.
 
 Set `LEBLEG_TEST_DB_IMAGE` to a locally built DB target to run the synthetic first-boot, restart and failure integration checks. These use tiny fixture dumps and disposable volumes, never the real dataset.
 

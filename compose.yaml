@@ -21,7 +21,7 @@ services:
       retries: 30
   # The REST API in api/, read-only on the database. Health comes from the image.
   api:
-    image: ${API_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-api:0.4.0}
+    image: ${API_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-api:latest}
     environment:
       DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"
       # Optional: your own key turns on search by meaning. Exact and citation search need none.
@@ -43,7 +43,7 @@ services:
     cap_drop: [ALL]
   # The MCP server in mcp/.
   mcp:
-    image: ${MCP_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-mcp:0.4.0}
+    image: ${MCP_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-mcp:latest}
     environment:
       MCP_ALLOWED_ORIGINS: ${MCP_ALLOWED_ORIGINS:-}
       DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"

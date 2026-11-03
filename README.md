@@ -1,6 +1,6 @@
 # Lebanese Legislation
 
-The code and data behind [LebaneseLegislation.com](https://lebaneselegislation.com/): 103,118 laws, 389,078 articles, 47,657 court rulings and 6,851 Official Gazette issues, with search, a REST API and an MCP server.
+The code and data behind [LebaneseLegislation.com](https://lebaneselegislation.com/): 103,117 laws, 389,078 articles, 47,657 court rulings and 6,851 Official Gazette issues, with search, a REST API and an MCP server. Everything is open: the code here, the data on [Hugging Face](https://huggingface.co/taktekhq), and the images on GitHub Container Registry.
 
 The former private `taktekhq/lebaneselegislation` repository is folded into this
 one: code, scraper, build pipeline, website and MCP.
@@ -30,6 +30,9 @@ See [architecture](docs/architecture.md) for the request and build paths.
 | The data as a PostgreSQL database | The `-db` or `-all` image below, with both databases baked from `data/`. |
 | Semantic search vectors | [vectors/vectors.parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet), 1,547,937 chunks, 768 dimensions, `gemini-embedding-001`. [Read with DuckDB](docs/reference.md#vectors). |
 | The original court scans | [Court scans on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-court-scans) |
+| Every source page as it was served | [Archive dataset on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation-archive) and [its repository](https://github.com/taktekhq/lebanese-legislation-archive) |
+| What changed and why | The [project journal](https://lebaneselegislation.com/blog/) and [docs/changes.md](docs/changes.md) |
+| Get paid to study with it (students in Lebanon) | [The student program](#students-get-paid-to-study-with-it) |
 | Everything on your own machine | [Run the services locally](#run-the-services-locally) |
 
 Data lives on Hugging Face. Code and Docker images live here. Each GitHub release is a code version, never a data download.
@@ -52,11 +55,14 @@ In development every page is rendered on request, which is slower than productio
 git clone https://github.com/taktekhq/lebanese-legislation.git
 cd lebanese-legislation
 ./setup
+docker compose --profile all up -d all
 ```
 
-You need Docker Compose, 8 GB of free memory and 30 GB of free disk. The database image already holds both databases. The first start copies them into an empty volume; later starts reuse it. The website uses the all-in-one image with its own baked database.
+You need Docker Compose, 8 GB of free memory and 30 GB of free disk. `./setup` writes private local passwords to `.env`. The image already holds both databases. The first start copies them into an empty volume; later starts reuse it.
 
-Then open the website at http://localhost:8080, the API at http://localhost:8000/api/v1/, or point an MCP client at http://localhost:8001/mcp. Exact and citation search need no AI key. For search by meaning, configure your own Gemini key and Vectorize index, or load the public vectors into pgvector in `lebleg_search`. See [loading vectors](vectors/README.md).
+Then open the website at http://localhost:8080, the API at http://localhost:8080/api/v1/, or point an MCP client at http://localhost:8080/mcp.
+
+To run the database, API and MCP as separate services instead, use `docker compose up -d --wait db api mcp`: the API answers on http://localhost:8000/api/v1/ and MCP on http://localhost:8001/mcp. Every image is pulled as `:latest`, so a `docker compose pull` is all an update needs. Exact and citation search need no AI key. For search by meaning, configure your own Gemini key and Vectorize index, or load the public vectors into pgvector in `lebleg_search`. See [loading vectors](vectors/README.md).
 
 ## Images
 
@@ -70,11 +76,13 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 | `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
 | `-vectors` | `vectorize-sync`, `export-vectors`, DuckDB 1.5.6; downloads Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
 
-Only `.github/workflows/images.yml` publishes these images. Each has its own
-job; `-all` waits for `-db` when both are selected. All receive UTC date and
-`latest` tags; `-all` also receives the git short SHA. Dispatch `which: all` or
-a full image name. Pushes to main select images by their input paths. Successful
-`vectors` runs refresh `-vectors`. Static pages are published directly to R2.
+Each image is built by the workflow that produces its inputs: the
+[checks](.github/workflows/checks.yml) workflow publishes `-api`, `-mcp` and
+`-all` after a push to main, [data](.github/workflows/data.yml) publishes `-db`
+and `-all` after a data change, and [vectors](.github/workflows/vectors.yml)
+publishes `-vectors`. [images.yml](.github/workflows/images.yml) is a manual
+button to rebuild one. Every image gets a `latest` tag and a UTC date tag, so
+use `:latest` unless you need a fixed copy. Static pages are published directly to R2.
 Publishing of `-web` and `-data` has stopped; existing registry packages remain.
 Compose pulls `ghcr.io/taktekhq/lebanese-legislation-all:latest` for the website, including its database, API and MCP.
 
@@ -101,6 +109,14 @@ existing immutable release versions are retained and new versions are added when
 | [`workers/`](workers/) | Cloudflare Workers, including the static-site router and its dynamic container. |
 
 `compose.yaml` runs the four images. `compose.build.yaml` builds them from this checkout instead. `compose.local.yaml` selects an already built database image. `server.json` is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry and `.mcp.json` the client configuration for the hosted server.
+
+## Students: get paid to study with it
+
+If you study law or political science at a Lebanese university right now, we pay
+$10 for every week you study with the site (at least 2 days a week), paid monthly,
+until March 2027. You tell us what is wrong, missing or hard to use, and fill in
+a 10-minute form once a month. We chose to spend this money on students instead
+of ads. [Apply on LinkedIn](https://www.linkedin.com/jobs/view/4483994893/).
 
 ## Contribute and licence
 

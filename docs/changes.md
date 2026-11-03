@@ -1,5 +1,16 @@
 # Changes
 
+## 2-3 November 2026
+
+- Hetzner is gone. Every part of LebaneseLegislation.com runs on Cloudflare: static pages and ruling PDFs from R2, everything dynamic in the `-all` image on Cloudflare Containers, deployed blue/green by [origin.yml](../.github/workflows/origin.yml). The public MCP server at `/mcp` is the Go server in that container; the old MCP Worker with its D1 snapshot is removed.
+- Use `:latest`. Every image (`-db`, `-api`, `-mcp`, `-all`, `-vectors`) gets a `latest` tag and a UTC date tag from the workflow that produces its inputs. Compose and the docs now pull `:latest`; the 0.x version tags stay published but get no updates.
+- No more PostgreSQL dump releases. The data is the Parquet dataset on Hugging Face and the database baked into the `-db` image.
+- The static build runs in 24 shards, each page rendered by exactly one shard, and renders only the pages whose data changed.
+- Every page shows when it last changed, with `dateModified` in its JSON-LD; `updated_at` is in `/api/v1/` responses and the MCP tools. `/openapi.json` describes the API as OpenAPI 3.1.
+- Weak pages are hidden from search engines: generated topic pages, badly scanned rulings and machine English for texts few people read (`noindex, follow`, still linked).
+- One `compose.yaml`: `db`, `api`, `mcp`, and the all-in-one service under the `all` profile. `./setup` only writes `.env`; `./start` is gone.
+- A daily workflow checks that the AI answer on the search page still works.
+
 ## 1-2 November 2026
 
 - Cloudflare now serves the website: about 760,000 static pages from R2 bucket `lebleg-site`, rendered from `data/` by [static-site.yml](../.github/workflows/static-site.yml) with `cmd/static-export` in 8 parallel shards. The JavaScript Worker in `workers/static-site` also serves ruling PDFs from R2.

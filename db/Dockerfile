@@ -22,6 +22,7 @@ COPY --from=pgvector-build /out/usr/lib/postgresql/18/lib/vector.so /usr/lib/pos
 COPY --from=pgvector-build /out/usr/share/postgresql/18/extension/vector* /usr/share/postgresql/18/extension/
 COPY db/init-reader.sh /docker-entrypoint-initdb.d/20-lebleg-reader.sh
 LABEL org.opencontainers.image.source="https://github.com/taktekhq/lebanese-legislation"
+LABEL org.opencontainers.image.description="PostgreSQL 18.6 with pgvector and the whole Lebanese Legislation database baked in: laws, articles, court rulings and Gazette issues from lebaneselegislation.com. Pull :latest for the newest data."
 LABEL org.opencontainers.image.licenses="PostgreSQL"
 
 # The release commands (cmd/restore-release, cmd/check-release, cmd/build-release,
