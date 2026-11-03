@@ -15,6 +15,7 @@ export class OriginGreen extends DurableObject {}
 import { route, keyFor, resolve, indexRedirectData } from "./route.js";
 import { SECURITY_HEADERS } from "./headers.js";
 import { originFetch } from "./origin.js";
+import { isParts, parseParts, prepareFrame, assemble, indexPointer } from "./layout.js";
 
 // The export generation (the workflow run that last finished uploading) is
 // part of the page cache key: pages are cached for 12 hours, and CI cannot
@@ -29,6 +30,38 @@ async function exportGeneration(env) {
   return generation.value;
 }
 
+// The frames pages in parts are put into (layout.js). _export/layout.json
+// names the frame of each lang/schema and is read like the generation; a
+// frame object never changes, so a Worker keeps the few it has read. The
+// pointer's ETag is part of the page cache key, so a new frame shows at once.
+// With no pointer (before the first export in parts) the key is as before.
+let pointer = { at: 0, value: null };
+
+async function layoutPointer(env) {
+  if (pointer.at && Date.now() - pointer.at < GENERATION_TTL_MS) return pointer.value;
+  const obj = await env.SITE.get("_export/layout.json");
+  pointer = { at: Date.now(), value: obj ? { etag: obj.etag || obj.httpEtag || "", ids: indexPointer(await obj.json()) } : null };
+  return pointer.value;
+}
+
+const FRAMES_KEPT = 16;
+const frames = new Map();
+
+async function frameFor(env, key) {
+  const p = await layoutPointer(env);
+  const id = p && p.ids.get(key);
+  if (!id) throw new Error("no frame for pages in parts " + key);
+  let f = frames.get(id);
+  if (!f) {
+    const obj = await env.SITE.get("_layout/" + id + ".json");
+    if (!obj) throw new Error("frame object missing: " + id);
+    f = { id, ...prepareFrame(await obj.json()) };
+    if (frames.size >= FRAMES_KEPT) frames.delete(frames.keys().next().value);
+    frames.set(id, f);
+  }
+  return f;
+}
+
 const REDIRECT_DATA_TTL_MS = 10 * 60 * 1000;
 let redirects = { at: 0, data: null };
 
@@ -40,21 +73,40 @@ async function redirectData(env) {
   return redirects.data;
 }
 
-function withHeaders(obj, request) {
+function withHeaders(obj, request, body = obj.body, etag = obj.httpEtag) {
   const h = new Headers(SECURITY_HEADERS);
   h.set("Content-Type", obj.httpMetadata?.contentType || "application/octet-stream");
   h.set("Cache-Control", obj.httpMetadata?.cacheControl || "public, max-age=300");
-  h.set("ETag", obj.httpEtag);
+  h.set("ETag", etag);
   h.set("X-Served-By", "static"); // for the cutover; drop it once routes are final
   const match = request.headers.get("If-None-Match");
-  if (match && match === obj.httpEtag) return new Response(null, { status: 304, headers: h });
-  return new Response(request.method === "HEAD" ? null : obj.body, { status: 200, headers: h });
+  if (match && match === etag) return new Response(null, { status: 304, headers: h });
+  return new Response(request.method === "HEAD" ? null : body, { status: 200, headers: h });
+}
+
+// pageResponse answers with a stored object. An HTML page may be stored
+// whole (every page before the edge layout, and pages outside the layout)
+// or in parts; the bytes tell which. Its ETag names the frame too, so a new
+// footer is a new ETag.
+export async function pageResponse(obj, request, env) {
+  if (!(obj.httpMetadata?.contentType || "").startsWith("text/html")) return withHeaders(obj, request);
+  const bytes = new Uint8Array(await obj.arrayBuffer());
+  if (!isParts(bytes)) return withHeaders(obj, request, bytes);
+  const page = parseParts(bytes);
+  const frame = await frameFor(env, page.key);
+  const etag = obj.httpEtag.replace(/"$/, "") + "-" + frame.id.slice(0, 12) + '"';
+  return withHeaders(obj, request, assemble(frame, page), etag);
 }
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (url.pathname.startsWith("/_build/") || url.pathname.startsWith("/_export/")) {
+    // The exporter asks this before it stores pages in parts: an older Worker
+    // answers 404 here and would serve the parts as they are.
+    if (url.pathname === "/_build/layout") {
+      return new Response("LLP1\n", { status: 200, headers: { ...SECURITY_HEADERS, "Content-Type": "text/plain", "Cache-Control": "no-store" } });
+    }
+    if (url.pathname.startsWith("/_build/") || url.pathname.startsWith("/_export/") || url.pathname.startsWith("/_layout/")) {
       return new Response(null, { status: 404, headers: SECURITY_HEADERS });
     }
     if (url.hostname === "www.lebaneselegislation.com") {
@@ -80,12 +132,17 @@ export default {
       if (key) {
         const cache = caches.default;
         const gen = await exportGeneration(env);
-        const cacheKey = new Request(url.origin + url.pathname + (gen ? "?__export=" + encodeURIComponent(gen) : ""), { method: "GET" });
+        const layout = await layoutPointer(env);
+        const q = new URLSearchParams();
+        if (gen) q.set("__export", gen);
+        if (layout) q.set("__layout", layout.etag);
+        const qs = q.toString();
+        const cacheKey = new Request(url.origin + url.pathname + (qs ? "?" + qs : ""), { method: "GET" });
         const hit = await cache.match(cacheKey);
         if (hit && request.method === "GET") return hit;
         const obj = await env.SITE.get(key);
         if (obj) {
-          const res = withHeaders(obj, request);
+          const res = await pageResponse(obj, request, env);
           if (res.status === 200 && request.method === "GET") ctx.waitUntil(cache.put(cacheKey, res.clone()));
           return res;
         }

@@ -75,6 +75,8 @@ type Server struct {
 	memo      memoCache                                         // sitemap.go
 	sets      setCache                                          // the big sitemap families, built once: sitemap_sets.go
 	coreExtra []func(ctx context.Context) ([]SitemapURL, error) // more core sitemap entries: AddCoreSitemap
+
+	funcs template.FuncMap // the shared template funcs, before the language ones: LayoutFrames
 }
 
 // SetEvents turns on the anonymous usage record (see events.go).
@@ -133,6 +135,7 @@ func newServer(db *pgxpool.Pool, static bool) (*Server, error) {
 	if static {
 		funcs["artURL"] = func(id int, number string) string { return fmt.Sprintf("/law/%d/#a-%s", id, Slug(number)) }
 	}
+	s.funcs = funcs
 	names, err := fs.Glob(templateFS, "templates/*.html")
 	if err != nil {
 		return nil, err

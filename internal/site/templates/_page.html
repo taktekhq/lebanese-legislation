@@ -1,0 +1,23 @@
+{{/* The page's own parts of the layout. layout.html is the frame every page
+     shares and may use only what is the same on every page of a language
+     (t, u, uilang, assetVersion...); everything it takes from the Page is
+     one of these "page:" templates. The static export stores a page as
+     these parts alone and the edge puts them back into the frame
+     (internal/site/layoutframe.go, docs/static-export.md), so a change to
+     the frame does not rewrite every page. */}}
+{{define "page:title"}}{{.Title}}{{end}}
+{{define "page:desc"}}{{.Desc}}{{end}}
+{{define "page:canon"}}{{absURL .Canon}}{{end}}
+{{define "page:hreflang"}}{{if .Hreflang}}<link rel="alternate" hreflang="en" href="{{enURL .Path}}">
+<link rel="alternate" hreflang="ar" href="{{arURL .Path}}">
+<link rel="alternate" hreflang="x-default" href="{{arURL .Path}}">
+{{end}}{{end}}
+{{define "page:robots"}}{{if .NoIndex}}noindex, follow{{else}}index, follow, max-image-preview:large{{end}}{{end}}
+{{define "page:ogtype"}}{{if .OGType}}{{.OGType}}{{else}}website{{end}}{{end}}
+{{define "page:fonts"}}{{if eq .Lang "ar"}}<link rel="preload" href="/assets/fonts/naskh-arabic.woff2" as="font" type="font/woff2" crossorigin>
+{{end}}{{end}}
+{{define "page:ld"}}{{range .LD}}<script type="application/ld+json">{{.}}</script>
+{{end}}{{end}}
+{{define "page:alt"}}{{altURL .Path}}{{end}}
+{{define "page:en"}}{{enPath .Path}}{{end}}
+{{define "page:content"}}{{template "content" .}}{{end}}

@@ -41,7 +41,7 @@ export function keyFor(pathname) {
   const p = pathname.replace(/%[0-9a-f]{2}/gi, (m) => m.toUpperCase());
   if (p.split("/").some((s) => s === "..")) return null;
   const key = p === "/" ? "index.html" : p.endsWith("/") ? p.slice(1) + "index.html" : p.slice(1);
-  return key.startsWith("_export/") ? null : key;
+  return key.startsWith("_export/") || key.startsWith("_layout/") ? null : key;
 }
 
 // ---------------------------------------------------------------- redirects

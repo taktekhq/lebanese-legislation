@@ -15,7 +15,9 @@
 //
 // A manifest records every path with its status, size and content hash; a
 // rebuild reads the previous manifest and rewrites only the pages whose hash
-// changed.
+// changed. With a Layout, an HTML page is stored as its own parts only
+// (edgelayout.go) and its hash covers only them, so a change to the shared
+// header or footer leaves every page's hash as it was.
 package staticexport
 
 import (
@@ -89,6 +91,9 @@ type Options struct {
 	// Prev is the previous manifest. When empty, <Out>/.export/manifest.jsonl
 	// is used if it exists.
 	Prev string
+	// Layout, when set, stores each HTML page that fits one of its frames as
+	// the page's own parts (edgelayout.go); the edge puts them back.
+	Layout *Layout
 	// Host is the Host header of the in-process requests.
 	Host string
 	// Log receives progress lines; nil is silent.
@@ -105,6 +110,9 @@ type Entry struct {
 	File   string `json:"f,omitempty"` // file under Out
 	Cache  string `json:"c,omitempty"` // the live Cache-Control, for the edge
 	To     string `json:"to,omitempty"`
+	// Layout is the lang/schema of the frame a page in parts belongs in;
+	// empty for a page stored whole.
+	Layout string `json:"l,omitempty"`
 }
 
 // Stats is what a run did.
@@ -117,6 +125,8 @@ type Stats struct {
 	Errors    int64
 	Raw       int64 // body bytes of all 200 responses
 	Gzip      int64 // the same bytes, gzipped (level 6), to size the upload
+	Parts     int64 // pages stored as their own parts (Options.Layout)
+	Stored    int64 // bytes of what is stored: the parts of those pages, the rest whole
 	Removed   int64 // paths in the previous manifest that no longer exist
 	PeakHeap  uint64
 	PeakSys   uint64
@@ -492,9 +502,17 @@ func (ex *exporter) ok(p string, rec *httptest.ResponseRecorder, e Entry) error 
 	if ex.o.Transform != nil {
 		body = ex.o.Transform(p, e.Type, body)
 	}
-	sum := sha256.Sum256(body)
+	stored := body
+	if ex.o.Layout != nil && strings.HasPrefix(e.Type, "text/html") {
+		if parts, key, ok := ex.o.Layout.Split(body); ok {
+			stored, e.Layout = parts, key
+			atomic.AddInt64(&ex.st.Parts, 1)
+		}
+	}
+	atomic.AddInt64(&ex.st.Stored, int64(len(stored)))
+	sum := sha256.Sum256(stored)
 	e.Hash = hex.EncodeToString(sum[:])
-	e.Size = int64(len(body))
+	e.Size = int64(len(stored))
 	file, err := FileFor(p, e.Type)
 	if err != nil {
 		return fmt.Errorf("%s: %w", p, err)
@@ -505,17 +523,17 @@ func (ex *exporter) ok(p string, rec *httptest.ResponseRecorder, e Entry) error 
 		atomic.AddInt64(&ex.st.Unchanged, 1)
 	} else {
 		if ex.o.Sink != nil {
-			if err := ex.o.Sink(e, body); err != nil {
+			if err := ex.o.Sink(e, stored); err != nil {
 				return fmt.Errorf("%s: %w", p, err)
 			}
-		} else if err := writeFile(dest, body); err != nil {
+		} else if err := writeFile(dest, stored); err != nil {
 			return err
 		}
 		atomic.AddInt64(&ex.st.Written, 1)
 	}
 	gz := gzipSize(body)
 	n := atomic.AddInt64(&ex.st.Pages, 1)
-	atomic.AddInt64(&ex.st.Raw, e.Size)
+	atomic.AddInt64(&ex.st.Raw, int64(len(body)))
 	atomic.AddInt64(&ex.st.Gzip, gz)
 	ex.mu.Lock()
 	k := kindOf(p)
@@ -525,7 +543,7 @@ func (ex *exporter) ok(p string, rec *httptest.ResponseRecorder, e Entry) error 
 		ex.st.ByKind[k] = ks
 	}
 	ks.Pages++
-	ks.Raw += e.Size
+	ks.Raw += int64(len(body))
 	ks.Gzip += gz
 	ex.mu.Unlock()
 	if n%20000 == 0 {

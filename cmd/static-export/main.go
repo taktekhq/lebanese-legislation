@@ -16,6 +16,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -23,6 +24,7 @@ import (
 	"io/fs"
 	"log"
 	"mime"
+	"net/http"
 	"os"
 	"os/signal"
 	"path"
@@ -95,8 +97,12 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 	shardArg := fs.String("shard", "", "render only slice i of n of the site, as i/n (for splitting a full export across jobs)")
 	meaningNotice := fs.Bool("meaning-notice", false, "render the search forms as the live site does when search by meaning is on (the notice under the box); no request is ever sent to the provider")
 	dry := fs.Bool("dry-run", false, "with -r2-bucket: render everything and count what would be uploaded, send nothing")
+	edge := fs.String("edge-layout", "auto", "store HTML pages as their own parts, for the Worker to put into the shared frame (docs/static-export.md): on, off, or auto (with -r2-bucket, on once the live Worker answers <base>/_build/layout; off without)")
 	if err := fs.Parse(args); err != nil {
 		return err
+	}
+	if *edge != "on" && *edge != "off" && *edge != "auto" {
+		return fmt.Errorf("export: -edge-layout wants on, off or auto, got %q", *edge)
 	}
 	if *exchangeTimeout <= 0 {
 		return errors.New("export: -exchange-timeout must be positive")
@@ -151,6 +157,10 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 	site.BuildID = *build
 	site.Base = strings.TrimRight(*base, "/")
 	srv, err := newSite(pool, os.Getenv)
+	if err != nil {
+		return err
+	}
+	edgeOn, err := edgeLayoutOn(ctx, *edge, *r2bucket != "", site.Base, stderr)
 	if err != nil {
 		return err
 	}
@@ -212,6 +222,18 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 		up = staticexport.NewUploader(ctx, r2, *r2workers)
 		up.DryRun = *dry || r2 == nil
 		o.Sink = up.Sink(ctx)
+	}
+	if edgeOn {
+		// The frames go up before any page: a page in parts that finds no
+		// frame is answered by the origin, never shown as parts. Only one
+		// shard writes the list of frames, so shards never race on it.
+		writer := r2
+		if up != nil && up.DryRun || shards > 1 && shard != 0 {
+			writer = nil
+		}
+		if o.Layout, err = publishLayout(ctx, srv, writer, *out, stdout); err != nil {
+			return err
+		}
 	}
 	st, err := staticexport.Run(ctx, srv, o)
 	if up != nil {
@@ -328,6 +350,110 @@ func publish(ctx context.Context, r2 *staticexport.R2, out, meta string, removed
 	return nil
 }
 
+// edgeLayoutOn resolves -edge-layout. Pages in parts are garbage to a Worker
+// that cannot put them together, so auto asks the live Worker first: a 404
+// means it is older, and pages are stored whole as before. Any other answer
+// stops the export rather than guess, so one network error cannot rewrite
+// every page in the other form.
+func edgeLayoutOn(ctx context.Context, mode string, r2 bool, base string, stderr io.Writer) (bool, error) {
+	switch {
+	case mode == "on":
+		return true, nil
+	case mode == "off", !r2:
+		return false, nil
+	}
+	u := strings.TrimRight(base, "/") + "/_build/layout"
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return false, err
+	}
+	resp, err := (&http.Client{Timeout: 30 * time.Second}).Do(req)
+	if err != nil {
+		return false, fmt.Errorf("edge layout: asking the Worker (%s): %w; pass -edge-layout on or off", u, err)
+	}
+	defer resp.Body.Close()
+	b, _ := io.ReadAll(io.LimitReader(resp.Body, 64))
+	switch {
+	case resp.StatusCode == http.StatusOK && strings.HasPrefix(string(b), "LLP1"):
+		fmt.Fprintln(stderr, "edge layout: the Worker puts pages together; storing pages in parts")
+		return true, nil
+	case resp.StatusCode == http.StatusNotFound:
+		fmt.Fprintln(stderr, "edge layout: the live Worker predates it; storing pages whole")
+		return false, nil
+	}
+	return false, fmt.Errorf("edge layout: %s answered %d; pass -edge-layout on or off", u, resp.StatusCode)
+}
+
+// publishLayout writes this build's frames under <out>/.export (_layout/ and
+// layout.json, as in the bucket) and, when r2 is set, stores in the bucket
+// any frame the bucket's list does not have, then the list. A build whose
+// frames are already there writes nothing.
+func publishLayout(ctx context.Context, srv *site.Server, r2 *staticexport.R2, out string, stdout io.Writer) (*staticexport.Layout, error) {
+	frames, err := srv.LayoutFrames()
+	if err != nil {
+		return nil, err
+	}
+	layout, err := staticexport.NewLayout(frames)
+	if err != nil {
+		return nil, err
+	}
+	dir := filepath.Join(out, ".export")
+	var refs []staticexport.LayoutRef
+	bodies := map[string][]byte{}
+	for _, f := range frames {
+		b, id := staticexport.FrameObject(f)
+		refs = append(refs, staticexport.LayoutRef{Key: f.Lang + "/" + f.Schema, ID: id})
+		bodies[id] = b
+		if err := os.MkdirAll(filepath.Join(dir, "_layout"), 0o755); err != nil {
+			return nil, err
+		}
+		if err := os.WriteFile(filepath.Join(dir, filepath.FromSlash(staticexport.FrameKey(id))), b, 0o644); err != nil {
+			return nil, err
+		}
+	}
+	var prev []byte
+	if r2 != nil {
+		prev, err = r2.Get(ctx, staticexport.LayoutPointerKey)
+		if err != nil && !errors.Is(err, staticexport.ErrNotFound) {
+			return nil, fmt.Errorf("reading %s: %w", staticexport.LayoutPointerKey, err)
+		}
+	} else if b, err := os.ReadFile(filepath.Join(dir, "layout.json")); err == nil {
+		prev = b
+	}
+	ptr, changed, err := staticexport.MergeLayoutPointer(prev, refs)
+	if err != nil {
+		return nil, err
+	}
+	if err := os.WriteFile(filepath.Join(dir, "layout.json"), ptr, 0o644); err != nil {
+		return nil, err
+	}
+	if r2 == nil || !changed {
+		return layout, nil
+	}
+	known := map[string]bool{}
+	if len(prev) > 0 {
+		var p staticexport.LayoutPointer
+		if err := json.Unmarshal(prev, &p); err == nil {
+			for _, r := range p.Layouts {
+				known[r.ID] = true
+			}
+		}
+	}
+	for _, r := range refs {
+		if known[r.ID] {
+			continue
+		}
+		if err := r2.Put(ctx, staticexport.FrameKey(r.ID), bodies[r.ID], staticexport.PutOptions{ContentType: "application/json", CacheControl: "public, max-age=31536000, immutable"}); err != nil {
+			return nil, err
+		}
+	}
+	if err := r2.Put(ctx, staticexport.LayoutPointerKey, ptr, staticexport.PutOptions{ContentType: "application/json"}); err != nil {
+		return nil, err
+	}
+	fmt.Fprintf(stdout, "layout: stored %d frames and %s\n", len(refs), staticexport.LayoutPointerKey)
+	return layout, nil
+}
+
 func contentType(name string) string {
 	switch path.Ext(name) {
 	case ".json", ".jsonl":
@@ -358,6 +484,9 @@ func printStats(w io.Writer, st *staticexport.Stats) {
 	fmt.Fprintf(w, "written:          %d   unchanged: %d   removed: %d\n", st.Written, st.Unchanged, st.Removed)
 	fmt.Fprintf(w, "redirects:        %d   not found: %d   errors: %d\n", st.Redirects, st.NotFound, st.Errors)
 	fmt.Fprintf(w, "raw bytes:        %.1f MB   gzip(6): %.1f MB\n", float64(st.Raw)/1e6, float64(st.Gzip)/1e6)
+	if st.Parts > 0 {
+		fmt.Fprintf(w, "in parts:         %d pages   stored: %.1f MB\n", st.Parts, float64(st.Stored)/1e6)
+	}
 	fmt.Fprintf(w, "elapsed:          %s   pages/s: %.1f\n", st.Elapsed.Round(time.Second), float64(st.Pages+st.Redirects+st.NotFound)/max(secs, 0.001))
 	fmt.Fprintf(w, "peak heap/sys:    %.0f MB / %.0f MB\n", float64(st.PeakHeap)/1e6, float64(st.PeakSys)/1e6)
 	kinds := make([]string, 0, len(st.ByKind))
@@ -415,8 +544,16 @@ func compare(ctx context.Context, args []string, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
+	layout, err := staticexport.ReadLayoutDir(filepath.Join(*out, ".export"))
+	if err != nil {
+		return err
+	}
 	read := func(e staticexport.Entry) ([]byte, error) {
-		return os.ReadFile(filepath.Join(*out, filepath.FromSlash(e.File)))
+		b, err := os.ReadFile(filepath.Join(*out, filepath.FromSlash(e.File)))
+		if err != nil {
+			return nil, err
+		}
+		return layout.Join(b) // a page in parts, put back into its frame
 	}
 	cl := staticexport.NewClient(*live, *workers, *pause)
 	cl.FromDir = *fromDir

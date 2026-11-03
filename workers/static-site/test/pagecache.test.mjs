@@ -15,7 +15,8 @@ test('a new export generation gets new page cache keys', async () => {
   let generation = 'run-1';
   const env = { SITE: { get: async key => key === '_export/generation'
     ? { text: async () => generation + '\n' }
-    : { body: 'page', httpEtag: '"e"', httpMetadata: { contentType: 'text/html' } } } };
+    : key === '_export/layout.json' ? null
+    : { body: 'page', arrayBuffer: async () => new TextEncoder().encode('page').buffer, httpEtag: '"e"', httpMetadata: { contentType: 'text/html' } } } };
   const ctx = { waitUntil() {} };
   const now = Date.now;
   let clock = now();

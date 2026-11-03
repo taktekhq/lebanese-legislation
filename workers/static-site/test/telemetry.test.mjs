@@ -25,7 +25,7 @@ async function run(t, { path = '/healthz', duration = 0, random = 0.9, status = 
   t.after(() => { globalThis.caches = saved; });
   const service = { fetch: async () => { now += duration; if (serviceFail) throw Error('offline'); return new Response('origin', { status }); } };
   const env = { POSTHOG_KEY: 'test-key',
-    SITE: { get: async key => key === '_export/generation' ? null : key === '_build/live-side' ? { text: async () => 'green' }
+    SITE: { get: async key => key === '_export/generation' || key === '_export/layout.json' ? null : key === '_build/live-side' ? { text: async () => 'green' }
       : (r2 || staticPage) ? { body: 'file', httpEtag: '"x"' } : null },
     ORIGIN_BLUE: service, ORIGIN_GREEN: service };
   const request = new Request('https://example.com' + path);
