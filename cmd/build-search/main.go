@@ -19,7 +19,12 @@ func main() {
 	indexDSN := flag.String("index-dsn", os.Getenv("SEARCH_DATABASE_URL"), "empty metadata database DSN")
 	model := flag.String("model", semantic.DefaultModel, "embedding model whose IDs to generate")
 	ids := flag.String("ids-out", "", "optional current id,hash CSV output")
+	idSQL := flag.Bool("id-sql", false, "print the SQL expression for a chunk's id (as in vectors.parquet) over semantic_chunks columns, and exit")
 	flag.Parse()
+	if *idSQL {
+		fmt.Println(vectorize.ChunkIDSQL)
+		return
+	}
 	corpus, err := pgxpool.New(ctx, *corpusDSN)
 	if err != nil {
 		cli.Exit(err)

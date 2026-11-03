@@ -28,7 +28,7 @@ act workflow_dispatch -W .github/workflows/data.yml --input publish=true \
 
 | Workflow | What it does | Secrets |
 | --- | --- | --- |
-| `data.yml` | Loads `data/` into PostgreSQL, exports and checks the Parquet tables, (job `publish`) uploads them to Hugging Face, builds the `-db` image, and (job `dump`) uploads `pg_dump` files of both databases from that image to `postgres/` on Hugging Face, refusing an image from another commit. | `HF_TOKEN` (write token for the dataset) |
+| `data.yml` | Loads `data/` into PostgreSQL, exports and checks the Parquet tables, (job `publish`) uploads them to Hugging Face, builds the `-db` image, and (job `dump`) loads `vectors/vectors.parquet` into `lebleg_search.semantic_chunks.embedding` with its HNSW index and uploads `pg_dump` files of both databases from that image to `postgres/` on Hugging Face, refusing an image from another commit. | `HF_TOKEN` (write token for the dataset) |
 
 On GitHub, `HF_TOKEN` lives only in the `huggingface` environment, which
 deploys from `main` only, and the token can write to the

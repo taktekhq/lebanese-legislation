@@ -612,7 +612,7 @@
   "resources.dump": "Download the PostgreSQL dump of the laws database on Hugging Face (lebleg.dump)",
   "resources.dump_search": "Download the PostgreSQL dump of the search database (lebleg_search.dump)",
   "resources.dump_manifest": "Dump manifest: commit, date and SHA-256 checksums",
-  "resources.dump_note": "The dumps are rebuilt after every data update. Restore them with pg_restore into PostgreSQL 18 with pgvector, and check the SHA-256 in the manifest first. They have no embeddings: the semantic vectors are the Parquet file below.",
+  "resources.dump_note": "The dumps are rebuilt after every data update. Restore them with pg_restore into PostgreSQL 18 with pgvector, and check the SHA-256 in the manifest first. The search database includes the semantic vectors (gemini-embedding-001, 768 dimensions) and their HNSW index.",
   "resources.database": "PostgreSQL database image (-db)",
   "resources.database_note": "The -db and -all images include both databases built from the source tables. Parquet tables and semantic vectors are available on Hugging Face.",
   "resources.heading": "Build with the public resources",

@@ -612,7 +612,7 @@
   "resources.dump": "تنزيل نسخة PostgreSQL من قاعدة بيانات القوانين على Hugging Face (lebleg.dump)",
   "resources.dump_search": "تنزيل نسخة PostgreSQL من قاعدة بيانات البحث (lebleg_search.dump)",
   "resources.dump_manifest": "بيان النسخ: الالتزام والتاريخ وبصمات SHA-256",
-  "resources.dump_note": "تُعاد النسخ بعد كل تحديث للبيانات. استعدها باستخدام pg_restore في PostgreSQL 18 مع pgvector، وتحقّق أولاً من بصمة SHA-256 في البيان. لا تتضمن متجهات دلالية: المتجهات في ملف Parquet أدناه.",
+  "resources.dump_note": "تُعاد النسخ بعد كل تحديث للبيانات. استعدها باستخدام pg_restore في PostgreSQL 18 مع pgvector، وتحقّق أولاً من بصمة SHA-256 في البيان. تتضمن قاعدة بيانات البحث المتجهات الدلالية (gemini-embedding-001، 768 بُعداً) وفهرس HNSW الخاص بها.",
   "resources.database": "صورة قاعدة بيانات PostgreSQL (-db)",
   "resources.database_note": "تتضمن صورتا -db و-all قاعدتي البيانات المبنيتين من جداول المصدر. تتوفر جداول Parquet ومتجهات البحث على Hugging Face.",
   "resources.heading": "استخدم الموارد العامة في مشروعك",

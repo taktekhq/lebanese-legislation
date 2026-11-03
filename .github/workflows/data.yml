@@ -151,13 +151,15 @@ jobs:
   dump:
     # PostgreSQL dumps of both databases from the -db image this run just
     # built, to one fixed path on Hugging Face that each run overwrites
-    # (postgres/). Old versions stay in the dataset's git history. No
-    # embeddings: semantic vectors are in the -vectors image and Vectorize.
+    # (postgres/). Old versions stay in the dataset's git history. The
+    # published vectors (vectors/vectors.parquet) are loaded into
+    # lebleg_search.semantic_chunks.embedding with its HNSW index first, as
+    # the old releases had them; chunks with no vector yet stay NULL.
     needs: db
     if: github.ref == 'refs/heads/main'
     environment: huggingface
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 300
     env:
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
       HF_REPO: taktekhq/lebanese-legislation
@@ -169,6 +171,11 @@ jobs:
             echo "No HF_TOKEN secret: no dump uploaded." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
       - name: Free runner disk
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
@@ -186,7 +193,7 @@ jobs:
           fi
       - name: Start PostgreSQL
         run: |
-          docker run -d --name db -e POSTGRES_PASSWORD=dump "$IMAGE"
+          docker run -d --name db --shm-size=4g -e POSTGRES_PASSWORD=dump "$IMAGE"
           for i in $(seq 180); do
             docker exec -u postgres db pg_isready -q && \
               docker exec -u postgres db psql -d lebleg -Atc 'SELECT 1' >/dev/null 2>&1 && exit 0
@@ -194,6 +201,29 @@ jobs:
           done
           docker logs db | tail -50
           exit 1
+      - name: Load the published vectors into lebleg_search
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" https://github.com/duckdb/duckdb/releases/download/v1.5.6/duckdb_cli-linux-amd64.zip
+          unzip -q "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/bin"
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/vectors.parquet" "https://huggingface.co/datasets/$HF_REPO/resolve/main/vectors/vectors.parquet"
+          idsql=$(go run ./cmd/build-search -id-sql)
+          psql() { docker exec -i -u postgres db psql -v ON_ERROR_STOP=1 -d lebleg_search "$@"; }
+          psql -c 'CREATE EXTENSION IF NOT EXISTS vector' \
+               -c 'ALTER TABLE semantic_chunks ADD COLUMN IF NOT EXISTS embedding halfvec(768)' \
+               -c 'CREATE UNLOGGED TABLE dump_vectors (id text NOT NULL, embedding halfvec(768) NOT NULL)'
+          # Streamed: as CSV text the vectors would be about 12 GB on disk.
+          "$RUNNER_TEMP/bin/duckdb" -c "COPY (SELECT id, '[' || array_to_string(\"values\", ',') || ']' FROM read_parquet('$RUNNER_TEMP/vectors.parquet')) TO '/dev/stdout' (FORMAT csv, HEADER false)" \
+            | psql -c 'COPY dump_vectors FROM STDIN WITH (FORMAT csv)'
+          rm -f "$RUNNER_TEMP/vectors.parquet"
+          psql -c "UPDATE semantic_chunks SET embedding = v.embedding FROM dump_vectors v WHERE $idsql = v.id"
+          psql -At -F ' ' -c "SELECT count(*), count(embedding), count(*) - count(embedding), (SELECT count(*) FROM dump_vectors) FROM semantic_chunks" \
+            | { read chunks with without vectors; printf '{"chunks": %s, "with_embedding": %s, "without_embedding": %s, "vectors_in_parquet": %s}\n' "$chunks" "$with" "$without" "$vectors"; } \
+            | tee "$RUNNER_TEMP/vectors.json"
+          psql -c 'DROP TABLE dump_vectors'
+          # The old releases' index (internal/releasedb): pg_dump writes only its
+          # definition, and pg_restore builds it.
+          psql -c "SET maintenance_work_mem = '4GB'" -c 'SET max_parallel_maintenance_workers = 3' \
+               -c 'CREATE INDEX IF NOT EXISTS semantic_chunks_embedding ON semantic_chunks USING hnsw (embedding halfvec_cosine_ops)'
       - name: Dump both databases
         run: |
           out="$RUNNER_TEMP/postgres"; mkdir -p "$out"
@@ -216,7 +246,8 @@ jobs:
               p = os.path.join(out, name)
               files[name] = {"bytes": os.path.getsize(p), "sha256": sha(p)}
           manifest = {"commit": os.environ["GITHUB_SHA"], "date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                      "image": os.environ["IMAGE"], "pg_dump": pg, "format": "custom (pg_restore)", "embeddings": False, "files": files}
+                      "image": os.environ["IMAGE"], "pg_dump": pg, "format": "custom (pg_restore)", "files": files,
+                      "vectors": json.load(open(os.path.join(os.environ["RUNNER_TEMP"], "vectors.json")))}
           with open(os.path.join(out, "manifest.json"), "w") as f:
               json.dump(manifest, f, indent=2)
               f.write("\n")
