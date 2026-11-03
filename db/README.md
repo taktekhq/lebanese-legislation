@@ -37,7 +37,7 @@ target includes the data and runs `ANALYZE`. After a clean shutdown, the build
 resets WAL on this new cluster without forcing it, then copies only the finished
 cluster into the final image. This excludes the bulk load's spare WAL segments
 from published layers. It never resets WAL on a user's running database.
-Optional scans belong in `db/scans/`; the image workflow fetches them from R2.
+Gazette scans are served from R2 by the static-site Worker and are not included in the images.
 `health.sh` checks PostgreSQL and both databases' serving tables.
 
 ```sh

@@ -22,7 +22,7 @@ until pg_isready -h 127.0.0.1 -U lebleg_web -d lebleg -q; do
 done
 echo "start: $(date -u +%T) postgres ready after $i s"
 install -d -o 65532 -g 65532 /tmp/lebleg-events
-gosu 65532:65532 /usr/local/bin/lebleg-web -addr 0.0.0.0:8080 -events /tmp/lebleg-events -scans /scans -db "host=127.0.0.1 user=lebleg_web dbname=lebleg" &
+gosu 65532:65532 /usr/local/bin/lebleg-web -addr 0.0.0.0:8080 -events /tmp/lebleg-events -db "host=127.0.0.1 user=lebleg_web dbname=lebleg" &
 WEB=$!
 wait $WEB
 code=$?

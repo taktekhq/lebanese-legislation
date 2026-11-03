@@ -30,4 +30,4 @@ gosu postgres pg_ctl -D "$PGDATA" -o "-c listen_addresses='' -c unix_socket_dire
 psql -c CHECKPOINT -c CHECKPOINT
 gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
 trap - EXIT
-du -sh "$PGDATA" "$PGDATA/pg_wal" /scans
+du -sh "$PGDATA" "$PGDATA/pg_wal"

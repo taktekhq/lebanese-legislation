@@ -18,13 +18,15 @@ test("only GET and HEAD for a page without a real query are served from files", 
   assert.equal(route("GET", "/law/1/", ""), "static");
   assert.equal(route("HEAD", "/en/decree/2/article/3/", ""), "static");
   assert.equal(route("POST", "/search/", ""), "origin");
+  assert.equal(route("GET", "/scan/2000000001/page-1.png", ""), "static");
+  assert.equal(route("HEAD", "/scan/2000000001/source.pdf", ""), "static");
   assert.equal(route("GET", "/law/1/", "?utm_source=chatgpt.com"), "static", "ChatGPT referrals stay off the origin");
   assert.equal(route("GET", "/law/1/", "?utm_source=chatgpt.com&gclid=x"), "static");
   assert.equal(route("GET", "/laws/", "?kind=decree"), "origin", "a filter is built by the origin");
   assert.equal(route("GET", "/search/", "?q=labour"), "origin", "a search with a query is answered by the server page (issue 43)");
   assert.equal(route("GET", "/law/1/go/", "?n=5"), "origin");
   for (const p of ["/api/v1/search/", "/ph/e/", "/ph", "/mcp", "/healthz", "/.well-known/x", "/ul/uploads/images/a.png",
-    "/scan/1/a.png", "/ruling-files/9.pdf", "/official/", "/en/official/3/", "/official-files/1/a"]) {
+    "/ruling-files/9.pdf", "/official/", "/en/official/3/", "/official-files/1/a"]) {
     assert.equal(route("GET", p, ""), "origin", p);
   }
   assert.equal(route("GET", "/phrases/", ""), "static", "only /ph and /ph/ are the analytics proxy");
