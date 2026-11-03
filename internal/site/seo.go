@@ -14,9 +14,12 @@ const (
 	IndexNowKey = "ea77b6da080977a1becb866c3314f534"
 )
 
-// The crawlers that feed answer engines, welcomed by name (they also match "*").
+// The crawlers that feed answer engines and agents, welcomed by name. Unlike
+// "*" (search engines), they may also read search, the API and the MCP server,
+// so the assistants and agents that use them learn them (Nizar, 4 Nov 2026).
 var aiCrawlers = []string{"GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot",
-	"Claude-User", "PerplexityBot", "Perplexity-User", "Google-Extended", "Applebot-Extended", "CCBot"}
+	"Claude-User", "PerplexityBot", "Perplexity-User", "Google-Extended", "Applebot-Extended", "CCBot",
+	"ShapBot", "DuckAssistBot", "MistralAI-User"}
 
 func (s *Server) seoRoutes() {
 	m := s.mux
@@ -40,9 +43,10 @@ func (s *Server) robots(w http.ResponseWriter, r *http.Request) {
 	var b strings.Builder
 	b.WriteString("# Lebanese Legislation: every Lebanese law, free to read, cite and build on.\n")
 	b.WriteString("# Search engines and AI assistants are welcome; please cite the article's address.\n\n")
+	aiRules := "Allow: /\nDisallow: /changes/review/\nDisallow: /en/changes/review/\n"
 	b.WriteString("User-agent: *\n" + rules + "\n")
 	for _, bot := range aiCrawlers {
-		b.WriteString("User-agent: " + bot + "\n" + rules + "\n")
+		b.WriteString("User-agent: " + bot + "\n" + aiRules + "\n")
 	}
 	b.WriteString("Sitemap: " + Base + "/sitemap.xml\n")
 	b.WriteString("Sitemap: " + Base + "/blog-sitemap.xml\n")
