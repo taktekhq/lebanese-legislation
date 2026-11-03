@@ -20,7 +20,7 @@ DATABASE_URL='host=localhost port=5433 dbname=lebleg user=lebleg_reader password
 
 It listens on `127.0.0.1:8080` (`LISTEN_ADDR` changes it). In Compose it is on http://localhost:8001/mcp. Browser requests are answered only from `MCP_ALLOWED_ORIGINS` or the same localhost address.
 
-- [`cloudflare/`](cloudflare/): run this image on Cloudflare Containers.
+- The hosted server at https://lebaneselegislation.com/mcp is this code inside the `-all` image on Cloudflare Containers: see [workers/static-site/container](../workers/static-site/container/README.md).
 - [`server.json`](../server.json) at the repository root is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry for the hosted server, and [`.mcp.json`](../.mcp.json) the client configuration.
 
 ## Code and datasets

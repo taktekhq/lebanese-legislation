@@ -71,7 +71,7 @@ The server itself is [`web/`](../web/README.md) (with `api/` and `mcp/`); these 
 ## Hosted builds
 
 [static-site.yml](../.github/workflows/static-site.yml) runs `static-export` in
-8 parallel shards into R2. [origin.yml](../.github/workflows/origin.yml) deploys
+24 parallel shards into R2, rendering only the pages whose data changed. [origin.yml](../.github/workflows/origin.yml) deploys
 the database and Go website server in one Cloudflare Container.
 [vectors.yml](../.github/workflows/vectors.yml) uses `export-vectors` and
 `vectorize-sync` to publish `vectors/vectors.parquet` on Hugging Face and load
