@@ -131,9 +131,17 @@ fi
   git submodule update -q --init --remote archive \
     || echo "archive: could not update the archive submodule; building on the archive as it is"
   # Use the existing resumable scraper. Never publish or push the archive here.
-  "$REPO/scraper/bin/ul-scrape" --data "$STORE" --minutes "${LEBLEG_SCRAPE_MINUTES:-180}" daily
-  "$REPO/scraper/bin/ul-scrape" --data "$STORE" --minutes "${LEBLEG_ARTICLE_MINUTES:-30}" articles
-  "$REPO/scraper/bin/ul-scrape" --data "$STORE" --out "$ARCHIVE" export
+  # LEBLEG_SCRAPE=0: another job scrapes the store and publishes the archive
+  # (the ullaw-* timers on our host), so build from the archive as published.
+  # The export writes the whole store into the archive, so point LEBLEG_STORE
+  # at the full store: a partial one deletes everything it does not hold.
+  if [ "${LEBLEG_SCRAPE:-1}" != 0 ]; then
+    "$REPO/scraper/bin/ul-scrape" --data "$STORE" --minutes "${LEBLEG_SCRAPE_MINUTES:-180}" daily
+    "$REPO/scraper/bin/ul-scrape" --data "$STORE" --minutes "${LEBLEG_ARTICLE_MINUTES:-30}" articles
+    "$REPO/scraper/bin/ul-scrape" --data "$STORE" --out "$ARCHIVE" export
+  else
+    echo "scrape: skipped (LEBLEG_SCRAPE=0); building from the published archive"
+  fi
   for command in build-db recall-report record-scan-manifest check-dates check-amounts check-english check-versions check-rulings export-data calculated-current judge citeagy; do
     go build -o "$BIN/$command" "./cmd/$command"
   done
