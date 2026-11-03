@@ -24,6 +24,8 @@ func topicGet(s *Server, path string) (int, string) {
 	return rec.Code, rec.Body.String()
 }
 
+const googleOnlyNoIndex = `<meta name="googlebot" content="noindex, follow">`
+
 func TestTopicsIndexAndPages(t *testing.T) {
 	all := topics.All()
 	if len(all) == 0 {
@@ -36,8 +38,8 @@ func TestTopicsIndexAndPages(t *testing.T) {
 		if code != 200 || !strings.Contains(body, `href="`+link+`"`) {
 			t.Fatalf("%s/topics/: %d, links the first topic: %v", prefix, code, strings.Contains(body, link))
 		}
-		if !strings.Contains(body, `<meta name="robots" content="noindex, follow">`) {
-			t.Errorf("%s/topics/ is offered to search engines", prefix)
+		if !strings.Contains(body, googleOnlyNoIndex) || !strings.Contains(body, `<meta name="robots" content="index, follow, max-image-preview:large">`) {
+			t.Errorf("%s/topics/ must be hidden from Google only", prefix)
 		}
 		for _, tp := range all {
 			path := prefix + "/topic/" + tp.Slug + "/"
@@ -49,7 +51,9 @@ func TestTopicsIndexAndPages(t *testing.T) {
 			canon := path
 			for _, want := range []string{
 				`<link rel="canonical" href="` + Base + canon + `">`, // self-canonical
-				`<meta name="robots" content="noindex, follow">`,     // generated: kept for visitors, hidden from search (#86)
+				googleOnlyNoIndex, // generated: hidden from Google (#86), open to Bing (3 Nov)
+				`<meta name="robots" content="index, follow, max-image-preview:large">`,
+				`<link rel="alternate" hreflang="en" href="` + Base + "/en/topic/" + tp.Slug + `/">`,
 				`"dateModified":"` + tp.Updated + `"`,
 				`"@type":"Article"`,
 				`<blockquote lang="ar" dir="rtl">`,
@@ -61,9 +65,6 @@ func TestTopicsIndexAndPages(t *testing.T) {
 			if !strings.Contains(body, strings.ReplaceAll(c.Answer.Text, "'", "&#39;")) && !strings.Contains(body, c.Answer.Text) {
 				t.Errorf("%s does not print its answer", path)
 			}
-			if strings.Contains(body, `rel="alternate" hreflang=`) {
-				t.Errorf("%s: a hidden page names hreflang", path)
-			}
 			if strings.Contains(body, "FAQPage") {
 				t.Errorf("%s: FAQPage markup is not a citation lever and is not used", path)
 			}
@@ -71,6 +72,9 @@ func TestTopicsIndexAndPages(t *testing.T) {
 				t.Errorf("%s contains an em dash", path)
 			}
 		}
+	}
+	if _, body := topicGet(s, "/about/"); strings.Contains(body, `name="googlebot"`) {
+		t.Error("/about/ carries a googlebot meta")
 	}
 	if code, _ := topicGet(s, "/topic/no-such-topic/"); code != 404 {
 		t.Errorf("unknown topic: %d, want 404", code)

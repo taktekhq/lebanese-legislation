@@ -220,10 +220,13 @@ type Page struct {
 	Desc    string
 	Path    string // canonical, from the site root, with leading slash
 	NoIndex bool
-	OGType  string // "article" for documents; "website" when empty
-	LD      []any  // schema.org objects
-	Data    any
-	Lang    string // the main content's language ("ar" for a text's pages); "en" when empty
+	// GoogleNoIndex keeps an indexable page out of Google only: a
+	// <meta name="googlebot" content="noindex, follow"> beside the robots one.
+	GoogleNoIndex bool
+	OGType        string // "article" for documents; "website" when empty
+	LD            []any  // schema.org objects
+	Data          any
+	Lang          string // the main content's language ("ar" for a text's pages); "en" when empty
 
 	// Translated says an Arabic-content page also has real English content (a
 	// principal code's summary, a topic page): it stays self-canonical in both

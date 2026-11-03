@@ -56,7 +56,7 @@ type langCase struct {
 	name string
 	path string // the root (Arabic) path, with the query if any
 	pair bool   // a real translation pair: hreflang, and the English page is its own canonical
-	// hidden: noindex in both languages (search, the generated topics), so
+	// hidden: noindex in both languages (search, the rulings list), so
 	// the pair names no hreflang: hreflang never points at a hidden page
 	hidden bool
 }
@@ -112,7 +112,7 @@ func langCases(t *testing.T, s *Server) []langCase {
 func TestLanguageLayoutTable(t *testing.T) {
 	s := testServer(t)
 	cases := langCases(t, s)
-	cases = append(cases, langCase{"topic", "/topic/" + firstTopicSlug(t) + "/", true, true})
+	cases = append(cases, langCase{"topic", "/topic/" + firstTopicSlug(t) + "/", true, false})
 	for _, c := range cases {
 		path, query, _ := strings.Cut(c.path, "?")
 		if query != "" {

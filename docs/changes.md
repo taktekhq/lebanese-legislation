@@ -7,7 +7,8 @@
 - No more PostgreSQL dump releases. The data is the Parquet dataset on Hugging Face and the database baked into the `-db` image.
 - The static build runs in 24 shards, each page rendered by exactly one shard, and renders only the pages whose data changed.
 - Every page shows when it last changed, with `dateModified` in its JSON-LD; `updated_at` is in `/api/v1/` responses and the MCP tools. `/openapi.json` describes the API as OpenAPI 3.1.
-- Weak pages are hidden from search engines: generated topic pages, badly scanned rulings and machine English for texts few people read (`noindex, follow`, still linked).
+- Weak pages are hidden from search engines: badly scanned rulings and machine English for texts few people read (`noindex, follow`, still linked). The generated topic pages are hidden from Google only (`<meta name="googlebot" content="noindex, follow">`), so Bing, which ChatGPT and Copilot search, can still index them.
+- Changed pages go to IndexNow after every static render (Bing, Yandex, Naver, Seznam).
 - One `compose.yaml`: `db`, `api`, `mcp`, and the all-in-one service under the `all` profile. `./setup` only writes `.env`; `./start` is gone.
 - A daily workflow checks that the AI answer on the search page still works.
 
