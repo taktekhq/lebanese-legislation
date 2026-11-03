@@ -1,0 +1,20 @@
+{{define "content"}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <h1 class="page__title">{{t "terms.title"}}</h1>
+  <p class="lead">{{t "terms.lead"}}</p>
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <article class="prose">
+    <h2>{{t "terms.advice_h2"}}</h2>
+    <p>{{t "terms.advice_p"}}</p>
+    <h2>{{t "terms.reuse_h2"}}</h2>
+    <p>{{t "terms.reuse_p" (safe (printf "<a class=\"link\" href=\"%s#license\">" (u "/data/"))) (safe "</a>")}}</p>
+    <h2>{{t "terms.api_h2"}}</h2>
+    <p>{{t "terms.api_p"}}</p>
+    <h2>{{t "terms.changes_h2"}}</h2>
+    <p>{{t "terms.changes_p" (safe "<a class=\"link\" href=\"mailto:nizar@taktek.io\">nizar@taktek.io</a>")}}</p>
+    <p class="tiny">{{t "legal.updated"}}</p>
+  </article>
+</section>
+{{end}}
