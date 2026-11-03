@@ -126,6 +126,10 @@ func run(ctx context.Context) error {
 		}
 		defer os.Remove(tmp.Name())
 		defer tmp.Close()
+		// CreateTemp makes the file 0600; the workflow uploads it from outside the container's user.
+		if err = tmp.Chmod(0o644); err != nil {
+			return err
+		}
 		writer = bufio.NewWriter(tmp)
 	}
 	current := make(map[string]string)
