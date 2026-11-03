@@ -196,7 +196,7 @@ CREATE TABLE legislation_article (
   -- Where text_ar and text_fr were read, written with them: ul with
   -- lawtext/<law id>, or saderlex with the scan's id. The wording guard
   -- (internal/provenance) checks the text against that archived source
-  -- before any export. Internal: export, the D1 snapshot and the Hugging
+  -- before any export. Internal: export and the Hugging
   -- Face dataset leave these two columns out.
   source_kind    text,                    -- internal: provenance
   source_id      text,                    -- internal: provenance

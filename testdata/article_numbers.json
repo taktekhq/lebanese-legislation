@@ -1,5 +1,5 @@
 {
-  "about": "Spellings of article numbers and what each is read as against a target text's own article numbers. Read by internal/amend (Canon, Resolve) and workers/mcp (numberForms): the two must agree. want: the articles, in order, that Canon returns (an article the target lacks keeps its folded spelling; a spelling that names no article gives none). parts: the part kept beside each article ('' when none). The worker's check: the first of numberForms(raw) that is in target is the first of want that is in target (none, when none).",
+  "about": "Spellings of article numbers and what each is read as against a target text's own article numbers. Read by internal/amend (Canon, Resolve). want: the articles, in order, that Canon returns (an article the target lacks keeps its folded spelling; a spelling that names no article gives none). parts: the part kept beside each article ('' when none).",
   "cases": [
     {"raw": "121 مكررا", "target": ["121", "121 مكرر"], "want": ["121 مكرر"]},
     {"raw": "267 رباعا", "target": ["267", "267 مكرر"], "want": []},

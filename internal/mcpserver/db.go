@@ -14,9 +14,9 @@ import (
 )
 
 // Row shapes and small helpers shared by the tools. Every query reads the
-// corpus as the D1 snapshot flattened it (internal/snapshot): a law row
+// corpus through joins at request time: a law row
 // carries its kind's English name, its code, its source page and English
-// title, joined here at request time instead of once at export time.
+// title.
 
 // Base is the site every url and source link points into.
 const Base = "https://lebaneselegislation.com"

@@ -9,7 +9,7 @@
 //   PLAYWRIGHT_MODULE  where to require Playwright from (default "playwright")
 //   CHROME_PATH        a Chromium binary, if Playwright's own is not installed
 //
-// /ph/* is fetched from PostHog directly, so a local server without the Caddy
+// /ph/* is fetched from PostHog directly, so a local server without the analytics
 // proxy works too. It checks, per device and page:
 //   GA4      a page_view for G-RDYRK422NP with the page's real title and the
 //            full address (utm_source kept), and no ep.source/medium/campaign

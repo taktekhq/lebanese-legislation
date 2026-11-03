@@ -10,7 +10,7 @@ changes to `data/` on main.
 `docker build -f workers/static-site/container/Dockerfile --build-arg DATA_TAG=latest .`.
 The server serves dynamic pages, `/api/v1/`, and the ten-tool
 `internal/mcpserver` handler at `/mcp` over the same canonical database.
-Cloudflare MCP and badge routes remain unchanged pending issue #51.
+The site Worker routes MCP and badge requests to the live origin container.
 
 The `origin` workflow takes `tag` (default `latest`) and pulls the published
 GHCR `-all` image, then copies it to the Cloudflare registry with a unique
@@ -28,7 +28,7 @@ The workflow runs these jobs:
    was supplied.
 2. `site-worker` optionally deploys `workers/static-site` when
    `deploy_site_worker` is true (default false). Only this job applies the `route`
-   and `mode` inputs and sets `ORIGIN_TEST_KEY` on the site Worker.
+   input and sets `ORIGIN_TEST_KEY` on the site Worker.
 3. `stage` reads R2 `_build/live-side` (default blue), deploys only the idle
    environment with the new image, and sets its `GEMINI_API_KEY` and
    `LEBLEG_VECTORIZE_TOKEN` secrets. The live environment is never deployed.
@@ -42,7 +42,7 @@ The workflow runs these jobs:
 
 `origin-state` is a short-lived workflow artifact recording the old and idle side
 and the new image. Switch and rollback only need the side names.
-`ORIGIN_MODE` and `AI_TO_HETZNER` retain their existing behavior.
+All dynamic requests use the live blue/green container.
 
 The workflow requires `CLOUDFLARE_WORKERS_TOKEN`, `R2_ACCESS_KEY_ID`,
 `R2_SECRET_ACCESS_KEY`, `ORIGIN_TEST_KEY` and `LEBLEG_GEMINI_API_KEY`.

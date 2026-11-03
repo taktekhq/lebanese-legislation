@@ -147,7 +147,7 @@ func TestManifestBesideTheBundle(t *testing.T) {
 	if _, err := (&ArchiveSources{Bundle: bundle}).Text(build.SourceSaderlex, "197135"); !errors.Is(err, ErrNoManifest) {
 		t.Errorf("a manifest inside the folder was read: %v", err)
 	}
-	// From a checkout's root, as the nightly, snapshot.sh and hf.sh run it.
+	// From a checkout's root, as the nightly and hf.sh run it.
 	if got := ManifestPath(DefaultPaths("repo").Bundle); got != "repo/manual/scans.manifest.tsv" {
 		t.Errorf("default manifest %q", got)
 	}

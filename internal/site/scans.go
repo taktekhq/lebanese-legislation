@@ -103,8 +103,7 @@ func (c *Scan) SourceName() string {
 	return c.Source
 }
 
-// scanReadings writes a disputed span as ⟦one | two⟧ for the API, as the
-// MCP snapshot does (internal/snapshot).
+// scanReadings writes a disputed span as ⟦one | two⟧ for the API.
 var scanReadings = strings.NewReplacer("\uE000", "⟦", "\uE001", " | ", "\uE002", "⟧").Replace
 
 // countScans is how many of the texts were read from Gazette scans.

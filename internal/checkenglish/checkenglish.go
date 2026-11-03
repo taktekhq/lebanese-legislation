@@ -20,9 +20,7 @@ import (
 var Surfaces = []string{
 	"internal/site/templates/*.html",
 	"internal/site/*.go",
-	"internal/snapshot/*.go",
 	"internal/export/*.go",
-	"mcp/cloudflare/*.mjs",
 	"tools/src/lebleg/*.py",
 }
 

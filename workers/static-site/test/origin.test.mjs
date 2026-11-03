@@ -69,7 +69,6 @@ test('visitors use the R2 flag and cannot choose a side without the secret', asy
 test('authenticated probes reach the chosen side and bypass API cache', async () => {
   const { env, calls } = fixture();
   globalThis.caches = { default: { match() { throw Error('must bypass cache'); } } };
-  env.ORIGIN_MODE = 'hetzner';
   await originFetch(req('/api/v1/search/?q=law', { 'x-origin-test': 'secret', 'x-origin-side': 'green' }), env);
   assert.deepEqual(calls, ['green']);
 });
@@ -81,17 +80,17 @@ test('admin endpoints select their side from the query', async () => {
   assert.deepEqual(calls, ['stop:green', 'log:blue']);
   assert.equal((await originFetch(req('/_origin/restart?side=red', { 'x-origin-test': 'secret' }), env)).status, 400);
 });
-test('Hetzner mode and AI bypass keep their existing behavior', async () => {
+test('health, MCP and AI requests always reach the live container', async () => {
   const saved = globalThis.fetch;
-  globalThis.fetch = async () => new Response('hetzner');
+  globalThis.fetch = async () => { throw Error('must use a service binding'); };
   try {
-    const { env, calls } = fixture();
-    env.ORIGIN_MODE = 'hetzner';
-    assert.equal(await (await originFetch(req('/healthz'), env)).text(), 'hetzner');
-    env.ORIGIN_MODE = 'container';
-    env.AI_TO_HETZNER = '1';
-    assert.equal(await (await originFetch(req('/search/answer/'), env)).text(), 'hetzner');
-    assert.deepEqual(calls, []);
+    for (const side of ['blue', 'green']) {
+      const { env, calls } = fixture(side);
+      for (const path of ['/healthz', '/mcp', '/search/answer/', '/en/search/answer/', '/ar/search/answer/', '/search/ai/', '/en/search/ai/', '/ar/search/ai/']) {
+        assert.equal(await (await originFetch(req(path), env)).text(), side);
+      }
+      assert.deepEqual(calls, Array(8).fill(side));
+    }
   } finally { globalThis.fetch = saved; }
 });
 

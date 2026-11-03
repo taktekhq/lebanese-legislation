@@ -46,7 +46,6 @@ run on public data only.
 | `export-data` | Writes the database into `data/` as sorted text, after the wording guard passes. |
 | `calculated-current` | Writes each article's source-verified calculated wording to `data/article_calculated_current.jsonl`. |
 | `export-graph` | Writes the citation graph as CSV and GraphML. |
-| `mcp-snapshot` | Writes a SQLite (D1) snapshot of the database for the hosted MCP Worker. |
 
 ## Get the database
 
