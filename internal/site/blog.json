@@ -1,5 +1,151 @@
 [
   {
+    "Slug": "students-paid-instead-of-ads",
+    "Milestone": "2026-11-03",
+    "Published": "2026-11-03",
+    "Commit": "",
+    "EvidenceKind": "publication-record",
+    "Title": "We pay students to study with the site, instead of buying ads",
+    "TitleAr": "ندفع للطلاب ليدرسوا بالموقع بدلاً من شراء الإعلانات",
+    "Summary": "Current law and political science students at Lebanese universities get $10 for every week they study with Lebanese Legislation and tell us what is wrong. The money we would have spent on ads goes to them.",
+    "SummaryAr": "يتقاضى طلاب الحقوق والعلوم السياسية الحاليون في الجامعات اللبنانية 10 دولارات عن كل أسبوع يدرسون فيه باستخدام موقع التشريع اللبناني ويخبروننا بما هو خاطئ. المال الذي كنا سننفقه على الإعلانات يذهب إليهم.",
+    "Sections": [
+      {
+        "Heading": "Why students, and why not ads.",
+        "Body": "A free public library is only useful if people use it and it is right. Ads would bring visits. Students bring visits and corrections: they read these texts every week for their exams, and they notice when an article is missing, a date is wrong or a search finds nothing. So the budget we had for ads goes to them."
+      },
+      {
+        "Heading": "What we ask.",
+        "Body": "Use the site when you study, at least 2 days a week. Tell us when something is wrong, missing or hard to use. Fill in a 10-minute feedback form once a month. Be honest: what is bad helps us more than what is good."
+      },
+      {
+        "Heading": "What we pay.",
+        "Body": "$10 for every week you study with it, paid monthly. Errors you report carry your name on that law, linked to your LinkedIn profile, and you get a public contributor profile you can put on your CV. The program runs until March 2027."
+      },
+      {
+        "Heading": "Who can apply.",
+        "Body": "Students currently enrolled in law or political science at a Lebanese university, in any year, who study Lebanese law in Arabic. Graduates and professionals cannot apply to this one. Intake is rolling: apply on LinkedIn at any time and we reply within a week. If you are picked, we ask for your student ID or university email."
+      },
+      {
+        "Heading": "Independent, and open.",
+        "Body": "Lebanese Legislation is an independent project by Taktek. It is not affiliated with the Lebanese University, any other university or any government body. The texts come from the Lebanese University's Centre for Research and Studies in Legal Informatics, every page links to the Centre's record, and the code and data are public on GitHub and Hugging Face."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "لماذا الطلاب، ولماذا لا الإعلانات.",
+        "Body": "لا تفيد مكتبة عامة مجانية إلا إذا استخدمها الناس وكانت صحيحة. الإعلانات تجلب الزيارات. أما الطلاب فيجلبون الزيارات والتصحيحات: يقرأون هذه النصوص كل أسبوع استعداداً لامتحاناتهم، ويلاحظون حين تنقص مادة أو يكون تاريخ خاطئاً أو لا يجد البحث شيئاً. لذلك تذهب الميزانية التي خصصناها للإعلانات إليهم."
+      },
+      {
+        "Heading": "ما نطلبه.",
+        "Body": "استخدم الموقع حين تدرس، يومين في الأسبوع على الأقل. أخبرنا حين يكون شيء خاطئاً أو ناقصاً أو صعب الاستخدام. واملأ استمارة ملاحظات من 10 دقائق مرة في الشهر. كن صريحاً: ما هو سيئ يفيدنا أكثر مما هو جيد."
+      },
+      {
+        "Heading": "ما ندفعه.",
+        "Body": "10 دولارات عن كل أسبوع تدرس فيه باستخدامه، تُدفع شهرياً. الأخطاء التي تبلّغ عنها تحمل اسمك على ذلك القانون، مع رابط إلى حسابك على LinkedIn، وتحصل على صفحة مساهم علنية يمكنك وضعها في سيرتك الذاتية. يستمر البرنامج حتى آذار 2027."
+      },
+      {
+        "Heading": "من يمكنه التقديم.",
+        "Body": "الطلاب المسجلون حالياً في الحقوق أو العلوم السياسية في جامعة لبنانية، في أي سنة، ممن يدرسون القانون اللبناني بالعربية. لا يمكن للخريجين والمهنيين التقديم إلى هذا البرنامج. القبول مفتوح باستمرار: قدّم على LinkedIn في أي وقت ونرد خلال أسبوع. إذا وقع الاختيار عليك، نطلب بطاقتك الجامعية أو بريدك الجامعي."
+      },
+      {
+        "Heading": "مستقل ومفتوح.",
+        "Body": "التشريع اللبناني مشروع مستقل من Taktek. لا يتبع الجامعة اللبنانية ولا أي جامعة أخرى ولا أي جهة حكومية. تأتي النصوص من مركز الدراسات والأبحاث في المعلوماتية القانونية في الجامعة اللبنانية، وكل صفحة تربط بسجل المركز، والشيفرة والبيانات منشورة للعموم على GitHub وHugging Face."
+      }
+    ],
+    "Action": "Read about the student program",
+    "ActionPath": "/contribute/",
+    "Sources": [
+      {
+        "URL": "https://www.linkedin.com/jobs/view/4483994893/",
+        "Label": "The student program listing on LinkedIn",
+        "LabelAr": "إعلان برنامج الطلاب على LinkedIn"
+      },
+      {
+        "URL": "https://x.com/nizarmah_/status/2117298198557364240",
+        "Label": "The announcement by Nizar Mahmoud",
+        "LabelAr": "إعلان نزار محمود"
+      }
+    ],
+    "ResourceURL": "https://www.linkedin.com/jobs/view/4483994893/",
+    "ResourceLabel": "Apply on LinkedIn",
+    "ResourceLabelAr": "قدّم طلبك على LinkedIn",
+    "Updated": "2026-11-03"
+  },
+  {
+    "Slug": "cloudflare-only-latest-images",
+    "Milestone": "2026-11-03",
+    "Published": "2026-11-03",
+    "Commit": "e6df938",
+    "EvidenceKind": "public-commit",
+    "Title": "The last server is off, and every image now says latest",
+    "TitleAr": "أُطفئ آخر خادم، وكل صورة تحمل الآن الوسم latest",
+    "Summary": "On 3 November we deleted the last server outside Cloudflare. The MCP server now runs on the same database as the site's search, every Docker image has a latest tag, and every page says when it last changed.",
+    "SummaryAr": "في 3 تشرين الثاني حذفنا آخر خادم خارج Cloudflare. يعمل خادم MCP الآن على قاعدة البيانات نفسها التي يعتمد عليها البحث في الموقع، ولكل صورة Docker وسم latest، وكل صفحة تذكر متى تغيّرت آخر مرة.",
+    "Sections": [
+      {
+        "Heading": "Nothing left outside Cloudflare.",
+        "Body": "Until 2 November a rented server answered search, AI answers and the scans. Now the static pages and ruling PDFs come from Cloudflare R2, and everything else from one image on Cloudflare Containers. It runs in two copies, so a new version goes live without taking the site down. On 3 November we deleted the old server."
+      },
+      {
+        "Heading": "MCP reads what the pages show.",
+        "Body": "The MCP server at lebaneselegislation.com/mcp used to read a nightly copy of the library stored in Cloudflare D1. It is now the same Go server and PostgreSQL database that answer the site's search, so an assistant reads exactly what the pages show. The ten tools and their answers did not change."
+      },
+      {
+        "Heading": "Use :latest.",
+        "Body": "Every image, -db, -api, -mcp, -all and -vectors, now gets a latest tag from the workflow that builds it, plus a dated tag such as 2026-11-03. The documentation and compose.yaml pull :latest, so docker compose pull is all an update needs. The 0.x version tags stay published but no longer change. We also stopped publishing PostgreSQL dump files: the data is the Parquet dataset on Hugging Face and the database inside the -db image."
+      },
+      {
+        "Heading": "A date on every page.",
+        "Body": "Every law, article and ruling page now says when it last changed on this site, from its amendments, readings and corrections, and says it in its structured data too. That is never the date of the text itself. The API and the MCP tools return the same date as updated_at, and /openapi.json describes the whole API."
+      },
+      {
+        "Heading": "Fewer, better pages for search engines.",
+        "Body": "Pages that add little, such as generated topic summaries, badly scanned rulings and machine English for texts few people read, now ask search engines not to index them. They stay on the site and stay linked. English titles remain search aids, never translations."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "لم يبقَ شيء خارج Cloudflare.",
+        "Body": "حتى 2 تشرين الثاني كان خادم مستأجر يجيب عن البحث وأجوبة الذكاء الاصطناعي والمسوح. أما الآن فتأتي الصفحات الثابتة وملفات الأحكام بصيغة PDF من Cloudflare R2، وكل ما عداها من صورة واحدة على Cloudflare Containers. تعمل منها نسختان، فيصبح الإصدار الجديد متاحاً من دون إيقاف الموقع. وفي 3 تشرين الثاني حذفنا الخادم القديم."
+      },
+      {
+        "Heading": "يقرأ MCP ما تعرضه الصفحات.",
+        "Body": "كان خادم MCP على العنوان lebaneselegislation.com/mcp يقرأ نسخة ليلية من المكتبة محفوظة في Cloudflare D1. أما الآن فهو خادم Go وقاعدة PostgreSQL نفسهما اللذان يجيبان عن البحث في الموقع، فيقرأ المساعد ما تعرضه الصفحات تماماً. ولم تتغيّر الأدوات العشر ولا أجوبتها."
+      },
+      {
+        "Heading": "استخدم :latest.",
+        "Body": "تحصل كل صورة، -db و-api و-mcp و-all و-vectors، على وسم latest من مسار العمل الذي يبنيها، إضافة إلى وسم مؤرّخ مثل 2026-11-03. وتسحب الوثائق وملف compose.yaml الوسم :latest، فيكفي docker compose pull للتحديث. تبقى وسوم الإصدارات 0.x منشورة لكنها لم تعد تتغيّر. كما توقفنا عن نشر ملفات تفريغ PostgreSQL: البيانات هي مجموعة Parquet على Hugging Face وقاعدة البيانات داخل صورة -db."
+      },
+      {
+        "Heading": "تاريخ على كل صفحة.",
+        "Body": "تذكر كل صفحة قانون ومادة وحكم الآن متى تغيّرت آخر مرة على هذا الموقع، بحسب تعديلاتها وقراءاتها وتصحيحاتها، وتذكر ذلك في بياناتها المنظّمة أيضاً. وهذا ليس أبداً تاريخ النص نفسه. وتعيد واجهة البرمجة وأدوات MCP التاريخ نفسه باسم updated_at، ويصف الملف /openapi.json واجهة البرمجة كاملة."
+      },
+      {
+        "Heading": "صفحات أقل وأفضل لمحركات البحث.",
+        "Body": "الصفحات التي لا تضيف الكثير، مثل ملخصات المواضيع المولّدة والأحكام الممسوحة بشكل سيئ والإنكليزية الآلية للنصوص القليلة القراءة، تطلب الآن من محركات البحث ألا تفهرسها. وتبقى على الموقع ومرتبطة بغيرها. وتبقى العناوين الإنكليزية أدوات بحث، لا ترجمات."
+      }
+    ],
+    "Action": "Run it yourself",
+    "ActionPath": "/run-it-yourself/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/commit/e6df938",
+        "Label": "The commit that removed the old server and the D1 MCP Worker",
+        "LabelAr": "التغيير الذي أزال الخادم القديم وخادم MCP على D1"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/changes.md",
+        "Label": "Changes in the public repository",
+        "LabelAr": "سجل التغييرات في المستودع العام"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation#images",
+    "ResourceLabel": "The images on GitHub",
+    "ResourceLabelAr": "الصور على GitHub",
+    "Updated": "2026-11-03"
+  },
+  {
     "Slug": "site-on-cloudflare",
     "Milestone": "2026-11-02",
     "Published": "2026-11-02",
@@ -128,6 +274,79 @@
     "ResourceLabel": "Open the vectors Parquet file on Hugging Face",
     "ResourceLabelAr": "افتح ملف المتجهات بصيغة Parquet على Hugging Face",
     "Updated": "2026-11-02"
+  },
+  {
+    "Slug": "search-answers-questions",
+    "Milestone": "2026-11-01",
+    "Published": "2026-11-03",
+    "Commit": "248637e",
+    "EvidenceKind": "public-commit",
+    "Title": "Search answers real questions, from our own texts",
+    "TitleAr": "البحث يجيب عن الأسئلة الفعلية، من نصوصنا نحن",
+    "Summary": "Ask a question in search, not a law number, and a short answer appears above the results. Gemini writes it only from passages of this library, and it links every source it used.",
+    "SummaryAr": "اطرح سؤالاً في البحث، لا رقم قانون، فيظهر جواب قصير فوق النتائج. يكتبه Gemini من مقاطع هذه المكتبة فقط، ويربط كل مصدر استخدمه.",
+    "Sections": [
+      {
+        "Heading": "Questions, not lookups.",
+        "Body": "Search now tells a question apart from a lookup without calling any model. A law number, an article or a decree gets its results as before. A question, such as whether a criminal acquittal stops a civil claim for damages, gets an answer box above the results. Before this, that question ended on nothing matches."
+      },
+      {
+        "Heading": "Written from our sources only.",
+        "Body": "The answer comes from passages of this library, found by meaning. Gemini writes one to four short paragraphs from them. If it cites a passage it was not given, or misquotes a passage word for word, the whole answer is thrown away. Each answer links to the articles it used."
+      },
+      {
+        "Heading": "Deeper when you ask.",
+        "Body": "Show more runs three more Arabic searches and writes a longer answer from up to 40 passages. It takes about 13 seconds."
+      },
+      {
+        "Heading": "Fair limits.",
+        "Body": "Each device gets 10 questions a day and one deep answer. A question costs us about half a US cent. The whole site has a daily cap, and the box says so when it is reached instead of failing quietly. A daily check in the public repository makes sure answers still work."
+      },
+      {
+        "Heading": "Check before you rely on it.",
+        "Body": "An answer is a place to start. It can be wrong or miss a rule. Open the articles it links, and the Official Gazette, before you rely on it. This is not legal advice."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "أسئلة لا عمليات بحث عن نص.",
+        "Body": "يميّز البحث الآن بين السؤال والبحث عن نص محدد من دون استدعاء أي نموذج. رقم القانون أو المادة أو المرسوم يعطي نتائجه كما في السابق. أما السؤال، مثل ما إذا كان الحكم الجزائي بالبراءة يمنع دعوى التعويض المدنية، فيعطي مربّع جواب فوق النتائج. قبل ذلك كان هذا السؤال ينتهي بعبارة لا نتائج مطابقة."
+      },
+      {
+        "Heading": "مكتوب من مصادرنا فقط.",
+        "Body": "يأتي الجواب من مقاطع هذه المكتبة، يُعثر عليها بحسب المعنى. يكتب Gemini منها فقرة إلى أربع فقرات قصيرة. وإذا استشهد بمقطع لم يُعطَ له، أو نقل مقطعاً حرفياً بشكل خاطئ، يُرفض الجواب كله. ويربط كل جواب بالمواد التي استخدمها."
+      },
+      {
+        "Heading": "أعمق حين تطلب.",
+        "Body": "زر عرض المزيد يجري ثلاث عمليات بحث إضافية بالعربية ويكتب جواباً أطول من 40 مقطعاً كحد أقصى. ويستغرق نحو 13 ثانية."
+      },
+      {
+        "Heading": "حدود عادلة.",
+        "Body": "لكل جهاز 10 أسئلة في اليوم وجواب معمّق واحد. يكلّفنا السؤال نحو نصف سنت أميركي. وللموقع كله سقف يومي، ويقول المربّع ذلك حين يُبلغ بدل أن يفشل بصمت. ويتحقق فحص يومي في المستودع العام من أن الأجوبة ما زالت تعمل."
+      },
+      {
+        "Heading": "تحقق قبل الاعتماد عليه.",
+        "Body": "الجواب نقطة انطلاق. قد يخطئ أو يغفل قاعدة. افتح المواد التي يربطها، والجريدة الرسمية، قبل الاعتماد عليه. هذا ليس استشارة قانونية."
+      }
+    ],
+    "Action": "Ask a question",
+    "ActionPath": "/search/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/commit/248637e",
+        "Label": "The commit that added the answer box",
+        "LabelAr": "التغيير الذي أضاف مربّع الجواب"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/blob/main/.github/workflows/ai-answer-check.yml",
+        "Label": "The daily answer check",
+        "LabelAr": "الفحص اليومي للأجوبة"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation",
+    "ResourceLabel": "View the source on GitHub",
+    "ResourceLabelAr": "افتح الشيفرة على GitHub",
+    "Updated": "2026-11-03"
   },
   {
     "Slug": "public-website-source-and-demo",
