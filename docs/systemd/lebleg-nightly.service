@@ -1,0 +1,13 @@
+[Unit]
+Description=Scrape and rebuild Lebanese Legislation data, then propose a PR
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/src/lebanese-legislation
+EnvironmentFile=%h/.config/lebleg/nightly.env
+ExecStart=%h/src/lebanese-legislation/scripts/nightly.sh
+TimeoutStartSec=infinity
+KillMode=control-group
+UMask=0077
