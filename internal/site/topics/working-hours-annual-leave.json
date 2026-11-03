@@ -2,13 +2,13 @@
   "slug": "working-hours-annual-leave",
   "order": 3,
   "published": "2026-10-20",
-  "updated": "2026-10-21",
+  "updated": "2026-11-03",
   "articles": [
     {
       "id": "a1",
       "law": 190374,
       "article": "31",
-      "quote": "ان الحد الاعلى للعمل في الاسبوع هو 48 ساعة في النقابات المبينة في المادة الخامسة ما خلا النقابات الزراعية. اما الاولاد والاحداث فيصير تشغيلهم وفقا لاحكام المادة 22 الى 25."
+      "quote": "ان الحد الاعلى للعمل في الاسبوع هو 48 ساعة في النقابات المبينة في المادة الخامسة ما خلا النقابات الزراعية."
     },
     {
       "id": "a2",
@@ -20,148 +20,352 @@
       "id": "a3",
       "law": 190374,
       "article": "33",
-      "quote": "تجوز مخالفة احكام المادة 31 في الاحوال الاضطرارية وذلك بجعل ساعات العمل اثنتي عشرة ساعة بشرط:\n\n1- ان تراعى احكام الفقرتين2 و3 من المادة 23\n\n2- ان تحاط مصلحة الشؤون الاجتماعية علما خلال الاربع والعشرين ساعة بالامر الحاصل وبالوقت اللازم لاتمام العمل.\n\n3- ان يكون اجر الساعات الاضافية التي اشتغل فيها الاجير 50 بالمائة زيادة عن اجر الساعات العادية."
+      "quote": "تجوز مخالفة احكام المادة 31 في الاحوال الاضطرارية وذلك بجعل ساعات العمل اثنتي عشرة ساعة بشرط:"
     },
     {
       "id": "a4",
       "law": 190374,
-      "article": "34",
-      "quote": "كلما زادت ساعات العمل على ست للرجال وخمس للنساء وجب على رب العمل ان يمنح اجراءه عند منتصف نهار العمل راحة لا يجوز ان تقل عن ساعة.\n\nيتمتع الاجير في كل اربع وعشرين ساعة بالراحة تسع ساعات متوالية ماعدا الاحوال التي تستلزمها ظروف العمل."
+      "article": "33",
+      "quote": "ان يكون اجر الساعات الاضافية التي اشتغل فيها الاجير 50 بالمائة زيادة عن اجر الساعات العادية."
     },
     {
       "id": "a5",
       "law": 190374,
-      "article": "36",
-      "quote": "يجب ان يمنح جميع الاجراء راحة اسبوعية لا تقل عن 36 ساعة بدون انقطاع.\n\nلرب العمل ان يختار يوم هذه الراحة وان يوزعها بين الاجراء حسب مقتضيات العمل."
+      "article": "34",
+      "quote": "كلما زادت ساعات العمل على ست للرجال وخمس للنساء وجب على رب العمل ان يمنح اجراءه عند منتصف نهار العمل راحة لا يجوز ان تقل عن ساعة."
     },
     {
       "id": "a6",
       "law": 190374,
-      "article": "39",
-      "quote": "لكل اجير الحق في اجازة سنوية خمسة عشر يوما باجر كامل بشرط ان يكون مستخدما في المؤسسة منذ سنة على الاقل.\n\nلرب العمل ان يختار تاريخ هذه الاجازات بحسب مقتضيات الخدمة وليس له ان يصرف الاجير ولا ان يوجه اليه علم الصرف خلال الاجازة."
+      "article": "34",
+      "quote": "يتمتع الاجير في كل اربع وعشرين ساعة بالراحة تسع ساعات متوالية"
     },
     {
       "id": "a7",
       "law": 190374,
-      "article": "40",
-      "quote": "اذا اصيب الاجير بمرض غير الامراض الناجمة عن خدمته وحوادث العمل المنصوص عليها في المرسوم الاشتراعي رقم 25/ET تاريخ 4 ايار 1943, فله الحق باجازة مرضية تحدد على الوجه التالي:\n\n1- نصف شهر باجر, كامل ونصف شهر بنصف اجر للاجير الذي قضى في الخدمة مدة ثلاثة اشهر واكثر حتى سنتين.\n\n2- شهر باجر كامل وشهر بنصف اجر لاجير الذي قضى في الخدمة اكثر من سنتين حتى اربع سنوات ."
+      "article": "36",
+      "quote": "يجب ان يمنح جميع الاجراء راحة اسبوعية لا تقل عن 36 ساعة بدون انقطاع."
     },
     {
       "id": "a8",
       "law": 190374,
-      "article": "40",
-      "quote": "3- شهر ونصف بأجر كامل وشهر ونصف بنصف اجر للاجير الذي قضى في الخدمة اكثر من اربع سنوات حتى ست سنوات .\n\n4- شهران, باجر كامل وشهران بنصف اجر للاجير الذي قضى في الخدمة اكثر من ست سنوات حتى عشر سنوات .\n\n5- شهران ونصف الشهر , باجر كامل وشهران ونصف الشهر بنصف اجر للاجير الذي تفوق خدمته العشر سنوات ."
+      "article": "12-1",
+      "quote": "يمكن الاتفاق بين صاحب العمل والاجير على العمل وفق دوام العمل المضغوط على الا تتعدى ساعات العمل الاسبوعية 48 ساعة"
     },
     {
       "id": "a9",
       "law": 190374,
-      "article": "28",
-      "quote": "يحق للنساء العاملات في جميع الفئات المبينة في هذا القانون، أن ينلن إجازة أمومة لمدة عشرة أسابيع تشمل المدة التي تتقدم الولادة والمدة التي تليها. وذلك بإبرازهن شهادة طبية تنم عن تاريخ الولادة المحتمل."
+      "article": "12-3",
+      "quote": "على ان يبلغ الاجير قبل ثلاثة ايام على الاقل بساعات العمل الاضافية المطلوبة منه والا تزيد ساعات العمل الاضافية عن عشرة بالمئة من ساعات العمل بدوام جزئي المتفق عليه بين الفريقين الا اذا وافق الاجير على هذه الزيادة ,يدفع اجر الساعة الاضافية خمسون بالمئة زيادة عن اجر ساعة عمل الاجير بدوام جزئي."
     },
     {
       "id": "a10",
       "law": 190374,
-      "article": "29",
-      "quote": "تدفع الأجرة بكاملها للمرأة أثناء إجازة الأمومة. يحق للمرأة العاملة التي استفادت من إجازة الأمومة مع بقاء الأجر كاملاً، أن تتقاضى أجراً عن مدة الإجازة السنوية العادية التي ستحصل عليها خلال السنة نفسها، عملاً بأحكام المادة /39/ من قانون العمل.\n\nويحظر أن تصرف المرأة من الخدمة أو أن يوجَّه إليها الإنذار خلال مدة إجازة الأمومة، ما لم يثبت إنها استخدمت في محل آخر خلال المدة المذكورة."
+      "article": "39",
+      "quote": "لكل اجير الحق في اجازة سنوية خمسة عشر يوما باجر كامل بشرط ان يكون مستخدما في المؤسسة منذ سنة على الاقل."
     },
     {
       "id": "a11",
-      "law": 244971,
-      "article": "26",
-      "quote": "لكل مضمونة الحق بتعويض أمومة طيلة فترة العشرة أسابيع التي تقع خلالها الولادة، شرط أن تمتنع عن العمل وأن لا تتقاضى أي أجر خلال تلك الفترة."
+      "law": 190374,
+      "article": "39",
+      "quote": "لرب العمل ان يختار تاريخ هذه الاجازات بحسب مقتضيات الخدمة وليس له ان يصرف الاجير ولا ان يوجه اليه علم الصرف خلال الاجازة."
     },
     {
       "id": "a12",
+      "law": 190374,
+      "article": "41",
+      "quote": "واذا تجاوزت الشهر حق لرب العمل ان يخفض الاجازة السنوية الى ثمانية ايام."
+    },
+    {
+      "id": "a13",
+      "law": 190374,
+      "article": "43",
+      "quote": "كل اتفاق مخالف لاحكام هذا الفصل بما يتعلق بمدة العمل والاجازات هو باطل حكما وللاجراء ان يستفيدوا من الاتفاقات والانظمة الاكثر فائدة لهم."
+    },
+    {
+      "id": "a14",
+      "law": 190374,
+      "article": "38",
+      "quote": "يحق لكل اجير فقد اباه او امه او زوجه او احد اولاده واحفاده او احد جدوده وجداته اجازة يومين باجر كامل."
+    },
+    {
+      "id": "a15",
       "law": 211715,
       "article": "1",
       "quote": "عيد العمال: في 1 أيار. في حال وقوع هذا العيد يوم أحد أو يوم عطلة تعطل مؤسسات القطاع الخاص في اليوم التالي باستثناء المستشفيات والصيدليات والأفران والمطاعم على أن تدفع المؤسسات المعفاة من التعطيل أجرة هذا اليوم مضاعفا للعاملين في هذا اليوم."
     },
     {
-      "id": "a13",
-      "law": 211715,
-      "article": "1",
-      "quote": "يراعى في تنفيذ هذه المادة أحكام القانونين الصادرين بتاريخ 30/4/1959 (تنظيم عيد العمل) وبتاريخ 21/11/1962 (وجوب التعطيل في جميع المؤسسات التجارية والصناعية في ذكرى الاستقلال)"
+      "id": "a16",
+      "law": 190374,
+      "article": "40",
+      "quote": "اذا اصيب الاجير بمرض غير الامراض الناجمة عن خدمته وحوادث العمل المنصوص عليها في المرسوم الاشتراعي رقم 25/ET تاريخ 4 ايار 1943, فله الحق باجازة مرضية تحدد على الوجه التالي:\n\n1- نصف شهر باجر, كامل ونصف شهر بنصف اجر للاجير الذي قضى في الخدمة مدة ثلاثة اشهر واكثر حتى سنتين.\n\n2- شهر باجر كامل وشهر بنصف اجر لاجير الذي قضى في الخدمة اكثر من سنتين حتى اربع سنوات ."
     },
     {
-      "id": "a14",
-      "law": 211715,
-      "article": "4",
-      "quote": "إذا صادف وقوع العيد أو المناسبة يوم أحد أو يوم عطلة، لا يستعاض عنه بيوم آخر."
+      "id": "a17",
+      "law": 190374,
+      "article": "40",
+      "quote": "3- شهر ونصف بأجر كامل وشهر ونصف بنصف اجر للاجير الذي قضى في الخدمة اكثر من اربع سنوات حتى ست سنوات .\n\n4- شهران, باجر كامل وشهران بنصف اجر للاجير الذي قضى في الخدمة اكثر من ست سنوات حتى عشر سنوات .\n\n5- شهران ونصف الشهر , باجر كامل وشهران ونصف الشهر بنصف اجر للاجير الذي تفوق خدمته العشر سنوات ."
+    },
+    {
+      "id": "a18",
+      "law": 190374,
+      "article": "41",
+      "quote": "تعطى الاجازات المرضية بناء على تقرير من الطبيب الذي عالج الاجير او من طبيب المؤسسة."
+    },
+    {
+      "id": "a19",
+      "law": 190374,
+      "article": "42",
+      "quote": "ليس لرب العمل ان يصرف الاجير من الخدمة ولا ان يوجه اليه علم الصرف اثناء الاجازة المرضية."
+    },
+    {
+      "id": "a20",
+      "law": 244971,
+      "article": "23",
+      "quote": "يحق, للمضمون, الذي يصاب بنتيجة مرض بعجز موقت عن العمل يتثبت منه طبيب مقبول ويؤدي الى توقف كسبه, ان يتقاضى تعويض مرض عن كل يوم من ايام العجر بدون فرق بين ايام الشغل وايام التعطيل وذلك اعتبارا من اليوم الرابع للعجز."
+    },
+    {
+      "id": "a21",
+      "law": 244971,
+      "article": "23",
+      "quote": "في الثلاثين يوما الاولى المتتابعة من العجز تبلغ قيمة تعويض المرض 50 بالمئة من متوسط الكسب اليومي و 30 بالمئة من هذا الكسب في حال وجود المريض في المستشفى. ترفع هاتين النسبتين الى 75 و50 بالمئة اعتبارا من اليوم الحادي والثلاثين من العجز شرط ان يثبت طبيب الصندوق المراقب ضرورة استمرار العجز."
+    },
+    {
+      "id": "a22",
+      "law": 190374,
+      "article": "28",
+      "quote": "يحق للنساء العاملات في جميع الفئات المبينة في هذا القانون، أن ينلن إجازة أمومة لمدة عشرة أسابيع تشمل المدة التي تتقدم الولادة والمدة التي تليها. وذلك بإبرازهن شهادة طبية تنم عن تاريخ الولادة المحتمل."
+    },
+    {
+      "id": "a23",
+      "law": 190374,
+      "article": "29",
+      "quote": "تدفع الأجرة بكاملها للمرأة أثناء إجازة الأمومة. يحق للمرأة العاملة التي استفادت من إجازة الأمومة مع بقاء الأجر كاملاً، أن تتقاضى أجراً عن مدة الإجازة السنوية العادية التي ستحصل عليها خلال السنة نفسها، عملاً بأحكام المادة /39/ من قانون العمل."
+    },
+    {
+      "id": "a24",
+      "law": 190374,
+      "article": "29",
+      "quote": "ويحظر أن تصرف المرأة من الخدمة أو أن يوجَّه إليها الإنذار خلال مدة إجازة الأمومة، ما لم يثبت إنها استخدمت في محل آخر خلال المدة المذكورة."
+    },
+    {
+      "id": "a25",
+      "law": 244971,
+      "article": "26",
+      "quote": "لكل مضمونة الحق بتعويض أمومة طيلة فترة العشرة أسابيع التي تقع خلالها الولادة، شرط أن تمتنع عن العمل وأن لا تتقاضى أي أجر خلال تلك الفترة."
+    },
+    {
+      "id": "a26",
+      "law": 244971,
+      "article": "26",
+      "quote": "إن تعويض الأمومة يعادل كامل متوسط الكسب اليومي الـمعيّن في الفقرة /2/ من الـمادة 23 من هذا القانون"
     }
   ],
   "en": {
-    "title": "Working hours, rest, leave and holidays in Lebanon",
-    "question": "How many hours can an employee be made to work in Lebanon, and what rest, annual leave, sick leave, maternity leave and public holidays does the law give?",
-    "description": "Weekly hours, overtime, rest, annual, sick and maternity leave, and public holidays under Lebanese law.",
+    "title": "How many days of annual leave and what working hours does Lebanese labour law allow?",
+    "question": "How many days of paid annual leave does a worker get in Lebanon, and what are the legal working hours, breaks and rest days?",
+    "description": "15 days' paid annual leave after 1 year, a 48-hour week, 36 hours' weekly rest, 50% extra for emergency overtime and 10 weeks' maternity leave.",
     "answer": {
-      "text": "The Labour Code caps work at 48 hours a week outside agriculture; the Minister may vary this, and emergency work may reach 12 hours with notice and 50% overtime pay. It gives a midday break of at least 1 hour, 9 hours' daily and 36 hours' weekly rest, 15 days' paid annual leave after a year, sick leave by service, and 10 weeks' paid maternity leave. The holiday decree covers public bodies; for private firms it fixes only the day after Labour Day when 1 May falls on a Sunday or holiday, and defers to separate Labour Day and Independence Day laws.",
+      "text": "Under Article 39 of the Labour Code, every worker gets 15 days of annual leave on full pay after at least 1 year with the employer, and Article 31 caps work at 48 hours a week outside agriculture. Weekly rest is at least 36 hours without a break, and emergency overtime, up to 12 hours a day, is paid 50% above the normal rate (Articles 36 and 33). Sick leave runs from half a month to 2 and a half months on full pay by length of service, and maternity leave is 10 weeks on full pay (Articles 40, 28 and 29).",
       "cites": [
+        "a10",
         "a1",
-        "a2",
+        "a7",
         "a3",
         "a4",
-        "a5",
-        "a6",
-        "a7",
-        "a8",
-        "a9",
-        "a10",
-        "a12",
-        "a13"
+        "a16",
+        "a17",
+        "a22",
+        "a23"
       ]
     },
     "sections": [
       {
-        "heading": "How many hours a week can a worker be made to work?",
+        "heading": "Key figures at a glance",
         "paras": [
           {
-            "text": "Article 31 of the Labour Code caps the week at 48 hours, except in agriculture. Article 32 lets the Minister of National Economy cut hours in arduous or unhealthy work, or raise them in cases such as restaurants and cafés.",
+            "text": "These are minimums: any agreement that gives a worker less on working time or leave is void, and better terms apply (Article 43).",
             "cites": [
-              "a1",
-              "a2"
+              "a13"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Working time and leave under the Labour Code",
+          "head": [
+            "Rule",
+            "Figure",
+            "Source"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Maximum working week",
+                "48 hours, except agriculture",
+                "Labour Code, Article 31"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "Working day in emergencies",
+                "Up to 12 hours",
+                "Labour Code, Article 33"
+              ],
+              "cites": [
+                "a3"
+              ]
+            },
+            {
+              "cells": [
+                "Overtime pay in emergencies",
+                "50% above the normal hourly wage",
+                "Labour Code, Article 33"
+              ],
+              "cites": [
+                "a4"
+              ]
+            },
+            {
+              "cells": [
+                "Midday break",
+                "At least 1 hour when the day exceeds 6 hours (men) or 5 hours (women)",
+                "Labour Code, Article 34"
+              ],
+              "cites": [
+                "a5"
+              ]
+            },
+            {
+              "cells": [
+                "Daily rest",
+                "9 consecutive hours in every 24",
+                "Labour Code, Article 34"
+              ],
+              "cites": [
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "Weekly rest",
+                "At least 36 hours without a break",
+                "Labour Code, Article 36"
+              ],
+              "cites": [
+                "a7"
+              ]
+            },
+            {
+              "cells": [
+                "Annual leave",
+                "15 days on full pay, after 1 year of service",
+                "Labour Code, Article 39"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "Bereavement leave",
+                "2 days on full pay",
+                "Labour Code, Article 38"
+              ],
+              "cites": [
+                "a14"
+              ]
+            },
+            {
+              "cells": [
+                "Sick leave",
+                "Half a month to 2 and a half months on full pay, the same on half pay",
+                "Labour Code, Article 40"
+              ],
+              "cites": [
+                "a16",
+                "a17"
+              ]
+            },
+            {
+              "cells": [
+                "Maternity leave",
+                "10 weeks on full pay",
+                "Labour Code, Articles 28 and 29"
+              ],
+              "cites": [
+                "a22",
+                "a23"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "What are the legal working hours, breaks and overtime pay?",
+        "paras": [
+          {
+            "text": "The Labour Code caps work at 48 hours a week, except in agriculture (Article 31).",
+            "cites": [
+              "a1"
             ]
           },
           {
-            "text": "In emergencies, Article 33 allows 12 working hours. The employer must respect paragraphs 2 and 3 of Article 23 and inform the Social Affairs service within 24 hours. Emergency overtime is paid 50% above ordinary hourly pay.",
+            "text": "The minister may lower this for strenuous or unhealthy work, or raise it for trades such as restaurants and cafés (Article 32). A compressed schedule, allowed by agreement since 2025, must also stay within 48 hours a week (Article 12-1).",
             "cites": [
-              "a3"
+              "a2",
+              "a8"
             ]
           },
           {
-            "text": "The texts we hold set no overtime rate for ordinary full-time work. Flexible work is not covered here.",
-            "note": true
+            "text": "In emergencies the working day may reach 12 hours if the labour authority is told within 24 hours, and the extra hours are paid 50% above the normal rate (Article 33). Part-time workers are also paid 50% extra for overtime, which needs 3 days' notice and may not exceed 10% of their agreed hours unless they accept (Article 12-3).",
+            "cites": [
+              "a3",
+              "a4",
+              "a9"
+            ]
+          },
+          {
+            "text": "When the working day exceeds 6 hours for men or 5 for women, the employer must give a midday break of at least 1 hour, and every worker gets 9 consecutive hours of rest in each 24 hours (Article 34). Weekly rest is at least 36 hours without a break, on a day the employer chooses (Article 36).",
+            "cites": [
+              "a5",
+              "a6",
+              "a7"
+            ]
           }
         ]
       },
       {
-        "heading": "What breaks and rest does a worker get?",
+        "heading": "How many days of annual leave does a worker get?",
         "paras": [
           {
-            "text": "When the working day exceeds 6 hours for men or 5 for women, the employer must give a midday break of at least 1 hour. Workers get 9 consecutive hours of rest in every 24, unless work conditions require otherwise.",
+            "text": "Every worker gets 15 days of annual leave on full pay once they have worked for the employer for at least 1 year (Article 39).",
             "cites": [
-              "a4"
+              "a10"
             ]
           },
           {
-            "text": "Weekly rest is at least 36 uninterrupted hours for all workers. The employer picks the day and may spread it among workers.",
+            "text": "The employer picks the dates to suit the work and may not dismiss the worker or give notice during the leave (Article 39). If sick leave in a year passes a month, the employer may cut that year's annual leave to 8 days (Article 41).",
             "cites": [
-              "a5"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "How much paid annual leave does a worker get?",
-        "paras": [
-          {
-            "text": "Annual leave is 15 days at full pay, after at least a year in the establishment. The employer sets the dates and may not dismiss the worker or give notice of dismissal during the leave.",
-            "cites": [
-              "a6"
+              "a11",
+              "a12"
             ]
           },
           {
-            "text": "Children and juveniles have separate rules on hours and leave, not covered here.",
-            "note": true
+            "text": "Example: after 1 year with the employer, a worker is owed 15 days on full pay; if their sick leave that year passed a month, the employer may reduce this to 8 days.",
+            "cites": [
+              "a10",
+              "a12"
+            ]
+          },
+          {
+            "text": "A worker who loses a parent, spouse, child, grandchild or grandparent gets 2 days' leave on full pay (Article 38). Decree 15215 of 2005 lists holidays for public administrations; for private firms it says only that when Labour Day on 1 May falls on a Sunday or holiday they close the next day, and hospitals, pharmacies, bakeries and restaurants that open pay double for it.",
+            "cites": [
+              "a14",
+              "a15"
+            ]
           }
         ]
       },
@@ -169,19 +373,30 @@
         "heading": "How much sick leave does a worker get?",
         "paras": [
           {
-            "text": "Article 40 covers illness other than work-related illness and work accidents. Each step gives equal time at full and half pay. No figure is given for service under 3 months.",
+            "text": "A worker ill from a cause unrelated to work gets sick leave by length of service, from half a month on full pay and half a month on half pay after 3 months, up to 2 and a half months of each after more than 10 years (Article 40).",
             "cites": [
-              "a7",
-              "a8"
+              "a16",
+              "a17"
             ]
           },
           {
-            "text": "This page does not cover the medical report, dismissal during sick leave, bereavement leave or Social Security sickness pay.",
-            "note": true
+            "text": "Example: a worker with 3 years of service, in the band of more than 2 and up to 4 years, gets 1 month on full pay and 1 month on half pay.",
+            "cites": [
+              "a16"
+            ]
+          },
+          {
+            "text": "Sick leave is granted on a report from the treating doctor or the firm's doctor, and the employer may not dismiss the worker or give notice during it (Articles 41 and 42). An NSSF-insured worker who loses earnings through illness receives a daily allowance from the 4th day: 50% of average daily earnings for the first 30 days and 75% from the 31st day (Social Security Law, Article 23).",
+            "cites": [
+              "a18",
+              "a19",
+              "a20",
+              "a21"
+            ]
           }
         ],
         "table": {
-          "caption": "Sick leave by length of service (Article 40)",
+          "caption": "Sick leave by length of service",
           "head": [
             "Service",
             "Full pay",
@@ -190,52 +405,52 @@
           "rows": [
             {
               "cells": [
-                "3 months to 2 years",
+                "3 months up to 2 years",
                 "Half a month",
                 "Half a month"
               ],
               "cites": [
-                "a7"
+                "a16"
               ]
             },
             {
               "cells": [
-                "Over 2 to 4 years",
+                "More than 2 up to 4 years",
                 "1 month",
                 "1 month"
               ],
               "cites": [
-                "a7"
+                "a16"
               ]
             },
             {
               "cells": [
-                "Over 4 to 6 years",
+                "More than 4 up to 6 years",
                 "1 and a half months",
                 "1 and a half months"
               ],
               "cites": [
-                "a8"
+                "a17"
               ]
             },
             {
               "cells": [
-                "Over 6 to 10 years",
+                "More than 6 up to 10 years",
                 "2 months",
                 "2 months"
               ],
               "cites": [
-                "a8"
+                "a17"
               ]
             },
             {
               "cells": [
-                "Over 10 years",
+                "More than 10 years",
                 "2 and a half months",
                 "2 and a half months"
               ],
               "cites": [
-                "a8"
+                "a17"
               ]
             }
           ]
@@ -245,123 +460,247 @@
         "heading": "How long is maternity leave, and who pays?",
         "paras": [
           {
-            "text": "Article 28 of the Labour Code, as now worded, gives women workers in all categories 10 weeks' maternity leave around the birth, on a medical certificate of the expected date.",
+            "text": "A working woman gets 10 weeks of maternity leave, covering the time before and after the birth, on presenting a medical certificate of the expected date (Article 28).",
             "cites": [
-              "a9"
+              "a22"
             ]
           },
           {
-            "text": "A woman on maternity leave gets her full wage and keeps that year's paid annual leave under Article 39. She may not be dismissed or given notice unless proved to have worked elsewhere.",
+            "text": "The employer pays her full wage during the leave, she keeps her normal annual leave for that year, and she may not be dismissed or given notice during it unless she worked elsewhere in that time (Article 29).",
             "cites": [
-              "a10"
+              "a23",
+              "a24"
             ]
           },
           {
-            "text": "Article 26 of the Social Security Law gives an insured woman an allowance for the 10 weeks in which the birth falls, if she stops work and receives no wage. The texts we hold do not say how this fits with the full wage.",
+            "text": "An NSSF-insured woman receives a maternity allowance from the Fund for the 10 weeks around the birth, equal to her full average daily earnings, if she stops work and receives no wage in that period (Social Security Law, Article 26).",
             "cites": [
-              "a11"
+              "a25",
+              "a26"
             ]
           }
         ]
       },
       {
-        "heading": "Which public holidays are days off, and what if one falls on a Sunday?",
+        "heading": "What this page does not cover",
         "paras": [
           {
-            "text": "Decree 15215/2005 sets holidays for public administrations, public institutions and municipalities. Under its Article 4, a holiday falling on a Sunday or another holiday is not replaced by another day.",
-            "cites": [
-              "a14"
-            ]
+            "text": "Article 39's 15 days is the original wording, and we hold no amendment to it. The texts do not say how the employer's full wage during maternity leave fits with the Fund's allowance, which requires that the woman receive no wage, or how Labour Code sick pay fits with the Fund's sickness allowance.",
+            "note": true
           },
           {
-            "text": "For private firms, Labour Day is an exception. When 1 May falls on a Sunday or a holiday, private-sector establishments close the next day. Hospitals, pharmacies, bakeries and restaurants are exempt and pay double wages to those who work that day.",
-            "cites": [
-              "a12"
-            ]
-          },
-          {
-            "text": "The decree applies subject to the 30/4/1959 law on Labour Day and the 21/11/1962 law on compulsory closure of commercial and industrial establishments on Independence Day. We do not hold either law.",
-            "cites": [
-              "a13"
-            ]
+            "text": "This page does not cover the work of children and young people (Articles 22 to 25), remote and seasonal work, or the Labour Day and Independence Day laws of 1959 and 1962 that Decree 15215 refers to. We hold no general list of paid public holidays for private employers.",
+            "note": true
           }
         ]
       }
     ]
   },
   "ar": {
-    "title": "ساعات العمل والراحة والإجازات والعطل في لبنان",
-    "question": "كم ساعة يجوز تشغيل الأجير في لبنان، وما هي الراحة والإجازة السنوية والمرضية والأمومة والعطل الرسمية التي يقرها القانون؟",
-    "description": "ساعات العمل والساعات الإضافية والراحة والإجازات السنوية والمرضية والأمومة والعطل الرسمية في القانون اللبناني.",
+    "title": "كم يوماً من الإجازة السنوية وكم ساعة عمل يسمح بها قانون العمل اللبناني؟",
+    "question": "كم يوماً من الإجازة السنوية المدفوعة يستحق الأجير في لبنان، وما ساعات العمل والاستراحات وأيام الراحة القانونية؟",
+    "description": "إجازة سنوية 15 يوماً بأجر كامل بعد سنة خدمة، و48 ساعة عمل في الأسبوع، وراحة أسبوعية 36 ساعة، و50% زيادة للساعات الإضافية الطارئة، وإجازة أمومة 10 أسابيع.",
     "answer": {
-      "text": "يحدد قانون العمل الحد الأقصى للعمل بـ48 ساعة في الأسبوع خارج العمل الزراعي، ويجوز للوزير تعديله، وفي الأحوال الاضطرارية تبلغ ساعات العمل 12 ساعة مع إعلام الإدارة وزيادة 50% على أجر الساعات الإضافية. ويمنح الأجير استراحة وسط النهار لا تقل عن ساعة، وراحة يومية 9 ساعات وأسبوعية 36 ساعة، وإجازة سنوية 15 يوماً بأجر كامل بعد سنة، وإجازة مرضية بحسب مدة الخدمة، وإجازة أمومة مدتها 10 أسابيع بأجر كامل. أما مرسوم الأعياد فيخص القطاع العام، ولا يقرر للقطاع الخاص إلا تعطيل اليوم التالي لعيد العمال إذا وقع 1 أيار يوم أحد أو يوم عطلة، ويحيل إلى قانونين مستقلين بشأن عيد العمل وذكرى الاستقلال.",
+      "text": "وفق المادة 39 من قانون العمل، يستحق كل أجير إجازة سنوية 15 يوماً بأجر كامل بعد سنة على الأقل في المؤسسة، وتحدد المادة 31 الحد الأعلى للعمل بـ48 ساعة في الأسبوع خارج الزراعة. والراحة الأسبوعية 36 ساعة متواصلة على الأقل، وتُدفع الساعات الإضافية في الأحوال الاضطرارية، حتى 12 ساعة في اليوم، بزيادة 50% عن الأجر العادي (المادتان 36 و33). وتتراوح الإجازة المرضية بين نصف شهر وشهرين ونصف الشهر بأجر كامل بحسب مدة الخدمة، وإجازة الأمومة 10 أسابيع بأجر كامل (المواد 40 و28 و29).",
       "cites": [
+        "a10",
         "a1",
-        "a2",
+        "a7",
         "a3",
         "a4",
-        "a5",
-        "a6",
-        "a7",
-        "a8",
-        "a9",
-        "a10",
-        "a12",
-        "a13"
+        "a16",
+        "a17",
+        "a22",
+        "a23"
       ]
     },
     "sections": [
       {
-        "heading": "كم ساعة في الأسبوع يجوز تشغيل الأجير؟",
+        "heading": "الأرقام الأساسية باختصار",
         "paras": [
           {
-            "text": "تحدد المادة 31 من قانون العمل الحد الأقصى للعمل بـ48 ساعة في الأسبوع، ما عدا العمل الزراعي. وتجيز المادة 32 لوزير الاقتصاد الوطني إنقاص الساعات في الأشغال المرهقة أو المضرة بالصحة، أو زيادتها في بعض الأحوال كأشغال المطاعم والمقاهي.",
+            "text": "هذه حدود دنيا: كل اتفاق يعطي الأجير أقل منها في مدة العمل والإجازات باطل حكماً، ويستفيد الأجير من الشروط الأكثر فائدة له (المادة 43).",
             "cites": [
-              "a1",
-              "a2"
+              "a13"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "مدة العمل والإجازات في قانون العمل",
+          "head": [
+            "القاعدة",
+            "الرقم",
+            "المصدر"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "الحد الأعلى للعمل في الأسبوع",
+                "48 ساعة، باستثناء الزراعة",
+                "قانون العمل، المادة 31"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "يوم العمل في الأحوال الاضطرارية",
+                "حتى 12 ساعة",
+                "قانون العمل، المادة 33"
+              ],
+              "cites": [
+                "a3"
+              ]
+            },
+            {
+              "cells": [
+                "أجر الساعات الإضافية في الأحوال الاضطرارية",
+                "50% زيادة عن أجر الساعة العادية",
+                "قانون العمل، المادة 33"
+              ],
+              "cites": [
+                "a4"
+              ]
+            },
+            {
+              "cells": [
+                "استراحة منتصف النهار",
+                "ساعة على الأقل إذا زاد العمل على 6 ساعات للرجال أو 5 ساعات للنساء",
+                "قانون العمل، المادة 34"
+              ],
+              "cites": [
+                "a5"
+              ]
+            },
+            {
+              "cells": [
+                "الراحة اليومية",
+                "9 ساعات متوالية في كل 24 ساعة",
+                "قانون العمل، المادة 34"
+              ],
+              "cites": [
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "الراحة الأسبوعية",
+                "36 ساعة متواصلة على الأقل",
+                "قانون العمل، المادة 36"
+              ],
+              "cites": [
+                "a7"
+              ]
+            },
+            {
+              "cells": [
+                "الإجازة السنوية",
+                "15 يوماً بأجر كامل بعد سنة خدمة",
+                "قانون العمل، المادة 39"
+              ],
+              "cites": [
+                "a10"
+              ]
+            },
+            {
+              "cells": [
+                "إجازة الوفاة",
+                "يومان بأجر كامل",
+                "قانون العمل، المادة 38"
+              ],
+              "cites": [
+                "a14"
+              ]
+            },
+            {
+              "cells": [
+                "الإجازة المرضية",
+                "من نصف شهر إلى شهرين ونصف الشهر بأجر كامل، ومثلها بنصف أجر",
+                "قانون العمل، المادة 40"
+              ],
+              "cites": [
+                "a16",
+                "a17"
+              ]
+            },
+            {
+              "cells": [
+                "إجازة الأمومة",
+                "10 أسابيع بأجر كامل",
+                "قانون العمل، المادتان 28 و29"
+              ],
+              "cites": [
+                "a22",
+                "a23"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "ما ساعات العمل القانونية والاستراحات وأجر الساعات الإضافية؟",
+        "paras": [
+          {
+            "text": "يحدد قانون العمل الحد الأعلى للعمل بـ48 ساعة في الأسبوع، باستثناء الزراعة (المادة 31).",
+            "cites": [
+              "a1"
             ]
           },
           {
-            "text": "في الأحوال الاضطرارية، تجيز المادة 33 جعل ساعات العمل 12 ساعة. ويشترط ذلك مراعاة الفقرتين 2 و3 من المادة 23، وإعلام مصلحة الشؤون الاجتماعية خلال 24 ساعة. ويُدفع أجر الساعات الإضافية في هذه الأحوال بزيادة 50% على أجر الساعات العادية.",
+            "text": "يمكن إنقاص ساعات العمل في الأشغال المرهقة أو المضرة بالصحة، أو زيادتها في بعض الأشغال كالمطاعم والمقاهي، بقرار وزاري (المادة 32). ويجب أن يبقى دوام العمل المضغوط، الجائز بالاتفاق منذ عام 2025، ضمن 48 ساعة في الأسبوع (المادة 12-1).",
             "cites": [
-              "a3"
+              "a2",
+              "a8"
             ]
           },
           {
-            "text": "النصوص المتوفرة لدينا لا تحدد أجراً للساعات الإضافية في العمل العادي بدوام كامل. ولا تتناول هذه الصفحة العمل المرن.",
-            "note": true
+            "text": "في الأحوال الاضطرارية يجوز أن يبلغ يوم العمل 12 ساعة بشرط إعلام الإدارة المختصة خلال 24 ساعة، وأن يُدفع أجر الساعات الإضافية بزيادة 50% عن أجر الساعات العادية (المادة 33). ويُدفع للأجير بدوام جزئي أيضاً أجر الساعة الإضافية بزيادة 50%، بشرط إبلاغه قبل 3 أيام على الأقل وألا تتجاوز الساعات الإضافية 10% من ساعاته المتفق عليها إلا بموافقته (المادة 12-3).",
+            "cites": [
+              "a3",
+              "a4",
+              "a9"
+            ]
+          },
+          {
+            "text": "كلما زادت ساعات العمل على 6 للرجال و5 للنساء، وجب على رب العمل منح استراحة عند منتصف النهار لا تقل عن ساعة، ويتمتع الأجير في كل 24 ساعة براحة 9 ساعات متوالية (المادة 34). والراحة الأسبوعية 36 ساعة متواصلة على الأقل، في يوم يختاره رب العمل (المادة 36).",
+            "cites": [
+              "a5",
+              "a6",
+              "a7"
+            ]
           }
         ]
       },
       {
-        "heading": "ما هي الاستراحة والراحة التي يستحقها الأجير؟",
+        "heading": "كم يوماً من الإجازة السنوية يستحق الأجير؟",
         "paras": [
           {
-            "text": "إذا زادت ساعات العمل على 6 للرجال أو 5 للنساء، وجب على رب العمل أن يمنح الأجراء عند منتصف النهار استراحة لا تقل عن ساعة. ويتمتع الأجير في كل 24 ساعة براحة 9 ساعات متوالية، إلا في الأحوال التي تستلزمها ظروف العمل.",
+            "text": "يستحق كل أجير إجازة سنوية 15 يوماً بأجر كامل متى أمضى في المؤسسة سنة على الأقل (المادة 39).",
             "cites": [
-              "a4"
+              "a10"
             ]
           },
           {
-            "text": "لا تقل الراحة الأسبوعية لجميع الأجراء عن 36 ساعة متواصلة. ويختار رب العمل يوم الراحة، وله أن يوزعها بين الأجراء.",
+            "text": "يختار رب العمل تاريخ الإجازة بحسب مقتضيات الخدمة، ولا يجوز له صرف الأجير أو توجيه علم الصرف إليه خلالها (المادة 39). وإذا تجاوزت الإجازات المرضية في السنة شهراً، يحق لرب العمل تخفيض الإجازة السنوية لتلك السنة إلى 8 أيام (المادة 41).",
             "cites": [
-              "a5"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "كم تبلغ الإجازة السنوية المدفوعة؟",
-        "paras": [
-          {
-            "text": "الإجازة السنوية 15 يوماً بأجر كامل، بشرط أن يكون الأجير مستخدماً في المؤسسة منذ سنة على الأقل. ويختار رب العمل تاريخها، ولا يجوز له أن يصرف الأجير أو يوجه إليه علم الصرف خلال الإجازة.",
-            "cites": [
-              "a6"
+              "a11",
+              "a12"
             ]
           },
           {
-            "text": "للأولاد والأحداث أحكام خاصة بساعات العمل والإجازات لا تتناولها هذه الصفحة.",
-            "note": true
+            "text": "مثال: بعد سنة في المؤسسة يستحق الأجير 15 يوماً بأجر كامل، وإذا تجاوزت إجازته المرضية في تلك السنة شهراً، يجوز لرب العمل تخفيضها إلى 8 أيام.",
+            "cites": [
+              "a10",
+              "a12"
+            ]
+          },
+          {
+            "text": "يستحق الأجير الذي فقد أباه أو أمه أو زوجه أو أحد أولاده أو أحفاده أو أجداده إجازة يومين بأجر كامل (المادة 38). ويعيّن المرسوم 15215 لعام 2005 الأعياد التي تعطل فيها الإدارات العامة، أما مؤسسات القطاع الخاص فينص فقط على تعطيلها في اليوم التالي لعيد العمال في 1 أيار إذا وقع يوم أحد أو يوم عطلة، وعلى أن تدفع المستشفيات والصيدليات والأفران والمطاعم التي تعمل أجرة هذا اليوم مضاعفة.",
+            "cites": [
+              "a14",
+              "a15"
+            ]
           }
         ]
       },
@@ -369,19 +708,30 @@
         "heading": "كم تبلغ الإجازة المرضية؟",
         "paras": [
           {
-            "text": "تشمل المادة 40 المرض غير الناجم عن الخدمة وغير حوادث العمل. ولكل مرحلة مدة بأجر كامل تعادلها مدة بنصف أجر. ولا تحدد المادة إجازة لمن تقل خدمته عن 3 أشهر.",
+            "text": "للأجير المصاب بمرض لا ينجم عن عمله إجازة مرضية بحسب مدة خدمته، من نصف شهر بأجر كامل ونصف شهر بنصف أجر بعد 3 أشهر من الخدمة، حتى شهرين ونصف الشهر من كل منهما لمن تفوق خدمته 10 سنوات (المادة 40).",
             "cites": [
-              "a7",
-              "a8"
+              "a16",
+              "a17"
             ]
           },
           {
-            "text": "لا تتناول هذه الصفحة التقرير الطبي، ولا حكم الصرف خلال الإجازة المرضية، ولا إجازة الوفاة، ولا تعويض المرض من الضمان الاجتماعي.",
-            "note": true
+            "text": "مثال: الأجير الذي أمضى 3 سنوات في الخدمة، أي أكثر من سنتين وحتى 4 سنوات، يستحق شهراً بأجر كامل وشهراً بنصف أجر.",
+            "cites": [
+              "a16"
+            ]
+          },
+          {
+            "text": "تُعطى الإجازة المرضية بناء على تقرير الطبيب المعالج أو طبيب المؤسسة، ولا يجوز لرب العمل صرف الأجير أو توجيه علم الصرف إليه أثناءها (المادتان 41 و42). ويتقاضى المضمون في الضمان الاجتماعي الذي يتوقف كسبه بسبب المرض تعويضاً يومياً اعتباراً من اليوم الرابع: 50% من متوسط الكسب اليومي في الثلاثين يوماً الأولى و75% اعتباراً من اليوم الحادي والثلاثين (قانون الضمان الاجتماعي، المادة 23).",
+            "cites": [
+              "a18",
+              "a19",
+              "a20",
+              "a21"
+            ]
           }
         ],
         "table": {
-          "caption": "الإجازة المرضية بحسب مدة الخدمة (المادة 40)",
+          "caption": "الإجازة المرضية بحسب مدة الخدمة",
           "head": [
             "مدة الخدمة",
             "بأجر كامل",
@@ -390,12 +740,12 @@
           "rows": [
             {
               "cells": [
-                "3 أشهر فأكثر حتى سنتين",
+                "من 3 أشهر حتى سنتين",
                 "نصف شهر",
                 "نصف شهر"
               ],
               "cites": [
-                "a7"
+                "a16"
               ]
             },
             {
@@ -405,7 +755,7 @@
                 "شهر"
               ],
               "cites": [
-                "a7"
+                "a16"
               ]
             },
             {
@@ -415,7 +765,7 @@
                 "شهر ونصف"
               ],
               "cites": [
-                "a8"
+                "a17"
               ]
             },
             {
@@ -425,65 +775,57 @@
                 "شهران"
               ],
               "cites": [
-                "a8"
+                "a17"
               ]
             },
             {
               "cells": [
                 "أكثر من 10 سنوات",
-                "شهران ونصف",
-                "شهران ونصف"
+                "شهران ونصف الشهر",
+                "شهران ونصف الشهر"
               ],
               "cites": [
-                "a8"
+                "a17"
               ]
             }
           ]
         }
       },
       {
-        "heading": "ما مدة إجازة الأمومة، ومن يدفع أجرها؟",
+        "heading": "كم تبلغ إجازة الأمومة، ومن يدفع الأجر خلالها؟",
         "paras": [
           {
-            "text": "تمنح المادة 28 من قانون العمل، بصيغتها الحالية، النساء العاملات في جميع الفئات إجازة أمومة مدتها 10 أسابيع تشمل ما قبل الولادة وما بعدها، بإبراز شهادة طبية بتاريخ الولادة المحتمل.",
+            "text": "يحق للمرأة العاملة إجازة أمومة مدتها 10 أسابيع تشمل المدة التي تسبق الولادة والمدة التي تليها، بإبراز شهادة طبية بتاريخ الولادة المحتمل (المادة 28).",
             "cites": [
-              "a9"
+              "a22"
             ]
           },
           {
-            "text": "تتقاضى المرأة أجرها كاملاً خلال إجازة الأمومة، وتحتفظ بأجر إجازتها السنوية عن السنة نفسها وفق المادة 39. ولا يجوز صرفها أو توجيه الإنذار إليها، ما لم يثبت أنها عملت في محل آخر خلال الإجازة.",
+            "text": "يدفع رب العمل الأجرة كاملة خلال إجازة الأمومة، وتحتفظ المرأة بإجازتها السنوية العادية عن السنة نفسها، ولا يجوز صرفها أو توجيه الإنذار إليها خلال الإجازة ما لم يثبت أنها عملت في مكان آخر خلالها (المادة 29).",
             "cites": [
-              "a10"
+              "a23",
+              "a24"
             ]
           },
           {
-            "text": "تمنح المادة 26 من قانون الضمان الاجتماعي المضمونة تعويض أمومة طوال فترة 10 أسابيع تقع خلالها الولادة، بشرط أن تمتنع عن العمل ولا تتقاضى أي أجر. والنصوص المتوفرة لدينا لا تبيّن كيف يتوافق هذا التعويض مع الأجر الكامل.",
+            "text": "تستحق المضمونة في الضمان الاجتماعي تعويض أمومة طيلة الأسابيع العشرة التي تقع خلالها الولادة، يعادل كامل متوسط كسبها اليومي، شرط أن تمتنع عن العمل وألا تتقاضى أي أجر خلال تلك الفترة (قانون الضمان الاجتماعي، المادة 26).",
             "cites": [
-              "a11"
+              "a25",
+              "a26"
             ]
           }
         ]
       },
       {
-        "heading": "ما هي العطل الرسمية، وما الحكم إذا وقعت يوم أحد؟",
+        "heading": "ما لا تتناوله هذه الصفحة",
         "paras": [
           {
-            "text": "يحدد المرسوم 15215/2005 الأعياد التي تعطل فيها الإدارات العامة والمؤسسات العامة والبلديات. وبموجب المادة 4 منه، إذا وقع العيد يوم أحد أو يوم عطلة لا يستعاض عنه بيوم آخر.",
-            "cites": [
-              "a14"
-            ]
+            "text": "مدة الخمسة عشر يوماً في المادة 39 هي الصيغة الأصلية، ولا يتوفر لدينا تعديل لها. ولا تبيّن النصوص كيف يتوافق دفع رب العمل الأجر كاملاً خلال إجازة الأمومة مع تعويض الضمان المشروط بعدم تقاضي أي أجر، ولا كيف تتوافق الإجازة المرضية المدفوعة في قانون العمل مع تعويض المرض من الضمان.",
+            "note": true
           },
           {
-            "text": "يشكّل عيد العمال استثناءً للقطاع الخاص. فإذا وقع 1 أيار يوم أحد أو يوم عطلة، تعطل مؤسسات القطاع الخاص في اليوم التالي. وتستثنى المستشفيات والصيدليات والأفران والمطاعم، على أن تدفع أجرة ذلك اليوم مضاعفة لمن يعمل فيه.",
-            "cites": [
-              "a12"
-            ]
-          },
-          {
-            "text": "يطبق المرسوم مع مراعاة قانون 30/4/1959 المتعلق بتنظيم عيد العمل، وقانون 21/11/1962 المتعلق بوجوب التعطيل في جميع المؤسسات التجارية والصناعية في ذكرى الاستقلال. ولا يتوفر لدينا نص أي من القانونين.",
-            "cites": [
-              "a13"
-            ]
+            "text": "لا تتناول هذه الصفحة عمل الأولاد والأحداث (المواد 22 إلى 25)، ولا العمل عن بعد والعمل الموسمي، ولا قانوني عيد العمل وعيد الاستقلال الصادرين عامي 1959 و1962 اللذين يحيل إليهما المرسوم 15215. ولا تتوفر لدينا لائحة عامة بالأعياد المدفوعة في القطاع الخاص.",
+            "note": true
           }
         ]
       }

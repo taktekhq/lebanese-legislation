@@ -2,230 +2,450 @@
   "slug": "banking-secrecy",
   "order": 9,
   "published": "2026-10-20",
-  "updated": "2026-10-21",
+  "updated": "2026-11-03",
   "articles": [
     {
-      "id": "a1",
+      "id": "s1",
       "law": 186456,
       "article": "1",
       "quote": "تخضع لسر الـمهنة الـمصارف الـمؤسسة في لبنان على شكل شركات مغفلة والـمصارف التي هي فروع لشركات اجنبية.\n\nيستثنى من أحكام هذا القانون مصرف التسليف الزراعي والصناعي والعقاري."
     },
     {
-      "id": "a2",
+      "id": "s2a",
       "law": 186456,
       "article": "2",
       "quote": "إن مديري ومستخدمي الـمصارف الـمشار إليها في الـمادة الأولى وكل من له اطلاع بحكم صفته أو وظيفته بأية طريقة كانت على قيود الدفاتر والـمعاملات والـمراسلات الـمصرفية يلزمون بكتمان السر لـمصلحة زبائن هذه الـمصارف ولا يجوز لهم إفشاء ما يعرفونه عن أسماء الزبائن وأموالهم والأمور الـمتعلقة بهم لأي شخص فرداً كان أم سلطة عامة إدارية أو عسكرية أو قضائية"
     },
     {
-      "id": "a3",
+      "id": "s2b",
       "law": 186456,
       "article": "2",
       "quote": "إلا إذا أذن لهم بذلك خطياً صاحب الشأن أو ورثته أو الـموصى لهم أو إذا أعلن إفلاسه أو إذا نشأت دعوى تتعلق بمعاملة مصـرفـيـة بين الـمصارف وزبائنها، أو وفقاً للاستثناءات الـمنصوص عليها في الـمادة السابعة من هذا القانون."
     },
     {
-      "id": "a4",
-      "law": 186456,
-      "article": "5",
-      "quote": "يجوز الاتفاق مسبقا على اعطاء الاذن المنوه عنه في المواد السابقة في كل عقد من اي نوع كان ولا يجوز الرجوع عن هذا الاذن الا بموافقة جميع المتعاقدين."
-    },
-    {
-      "id": "a5",
+      "id": "s2x1",
       "law": 186456,
       "article": "2",
-      "quote": "لا تطبق أحكام السرية الـمصرفية بالنسبة إلى:\n\n1- الـموظف العمومي: أي شخص ملزم بتقديم تصريح الذمة الـمالية الـمنصوص عليها في القانون رقم 189/2020 ويؤدي وظيفة عامة أو خدمة عامة سواء أكان معيناً أم منتخباً، دائماً أم مؤقتاً، مدفوع الأجر أم غير مدفوع الأجر"
+      "quote": "1- الـموظف العمومي: أي شخص ملزم بتقديم تصريح الذمة الـمالية الـمنصوص عليها في القانون رقم 189/2020 ويؤدي وظيفة عامة أو خدمة عامة سواء أكان معيناً أم منتخباً، دائماً أم مؤقتاً، مدفوع الأجر أم غير مدفوع الأجر"
     },
     {
-      "id": "a6",
+      "id": "s2x2",
       "law": 186456,
       "article": "2",
-      "quote": "رؤساء الجمعيات والهيئات الادارية التي تتعاطى نشاطاً سياسياً، وهيئات الـمجتمع الـمدني، كما وأزواجهم وأولادهم القاصرون، والأشخاص الـمستعارون ، و/أو الـمؤتمنون و/أو الأوصياء ­ و/أو صاحب الحق الاقتصادي، والـمرشحون للانتخابات النيابية والبلدية والاختيارية كافة، من خلال تملكات متسلسلة أو وسائل سيطرة غير مباشرة متسلسلة أخرى أو خارجها ­ عملاً بالقوانين الـمرعية."
+      "quote": "2- رؤساء الجمعيات والهيئات الادارية التي تتعاطى نشاطاً سياسياً، وهيئات الـمجتمع الـمدني، كما وأزواجهم وأولادهم القاصرون، والأشخاص الـمستعارون ، و/أو الـمؤتمنون و/أو الأوصياء ­ و/أو صاحب الحق الاقتصادي، والـمرشحون للانتخابات النيابية والبلدية والاختيارية كافة، من خلال تملكات متسلسلة أو وسائل سيطرة غير مباشرة متسلسلة أخرى أو خارجها ­ عملاً بالقوانين الـمرعية."
     },
     {
-      "id": "a7",
+      "id": "s2x3",
       "law": 186456,
       "article": "2",
-      "quote": "رؤساء وأعضاء مجالس إدارة الـمصارف ومدراؤها التنفيذيين ومدققو الحسابات الحاليين والسابقين، ورؤساء وأعضاء مجالس إدارة الشركات التي تدير أو تملك الوسائل الإعلامية الـمرئية والـمسموعة والـمكتوبة والالكترونية."
+      "quote": "3- رؤساء وأعضاء مجالس إدارة الـمصارف ومدراؤها التنفيذيين ومدققو الحسابات الحاليين والسابقين، ورؤساء وأعضاء مجالس إدارة الشركات التي تدير أو تملك الوسائل الإعلامية الـمرئية والـمسموعة والـمكتوبة والالكترونية."
     },
     {
-      "id": "a8",
+      "id": "s2t",
       "law": 186456,
       "article": "2",
       "quote": "تبقى مفاعيل الفقرة (ب) سارية على الـمذكورين فيها حتى بعد تاريخ استقالتهم أو إنهاء خدماتهم أو إحالتهم عـلـى التقاعد، وذلك عن طيلة الفترة التي كانوا يتولون فيها مهامهم أعلاه ولـمدة خمس سنوات إضافية بعدها. كما تسـري عـلـى كـل من تولّى سابقاً أياً من الـمسؤوليات الواردة فيها في 23 أيلول 1988 ولغاية تاريخه، بمن فيهم من أحيلوا على التقاعد أو أصبحوا خارج الخدمة"
     },
     {
-      "id": "a9",
+      "id": "s3",
       "law": 186456,
-      "article": "7",
-      "quote": "مع مراعاة أحكام الـمادة الثانية من هذا القانون، لا يمكن للـمصارف الـمشار إليها في الـمادة الأولى أن تتذرع بسر الـمهنة أو بسرية الـمصارف الـمنصوص عليها في هذا القانون، وعليها أن تقدم جميع الـمعلومات الـمطلوبة فور تلقيها طلباً من:\n\nأ -­ القضاء الـمختص في الدعاوى الـمتعلقة بجرائم الفـسـاد والجـرائـم الواقعة على الأموال وفقاً لأحكام قانون العقوبات"
+      "article": "3",
+      "quote": "1- يحظر فتح حسابات ودائع مرقمة وتأجير خزائن حديدية لزبائن لا يعرف اصحابها غير مديري الـمصرف او وكلائهم.\n\n2- يجب تحويل حسابات الزبائن الـمرقمة والخزائن الحديدية الـمؤجرة إلى حسابات عادية وخزائن تطبق عليها جميع متطلبات مكافحة تبييض الأموال وتمويل الإرهاب وقوانينها ومراسيمها التطبيقية وذلك في مهلة أقصاها ستة أشهر تلي دخول هذا القانون حيز التنفيذ."
     },
     {
-      "id": "a10",
-      "law": 186456,
-      "article": "7",
-      "quote": "ب ­- هيئة التحقيق الخاصة بموجب قانون مكافحة تبييض الأموال وتمويل الإرهاب الآنف الذكر.\n\nج -­ الهيئة الوطنية لـمكافحة الفساد استناداً إلى القانون رقم 175 تاريخ 8 أيار 2020"
-    },
-    {
-      "id": "a11",
-      "law": 186456,
-      "article": "7",
-      "quote": "د ­- الإدارة الضريبية بهدف مكافحة التهرب الضريبي والالتزام الضريبي والتدقيق وذلك وفقاً لأحكام القانون رقم 44 تاريخ 11 تشرين الثاني 2008 وتعديلاته (قانون الإجراءات الضريبية).\n\nهـ ­- كل من: مصرف لبنان الـمنشأ بموجب القانون الـمـنـفـذ بالـمـرســوم رقــم 13513 تــاريــخ 1/8/1963 وتـعـديـلاتـه (قانون النقد والتسليف)، ولجـنـة الـرقـابـة عـلـى الـمـصـارف والـمـؤسـسـة الوطنية لضمان الودائع"
-    },
-    {
-      "id": "a12",
-      "law": 241399,
-      "article": "6",
-      "quote": "3 - يُحضر «بالهيئة»، بعد اجراء التدقيق والتحليل اللازمين، حق تقرير:\n\n. التجميد النهائي للحسابات و/أو العمليات المعنية و/أو رفع السرية المصرفية لصالح المراجع القضائية المختصة ولصالح الهيئة المصرفية العليا بشخص رئيسها عن الحسابات او العمليات التي يشتبه بأنها تتعلق بتبييض أموال او بتمويل ارهاب."
-    },
-    {
-      "id": "a13",
+      "id": "s4",
       "law": 186456,
       "article": "4",
       "quote": "لا يجوز القاء اي حجز على الاموال والموجودات المودعة لدى المصارف المشار اليها في المادة الاولى الا باذن خطي من اصحابها\n\nأ -­ تجمد الاموال بقرار صادر عن هيئة التحقيق الخاصة وفقاً لقانون مكافحة تبييض الأموال وتمويل الإرهاب.\n\nب -­ يلقى الحجز على الاموال بقرار صادر عن القضاء الـمختص بحسب الـمادة السابعة من هذا القانون."
     },
     {
-      "id": "a14",
+      "id": "s5",
+      "law": 186456,
+      "article": "5",
+      "quote": "يجوز الاتفاق مسبقا على اعطاء الاذن المنوه عنه في المواد السابقة في كل عقد من اي نوع كان ولا يجوز الرجوع عن هذا الاذن الا بموافقة جميع المتعاقدين."
+    },
+    {
+      "id": "s7a",
+      "law": 186456,
+      "article": "7",
+      "quote": "مع مراعاة أحكام الـمادة الثانية من هذا القانون، لا يمكن للـمصارف الـمشار إليها في الـمادة الأولى أن تتذرع بسر الـمهنة أو بسرية الـمصارف الـمنصوص عليها في هذا القانون، وعليها أن تقدم جميع الـمعلومات الـمطلوبة فور تلقيها طلباً من:\n\nأ -­ القضاء الـمختص في الدعاوى الـمتعلقة بجرائم الفـسـاد والجـرائـم الواقعة على الأموال وفقاً لأحكام قانون العقوبات، والجرائم الـمنصوص عليها في الـمادة 19 من قانون أصول الـمحاكمات الجزائية، والجرائم الـمحددة في الـمادة الأولى من القانون رقم 44 تاريخ 24/11/2015 وتعديلاته (مكافحة تبييض الأموال وتمويل الإرهاب)، ودعاوى الإثراء غير الـمشروع"
+    },
+    {
+      "id": "s7b",
+      "law": 186456,
+      "article": "7",
+      "quote": "ب ­- هيئة التحقيق الخاصة بموجب قانون مكافحة تبييض الأموال وتمويل الإرهاب الآنف الذكر.\n\nج -­ الهيئة الوطنية لـمكافحة الفساد استناداً إلى القانون رقم 175 تاريخ 8 أيار 2020"
+    },
+    {
+      "id": "s7d",
+      "law": 186456,
+      "article": "7",
+      "quote": "د ­- الإدارة الضريبية بهدف مكافحة التهرب الضريبي والالتزام الضريبي والتدقيق وذلك وفقاً لأحكام القانون رقم 44 تاريخ 11 تشرين الثاني 2008 وتعديلاته (قانون الإجراءات الضريبية).\n\nهـ ­- كل من: مصرف لبنان الـمنشأ بموجب القانون الـمـنـفـذ بالـمـرســوم رقــم 13513 تــاريــخ 1/8/1963 وتـعـديـلاتـه (قانون النقد والتسليف)، ولجـنـة الـرقـابـة عـلـى الـمـصـارف والـمـؤسـسـة الوطنية لضمان الودائع"
+    },
+    {
+      "id": "s7f",
+      "law": 186456,
+      "article": "7",
+      "quote": "و -­ بهدف إعادة هيكلة القطاع الـمصرفي والقيام بالأعمال الرقابية عليه، يمكن للجهات الـمشار إليها في البند (هـ) أعلاه أن تطلب معلومات محمية بالسرية الـمصرفية دون تحديد حساب معين أو عميل معين، بما في ذلك إصدار طلب عام بإعطاء معلومات عن جميع الحسابات والعملاء من دون أسمائهم. إلا أن هـذه الطـلـبـات تبقى قابلة للاعتراض أمام قاضي الأمور الـمستعجلة من قبل الأشخاص الطبيعيين والـمعنويين الـمعنيين بها، ويكون الاعتراض بدوره خاضعاً للأصول الـمقررة بشأن الأوامر على العرائض.\n\nز- ­ يتم تحديد الـمعايير والضوابط التطبيقية الـمتعلقة بالفقرتين (هـ) و (و) أعلاه بموجب مراسيم تتخذ في مجلس الوزراء بناءً على اقتراح وزير الـمالية.\n\nيوقف الاعتراض تنفيذ الطلب إلى حين صدور الحكم بشأنه، ما لـم يقرر القاضي الناظر في الطلب خلاف ذلك خلال مدة خمسة عشر يوماً."
+    },
+    {
+      "id": "s8a",
+      "law": 186456,
+      "article": "8",
+      "quote": "1- كل من أفشى او حاول إفشاء معلومات محمية بالسرية الـمصرفية أو بيانات استحصل عليها بمعرض تطبيق هذا القانون وخلافاً لأحكامه يعاقب بالحبس من شهر حتى ثلاثة أشهر، وبالغرامة من 150 ضعف الحد الادنى للرواتب والاجور لغاية 300 ضعف الحد الادنى للرواتب والاجور، ويعاقب الشروع بالجريمة بالعقوبة ذاتها.\n\n2- تضاعف الغرامة في حال تكرار الـمخالفة أو التمادي فيها."
+    },
+    {
+      "id": "s8b",
+      "law": 186456,
+      "article": "8",
+      "quote": "1- كل من امتنع عن الاستجابة للطلبات الصادرة وفق الـمادة السابعة من هذا القانون يخضع للعقوبة الـمنصوص عليها في البند (1) من الـمادة الثالثة من القانون رقم 44 تاريخ 24/11/2015 وتعديلاته (مكافحة تبييض الأموال وتمويل الإرهاب).\n\nتشدد العقوبة، كما تقضي أحكام الـمادة 257 من قانون العقوبات، في حال عدم الاستجابة لأي من هذه الطلبات لفترة تتجاوز الثلاثين يوماً من تاريخ وروده، أو في حال التكرار."
+    },
+    {
+      "id": "s8c",
+      "law": 186456,
+      "article": "8",
+      "quote": "3- يحيل أي من الـمراجع الـمنصوص عليها في الـمادة السابعة من هذا القانون على الهيئة الـمصرفية العليا الـمنشأة لدى مصرف لبنان الـمصارف التي ترفض عمداً تقديم الـمعلومات الـمطلوبة خلال الفترة الـمحددة في الطلبات الـموجهة إليها لاتخاذ الإجراءات القانونية بحقها، ولا سيما تلك الـمنصوص عليها في الـمادة 208 من قانون النقد والتسليف، وذلك في مهلة أسبوعين من تاريخ الإحالة."
+    },
+    {
+      "id": "aml3",
+      "law": 241399,
+      "article": "3",
+      "quote": "1 - في عمليات تبييض اموال بالحبس من ثلاث الى سبع سنوات وبغرامة لا تزيد عن مثلي المبلغ موضوع عملية التبييض."
+    },
+    {
+      "id": "aml6t",
+      "law": 241399,
+      "article": "6",
+      "quote": "التجميد الاحترازي المؤقت للحسابات و/أو للعمليات المشتبه بها وذلك لمدة اقصاها سنة قابلة للتمديد لستة اشهر اضافية ولمرة واحدة في ما خص طلبات المساعدة الواردة من الخارج ولمدة اقصاها سنة اشهر قابلة للتمديد لثلاثة اشهر اضافية ولمرة واحدة بالنسبة للابلاغات وطلبات المساعدة الواردة من الداخل."
+    },
+    {
+      "id": "aml6f",
+      "law": 241399,
+      "article": "6",
+      "quote": "التجميد النهائي للحسابات و/أو العمليات المعنية و/أو رفع السرية المصرفية لصالح المراجع القضائية المختصة ولصالح الهيئة المصرفية العليا بشخص رئيسها عن الحسابات او العمليات التي يشتبه بأنها تتعلق بتبييض أموال او بتمويل ارهاب."
+    },
+    {
+      "id": "aml16",
       "law": 241399,
       "article": "16",
-      "quote": "لا يعتد، فور نفاذ هذا القانون، بجميع الاحكام المخالفة او التي لا تأتلف مع مضمونه ولا سيما تلك الواردة في:\n\n- قانون سرية المصارف الصادر بتاريخ 3/9/1956 وفي"
+      "quote": "لا يعتد، فور نفاذ هذا القانون، بجميع الاحكام المخالفة او التي لا تأتلف مع مضمونه ولا سيما تلك الواردة في:\n\n- قانون سرية المصارف الصادر بتاريخ 3/9/1956"
+    },
+    {
+      "id": "cmc150",
+      "law": 244905,
+      "article": "150",
+      "quote": "لا تحول أحكام قانون سرية الـمصارف الصادر بتاريخ 3/9/1956 دون قيام أية إدارة أو أي موظف من موظفي الـمصرف الـمركزي ولجنة الرقابة على الـمصارف بواجباتهم."
+    },
+    {
+      "id": "cmc151",
+      "law": 244905,
+      "article": "151",
+      "quote": "على كل شخص ينتمي او كان انتمى الى المصرف المركزي, بأية صفة كانت, ان يكتم السر المنشأ بقانون 3 ايلول سنة 1956."
+    },
+    {
+      "id": "l306a1",
+      "law": 315943,
+      "article": "1",
+      "quote": "أولاً: تعدل الـمواد /1/، /2/، /7/ و /8/ من القانون الصادر بتاريخ 3/9/1956 والـمتعلق بسرية الـمصارف"
+    },
+    {
+      "id": "l306a1b",
+      "law": 315943,
+      "article": "1",
+      "quote": "ثانياً: يلغى نص الـمادة الثالثة من القانون الصادر بتاريخ 3/9/1956 والـمتعلق بسرية الـمصارف ويستعاض عنه بالنص التالي:"
+    },
+    {
+      "id": "l306a3",
+      "law": 315943,
+      "article": "3",
+      "quote": "1- على كل شخص، بما في ذلك الإدارات الحكومية والأشخاص الـمعنويين ذوي الصفة العمومية، والـمؤسسات العامة، والبلديات، واتحادات البلديات، بالإضافة إلى مختلف هيئات القطاع الخاص والنقابات، أن يزود الإدارة الضريبية بأية معلومات تطلبها، بما في ذلك الـمعلومات الـمحمية بالسرية الـمصرفية، وذلك للقيام بواجباتها، بما في ذلك عمليات التدقيق الضريبي أو التدابير الرامية إلى تعزيز الامتثال الضريبي وكشف التهرب الضريبي."
+    },
+    {
+      "id": "l306a5",
+      "law": 315943,
+      "article": "5",
+      "quote": "يعمل بهذا القانون فور نشره في الجريدة الرسمية."
+    },
+    {
+      "id": "l200",
+      "law": 286755,
+      "article": "1",
+      "quote": "1- يعلق العمل بقانون سرية المصارف الصادر بتاريخ 3/9/1956 وجميع المواد التي تشير اليه لمدة سنة واحدة تسري من تاريخ نشر هذا القانون، وذلك في كل ما يتعلق بعمليات التدقيق المالي و/أو التحقيق الجنائي التي قررتها وتقررها الحكومة على حسابات مصرف لبنان والوزارات والمصالح المستقلة والمجالس والصناديق والمؤسسات العامة"
+    },
+    {
+      "id": "d1578a1",
+      "law": 2000198105,
+      "article": "1",
+      "quote": "يحدد هذا المرسوم دقائق تطبيق المادة ٣ من القانون رقم ١ الصادر بتاريخ ٢٠٢٥/٤/٢٤ لجهة تحديد ضوابط تطبيق التعديل في المادة ١٥٠ من قانون النقد والتسليف."
+    },
+    {
+      "id": "d1578a5",
+      "law": 2000198105,
+      "article": "5",
+      "quote": "ترفع السرية المصرفية بشكل كامل وغير مقيد تجاه مصرف لبنان ولجنة الرقابة على المصارف والمدققين أو المقيمين المعينين وفقاً للأصول من قبل مصرف لبنان أو لجنة الرقابة على المصارف وذلك في إطار ممارسة عمل الرقابة أو\n\nالتدقيق الدوري أو أي دور آخر على أن تحدد أعمال الرقابة والتدقيق أو غيرها بصورة واضحة وذلك بكتاب خطي من قبل لجنة الرقابة على المصارف أو حاكم مصرف لبنان عند المباشرة بأي مهمة."
+    },
+    {
+      "id": "d2087a3",
+      "law": 2000198680,
+      "article": "3",
+      "quote": "يتوجب على المصرف أن يزوّد رئيس الإدارة الضريبية بالمعلومات المطلوبة خلال مهلة ١٥ يوما من تاريخ تبلغه طلب المعلومات، وفي حال عدم التجاوب أو التأخر في الإجابة تفرض على المصرف الغرامات المحددة في قانون الإجراءات الضريبية"
     }
   ],
   "en": {
-    "title": "Banking secrecy in Lebanon",
-    "question": "What does Lebanese law say about banking secrecy, and when can it be lifted?",
-    "description": "Who must keep banking secrecy in Lebanon, whose accounts it does not cover, and which authorities can obtain bank information or freeze funds.",
+    "title": "What does Lebanon's banking secrecy law say, and has it been amended?",
+    "question": "What does Lebanon's banking secrecy law of 1956 say today, who can lift secrecy, and how was it amended in 2022 and 2025?",
+    "description": "Lebanon's 1956 banking secrecy law, rewritten in 2022 and amended in 2025: who is bound, who is excluded, who can demand data, and 1 to 3 months' jail.",
     "answer": {
-      "text": "Banks in Lebanon and anyone who sees their records must keep client information secret, but the 2015 money-laundering law overrides conflicting secrecy rules. A bank may disclose with written consent, which a contract can give in advance, on bankruptcy, in a bank-client dispute, or when listed authorities ask. Secrecy does not apply to public officials, political and civil-society heads, election candidates, or bank and media board members, until 5 years after leaving office.",
+      "text": "Lebanon's banking secrecy law of 3 September 1956 is still in force: Article 2 binds bank managers, staff and anyone who sees bank records to keep clients' names, funds and affairs secret, and disclosure is punished by 1 to 3 months in jail and a fine of 150 to 300 times the minimum wage. Law 306 of 28 October 2022 rewrote it, removing secrecy for public officials, politicians, election candidates and bank and media board members, and letting courts, the anti-corruption and tax authorities and the banking supervisors demand account data. Law 1 of 24 April 2025 amended Article 7 again, and its Decree 1578 lifts secrecy fully toward the central bank and the Banking Control Commission when they supervise banks.",
       "cites": [
-        "a14",
-        "a1",
-        "a2",
-        "a3",
-        "a4",
-        "a9",
-        "a5",
-        "a6",
-        "a7",
-        "a8"
+        "s2a",
+        "s8a",
+        "l306a1",
+        "s2x1",
+        "s2x2",
+        "s2x3",
+        "s7a",
+        "s7d",
+        "d1578a1",
+        "d1578a5"
       ]
     },
     "sections": [
       {
-        "heading": "Who must keep banking secrecy?",
+        "heading": "Banking secrecy in figures: penalties, deadlines and time limits",
         "paras": [
           {
-            "text": "Article 1 of the banking secrecy law of 3 September 1956 covers banks set up in Lebanon as joint-stock companies and branches of foreign companies. It excludes the Agricultural, Industrial and Real Estate Credit Bank.",
+            "text": "Article 8 sets the penalties; other articles set deadlines for banks and time limits on exclusions and freezes.",
             "cites": [
-              "a1"
+              "s8a"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Key figures in Lebanon's banking secrecy rules",
+          "head": [
+            "Rule",
+            "Figure"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Disclosing protected information, or trying to",
+                "1 to 3 months in jail and a fine of 150 to 300 times the minimum wage; the fine doubles on a repeat"
+              ],
+              "cites": [
+                "s8a"
+              ]
+            },
+            {
+              "cells": [
+                "Refusing a request made under Article 7",
+                "Penalty of Article 3(1) of Law 44/2015: 3 to 7 years in jail and a fine; heavier after 30 days without an answer"
+              ],
+              "cites": [
+                "s8b",
+                "aml3"
+              ]
+            },
+            {
+              "cells": [
+                "Bank that wilfully withholds information",
+                "Referred to the Higher Banking Commission, which acts within two weeks"
+              ],
+              "cites": [
+                "s8c"
+              ]
+            },
+            {
+              "cells": [
+                "Exclusion of officials and others from secrecy",
+                "Time in office plus 5 years, for posts held since 23 September 1988"
+              ],
+              "cites": [
+                "s2t"
+              ]
+            },
+            {
+              "cells": [
+                "Numbered accounts and anonymous safe boxes",
+                "Banned; existing ones converted within 6 months"
+              ],
+              "cites": [
+                "s3"
+              ]
+            },
+            {
+              "cells": [
+                "Objection to a supervisor's general request",
+                "Suspends the request unless the judge rules otherwise within 15 days"
+              ],
+              "cites": [
+                "s7f"
+              ]
+            },
+            {
+              "cells": [
+                "Tax administration request to a bank",
+                "Answer due within 15 days"
+              ],
+              "cites": [
+                "d2087a3"
+              ]
+            },
+            {
+              "cells": [
+                "Special Investigation Commission precautionary freeze",
+                "Up to 1 year plus 6 months (requests from abroad); up to 6 months plus 3 (domestic reports)"
+              ],
+              "cites": [
+                "aml6t"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "Has the banking secrecy law been amended?",
+        "paras": [
+          {
+            "text": "Yes: Law 306 of 28 October 2022 rewrote most of the 1956 law, and Law 1 of 24 April 2025 amended it again.",
+            "cites": [
+              "l306a1",
+              "d1578a1"
             ]
           },
           {
-            "text": "Article 2 binds bank managers, employees and anyone who sees bank records through their post. They may not reveal clients' names, funds or affairs to anyone, including administrative, military and judicial authorities.",
+            "text": "Law 306 rewrote Articles 1, 2, 7 and 8 and replaced Article 3, with effect on publication. The new texts remove secrecy for public officials and others, let the tax administration and the banking supervisors demand data, and ban numbered accounts.",
             "cites": [
-              "a2"
+              "l306a1",
+              "l306a1b",
+              "l306a5",
+              "s2x1",
+              "s7d",
+              "s3"
             ]
           },
           {
-            "text": "Article 16 of Law 44/2015 on money laundering and terrorism financing sets aside any rule of the 1956 banking secrecy law that conflicts with it.",
+            "text": "It also amended Article 150 of the Code of Money and Credit so that secrecy does not stop central bank and Banking Control Commission staff doing their duties, and it obliged everyone to give the tax administration the information it asks for, banking data included.",
             "cites": [
-              "a14"
+              "cmc150",
+              "l306a3"
+            ]
+          },
+          {
+            "text": "Law 1 of 24 April 2025 amended Article 7(e) and (f) and Article 150 again. Under its Decree 1578 of 15 October 2025, secrecy is lifted fully toward the central bank, the Banking Control Commission and the auditors they appoint, for a task set out in a written mission letter.",
+            "cites": [
+              "d1578a1",
+              "d1578a5"
+            ]
+          },
+          {
+            "text": "Earlier, Law 200 of 29 December 2020 suspended the law for one year, only for the audits of the accounts of the central bank, ministries and public bodies.",
+            "cites": [
+              "l200"
             ]
           }
         ]
       },
       {
-        "heading": "When may a bank reveal a client's information?",
+        "heading": "Who is bound by banking secrecy, and whose accounts are not covered?",
         "paras": [
           {
-            "text": "Article 2 allows disclosure with written permission from the client, the client's heirs or legatees, or if the client is declared bankrupt. It also allows it in a bank-client lawsuit over a banking transaction, and under Article 7.",
+            "text": "Secrecy binds the managers and staff of banks set up in Lebanon as joint-stock companies or as branches of foreign companies, and anyone who sees bank records through their job.",
             "cites": [
-              "a3"
+              "s1",
+              "s2a"
             ]
           },
           {
-            "text": "Article 5 lets the permission be agreed in advance in any contract. It can then be withdrawn only with the consent of all contracting parties.",
+            "text": "They may not reveal clients' names, funds or affairs to anyone, including administrative, military and judicial authorities. The Agricultural, Industrial and Real Estate Credit Bank is outside the law, and central bank staff keep the same secrecy under Article 151 of the Code of Money and Credit.",
             "cites": [
-              "a4"
+              "s2a",
+              "s1",
+              "cmc151"
+            ]
+          },
+          {
+            "text": "Article 2(b) removes secrecy for three groups: public officials who must declare their assets under Law 189/2020; heads of political and civil-society bodies and all election candidates, with their spouses, minor children and nominees; and current and former bank board members, executives and auditors, and media company board members.",
+            "cites": [
+              "s2x1",
+              "s2x2",
+              "s2x3"
+            ]
+          },
+          {
+            "text": "The exclusion covers the time in office and 5 more years. It also reaches anyone who held one of these posts from 23 September 1988, retirees included.",
+            "cites": [
+              "s2t"
             ]
           }
         ]
       },
       {
-        "heading": "Whose accounts does banking secrecy not cover?",
+        "heading": "Who can obtain account information despite banking secrecy?",
         "paras": [
           {
-            "text": "Article 2(b) says banking secrecy rules do not apply to public officials. These are people who must file an asset declaration under Law 189/2020 and perform a public function or service. The post may be appointed or elected, permanent or temporary, paid or unpaid.",
+            "text": "A bank may disclose with the written consent of the client, the heirs or legatees, on bankruptcy, in a bank-client lawsuit, or at the request of an authority listed in Article 7. Consent can be given in advance in any contract and then withdrawn only with all parties' agreement.",
             "cites": [
-              "a5"
+              "s2b",
+              "s5"
             ]
           },
           {
-            "text": "The rules also do not apply to heads of associations and bodies active in politics, or of civil-society bodies. Their spouses, minor children, nominees, trustees, guardians and beneficial owners are excluded too. So are all candidates in parliamentary, municipal and mukhtar elections.",
+            "text": "Article 7 lists those authorities: the courts in corruption, property-crime, money-laundering and illicit-enrichment cases, the Special Investigation Commission, the National Anti-Corruption Commission, the tax administration, and the central bank, the Banking Control Commission and the National Deposit Guarantee Institution.",
             "cites": [
-              "a6"
+              "s7a",
+              "s7b",
+              "s7d"
             ]
           },
           {
-            "text": "Current and former bank board chairs and members, executive managers and auditors are excluded. So are board chairs and members of companies that run or own audio, visual, print or electronic media.",
+            "text": "The supervisors may ask about all accounts without naming clients. Those concerned can object before the urgent matters judge, and the objection suspends the request unless the judge rules otherwise within 15 days.",
             "cites": [
-              "a7"
+              "s7f"
+            ]
+          },
+          {
+            "text": "Under Decree 2087 of 15 December 2025, a bank must answer a written request from the head of the tax administration within 15 days or face the fines of the Tax Procedures Law.",
+            "cites": [
+              "d2087a3"
             ]
           }
         ]
       },
       {
-        "heading": "How long does the exclusion from banking secrecy last?",
+        "heading": "Can a bank account be frozen or seized?",
         "paras": [
           {
-            "text": "Under Article 2, the exclusion survives resignation, end of service or retirement. It covers the whole time in office and 5 more years. It also reaches anyone who held a listed post from 23 September 1988 to date, retirees included.",
+            "text": "Only in set ways: under Article 4, as amended in 2022, deposits can be attached only with the owner's written consent, a freeze decision of the Special Investigation Commission, or an attachment decision of a court competent under Article 7.",
             "cites": [
-              "a8"
+              "s4"
             ]
           },
           {
-            "text": "This page does not say who may see these accounts outside the authorities that can demand bank information.",
+            "text": "The Commission can freeze suspect accounts as a precaution for up to 1 year plus 6 months on requests from abroad, and up to 6 months plus 3 on domestic reports. After its audit it can freeze them for good or lift secrecy for the courts and the head of the Higher Banking Commission.",
+            "cites": [
+              "aml6t",
+              "aml6f"
+            ]
+          },
+          {
+            "text": "Article 16 of Law 44/2015 sets aside any rule of the 1956 law that conflicts with the money-laundering law.",
+            "cites": [
+              "aml16"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What this page does not cover",
+        "paras": [
+          {
+            "text": "We do not hold the text of Law 1 of 24 April 2025. It amended Article 7(e) and (f), so the wording of those paragraphs here is the 2022 one and may be out of date.",
             "note": true
-          }
-        ]
-      },
-      {
-        "heading": "Which authorities can demand bank information?",
-        "paras": [
-          {
-            "text": "Subject to Article 2, Article 7 bars banks from invoking secrecy against the authorities it lists. Banks must give all requested information as soon as a request arrives. The first is the competent court in corruption cases and cases of crimes against property under the Penal Code.",
-            "cites": [
-              "a9"
-            ]
           },
           {
-            "text": "Article 7 also lists the Special Investigation Commission, and the National Anti-Corruption Commission under Law 175 of 8 May 2020. It lists the tax administration, for tax evasion, compliance and audit. It lists the Central Bank, the Banking Control Commission and the National Deposit Guarantee Institution.",
-            "cites": [
-              "a10",
-              "a11"
-            ]
-          },
-          {
-            "text": "This page does not list every court case covered, or general requests, objections and implementing decrees. The texts we hold include no implementing decree.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "Can bank deposits be frozen or attached?",
-        "paras": [
-          {
-            "text": "Under Article 4, funds and assets deposited with banks covered by Article 1 cannot be attached without the owners' written permission. The Special Investigation Commission freezes funds by decision under the anti-money-laundering law. A competent court attaches them by decision under Article 7.",
-            "cites": [
-              "a13"
-            ]
-          },
-          {
-            "text": "Under Article 6(3) of Law 44/2015, only the Special Investigation Commission may finally freeze accounts or lift secrecy, after audit and analysis. This covers accounts or transactions suspected of money laundering or terrorism financing. Secrecy is lifted for the competent courts and the head of the Higher Banking Commission.",
-            "cites": [
-              "a12"
-            ]
-          },
-          {
-            "text": "This page does not cover penalties, temporary freeze periods or the release of frozen funds. We do not hold any Constitutional Council ruling on these articles.",
+            "text": "Article 8's fines are multiples of the minimum wage, which this page does not give. A Constitutional Council decision on a partial challenge to Law 306 is in our records without its text, so this page does not say what it decided.",
             "note": true
           }
         ]
@@ -233,142 +453,260 @@
     ]
   },
   "ar": {
-    "title": "السرية المصرفية في لبنان",
-    "question": "ماذا يقول القانون اللبناني عن السرية المصرفية ومتى يمكن رفعها؟",
-    "description": "من تلزمه السرية المصرفية في لبنان، ومن لا تشملهم، والجهات التي يحق لها طلب المعلومات المصرفية أو تجميد الأموال.",
+    "title": "ماذا يقول قانون السرية المصرفية في لبنان، وهل عُدّل؟",
+    "question": "ماذا ينص قانون سرية المصارف الصادر عام 1956 اليوم، ومن يحق له رفع السرية، وكيف عُدّل عامَي 2022 و2025؟",
+    "description": "قانون سرية المصارف لعام 1956 بعد تعديلات 2022 و2025: من تلزمه السرية ومن تستثنيه ومن يحق له طلب المعلومات، والحبس من شهر إلى 3 أشهر للإفشاء.",
     "answer": {
-      "text": "تلتزم المصارف في لبنان وكل من يطّلع على قيودها بكتمان معلومات الزبائن، على أن قانون مكافحة تبييض الأموال لعام 2015 يتقدّم على أحكام السرية المخالفة له. ويجوز للمصرف الإفشاء بإذن خطي من الزبون، ولو أُعطي مسبقاً في عقد، أو عند إفلاسه، أو في دعوى بينه وبين المصرف، أو بطلب من جهات محددة. ولا تطبق السرية على الموظفين العموميين ورؤساء الهيئات السياسية وهيئات المجتمع المدني والمرشحين للانتخابات وأعضاء مجالس إدارة المصارف ووسائل الإعلام، حتى 5 سنوات بعد ترك المنصب.",
+      "text": "لا يزال قانون سرية المصارف الصادر في 3 أيلول 1956 نافذاً: تُلزم المادة 2 منه مديري المصارف ومستخدميها وكل من يطّلع على قيودها بكتمان أسماء الزبائن وأموالهم وشؤونهم، ويعاقَب الإفشاء بالحبس من شهر إلى 3 أشهر وبغرامة من 150 إلى 300 ضعف الحد الأدنى للأجور. وقد أعاد القانون رقم 306 تاريخ 28 تشرين الأول 2022 صياغته، فرفع السرية عن الموظفين العموميين والسياسيين والمرشحين للانتخابات وأعضاء مجالس إدارة المصارف ووسائل الإعلام، وأجاز للقضاء ولهيئة مكافحة الفساد والإدارة الضريبية وجهات الرقابة المصرفية طلب المعلومات. ثم عدّل القانون رقم 1 تاريخ 24 نيسان 2025 المادة 7 مجدداً، ويرفع مرسومه التطبيقي رقم 1578 السرية كلياً تجاه مصرف لبنان ولجنة الرقابة على المصارف عند رقابتهما على المصارف.",
       "cites": [
-        "a14",
-        "a1",
-        "a2",
-        "a3",
-        "a4",
-        "a9",
-        "a5",
-        "a6",
-        "a7",
-        "a8"
+        "s2a",
+        "s8a",
+        "l306a1",
+        "s2x1",
+        "s2x2",
+        "s2x3",
+        "s7a",
+        "s7d",
+        "d1578a1",
+        "d1578a5"
       ]
     },
     "sections": [
       {
-        "heading": "من تلزمه السرية المصرفية؟",
+        "heading": "السرية المصرفية بالأرقام: العقوبات والمهل والمدد",
         "paras": [
           {
-            "text": "تُخضع المادة 1 من قانون سرية المصارف الصادر في 3 أيلول 1956 لسر المهنة المصارفَ المؤسسة في لبنان على شكل شركات مغفلة، والمصارف التي هي فروع لشركات أجنبية. ويُستثنى من القانون مصرف التسليف الزراعي والصناعي والعقاري.",
+            "text": "تحدد المادة 8 العقوبات، وتحدد مواد أخرى مهلاً على المصارف ومدداً للاستثناءات والتجميد.",
             "cites": [
-              "a1"
+              "s8a"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "أبرز الأرقام في أحكام السرية المصرفية في لبنان",
+          "head": [
+            "القاعدة",
+            "الرقم"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "إفشاء معلومات محمية بالسرية أو محاولة إفشائها",
+                "الحبس من شهر إلى 3 أشهر وغرامة من 150 إلى 300 ضعف الحد الأدنى للأجور، وتضاعف الغرامة عند التكرار"
+              ],
+              "cites": [
+                "s8a"
+              ]
+            },
+            {
+              "cells": [
+                "الامتناع عن تلبية طلب صادر وفق المادة 7",
+                "عقوبة البند (1) من المادة 3 من القانون رقم 44/2015: الحبس من 3 إلى 7 سنوات وغرامة، وتشدد بعد 30 يوماً من دون جواب"
+              ],
+              "cites": [
+                "s8b",
+                "aml3"
+              ]
+            },
+            {
+              "cells": [
+                "مصرف يرفض عمداً تقديم المعلومات",
+                "يحال إلى الهيئة المصرفية العليا لتتخذ الإجراءات في مهلة أسبوعين"
+              ],
+              "cites": [
+                "s8c"
+              ]
+            },
+            {
+              "cells": [
+                "استثناء الموظفين العموميين وغيرهم من السرية",
+                "مدة تولي المهام و5 سنوات بعدها، للمناصب المتولاة منذ 23 أيلول 1988"
+              ],
+              "cites": [
+                "s2t"
+              ]
+            },
+            {
+              "cells": [
+                "الحسابات المرقمة والخزائن الحديدية المجهولة",
+                "محظورة، وتحوَّل القائمة منها خلال 6 أشهر"
+              ],
+              "cites": [
+                "s3"
+              ]
+            },
+            {
+              "cells": [
+                "الاعتراض على طلب عام من جهات الرقابة",
+                "يوقف تنفيذ الطلب ما لم يقرر القاضي خلاف ذلك خلال 15 يوماً"
+              ],
+              "cites": [
+                "s7f"
+              ]
+            },
+            {
+              "cells": [
+                "طلب الإدارة الضريبية من المصرف",
+                "الجواب خلال 15 يوماً"
+              ],
+              "cites": [
+                "d2087a3"
+              ]
+            },
+            {
+              "cells": [
+                "التجميد الاحترازي المؤقت من هيئة التحقيق الخاصة",
+                "حتى سنة تضاف إليها 6 أشهر (طلبات من الخارج)، وحتى 6 أشهر تضاف إليها 3 (إبلاغات داخلية)"
+              ],
+              "cites": [
+                "aml6t"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "هل عُدّل قانون السرية المصرفية؟",
+        "paras": [
+          {
+            "text": "نعم: أعاد القانون رقم 306 تاريخ 28 تشرين الأول 2022 صياغة معظم قانون 1956، ثم عدّله القانون رقم 1 تاريخ 24 نيسان 2025 مجدداً.",
+            "cites": [
+              "l306a1",
+              "d1578a1"
             ]
           },
           {
-            "text": "تُلزم المادة 2 مديري المصارف ومستخدميها وكل من يطّلع على قيودها بحكم صفته أو وظيفته بكتمان السر. ولا يجوز لهم إفشاء ما يعرفونه عن أسماء الزبائن وأموالهم وشؤونهم لأي شخص، ولو كان سلطة إدارية أو عسكرية أو قضائية.",
+            "text": "عدّل القانون رقم 306 المواد 1 و2 و7 و8 واستعاض عن نص المادة 3، وعُمل به فور نشره. وترفع النصوص الجديدة السرية عن الموظفين العموميين وغيرهم، وتجيز للإدارة الضريبية ولجهات الرقابة المصرفية طلب المعلومات، وتحظر الحسابات المرقمة.",
             "cites": [
-              "a2"
+              "l306a1",
+              "l306a1b",
+              "l306a5",
+              "s2x1",
+              "s7d",
+              "s3"
             ]
           },
           {
-            "text": "تنص المادة 16 من القانون رقم 44/2015 لمكافحة تبييض الأموال وتمويل الإرهاب على عدم الاعتداد بأي حكم في قانون سرية المصارف لعام 1956 يخالفها.",
+            "text": "وعدّل كذلك المادة 150 من قانون النقد والتسليف بحيث لا تحول السرية دون قيام موظفي المصرف المركزي ولجنة الرقابة على المصارف بواجباتهم، وألزم كل شخص بتزويد الإدارة الضريبية بالمعلومات التي تطلبها، بما فيها المحمية بالسرية المصرفية.",
             "cites": [
-              "a14"
+              "cmc150",
+              "l306a3"
+            ]
+          },
+          {
+            "text": "وعدّل القانون رقم 1 تاريخ 24 نيسان 2025 الفقرتين (هـ) و(و) من المادة 7 والمادة 150 مجدداً. وبموجب مرسومه التطبيقي رقم 1578 تاريخ 15 تشرين الأول 2025، ترفع السرية بشكل كامل وغير مقيد تجاه مصرف لبنان ولجنة الرقابة على المصارف والمدققين الذين يعيّنونهم، في مهمة يحددها كتاب خطي.",
+            "cites": [
+              "d1578a1",
+              "d1578a5"
+            ]
+          },
+          {
+            "text": "وقبل ذلك، علّق القانون رقم 200 تاريخ 29 كانون الأول 2020 العمل بقانون سرية المصارف مدة سنة، حصراً لعمليات التدقيق في حسابات مصرف لبنان والوزارات والمؤسسات العامة.",
+            "cites": [
+              "l200"
             ]
           }
         ]
       },
       {
-        "heading": "متى يجوز للمصرف إفشاء معلومات الزبون؟",
+        "heading": "من تلزمه السرية المصرفية، ومن لا تشمل حساباتهم؟",
         "paras": [
           {
-            "text": "تجيز المادة 2 الإفشاء بإذن خطي من الزبون أو ورثته أو الموصى لهم، أو إذا أُعلن إفلاسه. وتجيزه كذلك في دعوى بين المصرف والزبون تتعلق بمعاملة مصرفية، وفي الاستثناءات الواردة في المادة 7.",
+            "text": "تلزم السرية مديري ومستخدمي المصارف المؤسسة في لبنان على شكل شركات مغفلة أو فروعاً لشركات أجنبية، وكل من يطّلع على قيودها بحكم وظيفته.",
             "cites": [
-              "a3"
+              "s1",
+              "s2a"
             ]
           },
           {
-            "text": "تجيز المادة 5 الاتفاق مسبقاً على هذا الإذن في أي عقد. ولا يجوز الرجوع عنه بعد ذلك إلا بموافقة جميع المتعاقدين.",
+            "text": "ولا يجوز لهم إفشاء أسماء الزبائن وأموالهم وشؤونهم لأي شخص، ولو كان سلطة إدارية أو عسكرية أو قضائية. ويُستثنى من القانون مصرف التسليف الزراعي والصناعي والعقاري، ويلتزم موظفو المصرف المركزي بالسر نفسه بموجب المادة 151 من قانون النقد والتسليف.",
             "cites": [
-              "a4"
+              "s2a",
+              "s1",
+              "cmc151"
+            ]
+          },
+          {
+            "text": "ترفع الفقرة (ب) من المادة 2 السرية عن ثلاث فئات: الموظفون العموميون الملزمون بتصريح الذمة المالية وفق القانون رقم 189/2020؛ ورؤساء الهيئات السياسية وهيئات المجتمع المدني وجميع المرشحين للانتخابات، مع أزواجهم وأولادهم القاصرين والأشخاص المستعارين؛ وأعضاء مجالس إدارة المصارف ومدراؤها التنفيذيون ومدققو حساباتها الحاليون والسابقون، وأعضاء مجالس إدارة الشركات الإعلامية.",
+            "cites": [
+              "s2x1",
+              "s2x2",
+              "s2x3"
+            ]
+          },
+          {
+            "text": "ويغطي الاستثناء مدة تولي المهام و5 سنوات إضافية. ويسري أيضاً على كل من تولى أحد هذه المناصب منذ 23 أيلول 1988، بمن فيهم المتقاعدون.",
+            "cites": [
+              "s2t"
             ]
           }
         ]
       },
       {
-        "heading": "من لا تشملهم السرية المصرفية؟",
+        "heading": "من يحق له الحصول على معلومات الحسابات رغم السرية؟",
         "paras": [
           {
-            "text": "تنص الفقرة (ب) من المادة 2 على أن أحكام السرية المصرفية لا تطبق على الموظف العمومي. وهو كل من يلزمه القانون رقم 189/2020 بتقديم تصريح الذمة المالية ويؤدي وظيفة عامة أو خدمة عامة. ولا فرق أن يكون معيّناً أو منتخباً، دائماً أو مؤقتاً، بأجر أو بلا أجر.",
+            "text": "يجوز للمصرف الإفشاء بإذن خطي من الزبون أو ورثته أو الموصى لهم، أو عند إعلان إفلاسه، أو في دعوى بينه وبين المصرف، أو بطلب من جهة تعددها المادة 7. ويجوز إعطاء الإذن مسبقاً في أي عقد، ولا يجوز الرجوع عنه بعد ذلك إلا بموافقة جميع المتعاقدين.",
             "cites": [
-              "a5"
+              "s2b",
+              "s5"
             ]
           },
           {
-            "text": "ولا تطبق هذه الأحكام كذلك على رؤساء الجمعيات والهيئات الإدارية التي تتعاطى نشاطاً سياسياً، ورؤساء هيئات المجتمع المدني. ويُستثنى معهم أزواجهم وأولادهم القاصرون والأشخاص المستعارون والمؤتمنون والأوصياء وأصحاب الحق الاقتصادي. ويُستثنى أيضاً جميع المرشحين للانتخابات النيابية والبلدية والاختيارية.",
+            "text": "تعدد المادة 7 هذه الجهات: القضاء المختص في دعاوى الفساد والجرائم الواقعة على الأموال وتبييض الأموال والإثراء غير المشروع، وهيئة التحقيق الخاصة، والهيئة الوطنية لمكافحة الفساد، والإدارة الضريبية، ومصرف لبنان ولجنة الرقابة على المصارف والمؤسسة الوطنية لضمان الودائع.",
             "cites": [
-              "a6"
+              "s7a",
+              "s7b",
+              "s7d"
             ]
           },
           {
-            "text": "ويخرج من السرية رؤساء مجالس إدارة المصارف وأعضاؤها ومديروها التنفيذيون ومدققو حساباتها، الحاليون منهم والسابقون. ويخرج منها كذلك رؤساء وأعضاء مجالس إدارة الشركات التي تدير أو تملك وسائل إعلام مرئية أو مسموعة أو مكتوبة أو إلكترونية.",
+            "text": "ويجوز لجهات الرقابة طلب معلومات عن جميع الحسابات من دون تسمية العملاء. ويحق للمعنيين الاعتراض أمام قاضي الأمور المستعجلة، ويوقف الاعتراض تنفيذ الطلب ما لم يقرر القاضي خلاف ذلك خلال 15 يوماً.",
             "cites": [
-              "a7"
+              "s7f"
+            ]
+          },
+          {
+            "text": "بموجب المرسوم رقم 2087 تاريخ 15 كانون الأول 2025، على المصرف الجواب على الطلب الخطي لرئيس الإدارة الضريبية خلال 15 يوماً، وإلا فرضت عليه غرامات قانون الإجراءات الضريبية.",
+            "cites": [
+              "d2087a3"
             ]
           }
         ]
       },
       {
-        "heading": "كم يدوم الاستثناء من السرية المصرفية؟",
+        "heading": "هل يمكن تجميد الحساب المصرفي أو الحجز عليه؟",
         "paras": [
           {
-            "text": "بحسب المادة 2، يبقى الاستثناء سارياً بعد الاستقالة أو انتهاء الخدمة أو التقاعد. ويغطي كامل مدة تولي المهام و5 سنوات إضافية بعدها. ويسري كذلك على كل من تولى إحدى المسؤوليات المذكورة منذ 23 أيلول 1988 حتى اليوم، بمن فيهم المتقاعدون.",
+            "text": "بطرق محددة فقط: بموجب المادة 4 كما عدّلت عام 2022، لا يجوز الحجز على الودائع إلا بإذن خطي من أصحابها، أو بقرار تجميد من هيئة التحقيق الخاصة، أو بقرار حجز من القضاء المختص بحسب المادة 7.",
             "cites": [
-              "a8"
+              "s4"
             ]
           },
           {
-            "text": "لا تبيّن هذه الصفحة من يحق له الاطلاع على هذه الحسابات خارج الجهات التي يحق لها طلب المعلومات المصرفية.",
+            "text": "يحق للهيئة التجميد الاحترازي المؤقت للحسابات المشتبه بها حتى سنة تضاف إليها 6 أشهر للطلبات الواردة من الخارج، وحتى 6 أشهر تضاف إليها 3 للإبلاغات الداخلية. وبعد التدقيق يحق لها التجميد النهائي أو رفع السرية لصالح القضاء المختص ورئيس الهيئة المصرفية العليا.",
+            "cites": [
+              "aml6t",
+              "aml6f"
+            ]
+          },
+          {
+            "text": "وتنص المادة 16 من القانون رقم 44/2015 على عدم الاعتداد بأي حكم في قانون 1956 يخالف قانون مكافحة تبييض الأموال.",
+            "cites": [
+              "aml16"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما لا تتناوله هذه الصفحة",
+        "paras": [
+          {
+            "text": "لا نملك نص القانون رقم 1 تاريخ 24 نيسان 2025. وقد عدّل الفقرتين (هـ) و(و) من المادة 7، لذا فإن صيغتهما هنا هي صيغة 2022 وقد لا تكون الأحدث.",
             "note": true
-          }
-        ]
-      },
-      {
-        "heading": "ما الجهات التي يحق لها طلب المعلومات المصرفية؟",
-        "paras": [
-          {
-            "text": "مع مراعاة المادة 2، تمنع المادة 7 المصارف من التذرع بالسرية تجاه الجهات التي تعددها. وعلى المصرف أن يقدم جميع المعلومات المطلوبة فور تلقيه الطلب. وأولى هذه الجهات القضاء المختص في دعاوى جرائم الفساد والجرائم الواقعة على الأموال وفق قانون العقوبات.",
-            "cites": [
-              "a9"
-            ]
           },
           {
-            "text": "وتعدد المادة 7 أيضاً هيئة التحقيق الخاصة، والهيئة الوطنية لمكافحة الفساد بموجب القانون رقم 175 تاريخ 8 أيار 2020. وتعدد الإدارة الضريبية لمكافحة التهرب الضريبي ولأغراض الالتزام والتدقيق. وتعدد مصرف لبنان ولجنة الرقابة على المصارف والمؤسسة الوطنية لضمان الودائع.",
-            "cites": [
-              "a10",
-              "a11"
-            ]
-          },
-          {
-            "text": "لا تعدد هذه الصفحة جميع الدعاوى المشمولة، ولا تتناول الطلبات العامة والاعتراض عليها والمراسيم التطبيقية. والنصوص المتوفرة لدينا لا تتضمن أي مرسوم تطبيقي.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "هل يمكن تجميد الودائع أو الحجز عليها؟",
-        "paras": [
-          {
-            "text": "بحسب المادة 4، لا يجوز إلقاء الحجز على الأموال والموجودات المودعة لدى المصارف المشمولة بالمادة 1 إلا بإذن خطي من أصحابها. وتجمّد هيئة التحقيق الخاصة الأموال بقرار وفق قانون مكافحة تبييض الأموال وتمويل الإرهاب. ويُلقي القضاء المختص الحجز بقرار وفق المادة 7.",
-            "cites": [
-              "a13"
-            ]
-          },
-          {
-            "text": "بموجب البند 3 من المادة 6 من القانون رقم 44/2015، يعود لهيئة التحقيق الخاصة وحدها، بعد التدقيق والتحليل، تقرير التجميد النهائي للحسابات أو رفع السرية المصرفية. ويقتصر ذلك على الحسابات أو العمليات المشتبه بتعلقها بتبييض الأموال أو تمويل الإرهاب. وتُرفع السرية لصالح المراجع القضائية المختصة ورئيس الهيئة المصرفية العليا.",
-            "cites": [
-              "a12"
-            ]
-          },
-          {
-            "text": "لا تتناول هذه الصفحة العقوبات، ولا مهل التجميد المؤقت، ولا تحرير الأموال المجمدة. ولا نملك أي قرار للمجلس الدستوري بشأن هذه المواد.",
+            "text": "غرامات المادة 8 مضاعفات للحد الأدنى للأجور، ولا تذكر هذه الصفحة قيمته. ولدينا قرار للمجلس الدستوري بشأن طعن جزئي في القانون رقم 306 من دون نصه، لذا لا تذكر هذه الصفحة مضمونه.",
             "note": true
           }
         ]

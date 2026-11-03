@@ -2,222 +2,327 @@
   "slug": "capital-control",
   "order": 10,
   "published": "2026-10-20",
-  "updated": "2026-10-21",
+  "updated": "2026-11-03",
   "articles": [
     {
-      "id": "a1",
+      "id": "names",
+      "law": 333284,
+      "article": "2",
+      "quote": "يتم استعمال الفرق الناتج عن التخفيض الـمنصوص عليه في البند (1) اعلاه من قبل مصرف لبنان، حصرا، لتأمين السيولة الـمتوجبة عملا بأحكام القرار الاساسي رقم 13335 تاريخ 8/6/2021 (التعميم الاساسي رقم 158) والقرار الاساسي رقم 13611 تاريخ 2/2/2024 (التعميم الاساسي رقم 166)"
+    },
+    {
+      "id": "b158s",
+      "law": 288318,
+      "article": "1",
+      "quote": "على كل مصرف عامل في لبنان ان يقوم بما يلزم لتأمين تسديد تدريجي للودائع بالعملات الاجنبية الـمكونة في الحسابات الـمفتوحة قبل 31/10/2019 وفقا للشروط والآلية الـمحددة أدناه."
+    },
+    {
+      "id": "b158a",
+      "law": 333070,
+      "article": "1",
+      "quote": "1 ــ /500/ د.أ.، شهريا تدفع نقدا (Banknotes) «لصاحب الحساب» و/أو عن طريق تحويل الى الخارج و/أو بواسطة البطاقات الـمصرفية التي يمكن استعمالها في لبنان والخارج و/أو ايداعها في حساب جديد Fresh Account) ) وذلك دون ان يتم ترتيب أي عمولة أو نفقة مباشرة أو غير مباشرة من أي نوع كانت على هذه العملية وعلى ان لا يتجاوز مجموع ما يمكن سحبه، سنويا عملا بالبند (1) هذا، بالدولار الاميركي من الـمصارف كافة مبلغ /000 6/د.أ.\n\n2 ــ يعدل سقف السحب السنوي من الـمصارف كافة خلال الدورة الحالية التي تنتهي بتاريخ 30/6/2025 ليصبح كما يلي:\n\nــ /200 7/د.أ. في ما خص الـمستفيدين من احكام هذا القرار قبل 1/7/2023\n\nــ /900 5/د.أ. في ما خص العملاء الذين لـم يستفيدوا من أحكام هذا القرار قبل تاريخ 1/7/2023"
+    },
+    {
+      "id": "b158e",
+      "law": 333070,
+      "article": "4",
+      "quote": "يعمل بهـذا القرار اعـتـبـاراً مــن 1/3/2025"
+    },
+    {
+      "id": "b166s",
+      "law": 329877,
+      "article": "1",
+      "quote": "دون الـمس بحق الـمودعين باستعادة ودائعهم، على كل مصرف عامل في لبنان ان يقوم استثنائيا بما يلزم لتأمين تسديد تدريجي للودائع بالعملات الاجنبية من غير «الاموال النقدية» والـمكونة قبل تاريخ 30/6/2023 والتي لا يستفد منها اصحابها من احكام القرار الأساسي رقم 13335 تاريخ 8/6/2021 (تعميم اساسي رقم 158) وذلك وفقا للشروط والآلية الـمحددة ادناه."
+    },
+    {
+      "id": "b166a",
+      "law": 333067,
+      "article": "2",
+      "quote": "1 ــ مبلغ /250/ د.أ. يدفع نقدا Banknotes))، شهريا، لـ «صاحب الحساب» و/أو عن طريق تحويل الى الخارج أو ايداعه في حساب جديد )\n\nFresh Account) وذلك بدون ان يتم ترتيب اي عمولة أو نفقة مباشرة أو غير مباشرة من أي نوع كانت على هذه العملية وعلى ان لا يتجاوز مجمـوع مـا يمكن سحبه عـمـلا بهـذه الـمـادة، مـن الـمصارف كافة، سنويا، مبلغ /000 3/د.أ. من الـمصارف كافة.\n\nيعدل سقف السحب السنوي من الـمصارف كافة خلال الدورة الحالية التي تنتهي بتاريخ 30/6/2025 ليصبح /950 2/د.أ."
+    },
+    {
+      "id": "b166e",
+      "law": 333067,
+      "article": "5",
+      "quote": "يعمل بهـذا القرار اعتباراً مـن 1/3/2025"
+    },
+    {
+      "id": "c76",
       "law": 244905,
       "article": "76",
-      "quote": "صلاحية اتخاذ جميع التدابير التي يراها ملائمة وخاصة التدابير التالية التي يمكنه اتخاذها منفردة او مجتمعة"
+      "quote": "- يخول المصرف المركزي ابقاء على الانسجام بين السيولة المصرفية وحجم التسليف وبين مهمته العامة المنصوص عليها\n\nبالمادة 70, صلاحية اتخاذ جميع التدابير التي يراها ملائمة وخاصة التدابير التالية التي يمكنه اتخاذها منفردة او مجتمعة او\n\nمع التدابير المنصوص عليها في الباب الثالث من هذا القانون:\n\nآ - تحديد وتعديل معدلات الحسم وحدوده القصوى وكذلك معدلات الاعتمادات الاخرى المجاز له منحها للمصارف وللمؤسسات المالية وحدودها القصوى."
     },
     {
-      "id": "a2",
+      "id": "c76r",
+      "law": 244905,
+      "article": "76",
+      "quote": "ولا يمكن المصرف المركزي ان يحدد نسبة الاحتياط الادنى باكثر ن 25 بالمئة من الالتزامات تحت الطلب باكثر من 15 بالمئة من الالتزامات لاجل معين.\n\nوللمصرف المركزي ان يفرض نسبا مختلفة على فئات مختلفة من التزامات المصارف ضمن الحدود المذكورة في الفقرة السابقة.\n\nوله كذلك في الحالات الاستثنائية ان يفرض نسبا حدية خاصة ون التقيد بالحدود الآنفة الذكر على ما يزيد من هذه الالتزامات\n\nاو من اي فئات منها عن حد معين او على الزيادة المحققة في هذه الالتزامات او في اي فئات منها بعد تاريخ معين."
+    },
+    {
+      "id": "d48a",
       "law": 195608,
       "article": "4",
-      "quote": "مع الاحتفاظ باحكام المادة التالية: 1- يحق للوسطاء والافراد ان يتصرفوا بحرية تامة بما يملكون بتاريخ نشر هذا المرسوم اما بما سيحصلون عليه بعد ذلك التاريخ من العملات الاجنبية في الخارج."
+      "quote": "1- يحق للوسطاء والافراد ان يتصرفوا بحرية تامة بما يملكون بتاريخ نشر هذا المرسوم اما بما سيحصلون عليه بعد ذلك التاريخ من العملات الاجنبية في الخارج. 2- يحق للوسطاء والافراد الذين يملكون عملات اجنبية في الاراضي اللبنانية بتاريخ نشر هذا المرسوم او الذين سيشترون فيها عملات اجنبية بعد ذلك التاريخ. اما ان يحتفظوا لديهم بهذه العملات او ان يودعوها لدى وسطاء مقبولين او مأذونين داخل الاراضي اللبنانية. واما ان يصدروها الى خارج الاراضي اللبنانية واما ان يبيعوها من المراقبة العامة للقطع ضمن الشروط المحددة في الانظمة النافذة. واما ان يبيعوها من وسطاء مقبولين او مأذونين او عاديين. ويحق لهؤلاء ان يشتروها لحسابهم الخاص بالشروط التي يستنسبونها."
     },
     {
-      "id": "a3",
-      "law": 195608,
-      "article": "4",
-      "quote": "يحق للوسطاء والافراد الذين يملكون عملات اجنبية في الاراضي اللبنانية بتاريخ نشر هذا المرسوم او الذين سيشترون فيها عملات اجنبية بعد ذلك التاريخ. اما ان يحتفظوا لديهم بهذه العملات او ان يودعوها لدى وسطاء مقبولين او مأذونين داخل الاراضي اللبنانية. واما ان يصدروها الى خارج الاراضي اللبنانية"
-    },
-    {
-      "id": "a4",
+      "id": "d48f",
       "law": 195608,
       "article": "4",
       "quote": "ولا يحق لاحد الافراد في اي حال من الاحوال ان يشتري او ان يبيع عملات اجنبية من فرد آخر."
     },
     {
-      "id": "a5",
+      "id": "d48c",
       "law": 195608,
       "article": "5",
-      "quote": "يجب التخلي بصورة اجبارية الى المراقبة العامة للقطع بالشروط المحددة في الانظمة المرعية الاجراء عن 10 بالمئة من جميع العملات الاجنبية المستوردة الى الاراضي اللبنانية."
+      "quote": "1) يجب التخلي بصورة اجبارية الى المراقبة العامة للقطع بالشروط المحددة في الانظمة المرعية الاجراء عن 10 بالمئة من جميع العملات الاجنبية المستوردة الى الاراضي اللبنانية. ان وسائل الدفع التي يجري تسديدها بتاريخ لاحق لنشر هذا المرسوم تعتبر انها استوردت الى الاراضي اللبنانية بتاريخ هذا التسديد. 2) على كل مصدر بضائع ان يستورد لقاءها ما يوازي قيمتها من عملات او بضائع اجنبية توافق على نوعها وزارة الاقتصاد الوطني. وعلى المصدر في حالة استيراده من عملات ان يتخلى لمراقبة القطع العامة عن عشرة بالمئة منها تطبيقا لاحكام الفقرة الاولى من هذه المادة. 3) شذوذا عن احكام الفقرة الاولى من هذه المادة يتوجب على الشركات التجارية التي تربطها بالدولة عقود سابقة او لاحقة ان تتخلى الى المراقبة العامة للقطع بالشروط المحددة في الانظمة المرعية الاجراء عن 80 (ثمانين) بالمئة من العملات الاجنبية التي تستوردها الى لبنان."
     },
     {
-      "id": "a6",
-      "law": 195608,
-      "article": "5",
-      "quote": "على كل مصدر بضائع ان يستورد لقاءها ما يوازي قيمتها من عملات او بضائع اجنبية توافق على نوعها وزارة الاقتصاد الوطني. وعلى المصدر في حالة استيراده من عملات ان يتخلى لمراقبة القطع العامة عن عشرة بالمئة منها تطبيقا لاحكام الفقرة الاولى من هذه المادة."
-    },
-    {
-      "id": "a7",
-      "law": 195608,
-      "article": "5",
-      "quote": "يتوجب على الشركات التجارية التي تربطها بالدولة عقود سابقة او لاحقة ان تتخلى الى المراقبة العامة للقطع بالشروط المحددة في الانظمة المرعية الاجراء عن 80 (ثمانين) بالمئة من العملات الاجنبية التي تستوردها الى لبنان."
-    },
-    {
-      "id": "a8",
-      "law": 195608,
-      "article": "2",
-      "quote": "وتبقى مرعية الاجراء الاحكام التشريعية والتنظيمية المتعلقة بمعاملات مشترى وبيع العملات الاجنبية التي تجريها المراقبة العامة للقطع."
-    },
-    {
-      "id": "a9",
+      "id": "d48d",
       "law": 195608,
       "article": "7",
       "quote": "تجري عمليات شراء وبيع العملات الاجنبية التي لا تسعرها المراقبة العامة للقطع بحرية تامة ما بين الجميع ولا تخضع لاية مراقبة كانت ."
     },
     {
-      "id": "a10",
+      "id": "d48e",
       "law": 195608,
       "article": "9",
       "quote": "ان عمليات شراء وبيع النقود (اوراق النقد والقطع المعدنية) باية عملة كانت تجري بحرية تامة بين الجميع ولا تخضع لاية مراقبة كانت ."
     },
     {
-      "id": "a11",
+      "id": "d48g",
       "law": 195608,
       "article": "10",
       "quote": "ان المخالفات لاحكام هذا المرسوم تعرض مرتكبيها للعقوبات المنصوص عليها في الملحق رقم 6 من النظام المربوط بالمرسوم رقم 2025 تاريخ 11/10/44."
     },
     {
-      "id": "a12",
+      "id": "d44",
+      "law": 244592,
+      "article": "1 اصدار",
+      "quote": "صدق ووضع بالتنفيذ اعتبارا من تاريخ نشره في الجريدة الرسمية النظام المرفق بهذا المرسوم واستيراد الرساميل وبمعاملات القطع"
+    },
+    {
+      "id": "l23s37",
       "law": 2000197086,
       "article": "37",
       "quote": "ينشر هذا القانون في الجريدة الرسمية ويعلّق تنفيذه الى حين إقرار ونشر قانون الانتظام المالي واسترداد الودائع."
     },
     {
-      "id": "a13",
+      "id": "l71s29",
       "law": 2000200594,
       "article": "29",
       "quote": "ينشر هذا القانون في الجريدة الرسمية ويعلق تنفيذه إلى حين إقرار ونشر قانون الانتظام المالي واسترداد الودائع."
     },
     {
-      "id": "a14",
-      "law": 2000197086,
-      "article": "16",
-      "quote": "فرض استرجاع أية أموال تمّ تحويلها إلى أطراف أخرى بشكل تمييزي أو غير عادل، مما أضرّ بحقوق مودعين أو دائنين آخرين لم يتمكنوا من إجراء تحويلات مماثلة بعد ١٧ تشرين الأول ٢٠١٩"
+      "id": "l71a11",
+      "law": 2000200594,
+      "article": "11",
+      "quote": "يعود للهيئة المصرفية العليا أن تقرر تطبيق أي من أدوات إصلاح وضع المصرف التالية على حدة أو مع غيرها من الأدوات على سبيل المثال وليس الحصر:\n\n* الإنقاذ الداخلي Bail-in. من خلال تخفيض قيمة الأموال الخاصة والمطلوبات و/أو تحويل المطلوبات إلى أدوات رأسمالية، تكمن آلية تخفيض القيمة بإجراء تخفيض جزئي أو كلي لقيمة عناصر الأموال الخاصة والمطلوبات (بما في ذلك الفائدة حيث ينطبق) وفقاً لتراتبية المطلوبات والأموال المحددة في الملحق رقم «١»\n\n* إعادة تكوين رأسمال المصرف من خلال إصدار أسهم جديدة لمستثمرين جدد مع إمكانية وليس إلزامية قبول مشاركة مساهمي الأقلية الذين ليسوا من كبار المساهمين ولا يملكون حقوق السيطرة على إدارة المصرف في مرحلة ما قبل وضع المصرف قيد الإصلاح. يمكن بصورة إستثنائية اشراك جميع المساهمين في إعادة الرسملة فقط في حالة إقرار وتطبيق قانون الانتظام المالي واستعادة الودائع.\n\n* تحويل بعض أو كامل موجودات المصرف وحقوقه ومطلوباته إلى مؤسسة أخرى.\n\n* إجراء دمج مع مصرف آخر."
+    },
+    {
+      "id": "l71a23",
+      "law": 2000200594,
+      "article": "23",
+      "quote": "في حال تصفية مصرف، تغطى الودائع وفقاً للمعايير والأحكام التي يحددها هذا القانون وقانون إعادة الانتظام المالي واسترداد الودائع، ونظام المؤسسة الوطنية لضمان الودائع مع تعديلاته."
     }
   ],
   "en": {
-    "title": "Capital controls and bank withdrawal limits in Lebanon",
-    "question": "Is there a Lebanese law that restricts bank withdrawals and transfers abroad, and what does the law say about the free movement of capital?",
-    "description": "What Lebanese law says on bank withdrawal limits, sending foreign currency abroad, Banque du Liban's powers and the suspended 2025 bank law.",
+    "title": "Is there a capital control law in Lebanon?",
+    "question": "Is there a capital control law in Lebanon, and where do the limits on bank withdrawals and transfers abroad come from?",
+    "description": "No. Lebanon has no capital control law: Banque du Liban Circulars 158 and 166 cap withdrawals at $500 and $250 a month from 1 March 2025.",
     "answer": {
-      "text": "No law we hold sets limits on bank withdrawals or on transfers abroad, and Law 23 of 2025 on bank resolution is suspended. The Code of Money and Credit lets Banque du Liban take measures it sees fit on liquidity and credit, and names no withdrawal limit. Decree 13532 of 1948 lets holders keep, deposit or export foreign currency, subject to its surrender rules for currency brought into Lebanon.",
+      "text": "No: Lebanon has no capital control law, and the limits on taking dollars out of bank accounts come from Banque du Liban decisions, chiefly Basic Decision 13335 (Circular 158) and Basic Decision 13611 (Circular 166). From 1 March 2025, Circular 158 lets a depositor withdraw $500 a month and Circular 166 $250 a month, in cash, by transfer abroad or into a fresh account. Law 23 of 2025 on reforming banks sets rules for failing banks and their deposits, but its execution is suspended until a financial regularity and deposit recovery law is passed.",
       "cites": [
-        "a12",
-        "a1",
-        "a2",
-        "a3"
+        "names",
+        "b158a",
+        "b158e",
+        "b166a",
+        "b166e",
+        "l23s37"
       ]
     },
     "sections": [
       {
-        "heading": "Does any law set limits on bank withdrawals?",
+        "heading": "Capital control in Lebanon in figures",
         "paras": [
           {
-            "text": "No law we hold sets a limit on withdrawals from bank accounts. Article 76 of the Code of Money and Credit lets Banque du Liban take all measures it sees fit on bank liquidity and credit. It names some measures \"in particular\", as examples. None of them mentions withdrawals.",
+            "text": "The withdrawal caps come from Banque du Liban decisions; the central bank's reserve powers and the old exchange rules come from laws and decrees.",
             "cites": [
-              "a1"
+              "b158a",
+              "c76r",
+              "d48c"
             ]
-          },
-          {
-            "text": "This page does not cover Banque du Liban circulars or decisions taken by banks. We do not hold them, so the page cannot say what they provide.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "Can you send foreign currency abroad under the 1948 decree?",
-        "paras": [
-          {
-            "text": "Decree 13532 of 5/11/1948 lets intermediaries and individuals deal freely with foreign currency they hold abroad. Currency held or bought in Lebanon may be kept, deposited with accepted or authorised intermediaries in Lebanon, or exported. Article 4 makes all of this subject to Article 5 of the decree.",
-            "cites": [
-              "a2",
-              "a3"
-            ]
-          },
-          {
-            "text": "No individual may buy foreign currency from another individual, or sell it to one, in any case. An exporter of goods must bring in their value, in foreign currency or in foreign goods the Ministry of National Economy approves.",
-            "cites": [
-              "a4",
-              "a6"
-            ]
-          },
-          {
-            "text": "A later amending decree is recorded against Article 5. We have not confirmed its effect, so this section shows the 1948 wording.",
-            "note": true
           }
         ],
         "table": {
-          "caption": "Share of imported foreign currency to surrender to the General Exchange Control under Article 5 of the 1948 decree",
+          "caption": "Key figures on withdrawals, reserves and foreign currency",
           "head": [
-            "Who brings currency in",
-            "Share to surrender"
+            "Rule",
+            "Figure"
           ],
           "rows": [
             {
               "cells": [
-                "Anyone importing foreign currency into Lebanon",
-                "10%"
+                "Circular 158: foreign-currency deposits in accounts opened before 31 October 2019",
+                "$500 a month, at most $6 000 a year from all banks, from 1 March 2025"
               ],
               "cites": [
-                "a5"
+                "b158s",
+                "b158a",
+                "b158e",
+                "names"
               ]
             },
             {
               "cells": [
-                "An exporter, on currency brought in for exported goods",
-                "10%"
+                "Circular 166: foreign-currency deposits formed before 30 June 2023 and outside Circular 158",
+                "$250 a month, at most $3 000 a year from all banks, from 1 March 2025"
               ],
               "cites": [
-                "a6"
+                "b166s",
+                "b166a",
+                "b166e",
+                "names"
               ]
             },
             {
               "cells": [
-                "A commercial company with a contract with the State",
-                "80%"
+                "Central bank reserve requirement ceiling",
+                "25% of sight liabilities and 15% of term liabilities, with special marginal rates allowed in exceptional cases"
               ],
               "cites": [
-                "a7"
+                "c76r"
+              ]
+            },
+            {
+              "cells": [
+                "1948 decree: foreign currency brought into Lebanon",
+                "10% surrendered to the General Exchange Control; 80% for companies with State contracts"
+              ],
+              "cites": [
+                "d48c"
+              ]
+            },
+            {
+              "cells": [
+                "Law 23 of 2025 on reforming banks",
+                "Suspended until the financial regularity and deposit recovery law is passed and published"
+              ],
+              "cites": [
+                "l23s37"
               ]
             }
           ]
         }
       },
       {
-        "heading": "Is dealing in foreign currency free of control?",
+        "heading": "Does Lebanon have a capital control law?",
         "paras": [
           {
-            "text": "Article 7 of the 1948 decree frees dealings in foreign currencies that the General Exchange Control does not price. Article 9 frees dealings in banknotes and coins in any currency. Both articles say these dealings are subject to no control.",
+            "text": "No. The central bank's general power is in Article 76 of the Code of Money and Credit: to keep bank liquidity in line with credit, it may take all measures it sees fit, such as setting discount and lending rates. None of the measures the article lists is a limit on withdrawals or transfers.",
             "cites": [
-              "a9",
-              "a10"
+              "c76"
             ]
           },
           {
-            "text": "Article 2 of the same decree limits that freedom. It keeps in force the laws and regulations on currency deals carried out by the General Exchange Control. Article 10 applies to breaches the penalties in annex 6 of the regulation attached to Decree 2025 of 11/10/44.",
+            "text": "The limits banks apply come from Banque du Liban decisions issued as exceptional measures. Basic Decision 13335 of 8 June 2021 (Circular 158) orders every bank to repay foreign-currency deposits gradually, and Basic Decision 13611 of 2 February 2024 (Circular 166) does the same for later deposits, without prejudice to depositors' right to recover their deposits.",
             "cites": [
-              "a8",
-              "a11"
+              "b158s",
+              "b166s",
+              "names"
             ]
-          },
-          {
-            "text": "We do not hold Decree 2025 of 11/10/44 or any text repealing it. This page cannot say which exchange rules apply today.",
-            "note": true
           }
         ]
       },
       {
-        "heading": "Is the 2025 bank law in force, and what would it change?",
+        "heading": "What are the withdrawal limits under Circulars 158 and 166?",
         "paras": [
           {
-            "text": "Law 23 of 14/8/2025 on bank resolution is suspended. Its Article 37 suspends it until the financial regularity and deposit recovery law is passed and published. Law 71 of 10/9/2026 amended Law 23, and its Article 29 suspends Law 71 on the same terms.",
+            "text": "From 1 March 2025, Circular 158 pays $500 a month from a special sub-account, in cash, by transfer abroad, by bank card or into a fresh account, with no commission and no more than $6 000 a year from all banks. It covers foreign-currency deposits in accounts opened before 31 October 2019.",
             "cites": [
-              "a12",
-              "a13"
+              "b158a",
+              "b158e",
+              "b158s",
+              "names"
             ]
           },
           {
-            "text": "If Law 23 comes into force, its Article 16 lets the Higher Banking Commission order the return of some funds. These are funds transferred to others in a discriminatory or unfair way. They must have harmed depositors or other creditors who could not make similar transfers after 17 October 2019.",
+            "text": "Circular 166 covers foreign-currency deposits formed before 30 June 2023 whose owners do not benefit from Circular 158. From 1 March 2025 it pays $250 a month, in cash, by transfer abroad or into a fresh account, up to $3 000 a year from all banks.",
             "cites": [
-              "a14"
+              "b166s",
+              "b166a",
+              "b166e",
+              "names"
             ]
           },
           {
-            "text": "We do not hold the financial regularity and deposit recovery law, and the texts we hold do not show that it has been passed. This page does not set out the other rules of Law 23, such as bail-in and liquidation.",
+            "text": "For the yearly cycle that ended on 30 June 2025, the cap was $7 200 for Circular 158 holders who joined before 1 July 2023, $5 900 for those who joined later, and $2 950 under Circular 166.",
+            "cites": [
+              "b158a",
+              "b166a",
+              "names"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What do the old exchange-control decrees say about foreign currency?",
+        "paras": [
+          {
+            "text": "Decree 13532 of 5 November 1948 lets individuals and intermediaries deal freely with foreign currency they hold abroad, and keep, deposit, export or sell foreign currency they hold in Lebanon. Dealing in currencies the General Exchange Control does not price, and in banknotes and coins of any currency, is free of any control.",
+            "cites": [
+              "d48a",
+              "d48d",
+              "d48e"
+            ]
+          },
+          {
+            "text": "The same decree makes anyone bringing foreign currency into Lebanon surrender 10% of it, and commercial companies with State contracts 80%. Individuals may not buy or sell foreign currency between themselves.",
+            "cites": [
+              "d48c",
+              "d48f"
+            ]
+          },
+          {
+            "text": "Breaches carry the penalties of the regulation attached to Decree 2025 of 11 October 1944, which put an exchange-control regulation into force.",
+            "cites": [
+              "d48g",
+              "d44"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What does the 2025 bank law say about deposits, and is it in force?",
+        "paras": [
+          {
+            "text": "It is not in force: Law 23 of 14 August 2025 on reforming and reorganising banks was published with its execution suspended until the financial regularity and deposit recovery law is passed and published. Law 71 of 10 September 2026, which amended it, is suspended on the same terms.",
+            "cites": [
+              "l23s37",
+              "l71s29"
+            ]
+          },
+          {
+            "text": "As amended by Law 71, the Higher Banking Commission decides which tools apply to a failing bank: bail-in, recapitalisation with new shares, transfer of assets and liabilities, or merger. If a bank is liquidated, deposits are covered under the criteria of this law, the financial regularity law and the rules of the National Deposit Guarantee Institution.",
+            "cites": [
+              "l71a11",
+              "l71a23"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What this page does not cover",
+        "paras": [
+          {
+            "text": "We found no capital control law among the laws in our records, which run to Law 71 of 10 September 2026, and the financial regularity and deposit recovery law is not among them either.",
+            "note": true
+          },
+          {
+            "text": "The circular figures come from Intermediate Decisions 13701 and 13702 of 20 February 2025, the latest changes to Circulars 158 and 166 we hold. The cycle they set ended on 30 June 2025, so later amounts may differ. Other Banque du Liban decisions on cash withdrawals are not covered.",
+            "note": true
+          },
+          {
+            "text": "The 1948 and 1944 decrees are both listed as in force with no repeal recorded, so this page does not say which exchange rules apply today.",
             "note": true
           }
         ]
@@ -225,134 +330,203 @@
     ]
   },
   "ar": {
-    "title": "القيود على تحويل الأموال وعلى السحوبات المصرفية في لبنان",
-    "question": "هل يوجد قانون لبناني يقيّد السحوبات المصرفية والتحويلات إلى الخارج، وماذا يقول القانون عن حرية تحويل الأموال؟",
-    "description": "ما يقوله القانون اللبناني عن سقوف السحب وتصدير العملات الأجنبية وصلاحيات مصرف لبنان وقانون المصارف المعلّق لعام 2025.",
+    "title": "هل يوجد قانون كابيتال كونترول في لبنان؟",
+    "question": "هل يوجد في لبنان قانون كابيتال كونترول، ومن أين تأتي القيود على السحوبات المصرفية والتحويلات إلى الخارج؟",
+    "description": "لا يوجد في لبنان قانون كابيتال كونترول: سقوف السحب يحددها مصرف لبنان في التعميمين 158 و166، أي 500 و250 دولاراً شهرياً منذ 1 آذار 2025.",
     "answer": {
-      "text": "لا يحدد أي قانون من القوانين المتوفرة لدينا سقفاً للسحب من المصارف أو للتحويل إلى الخارج، والقانون رقم 23 لعام 2025 المتعلق بإصلاح وضع المصارف معلّق التنفيذ. ويجيز قانون النقد والتسليف لمصرف لبنان اتخاذ التدابير التي يراها ملائمة في شأن السيولة والتسليف، ولا يذكر سقفاً للسحب. ويجيز المرسوم رقم 13532 لعام 1948 لحائزي العملات الأجنبية الاحتفاظ بها أو إيداعها أو تصديرها، مع مراعاة قواعد التخلي عن نسبة من العملات المستوردة إلى لبنان.",
+      "text": "لا: ليس في لبنان قانون كابيتال كونترول، والقيود على سحب الدولارات من الحسابات المصرفية مصدرها قرارات مصرف لبنان، وأبرزها القرار الأساسي رقم 13335 (التعميم 158) والقرار الأساسي رقم 13611 (التعميم 166). فمنذ 1 آذار 2025، يتيح التعميم 158 للمودع سحب 500 دولار شهرياً والتعميم 166 سحب 250 دولاراً شهرياً، نقداً أو بتحويل إلى الخارج أو بإيداعها في حساب جديد. أما القانون رقم 23 لعام 2025 المتعلق بإصلاح وضع المصارف فيضع قواعد للمصارف المتعثرة وودائعها، لكن تنفيذه معلّق إلى حين إقرار قانون الانتظام المالي واسترداد الودائع.",
       "cites": [
-        "a12",
-        "a1",
-        "a2",
-        "a3"
+        "names",
+        "b158a",
+        "b158e",
+        "b166a",
+        "b166e",
+        "l23s37"
       ]
     },
     "sections": [
       {
-        "heading": "هل يحدد أي قانون سقفاً للسحب من المصارف؟",
+        "heading": "الكابيتال كونترول في لبنان بالأرقام",
         "paras": [
           {
-            "text": "لا يحدد أي قانون من القوانين المتوفرة لدينا سقفاً للسحب من الحسابات المصرفية. وتجيز المادة 76 من قانون النقد والتسليف لمصرف لبنان أن يتخذ جميع التدابير التي يراها ملائمة في شأن السيولة المصرفية والتسليف. وتعدّد المادة بعض هذه التدابير «خاصة»، أي على سبيل المثال. ولا يذكر أي منها السحوبات.",
+            "text": "سقوف السحب مصدرها قرارات مصرف لبنان، أما صلاحيات المصرف المركزي في الاحتياطي وقواعد القطع القديمة فمصدرها قوانين ومراسيم.",
             "cites": [
-              "a1"
+              "b158a",
+              "c76r",
+              "d48c"
             ]
-          },
-          {
-            "text": "لا تتناول هذه الصفحة تعاميم مصرف لبنان ولا القرارات التي تتخذها المصارف. فهذه النصوص غير متوفرة لدينا، ولا تستطيع الصفحة أن تبيّن ما تنص عليه.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "هل يجيز مرسوم 1948 تصدير العملات الأجنبية إلى الخارج؟",
-        "paras": [
-          {
-            "text": "يجيز المرسوم رقم 13532 تاريخ 5/11/1948 للوسطاء والأفراد التصرف بحرية تامة بما يملكونه من عملات أجنبية في الخارج. أما العملات التي يملكونها أو يشترونها في لبنان، فيحق لهم الاحتفاظ بها، أو إيداعها لدى وسطاء مقبولين أو مأذونين في لبنان، أو تصديرها. وتجعل المادة 4 ذلك كله خاضعاً لأحكام المادة 5 من المرسوم.",
-            "cites": [
-              "a2",
-              "a3"
-            ]
-          },
-          {
-            "text": "لا يحق لأي فرد، في أي حال، أن يشتري عملات أجنبية من فرد آخر أو أن يبيعه إياها. وعلى مصدّر البضائع أن يستورد ما يوازي قيمتها من عملات أجنبية أو من بضائع أجنبية توافق عليها وزارة الاقتصاد الوطني.",
-            "cites": [
-              "a4",
-              "a6"
-            ]
-          },
-          {
-            "text": "سُجّل مرسوم تعديلي لاحق على المادة 5، ولم نتحقق من أثره، لذلك يعرض هذا القسم نص عام 1948.",
-            "note": true
           }
         ],
         "table": {
-          "caption": "نسبة العملات الأجنبية المستوردة الواجب التخلي عنها للمراقبة العامة للقطع بموجب المادة 5 من مرسوم 1948",
+          "caption": "أبرز الأرقام في السحوبات والاحتياطي والعملات الأجنبية",
           "head": [
-            "من يستورد العملات",
-            "النسبة الواجب التخلي عنها"
+            "القاعدة",
+            "الرقم"
           ],
           "rows": [
             {
               "cells": [
-                "كل من يستورد عملات أجنبية إلى لبنان",
-                "10%"
+                "التعميم 158: الودائع بالعملات الأجنبية في الحسابات المفتوحة قبل 31 تشرين الأول 2019",
+                "500 دولار شهرياً، وبحد أقصى 6 000 دولار سنوياً من المصارف كافة، منذ 1 آذار 2025"
               ],
               "cites": [
-                "a5"
+                "b158s",
+                "b158a",
+                "b158e",
+                "names"
               ]
             },
             {
               "cells": [
-                "مصدّر البضائع، عن العملات التي يستوردها لقاءها",
-                "10%"
+                "التعميم 166: الودائع بالعملات الأجنبية المكوّنة قبل 30 حزيران 2023 وغير المستفيدة من التعميم 158",
+                "250 دولاراً شهرياً، وبحد أقصى 3 000 دولار سنوياً من المصارف كافة، منذ 1 آذار 2025"
               ],
               "cites": [
-                "a6"
+                "b166s",
+                "b166a",
+                "b166e",
+                "names"
               ]
             },
             {
               "cells": [
-                "الشركة التجارية المرتبطة بعقد مع الدولة",
-                "80%"
+                "الحد الأقصى للاحتياطي الإلزامي لدى المصرف المركزي",
+                "25% من الالتزامات تحت الطلب و15% من الالتزامات لأجل، مع نسب حدية خاصة في الحالات الاستثنائية"
               ],
               "cites": [
-                "a7"
+                "c76r"
+              ]
+            },
+            {
+              "cells": [
+                "مرسوم 1948: العملات الأجنبية المستوردة إلى لبنان",
+                "التخلي عن 10% منها للمراقبة العامة للقطع، و80% للشركات المرتبطة بعقود مع الدولة"
+              ],
+              "cites": [
+                "d48c"
+              ]
+            },
+            {
+              "cells": [
+                "القانون رقم 23 لعام 2025 لإصلاح وضع المصارف",
+                "معلّق تنفيذه إلى حين إقرار ونشر قانون الانتظام المالي واسترداد الودائع"
+              ],
+              "cites": [
+                "l23s37"
               ]
             }
           ]
         }
       },
       {
-        "heading": "هل يجري التعامل بالعملات الأجنبية بلا رقابة؟",
+        "heading": "هل يوجد في لبنان قانون كابيتال كونترول؟",
         "paras": [
           {
-            "text": "تقضي المادة 7 من مرسوم 1948 بأن شراء العملات الأجنبية التي لا تسعّرها المراقبة العامة للقطع وبيعها يجريان بحرية تامة. وتقضي المادة 9 بالحكم نفسه في شراء الأوراق النقدية والقطع المعدنية وبيعها بأي عملة. وتنص المادتان على أن هذه العمليات لا تخضع لأي رقابة.",
+            "text": "لا. ترد الصلاحية العامة للمصرف المركزي في المادة 76 من قانون النقد والتسليف: فله، إبقاءً على الانسجام بين السيولة المصرفية وحجم التسليف، اتخاذ جميع التدابير التي يراها ملائمة، كتحديد معدلات الحسم والاعتمادات. وليس بين التدابير التي تعددها المادة أي قيد على السحوبات أو التحويلات.",
             "cites": [
-              "a9",
-              "a10"
+              "c76"
             ]
           },
           {
-            "text": "وتحدّ المادة 2 من المرسوم نفسه من هذه الحرية، إذ تُبقي نافذة الأحكام التشريعية والتنظيمية المتعلقة بعمليات شراء العملات الأجنبية وبيعها التي تجريها المراقبة العامة للقطع. وتُخضع المادة 10 المخالفين للعقوبات الواردة في الملحق رقم 6 من النظام المربوط بالمرسوم رقم 2025 تاريخ 11/10/44.",
+            "text": "القيود التي تطبقها المصارف مصدرها قرارات أصدرها مصرف لبنان بوصفها إجراءات استثنائية. فالقرار الأساسي رقم 13335 تاريخ 8 حزيران 2021 (التعميم 158) يلزم كل مصرف بالتسديد التدريجي للودائع بالعملات الأجنبية، والقرار الأساسي رقم 13611 تاريخ 2 شباط 2024 (التعميم 166) يفعل ذلك لودائع لاحقة، دون المس بحق المودعين باستعادة ودائعهم.",
             "cites": [
-              "a8",
-              "a11"
+              "b158s",
+              "b166s",
+              "names"
             ]
-          },
-          {
-            "text": "النصوص المتوفرة لدينا لا تتضمن المرسوم رقم 2025 تاريخ 11/10/44 ولا أي نص يلغيه. لذلك لا تستطيع هذه الصفحة أن تحدد قواعد القطع المطبّقة اليوم.",
-            "note": true
           }
         ]
       },
       {
-        "heading": "هل يسري قانون المصارف لعام 2025، وماذا يغيّر؟",
+        "heading": "ما سقوف السحب بموجب التعميمين 158 و166؟",
         "paras": [
           {
-            "text": "القانون رقم 23 تاريخ 14/8/2025 المتعلق بإصلاح وضع المصارف معلّق التنفيذ. فمادته 37 تعلّق تنفيذه إلى حين إقرار قانون الانتظام المالي واسترداد الودائع ونشره. وقد عدّل القانون رقم 71 تاريخ 10/9/2026 القانون رقم 23، وتعلّق مادته 29 تنفيذه بالشرط نفسه.",
+            "text": "منذ 1 آذار 2025، يدفع التعميم 158 من «الحساب الخاص المتفرع» 500 دولار شهرياً، نقداً أو بتحويل إلى الخارج أو بالبطاقة المصرفية أو بإيداعها في حساب جديد، من دون أي عمولة، وبما لا يتجاوز 6 000 دولار سنوياً من المصارف كافة. ويشمل الودائع بالعملات الأجنبية في الحسابات المفتوحة قبل 31 تشرين الأول 2019.",
             "cites": [
-              "a12",
-              "a13"
+              "b158a",
+              "b158e",
+              "b158s",
+              "names"
             ]
           },
           {
-            "text": "إذا دخل القانون رقم 23 حيز التنفيذ، تجيز مادته 16 للهيئة المصرفية العليا أن تفرض استرجاع بعض الأموال. وهي الأموال المحوّلة إلى أطراف أخرى بشكل تمييزي أو غير عادل. ويُشترط أن يكون التحويل قد أضرّ بمودعين أو دائنين آخرين لم يتمكنوا من إجراء تحويلات مماثلة بعد 17 تشرين الأول 2019.",
+            "text": "ويشمل التعميم 166 الودائع بالعملات الأجنبية المكوّنة قبل 30 حزيران 2023 التي لا يستفيد أصحابها من التعميم 158. ومنذ 1 آذار 2025 يدفع 250 دولاراً شهرياً، نقداً أو بتحويل إلى الخارج أو بإيداعها في حساب جديد، وبحد أقصى 3 000 دولار سنوياً من المصارف كافة.",
             "cites": [
-              "a14"
+              "b166s",
+              "b166a",
+              "b166e",
+              "names"
             ]
           },
           {
-            "text": "النصوص المتوفرة لدينا لا تتضمن قانون الانتظام المالي واسترداد الودائع، ولا تبيّن أنه أُقرّ. ولا تعرض هذه الصفحة سائر أحكام القانون رقم 23، كالإنقاذ الداخلي والتصفية.",
+            "text": "وفي الدورة السنوية التي انتهت في 30 حزيران 2025، بلغ السقف 7 200 دولار للمستفيدين من التعميم 158 قبل 1 تموز 2023، و5 900 دولار لمن استفاد بعد ذلك، و2 950 دولاراً بموجب التعميم 166.",
+            "cites": [
+              "b158a",
+              "b166a",
+              "names"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا تقول مراسيم القطع القديمة عن العملات الأجنبية؟",
+        "paras": [
+          {
+            "text": "يتيح المرسوم رقم 13532 تاريخ 5 تشرين الثاني 1948 للأفراد والوسطاء التصرف بحرية بالعملات الأجنبية التي يملكونها في الخارج، والاحتفاظ بما يملكونه منها في لبنان أو إيداعه أو تصديره أو بيعه. وتجري عمليات شراء وبيع العملات التي لا تسعّرها المراقبة العامة للقطع، وأوراق النقد والقطع المعدنية بأي عملة، بحرية تامة ودون أي مراقبة.",
+            "cites": [
+              "d48a",
+              "d48d",
+              "d48e"
+            ]
+          },
+          {
+            "text": "ويلزم المرسوم نفسه كل من يستورد عملات أجنبية إلى لبنان بالتخلي عن 10% منها، والشركات التجارية المرتبطة بعقود مع الدولة عن 80%. ولا يحق للأفراد شراء العملات الأجنبية أو بيعها في ما بينهم.",
+            "cites": [
+              "d48c",
+              "d48f"
+            ]
+          },
+          {
+            "text": "وتخضع المخالفات للعقوبات الواردة في النظام المربوط بالمرسوم رقم 2025 تاريخ 11 تشرين الأول 1944، الذي وضع نظاماً للقطع موضع التنفيذ.",
+            "cites": [
+              "d48g",
+              "d44"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يقول قانون المصارف لعام 2025 عن الودائع، وهل هو نافذ؟",
+        "paras": [
+          {
+            "text": "ليس نافذاً: نُشر القانون رقم 23 تاريخ 14 آب 2025 المتعلق بإصلاح وضع المصارف وإعادة تنظيمها مع تعليق تنفيذه إلى حين إقرار ونشر قانون الانتظام المالي واسترداد الودائع. والقانون رقم 71 تاريخ 10 أيلول 2026 الذي عدّله معلّق بالشروط نفسها.",
+            "cites": [
+              "l23s37",
+              "l71s29"
+            ]
+          },
+          {
+            "text": "وبحسب تعديلات القانون رقم 71، تقرر الهيئة المصرفية العليا الأدوات التي تطبق على المصرف المتعثر: الإنقاذ الداخلي، أو إعادة الرسملة بأسهم جديدة، أو تحويل الموجودات والمطلوبات، أو الدمج. وفي حال تصفية مصرف، تغطى الودائع وفق معايير هذا القانون وقانون الانتظام المالي ونظام المؤسسة الوطنية لضمان الودائع.",
+            "cites": [
+              "l71a11",
+              "l71a23"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما لا تتناوله هذه الصفحة",
+        "paras": [
+          {
+            "text": "لم نجد قانون كابيتال كونترول بين القوانين المتوفرة لدينا، وهي تمتد حتى القانون رقم 71 تاريخ 10 أيلول 2026، وليس بينها قانون الانتظام المالي واسترداد الودائع.",
+            "note": true
+          },
+          {
+            "text": "أرقام التعميمين مأخوذة من القرارين الوسيطين رقم 13701 و13702 تاريخ 20 شباط 2025، وهما آخر تعديل للتعميمين 158 و166 لدينا. وقد انتهت الدورة التي حدداها في 30 حزيران 2025، لذا قد تختلف المبالغ اللاحقة. ولا تتناول الصفحة قرارات مصرف لبنان الأخرى حول السحوبات النقدية.",
+            "note": true
+          },
+          {
+            "text": "مرسوما 1948 و1944 مدرجان كلاهما على أنهما نافذان من دون إلغاء مسجّل، لذا لا تحدد هذه الصفحة قواعد القطع المطبقة اليوم.",
             "note": true
           }
         ]

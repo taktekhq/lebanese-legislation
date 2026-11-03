@@ -2,7 +2,7 @@
   "slug": "income-tax-brackets",
   "order": 13,
   "published": "2026-10-20",
-  "updated": "2026-10-21",
+  "updated": "2026-11-03",
   "articles": [
     {
       "id": "a1",
@@ -26,120 +26,183 @@
       "id": "a4",
       "law": 185603,
       "article": "58",
-      "quote": "20% (عشرون بالمئة) عن قسم الواردات الصافية الخاضعة للضريبة الذي يزيد عن /7.200.000.000/ ل.ل. سبعة مليارات ومايتا مليون ليرة لبنانية ولا يتجاوز /13.500.000.000/ ل.ل. ثلاثة عشر مليار وخمسماية مليون ليرة لبنانية.\n\n25% (خمسة وعشرون بالمئة) عن قسم الواردات الصافية الخاضعة للضريبة الذي يزيد عن /13.500.000.000/ ل.ل. ثلاثة عشر مليار وخمسماية مليون ليرة لبنانية."
+      "quote": "20% (عشرون بالمئة) عن قسم الواردات الصافية الخاضعة للضريبة الذي يزيد عن /7.200.000.000/ ل.ل. سبعة مليارات ومايتا مليون ليرة لبنانية ولا يتجاوز /13.500.000.000/ ل.ل. ثلاثة عشر مليار وخمسماية مليون ليرة لبنانية.\n\n25%"
     },
     {
       "id": "a5",
       "law": 185603,
-      "article": "32",
-      "quote": "حدد معدل الضريبة على أرباح المهن التجارية والصناعية وغير التجارية على الصورة التالية:\n\n4% (أربعة بالمئة) عن القسم الخاضع للضريبة الذي لا يتجاوز /540.000.000/ل.ل. خمسماية وأربعون مليون ليرة لبنانية.\n\n7% (سبعة بالمئة) عن القسم الخاضع للضريبة الذي يزيد عن /540.000.000/ل.ل. خمسماية وأربعون مليون ليرة لبنانية ولا يتجاوز /1.440.000.000/ل.ل. مليار وأربعماية وأربعون ليرة لبنانية."
+      "article": "58",
+      "quote": "25% (خمسة وعشرون بالمئة) عن قسم الواردات الصافية الخاضعة للضريبة الذي يزيد عن /13.500.000.000/ ل.ل. ثلاثة عشر مليار وخمسماية مليون ليرة لبنانية."
     },
     {
       "id": "a6",
-      "law": 185603,
-      "article": "32",
-      "quote": "12% (اثنا عشر بالمئة) عن القسم الخاضع للضريبة الذي يزيد عن /1.440.000.000/ل.ل. مليار وأربعماية وأربعون ليرة لبنانية ولا يتجاوز /3.240.000.000/ ل.ل. ثلاثة مليارات ومايتان وأربعون مليون ليرة لبنانية.\n\n16% (ستة عشر بالمئة) عن القسم الخاضع للضريبة الذي يزيد عن /3.240.000.000/ ل.ل. ثلاثة مليارات ومايتان وأربعون مليون ليرة لبنانية ولا يتجاوز /6.240.000.000/ل.ل."
-    },
-    {
-      "id": "a7",
-      "law": 185603,
-      "article": "32",
-      "quote": "21% (واحد وعشرين بالمئة) عن القسم الخاضع للضريبة الذي يزيد عن /6.240.000.000/ل.ل. ستة مليارات ومايتان وأربعون مليون ليرة لبنانية ولا يتجاوز /13.500.000.000/ل.ل. ثلاثة عشر مليار وخمسماية مليون ليرة لبنانية.\n\n25% (خمسة وعشرون بالمئة) عن القسم الخاضع للضريبة الذي يزيد عن /13.500.000.000/ل.ل. ثلاثة عشر مليار وخمسماية مليون ليرة لبنانية."
-    },
-    {
-      "id": "a8",
-      "law": 185603,
-      "article": "32",
-      "quote": "أما أرباح شركات الأموال (الشركات المغفلة- الشركات المحدودة المسؤولية- شركات التوصية بالأسهم بالنسبة للشركاء الموصين) فتخضع لضريبة نسبية قدرها 17% (سبعة عشرة بالمئة)."
-    },
-    {
-      "id": "a9",
       "law": 185603,
       "article": "31",
       "quote": "تفرض الضريبة على الربح الحقيقي أو الـمحدد بصورة مقطوعة بعد أن ينزل منه لكل شخص طبيعي من الـمكلفين مبلغ /450.000.000/ل.ل. أربعماية وخمسون مليون ليرة لبنانية، ويضاف إلى هـذا التـنـزيـل مبـلـغ /225.000.000/ مايتان وخمس وعشرون مليون ليرة لبنانية للـمكلف الـمتزوج و/45.000,000/ ل.ل. وخمسة وأربعون مليون ليرة لبنانية لكل ولد شرعي ما يزال على عاتقه ضمن الشروط الآتية:"
     },
     {
-      "id": "a10",
+      "id": "a7",
       "law": 185603,
       "article": "31",
       "quote": "للذكور إذا لـم يتجاوز سن الثامنة عشرة أو لغاية الخامسة والعشرين كحد أقصى للذين يتابعون دراسة جامعية.\n\nللذكور الـمصابين بعلة مقعدة ولا يقومون بعمل مأجور شرط إثبات العلة الـمقعدة بموجب إفادة صادرة عن وزارة الشؤون الاجتماعية تثبت الحاجات الخاصة.\n\nللإناث قبل زواجهن أو إذا كنّ أرامل أو مطلقات، على أن لا يتجاوز عدد الأولاد الـمستفيدين الخمسة."
     },
     {
-      "id": "a11",
+      "id": "a8",
+      "law": 185603,
+      "article": "31",
+      "quote": "في حال كان كل من الزوجين يتعاطى مهنة أو يشغل وظيفة يستفيد كل منهما من التنزيل الـمعطى للعازب، وإذا كان للزوجين أولاد على عاتقهما يستفيد الزوجان مناصفة في ما بينهما وعلى قدم الـمساواة وفقا لأحكام الفقرة الأولى من هذه الـمادة."
+    },
+    {
+      "id": "a9",
       "law": 185603,
       "article": "56",
       "quote": "تفرض الضريبة على الواردات السنوية الصافية المحددة وفقاً لأحكام المواد 48 و49 و50 من قانون ضريبة الدخل بعد أن ينزل منها لكل شخص طبيعي من المكلفين التنزيل العائلي وفقاً لأحكام المادة 31 من قانون ضريبة الدخل ضمن ذات الشروط، بالإضافة إلى تنزيل مبلغ عشرة ملايين ليرة لبنانية من أساس المعاش التقاعدي للمتقاعدين."
     },
     {
+      "id": "a10",
+      "law": 185603,
+      "article": "59",
+      "quote": "يحسب التنزيل من الأساس بمبلغ يعادل 1.500.000 ل.ل مليون وخمسماية ألف ليرة لبنانية عن كل يوم للأجراء والعاملين بالساعة الذين يتقاضون أجورا يومية بصرف النظر عن حالتهم العائلية."
+    },
+    {
+      "id": "a11",
+      "law": 185603,
+      "article": "50",
+      "quote": "لاجل تحديد الواردات الصافية, تنزل من الواردات غير الصافية المذكورة في المادة السابقة:\n\n1 - المبالغ المحسومة والمدفوعة للتقاعد وفقا للقوانين والانظمة النافذة.\n\n2 - التعويضات التي تعطى لقاء نفقات الوظيفة او التمثيل او النقل او الانتقال وتعويضات مسؤولية الصندوق, وبدل العلف, وبدل الملبس وبصورة عامة جميع التعويضات المعطاة لتغطية النفقات المصروفة بمناسبة القيام بعمل تطلبته الخدمة."
+    },
+    {
       "id": "a12",
       "law": 185603,
-      "article": "57",
-      "quote": "اذا كان حد المكلفين الخاضعين للضريبة المحدثة بموجب هذا الباب يتعاطى في الوقت نفسه عملا خاضعا لضريبة الباب الاول فلا يستفيد الا من التنزيل المنصوص عليه في الباب الاول."
+      "article": "63",
+      "quote": "على رب العمل ان يقتطع الضريبة من الرواتب والأجور التي يدفعها الى الأجير وان يؤدي المبالغ المقتطعة الى الخزينة بالعملة ذاتها التي دفعت فيها تلك الرواتب والأجور كل ثلاثة أشهر في موعد لا يتعدى الخامس عشر من الشهر الذي يلي فترة الثلاثة أشهر المعنية."
     },
     {
       "id": "a13",
       "law": 185603,
-      "article": "35",
-      "quote": "في شركات التضامن او التوصية اللبنانية القانونية يكلف شخصيا عن حصته في الارباح كل شريك متمتع بالاهلية, وكذلك كل شريك لا يتمتع بهذه الاهلية عندما تكون شراكته ناتجة عن تطبيق احكام المادة 66 من قانون التجارة ويكلف رصيد الارباح باسم الشركة.\n\nغير ان الضريبة المفروضة باسم كل شريك تعتبر في جميع الاحوال ذمة على الشركة."
+      "article": "63",
+      "quote": "من اجل احتساب الضريبة المتوجبة على الرواتب والأجور المدفوعة بالعملات الأجنبية وتسديدها، يتم تحويل الرواتب والأجور الى الليرة اللبنانية وفقا لأحكام المادة 35 من القانون النافذ حكما رقم 10 تاريخ 15\\11\\2022، ثم يتم تحويل الضريبة المحتسبة الى العملة الأجنبية التي دفعت فيها الرواتب والأجور بحسب سعر الصرف الذي يحدده مصرف لبنان"
     },
     {
       "id": "a14",
       "law": 185603,
-      "article": "63",
-      "quote": "من اجل احتساب الضريبة المتوجبة على الرواتب والأجور المدفوعة بالعملات الأجنبية وتسديدها، يتم تحويل الرواتب والأجور الى الليرة اللبنانية وفقا لأحكام المادة 35 من القانون النافذ حكما رقم 10 تاريخ 15\\11\\2022، ثم يتم تحويل الضريبة المحتسبة الى العملة الأجنبية التي دفعت فيها الرواتب والأجور بحسب سعر الصرف الذي يحدده مصرف لبنان.."
+      "article": "32",
+      "quote": "4% (أربعة بالمئة) عن القسم الخاضع للضريبة الذي لا يتجاوز /540.000.000/ل.ل. خمسماية وأربعون مليون ليرة لبنانية.\n\n7% (سبعة بالمئة) عن القسم الخاضع للضريبة الذي يزيد عن /540.000.000/ل.ل. خمسماية وأربعون مليون ليرة لبنانية ولا يتجاوز /1.440.000.000/ل.ل. مليار وأربعماية وأربعون ليرة لبنانية."
+    },
+    {
+      "id": "a15",
+      "law": 185603,
+      "article": "32",
+      "quote": "12% (اثنا عشر بالمئة) عن القسم الخاضع للضريبة الذي يزيد عن /1.440.000.000/ل.ل. مليار وأربعماية وأربعون ليرة لبنانية ولا يتجاوز /3.240.000.000/ ل.ل. ثلاثة مليارات ومايتان وأربعون مليون ليرة لبنانية.\n\n16% (ستة عشر بالمئة) عن القسم الخاضع للضريبة الذي يزيد عن /3.240.000.000/ ل.ل. ثلاثة مليارات ومايتان وأربعون مليون ليرة لبنانية ولا يتجاوز /6.240.000.000/ل.ل. ستة مليارات ومايتان وأربعون مليون ليرة لبنانية."
+    },
+    {
+      "id": "a16",
+      "law": 185603,
+      "article": "32",
+      "quote": "21% (واحد وعشرين بالمئة) عن القسم الخاضع للضريبة الذي يزيد عن /6.240.000.000/ل.ل. ستة مليارات ومايتان وأربعون مليون ليرة لبنانية ولا يتجاوز /13.500.000.000/ل.ل. ثلاثة عشر مليار وخمسماية مليون ليرة لبنانية.\n\n25%"
+    },
+    {
+      "id": "a17",
+      "law": 185603,
+      "article": "32",
+      "quote": "25% (خمسة وعشرون بالمئة) عن القسم الخاضع للضريبة الذي يزيد عن /13.500.000.000/ل.ل. ثلاثة عشر مليار وخمسماية مليون ليرة لبنانية."
+    },
+    {
+      "id": "a18",
+      "law": 185603,
+      "article": "32",
+      "quote": "أما أرباح شركات الأموال (الشركات المغفلة- الشركات المحدودة المسؤولية- شركات التوصية بالأسهم بالنسبة للشركاء الموصين) فتخضع لضريبة نسبية قدرها 17% (سبعة عشرة بالمئة)."
+    },
+    {
+      "id": "a19",
+      "law": 185603,
+      "article": "32",
+      "quote": "ولا تضاف أية علاوة على أصل الضريبة."
+    },
+    {
+      "id": "a20",
+      "law": 185603,
+      "article": "33",
+      "quote": "يضاف الى الضريبة على ارباح المهن التجارية والصناعية وغير التجارية, لحساب جميع البلديات , علاوة قدرها /15%/ خمسة عشر بالمئة من الضريبة."
+    },
+    {
+      "id": "a21",
+      "law": 185603,
+      "article": "35",
+      "quote": "في شركات التضامن او التوصية اللبنانية القانونية يكلف شخصيا عن حصته في الارباح كل شريك متمتع بالاهلية, وكذلك كل شريك لا يتمتع بهذه الاهلية عندما تكون شراكته ناتجة عن تطبيق احكام المادة 66 من قانون التجارة ويكلف رصيد الارباح باسم الشركة."
+    },
+    {
+      "id": "a22",
+      "law": 185603,
+      "article": "69",
+      "quote": "اولا: خلافا لاي نص اخر تخضع لاحكام قانون ضريبة الدخل (المرسوم الاشتراعي رقم 144/59 وتعديلاته) ولضريبة الباب الثالث منه بمعدل سبعة بالمائة ( 7% ):"
+    },
+    {
+      "id": "a23",
+      "law": 185603,
+      "article": "72 مكرر",
+      "quote": "تخضع توزيعات شركات الاموال اللبنانية لضريبة نسبية قدرها عشرة بالمائة (10%)"
+    },
+    {
+      "id": "a24",
+      "law": 185603,
+      "article": "42",
+      "quote": "يحدد المبلغ الصافي الخاضع للضريبة الذي يتقاضاه غير المقيم استناداً للتعريف الوارد في قانون الإجراءات الضريبية للمقيم بعشرين بالمئة\n\n(20%) من الواردات الأصلية المشار إليها في المادة السابقة بصورة مقطوعة، إذا كانت لقاء تسليم أموال، وبخمسين بالمئة (50%) منها إذا كانت لها صفة التعويض عن خدمة، وتقتطع الضريبة وتستوفى بمعدل سبعة عشرة بالمئة (17%)، ولا تضاف أي علاوة على أصل الضريبة."
+    },
+    {
+      "id": "a25",
+      "law": 185603,
+      "article": "47",
+      "quote": "تستثنى من الضريبة:\n\n1 - المخصصات التي يتناولها رجال الدين لقاء قيامهم بالطقوس الدينية.\n\n2 - الرواتب وملحقات الرواتب التي يقبضها سفراء الدول الاجنبية وممثلوها الديبلوماسيون وقناصلها وممثلوها القنصليون, والرعايا الاجانب من موظفيهم وذلك شرط المعاملة بالمثل.\n\n3 - الرواتب وملحقات الرواتب التي يقبضها العسكريون من اية رتبة كانوا التابعون لجيوش الدول الحليفة.\n\n4 - معاشات التقاعد التي تمنح لموظفي الدولة والمصالح العامة او المؤسسات العامة والخاصة وفقا لقوانين التقاعد وانظمته.\n\n5 - التخصيصات لمدى الحياة والتعويضات الموقتة التي تدفع لضحايا حوادث العمل.\n\n6 - اجور اليد العاملة الزراعية.\n\n7 - اجور الخدم في المنازل الخاصة."
+    },
+    {
+      "id": "a26",
+      "law": 185603,
+      "article": "47",
+      "quote": "9 - تعويض الصرف من الخدمة المدفوع وفقا للقوانين النافذة في لبنان.\n\n10 - التعويضات العائلية المدفوعة وفقا للقوانين والانظمة النافذة."
     }
   ],
   "en": {
-    "title": "Income tax rates and brackets in Lebanon",
-    "question": "What are the income tax rates and brackets on salaries and on company profits in Lebanon?",
-    "description": "Salary and business profit tax brackets in Lebanon, the family deduction, partnership and company rates, and pay in foreign currency.",
+    "title": "What are the income tax brackets in Lebanon?",
+    "question": "What are the income tax brackets on salaries and business profits under Lebanon's Income Tax Law, and which deductions and exemptions apply?",
+    "description": "Salary tax runs from 2% up to 360,000,000 LBP to 25% above 13,500,000,000 LBP, after a 450,000,000 LBP personal deduction. Companies pay 17%.",
     "answer": {
-      "text": "Salary tax runs from 2% on the first 360,000,000 LBP of net taxable pay to 25% above 13,500,000,000 LBP. A family deduction of 450,000,000 LBP comes off first, and someone with both salary and business profits takes it only against the profits. Business profits of individuals and partners are taxed from 4% to 25%, and capital companies pay a flat 17%.",
+      "text": "Under Article 58 of the Income Tax Law (Legislative Decree 144 of 1959), salaries are taxed in brackets from 2% on the first 360,000,000 LBP of net taxable income to 25% on income above 13,500,000,000 LBP. Before the rates apply, each taxpayer deducts 450,000,000 LBP, plus 225,000,000 LBP if married and 45,000,000 LBP for each dependent child, up to 5 children (Articles 31 and 56). Business profits of individuals are taxed from 4% to 25%, and capital companies such as SAL and SARL pay a flat 17% (Article 32).",
       "cites": [
         "a1",
-        "a4",
-        "a9",
-        "a11",
-        "a12",
         "a5",
+        "a6",
         "a7",
-        "a13",
-        "a8"
+        "a9",
+        "a14",
+        "a17",
+        "a18"
       ]
     },
     "sections": [
       {
-        "heading": "What are the tax brackets on salaries?",
+        "heading": "Key figures at a glance",
         "paras": [
           {
-            "text": "Article 58 of the Income Tax Law taxes each portion of your net taxable salary at its own rate. The rate rises from 2% to 25%, as the table shows.",
+            "text": "These are the rates and deductions in the current text of the Income Tax Law, last replaced by the 2024 budget law, with all amounts in Lebanese pounds.",
             "cites": [
               "a1",
-              "a4"
+              "a6"
             ]
-          },
-          {
-            "text": "If you are paid in a foreign currency, Article 63 converts your pay into LBP to work out the tax. The conversion follows Article 35 of Law 10 of 2022. The tax is then converted back into the currency of your pay at the rate Banque du Liban sets.",
-            "cites": [
-              "a14"
-            ]
-          },
-          {
-            "text": "The texts we hold do not show which law last set these salary brackets, or the first tax year they apply to. We also do not hold the text that sets the conversion.",
-            "note": true
           }
         ],
         "table": {
-          "caption": "Salary tax brackets",
+          "caption": "Income tax rates and deductions",
           "head": [
-            "Portion of net taxable salary (LBP)",
-            "Rate"
+            "Income or item",
+            "Rate or amount",
+            "Source"
           ],
           "rows": [
             {
               "cells": [
-                "Up to 360,000,000",
-                "2%"
+                "Salary: up to 360,000,000 LBP",
+                "2%",
+                "Article 58"
               ],
               "cites": [
                 "a1"
@@ -147,8 +210,9 @@
             },
             {
               "cells": [
-                "Over 360,000,000 to 900,000,000",
-                "4%"
+                "Salary: over 360,000,000 to 900,000,000 LBP",
+                "4%",
+                "Article 58"
               ],
               "cites": [
                 "a1"
@@ -156,8 +220,9 @@
             },
             {
               "cells": [
-                "Over 900,000,000 to 1,800,000,000",
-                "7%"
+                "Salary: over 900,000,000 to 1,800,000,000 LBP",
+                "7%",
+                "Article 58"
               ],
               "cites": [
                 "a2"
@@ -165,8 +230,9 @@
             },
             {
               "cells": [
-                "Over 1,800,000,000 to 3,600,000,000",
-                "11%"
+                "Salary: over 1,800,000,000 to 3,600,000,000 LBP",
+                "11%",
+                "Article 58"
               ],
               "cites": [
                 "a2"
@@ -174,8 +240,9 @@
             },
             {
               "cells": [
-                "Over 3,600,000,000 to 7,200,000,000",
-                "15%"
+                "Salary: over 3,600,000,000 to 7,200,000,000 LBP",
+                "15%",
+                "Article 58"
               ],
               "cites": [
                 "a3"
@@ -183,8 +250,9 @@
             },
             {
               "cells": [
-                "Over 7,200,000,000 to 13,500,000,000",
-                "20%"
+                "Salary: over 7,200,000,000 to 13,500,000,000 LBP",
+                "20%",
+                "Article 58"
               ],
               "cites": [
                 "a4"
@@ -192,60 +260,183 @@
             },
             {
               "cells": [
-                "Over 13,500,000,000",
-                "25%"
+                "Salary: over 13,500,000,000 LBP",
+                "25%",
+                "Article 58"
               ],
               "cites": [
-                "a4"
+                "a5"
+              ]
+            },
+            {
+              "cells": [
+                "Personal deduction",
+                "450,000,000 LBP",
+                "Article 31"
+              ],
+              "cites": [
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "Extra deduction if married",
+                "225,000,000 LBP",
+                "Article 31"
+              ],
+              "cites": [
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "Extra deduction per dependent child, up to 5",
+                "45,000,000 LBP",
+                "Article 31"
+              ],
+              "cites": [
+                "a6",
+                "a7"
+              ]
+            },
+            {
+              "cells": [
+                "Profits of capital companies (SAL, SARL)",
+                "17% flat",
+                "Article 32"
+              ],
+              "cites": [
+                "a18"
+              ]
+            },
+            {
+              "cells": [
+                "Interest on bank accounts and deposits",
+                "7%",
+                "Article 69"
+              ],
+              "cites": [
+                "a22"
+              ]
+            },
+            {
+              "cells": [
+                "Dividends of Lebanese capital companies",
+                "10%",
+                "Article 72 bis"
+              ],
+              "cites": [
+                "a23"
+              ]
+            },
+            {
+              "cells": [
+                "Payments to non-residents",
+                "17% on a deemed 20% or 50% of the gross",
+                "Article 42"
+              ],
+              "cites": [
+                "a24"
               ]
             }
           ]
         }
       },
       {
-        "heading": "What is deducted before the rates apply?",
+        "heading": "How is salary tax calculated?",
         "paras": [
           {
-            "text": "Article 31 deducts 450,000,000 LBP for each individual taxpayer. A married taxpayer deducts another 225,000,000 LBP. Each legitimate dependent child adds 45,000,000 LBP.",
+            "text": "Each slice of net taxable salary is taxed at its own rate, from 2% to 25%, after the family deduction (Articles 58 and 56).",
             "cites": [
+              "a1",
+              "a5",
               "a9"
             ]
           },
           {
-            "text": "A son counts up to age 18, or up to 25 if he is at university. A son with a disabling condition counts if he does no paid work, shown by a Ministry of Social Affairs certificate. A daughter counts before marriage, or if widowed or divorced. No more than 5 children count.",
-            "cites": [
-              "a10"
-            ]
-          },
-          {
-            "text": "Article 56 applies the same Article 31 deduction to salaries, on the same conditions. Retirees also deduct 10,000,000 LBP from the pension base. Article 57 limits this. A salaried person who also works in an activity taxed under Title I, the business profits tax, gets only the Title I deduction.",
+            "text": "Net income is gross pay minus pension deductions and allowances that cover work expenses such as transport or representation (Article 50). The employer withholds the tax and pays it to the Treasury every 3 months, by the 15th of the following month, in the currency of the pay (Article 63).",
             "cites": [
               "a11",
               "a12"
+            ]
+          },
+          {
+            "text": "Example: on a net taxable salary of 900,000,000 LBP, the first 360,000,000 LBP is taxed at 2% and the rest, up to 900,000,000 LBP, at 4%. No part is taxed at 7%, which applies only above 900,000,000 LBP.",
+            "cites": [
+              "a1",
+              "a2"
+            ]
+          },
+          {
+            "text": "Pay in a foreign currency is converted to lira to compute the tax under Article 35 of Law 10 of 2022, and the tax is converted back into the currency of the pay at the Banque du Liban rate (Article 63).",
+            "cites": [
+              "a13"
             ]
           }
         ]
       },
       {
-        "heading": "What are the tax brackets on business profits?",
+        "heading": "What is deducted before the rates apply?",
         "paras": [
           {
-            "text": "Article 32 sets one scale for commercial, industrial and non-commercial profits. It takes only capital companies out of this scale. The scale covers individuals, and partners taxed on their shares under Article 35.",
+            "text": "Each taxpayer deducts 450,000,000 LBP, plus 225,000,000 LBP if married and 45,000,000 LBP for each dependent child (Article 31), and Article 56 applies the same family deduction to salaries.",
             "cites": [
-              "a5",
-              "a8",
-              "a13"
+              "a6",
+              "a9"
             ]
           },
           {
-            "text": "This page does not cover the municipal surcharge on profit tax. The texts we hold do not settle whether it still applies.",
-            "note": true
+            "text": "A son counts up to 18, or 25 if at university, or at any age if disabled and not in paid work; a daughter counts until she marries, or if widowed or divorced; no more than 5 children count (Article 31).",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "If both spouses work, each takes the single person's deduction and they share the children's deduction equally (Article 31). Retirees also deduct 10,000,000 LBP from the pension base (Article 56), and daily-wage workers deduct 1,500,000 LBP for each day, whatever their family status (Article 59).",
+            "cites": [
+              "a8",
+              "a9",
+              "a10"
+            ]
+          },
+          {
+            "text": "Example: a married taxpayer with 5 dependent children deducts 450,000,000 LBP, 225,000,000 LBP for being married and 45,000,000 LBP for each of the 5 children; a sixth child adds nothing.",
+            "cites": [
+              "a6",
+              "a7"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "How are business profits and companies taxed?",
+        "paras": [
+          {
+            "text": "Profits of individuals from commercial, industrial and non-commercial work are taxed in brackets from 4% to 25%, while capital companies, meaning SAL, SARL and the limited partners of partnerships limited by shares, pay a flat 17% (Article 32).",
+            "cites": [
+              "a14",
+              "a17",
+              "a18"
+            ]
+          },
+          {
+            "text": "In a Lebanese general or limited partnership, each partner is taxed in his own name on his share of the profits, and the rest of the profit is taxed in the partnership's name (Article 35).",
+            "cites": [
+              "a21"
+            ]
+          },
+          {
+            "text": "Article 32 says no surcharge is added to the tax, but Article 33 still prints a 15% surcharge for municipalities on profit tax, and the texts we hold do not settle the conflict.",
+            "cites": [
+              "a19",
+              "a20"
+            ]
           }
         ],
         "table": {
-          "caption": "Business profit tax brackets",
+          "caption": "Profit tax brackets for individuals and partners",
           "head": [
-            "Taxable portion of profit (LBP)",
+            "Taxable profit (LBP)",
             "Rate"
           ],
           "rows": [
@@ -255,7 +446,7 @@
                 "4%"
               ],
               "cites": [
-                "a5"
+                "a14"
               ]
             },
             {
@@ -264,7 +455,7 @@
                 "7%"
               ],
               "cites": [
-                "a5"
+                "a14"
               ]
             },
             {
@@ -273,7 +464,7 @@
                 "12%"
               ],
               "cites": [
-                "a6"
+                "a15"
               ]
             },
             {
@@ -282,7 +473,7 @@
                 "16%"
               ],
               "cites": [
-                "a6"
+                "a15"
               ]
             },
             {
@@ -291,7 +482,7 @@
                 "21%"
               ],
               "cites": [
-                "a7"
+                "a16"
               ]
             },
             {
@@ -300,39 +491,46 @@
                 "25%"
               ],
               "cites": [
-                "a7"
+                "a17"
               ]
             }
           ]
         }
       },
       {
-        "heading": "Which companies pay the flat company rate?",
+        "heading": "How are interest, dividends and non-residents taxed, and what is exempt?",
         "paras": [
           {
-            "text": "Article 32 taxes the profits of capital companies at a flat 17%. These are joint stock companies, limited liability companies, and limited partners in partnerships limited by shares.",
+            "text": "Interest on bank accounts, deposits, certificates of deposit and treasury bills is taxed at 7% (Article 69), and dividends of Lebanese capital companies at 10% (Article 72 bis).",
             "cites": [
-              "a8"
+              "a22",
+              "a23"
             ]
           },
           {
-            "text": "General and limited partnerships are not on that list. Under Article 35, each partner in a Lebanese general or limited partnership is taxed in his own name on his share of profits. The balance of profit is taxed in the partnership's name. The tax charged to each partner is always a debt of the partnership.",
+            "text": "Payments to a non-resident are taxed at 17% on a deemed net base of 20% of the gross for supplies of goods and 50% for services (Article 42). Example: a non-resident paid for a service is taxed at 17% on 50% of the payment.",
             "cites": [
-              "a13",
-              "a8"
+              "a24"
+            ]
+          },
+          {
+            "text": "Exempt from salary tax are, among others, the wages of agricultural workers and of domestic servants in private homes, dismissal indemnity paid under Lebanese law, and family allowances (Article 47).",
+            "cites": [
+              "a25",
+              "a26"
             ]
           }
         ]
       },
       {
-        "heading": "What does this page not cover?",
+        "heading": "What this page does not cover",
         "paras": [
           {
-            "text": "This page does not cover how working spouses share the family deduction, the daily deduction for daily-wage workers, or the salary items exempt from tax.",
+            "text": "The brackets and deductions come from Law 324 of 2024, the latest change our copy records; the texts do not say from which tax year they apply. Article 69's history in our copy lists no change after 2007, so another law may have set a different interest rate for some years.",
             "note": true
           },
           {
-            "text": "It does not cover tax on dividends and bank interest, payments to non-residents, capital gains, or fines for late filing and late payment. The Income Tax Law sets each of these in separate articles.",
+            "text": "This page does not cover capital gains, built property tax, filing deadlines or late-payment fines, which the Income Tax Law sets in other articles.",
             "note": true
           }
         ]
@@ -340,56 +538,47 @@
     ]
   },
   "ar": {
-    "title": "معدلات وشرائح ضريبة الدخل في لبنان",
-    "question": "ما هي معدلات وشرائح ضريبة الدخل على الرواتب والأجور وعلى أرباح الشركات في لبنان؟",
-    "description": "شرائح الضريبة على الرواتب وأرباح المهن في لبنان، والتنزيل العائلي، ومعدلات الشركات، والرواتب بالعملة الأجنبية.",
+    "title": "ما شرائح ضريبة الدخل في لبنان، وما التنزيلات والإعفاءات؟",
+    "question": "ما شرائح ضريبة الدخل على الرواتب وأرباح المهن في قانون ضريبة الدخل اللبناني، وما التنزيلات والإعفاءات المطبقة؟",
+    "description": "ضريبة الرواتب من 2% حتى 360,000,000 ل.ل. إلى 25% فوق 13,500,000,000 ل.ل.، بعد تنزيل شخصي قدره 450,000,000 ل.ل. وتدفع شركات الأموال 17%.",
     "answer": {
-      "text": "تبدأ الضريبة على الرواتب والأجور بمعدل 2% على أول 360.000.000 ليرة لبنانية من الراتب الصافي الخاضع للضريبة، وتصل إلى 25% على ما يزيد عن 13.500.000.000 ليرة لبنانية. ويُنزَّل أولاً تنزيل عائلي قدره 450.000.000 ليرة لبنانية، ومن يجمع بين الراتب وأرباح المهنة لا يستفيد منه إلا على أرباحه. وتخضع أرباح الأفراد والشركاء لمعدلات من 4% إلى 25%، أما شركات الأموال فتخضع لمعدل ثابت قدره 17%.",
+      "text": "وفق المادة 58 من قانون ضريبة الدخل (المرسوم الاشتراعي 144 لعام 1959)، تخضع الرواتب والأجور لشرائح تبدأ بـ2% على أول 360,000,000 ليرة من الواردات الصافية الخاضعة للضريبة وتصل إلى 25% على ما يزيد عن 13,500,000,000 ليرة. وقبل تطبيق المعدلات يُنزَّل لكل مكلف 450,000,000 ليرة، يضاف إليها 225,000,000 ليرة للمتزوج و45,000,000 ليرة عن كل ولد على عاتقه، بحد أقصى 5 أولاد (المادتان 31 و56). وتخضع أرباح المهن للأفراد لمعدلات من 4% إلى 25%، وتدفع شركات الأموال كالشركات المغفلة والمحدودة المسؤولية ضريبة نسبية قدرها 17% (المادة 32).",
       "cites": [
         "a1",
-        "a4",
-        "a9",
-        "a11",
-        "a12",
         "a5",
+        "a6",
         "a7",
-        "a13",
-        "a8"
+        "a9",
+        "a14",
+        "a17",
+        "a18"
       ]
     },
     "sections": [
       {
-        "heading": "ما شرائح الضريبة على الرواتب والأجور؟",
+        "heading": "الأرقام الأساسية باختصار",
         "paras": [
           {
-            "text": "تفرض المادة 58 من قانون ضريبة الدخل على كل قسم من الراتب الصافي الخاضع للضريبة معدله الخاص. ويرتفع المعدل من 2% إلى 25% كما يبيّن الجدول.",
+            "text": "هذه هي المعدلات والتنزيلات في النص الحالي لقانون ضريبة الدخل كما استبدلها قانون موازنة عام 2024، وجميع المبالغ بالليرة اللبنانية.",
             "cites": [
               "a1",
-              "a4"
+              "a6"
             ]
-          },
-          {
-            "text": "إذا كنت تتقاضى راتبك بعملة أجنبية، تحوّل المادة 63 الراتب إلى الليرة اللبنانية لاحتساب الضريبة. ويجري التحويل وفق المادة 35 من القانون رقم 10 لعام 2022. ثم تُحوَّل الضريبة إلى عملة الراتب بحسب سعر الصرف الذي يحدده مصرف لبنان.",
-            "cites": [
-              "a14"
-            ]
-          },
-          {
-            "text": "النصوص المتوفرة لدينا لا تبيّن القانون الذي حدّد هذه الشرائح أخيراً، ولا السنة الضريبية الأولى التي تُطبَّق عليها. ولا نملك النص الذي ينظّم التحويل.",
-            "note": true
           }
         ],
         "table": {
-          "caption": "شرائح الضريبة على الرواتب والأجور",
+          "caption": "معدلات ضريبة الدخل والتنزيلات",
           "head": [
-            "قسم الراتب الصافي الخاضع للضريبة (ل.ل.)",
-            "المعدل"
+            "الدخل أو البند",
+            "المعدل أو المبلغ",
+            "المصدر"
           ],
           "rows": [
             {
               "cells": [
-                "حتى 360.000.000",
-                "2%"
+                "الرواتب: حتى 360,000,000 ل.ل.",
+                "2%",
+                "المادة 58"
               ],
               "cites": [
                 "a1"
@@ -397,8 +586,9 @@
             },
             {
               "cells": [
-                "ما يزيد عن 360.000.000 حتى 900.000.000",
-                "4%"
+                "الرواتب: فوق 360,000,000 حتى 900,000,000 ل.ل.",
+                "4%",
+                "المادة 58"
               ],
               "cites": [
                 "a1"
@@ -406,8 +596,9 @@
             },
             {
               "cells": [
-                "ما يزيد عن 900.000.000 حتى 1.800.000.000",
-                "7%"
+                "الرواتب: فوق 900,000,000 حتى 1,800,000,000 ل.ل.",
+                "7%",
+                "المادة 58"
               ],
               "cites": [
                 "a2"
@@ -415,8 +606,9 @@
             },
             {
               "cells": [
-                "ما يزيد عن 1.800.000.000 حتى 3.600.000.000",
-                "11%"
+                "الرواتب: فوق 1,800,000,000 حتى 3,600,000,000 ل.ل.",
+                "11%",
+                "المادة 58"
               ],
               "cites": [
                 "a2"
@@ -424,8 +616,9 @@
             },
             {
               "cells": [
-                "ما يزيد عن 3.600.000.000 حتى 7.200.000.000",
-                "15%"
+                "الرواتب: فوق 3,600,000,000 حتى 7,200,000,000 ل.ل.",
+                "15%",
+                "المادة 58"
               ],
               "cites": [
                 "a3"
@@ -433,8 +626,9 @@
             },
             {
               "cells": [
-                "ما يزيد عن 7.200.000.000 حتى 13.500.000.000",
-                "20%"
+                "الرواتب: فوق 7,200,000,000 حتى 13,500,000,000 ل.ل.",
+                "20%",
+                "المادة 58"
               ],
               "cites": [
                 "a4"
@@ -442,147 +636,277 @@
             },
             {
               "cells": [
-                "ما يزيد عن 13.500.000.000",
-                "25%"
+                "الرواتب: فوق 13,500,000,000 ل.ل.",
+                "25%",
+                "المادة 58"
               ],
               "cites": [
-                "a4"
+                "a5"
+              ]
+            },
+            {
+              "cells": [
+                "التنزيل الشخصي",
+                "450,000,000 ل.ل.",
+                "المادة 31"
+              ],
+              "cites": [
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "تنزيل إضافي للمتزوج",
+                "225,000,000 ل.ل.",
+                "المادة 31"
+              ],
+              "cites": [
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "تنزيل إضافي عن كل ولد على العاتق، حتى 5 أولاد",
+                "45,000,000 ل.ل.",
+                "المادة 31"
+              ],
+              "cites": [
+                "a6",
+                "a7"
+              ]
+            },
+            {
+              "cells": [
+                "أرباح شركات الأموال (المغفلة والمحدودة المسؤولية)",
+                "17% نسبية",
+                "المادة 32"
+              ],
+              "cites": [
+                "a18"
+              ]
+            },
+            {
+              "cells": [
+                "فوائد الحسابات والودائع المصرفية",
+                "7%",
+                "المادة 69"
+              ],
+              "cites": [
+                "a22"
+              ]
+            },
+            {
+              "cells": [
+                "توزيعات شركات الأموال اللبنانية",
+                "10%",
+                "المادة 72 مكرر"
+              ],
+              "cites": [
+                "a23"
+              ]
+            },
+            {
+              "cells": [
+                "المبالغ المدفوعة لغير المقيمين",
+                "17% على 20% أو 50% من الواردات بصورة مقطوعة",
+                "المادة 42"
+              ],
+              "cites": [
+                "a24"
               ]
             }
           ]
         }
       },
       {
-        "heading": "ما الذي يُنزَّل قبل تطبيق المعدلات؟",
+        "heading": "كيف تُحتسب ضريبة الرواتب؟",
         "paras": [
           {
-            "text": "تنزّل المادة 31 مبلغ 450.000.000 ليرة لبنانية لكل مكلف من الأشخاص الطبيعيين. ويُضاف للمكلف المتزوج 225.000.000 ليرة لبنانية. ويُضاف عن كل ولد شرعي على عاتقه 45.000.000 ليرة لبنانية.",
+            "text": "يخضع كل قسم من الراتب الصافي الخاضع للضريبة لمعدله الخاص، من 2% إلى 25%، بعد التنزيل العائلي (المادتان 58 و56).",
             "cites": [
+              "a1",
+              "a5",
               "a9"
             ]
           },
           {
-            "text": "يُحتسب الابن حتى سن 18، أو حتى سن 25 إذا كان يتابع دراسة جامعية. ويُحتسب الابن المصاب بعلة مقعدة إذا لم يكن يعمل بأجر، على أن تثبت العلة إفادة من وزارة الشؤون الاجتماعية. وتُحتسب الابنة قبل زواجها، أو إذا كانت أرملة أو مطلقة. ولا يتجاوز عدد الأولاد المستفيدين 5.",
-            "cites": [
-              "a10"
-            ]
-          },
-          {
-            "text": "تطبّق المادة 56 على الرواتب التنزيل العائلي نفسه وفق المادة 31 وضمن الشروط ذاتها. ويُنزَّل للمتقاعد 10.000.000 ليرة لبنانية من أساس معاشه التقاعدي. وتحدّ المادة 57 من ذلك. فمن يخضع لضريبة الرواتب ويمارس في الوقت نفسه عملاً خاضعاً لضريبة الباب الأول، أي الضريبة على أرباح المهن، لا يستفيد إلا من تنزيل الباب الأول.",
+            "text": "الواردات الصافية هي الواردات غير الصافية بعد حسم المبالغ المدفوعة للتقاعد والتعويضات التي تغطي نفقات الوظيفة كالنقل والتمثيل (المادة 50). ويقتطع رب العمل الضريبة ويؤديها إلى الخزينة كل 3 أشهر في موعد لا يتعدى اليوم 15 من الشهر التالي، بالعملة التي دُفع بها الأجر (المادة 63).",
             "cites": [
               "a11",
               "a12"
+            ]
+          },
+          {
+            "text": "مثال: على راتب صافٍ خاضع للضريبة قدره 900,000,000 ل.ل.، يخضع أول 360,000,000 ل.ل. لمعدل 2% ويخضع الباقي حتى 900,000,000 ل.ل. لمعدل 4%. ولا يخضع أي جزء منه لمعدل 7% الذي يطبق فقط على ما يزيد عن 900,000,000 ل.ل.",
+            "cites": [
+              "a1",
+              "a2"
+            ]
+          },
+          {
+            "text": "تُحوَّل الرواتب المدفوعة بالعملات الأجنبية إلى الليرة لاحتساب الضريبة وفق المادة 35 من القانون 10 لعام 2022، ثم تُحوَّل الضريبة إلى عملة الأجر بحسب سعر الصرف الذي يحدده مصرف لبنان (المادة 63).",
+            "cites": [
+              "a13"
             ]
           }
         ]
       },
       {
-        "heading": "ما شرائح الضريبة على أرباح المهن؟",
+        "heading": "ما التنزيلات قبل تطبيق المعدلات؟",
         "paras": [
           {
-            "text": "تحدد المادة 32 جدولاً واحداً لأرباح المهن التجارية والصناعية وغير التجارية. ولا تُخرج من هذا الجدول إلا أرباح شركات الأموال. ويشمل الجدول الأفراد، والشركاء الذين يُكلَّفون عن حصصهم وفق المادة 35.",
+            "text": "يُنزَّل لكل مكلف 450,000,000 ل.ل.، يضاف إليها 225,000,000 ل.ل. للمتزوج و45,000,000 ل.ل. عن كل ولد شرعي على عاتقه (المادة 31)، وتطبق المادة 56 التنزيل العائلي نفسه على الرواتب والأجور.",
             "cites": [
-              "a5",
-              "a8",
-              "a13"
+              "a6",
+              "a9"
             ]
           },
           {
-            "text": "لا تتناول هذه الصفحة العلاوة البلدية على ضريبة الأرباح. والنصوص المتوفرة لدينا لا تحسم ما إذا كانت لا تزال مطبّقة.",
-            "note": true
+            "text": "يُحتسب الولد الذكر حتى سن 18، أو حتى 25 إذا تابع دراسة جامعية، ودون حد للسن إذا كان مصاباً بعلة مقعدة ولا يقوم بعمل مأجور، وتُحتسب الأنثى قبل زواجها أو إذا كانت أرملة أو مطلقة، ولا يتجاوز عدد الأولاد المستفيدين 5 (المادة 31).",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "إذا كان كل من الزوجين يعمل، يستفيد كل منهما من التنزيل المعطى للعازب ويتقاسمان تنزيل الأولاد مناصفة (المادة 31). ويُنزَّل للمتقاعدين أيضاً 10,000,000 ل.ل. من أساس المعاش التقاعدي (المادة 56)، وللأجراء الذين يتقاضون أجوراً يومية 1,500,000 ل.ل. عن كل يوم بصرف النظر عن حالتهم العائلية (المادة 59).",
+            "cites": [
+              "a8",
+              "a9",
+              "a10"
+            ]
+          },
+          {
+            "text": "مثال: المكلف المتزوج الذي على عاتقه 5 أولاد يُنزَّل له 450,000,000 ل.ل.، و225,000,000 ل.ل. عن الزواج، و45,000,000 ل.ل. عن كل من الأولاد الخمسة، ولا يُضاف أي تنزيل عن ولد إضافي.",
+            "cites": [
+              "a6",
+              "a7"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "كيف تُفرض الضريبة على أرباح المهن والشركات؟",
+        "paras": [
+          {
+            "text": "تخضع أرباح الأفراد من المهن التجارية والصناعية وغير التجارية لشرائح من 4% إلى 25%، أما شركات الأموال، أي الشركات المغفلة والمحدودة المسؤولية والشركاء الموصون في شركات التوصية بالأسهم، فتخضع لضريبة نسبية قدرها 17% (المادة 32).",
+            "cites": [
+              "a14",
+              "a17",
+              "a18"
+            ]
+          },
+          {
+            "text": "في شركات التضامن والتوصية اللبنانية، يُكلَّف كل شريك شخصياً عن حصته في الأرباح، ويُكلَّف رصيد الأرباح باسم الشركة (المادة 35).",
+            "cites": [
+              "a21"
+            ]
+          },
+          {
+            "text": "تنص المادة 32 على ألا تضاف أية علاوة على أصل الضريبة، لكن المادة 33 ما زالت تنص على علاوة 15% لحساب البلديات على ضريبة أرباح المهن، والنصوص المتوفرة لدينا لا تحسم هذا التعارض.",
+            "cites": [
+              "a19",
+              "a20"
+            ]
           }
         ],
         "table": {
-          "caption": "شرائح الضريبة على أرباح المهن",
+          "caption": "شرائح الضريبة على أرباح الأفراد والشركاء",
           "head": [
-            "القسم الخاضع للضريبة من الربح (ل.ل.)",
+            "الربح الخاضع للضريبة (ل.ل.)",
             "المعدل"
           ],
           "rows": [
             {
               "cells": [
-                "حتى 540.000.000",
+                "حتى 540,000,000",
                 "4%"
               ],
               "cites": [
-                "a5"
+                "a14"
               ]
             },
             {
               "cells": [
-                "ما يزيد عن 540.000.000 حتى 1.440.000.000",
+                "فوق 540,000,000 حتى 1,440,000,000",
                 "7%"
               ],
               "cites": [
-                "a5"
+                "a14"
               ]
             },
             {
               "cells": [
-                "ما يزيد عن 1.440.000.000 حتى 3.240.000.000",
+                "فوق 1,440,000,000 حتى 3,240,000,000",
                 "12%"
               ],
               "cites": [
-                "a6"
+                "a15"
               ]
             },
             {
               "cells": [
-                "ما يزيد عن 3.240.000.000 حتى 6.240.000.000",
+                "فوق 3,240,000,000 حتى 6,240,000,000",
                 "16%"
               ],
               "cites": [
-                "a6"
+                "a15"
               ]
             },
             {
               "cells": [
-                "ما يزيد عن 6.240.000.000 حتى 13.500.000.000",
+                "فوق 6,240,000,000 حتى 13,500,000,000",
                 "21%"
               ],
               "cites": [
-                "a7"
+                "a16"
               ]
             },
             {
               "cells": [
-                "ما يزيد عن 13.500.000.000",
+                "فوق 13,500,000,000",
                 "25%"
               ],
               "cites": [
-                "a7"
+                "a17"
               ]
             }
           ]
         }
       },
       {
-        "heading": "أي الشركات تخضع للمعدل النسبي الثابت؟",
+        "heading": "كيف تُفرض الضريبة على الفوائد والتوزيعات وغير المقيمين، وما المعفى منها؟",
         "paras": [
           {
-            "text": "تُخضع المادة 32 أرباح شركات الأموال لضريبة نسبية قدرها 17%. وشركات الأموال هي الشركات المغفلة، والشركات المحدودة المسؤولية، وشركات التوصية بالأسهم بالنسبة إلى الشركاء الموصين.",
+            "text": "تخضع فوائد الحسابات والودائع المصرفية وشهادات الإيداع وسندات الخزينة لضريبة بمعدل 7% (المادة 69)، وتخضع توزيعات شركات الأموال اللبنانية لضريبة نسبية قدرها 10% (المادة 72 مكرر).",
             "cites": [
-              "a8"
+              "a22",
+              "a23"
             ]
           },
           {
-            "text": "شركات التضامن والتوصية ليست من هذه الشركات. فبموجب المادة 35، يُكلَّف كل شريك في شركة التضامن أو التوصية اللبنانية شخصياً عن حصته في الأرباح. ويُكلَّف رصيد الأرباح باسم الشركة. وتبقى الضريبة المفروضة باسم كل شريك ديناً على الشركة في جميع الأحوال.",
+            "text": "تُقتطع من المبالغ المدفوعة لغير المقيم ضريبة بمعدل 17% على مبلغ صافٍ مقطوع يعادل 20% من الواردات إذا كانت لقاء تسليم أموال و50% إذا كانت تعويضاً عن خدمة (المادة 42). مثال: غير المقيم الذي يتقاضى بدل خدمة يُقتطع منه 17% على 50% من المبلغ.",
             "cites": [
-              "a13",
-              "a8"
+              "a24"
+            ]
+          },
+          {
+            "text": "تُستثنى من ضريبة الرواتب، ومن بين حالات أخرى، أجور اليد العاملة الزراعية، وأجور الخدم في المنازل الخاصة، وتعويض الصرف من الخدمة المدفوع وفق القوانين اللبنانية، والتعويضات العائلية (المادة 47).",
+            "cites": [
+              "a25",
+              "a26"
             ]
           }
         ]
       },
       {
-        "heading": "ما الذي لا تتناوله هذه الصفحة؟",
+        "heading": "ما لا تتناوله هذه الصفحة",
         "paras": [
           {
-            "text": "لا تتناول هذه الصفحة كيفية توزيع التنزيل العائلي بين الزوجين العاملين، ولا التنزيل اليومي للأجراء المياومين، ولا عناصر الرواتب المعفاة من الضريبة.",
+            "text": "الشرائح والتنزيلات مأخوذة من القانون 324 لعام 2024، وهو آخر تعديل تسجله نسختنا، ولا تحدد النصوص السنة الضريبية التي يبدأ تطبيقها منها. ولا يذكر تاريخ المادة 69 في نسختنا أي تعديل بعد عام 2007، فقد يكون قانون آخر حدد معدلاً مختلفاً للفوائد في بعض السنوات.",
             "note": true
           },
           {
-            "text": "ولا تتناول الضريبة على توزيعات الأرباح والفوائد المصرفية، ولا المبالغ المدفوعة لغير المقيمين، ولا أرباح التفرغ، ولا غرامات التأخير في التصريح والدفع. ولكلٍّ منها مواد مستقلة في قانون ضريبة الدخل.",
+            "text": "لا تتناول هذه الصفحة الضريبة على التفرغ عن الأصول، ولا ضريبة الأملاك المبنية، ولا مهل التصريح وغرامات التأخير التي يحددها قانون ضريبة الدخل في مواد أخرى.",
             "note": true
           }
         ]
