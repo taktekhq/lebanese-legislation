@@ -31,12 +31,16 @@ set `VECTORS_INPUT=/work/current.parquet`. `VECTORS_PREVIOUS` and
 to export a pgvector database with `LEBLEG_VECTOR_DSN` and `-out /work/vectors.ndjson`.
 
 The repository workflow generates the current IDs from `data/`, filters the
-published Parquet to them and refuses missing embeddings. It preserves the
+published Parquet to them and embeds missing chunks with Gemini. It preserves the
 archive's ID list alongside the previous sync manifest as the deletion baseline.
 This removes the 21 stale archive IDs, even if the previous manifest is absent.
 The workflow runs this image with the filtered artifact and only publishes it
-after sync succeeds, so a failed sync cannot lose the archive deletion baseline. No embedding API is called. If new chunks lack vectors, generate a
-public release with embeddings and export its vectors before retrying.
+after sync succeeds, so a failed sync cannot lose the archive deletion baseline.
+
+Missing chunks are embedded with Gemini under a $1 daily budget in Asia/Beirut,
+with a cap of 20,000 new chunks per run. Completed rows and the daily budget
+are cached between runs; if coverage is incomplete, publication stops and the
+next run continues from those rows.
 
 ## Load pgvector
 

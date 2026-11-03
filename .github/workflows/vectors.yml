@@ -8,7 +8,7 @@ on:
         default: false
   push:
     branches: [main]
-    paths: ['vectors/**', 'cmd/vectorize-sync/**', 'cmd/export-vectors/**', 'internal/vectorize/**', 'data/**', 'internal/semantic/**', '.github/workflows/vectors.yml']
+    paths: ['vectors/**', 'cmd/vectorize-sync/**', 'cmd/export-vectors/**', 'cmd/embed-missing/**', 'internal/embedding/**', 'internal/vectorize/**', 'data/**', 'internal/semantic/**', '.github/workflows/vectors.yml']
 permissions:
   contents: read
   packages: read
@@ -49,18 +49,88 @@ jobs:
         run: |
           curl -fL --retry 3 -o "$RUNNER_TEMP/published.parquet" \
             https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet
-      - name: Filter to current IDs, refusing missing embeddings
+      - name: Name the budget day
+        id: budget-day
+        run: echo "day=$(TZ=Asia/Beirut date +%F)" >> "$GITHUB_OUTPUT"
+      - name: Keep the daily embedding budget between runs
+        id: budget
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .release/budget
+            .release/pending.ndjson
+          key: embedding-budget-${{ steps.budget-day.outputs.day }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            embedding-budget-${{ steps.budget-day.outputs.day }}-
+            embedding-budget-
+      - name: Find missing embeddings
+        env:
+          IMAGE: ghcr.io/taktekhq/lebanese-legislation-vectors:latest
+        run: |
+          mkdir -p .release/budget
+          touch .release/pending.ndjson
+          cp .release/pending.ndjson "$RUNNER_TEMP/pending.ndjson"
+          docker run --rm --entrypoint duckdb -v "$RUNNER_TEMP:/work" "$IMAGE" -batch -bail -c "
+            SET memory_limit='8GB'; SET threads=2; SET temp_directory='/work/duckdb-tmp';
+            CREATE VIEW current AS SELECT * FROM read_csv('/work/current.csv', all_varchar=true);
+            CREATE VIEW published AS SELECT * FROM read_parquet('/work/published.parquet');
+            CREATE TABLE pending AS SELECT * FROM read_json('/work/pending.ndjson', format='newline_delimited',
+              columns={id: 'VARCHAR', document: 'VARCHAR', model: 'VARCHAR', hash: 'VARCHAR', values: 'FLOAT[768]'});
+            CREATE VIEW available AS SELECT * FROM published UNION ALL SELECT * FROM pending;
+            COPY (SELECT c.id,c.hash FROM current c ANTI JOIN available p ON c.id=p.id AND c.hash=p.hash ORDER BY c.id)
+              TO '/work/missing.csv' (FORMAT CSV, HEADER);
+            COPY (SELECT p.* FROM pending p JOIN current c ON c.id=p.id AND c.hash=p.hash
+              ANTI JOIN published a ON p.id=a.id AND p.hash=a.hash)
+              TO '/work/pending-current.ndjson' (FORMAT JSON);"
+          cp "$RUNNER_TEMP/pending-current.ndjson" .release/pending.ndjson
+      - name: Embed missing chunks under the daily budget
+        id: embed
+        env:
+          GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
+        run: |
+          if [ "$(wc -l < "$RUNNER_TEMP/missing.csv")" -gt 1 ]; then
+            # go run reports a program's exit 2 as exit 1 with "exit status 2".
+            status=0
+            go run ./cmd/embed-missing \
+              -index-dsn 'host=localhost user=postgres dbname=lebleg_search' \
+              -missing "$RUNNER_TEMP/missing.csv" -out "$RUNNER_TEMP/new.ndjson" \
+              -daily-budget-dir .release/budget \
+              2> "$RUNNER_TEMP/embed.log" || status=$?
+            cat "$RUNNER_TEMP/embed.log" >&2
+            if [ -f "$RUNNER_TEMP/new.ndjson" ]; then
+              cat "$RUNNER_TEMP/new.ndjson" >> .release/pending.ndjson
+            fi
+            if [ "$status" -ne 0 ] && ! grep -qx 'exit status 2' "$RUNNER_TEMP/embed.log"; then
+              exit "$status"
+            fi
+          else
+            echo 'embedded=0'
+          fi
+      - name: Save the budget and completed rows even when incomplete
+        if: ${{ always() && steps.embed.outcome != 'skipped' }}
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .release/budget
+            .release/pending.ndjson
+          key: ${{ steps.budget.outputs.cache-primary-key }}
+      - name: Filter to current IDs and check embedding coverage
         env:
           IMAGE: ghcr.io/taktekhq/lebanese-legislation-vectors:latest
         run: |
           mkdir -p "$RUNNER_TEMP/out/vectors"
+          cp .release/pending.ndjson "$RUNNER_TEMP/new.ndjson"
           docker run --rm --entrypoint duckdb -v "$RUNNER_TEMP:/work" "$IMAGE" -batch -bail -c "
             SET memory_limit='8GB'; SET threads=2; SET preserve_insertion_order=false; SET temp_directory='/work/duckdb-tmp';
             CREATE VIEW current AS SELECT * FROM read_csv('/work/current.csv', all_varchar=true);
             CREATE VIEW published AS SELECT * FROM read_parquet('/work/published.parquet');
-            SELECT CASE WHEN count(*)=0 THEN true ELSE error('Current chunks lack published vectors; run the release workflow to embed them first') END
-              FROM current c ANTI JOIN published p ON c.id=p.id AND c.hash=p.hash;
-            COPY (SELECT p.* FROM published p JOIN current c ON c.id=p.id AND c.hash=p.hash)
+            CREATE VIEW new_vectors AS SELECT id,document,model,hash,values::FLOAT[768] AS values
+              FROM read_json('/work/new.ndjson', format='newline_delimited',
+                columns={id: 'VARCHAR', document: 'VARCHAR', model: 'VARCHAR', hash: 'VARCHAR', values: 'FLOAT[768]'});
+            CREATE VIEW available AS SELECT * FROM published UNION ALL SELECT * FROM new_vectors;
+            SELECT CASE WHEN count(*)=0 THEN true ELSE error(count(*)::VARCHAR || ' current chunks still lack vectors (daily embedding budget); they will be embedded on the next run') END
+              FROM current c ANTI JOIN available p ON c.id=p.id AND c.hash=p.hash;
+            COPY (SELECT p.* FROM available p JOIN current c ON c.id=p.id AND c.hash=p.hash)
               TO '/work/out/vectors/vectors.parquet' (FORMAT parquet, COMPRESSION zstd);
             COPY (SELECT id,hash FROM published) TO '/work/out/vectors/archive-manifest.tsv' (FORMAT CSV, DELIMITER '\t', HEADER false, QUOTE '');"
       - uses: actions/upload-artifact@v4
