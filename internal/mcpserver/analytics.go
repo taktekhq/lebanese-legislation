@@ -343,6 +343,23 @@ func (s *Server) SendHFStats(ctx context.Context) error {
 	return nil
 }
 
+// hfDownloads is the dataset's all-time download count, cached for an hour.
+func (s *Server) hfDownloads(ctx context.Context) (int, error) {
+	s.hfMu.Lock()
+	defer s.hfMu.Unlock()
+	if !s.hfDownloadsAt.IsZero() && time.Since(s.hfDownloadsAt) < time.Hour {
+		return s.hfDownloadsN, nil
+	}
+	var v struct {
+		DownloadsAllTime float64 `json:"downloadsAllTime"`
+	}
+	if err := s.hfGet(ctx, "expand[]=downloadsAllTime", &v); err != nil {
+		return 0, err
+	}
+	s.hfDownloadsN, s.hfDownloadsAt = int(v.DownloadsAllTime), time.Now()
+	return s.hfDownloadsN, nil
+}
+
 // hfLastModified is when the dataset last changed on Hugging Face, cached
 // for an hour: uploads happen once a night at most.
 func (s *Server) hfLastModified(ctx context.Context) (string, error) {

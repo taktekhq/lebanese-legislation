@@ -118,9 +118,11 @@ type Server struct {
 	badgeAt    time.Time
 	badgeStats badgeStats
 
-	hfMu         sync.Mutex
-	hfModified   string
-	hfModifiedAt time.Time
+	hfMu          sync.Mutex
+	hfModified    string
+	hfModifiedAt  time.Time
+	hfDownloadsN  int
+	hfDownloadsAt time.Time
 }
 
 // New serves the corpus behind pool. Connect it read-only: the server

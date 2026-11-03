@@ -39,6 +39,14 @@ var badgePages = map[string]badgePage{
 		title:    "Lebanese Legislation dataset (Hugging Face)",
 		url:      "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
 	},
+	// GitHub serves README images through its camo proxy, which honours
+	// no-store, so each README view fetches the badge once. The count is
+	// views, not people: every fetch comes from camo's addresses.
+	"gh": {
+		location: "https://lebaneselegislation.com/github",
+		title:    "Lebanese Legislation repository (GitHub)",
+		url:      "https://github.com/taktekhq/lebanese-legislation",
+	},
 }
 
 type badgeStats struct{ legislation, articles, rulings int }
@@ -95,6 +103,13 @@ var badges = map[string]badgeDef{
 			return "", err
 		}
 		return badgeDay(iso), nil
+	}},
+	"downloads": {label: "Hugging Face downloads", value: func(badgeStats) string { return "" }, load: func(s *Server, ctx context.Context) (string, error) {
+		n, err := s.hfDownloads(ctx)
+		if err != nil {
+			return "", err
+		}
+		return thousands(n), nil
 	}},
 }
 
