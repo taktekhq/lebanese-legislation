@@ -2,384 +2,796 @@
   "slug": "nssf-registration-contributions",
   "order": 2,
   "published": "2026-10-20",
-  "updated": "2026-10-21",
+  "updated": "2026-11-03",
   "articles": [
     {
       "id": "a1",
       "law": 244971,
-      "article": "10",
-      "quote": "يخضع لاحكام هذا القانون في المرحلة الثانية جميع الاجراء اللبنانيين, عمالا ومستخدمين, متدربين ومتمرنين, العاملين على الاراضي اللبنانية في مؤسسة زراعية لحساب رب عمل واحد او اكثر, لبناني او اجنبي.\n\nاذا كان هؤلاء الاجراء اجانب فلا يخضعون لاحكام هذا القانون الا بالشروط المبينة في الفقرة 4 من المادة السابقة."
+      "article": "9",
+      "quote": "الاجراء اللبنانيون (عمال ومستخدمون) الدائمون والمؤقتون والمتمرنون والموسميون والمتدربون الذين يعملون لحساب رب عمل واحد او اكثر لبناني او اجنبي, ايا كانت مدة او نوع او طبيعة او شكل او صحة العقود التي تربطهم برب عملهم"
     },
     {
       "id": "a2",
       "law": 244971,
-      "article": "73",
-      "quote": "1- ان اشتراكات : ضمان طوارىء العمل والامراض المهنية ونظام التقديمات العائلية والتعليمية ونظام تعويض نهاية الخدمة هي كلها على عاتق ارباب العمل. عندما يصيب الاجير تخفيض في الاجر خلال عمله عند رب العمل نفسه فان اشتراك رب العمل يظل يحسب على اساس اجره الاعلى."
+      "article": "9",
+      "quote": "يخضع الاجراء الاجانب العاملون على الاراضي اللبنانية المرتبطون برب عمل واحد او اكثر وارباب العمل والذين يستخدمونهم لجميع الموجبات المنصوص عليها في قانون الضمان الاجتماعي بالشروط المحددة فيه, فيما خص فرع ضمان المرض والامومة ونظام التعويضات العائلية والتعليمية وضمان وطوارىء العمل والامراض المهنية. ولا يخضع ارباب العمل للموجبات المتعلقة بفرع نهاية الخدمة الا اذا كان يحق للاجراء الاستفادة من تقديمات هذا النوع."
     },
     {
       "id": "a3",
       "law": 244971,
-      "article": "73",
-      "quote": "2- ان اشتراكات ضمان المرض والامومة هي على عاتق المضمونين وارباب عملهم والدولة. تأخذ الدولة على عاتقها 25% من قيمة التقديمات المتعلقة بالضمان المذكور وتعيين نسبة الاشتركات التي هي على عاتق كل من ارباب العمل والاجراء بمرسوم يتخذ في مجلس الوزراء, بناء على اقتراح وزير العمل والشؤون الاجتماعية وانهاء مجلس الادارة. غير ان الاشتراكات المتعلقة بالمتدربين, والاشخاص الذين لا يقبضون اجورا نقدية تزيد على مقدار يحدده مجلس الادارة, تكون كلها على عاتق ارباب العمل."
+      "article": "9",
+      "quote": "يستفيد الاجراء الاجانب المذكورون من التقديمات المنصوص عليها في قانون الضمان الاجتماعي, شرط ان يكونوا حائزين على اجازة عمل وفق القوانين والانظمة المرعية وان تكون الدولة التي ينتمون اليها تقر للبنانيين مبدأ المساواة في المعاملة مع رعاياها فيما يتعلق بالضمان الاجتماعي."
     },
     {
       "id": "a4",
+      "law": 244971,
+      "article": "9",
+      "quote": "يعفى المستفيد من العمال اللاجئين الفلسطينيين من شروط المعاملة بالمثل المنصوص عنه في قانون العمل وقانون الضمان الاجتماعي، ويستفيد من تقديمات تعويض نهاية الخدمة بالشروط التي يستفيد فيها العامل اللبناني."
+    },
+    {
+      "id": "a5",
+      "law": 244971,
+      "article": "9",
+      "quote": "لا يستفيد المشمولون بأحكام هذا القانون من تقديمات صندوقي ضمان المرض والأمومة والتقديمات العائلية والتعليمية."
+    },
+    {
+      "id": "a6",
+      "law": 244971,
+      "article": "76",
+      "quote": "يُحَدِّد مجلس الادارة، وفقا لأحكام الـمادة 3 من هذا القانون، القواعد الـمتعلقة بتسجيل أرباب العمل والـمضمونين وتصاريح الدخول في العمل والخروج منه وطرق دفع الاشتراكات والعلاوات والسلفات، وكذلك جميع التدابير الاخرى اللازمة لتطبيق هذا القانون."
+    },
+    {
+      "id": "a7",
+      "law": 244971,
+      "article": "76",
+      "quote": "إنشاء منصة رقمية مخصصة للخدمات الإلكترونية الـمتعلقة بتلك القواعد، ومنها تسجيل الـمشتركين ودفع الاشتراكات والـمستحقات"
+    },
+    {
+      "id": "a8",
+      "law": 244971,
+      "article": "7",
+      "quote": "يشتمل الضمان الاجتماعي على الفروع التالية:\n\nآ - ضمان المرض والامومة.\n\nب - ضمان طوارىء العمل والامراض المهنية.\n\nج - نظام التعويضات العائلية والتعليمية.\n\nد - نظام التقاعد."
+    },
+    {
+      "id": "a9",
+      "law": 244971,
+      "article": "15",
+      "quote": "ان تقديمات ضمان المرض والامومة تشتمل على ما يأتي:\n\nآ - العناية الطبية الوقائية والعلاجية .\n\nب - في حال الامومة, الفحوص والعناية السابقة للولادة والعناية اللازمة اثناء الولادة وبعدها.\n\nج - في حال العجز الموقت عن العمل الناتج عن المرض او عن الامومة, تعويض المرض او الامومة.\n\nد - في حال الوفاة, تعويض نفقات الدفن."
+    },
+    {
+      "id": "a10",
+      "law": 244971,
+      "article": "16",
+      "quote": "لا تستحق تقديمات الـمرض والأمومة إلا إذا كان الـمضمون مشتركاً في الضمان طيلة ثلاثة أشهر على الأقل خلال الستة أشهر السابقة لتاريخ التثبت الطبي أو لتاريخ الوفاة."
+    },
+    {
+      "id": "a11",
+      "law": 244971,
+      "article": "14",
+      "quote": "يعتبر من أفراد عائلة الـمضمون الأشخاص الـمذكورين في ما يلي الذين يعيشون تحت سقف واحد وعلى نفقته:"
+    },
+    {
+      "id": "a12",
+      "law": 244971,
+      "article": "49",
+      "quote": "ينشأ نظام للتقاعد، ليحل محل نظام تعويض نهاية الخدمة في جميع حقوقه والتزاماته."
+    },
+    {
+      "id": "a13",
+      "law": 244971,
+      "article": "54",
+      "quote": "إن الاشتراكات هي على عاتق أصحاب العمل والـمضمونين."
+    },
+    {
+      "id": "a14",
+      "law": 244971,
+      "article": "54-6",
+      "quote": "يتخذ مجلس الوزراء مرسومًا تطبيقياً بناء على اقتراح وزير العمل وإنهاء مجلس إدارة الصندوق، يحدد فيه نِسب الاشتراكات"
+    },
+    {
+      "id": "a15",
+      "law": 244971,
+      "article": "73",
+      "quote": "ان اشتراكات : ضمان طوارىء العمل والامراض المهنية ونظام التقديمات العائلية والتعليمية ونظام تعويض نهاية الخدمة هي كلها على عاتق ارباب العمل."
+    },
+    {
+      "id": "a16",
+      "law": 244971,
+      "article": "73",
+      "quote": "ان اشتراكات ضمان المرض والامومة هي على عاتق المضمونين وارباب عملهم والدولة. تأخذ الدولة على عاتقها 25% من قيمة التقديمات المتعلقة بالضمان المذكور"
+    },
+    {
+      "id": "a17",
       "law": 244971,
       "article": "71",
       "quote": "تعين معدلات الاشتراكات بمرسوم يتخذ في مجلس الوزراء بناء على اقتراح وزير العمل والشؤون الاجتماعية وانهاء مجلس الادارة, وهي تحدد بنسبة مئوية من الكسب الخاضع للحسومات"
     },
     {
-      "id": "a5",
-      "law": 244971,
-      "article": "54",
-      "quote": "يسدد صاحب العمل الاشتراكات الـمتوجبة عليه وعلى الـمضمونين العاملين لديه كاملة إلى نظام التقاعد، ويعلـمهم برصيد حسابات اشتراكاتهم سنويا."
+      "id": "a18",
+      "law": 169424,
+      "article": "2",
+      "quote": "حدد معدل الاشتراك المتوجب عن المضمون المتزوج والمضمون العازب على السواء لفرع ضمان المرض والامومة (تقديمات العناية الطبية ونفقات الدفن) المنصوص عليه في المادة 68 الفقرة (2) من قانون الضمان الاجتماعي بنسبة 9% (تسعة بالمئة) من الكسب المنصوص عليه في المادة الاولى يوزع كما يلي: ­ 7% (سبعة بالمئة) على عاتق صاحب العمل. ­2% (اثنين بالمئة) على عاتق المضمون."
     },
     {
-      "id": "a6",
-      "law": 244971,
-      "article": "54-6",
-      "quote": "يجب تضمين الـمرسوم التطبيقي جميع الأحكام الانتقالية الـمتعلقة بمعالجة وتصفية الحقوق الـمكتسبة للأجراء بموجب نظام تعويض نهاية الخدمة، بما في ذلك آليات التعامل مع الاعتراضات التي تثار بعد تطبيق هذه الأحكام الانتقالية."
+      "id": "a19",
+      "law": 169425,
+      "article": "2",
+      "quote": "حدد معدل الاشتراك المتوجب على صاحب العمل لفرع التقديمات العائلية والتعليمية المنصوص عليه في قانون الضمان الاجتماعي عن المضون المتزوج والمضمون العازب على السواء بنسبة 6% (ستة بالمائة) من الكسب المنصوص عليه في المادة الاولى اعلاه."
     },
     {
-      "id": "a7",
+      "id": "a20",
+      "law": 205715,
+      "article": "1",
+      "quote": "يحدد معدل اشتراك فرع تعويض نهاية الخدمة المنصوص عليه في قانون الضمان الاجتماعي بثمانية ونصف بالماية (8،5%) من الكسب المنصوص عليه في المادة 68 الفقرتان 1 و3) من قانون الضمان الاجتماعي ويوزع هذا المعدل على الشكل الاتي: - ثمانية بالماية (8%) لحساب الاجراء المستفيدين - نصف بالماية (0،5%) لتغطية النفقات الادارية والاعباء العامة التي تقع على عاتق الصندوق"
+    },
+    {
+      "id": "a21",
+      "law": 269964,
+      "article": "1",
+      "quote": "الاجراء والاشخاص العاملين الخاضعين لهذا النظام واصحاب عملهم والدولة، وتحدد نسبة الاشتراك بثلاثة بالماية (%3) من الكسب الخاضع للاشتراكات توزع بينهم بالتساوي."
+    },
+    {
+      "id": "a22",
       "law": 244971,
       "article": "68",
-      "quote": "يؤخذ بعين الاعتبار كحد اقصى للدخل الخاضع للحسومات الدخل الذي تبلغ قيمته ضعفي الحد الادنى الرسمي للرواتب والاجور. ويمكن تعديل هذا الحد الاقصى بمرسوم يتخذ في مجلس الوزراء بناء على اقتراح وزير العمل والشؤون الاجتماعية وبعد انهاء مجلس الادارة.\n\n3 - لا تطبق احكام الفقرة 2 اعلاه على حساب تعويض نهاية الخدمة."
+      "quote": "إن الكسب الذي يتخذ أساساً لحساب الاشتراكات يشتمل على مجموع الدخل الـمدفوع للعامل مقابل العمل أو بمناسبة العمل بما فيه جميع العناصر واللواحق، ولا سيما الأجور والـمكاسب وتعويضات الإجازات الـمدفوعة"
     },
     {
-      "id": "a8",
+      "id": "a23",
       "law": 244971,
       "article": "68",
       "quote": "يُعدل الحد الأقصى للكسب الخاضع للحسومات لفرع ضمان الـمرض والأمومة الـمنصوص عليه في الـمادة 68 (الفقرة 2) من قانون الضمان الاجتماعي ليصبح خمسة أضعاف الحد الأدنى الرسمي للأجر الشهري."
     },
     {
-      "id": "a9",
+      "id": "a24",
+      "law": 244971,
+      "article": "68",
+      "quote": "3 - لا تطبق احكام الفقرة 2 اعلاه على حساب تعويض نهاية الخدمة."
+    },
+    {
+      "id": "a25",
+      "law": 333673,
+      "article": "1",
+      "quote": "يُعدل الحد الأقصى للكسب الخاضع لحسومات فرع التقديمات العائلية والتعليمية الـمنصوص عليه في الـمادة 68 (الفقرة 2) من قانون الضمان الاجتماعي ليصبح /18,000,000/ل.ل. (ثمانية عشر مليون ليرة لبنانية) شهريا."
+    },
+    {
+      "id": "a26",
+      "law": 244971,
+      "article": "80",
+      "quote": "ان صاحب العمل الذي يغفل التصريح عن التحاق الشخص الخاضع للضمان بالعمل او عن تركه العمل خلال خمسة عشر يوما من تاريخ الالتحاق او الترك"
+    },
+    {
+      "id": "a27",
       "law": 244971,
       "article": "77",
-      "quote": "6 - على صاحب العمل ان يدون, دون بياض او حشو او حك او تصحيح, في سجل خاص وفق نموذج تضعه ادارة الصندوق تحت تصرفه ويبين فيه تاريخ كل تدوين اسماء الاشخاص الخاضعين للضمان, وتاريخ ومحل ولادتهم ومقدار اجرهم والتعويضات الاضافية التي يستفيدون منها وذلك قبل مباشرتهم العمل, وكذلك تاريخ الانقطاع عن العمل او الصرف منه خلال ثلاثة ايام على الاكثر تلي تاريخ حصوله."
+      "quote": "على صاحب العمل ان يدون, دون بياض او حشو او حك او تصحيح, في سجل خاص وفق نموذج تضعه ادارة الصندوق تحت تصرفه ويبين فيه تاريخ كل تدوين اسماء الاشخاص الخاضعين للضمان, وتاريخ ومحل ولادتهم ومقدار اجرهم والتعويضات الاضافية التي يستفيدون منها وذلك قبل مباشرتهم العمل, وكذلك تاريخ الانقطاع عن العمل او الصرف منه خلال ثلاثة ايام على الاكثر تلي تاريخ حصوله."
     },
     {
-      "id": "a10",
-      "law": 244971,
-      "article": "80",
-      "quote": "أ - ان صاحب العمل الذي يغفل التصريح عن التحاق الشخص الخاضع للضمان بالعمل او عن تركه العمل خلال خمسة عشر يوما من تاريخ الالتحاق او الترك يعاقب بغرامة تتراوح بين 100 و 1000 ليرة لبنانية. واذا تجاوز التأخر في التصريح مدة أقصاها ثلاثة اشهر من تاريخ الالتحاق بالعمل او الترك, يعاقب المخالف بغرامة اضافية قدرها 50 ليرة شهريا عن كل شخص على ان لا تتجاوز الغرامة في مطلق الاحوال الف ليرة لبنانية عن كل شخص ."
-    },
-    {
-      "id": "a11",
-      "law": 244971,
-      "article": "80",
-      "quote": "1 - ان صاحب العمل الذي يحتجز بغير حق الاشتراك المحسوم من اجر او كسب الشخص الخاضع للضمان والمستحق للصندوق يعاقب بالحبس من ثلاثة اشهر الى سنتين او بغرامة تتراوح بين 100 و 1000 ليرة لبنانية او بهاتين العقوبتين معا اذا لم يسدد المبلغ المتوجب بذمته خلال مهلة اقصاها خمسة عشر يوما من تاريخ ابلاغه باحدى الطرق القانونية الانذار بالدفع."
-    },
-    {
-      "id": "a12",
+      "id": "a28",
       "law": 244971,
       "article": "79",
-      "quote": "1 - ان الاشتراكات التي لا تدفع خلال المهلة المحددة تزاد حكما بنسبة نصف بالاف عن كل يوم تأخير."
+      "quote": "ان الاشتراكات التي لا تدفع خلال المهلة المحددة تزاد حكما بنسبة نصف بالاف عن كل يوم تأخير."
     },
     {
-      "id": "a13",
+      "id": "a29",
       "law": 244971,
       "article": "54-2",
-      "quote": "إضافة إلى أحكام الـمادتين (79) و(80) من هذا القانون، واعتباراً من تاريخ الاستحقاق الـمحدد في نظام الصندوق، تفرض على صاحب العمل الذي يتخلف عن تسديد الاشتراكات ضمن الـمهل الـمحددة نظامياً غرامة إضافية بنسبة ثلاثة بالـمئة (3%) شهرياً من مجموع الاشتراكات الـمستحقة على أن لا تزيد هذه النسبة عن خمسة عشر بالـمئة (15%) من هذا الـمجموع."
+      "quote": "تفرض على صاحب العمل الذي يتخلف عن تسديد الاشتراكات ضمن الـمهل الـمحددة نظامياً غرامة إضافية بنسبة ثلاثة بالـمئة (3%) شهرياً من مجموع الاشتراكات الـمستحقة على أن لا تزيد هذه النسبة عن خمسة عشر بالـمئة (15%) من هذا الـمجموع."
     },
     {
-      "id": "a14",
+      "id": "a30",
+      "law": 244971,
+      "article": "80",
+      "quote": "ان صاحب العمل الذي يحتجز بغير حق الاشتراك المحسوم من اجر او كسب الشخص الخاضع للضمان والمستحق للصندوق يعاقب بالحبس من ثلاثة اشهر الى سنتين او بغرامة تتراوح بين 100 و 1000 ليرة لبنانية او بهاتين العقوبتين معا اذا لم يسدد المبلغ المتوجب بذمته خلال مهلة اقصاها خمسة عشر يوما من تاريخ ابلاغه باحدى الطرق القانونية الانذار بالدفع."
+    },
+    {
+      "id": "a31",
       "law": 244971,
       "article": "83",
       "quote": "في ما يتعلق بفرع طوارىء العمل والامراض المهنية, عندما يكون الاجير غير مصرح عنه او عندما يكون رب العمل متأخرا عن تسديد الاشتراكات المتوجبة عليه كليا او جزئيا لغاية يوم الحادث , ففي هذه الحالة على الصندوق ان يقدم للاجير جميع التقديمات المتوجبة له ويبقى رب العمل مدينا للصندوق بمبلغ يساوي مجموع التقديمات المتوجبة او المدفوعة للاجير او لاصحاب الحق من بعده"
     }
   ],
   "en": {
-    "title": "Registering with the NSSF and paying contributions",
-    "question": "Who must register with the National Social Security Fund in Lebanon, who pays which contributions, and what happens if the employer is late?",
-    "description": "Who the NSSF covers, who pays each contribution, the move from end-of-service to a pension, and the charges on late employers.",
+    "title": "Who must register with the NSSF in Lebanon, and what are the contribution rates?",
+    "question": "Who has to be registered with the National Social Security Fund (NSSF) in Lebanon, what does it cover, and what do employers and employees pay?",
+    "description": "Lebanese wage earners must be covered. Decrees set 9% for sickness (7% employer, 2% employee), 6% family and 8.5% end-of-service, paid by the employer.",
     "answer": {
-      "text": "We do not hold the general list of who must register with the Fund; Article 10 adds Lebanese wage earners in agricultural establishments. Employers alone pay work-accident, family and end-of-service contributions, and end-of-service rights are to move into a pension system whose contributions employers and workers share. Late payment adds half per thousand a day plus 3% a month up to 15%, and withholding deducted contributions is punishable by prison.",
+      "text": "Under Article 9 of the Social Security Law, every Lebanese wage earner working in Lebanon for one or more employers must be covered by the NSSF, whatever the contract, and foreign workers benefit if they hold a work permit and their country treats Lebanese equally. Decrees set contributions at 9% of earnings for sickness and maternity (7% employer, 2% employee), 6% for family allowances and 8.5% for end-of-service, the last two paid by the employer alone. The NSSF covers sickness and maternity, work accidents, family and education allowances, and a pension scheme that is to replace end-of-service pay.",
       "cites": [
         "a1",
-        "a2",
-        "a5",
-        "a6",
-        "a12",
-        "a13",
-        "a11"
+        "a3",
+        "a18",
+        "a19",
+        "a20",
+        "a15",
+        "a8",
+        "a12"
       ]
     },
     "sections": [
       {
-        "heading": "Who must be registered with the NSSF?",
+        "heading": "Key figures at a glance",
         "paras": [
           {
-            "text": "Article 10 covers Lebanese workers, employees, trainees and apprentices in an agricultural establishment in Lebanon, from the law's second phase. Their employer may be Lebanese or foreign.",
+            "text": "The Social Security Law leaves contribution rates to Council of Ministers decrees, as a percentage of earnings (Article 71), and the decrees and articles below give the figures.",
+            "cites": [
+              "a17"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "NSSF contributions, ceilings and deadlines",
+          "head": [
+            "Item",
+            "Figure",
+            "Source"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Sickness and maternity",
+                "9% of earnings: 7% employer, 2% employee",
+                "Decree 5101 of 2001, Article 2"
+              ],
+              "cites": [
+                "a18"
+              ]
+            },
+            {
+              "cells": [
+                "Medical cover for retirees",
+                "3% of earnings, split equally between worker, employer and State",
+                "Law 27 of 2017, Article 1"
+              ],
+              "cites": [
+                "a21"
+              ]
+            },
+            {
+              "cells": [
+                "Family and education allowances",
+                "6% of earnings, employer only",
+                "Decree 5102 of 2001, Article 2"
+              ],
+              "cites": [
+                "a19"
+              ]
+            },
+            {
+              "cells": [
+                "End-of-service",
+                "8.5% of earnings, employer only: 8% to the workers' accounts, 0.5% for running costs",
+                "Decree 2951 of 1965, Article 1"
+              ],
+              "cites": [
+                "a20"
+              ]
+            },
+            {
+              "cells": [
+                "State share of sickness and maternity",
+                "25% of the benefits",
+                "Social Security Law, Article 73"
+              ],
+              "cites": [
+                "a16"
+              ]
+            },
+            {
+              "cells": [
+                "Earnings ceiling, sickness and maternity",
+                "5 times the official monthly minimum wage",
+                "Social Security Law, Article 68"
+              ],
+              "cites": [
+                "a23"
+              ]
+            },
+            {
+              "cells": [
+                "Earnings ceiling, family allowances",
+                "18,000,000 LBP a month",
+                "Decree 422 of 2025, Article 1"
+              ],
+              "cites": [
+                "a25"
+              ]
+            },
+            {
+              "cells": [
+                "Earnings ceiling, end-of-service",
+                "None",
+                "Social Security Law, Article 68"
+              ],
+              "cites": [
+                "a24"
+              ]
+            },
+            {
+              "cells": [
+                "Declaring a hire or a departure",
+                "Within 15 days",
+                "Social Security Law, Article 80"
+              ],
+              "cites": [
+                "a26"
+              ]
+            },
+            {
+              "cells": [
+                "Late payment",
+                "Half per thousand a day, plus 3% a month up to 15%",
+                "Social Security Law, Articles 79 and 54-2"
+              ],
+              "cites": [
+                "a28",
+                "a29"
+              ]
+            },
+            {
+              "cells": [
+                "Qualifying for sickness benefits",
+                "3 months insured in the 6 months before",
+                "Social Security Law, Article 16"
+              ],
+              "cites": [
+                "a10"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "Who must register with the NSSF?",
+        "paras": [
+          {
+            "text": "Every Lebanese wage earner working in Lebanon for one or more employers, Lebanese or foreign, must be covered, whether permanent, temporary, seasonal, a trainee or an apprentice, and whatever the type or validity of the contract (Article 9).",
             "cites": [
               "a1"
             ]
           },
           {
-            "text": "Foreign wage earners in these establishments are covered only on the conditions in paragraph 4 of the preceding article, which we do not hold.",
+            "text": "Foreign workers and their employers carry all the obligations for sickness and maternity, family allowances and work accidents, but the workers benefit only with a work permit and if their country treats Lebanese equally in social security. The employer owes end-of-service contributions for them only where they can receive that benefit (Article 9).",
             "cites": [
-              "a1"
-            ]
-          },
-          {
-            "text": "We do not hold the general list of insured persons. This page cannot say whether workers outside agriculture are covered.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "When must the employer record and declare a worker?",
-        "paras": [
-          {
-            "text": "Before work starts, the employer must enter each covered worker in a special register on the Fund's model, with name, birth details, wage and allowances. The date of leaving or dismissal goes in within 3 days.",
-            "cites": [
-              "a9"
-            ]
-          },
-          {
-            "text": "Each hire and departure must be declared to the Fund within 15 days, or the employer faces a fine of 100 to 1,000 LBP. Past 3 months, 50 LBP a month per person is added, up to 1,000 LBP per person.",
-            "cites": [
-              "a10"
-            ]
-          },
-          {
-            "text": "The lira fines on this page are the amounts printed in the law. This page does not cover the Fund's notice and assessment procedure or time limits on old debts.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "Who pays which contributions?",
-        "paras": [
-          {
-            "text": "Employers alone pay contributions for work accidents and occupational diseases, family and education allowances, and end-of-service. If a worker's wage drops with the same employer, the employer still pays on the higher wage.",
-            "cites": [
-              "a2"
-            ]
-          },
-          {
-            "text": "Sickness and maternity contributions are shared by the insured person, the employer and the State, which bears 25% of the benefits. Employers pay all of them for trainees and for people whose cash wage does not exceed an amount the board sets.",
-            "cites": [
+              "a2",
               "a3"
             ]
           },
           {
-            "text": "Article 71 says Council of Ministers decrees set contribution rates as a percentage of earnings. Decrees also set the employer and worker shares of sickness and maternity. We do not hold the current rate decrees.",
+            "text": "Registered Palestinian refugee workers are exempt from the reciprocity condition and receive end-of-service pay on the same terms as Lebanese workers, but not sickness, maternity or family benefits (Article 9).",
             "cites": [
               "a4",
-              "a3"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "Is a pension replacing end-of-service pay?",
-        "paras": [
-          {
-            "text": "Article 54-6 requires an applicative decree with transitional rules to settle workers' end-of-service rights. The texts we hold do not show that it has been issued. So we cannot say whether Article 73's employer-only end-of-service contribution still applies.",
-            "cites": [
-              "a6",
-              "a2"
-            ]
-          },
-          {
-            "text": "Under Article 54, the employer pays its own and its workers' pension contributions in full to the pension system. It tells workers their balances every year.",
-            "cites": [
               "a5"
             ]
+          },
+          {
+            "text": "The Fund's board sets the rules for registering employers and insured persons and for declaring entry into and exit from work, and Article 76 requires the Fund to set up a digital platform for registration and payments.",
+            "cites": [
+              "a6",
+              "a7"
+            ]
           }
         ]
       },
       {
-        "heading": "What is the ceiling on earnings for contributions?",
+        "heading": "What does the NSSF cover?",
         "paras": [
           {
-            "text": "Article 68 caps the earnings subject to contributions at twice the official minimum wage. A Council of Ministers decree can change this cap. The cap does not apply to end-of-service.",
-            "cites": [
-              "a7"
-            ]
-          },
-          {
-            "text": "For sickness and maternity, Article 68 amends that cap to 5 times the official monthly minimum wage.",
+            "text": "The Social Security Law has these branches: sickness and maternity, work accidents and occupational diseases, family and education allowances, and a pension scheme (Article 7).",
             "cites": [
               "a8"
             ]
           },
           {
-            "text": "This page does not give the family branch or pension ceilings, and we do not hold the current minimum wage decree.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "What happens if the employer pays late?",
-        "paras": [
-          {
-            "text": "Contributions paid late rise automatically by half per thousand for each day. Article 54-2 adds 3% a month of the contributions due, capped at 15%, on top of Article 79. It sits among the pension rules and does not say whether other branches are covered.",
+            "text": "Sickness and maternity cover preventive and curative medical care, care before, during and after childbirth, an allowance during temporary incapacity, and funeral costs (Article 15). Benefits are due only if the worker was insured for at least 3 months in the 6 months before the medical finding (Article 16).",
             "cites": [
-              "a12",
-              "a13"
+              "a9",
+              "a10"
             ]
           },
           {
-            "text": "An employer who wrongfully keeps contributions deducted from a worker's pay faces 3 months to 2 years in prison, a fine of 100 to 1,000 LBP, or both. This applies if it does not pay within 15 days of a formal notice.",
+            "text": "Cover extends to family members who live with the insured person and depend on them: a spouse who does not work, children up to 18, or 25 if studying full time, and parents aged 60 or over (Article 14).",
             "cites": [
               "a11"
             ]
           },
           {
-            "text": "If a worker is undeclared, or the employer is behind on contributions on the day of a work accident, the Fund still pays all benefits. The employer then owes the Fund their full amount.",
+            "text": "A 2023 amendment creates a pension scheme to replace the end-of-service scheme, with contributions borne by employers and insured persons at rates an implementing decree is to set (Articles 49, 54 and 54-6).",
             "cites": [
+              "a12",
+              "a13",
               "a14"
             ]
+          }
+        ]
+      },
+      {
+        "heading": "What are the contribution rates, and who pays them?",
+        "paras": [
+          {
+            "text": "Employers alone pay the contributions for work accidents, family and education allowances and end-of-service, while sickness and maternity are shared by the insured person, the employer and the State, which bears 25% of the benefits (Article 73).",
+            "cites": [
+              "a15",
+              "a16"
+            ]
+          },
+          {
+            "text": "The decrees we hold set sickness and maternity at 9% of earnings, 7% from the employer and 2% from the employee, family allowances at 6% and end-of-service at 8.5%, both from the employer. A 2017 law added 3% for retirees' medical cover, shared equally by worker, employer and State.",
+            "cites": [
+              "a18",
+              "a19",
+              "a20",
+              "a21"
+            ]
+          },
+          {
+            "text": "Earnings means the whole pay and its extras, including wages, paid leave and allowances (Article 68). The sickness and maternity ceiling is 5 times the official monthly minimum wage, the family allowance ceiling is 18,000,000 LBP a month, and end-of-service has no ceiling.",
+            "cites": [
+              "a22",
+              "a23",
+              "a25",
+              "a24"
+            ]
+          },
+          {
+            "text": "Example: for a worker paid more than 18,000,000 LBP a month, the employer's 6% family contribution is charged on 18,000,000 LBP only, while the 8.5% end-of-service contribution is charged on the full pay.",
+            "cites": [
+              "a25",
+              "a19",
+              "a20",
+              "a24"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What are the deadlines, and what if the employer is late?",
+        "paras": [
+          {
+            "text": "The employer must declare each hire and each departure to the Fund within 15 days (Article 80), and enter each worker in its special register before work starts, recording a departure within 3 days (Article 77).",
+            "cites": [
+              "a26",
+              "a27"
+            ]
+          },
+          {
+            "text": "Late contributions rise automatically by half per thousand for each day of delay (Article 79), and Article 54-2 adds a fine of 3% a month of the contributions due, up to 15%.",
+            "cites": [
+              "a28",
+              "a29"
+            ]
+          },
+          {
+            "text": "An employer who wrongfully keeps contributions deducted from a worker's pay, and does not pay within 15 days of a formal notice, faces 3 months to 2 years in prison, a fine, or both (Article 80).",
+            "cites": [
+              "a30"
+            ]
+          },
+          {
+            "text": "If the worker was not declared, or the employer was behind on contributions on the day of a work accident, the Fund still pays the benefits and the employer owes it their full amount (Article 83).",
+            "cites": [
+              "a31"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What this page does not cover",
+        "paras": [
+          {
+            "text": "The rates come from decrees of 1965 and 2001 and a 2017 law in our database. A later decree may have changed them, and we hold no decree setting the work-accident rate.",
+            "note": true
+          },
+          {
+            "text": "Law 277 of 2022 rewrote the paragraph of Article 9 on retirees' contributions, and our copy shows only the split for people without an employer (2% insured, 1% State), so the equal 3% split rests on the 2017 text.",
+            "note": true
+          },
+          {
+            "text": "The fines in Article 80 are printed in old lira amounts (100 to 1,000 LBP) that are now symbolic. The pension's implementing decree is not in our database, and voluntary insurance, doctors, students and journalists are not covered here.",
+            "note": true
           }
         ]
       }
     ]
   },
   "ar": {
-    "title": "التسجيل في الصندوق الوطني للضمان الاجتماعي والاشتراكات",
-    "question": "من يجب أن يسجل في الصندوق الوطني للضمان الاجتماعي في لبنان، ومن يدفع الاشتراكات، وما الذي يترتب إذا تأخر رب العمل؟",
-    "description": "من يشمله الضمان، ومن يدفع كل اشتراك، وانتقال نهاية الخدمة إلى التقاعد، وما يترتب على رب العمل المتأخر.",
+    "title": "من يجب أن يُسجَّل في الضمان الاجتماعي في لبنان، وما نسب الاشتراكات؟",
+    "question": "من يجب أن يُسجَّل في الصندوق الوطني للضمان الاجتماعي في لبنان، وماذا يغطي، وكم يدفع صاحب العمل والأجير؟",
+    "description": "يخضع للضمان كل أجير لبناني. والاشتراكات بالمراسيم: 9% للمرض والأمومة (7% صاحب العمل و2% الأجير)، و6% للتقديمات العائلية و8.5% لنهاية الخدمة على صاحب العمل.",
     "answer": {
-      "text": "النصوص المتوفرة لدينا لا تتضمن اللائحة العامة لمن يجب تسجيلهم في الصندوق، وتضيف المادة 10 الأجراء اللبنانيين العاملين في المؤسسات الزراعية. يتحمل أرباب العمل وحدهم اشتراكات طوارئ العمل والتقديمات العائلية ونهاية الخدمة، على أن تنتقل حقوق نهاية الخدمة إلى نظام تقاعد يتقاسم اشتراكاته رب العمل والأجير. ويُزاد على الاشتراكات المتأخرة نصف بالألف عن كل يوم و3% شهرياً حتى 15%، ويعاقب بالحبس رب العمل الذي يحتجز الاشتراكات المحسومة من الأجر.",
+      "text": "وفق المادة 9 من قانون الضمان الاجتماعي، يخضع للضمان كل أجير لبناني يعمل في لبنان لحساب رب عمل واحد أو أكثر، أياً كان عقده، ويستفيد الأجراء الأجانب إذا كانوا حائزين على إجازة عمل وكانت دولتهم تعامل اللبنانيين بالمثل. وتحدد المراسيم الاشتراكات بنسبة 9% من الكسب لضمان المرض والأمومة (7% على صاحب العمل و2% على الأجير)، و6% للتقديمات العائلية، و8.5% لتعويض نهاية الخدمة، والأخيرتان على صاحب العمل وحده. ويغطي الضمان المرض والأمومة وطوارئ العمل والتقديمات العائلية والتعليمية ونظاماً للتقاعد يحل محل تعويض نهاية الخدمة.",
       "cites": [
         "a1",
-        "a2",
-        "a5",
-        "a6",
-        "a12",
-        "a13",
-        "a11"
+        "a3",
+        "a18",
+        "a19",
+        "a20",
+        "a15",
+        "a8",
+        "a12"
       ]
     },
     "sections": [
       {
-        "heading": "من يجب تسجيله في الصندوق الوطني للضمان الاجتماعي؟",
+        "heading": "الأرقام الأساسية باختصار",
         "paras": [
           {
-            "text": "تُخضع المادة 10 للضمان، ابتداءً من المرحلة الثانية، الأجراء اللبنانيين من عمال ومستخدمين ومتدربين ومتمرنين العاملين في مؤسسة زراعية في لبنان. ويستوي أن يكون رب العمل لبنانياً أو أجنبياً.",
+            "text": "يترك قانون الضمان الاجتماعي تحديد معدلات الاشتراكات لمراسيم تتخذ في مجلس الوزراء بنسبة مئوية من الكسب (المادة 71)، وترد الأرقام في المراسيم والمواد أدناه.",
+            "cites": [
+              "a17"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "اشتراكات الضمان وسقوفها ومهلها",
+          "head": [
+            "البند",
+            "الرقم",
+            "المصدر"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "ضمان المرض والأمومة",
+                "9% من الكسب: 7% على صاحب العمل و2% على الأجير",
+                "المرسوم 5101 لعام 2001، المادة 2"
+              ],
+              "cites": [
+                "a18"
+              ]
+            },
+            {
+              "cells": [
+                "التغطية الصحية للمتقاعدين",
+                "3% من الكسب، توزع بالتساوي بين الأجير وصاحب العمل والدولة",
+                "القانون 27 لعام 2017، المادة 1"
+              ],
+              "cites": [
+                "a21"
+              ]
+            },
+            {
+              "cells": [
+                "التقديمات العائلية والتعليمية",
+                "6% من الكسب على صاحب العمل وحده",
+                "المرسوم 5102 لعام 2001، المادة 2"
+              ],
+              "cites": [
+                "a19"
+              ]
+            },
+            {
+              "cells": [
+                "تعويض نهاية الخدمة",
+                "8.5% من الكسب على صاحب العمل وحده: 8% لحساب الأجراء و0.5% للنفقات الإدارية",
+                "المرسوم 2951 لعام 1965، المادة 1"
+              ],
+              "cites": [
+                "a20"
+              ]
+            },
+            {
+              "cells": [
+                "حصة الدولة في ضمان المرض والأمومة",
+                "25% من قيمة التقديمات",
+                "قانون الضمان الاجتماعي، المادة 73"
+              ],
+              "cites": [
+                "a16"
+              ]
+            },
+            {
+              "cells": [
+                "سقف الكسب لضمان المرض والأمومة",
+                "5 أضعاف الحد الأدنى الرسمي للأجر الشهري",
+                "قانون الضمان الاجتماعي، المادة 68"
+              ],
+              "cites": [
+                "a23"
+              ]
+            },
+            {
+              "cells": [
+                "سقف الكسب للتقديمات العائلية",
+                "18,000,000 ل.ل. شهرياً",
+                "المرسوم 422 لعام 2025، المادة 1"
+              ],
+              "cites": [
+                "a25"
+              ]
+            },
+            {
+              "cells": [
+                "سقف الكسب لنهاية الخدمة",
+                "لا سقف",
+                "قانون الضمان الاجتماعي، المادة 68"
+              ],
+              "cites": [
+                "a24"
+              ]
+            },
+            {
+              "cells": [
+                "التصريح عن الالتحاق بالعمل أو تركه",
+                "خلال 15 يوماً",
+                "قانون الضمان الاجتماعي، المادة 80"
+              ],
+              "cites": [
+                "a26"
+              ]
+            },
+            {
+              "cells": [
+                "التأخر في الدفع",
+                "نصف بالألف عن كل يوم، وغرامة 3% شهرياً حتى 15%",
+                "قانون الضمان الاجتماعي، المادتان 79 و54-2"
+              ],
+              "cites": [
+                "a28",
+                "a29"
+              ]
+            },
+            {
+              "cells": [
+                "استحقاق تقديمات المرض",
+                "3 أشهر اشتراك خلال الأشهر الستة السابقة",
+                "قانون الضمان الاجتماعي، المادة 16"
+              ],
+              "cites": [
+                "a10"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "من يجب أن يُسجَّل في الضمان؟",
+        "paras": [
+          {
+            "text": "يخضع للضمان كل أجير لبناني يعمل في لبنان لحساب رب عمل واحد أو أكثر، لبناني أو أجنبي، سواء كان دائماً أو مؤقتاً أو موسمياً أو متدرباً أو متمرناً، وأياً كانت مدة العقد أو نوعه أو صحته (المادة 9).",
             "cites": [
               "a1"
             ]
           },
           {
-            "text": "أما الأجراء الأجانب في هذه المؤسسات فلا يخضعون إلا بالشروط المبينة في الفقرة 4 من المادة السابقة، وهي غير متوفرة لدينا.",
+            "text": "يخضع الأجراء الأجانب وأرباب عملهم لجميع الموجبات المتعلقة بضمان المرض والأمومة والتعويضات العائلية وطوارئ العمل، لكن الأجير الأجنبي لا يستفيد إلا إذا كان حائزاً على إجازة عمل وكانت دولته تقر للبنانيين المساواة في المعاملة في الضمان. ولا يتوجب على صاحب العمل اشتراك نهاية الخدمة عنهم إلا إذا كان يحق لهم الاستفادة من هذا التعويض (المادة 9).",
             "cites": [
-              "a1"
-            ]
-          },
-          {
-            "text": "النصوص المتوفرة لدينا لا تتضمن اللائحة العامة للمضمونين، فلا تبيّن هذه الصفحة هل يشمل الضمان الأجراء خارج القطاع الزراعي.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "متى يدوّن رب العمل الأجير ويصرّح عنه؟",
-        "paras": [
-          {
-            "text": "على رب العمل، قبل مباشرة الأجير العمل، أن يدوّنه في سجل خاص وفق نموذج الصندوق، مع اسمه وتاريخ ولادته ومحلها وأجره وتعويضاته الإضافية. ويدوّن تاريخ ترك العمل أو الصرف خلال 3 أيام على الأكثر.",
-            "cites": [
-              "a9"
-            ]
-          },
-          {
-            "text": "ويصرّح رب العمل للصندوق عن التحاق الأجير بالعمل وعن تركه له خلال 15 يوماً، وإلا عوقب بغرامة من 100 إلى 1,000 ليرة لبنانية. وإذا تجاوز التأخير 3 أشهر، تضاف 50 ليرة شهرياً عن كل شخص، على ألا تتجاوز الغرامة 1,000 ليرة عن الشخص الواحد.",
-            "cites": [
-              "a10"
-            ]
-          },
-          {
-            "text": "الغرامات بالليرة في هذه الصفحة هي المبالغ الواردة في القانون. ولا تتناول الصفحة إنذار الصندوق وتقديره للاشتراكات، ولا مرور الزمن على الديون القديمة.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "من يدفع كل نوع من الاشتراكات؟",
-        "paras": [
-          {
-            "text": "يتحمل أرباب العمل وحدهم اشتراكات طوارئ العمل والأمراض المهنية والتقديمات العائلية والتعليمية ونهاية الخدمة. وإذا خُفّض أجر الأجير لدى رب العمل نفسه، يبقى اشتراك رب العمل محسوباً على أساس الأجر الأعلى.",
-            "cites": [
-              "a2"
-            ]
-          },
-          {
-            "text": "يتقاسم المضمون ورب العمل والدولة اشتراكات ضمان المرض والأمومة، وتتحمل الدولة 25% من قيمة التقديمات. ويدفع رب العمل الاشتراكات كلها عن المتدربين وعن الأشخاص الذين لا تزيد أجورهم النقدية على مقدار يحدده مجلس الإدارة.",
-            "cites": [
+              "a2",
               "a3"
             ]
           },
           {
-            "text": "تنص المادة 71 على أن معدلات الاشتراكات تُحدَّد بمرسوم يتخذ في مجلس الوزراء، بنسبة مئوية من الكسب الخاضع للحسومات. ويحدد مرسوم أيضاً حصة رب العمل وحصة الأجير في ضمان المرض والأمومة. ولا تتوفر لدينا المراسيم التي تحدد النسب الحالية.",
+            "text": "يُعفى العمال اللاجئون الفلسطينيون المسجلون من شرط المعاملة بالمثل ويستفيدون من تعويض نهاية الخدمة بشروط العامل اللبناني، لكنهم لا يستفيدون من تقديمات المرض والأمومة والتقديمات العائلية (المادة 9).",
             "cites": [
               "a4",
-              "a3"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "هل يحل نظام التقاعد محل تعويض نهاية الخدمة؟",
-        "paras": [
-          {
-            "text": "توجب المادة 54-6 إصدار مرسوم تطبيقي يتضمن الأحكام الانتقالية لتصفية الحقوق التي اكتسبها الأجراء في نظام تعويض نهاية الخدمة. والنصوص المتوفرة لدينا لا تبيّن أن هذا المرسوم قد صدر. لذلك لا يمكننا القول هل ما زال اشتراك نهاية الخدمة الذي تلقيه المادة 73 على رب العمل وحده مطبقاً.",
-            "cites": [
-              "a6",
-              "a2"
-            ]
-          },
-          {
-            "text": "بحسب المادة 54، يسدد رب العمل كامل اشتراكات التقاعد المتوجبة عليه وعلى أجرائه المضمونين إلى نظام التقاعد. ويُعلم الأجراء برصيد اشتراكاتهم سنوياً.",
-            "cites": [
               "a5"
             ]
+          },
+          {
+            "text": "يحدد مجلس إدارة الصندوق قواعد تسجيل أرباب العمل والمضمونين والتصريح عن الدخول في العمل والخروج منه، وتوجب المادة 76 على الصندوق إنشاء منصة رقمية للتسجيل ودفع الاشتراكات.",
+            "cites": [
+              "a6",
+              "a7"
+            ]
           }
         ]
       },
       {
-        "heading": "ما الحد الأقصى للكسب الخاضع للاشتراكات؟",
+        "heading": "ماذا يغطي الضمان الاجتماعي؟",
         "paras": [
           {
-            "text": "تجعل المادة 68 الحد الأقصى للكسب الخاضع للحسومات ضعفي الحد الأدنى الرسمي للرواتب والأجور، ويجوز تعديله بمرسوم يتخذ في مجلس الوزراء. ولا يطبق هذا الحد على حساب تعويض نهاية الخدمة.",
-            "cites": [
-              "a7"
-            ]
-          },
-          {
-            "text": "وفي فرع ضمان المرض والأمومة، تعدّل المادة 68 هذا الحد ليصبح 5 أضعاف الحد الأدنى الرسمي للأجر الشهري.",
+            "text": "يشتمل الضمان الاجتماعي على الفروع التالية: ضمان المرض والأمومة، وضمان طوارئ العمل والأمراض المهنية، ونظام التعويضات العائلية والتعليمية، ونظام التقاعد (المادة 7).",
             "cites": [
               "a8"
             ]
           },
           {
-            "text": "لا تذكر هذه الصفحة سقف فرع التقديمات العائلية والتعليمية ولا سقف اشتراكات التقاعد، ولا يتوفر لدينا مرسوم الحد الأدنى للأجور المعمول به.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "ماذا يترتب على رب العمل إذا تأخر في الدفع؟",
-        "paras": [
-          {
-            "text": "تُزاد الاشتراكات غير المدفوعة في مهلتها حكماً بنسبة نصف بالألف عن كل يوم تأخير. وتضيف المادة 54-2، فوق أحكام المادة 79، غرامة 3% شهرياً من الاشتراكات المستحقة، على ألا تتجاوز 15%. وترد هذه المادة بين أحكام نظام التقاعد، ولا يحدد نصها هل تشمل الفروع الأخرى.",
+            "text": "تشمل تقديمات المرض والأمومة العناية الطبية الوقائية والعلاجية، والعناية قبل الولادة وأثناءها وبعدها، وتعويضاً عن العجز الموقت عن العمل، وتعويض نفقات الدفن (المادة 15). ولا تُستحق إلا إذا كان المضمون مشتركاً 3 أشهر على الأقل خلال الأشهر الستة السابقة للتثبت الطبي (المادة 16).",
             "cites": [
-              "a12",
-              "a13"
+              "a9",
+              "a10"
             ]
           },
           {
-            "text": "يعاقب رب العمل الذي يحتجز بغير حق الاشتراك المحسوم من أجر الأجير بالحبس من 3 أشهر إلى سنتين، أو بغرامة من 100 إلى 1,000 ليرة لبنانية، أو بالعقوبتين معاً. ويطبق ذلك إذا لم يسدد المبلغ خلال 15 يوماً من إبلاغه الإنذار بالدفع.",
+            "text": "يشمل الضمان أفراد العائلة الذين يعيشون مع المضمون وعلى نفقته: الشريك الذي لا يزاول عملاً مأجوراً، والأولاد حتى سن 18 أو حتى سن 25 إذا تفرغوا للدراسة، والوالدان البالغان 60 عاماً على الأقل (المادة 14).",
             "cites": [
               "a11"
             ]
           },
           {
-            "text": "إذا كان الأجير غير مصرّح عنه، أو كان رب العمل متأخراً في تسديد الاشتراكات يوم وقوع طارئ العمل، يقدم الصندوق للأجير جميع التقديمات المتوجبة له. ويبقى رب العمل مديناً للصندوق بمبلغ يساوي مجموع هذه التقديمات.",
+            "text": "أنشأ تعديل عام 2023 نظاماً للتقاعد يحل محل نظام تعويض نهاية الخدمة، واشتراكاته على عاتق أصحاب العمل والمضمونين بنسب يحددها مرسوم تطبيقي (المواد 49 و54 و54-6).",
             "cites": [
+              "a12",
+              "a13",
               "a14"
             ]
+          }
+        ]
+      },
+      {
+        "heading": "ما نسب الاشتراكات، ومن يدفعها؟",
+        "paras": [
+          {
+            "text": "اشتراكات طوارئ العمل والتقديمات العائلية والتعليمية ونهاية الخدمة كلها على عاتق أرباب العمل، أما اشتراكات المرض والأمومة فعلى المضمونين وأرباب عملهم والدولة، وتتحمل الدولة 25% من قيمة التقديمات (المادة 73).",
+            "cites": [
+              "a15",
+              "a16"
+            ]
+          },
+          {
+            "text": "تحدد المراسيم المتوفرة لدينا اشتراك المرض والأمومة بنسبة 9% من الكسب، منها 7% على صاحب العمل و2% على الأجير، واشتراك التقديمات العائلية بنسبة 6% واشتراك نهاية الخدمة بنسبة 8.5%، وكلاهما على صاحب العمل. وأضاف قانون عام 2017 اشتراكاً بنسبة 3% للتغطية الصحية للمتقاعدين يوزع بالتساوي بين الأجير وصاحب العمل والدولة.",
+            "cites": [
+              "a18",
+              "a19",
+              "a20",
+              "a21"
+            ]
+          },
+          {
+            "text": "يشمل الكسب مجموع الدخل المدفوع للعامل مع لواحقه، ومنها الأجور وتعويضات الإجازات المدفوعة والتعويضات (المادة 68). وسقف الكسب لضمان المرض والأمومة 5 أضعاف الحد الأدنى الرسمي للأجر الشهري، وللتقديمات العائلية 18,000,000 ل.ل. شهرياً، ولا سقف لنهاية الخدمة.",
+            "cites": [
+              "a22",
+              "a23",
+              "a25",
+              "a24"
+            ]
+          },
+          {
+            "text": "مثال: إذا تجاوز أجر العامل 18,000,000 ل.ل. شهرياً، يُحتسب اشتراك التقديمات العائلية البالغ 6% على 18,000,000 ل.ل. فقط، فيما يُحتسب اشتراك نهاية الخدمة البالغ 8.5% على كامل الأجر.",
+            "cites": [
+              "a25",
+              "a19",
+              "a20",
+              "a24"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما المهل، وماذا لو تأخر صاحب العمل؟",
+        "paras": [
+          {
+            "text": "على صاحب العمل أن يصرّح للصندوق عن التحاق كل أجير بالعمل وعن تركه خلال 15 يوماً (المادة 80)، وأن يدوّن كل أجير في سجله الخاص قبل مباشرته العمل، وتاريخ تركه العمل خلال 3 أيام (المادة 77).",
+            "cites": [
+              "a26",
+              "a27"
+            ]
+          },
+          {
+            "text": "تُزاد الاشتراكات غير المدفوعة في مهلتها حكماً بنسبة نصف بالألف عن كل يوم تأخير (المادة 79)، وتضيف المادة 54-2 غرامة بنسبة 3% شهرياً من الاشتراكات المستحقة على ألا تتجاوز 15%.",
+            "cites": [
+              "a28",
+              "a29"
+            ]
+          },
+          {
+            "text": "يعاقب صاحب العمل الذي يحتجز بغير حق الاشتراك المحسوم من أجر الأجير، ولا يسدده خلال 15 يوماً من إبلاغه الإنذار، بالحبس من 3 أشهر إلى سنتين أو بغرامة أو بالعقوبتين معاً (المادة 80).",
+            "cites": [
+              "a30"
+            ]
+          },
+          {
+            "text": "إذا لم يكن الأجير مصرحاً عنه، أو كان صاحب العمل متأخراً في تسديد الاشتراكات يوم وقوع طارئ العمل، يقدم الصندوق للأجير جميع التقديمات ويبقى صاحب العمل مديناً للصندوق بمجموعها (المادة 83).",
+            "cites": [
+              "a31"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما لا تتناوله هذه الصفحة",
+        "paras": [
+          {
+            "text": "النسب الواردة هنا مأخوذة من مرسومين لعامي 1965 و2001 ومن قانون عام 2017 في قاعدة بياناتنا. وقد يكون مرسوم لاحق عدّلها، ولا يتوفر لدينا مرسوم يحدد اشتراك طوارئ العمل.",
+            "note": true
+          },
+          {
+            "text": "أعاد القانون 277 لعام 2022 صياغة بند اشتراكات المتقاعدين في المادة 9، ولا تُظهر نسختنا منه إلا توزيع الاشتراك لمن ليس لديهم صاحب عمل (2% على المضمون و1% على الدولة)، فيبقى التوزيع المتساوي لنسبة 3% مستنداً إلى نص عام 2017.",
+            "note": true
+          },
+          {
+            "text": "الغرامات في المادة 80 مدونة بمبالغ الليرة القديمة (من 100 إلى 1,000 ل.ل.) وقد أصبحت رمزية. ولا يتوفر لدينا المرسوم التطبيقي لنظام التقاعد، ولا تتناول هذه الصفحة الضمان الاختياري ولا الأطباء والطلاب والصحافيين.",
+            "note": true
           }
         ]
       }

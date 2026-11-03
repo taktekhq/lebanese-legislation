@@ -2,151 +2,361 @@
   "slug": "cybercrime-electronic-transactions",
   "order": 11,
   "published": "2026-10-20",
-  "updated": "2026-10-21",
+  "updated": "2026-11-03",
   "articles": [
     {
-      "id": "a1",
-      "law": 278573,
-      "article": "4",
-      "quote": "تنتج الكتابة والتوقيع الالكتروني ذات المفاعيل القانونية التي تتمتع بها الكتابة والتوقيع على دعامة ورقية او اي دعامة من نوع آخر، شرط ان يكون ممكناً تحديد الشخص الصادرة عنه، وان تنظم وتحفظ بطريقة ضمن سلامتها.\n\nيمكن ان تعتبر بداءة بينة خطية كل كتابة الكترونية لا تتوافر فيها الشروط المذكورة اعلاه."
-    },
-    {
-      "id": "a2",
-      "law": 278573,
-      "article": "8",
-      "quote": "لا تنتج الأسناد الرسمية الالكترونية اية مفاعيل قانونية الا بعد اقرارها وتنظيمها بمرسوم يتخذ في مجلس الوزراء بناء على اقتراح وزير العدل."
-    },
-    {
-      "id": "a3",
-      "law": 278573,
-      "article": "9",
-      "quote": "يصدر التوقيع الالكتروني عن طريق استعمال وسيلة آمنة تعرّف عن الموقع، وتشكل ضمانة على علاقة التوقيع بالعمل القانوني الذي يرتبط به.\n\nاذا اقترن التوقيع الالكتروني بإجراءات الحماية المصادق عليها من قبل مقدم خدمات المصادقة المعتمد وفق احكام الفصل الرابع، فإنه يعتبر صادراً وفق شروط الفقرة الأولى من هذه المادة حتى اثبات العكس."
-    },
-    {
-      "id": "a4",
+      "id": "l110",
       "law": 278573,
       "article": "110",
-      "quote": "يعاقب بالحبس من ثلاث اشهر الى سنتين وبالغرامة من مليون الى عشرين مليون ليرة لبنانية او بإحدى هاتين العقوبتين كل من اقدم، بنية الغش، على الوصول او الولوج الى نظام معلوماتي بكامله او في جزء منه او على المكوث فيه."
+      "quote": "الولوج غير المشروع الى نظام معلوماتي:\n\nيعاقب بالحبس من ثلاث اشهر الى سنتين وبالغرامة من مليون الى عشرين مليون ليرة لبنانية او بإحدى هاتين العقوبتين كل من اقدم، بنية الغش، على الوصول او الولوج الى نظام معلوماتي بكامله او في جزء منه او على المكوث فيه.\n\nتشدد العقوبة الى الحبس من ستة اشهر الى ثلاث سنوات والغرامة من مليونين الى اربعين مليون ليرة، اذا نتج عن العمل الغاء البيانات الرقمية او البرامج المعلوماتية او نسخها او تعديلها او المساس بعمل النظام المعلوماتي."
     },
     {
-      "id": "a5",
+      "id": "l118",
       "law": 278573,
-      "article": "110",
-      "quote": "تشدد العقوبة الى الحبس من ستة اشهر الى ثلاث سنوات والغرامة من مليونين الى اربعين مليون ليرة، اذا نتج عن العمل الغاء البيانات الرقمية او البرامج المعلوماتية او نسخها او تعديلها او المساس بعمل النظام المعلوماتي."
+      "article": "118",
+      "quote": "يعدل نص البند 3 من المادة (209) من قانون العقوبات على النحو التالي:\n\n«الكتابة والرسوم واللوحات والصور والافلام والشارات والتصاوير على اختلافها اذا عرضت في محل عام او مكان مباح للجمهور او معرض للانظار او بيعت او عرضت للبيع او وزعت على شخص او اكثر اياً كانت الوسيلة المعتمدة لذلك بما فيها الوسائل الالكترونية»."
     },
     {
-      "id": "a6",
+      "id": "c582",
+      "law": 244611,
+      "article": "582",
+      "quote": "يعاقب على الذم باحد الناس المقترف باحدى الوسائل المذكورة في المادة ال 209 بالحبس حتى ثلاثة اشهر وبالغرامة حتى المايتي الف ليرة او باحدى هاتين العقوبتين.\n\nويقضى بالغرامة وحدها اذا لم يقع الذم علانية."
+    },
+    {
+      "id": "c584",
+      "law": 244611,
+      "article": "584",
+      "quote": "يعاقب على القدح في احد الناس المقترف باحدى الوسائل المذكورة في المادة 209 وكذلك على التحقير الحاصل باحدى الوسائل الواردة في المادة 383 بالحبس من اسبوع الى ثلاثة اشهر او بالغرامة من خمسين الف الى اربعماية الف ليرة.\n\nويقضي بالغرامة وحدها اذا لم يقترف القدح علانية."
+    },
+    {
+      "id": "c386",
+      "law": 244611,
+      "article": "386",
+      "quote": "الذم باحدى الوسائل المعينة في المادة ال 209 يعاقب عليه:\n\nبالحبس من شهرين الى سنتين اذا وقع على رئيس الدولة.\n\nبالحبس سنة على الاكثر اذا وجه الى المحاكم او الهيئات المنظمة او الجيش او الادارات العامة, او وجه الى موظف ممن يمارسون السلطة العامة من اجل وظيفته او صفته.\n\nبالحبس ثلاثة اشهر على الاكثر او بغرامة من عشرين الف الى مايتي الف ليرة اذا وقع على اي موظف اخر بسبب وظيفته او صفته."
+    },
+    {
+      "id": "l111",
+      "law": 278573,
+      "article": "111",
+      "quote": "التعدي على سلامة النظام:\n\nيعاقب بالحبس من ستة اشهر الى ثلاث سنوات وبالغرامة من ثلاثة ملايين الى مئتي مليون ليرة لبنانية او بإحدى هاتين العقوبتين كل من اقدم، بنية الغش وبأي وسيلة على اعاقة عمل نظام معلوماتي او على افساده."
+    },
+    {
+      "id": "l112",
+      "law": 278573,
+      "article": "112",
+      "quote": "التعدي على سلامة البيانات الرقمية:\n\nيعاقب بالحبس من ستة اشهر الى ثلاث سنوات وبالغرامة من ثلاثة ملايين الى مئتي مليون ليرة لبنانية او بإحدى هاتين العقوبتين كل من ادخل بيانات رقمية، بنية الغش، في نظام معلوماتي وكل من الغى او عدل، بنية الغش، البيانات الرقمية التي يتضمنها نظام معلوماتي."
+    },
+    {
+      "id": "l113",
+      "law": 278573,
+      "article": "113",
+      "quote": "اعاقة او تشويش او تعطيل:\n\nكل من اعاق او شوش او عطل قصداً وبأي وسيلة، عن طريق الشبكة المعلوماتية او احد أجهزة الحاسب الآلي وما في حكمها، الوصول الى الخدمة او الدخول الى الاجهزة او البرامج او مصادر البيانات او المعلومات يعاقب بالحبس من ثلاثة اشهر الى سنتين وبالغرامة من مليونين الى ثلاثين مليون ليرة لبنانية او بإحدى هاتين العقوبتين."
+    },
+    {
+      "id": "l116",
+      "law": 278573,
+      "article": "116",
+      "quote": "يعاقب بالحبس من ستة اشهر الى ثلاث سنوات وبالغرامة من عشرة ملايين الى مئتي مليون ليرة لبنانية او بإحدى هاتين العقوبتين كل من:\n\n1 - قلد بطاقة مصرفية او زورها.\n\n2 - استعمل او تداول، مع علمه بالامر، بطاقة مصرفية مزورة او مقلدة.\n\n3 - قبل قبض مبالغ من النقود مع علمه بأن الايفاء تم بواسطة بطاقة مصرفية مزورة او مقلدة.\n\n4 - قلد نقوداً الكترونية او رقمية.\n\n5 - استعمل، مع علمه بالامر، نقوداً الكترونية او رقمية مقلدة.\n\n6 - قلد شيكاً الكترونياً او رقمياً.\n\n7 - استعمل مع علمه بالامر، شيكاً الكترونياً او رقمياً مقلداً."
+    },
+    {
+      "id": "c385",
+      "law": 244611,
+      "article": "385",
+      "quote": "الذم هو نسبة امر الى شخص ولو في معرض الشك او الاستفهام ينال من شرفه او كرامته, وكل لفظة ازدراء او سباب وكل تعبير او رسم يشفان عن التحقير يعد قدحا اذا لم ينطو على نسبة امر ما, وذلك دون التعرض لاحكام المادة ال 383 التي تتضمن تعريف التحقير."
+    },
+    {
+      "id": "c583",
+      "law": 244611,
+      "article": "583",
+      "quote": "لا يسمح لمرتكب الذم تبريرا لنفسه باثبات حقيقة الفعل موضوع الذم او اثبات اشتهاره."
+    },
+    {
+      "id": "c387",
+      "law": 244611,
+      "article": "387",
+      "quote": "في ما خلا الذم الواقع على رئيس الدولة يبرأ الظنين اذا كان موضوع الذم عملا ذا علاقة بالوظيفة وثبتت صحته."
+    },
+    {
+      "id": "c586",
+      "law": 244611,
+      "article": "586",
+      "quote": "تتوقف الدعوى على اتخاذ المعتدى عليه صفة المدعي الشخصي.\n\nاذا وجه الذم او القدح الى ميت جاز لاقربائه حتى الدرجة الرابعة دون سواهم استعمال حق الملاحقة"
+    },
+    {
+      "id": "l114",
+      "law": 278573,
+      "article": "114",
+      "quote": "إساءة التصرف بالاجهزة والبرامج المعلوماتية:\n\nيعاقب بالحبس من ستة اشهر الى ثلاث سنوات وبالغرامة من ثلاثة ملايين الى مئتي مليون ليرة لبنانية او بإحدى هاتين العقوبتين كل من استورد او انتج او حاز او قدّم او وضع في التصرف او نشر، دون سبب مشروع، جهازاً او برنامجاً معلوماتياً او اي بيانات معدة او مكيفة، بهدف اقتراف اي من الجرائم المنصوص عليها في المواد السابقة من هذا الفصل."
+    },
+    {
+      "id": "l115",
+      "law": 278573,
+      "article": "115",
+      "quote": "يعاقب بالعقوبة ذاتها على المحاولة في الجرائم المنصوص عليها في هذا الفصل."
+    },
+    {
+      "id": "l122",
+      "law": 278573,
+      "article": "122",
+      "quote": "يعود للمحكمة تقدير الدليل الرقمي او المعلوماتي وحجيته في الاثبات، ويشترط ان لا يكون قد تعرض لأي تغيير خلال عملية ضبطه او حفظه او تحليله."
+    },
+    {
+      "id": "l127",
+      "law": 278573,
+      "article": "127",
+      "quote": "تكون باطلة الادلة المضبوطة او المحفوظة خلافاً للاصول المحددة في هذا الفصل. تبطل تبعاً له اجراءات التحقيق المسندة اليه."
+    },
+    {
+      "id": "l126",
       "law": 278573,
       "article": "126",
-      "quote": "للنيابة العامة تقرير وقف خدمات الكترونية او حجب مواقع الكترونية او تجميد حسابات عليها بصورة مؤقتة لمدة اقصاها ثلاثين يوماً قابلة للتجديد مرة واحدة بقرار معلل، على أن ينقضي مفعول هذا الاجراء حكماً بانتهاء المهلة المحددة."
+      "quote": "للنيابة العامة تقرير وقف خدمات الكترونية او حجب مواقع الكترونية او تجميد حسابات عليها بصورة مؤقتة لمدة اقصاها ثلاثين يوماً قابلة للتجديد مرة واحدة بقرار معلل، على أن ينقضي مفعول هذا الاجراء حكماً بانتهاء المهلة المحددة.\n\nلقاضي التحقيق او للمحكمة المختصة الناظرة في الدعوى تقرير ذلك بصورة مؤقتة لحين صدور الحكم النهائي في الدعوى. كما للمرجع القضائي الرجوع عن قراره في حال توافر ظروف جديدة تبرر ذلك. يكون قرار قاضي التحقيق والمحكمة بوقف خدمات الكترونية او حجب مواقع الكترونية او تجميد حسابات عليها قابلاً للطعن وفق الاصول والمهل المختصة بقرار اخلاء السبيل."
     },
     {
-      "id": "a7",
-      "law": 278573,
-      "article": "126",
-      "quote": "لقاضي التحقيق او للمحكمة المختصة الناظرة في الدعوى تقرير ذلك بصورة مؤقتة لحين صدور الحكم النهائي في الدعوى. كما للمرجع القضائي الرجوع عن قراره في حال توافر ظروف جديدة تبرر ذلك. يكون قرار قاضي التحقيق والمحكمة بوقف خدمات الكترونية او حجب مواقع الكترونية او تجميد حسابات عليها قابلاً للطعن وفق الاصول والمهل المختصة بقرار اخلاء السبيل."
-    },
-    {
-      "id": "a8",
+      "id": "l125",
       "law": 278573,
       "article": "125",
       "quote": "يمكن للمحكمة الناظرة في الدعوى بموجب حكمها النهائي وقف خدمات الكترونية او حجب مواقع الكترونية او الغاء حسابات عليها اذا تعلقت بالجرائم المتعلقة بالارهاب او بالمواد الاباحية للقاصرين او بألعاب مقامرة ممنوعة او بعمليات الاحتيال الالكتروني المنظمة او تبييض الاموال او الجرائم الواقعة على الامن الداخلي والخارجي او المتعلقة بالتعدي على سلامة الانظمة المعلوماتية كنشر الفيروسات."
     },
     {
-      "id": "a9",
+      "id": "l4",
+      "law": 278573,
+      "article": "4",
+      "quote": "تنتج الكتابة والتوقيع الالكتروني ذات المفاعيل القانونية التي تتمتع بها الكتابة والتوقيع على دعامة ورقية او اي دعامة من نوع آخر، شرط ان يكون ممكناً تحديد الشخص الصادرة عنه، وان تنظم وتحفظ بطريقة ضمن سلامتها.\n\nيمكن ان تعتبر بداءة بينة خطية كل كتابة الكترونية لا تتوافر فيها الشروط المذكورة اعلاه."
+    },
+    {
+      "id": "l9",
+      "law": 278573,
+      "article": "9",
+      "quote": "يصدر التوقيع الالكتروني عن طريق استعمال وسيلة آمنة تعرّف عن الموقع، وتشكل ضمانة على علاقة التوقيع بالعمل القانوني الذي يرتبط به.\n\nاذا اقترن التوقيع الالكتروني بإجراءات الحماية المصادق عليها من قبل مقدم خدمات المصادقة المعتمد وفق احكام الفصل الرابع، فإنه يعتبر صادراً وفق شروط الفقرة الأولى من هذه المادة حتى اثبات العكس."
+    },
+    {
+      "id": "s1",
       "law": 198664,
       "article": "1",
       "quote": "الحق في سرية التخابر الجاري داخليا وخارجيا باي وسيلة من وسائل الاتصال السلكية او اللاسلكية (الأجهزة الهاتفية الثابتة, والاجهزة المنقولة بجميع انواعها بما فيها الخليوي, والفاكس , والبريد الالكتروني...) مصون وفي حمى القانون ولا يخضع لاي نوع من انواع التنصت او المراقبة او الاعتراض او الافشاء الا في الحالات التي ينص عليها هذا القانون وبواسطة الوسائل التي يحددها ويحدد اصولها."
     },
     {
-      "id": "a10",
+      "id": "s17",
       "law": 198664,
       "article": "17",
-      "quote": "يعاقب بالحبس من سنة الى ثلاث سنوات وبالغرامة من خمسين الى مئة مليون ليرة لبنانية كل شخص يعترض اي مخابرة خلافا لاحكام هذا القانون. يعاقب بالعقوبة عينها كل من حرض او اشترك او تدخل في الجرم او استنسخ او احتفط او افشى معلومات استحصل عليها لدى اعتراض المخابرات بناء على تكليف السلطات المختصة او اقدم على اعتراض المخابرات في غير الاماكن المحددة في قرار الاعتراض ."
-    },
-    {
-      "id": "a11",
-      "law": 198664,
-      "article": "2",
-      "quote": "في حالات الضرورة القصوى, لقاضي التحقيق الاول في كل محافظة اما عفوا او بناء لطلب خطي من القاضي المكلف بالتحقيق, ان يقرر اعتراض المخابرات التي تجري بواسطة اي من وسائل الاتصال المبينة في المادة الاولى من هذا القانون, وذلك في كل ملاحقة بجرم يعاقب عليه بالحرمان من الحرية لمدة لا تقل عن سنة. يكون القرار خطيا ومعللا, ولا يقبل اي طريق من طرق الطعن."
-    },
-    {
-      "id": "a12",
-      "law": 198664,
-      "article": "3",
-      "quote": "يحدد القرار القاضي بالاعتراض وسيلة الاتصال التى يتناولها الاجراء والجرم موضوع الملاحقة او التحقيق والمدة التي تتم خلالها عملية الاعتراض , على ان لا تتجاوز هذه المدة الشهرين, وعلى ان لا تكون قابلة للتمديد الا وفق الاصول والشروط عينها."
-    },
-    {
-      "id": "a13",
-      "law": 198664,
-      "article": "9",
-      "quote": "لكل من وزير الدفاع الوطني ووزير الداخلية ان يجيز اعتراض المخابرات بموجب قرار خطي معلل وبعد موافقة رئيس مجلس الوزراء, وذلك في سبيل جمع معلومات ترمي الى مكافحة الارهاب, والجرائم الواقعة على امن الدولة, والجرائم المنظمة. يحدد القرار وسيلة الاتصال موضوع الاجراء, والمعلومات التي يقتضي ضبطها, والمدة التي تتم خلالها عملية الاعتراض , على ان لا تتجاوز هذه المدة الشهرين, وعلى ان لا تكون قابلة للتمديد الا وفق الاصول والشروط عينها."
+      "quote": "يعاقب بالحبس من سنة الى ثلاث سنوات وبالغرامة من خمسين الى مئة مليون ليرة لبنانية كل شخص يعترض اي مخابرة خلافا لاحكام هذا القانون."
     }
   ],
   "en": {
-    "title": "Cybercrime and electronic transactions in Lebanon",
-    "question": "What does Lebanese law say about electronic signatures, online crimes such as hacking, and the secrecy of communications?",
-    "description": "What Lebanese law says on electronic signatures and documents, hacking, website blocking and the secrecy of calls and messages.",
+    "title": "Is there a cybercrime law in Lebanon, and what is the penalty for online defamation?",
+    "question": "Which Lebanese law punishes hacking and other computer crimes, and what are the penalties for defamation or insults posted online?",
+    "description": "Law 81 of 2018 punishes hacking with 3 months to 2 years and a fine. Online defamation falls under the Penal Code: up to 3 months and up to 200,000 LBP.",
     "answer": {
-      "text": "Law 81 of 2018 gives electronic writing and signatures the force of paper if the author is identifiable and integrity is preserved. Official electronic deeds take effect only after a decree, and fraudulent hacking carries 3 months to 2 years in prison, a fine, or both. Law 140 of 1999 keeps communications secret unless a judge or minister orders interception, and illegal interception carries 1 to 3 years in prison.",
+      "text": "Lebanon's computer crimes are set by Law 81 of 10/10/2018 on electronic transactions: hacking into an information system, for example, carries 3 months to 2 years in prison and a fine of 1,000,000 to 20,000,000 LBP (Article 110). Online defamation is punished under the Penal Code, since Article 118 of Law 81 made electronic means a means of publication: defamation carries up to 3 months in prison and a fine of up to 200,000 LBP, and insult 1 week to 3 months or a fine of 50,000 to 400,000 LBP (Articles 582 and 584). Defamation aimed at the head of state, the courts, the army or an official exercising public authority carries more, up to 2 years (Article 386).",
       "cites": [
-        "a1",
-        "a2",
-        "a4",
-        "a9",
-        "a11",
-        "a13",
-        "a10"
+        "l110",
+        "l118",
+        "c582",
+        "c584",
+        "c386"
       ]
     },
     "sections": [
       {
-        "heading": "When does an electronic document count like paper?",
+        "heading": "What are the penalties for cybercrime and online defamation?",
         "paras": [
           {
-            "text": "Article 4 of Law 81 of 2018 gives electronic writing and signatures the effects of paper. The author must be identifiable, and integrity must be preserved in creating and keeping them. Writing that fails this may still be a beginning of written proof. Article 8 limits this rule for official deeds.",
+            "text": "Computer crimes carry prison terms of 3 months to 3 years with fines in the millions of pounds, while defamation and insult of a private person carry up to 3 months.",
             "cites": [
-              "a1",
-              "a2"
+              "l110",
+              "l111",
+              "c582",
+              "c584"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Penalties in Law 81 of 2018 and the Penal Code (fines in LBP)",
+          "head": [
+            "Offence",
+            "Prison",
+            "Fine",
+            "Source"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Fraudulent access to, or staying in, an information system",
+                "3 months to 2 years",
+                "1,000,000 to 20,000,000",
+                "Law 81, Article 110"
+              ],
+              "cites": [
+                "l110"
+              ]
+            },
+            {
+              "cells": [
+                "The same, if it deletes, copies or alters data or disrupts the system",
+                "6 months to 3 years",
+                "2,000,000 to 40,000,000",
+                "Law 81, Article 110"
+              ],
+              "cites": [
+                "l110"
+              ]
+            },
+            {
+              "cells": [
+                "Obstructing or corrupting an information system",
+                "6 months to 3 years",
+                "3,000,000 to 200,000,000",
+                "Law 81, Article 111"
+              ],
+              "cites": [
+                "l111"
+              ]
+            },
+            {
+              "cells": [
+                "Fraudulently entering, deleting or altering digital data",
+                "6 months to 3 years",
+                "3,000,000 to 200,000,000",
+                "Law 81, Article 112"
+              ],
+              "cites": [
+                "l112"
+              ]
+            },
+            {
+              "cells": [
+                "Blocking or jamming access to a service, device or data",
+                "3 months to 2 years",
+                "2,000,000 to 30,000,000",
+                "Law 81, Article 113"
+              ],
+              "cites": [
+                "l113"
+              ]
+            },
+            {
+              "cells": [
+                "Forging a bank card, electronic money or an electronic cheque, or knowingly using one",
+                "6 months to 3 years",
+                "10,000,000 to 200,000,000",
+                "Law 81, Article 116"
+              ],
+              "cites": [
+                "l116"
+              ]
+            },
+            {
+              "cells": [
+                "Defamation of a person by a means of publication",
+                "Up to 3 months",
+                "Up to 200,000",
+                "Penal Code, Article 582"
+              ],
+              "cites": [
+                "c582"
+              ]
+            },
+            {
+              "cells": [
+                "Insult of a person by a means of publication",
+                "1 week to 3 months, or a fine instead",
+                "50,000 to 400,000",
+                "Penal Code, Article 584"
+              ],
+              "cites": [
+                "c584"
+              ]
+            },
+            {
+              "cells": [
+                "Defamation of the head of state",
+                "2 months to 2 years",
+                "None stated",
+                "Penal Code, Article 386"
+              ],
+              "cites": [
+                "c386"
+              ]
+            },
+            {
+              "cells": [
+                "Defamation of the courts, the army, public administrations or an official exercising public authority",
+                "Up to 1 year",
+                "None stated",
+                "Penal Code, Article 386"
+              ],
+              "cites": [
+                "c386"
+              ]
+            },
+            {
+              "cells": [
+                "Defamation of another official over his job",
+                "Up to 3 months, or a fine instead",
+                "20,000 to 200,000",
+                "Penal Code, Article 386"
+              ],
+              "cites": [
+                "c386"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "Is defamation on social media a crime in Lebanon?",
+        "paras": [
+          {
+            "text": "Yes. Article 118 of Law 81 of 2018 counts writing, pictures and films shown in public or distributed to one or more people by any means, including electronic means, as a means of publication, which is what the defamation articles of the Penal Code require.",
+            "cites": [
+              "l118",
+              "c582"
             ]
           },
           {
-            "text": "Official electronic deeds have no legal effect until a decree adopted in the Council of Ministers approves and regulates them. We do not hold that decree.",
+            "text": "Article 385 defines defamation as attributing a matter to a person, even as a doubt or a question, that harms his honour or dignity; insult is any word of contempt or abuse that attributes no matter. Worked example: a post accusing a named person of theft is defamation, punished by up to 3 months and up to 200,000 LBP, while a post that only swears at him is insult, punished by 1 week to 3 months or 50,000 to 400,000 LBP.",
             "cites": [
-              "a2"
+              "c385",
+              "c582",
+              "c584"
+            ]
+          },
+          {
+            "text": "The author of a defamation of a private person may not defend himself by proving it true, but defamation of an official over a job-related act is excused if proven, except for the head of state. Prosecution depends on the victim filing a personal claim.",
+            "cites": [
+              "c583",
+              "c387",
+              "c586"
             ]
           }
         ]
       },
       {
-        "heading": "What makes an electronic signature reliable?",
+        "heading": "Which computer crimes does Law 81 of 2018 punish?",
         "paras": [
           {
-            "text": "Article 9 of Law 81 of 2018 requires a secure means for an electronic signature. The means must identify the signer and tie the signature to the legal act. If an accredited provider certifies the protection procedures, the signature is presumed to meet these terms until proven otherwise.",
+            "text": "Law 81 punishes fraudulent access to an information system, damage to a system or its data, and blocking access to services, with prison, a fine, or either.",
             "cites": [
-              "a3"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "What is the penalty for hacking a computer system?",
-        "paras": [
-          {
-            "text": "Article 110 of Law 81 of 2018 punishes fraudulently entering or staying in all or part of an information system. It carries 3 months to 2 years in prison and a fine of LBP 1 million to 20 million, or either one.",
-            "cites": [
-              "a4"
+              "l110",
+              "l111",
+              "l112",
+              "l113"
             ]
           },
           {
-            "text": "The penalty rises if the act deletes, copies or alters digital data or programs, or affects how the system works. It is then 6 months to 3 years in prison and a fine of LBP 2 million to 40 million.",
+            "text": "Making, holding or distributing a device or program built to commit these crimes carries 6 months to 3 years and a fine of 3,000,000 to 200,000,000 LBP, and an attempt carries the same penalty as the crime itself.",
             "cites": [
-              "a5"
+              "l114",
+              "l115"
             ]
           },
           {
-            "text": "This page leaves out the other offences in Law 81 of 2018, such as electronic forgery and forged bank cards. We do not hold any later law that changed these fines.",
-            "note": true
+            "text": "The court weighs digital evidence, which must not have been altered while seized, stored or analysed. Evidence seized against the law's rules is void, with the investigation steps that rest on it.",
+            "cites": [
+              "l122",
+              "l127"
+            ]
           }
         ]
       },
@@ -154,60 +364,58 @@
         "heading": "Can a website be blocked or an account frozen?",
         "paras": [
           {
-            "text": "Article 126 of Law 81 of 2018 lets the public prosecution suspend services, block websites or freeze accounts for up to 30 days. It may renew this once by a reasoned decision. The measure lapses by law when the period ends.",
+            "text": "Yes. The public prosecution may suspend electronic services, block websites or freeze accounts for up to 30 days, renewable once by a reasoned decision, and the measure lapses by law at the end of that period.",
             "cites": [
-              "a6"
+              "l126"
             ]
           },
           {
-            "text": "Until final judgment, an investigating judge or the trial court may order the same measures temporarily. Their decision can be challenged under the rules and time limits for release decisions.",
+            "text": "Until the final judgment, an investigating judge or the trial court may order the same measures, and the decision can be challenged under the rules and time limits for release decisions.",
             "cites": [
-              "a7"
+              "l126"
             ]
           },
           {
-            "text": "Article 125 lets the trial court suspend services, block websites or cancel accounts by its final judgment. The case must concern terrorism, pornography involving minors, banned gambling, organised online fraud or money laundering. Offences against internal or external security also qualify, as do attacks on information systems such as spreading viruses.",
+            "text": "By its final judgment, the court may suspend services, block websites or cancel accounts when the case concerns terrorism, child pornography, banned gambling, organised online fraud, money laundering, state security or attacks on information systems such as spreading viruses.",
             "cites": [
-              "a8"
+              "l125"
             ]
           }
         ]
       },
       {
-        "heading": "Are calls and messages protected?",
+        "heading": "Are electronic signatures valid, and are messages protected?",
         "paras": [
           {
-            "text": "Law 140 of 1999 protects the secrecy of domestic and international communications, including phones, fax and email. No one may eavesdrop on, monitor, intercept or disclose them except as that law allows.",
+            "text": "Electronic writing and signatures have the legal effect of paper ones if the author can be identified and the writing is created and kept in a way that preserves its integrity; otherwise it may count as a beginning of written proof.",
             "cites": [
-              "a9"
+              "l4"
             ]
           },
           {
-            "text": "Article 17 of Law 140 of 1999 punishes illegal interception with 1 to 3 years in prison. A fine of LBP 50 million to 100 million applies as well. Instigators, accomplices and anyone who copies, keeps or discloses information from an authorised interception face the same penalty.",
+            "text": "An electronic signature must use a secure means that identifies the signer and ties the signature to the act. A signature with protection certified by an accredited provider is presumed to meet this test until proven otherwise.",
             "cites": [
-              "a10"
+              "l9"
+            ]
+          },
+          {
+            "text": "Law 140 of 1999 protects the secrecy of communications by landline and mobile phone, fax and email, and punishes anyone who intercepts a communication outside its rules with 1 to 3 years in prison and a fine of 50 million to 100 million LBP.",
+            "cites": [
+              "s1",
+              "s17"
             ]
           }
         ]
       },
       {
-        "heading": "Who may order interception, and for how long?",
+        "heading": "What this page does not cover",
         "paras": [
           {
-            "text": "In cases of extreme necessity, the first investigating judge of a governorate may order interception. The offence must carry at least 1 year of deprivation of liberty. The written, reasoned decision cannot be appealed. It lasts at most 2 months, extendable only on the same terms.",
-            "cites": [
-              "a11",
-              "a12"
-            ]
+            "text": "We hold no separate cybercrime law: the offences on this page come from Law 81 of 2018, the Penal Code and Law 140 of 1999. Our copy of Article 209 of the Penal Code still shows its wording from before Law 81, so this page relies on Article 118 of Law 81 for electronic means.",
+            "note": true
           },
           {
-            "text": "The Minister of National Defence or of the Interior may authorise interception by reasoned written decision, with the Prime Minister's approval. The aim must be information to combat terrorism, state security offences or organised crime. This decision also lasts at most 2 months, extendable only on the same terms.",
-            "cites": [
-              "a13"
-            ]
-          },
-          {
-            "text": "This page does not cover lawyers' communications, recording destruction, oversight or service providers' data duties.",
+            "text": "The fines are face values in Lebanese pounds, set before the pound's collapse, and we hold no text that revalues them. This page does not cover defamation in the press under the Publications Law, which court hears a case about a post, personal data offences, or when a judge or minister may order interception.",
             "note": true
           }
         ]
@@ -215,130 +423,278 @@
     ]
   },
   "ar": {
-    "title": "الجرائم المعلوماتية والمعاملات الإلكترونية في لبنان",
-    "question": "ماذا يقول القانون اللبناني عن التوقيع الإلكتروني، والجرائم المعلوماتية كالاختراق، وسرية المخابرات؟",
-    "description": "تشرح هذه الصفحة أحكام التوقيع والمستند الإلكترونيين، وعقوبة الاختراق، وحجب المواقع، وسرية المخابرات واعتراضها.",
+    "title": "هل يوجد قانون للجرائم الإلكترونية في لبنان، وما عقوبة الذم والقدح عبر الإنترنت؟",
+    "question": "أي قانون لبناني يعاقب على اختراق الأنظمة وسائر الجرائم المعلوماتية، وما عقوبة الذم أو القدح المنشور عبر الإنترنت؟",
+    "description": "يعاقب القانون رقم 81 لعام 2018 الاختراق بالحبس من 3 أشهر إلى سنتين وبغرامة. والذم عبر الإنترنت يخضع لقانون العقوبات: حبس حتى 3 أشهر وغرامة حتى 200,000 ل.ل.",
     "answer": {
-      "text": "وفق القانون رقم 81 لعام 2018، تنتج الكتابة والتوقيع الإلكترونيان مفاعيل الكتابة والتوقيع على الورق إذا أمكن تحديد صاحبهما وحُفظت سلامتهما. ولا تنتج الأسناد الرسمية الإلكترونية أثرها إلا بعد صدور مرسوم، ويُعاقَب على الاختراق بنية الغش بالحبس من 3 أشهر إلى سنتين أو بالغرامة أو بكلتيهما. ويصون القانون رقم 140 لعام 1999 سرية المخابرات ما لم يأمر قاضٍ أو وزير باعتراضها، ويُعاقَب على الاعتراض غير المشروع بالحبس من سنة إلى 3 سنوات.",
+      "text": "يحدّد القانون رقم 81 تاريخ 10/10/2018 المتعلق بالمعاملات الإلكترونية الجرائم المعلوماتية في لبنان: فالولوج غير المشروع إلى نظام معلوماتي مثلاً يُعاقب بالحبس من 3 أشهر إلى سنتين وبغرامة من 1,000,000 إلى 20,000,000 ليرة (المادة 110). ويُعاقب الذم عبر الإنترنت وفق قانون العقوبات، لأن المادة 118 من القانون رقم 81 جعلت الوسائل الإلكترونية من وسائل النشر: فعقوبة الذم الحبس حتى 3 أشهر والغرامة حتى 200,000 ليرة، وعقوبة القدح الحبس من أسبوع إلى 3 أشهر أو الغرامة من 50,000 إلى 400,000 ليرة (المادتان 582 و584). ويُعاقب الذم الموجّه إلى رئيس الدولة أو المحاكم أو الجيش أو الموظف الذي يمارس السلطة العامة بعقوبة أشد تصل إلى سنتين (المادة 386).",
       "cites": [
-        "a1",
-        "a2",
-        "a4",
-        "a9",
-        "a11",
-        "a13",
-        "a10"
+        "l110",
+        "l118",
+        "c582",
+        "c584",
+        "c386"
       ]
     },
     "sections": [
       {
-        "heading": "متى يكون للمستند الإلكتروني أثر المستند الورقي؟",
+        "heading": "ما عقوبات الجرائم المعلوماتية والذم عبر الإنترنت؟",
         "paras": [
           {
-            "text": "تمنح المادة 4 من القانون رقم 81 لعام 2018 الكتابة والتوقيع الإلكترونيين مفاعيل الكتابة والتوقيع على الورق. ويُشترط أن يمكن تحديد الشخص الصادرين عنه، وأن يُنظَّما ويُحفظا بطريقة تضمن سلامتهما. أما الكتابة التي لا تستوفي هذه الشروط فيجوز أن تُعتبر بداءة بينة خطية. وتقيّد المادة 8 هذه القاعدة في الأسناد الرسمية.",
+            "text": "تُعاقب الجرائم المعلوماتية بالحبس من 3 أشهر إلى 3 سنوات وبغرامات بملايين الليرات، أما الذم والقدح بحق شخص عادي فعقوبتهما الحبس حتى 3 أشهر.",
             "cites": [
-              "a1",
-              "a2"
+              "l110",
+              "l111",
+              "c582",
+              "c584"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "العقوبات في القانون رقم 81 لعام 2018 وقانون العقوبات (الغرامات بالليرة اللبنانية)",
+          "head": [
+            "الجرم",
+            "الحبس",
+            "الغرامة",
+            "المصدر"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "الوصول أو الولوج إلى نظام معلوماتي أو المكوث فيه بنية الغش",
+                "من 3 أشهر إلى سنتين",
+                "من 1,000,000 إلى 20,000,000",
+                "القانون 81، المادة 110"
+              ],
+              "cites": [
+                "l110"
+              ]
+            },
+            {
+              "cells": [
+                "الفعل نفسه إذا نتج عنه إلغاء البيانات أو نسخها أو تعديلها أو المساس بعمل النظام",
+                "من 6 أشهر إلى 3 سنوات",
+                "من 2,000,000 إلى 40,000,000",
+                "القانون 81، المادة 110"
+              ],
+              "cites": [
+                "l110"
+              ]
+            },
+            {
+              "cells": [
+                "إعاقة عمل نظام معلوماتي أو إفساده",
+                "من 6 أشهر إلى 3 سنوات",
+                "من 3,000,000 إلى 200,000,000",
+                "القانون 81، المادة 111"
+              ],
+              "cites": [
+                "l111"
+              ]
+            },
+            {
+              "cells": [
+                "إدخال بيانات رقمية أو إلغاؤها أو تعديلها بنية الغش",
+                "من 6 أشهر إلى 3 سنوات",
+                "من 3,000,000 إلى 200,000,000",
+                "القانون 81، المادة 112"
+              ],
+              "cites": [
+                "l112"
+              ]
+            },
+            {
+              "cells": [
+                "إعاقة الوصول إلى الخدمة أو الأجهزة أو البيانات أو التشويش عليه أو تعطيله",
+                "من 3 أشهر إلى سنتين",
+                "من 2,000,000 إلى 30,000,000",
+                "القانون 81، المادة 113"
+              ],
+              "cites": [
+                "l113"
+              ]
+            },
+            {
+              "cells": [
+                "تقليد بطاقة مصرفية أو نقود إلكترونية أو شيك إلكتروني، أو استعمالها مع العلم بأمرها",
+                "من 6 أشهر إلى 3 سنوات",
+                "من 10,000,000 إلى 200,000,000",
+                "القانون 81، المادة 116"
+              ],
+              "cites": [
+                "l116"
+              ]
+            },
+            {
+              "cells": [
+                "الذم بأحد الناس بإحدى وسائل النشر",
+                "حتى 3 أشهر",
+                "حتى 200,000",
+                "قانون العقوبات، المادة 582"
+              ],
+              "cites": [
+                "c582"
+              ]
+            },
+            {
+              "cells": [
+                "القدح بأحد الناس بإحدى وسائل النشر",
+                "من أسبوع إلى 3 أشهر، أو الغرامة بدلاً منه",
+                "من 50,000 إلى 400,000",
+                "قانون العقوبات، المادة 584"
+              ],
+              "cites": [
+                "c584"
+              ]
+            },
+            {
+              "cells": [
+                "الذم برئيس الدولة",
+                "من شهرين إلى سنتين",
+                "لم تنص عليها المادة",
+                "قانون العقوبات، المادة 386"
+              ],
+              "cites": [
+                "c386"
+              ]
+            },
+            {
+              "cells": [
+                "الذم بالمحاكم أو الهيئات المنظمة أو الجيش أو الإدارات العامة أو بموظف يمارس السلطة العامة",
+                "سنة على الأكثر",
+                "لم تنص عليها المادة",
+                "قانون العقوبات، المادة 386"
+              ],
+              "cites": [
+                "c386"
+              ]
+            },
+            {
+              "cells": [
+                "الذم بأي موظف آخر بسبب وظيفته",
+                "3 أشهر على الأكثر، أو الغرامة بدلاً منه",
+                "من 20,000 إلى 200,000",
+                "قانون العقوبات، المادة 386"
+              ],
+              "cites": [
+                "c386"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "هل الذم على وسائل التواصل الاجتماعي جريمة في لبنان؟",
+        "paras": [
+          {
+            "text": "نعم. تعدّ المادة 118 من القانون رقم 81 لعام 2018 الكتابة والرسوم والصور والأفلام من وسائل النشر إذا عُرضت في مكان عام أو وُزّعت على شخص أو أكثر أياً كانت الوسيلة، بما فيها الوسائل الإلكترونية، وهذا ما تشترطه مواد الذم في قانون العقوبات.",
+            "cites": [
+              "l118",
+              "c582"
             ]
           },
           {
-            "text": "لا تنتج الأسناد الرسمية الإلكترونية أي مفاعيل قانونية إلا بعد إقرارها وتنظيمها بمرسوم يُتخذ في مجلس الوزراء. ولا يتوفر لدينا نص هذا المرسوم.",
+            "text": "تعرّف المادة 385 الذم بأنه نسبة أمر إلى شخص، ولو في معرض الشك أو الاستفهام، ينال من شرفه أو كرامته، والقدح بأنه كل لفظة ازدراء أو سباب لا تنطوي على نسبة أمر ما. مثال تطبيقي: منشور يتهم شخصاً مسمّى بالسرقة ذمٌّ عقوبته الحبس حتى 3 أشهر والغرامة حتى 200,000 ليرة، أما منشور يكتفي بشتمه فقدحٌ عقوبته الحبس من أسبوع إلى 3 أشهر أو الغرامة من 50,000 إلى 400,000 ليرة.",
             "cites": [
-              "a2"
+              "c385",
+              "c582",
+              "c584"
+            ]
+          },
+          {
+            "text": "لا يُسمح لمرتكب الذم بشخص عادي أن يبرّر نفسه بإثبات حقيقة الفعل، أما الذم بموظف في عمل ذي علاقة بوظيفته فيبرأ فيه الظنين إذا ثبتت صحته، إلا إذا وقع على رئيس الدولة. وتتوقف الدعوى على اتخاذ المعتدى عليه صفة المدعي الشخصي.",
+            "cites": [
+              "c583",
+              "c387",
+              "c586"
             ]
           }
         ]
       },
       {
-        "heading": "متى يكون التوقيع الإلكتروني موثوقاً؟",
+        "heading": "ما الجرائم المعلوماتية التي يعاقب عليها القانون رقم 81 لعام 2018؟",
         "paras": [
           {
-            "text": "توجب المادة 9 من القانون رقم 81 لعام 2018 أن يصدر التوقيع الإلكتروني بوسيلة آمنة. وعلى هذه الوسيلة أن تعرّف بالموقّع وتضمن علاقة التوقيع بالعمل القانوني المرتبط به. وإذا صادق مقدم خدمات مصادقة معتمد على إجراءات الحماية، اعتُبر التوقيع مستوفياً هذه الشروط حتى إثبات العكس.",
+            "text": "يعاقب القانون رقم 81 على الولوج غير المشروع إلى نظام معلوماتي، والتعدي على سلامة النظام أو بياناته، وإعاقة الوصول إلى الخدمات، بالحبس أو بالغرامة أو بإحدى هاتين العقوبتين.",
             "cites": [
-              "a3"
+              "l110",
+              "l111",
+              "l112",
+              "l113"
+            ]
+          },
+          {
+            "text": "ويُعاقب من استورد أو أنتج أو حاز أو نشر جهازاً أو برنامجاً معداً لارتكاب هذه الجرائم بالحبس من 6 أشهر إلى 3 سنوات وبالغرامة من 3,000,000 إلى 200,000,000 ليرة، ويُعاقب على المحاولة بعقوبة الجريمة نفسها.",
+            "cites": [
+              "l114",
+              "l115"
+            ]
+          },
+          {
+            "text": "وتعود للمحكمة تقدير الدليل الرقمي، بشرط ألا يكون قد تعرّض لأي تغيير خلال ضبطه أو حفظه أو تحليله. وتكون باطلة الأدلة المضبوطة خلافاً للأصول المحددة، وتبطل تبعاً لها إجراءات التحقيق المسندة إليها.",
+            "cites": [
+              "l122",
+              "l127"
             ]
           }
         ]
       },
       {
-        "heading": "ما عقوبة اختراق نظام معلوماتي؟",
+        "heading": "هل يمكن حجب موقع إلكتروني أو تجميد حساب؟",
         "paras": [
           {
-            "text": "تعاقب المادة 110 من القانون رقم 81 لعام 2018 كل من دخل بنية الغش إلى نظام معلوماتي، كله أو جزء منه، أو مكث فيه. والعقوبة الحبس من 3 أشهر إلى سنتين وغرامة من مليون إلى 20 مليون ليرة، أو إحدى العقوبتين.",
+            "text": "نعم. للنيابة العامة أن تقرر وقف خدمات إلكترونية أو حجب مواقع أو تجميد حسابات بصورة مؤقتة لمدة أقصاها 30 يوماً، قابلة للتجديد مرة واحدة بقرار معلّل، وينقضي مفعول الإجراء حكماً بانتهاء المهلة.",
             "cites": [
-              "a4"
+              "l126"
             ]
           },
           {
-            "text": "تُشدَّد العقوبة إذا نتج عن الفعل إلغاء البيانات الرقمية أو البرامج أو نسخها أو تعديلها، أو المساس بعمل النظام. وتصبح عندئذ الحبس من 6 أشهر إلى 3 سنوات والغرامة من مليونين إلى 40 مليون ليرة.",
+            "text": "ولقاضي التحقيق أو للمحكمة الناظرة في الدعوى تقرير ذلك مؤقتاً لحين صدور الحكم النهائي، ويكون قرارهما قابلاً للطعن وفق الأصول والمهل المختصة بقرار إخلاء السبيل.",
             "cites": [
-              "a5"
+              "l126"
             ]
           },
           {
-            "text": "لا تعرض هذه الصفحة سائر الجرائم الواردة في القانون رقم 81 لعام 2018، كالتزوير الإلكتروني وتزوير البطاقات المصرفية. والنصوص المتوفرة لدينا لا تتضمن قانوناً لاحقاً عدّل قيمة هذه الغرامات.",
+            "text": "وللمحكمة بموجب حكمها النهائي وقف الخدمات أو حجب المواقع أو إلغاء الحسابات إذا تعلقت بالإرهاب أو بالمواد الإباحية للقاصرين أو بألعاب مقامرة ممنوعة أو بالاحتيال الإلكتروني المنظم أو بتبييض الأموال أو بالجرائم الواقعة على الأمن الداخلي والخارجي أو بالتعدي على سلامة الأنظمة المعلوماتية كنشر الفيروسات.",
+            "cites": [
+              "l125"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "هل التوقيع الإلكتروني صحيح، وهل المراسلات محمية؟",
+        "paras": [
+          {
+            "text": "تنتج الكتابة والتوقيع الإلكتروني المفاعيل القانونية نفسها التي للكتابة والتوقيع على الورق، شرط أن يكون ممكناً تحديد الشخص الصادرة عنه وأن تُنظَّم وتُحفظ بطريقة تضمن سلامتها، وإلا جاز اعتبارها بداءة بيّنة خطية.",
+            "cites": [
+              "l4"
+            ]
+          },
+          {
+            "text": "ويصدر التوقيع الإلكتروني بوسيلة آمنة تعرّف عن الموقّع وتضمن علاقة التوقيع بالعمل القانوني. وإذا اقترن بإجراءات حماية صادق عليها مقدّم خدمات مصادقة معتمد، يُعتبر مستوفياً هذه الشروط حتى إثبات العكس.",
+            "cites": [
+              "l9"
+            ]
+          },
+          {
+            "text": "ويحمي القانون رقم 140 لعام 1999 سرية المخابرات بالهاتف الثابت والخليوي والفاكس والبريد الإلكتروني، ويعاقب كل من يعترض مخابرة خلافاً لأحكامه بالحبس من سنة إلى 3 سنوات وبالغرامة من خمسين إلى مئة مليون ليرة.",
+            "cites": [
+              "s1",
+              "s17"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما الذي لا تغطيه هذه الصفحة",
+        "paras": [
+          {
+            "text": "لا نملك قانوناً مستقلاً للجرائم الإلكترونية: فالجرائم الواردة في هذه الصفحة مصدرها القانون رقم 81 لعام 2018 وقانون العقوبات والقانون رقم 140 لعام 1999. ولا تزال نسختنا من المادة 209 من قانون العقوبات تعرض نصها السابق للقانون رقم 81، لذلك تعتمد هذه الصفحة على المادة 118 من القانون رقم 81 بشأن الوسائل الإلكترونية.",
             "note": true
-          }
-        ]
-      },
-      {
-        "heading": "هل يجوز حجب موقع إلكتروني أو تجميد حساب؟",
-        "paras": [
-          {
-            "text": "تجيز المادة 126 من القانون رقم 81 لعام 2018 للنيابة العامة وقف الخدمات الإلكترونية أو حجب المواقع أو تجميد الحسابات مدة أقصاها 30 يوماً. ويجوز تجديد هذا الإجراء مرة واحدة بقرار معلل. وينقضي مفعوله حكماً بانتهاء المهلة.",
-            "cites": [
-              "a6"
-            ]
           },
           {
-            "text": "لقاضي التحقيق أو للمحكمة الناظرة في الدعوى اتخاذ هذه التدابير مؤقتاً حتى صدور الحكم النهائي. ويقبل قرارهما الطعن وفق الأصول والمهل المتبعة في قرار إخلاء السبيل.",
-            "cites": [
-              "a7"
-            ]
-          },
-          {
-            "text": "تجيز المادة 125 للمحكمة الناظرة في الدعوى، بحكمها النهائي، وقف الخدمات الإلكترونية أو حجب المواقع أو إلغاء الحسابات. ويُشترط أن تتعلق الدعوى بالإرهاب أو المواد الإباحية للقاصرين أو ألعاب المقامرة الممنوعة أو الاحتيال الإلكتروني المنظم أو تبييض الأموال. وتشمل كذلك الجرائم الواقعة على الأمن الداخلي أو الخارجي، والتعدي على سلامة الأنظمة المعلوماتية كنشر الفيروسات.",
-            "cites": [
-              "a8"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "هل المكالمات والرسائل محمية؟",
-        "paras": [
-          {
-            "text": "يصون القانون رقم 140 لعام 1999 سرية المخابرات الداخلية والخارجية، ومنها الهاتف والفاكس والبريد الإلكتروني. ولا يجوز التنصت عليها أو مراقبتها أو اعتراضها أو إفشاؤها إلا في الحالات التي ينص عليها هذا القانون.",
-            "cites": [
-              "a9"
-            ]
-          },
-          {
-            "text": "تعاقب المادة 17 من القانون رقم 140 لعام 1999 من يعترض أي مخابرة خلافاً لأحكامه بالحبس من سنة إلى 3 سنوات. وتُفرض معها غرامة من 50 إلى 100 مليون ليرة. ويُعاقَب بالعقوبة نفسها المحرّض والشريك، وكل من استنسخ أو احتفظ أو أفشى معلومات حصل عليها من اعتراض مأذون به.",
-            "cites": [
-              "a10"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "من يأمر باعتراض المخابرات، ولأي مدة؟",
-        "paras": [
-          {
-            "text": "في حالات الضرورة القصوى، يجوز لقاضي التحقيق الأول في المحافظة أن يقرر اعتراض المخابرات. ويُشترط أن يكون الجرم معاقباً عليه بالحرمان من الحرية مدة لا تقل عن سنة. ويصدر القرار خطياً ومعللاً ولا يقبل أي طريق من طرق الطعن. ولا تتجاوز مدته شهرين، ولا تُمدَّد إلا وفق الأصول والشروط نفسها.",
-            "cites": [
-              "a11",
-              "a12"
-            ]
-          },
-          {
-            "text": "لكل من وزير الدفاع الوطني ووزير الداخلية أن يجيز الاعتراض بقرار خطي معلل، بعد موافقة رئيس مجلس الوزراء. ويكون الغرض جمع معلومات ترمي إلى مكافحة الإرهاب والجرائم الواقعة على أمن الدولة والجرائم المنظمة. ولا تتجاوز مدة هذا القرار أيضاً شهرين، ولا تُمدَّد إلا وفق الأصول والشروط نفسها.",
-            "cites": [
-              "a13"
-            ]
-          },
-          {
-            "text": "لا تتناول هذه الصفحة مخابرات المحامين، ولا إتلاف التسجيلات، ولا الرقابة، ولا موجبات مقدمي الخدمات بشأن البيانات.",
+            "text": "الغرامات مبالغ اسمية بالليرة اللبنانية حُدّدت قبل انهيار الليرة، ولا نملك نصاً يعيد تقييمها. ولا تغطي هذه الصفحة الذم في المطبوعات وفق قانون المطبوعات، ولا المحكمة المختصة بالنظر في منشور، ولا جرائم البيانات الشخصية، ولا الحالات التي يجوز فيها لقاضٍ أو وزير تقرير اعتراض المخابرات.",
             "note": true
           }
         ]

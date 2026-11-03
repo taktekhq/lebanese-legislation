@@ -2,7 +2,7 @@
   "slug": "foreign-workers-work-permits",
   "order": 29,
   "published": "2026-10-21",
-  "updated": "2026-10-21",
+  "updated": "2026-11-03",
   "articles": [
     {
       "id": "a1",
@@ -14,79 +14,79 @@
       "id": "a2",
       "law": 204889,
       "article": "6",
-      "quote": "على الاجنبي الذي يحصل على موافقة مسبقة للعمل, ان يتقدم, خلال عشرة ايام على الاكثر من تاريخ دخوله لبنان, من وزارة العمل والشؤون الاجتماعية بطلب الحصول على اجازة العمل"
+      "quote": "على الاجنبي الذي يحصل على موافقة مسبقة للعمل, ان يتقدم, خلال عشرة ايام على الاكثر من تاريخ دخوله لبنان, من وزارة العمل والشؤون الاجتماعية بطلب الحصول على اجازة العمل المنصوص عليها في المادة 25 من القانون الصادر بتاريخ 10/7/1962 ويمكن للوزارة الغاء الموافقة المسبقة في حال التخلف عن الحضور الى لبنان خلال مهلة اقصاها ثلاثة اشهر من تاريخ ارسال الموافقة المسبقة من وزارة العمل والشؤون الاجتماعية."
     },
     {
       "id": "a3",
       "law": 204889,
-      "article": "8",
-      "quote": "مع مراعاة مبدأ تفضيل اللبناني, يمكن منح الاجنبي اجازة عمل او تجديدها, سواء اكان من المقيمين على الاراضي اللبنانية او من الراغبين في الدخول اليها بموجب موافقة مسبقة للعمل اذا توفرت فيه احدى الشروط التالية:"
+      "article": "3",
+      "quote": "يقدم الاجنبي في الخارج طلب الموافقة المسبقة الى وزارة العمل والشؤون الاجتماعية بواسطة ممثلي لبنان في الخارج او بواسطة وكيل رسمي له في لبنان."
     },
     {
       "id": "a4",
       "law": 204889,
-      "article": "8",
-      "quote": "1 - ان يكون اختصاصيا او خبيرا لا يمكن تأمين عمله بواسطة لبناني,"
+      "article": "5",
+      "quote": "اذا كان الاجنبي صاحب الطلب اجيرا, يجب على صاحب العمل ان يتقدم من وزارة العمل والشؤون الاجتماعية, بطلب يصرح فيه بموافقته على استقدامه, مرفق بصور عن المستندات والوثائق التي تثبت صحة ما ورد في طلب الاجنبي, وبعقد عمل مصدق لدى الكاتب العدل في لبنان, او من احدى الهيئات السياسية اللبنانية المعتمدة في الخارج."
     },
     {
       "id": "a5",
       "law": 204889,
-      "article": "8",
-      "quote": "2 - ان يكون مقيما في لبنان قبل اول سنة 1954 (الف وتسعماية واربع وخمسين) ويعمل في احدى المؤسسات بدون انقطاع مدة تسعة اشهر على الاقل في السنة."
+      "article": "13",
+      "quote": "يجب البت بطلبات الموافقة المسبقة, او باجازة العمل, او بالاجازة المجددة خلال مدة اقصاها شهر واحد تبدأ اعتبارا من تاريخ تقديم الطلب والمستندات العائدة له, ولا يمكن تأخير البت باحدى هذه الطلبات الى ما بعد هذه المدة, الا بموافقة الوزير."
     },
     {
       "id": "a6",
       "law": 204889,
-      "article": "8",
-      "quote": "3 - ان يكون متأهلا من لبنانية, وعليه ان يثبت زواجه هذا بموجب افادة تعطى له من المديرية العامة للاحوال الشخصية او من احدى دوائرها في الملحقات , وان يكون قد مضى على زواجه مدة سنة واحدة على الاقل."
+      "article": "19",
+      "quote": "تحدد بقرار من المدير العام لوزارة العمل والشؤون الاجتماعية المستندات التي يجب تقديمها مع كل نوع من الطلبات على ان يكون بينها نسخة عن السجل العدلي لا يعود تاريخه الى اكثر من ستة اشهر."
     },
     {
       "id": "a7",
-      "law": 204889,
-      "article": "8",
-      "quote": "4 - ان يكون مولودا من ام لبنانية, او من اصل لبناني,"
+      "law": 223096,
+      "article": "5",
+      "quote": "على صاحب العمل ان يقدم مع طلب اجازة العمل ومع طلب تجديد الاجازة نسختين اصليتين عن عقد التأمين والبوليصة وصورة عن بطاقة التأمين او الايصال الاصلي بالدفع."
     },
     {
       "id": "a8",
       "law": 204889,
       "article": "8",
-      "quote": "5 - ان يكون من مديري الشركات الاجنبية او رؤساء المحاسبة, او معاوني المدير, وفروع هذه الشركات في لبنان, او التي تعمل في الشرق الاوسط.\n\n6 - ان يكون من ممثلي الشركات الاجنبية بموجب مستند يثبت ذلك وان لا يمارس اي عمل مع الجمهور مباشرة."
+      "quote": "مع مراعاة مبدأ تفضيل اللبناني, يمكن منح الاجنبي اجازة عمل او تجديدها, سواء اكان من المقيمين على الاراضي اللبنانية او من الراغبين في الدخول اليها بموجب موافقة مسبقة للعمل اذا توفرت فيه احدى الشروط التالية:"
     },
     {
       "id": "a9",
       "law": 204889,
       "article": "8",
-      "quote": "7 - ان يكون من اصحاب الاعمال او الحرف او المهن او الصناعات وان يتوافر الشرطان الاتيان:\n\nآ - ان يكون من المقيمين على الاراضي اللبنانية قبل اول سنة 1954 (الف وتسعماية واربع وخمسين) وان يكون قد باشر عمله قبل اول كانون الثاني سنة 1960 (الف وتسعماية وستين)."
+      "quote": "1 - ان يكون اختصاصيا او خبيرا لا يمكن تأمين عمله بواسطة لبناني,"
     },
     {
       "id": "a10",
       "law": 204889,
       "article": "8",
-      "quote": "ب - اذا كان من الذين قدموا لبنان بعد اول كانون الثاني سنة 1960 (الف وتسعماية وستين) او من الذين يريدون القدوم اليه بموافقة مسبقة, على ان لا يقل رأس ماله عن الخمسين الف ليرة لبنانية, وان يستخدم على الاقل ثلاثة لبنانيين. اما اذا عقد اجانب شركة تضامن فيما بينهم, فيجب ان لا يقل رأس مال كل عضو من اعضاء الشركة عن الخمسين الف ليرة لبنانية, وان يستخدم من اللبنانيين بنسبة ثلاثة لكل عضو من اعضائها."
+      "quote": "3 - ان يكون متأهلا من لبنانية, وعليه ان يثبت زواجه هذا بموجب افادة تعطى له من المديرية العامة للاحوال الشخصية او من احدى دوائرها في الملحقات , وان يكون قد مضى على زواجه مدة سنة واحدة على الاقل."
     },
     {
       "id": "a11",
       "law": 204889,
-      "article": "14",
-      "quote": "يمكن أن تعطى إجازة العمل أو تجدد لمدة أقصاها ثلاث سنوات من تاريخ منحها, وكل إجازة لا يقدم طلب تجديدها خلال شهر على الأقل قبل موعد انتهائها, تعتبر ملغاة حكما"
+      "article": "8",
+      "quote": "4 - ان يكون مولودا من ام لبنانية, او من اصل لبناني,"
     },
     {
       "id": "a12",
       "law": 204889,
-      "article": "15",
-      "quote": "يحظر على من يحمل موافقة مسبقة او اجازة عمل, الانتقال الى مؤسسة اخرى او تغيير نوع العمل ما لم توافق على ذلك مسبقا وزارة العمل والشؤون الاجتماعية."
+      "article": "8",
+      "quote": "5 - ان يكون من مديري الشركات الاجنبية او رؤساء المحاسبة, او معاوني المدير, وفروع هذه الشركات في لبنان, او التي تعمل في الشرق الاوسط.\n\n6 - ان يكون من ممثلي الشركات الاجنبية بموجب مستند يثبت ذلك وان لا يمارس اي عمل مع الجمهور مباشرة."
     },
     {
       "id": "a13",
       "law": 204889,
-      "article": "17",
-      "quote": "تلغى اجازة العمل في اي وقت كان عند ظهور مستندات غير صحيحة, وكلما قضت مصلحة اليد العاملة اللبنانية بذلك, ولا سيما في الحالات الاتية:"
+      "article": "9",
+      "quote": "يحدد وزير العمل والشؤون الاجتماعية, خلال شهر كانون الاول من كل عام, بناء على اقتراح المدير العام, وبعد استطلاع رأي الادارات والهيئات المختصة عند الاقتضاء, الاعمال والمهن التي ترى الوزارة ضرورة حصرها باللبنانيين فقط."
     },
     {
       "id": "a14",
       "law": 204889,
-      "article": "17",
-      "quote": "1 - اذا صرفت المؤسسة اجيرا لبنانيا عملا باحكام المادة الخمسين من قانون العمل اللبناني, وابقت على اجير اجنبي مواز له في الكفاءة وشروط العمل.\n\n2 - اذا رفضت المؤسسة اعطاء تفضيل العمل الى لبناني تتوافر فيه شروط العمل الملائم.\n\n3 - اذا لم تقم المؤسسة بتعهداتها في تدريب اللبناني على العمل بدلا من الاجنبي.\n\n4 - اذا خالف الاجنبي شروط الموافقة المسبقة واجازة العمل.\n\n5 - اذا حكم عليه باحدى الجنايات او الجرائم الشائنة."
+      "article": "14",
+      "quote": "يمكن أن تعطى إجازة العمل أو تجدد لمدة أقصاها ثلاث سنوات من تاريخ منحها, وكل إجازة لا يقدم طلب تجديدها خلال شهر على الأقل قبل موعد انتهائها, تعتبر ملغاة حكما, ويصبح الأجنبي بدون إجازة عمل"
     },
     {
       "id": "a15",
@@ -96,201 +96,372 @@
     },
     {
       "id": "a16",
-      "law": 190374,
-      "article": "7",
-      "quote": "يستثنى من احكام هذا القانون.\n\n1- الخدم في بيوت الافراد"
+      "law": 204889,
+      "article": "15",
+      "quote": "يحظر على من يحمل موافقة مسبقة او اجازة عمل, الانتقال الى مؤسسة اخرى او تغيير نوع العمل ما لم توافق على ذلك مسبقا وزارة العمل والشؤون الاجتماعية."
     },
     {
       "id": "a17",
+      "law": 204889,
+      "article": "17",
+      "quote": "تلغى اجازة العمل في اي وقت كان عند ظهور مستندات غير صحيحة, وكلما قضت مصلحة اليد العاملة اللبنانية بذلك, ولا سيما في الحالات الاتية:"
+    },
+    {
+      "id": "a18",
+      "law": 204889,
+      "article": "17",
+      "quote": "1 - اذا صرفت المؤسسة اجيرا لبنانيا عملا باحكام المادة الخمسين من قانون العمل اللبناني, وابقت على اجير اجنبي مواز له في الكفاءة وشروط العمل.\n\n2 - اذا رفضت المؤسسة اعطاء تفضيل العمل الى لبناني تتوافر فيه شروط العمل الملائم.\n\n3 - اذا لم تقم المؤسسة بتعهداتها في تدريب اللبناني على العمل بدلا من الاجنبي.\n\n4 - اذا خالف الاجنبي شروط الموافقة المسبقة واجازة العمل.\n\n5 - اذا حكم عليه باحدى الجنايات او الجرائم الشائنة."
+    },
+    {
+      "id": "a19",
       "law": 190374,
       "article": "59",
       "quote": "يتمتع الأجراء الأجانب عند صرفهم من الخدمة بالحقوق التي يتمتع بها العمال اللبنانيون شرط المعاملة بالمثل ويترتب عليهم الحصول من وزارة العمل على اجازة عمل. يستثنى حصرا الأجراء الفلسطينيون اللاجئون المسجلون وفقا للأصول في سجلات وزارة الداخلية والبلديات - مديرية الشؤون السياسية واللاجئين - من شروط المعاملة بالمثل ورسم إجازة العمل الصادرة عن وزارة العمل."
     },
     {
-      "id": "a18",
-      "law": 302347,
-      "article": "24",
-      "quote": "1ــ على الـمسؤول عن مكتب الاستقدام ابلاغ صاحب العمل بوجوب التقيد بالـمهل القانونية الـمفروضة لطلبات إجازة العمل للأجنبي على الأراضي اللبنانية وتذكيره بوجوب الاستحصال على اجازة عمل في مهلة 10 أيام من دخول العاملة الى لبنان."
-    },
-    {
-      "id": "a19",
-      "law": 208490,
-      "article": "4",
-      "quote": "1- يعود لرئيس دائرة مراقبة عمل الاجانب في الادارة المركزية ولرؤساء الدوائر الاقليمية التابعة لوزارة العمل البت بطلبات اجازات عمل الخدم في منازل الافراد والعمال الزراعيين المبنية على موافقة مسبقة للعمل وتجديدها شرط ان يكون الطلب متطابقا مع الموافقة المسبقة وفي حال تغيير مكان او نوع العمل يحال الطلب مع باقي الطلبات الى رئيس مصلحة القوى العاملة"
-    },
-    {
       "id": "a20",
-      "law": 302347,
-      "article": "28",
-      "quote": "1ــ إبلاغ وزارة العمل عن أي انتهاكات تتعرض لها العاملة، أو سوء تطبيق عقد العمل الذي أبرمته مع صاحب العمل.\n\n2ــ الامتناع ومنع أي أجير عامل لديه او تحت سلطته عن تعريض العاملة لاي شكل من اشكال العنف الـمعنوي أو الجسدي أو الجنسي او الاكراه تحت طائلة اتخاذ تدابير بحقه تتراوح بحسب خطورة الفعل من وضع نقطة سوداء على ملفه لدى الوزارة الى السحب الفوري للرخصة دون انذار.\n\n3 ــ الامتناع عن تقاضي أي مبالغ مالية أو تقديمات عينية أو مادية مباشر أو غير مباشر من العلامات في الخدمة الـمنزلية."
+      "law": 179943,
+      "article": "25",
+      "quote": "يحظر على الاجنبي غير الفنان ان يتعاطى عملا او مهنة في لبنان ما لم يكن مرخصا له بذلك من وزارة العمل والشؤون الاجتماعية وفقا للقوانين والانظمة النافذة."
     },
     {
       "id": "a21",
-      "law": 302347,
-      "article": "29",
-      "quote": "على صاحب الـمكتب ان يتعهد باعادة العاملة الى بلدها على نفقته وتأمين بديل عنها، او اعادة الـمبلغ الـمدفوع بعد حسم قيمة استهلاك العقد وفقا للقاعدة الثلاثية، ودون تحميل صاحب العمل اية نفقات اضافية في الحالات التالية:\n\nأولا: خلال ثلاثة اشهر من تاريخ وجودها عند صاحـب العمل:"
-    },
-    {
-      "id": "a22",
-      "law": 302347,
-      "article": "29",
-      "quote": "4ــ في حال الاعاقة التي لا تمكن العاملة من اداء عملها على أن لا تكون الإعاقة ناتجة عن حادث بعد دخولها الأراضي اللبنانية."
-    },
-    {
-      "id": "a23",
-      "law": 302347,
-      "article": "27",
-      "quote": "يحظر على مكاتب الاستقدام استبقاء العاملات الـمعادة اليهم من قبل مستخدميهن أو اللواتي رفضن العمل خلال فترة التجربة لـمدة تتجاوز الشهر من تاريخ استلامها من صاحب العمل.\n\nيتوجب على صاحب الـمكتب بخلال هذه الـمدة تأمين عمل جديد للعاملة الأجنبية، وفي حال انقضاء الـمهلة دون تأمين عمل لها يتوجب عليه إعادتها الى بلدها."
-    },
-    {
-      "id": "a24",
-      "law": 302347,
-      "article": "31",
-      "quote": "تقدم الشكاوى والـمراجعات الـمتعلقة بالخلافات بين اصحاب العمل والعاملات أو بين أحد هذين الطرفين ومكاتب الاستقدام، لدى دائرة تفتيش العمل والوقاية والسلامة في مصلحة العمل والعلاقات الـمهنية، وفي الدوائر الاقليمية في الـمحافظات"
-    },
-    {
-      "id": "a25",
-      "law": 329714,
-      "article": "1",
-      "quote": "في حال الاصابة بعطل دائم من جراء الحادث تتعهد شركة التأمين بأن تدفع للاجير الـمصاب مبلغا لا يقل عن 10.000$ (عشرة آلاف دولار أميركي).\n\nاما في حال العطل الدائم الجزئي فتدفع نسبة مئوية من الـمبلغ الـمذكور اعلاه وذلك وفقا لجدول العجوزات الـمنصوص عليه في قانون طوارئ العمل."
-    },
-    {
-      "id": "a26",
-      "law": 329714,
-      "article": "1",
-      "quote": "تتعهد شركة التأمين بأن تدفع نفقات الاستشفاء من جراء حادث اثناء العمل أو خارجي أو من جراء مرض مهما كان نوعه أو سببه بالاضافة الى فحص مخبري واحد في السنة مبلغا لا يقل عن 23.000$ (ثلاثة وعشرون ألف دولار أميركي) كحد اقصى في السنة (حالة واحدة او عدة حالات)."
-    },
-    {
-      "id": "a27",
-      "law": 223096,
-      "article": "5",
-      "quote": "على صاحب العمل ان يقدم مع طلب اجازة العمل ومع طلب تجديد الاجازة نسختين اصليتين عن عقد التأمين والبوليصة وصورة عن بطاقة التأمين او الايصال الاصلي بالدفع."
-    },
-    {
-      "id": "a28",
       "law": 190374,
       "article": "107",
       "quote": "كل مخالفة لأحكام قانون العمل أو المراسيم والقرارات المتخذة لتطبيقه وتنفيذه تعرض مرتكبيها صاحب العمل سواء أكان لبنانياً أو أجنبياً والعامل الأجنبي كليهما لتسطير محضر ضبط بقيمة تتراوح بين مليوني ليرة لبنانية وخمسة ملايين ليرة لبنانية ."
     },
     {
+      "id": "a22",
+      "law": 190374,
+      "article": "7",
+      "quote": "يستثنى من احكام هذا القانون.\n\n1- الخدم في بيوت الافراد"
+    },
+    {
+      "id": "a23",
+      "law": 302347,
+      "article": "24",
+      "quote": "1ــ على الـمسؤول عن مكتب الاستقدام ابلاغ صاحب العمل بوجوب التقيد بالـمهل القانونية الـمفروضة لطلبات إجازة العمل للأجنبي على الأراضي اللبنانية وتذكيره بوجوب الاستحصال على اجازة عمل في مهلة 10 أيام من دخول العاملة الى لبنان."
+    },
+    {
+      "id": "a24",
+      "law": 302347,
+      "article": "28",
+      "quote": "1ــ إبلاغ وزارة العمل عن أي انتهاكات تتعرض لها العاملة، أو سوء تطبيق عقد العمل الذي أبرمته مع صاحب العمل.\n\n2ــ الامتناع ومنع أي أجير عامل لديه او تحت سلطته عن تعريض العاملة لاي شكل من اشكال العنف الـمعنوي أو الجسدي أو الجنسي او الاكراه تحت طائلة اتخاذ تدابير بحقه تتراوح بحسب خطورة الفعل من وضع نقطة سوداء على ملفه لدى الوزارة الى السحب الفوري للرخصة دون انذار.\n\n3 ــ الامتناع عن تقاضي أي مبالغ مالية أو تقديمات عينية أو مادية مباشر أو غير مباشر من العلامات في الخدمة الـمنزلية."
+    },
+    {
+      "id": "a25",
+      "law": 302347,
+      "article": "29",
+      "quote": "على صاحب الـمكتب ان يتعهد باعادة العاملة الى بلدها على نفقته وتأمين بديل عنها، او اعادة الـمبلغ الـمدفوع بعد حسم قيمة استهلاك العقد وفقا للقاعدة الثلاثية، ودون تحميل صاحب العمل اية نفقات اضافية في الحالات التالية:\n\nأولا: خلال ثلاثة اشهر من تاريخ وجودها عند صاحـب العمل:"
+    },
+    {
+      "id": "a26",
+      "law": 302347,
+      "article": "29",
+      "quote": "3ــ في حال عدم التوافق بين صاحب العمل والعامل في الخدمة الـمنزلية."
+    },
+    {
+      "id": "a27",
+      "law": 302347,
+      "article": "27",
+      "quote": "يحظر على مكاتب الاستقدام استبقاء العاملات الـمعادة اليهم من قبل مستخدميهن أو اللواتي رفضن العمل خلال فترة التجربة لـمدة تتجاوز الشهر من تاريخ استلامها من صاحب العمل.\n\nيتوجب على صاحب الـمكتب بخلال هذه الـمدة تأمين عمل جديد للعاملة الأجنبية، وفي حال انقضاء الـمهلة دون تأمين عمل لها يتوجب عليه إعادتها الى بلدها."
+    },
+    {
+      "id": "a28",
+      "law": 302347,
+      "article": "31",
+      "quote": "تقدم الشكاوى والـمراجعات الـمتعلقة بالخلافات بين اصحاب العمل والعاملات أو بين أحد هذين الطرفين ومكاتب الاستقدام، لدى دائرة تفتيش العمل والوقاية والسلامة في مصلحة العمل والعلاقات الـمهنية، وفي الدوائر الاقليمية في الـمحافظات"
+    },
+    {
       "id": "a29",
-      "law": 204889,
-      "article": "21",
-      "quote": "كل مخالفة لاحكام الموافقة المسبقة يعاقب مرتكبها بالعقوبات المنصوص عليها في المادة 32 من قانون 10 تموز سنة 1962 وكل مخالفة لاحكام هذا المرسوم, باستثناء المبينة في الفقرة السابقة, يعاقب مرتكبها بالعقوبات المنصوص عليها في المادة الثانية من قانون 17 ايلول سنة 1962 المتعلقة بالغاء واستبدال نص المادتين 107 و 108 من قانون العمل اللبناني."
+      "law": 302347,
+      "article": "31",
+      "quote": "كما يمكن تقديم الشكوى إما عبر الاتصال على الخط الساخن 1741"
     },
     {
       "id": "a30",
-      "law": 179943,
-      "article": "25",
-      "quote": "يحظر على الاجنبي غير الفنان ان يتعاطى عملا او مهنة في لبنان ما لم يكن مرخصا له بذلك من وزارة العمل والشؤون الاجتماعية وفقا للقوانين والانظمة النافذة."
+      "law": 329714,
+      "article": "1",
+      "quote": "في حال الوفاة لأي سبب كان تتعهد شركة التأمين بتحمل نفقات نقل الجثمان أو الرفاة الى وطن الاجنبي أو مكان اقامته الدائم في الخارج بمبلغ لا يقل عن 8.000$ (ثمانية آلاف دولار أميركي)"
+    },
+    {
+      "id": "a31",
+      "law": 329714,
+      "article": "1",
+      "quote": "في حال الاصابة بعطل دائم من جراء الحادث تتعهد شركة التأمين بأن تدفع للاجير الـمصاب مبلغا لا يقل عن 10.000$ (عشرة آلاف دولار أميركي)."
+    },
+    {
+      "id": "a32",
+      "law": 329714,
+      "article": "1",
+      "quote": "تتعهد شركة التأمين بأن تدفع نفقات الاستشفاء من جراء حادث اثناء العمل أو خارجي أو من جراء مرض مهما كان نوعه أو سببه بالاضافة الى فحص مخبري واحد في السنة مبلغا لا يقل عن 23.000$ (ثلاثة وعشرون ألف دولار أميركي) كحد اقصى في السنة"
     }
   ],
   "en": {
-    "title": "Foreign workers in Lebanon: work permits and the sponsorship system",
-    "question": "What do Lebanese texts say about work permits and the rights of foreign workers, including domestic workers under sponsorship?",
-    "description": "A guide to permits, domestic worker protections, recruitment offices and insurance in the texts held here.",
+    "title": "How does a foreign worker get a work permit in Lebanon, and what does the law say?",
+    "question": "What are the steps for a foreign worker to get a work permit in Lebanon, how long does it last, and what protections do the texts give?",
+    "description": "Ministry of Labour prior approval before arrival, then a work permit sought within 10 days of entry, valid up to 3 years. Changing employer needs consent.",
     "answer": {
-      "text": "No text held here uses kafala to describe a sponsorship system; Decision 41/1 uses the word only for a recruitment office’s deposit. Decree 17561 requires prior approval and a work permit, requested within 10 days of entry and lasting up to 3 years, including for domestic workers. Labour Code Article 7 excludes domestic servants in private homes, whose protections in these texts come from recruitment office and insurance decisions.",
+      "text": "Under Decree 17561 of 1964, a foreigner must get the Ministry of Labour's prior approval before coming to Lebanon, then apply for the work permit within 10 days of entry (Articles 2 and 6). The permit lasts up to 3 years, renewal must be requested at least 1 month before it ends, and the worker may not change employer or type of work without the Ministry's prior consent (Articles 14 and 15). Domestic workers need the same permit but fall outside the Labour Code under its Article 7, so their protections come from ministerial decisions on recruitment offices and insurance.",
       "cites": [
         "a1",
         "a2",
-        "a11",
+        "a14",
         "a16",
-        "a18"
+        "a22",
+        "a24",
+        "a30"
       ]
     },
     "sections": [
       {
-        "heading": "Who needs approval and a work permit?",
+        "heading": "Key figures at a glance",
         "paras": [
           {
-            "text": "A foreigner planning to work in Lebanon, with or without pay, must get prior approval before arrival; artists get approval from General Security. The foreigner must apply to the Ministry of Labour for a permit within 10 days after entry. If the worker does not arrive within 3 months after approval was sent, the Ministry may cancel it. Failure to apply within 10 days cancels approval unless force majeure prevented it. Decision 41/1 also requires an employer to be reminded that a domestic worker’s permit is due within 10 days.",
+            "text": "Decree 17561 of 1964 sets the permit procedure and its deadlines, and later ministerial decisions add insurance and recruitment rules.",
             "cites": [
               "a1",
-              "a2",
-              "a18"
+              "a30"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Work permits for foreigners: deadlines and amounts",
+          "head": [
+            "Rule",
+            "Figure",
+            "Source"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Prior approval",
+                "Before arrival, from the Ministry of Labour (artists: General Security)",
+                "Decree 17561, Article 2"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "Applying for the permit",
+                "Within 10 days of entry",
+                "Decree 17561, Article 6"
+              ],
+              "cites": [
+                "a2"
+              ]
+            },
+            {
+              "cells": [
+                "Arrival after approval",
+                "Within 3 months, or the Ministry may cancel the approval",
+                "Decree 17561, Article 6"
+              ],
+              "cites": [
+                "a2"
+              ]
+            },
+            {
+              "cells": [
+                "Ministry decision",
+                "Within 1 month of a complete file",
+                "Decree 17561, Article 13"
+              ],
+              "cites": [
+                "a5"
+              ]
+            },
+            {
+              "cells": [
+                "Criminal record in the file",
+                "No older than 6 months",
+                "Decree 17561, Article 19"
+              ],
+              "cites": [
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "Permit length",
+                "Up to 3 years",
+                "Decree 17561, Article 14"
+              ],
+              "cites": [
+                "a14"
+              ]
+            },
+            {
+              "cells": [
+                "Renewal request",
+                "At least 1 month before expiry, or the permit lapses",
+                "Decree 17561, Article 14"
+              ],
+              "cites": [
+                "a14"
+              ]
+            },
+            {
+              "cells": [
+                "Insurance, repatriation of remains",
+                "At least $8,000",
+                "Decision 4/1 of 2024, Article 1"
+              ],
+              "cites": [
+                "a30"
+              ]
+            },
+            {
+              "cells": [
+                "Insurance, permanent disability",
+                "At least $10,000",
+                "Decision 4/1 of 2024, Article 1"
+              ],
+              "cites": [
+                "a31"
+              ]
+            },
+            {
+              "cells": [
+                "Insurance, hospital care",
+                "At least $23,000 a year",
+                "Decision 4/1 of 2024, Article 1"
+              ],
+              "cites": [
+                "a32"
+              ]
+            },
+            {
+              "cells": [
+                "Breach of the Labour Code or its decisions",
+                "Violation record of 2,000,000 to 5,000,000 LBP, for employer and foreign worker",
+                "Labour Code, Article 107"
+              ],
+              "cites": [
+                "a21"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "What are the steps to get a work permit?",
+        "paras": [
+          {
+            "text": "The foreigner needs two documents in turn: the Ministry of Labour's prior approval before coming to Lebanon, then a work permit applied for within 10 days of entry (Articles 2 and 6).",
+            "cites": [
+              "a1",
+              "a2"
             ]
           },
           {
-            "text": "Subject to preferring Lebanese workers, a permit may be granted or renewed on 1 of these grounds: specialist or expert work unavailable from a Lebanese worker; residence before 1954 with at least 9 months of work a year; marriage to a Lebanese woman for at least 1 year; a Lebanese mother or Lebanese origin; specified company managers or representatives; or a business, craft, profession or industry meeting the conditions below.",
+            "text": "The request for prior approval is filed from abroad through Lebanon's representatives or an official agent in Lebanon, and for an employee the employer files its own request with an employment contract certified by a notary (Articles 3 and 5).",
             "cites": [
               "a3",
-              "a4",
-              "a5",
-              "a6",
-              "a7",
-              "a8",
-              "a9",
-              "a10"
+              "a4"
             ]
           },
           {
-            "text": "For the last ground, the worker must have resided in Lebanon before 1/1/1954 and begun work before 1/1/1960; a later arrival or prospective entrant must have capital of at least LBP 50,000 and employ at least 3 Lebanese workers, or 3 per partner in a partnership. A permit lasts up to 3 years. Renewal must be requested at least 1 month before expiry, or the permit is cancelled. It may also be cancelled for false documents or Lebanese labour interests, including the listed dismissal, preference, training, permit-breach and conviction cases.",
+            "text": "The Ministry must decide within 1 month of a complete file (Article 13). If the worker does not arrive within 3 months, the Ministry may cancel the approval, and the approval lapses if the permit is not sought within the 10 days (Article 6).",
             "cites": [
+              "a5",
+              "a2"
+            ]
+          },
+          {
+            "text": "The file includes a criminal record no older than 6 months (Article 19), and with every permit request and renewal the employer files the original insurance contract and policy (Decision 52/1 of 2009, Article 5).",
+            "cites": [
+              "a6",
+              "a7"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "Who can get a permit, and for how long?",
+        "paras": [
+          {
+            "text": "A permit is granted, with preference for Lebanese workers, only if the foreigner meets one of the grounds in Article 8, such as being a specialist or expert whose work no Lebanese can do, being married to a Lebanese woman for at least 1 year, or being born to a Lebanese mother.",
+            "cites": [
+              "a8",
               "a9",
               "a10",
-              "a11",
-              "a13",
+              "a11"
+            ]
+          },
+          {
+            "text": "Other grounds cover managers and representatives of foreign companies and some business owners (Article 8), and each December the Minister names the jobs reserved for Lebanese (Article 9).",
+            "cites": [
+              "a12",
+              "a13"
+            ]
+          },
+          {
+            "text": "The permit lasts up to 3 years and lapses if renewal is not requested at least 1 month before it ends, leaving the foreigner without a permit (Article 14). It extends the prior approval, so if it ends or renewal is refused, the approval ends too (Article 7).",
+            "cites": [
+              "a14",
+              "a15"
+            ]
+          },
+          {
+            "text": "Example: for a permit granted for the full 3 years, the renewal request must be filed at least 1 month before the 3 years end; filed later, the permit is treated as cancelled.",
+            "cites": [
               "a14"
             ]
           }
         ]
       },
       {
-        "heading": "Can a worker change employer or work?",
+        "heading": "Can a foreign worker change employer, and when is a permit cancelled?",
         "paras": [
           {
-            "text": "A foreigner holding prior approval or a permit cannot move to another establishment or change work type without prior Ministry of Labour approval. A permit extends the prior approval; if it expires or renewal is refused, approval lapses and new approval is needed to work. Domestic and agricultural worker permits matching prior approval are decided by the head of Foreign Labour Control or regional heads. A proposed change of workplace or work type goes to the head of the Manpower Service.",
+            "text": "Not freely: a holder of prior approval or a permit may not move to another establishment or change the type of work without the Ministry's prior consent (Article 15).",
             "cites": [
-              "a12",
-              "a15",
-              "a19"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "What protection applies to domestic workers?",
-        "paras": [
-          {
-            "text": "Labour Code Article 7 excludes domestic servants in private homes. Foreign employees covered by the Code receive the same dismissal rights as Lebanese workers only if reciprocity applies and they hold a work permit. Registered Palestinian refugees are exempt from reciprocity and the permit fee.",
-            "cites": [
-              "a16",
-              "a17"
+              "a16"
             ]
           },
           {
-            "text": "The texts held here do not set out domestic workers’ rules on passport retention, wage payment dates or weekly rest. The unified domestic worker contract model is not included.",
-            "note": true
+            "text": "The permit can be cancelled at any time for false documents or when the Lebanese workforce requires it, for example if the firm dismisses a Lebanese worker while keeping an equivalent foreigner, or if the foreigner breaks the permit conditions or is convicted of a felony (Article 17).",
+            "cites": [
+              "a17",
+              "a18"
+            ]
+          },
+          {
+            "text": "A foreign employee dismissed from work has the rights of Lebanese workers, on condition of reciprocity and a work permit, and registered Palestinian refugees are exempt from reciprocity and the permit fee (Labour Code, Article 59).",
+            "cites": [
+              "a19"
+            ]
+          },
+          {
+            "text": "Working without the Ministry's authorisation is banned (Law of 10 July 1962, Article 25), and each breach of the Labour Code or its decisions exposes both the employer and the foreign worker to a violation record of 2,000,000 to 5,000,000 LBP (Labour Code, Article 107).",
+            "cites": [
+              "a20",
+              "a21"
+            ]
           }
         ]
       },
       {
-        "heading": "What must recruitment offices and employers do?",
+        "heading": "What protection do domestic workers have?",
         "paras": [
           {
-            "text": "Recruitment offices must report violations, prevent violence or coercion by their staff, and take no money or in-kind benefit from domestic workers. In the listed cases, the office must repatriate the worker and provide a replacement, or refund the amount paid less contract consumption under the rule of three, without extra cost to the employer. Within 3 months, the listed cases include pre-existing disease, leaving without consent, refusing work without legal cause, incompatibility, and disability that prevents work and did not result from an accident after entry. The disease period extends to 6 months if it could not be detected in the first 3 months; the remedy also applies within 6 months to pre-existing pregnancy, unless the employer knew. Violence or coercion can bring measures from a black point to immediate licence withdrawal without warning.",
+            "text": "Domestic servants in private homes fall outside the Labour Code (Labour Code, Article 7), so the texts that protect them are ministerial decisions on recruitment offices and insurance.",
             "cites": [
-              "a20",
-              "a21",
               "a22"
             ]
           },
           {
-            "text": "An office may not keep a returned worker, or one who refused work in the trial period, for more than 1 month. It must find her new work during that period or repatriate her. If an employer fails to start the permit process, the office informs the Ministry, which refers the file to inspection to record the violation and fines, propose barring the employer, and propose deportation at the employer’s responsibility. The Ministry informs General Security of the failure. Where contract termination conditions are met, the office may ask the Ministry to request repatriation at the employer’s responsibility. Complaints go to labour inspection or regional departments, the 1741 hotline, or the Ministry website. An employer who breaches recruitment conditions, and people living in the same home, may be placed on the barred list.",
+            "text": "Recruitment offices must remind the employer to get the permit within 10 days of the worker's arrival, report abuses to the Ministry, keep their staff from any physical, moral or sexual violence against her, and take no money from her (Decision 41/1 of 2022, Articles 24 and 28).",
             "cites": [
-              "a18",
               "a23",
               "a24"
             ]
-          }
-        ]
-      },
-      {
-        "heading": "What insurance and penalties do the texts provide?",
-        "paras": [
+          },
           {
-            "text": "Insurance must cover repatriation of remains at no less than USD 8,000, with the balance paid to qualifying heirs after transfer costs; the employer must ensure transfer within 1 week of death. Permanent disability resulting from an accident must be covered at no less than USD 10,000; partial disability is paid proportionally. Hospital cover for an accident or illness, plus 1 laboratory test a year, must have an annual ceiling of no less than USD 23,000 for 1 or several cases. Employers submit 2 original copies of the insurance contract and policy, plus a copy of the insurance card or the original payment receipt, with each permit and renewal application.",
+            "text": "Within 3 months of her arrival at the employer's, the office must send her home at its own cost and find a replacement, or refund the employer, in cases such as incompatibility between them, and it may not keep a returned worker more than 1 month without finding her new work or sending her home (Articles 29 and 27).",
             "cites": [
               "a25",
               "a26",
@@ -298,15 +469,26 @@
             ]
           },
           {
-            "text": "A non-artist foreigner may not work without Ministry authorisation. Labour Code Article 107 states a citation of LBP 2,000,000 to LBP 5,000,000 for violations by the employer and foreign worker; the text also provides a settlement amount of 20% within 15 days, court penalties if unpaid, and doubled penalties for repetition within 1 year. The database also holds an older wording of the same Article 2 regime with fines stated in Lebanese pounds as written; the amending text for the newer wording is not recorded. Decree Article 21 points to that same Article 2 regime for decree violations; prior approval violations are referred to Article 32 of the 1962 law.",
+            "text": "Complaints go to the Ministry's labour inspection department, its regional offices or the hotline 1741 (Article 31). The employer's insurance must cover at least $8,000 for repatriation of remains, $10,000 for permanent disability and $23,000 a year for hospital care (Decision 4/1 of 2024, Article 1).",
             "cites": [
               "a28",
               "a29",
-              "a30"
+              "a30",
+              "a31",
+              "a32"
             ]
+          }
+        ]
+      },
+      {
+        "heading": "What this page does not cover",
+        "paras": [
+          {
+            "text": "No text in our database uses the word kafala for a sponsorship system: the tie to one employer comes from the permit rules above. We do not hold the unified domestic work contract, the yearly list of jobs reserved for Lebanese, or General Security's residence rules.",
+            "note": true
           },
           {
-            "text": "This page does not include the amending text for the newer Article 107 fine wording, General Security residence rules, exit visa practice, bilateral labour agreements or case law.",
+            "text": "Lira amounts set before the currency collapse, such as the 50,000 LBP capital Article 8 requires of some business owners, are now symbolic. This page does not cover permits for artists, teachers in private schools or bilateral labour agreements.",
             "note": true
           }
         ]
@@ -314,111 +496,270 @@
     ]
   },
   "ar": {
-    "title": "العمال الأجانب في لبنان: إجازات العمل ونظام الكفالة",
-    "question": "ماذا تقول النصوص اللبنانية عن إجازات العمل وحقوق العمال الأجانب، بمن فيهم عاملات المنازل في إطار الكفالة؟",
-    "description": "دليل إلى الإجازات وحماية عاملات المنازل وواجبات مكاتب الاستقدام والتأمين في النصوص المتاحة.",
+    "title": "كيف يحصل العامل الأجنبي على إجازة عمل في لبنان، وماذا يقول القانون؟",
+    "question": "ما خطوات حصول العامل الأجنبي على إجازة عمل في لبنان، وما مدتها، وما الحماية التي تمنحها النصوص؟",
+    "description": "موافقة مسبقة من وزارة العمل قبل القدوم، ثم طلب إجازة العمل خلال 10 أيام من الدخول، ومدتها 3 سنوات كحد أقصى. ولا يجوز تغيير صاحب العمل دون موافقة الوزارة.",
     "answer": {
-      "text": "لا يستخدم أي نص متاح لفظ «الكفالة» لوصف نظام رعاية العامل؛ ويستخدمه القرار 41/1 لوديعة مكتب الاستقدام فقط. يشترط المرسوم 17561 موافقة مسبقة وإجازة عمل، ويجب طلب الإجازة خلال 10 أيام من الدخول وتدوم حتى 3 سنوات، بما يشمل عاملات المنازل. يستثني قانون العمل في المادة 7 الخدم في بيوت الأفراد، وتأتي حمايتهم في النصوص المتاحة من قرارات مكاتب الاستقدام والتأمين.",
+      "text": "وفق المرسوم 17561 لعام 1964، على الأجنبي أن يحصل على موافقة مسبقة من وزارة العمل قبل مجيئه إلى لبنان، ثم أن يطلب إجازة العمل خلال 10 أيام من دخوله (المادتان 2 و6). ومدة الإجازة 3 سنوات كحد أقصى، ويجب تقديم طلب تجديدها قبل شهر على الأقل من انتهائها، ولا يجوز للعامل الانتقال إلى مؤسسة أخرى أو تغيير نوع عمله دون موافقة مسبقة من الوزارة (المادتان 14 و15). ويحتاج العمال في الخدمة المنزلية إلى الإجازة نفسها لكنهم مستثنون من قانون العمل بموجب مادته 7، فتأتي حمايتهم من قرارات وزارية تتعلق بمكاتب الاستقدام والتأمين.",
       "cites": [
         "a1",
         "a2",
-        "a11",
+        "a14",
         "a16",
-        "a18"
+        "a22",
+        "a24",
+        "a30"
       ]
     },
     "sections": [
       {
-        "heading": "من يحتاج إلى موافقة وإجازة عمل؟",
+        "heading": "الأرقام الأساسية باختصار",
         "paras": [
           {
-            "text": "على الأجنبي الذي يريد العمل في لبنان، بأجر أو من دونه، الحصول على موافقة مسبقة قبل الدخول؛ ويحصل الفنانون على الموافقة من الأمن العام. ويقدم الأجنبي طلب الإجازة إلى وزارة العمل خلال 10 أيام من دخوله. وللوزارة إلغاء الموافقة إذا لم يحضر الأجنبي خلال 3 أشهر من إرسالها. وتلغى الموافقة تلقائيا إذا لم يقدم الطلب خلال 10 أيام، إلا إذا حالت قوة قاهرة دون ذلك. ويلزم القرار 41/1 صاحب العمل بتذكيره بمهلة 10 أيام لإجازة عاملة المنزل.",
+            "text": "يحدد المرسوم 17561 لعام 1964 إجراءات إجازة العمل ومهلها، وتضيف قرارات وزارية لاحقة قواعد التأمين ومكاتب الاستقدام.",
             "cites": [
               "a1",
-              "a2",
-              "a18"
+              "a30"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "إجازات عمل الأجانب: المهل والمبالغ",
+          "head": [
+            "القاعدة",
+            "الرقم",
+            "المصدر"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "الموافقة المسبقة",
+                "قبل القدوم، من وزارة العمل (وللفنانين من الأمن العام)",
+                "المرسوم 17561، المادة 2"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "طلب إجازة العمل",
+                "خلال 10 أيام من الدخول",
+                "المرسوم 17561، المادة 6"
+              ],
+              "cites": [
+                "a2"
+              ]
+            },
+            {
+              "cells": [
+                "القدوم بعد الموافقة",
+                "خلال 3 أشهر، وإلا يمكن للوزارة إلغاء الموافقة",
+                "المرسوم 17561، المادة 6"
+              ],
+              "cites": [
+                "a2"
+              ]
+            },
+            {
+              "cells": [
+                "بت الوزارة بالطلب",
+                "خلال شهر من تقديم الملف كاملاً",
+                "المرسوم 17561، المادة 13"
+              ],
+              "cites": [
+                "a5"
+              ]
+            },
+            {
+              "cells": [
+                "السجل العدلي في الملف",
+                "لا يعود إلى أكثر من 6 أشهر",
+                "المرسوم 17561، المادة 19"
+              ],
+              "cites": [
+                "a6"
+              ]
+            },
+            {
+              "cells": [
+                "مدة الإجازة",
+                "3 سنوات كحد أقصى",
+                "المرسوم 17561، المادة 14"
+              ],
+              "cites": [
+                "a14"
+              ]
+            },
+            {
+              "cells": [
+                "طلب التجديد",
+                "قبل شهر على الأقل من انتهائها، وإلا تعتبر ملغاة",
+                "المرسوم 17561، المادة 14"
+              ],
+              "cites": [
+                "a14"
+              ]
+            },
+            {
+              "cells": [
+                "التأمين، نقل الجثمان",
+                "8,000 دولار على الأقل",
+                "القرار 4/1 لعام 2024، المادة 1"
+              ],
+              "cites": [
+                "a30"
+              ]
+            },
+            {
+              "cells": [
+                "التأمين، العطل الدائم",
+                "10,000 دولار على الأقل",
+                "القرار 4/1 لعام 2024، المادة 1"
+              ],
+              "cites": [
+                "a31"
+              ]
+            },
+            {
+              "cells": [
+                "التأمين، الاستشفاء",
+                "23,000 دولار على الأقل في السنة",
+                "القرار 4/1 لعام 2024، المادة 1"
+              ],
+              "cites": [
+                "a32"
+              ]
+            },
+            {
+              "cells": [
+                "مخالفة قانون العمل أو قراراته",
+                "محضر ضبط من 2,000,000 إلى 5,000,000 ل.ل. لصاحب العمل والعامل الأجنبي",
+                "قانون العمل، المادة 107"
+              ],
+              "cites": [
+                "a21"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "ما خطوات الحصول على إجازة العمل؟",
+        "paras": [
+          {
+            "text": "يحتاج الأجنبي إلى مستندين على التوالي: موافقة مسبقة من وزارة العمل قبل مجيئه إلى لبنان، ثم إجازة عمل يطلبها خلال 10 أيام من دخوله (المادتان 2 و6).",
+            "cites": [
+              "a1",
+              "a2"
             ]
           },
           {
-            "text": "مع تفضيل العامل اللبناني، يمكن منح الإجازة أو تجديدها عند تحقق سبب من الأسباب الآتية: اختصاص أو خبرة لا يمكن تأمينها بواسطة لبناني؛ إقامة قبل سنة 1954 وعمل 9 أشهر على الأقل في السنة؛ الزواج من لبنانية منذ سنة على الأقل؛ الولادة من أم لبنانية أو الأصل اللبناني؛ فئات محددة من مديري الشركات وممثليها؛ أو ممارسة عمل أو حرفة أو مهنة أو صناعة مع استيفاء الشروط.",
+            "text": "يُقدَّم طلب الموافقة المسبقة من الخارج بواسطة ممثلي لبنان في الخارج أو بواسطة وكيل رسمي في لبنان، وإذا كان الأجنبي أجيراً يتقدم صاحب العمل بطلب يصرح فيه بموافقته على استقدامه مع عقد عمل مصدق لدى الكاتب العدل (المادتان 3 و5).",
             "cites": [
               "a3",
-              "a4",
-              "a5",
-              "a6",
-              "a7",
-              "a8",
-              "a9",
-              "a10"
+              "a4"
             ]
           },
           {
-            "text": "في السبب الأخير، يجب أن يكون طالب الإجازة مقيما في لبنان قبل 1/1/1954 وقد بدأ العمل قبل 1/1/1960؛ أما القادم بعد ذلك أو الراغب في القدوم، فيجب ألا يقل رأس ماله عن 50,000 ليرة لبنانية وأن يستخدم 3 لبنانيين على الأقل، أو 3 عن كل شريك في شركة التضامن. تدوم الإجازة حتى 3 سنوات، ويقدم طلب تجديدها قبل شهر على الأقل من انتهائها، وإلا ألغيت. ويمكن إلغاؤها للمستندات غير الصحيحة أو لمصلحة اليد العاملة اللبنانية، ومنها حالات الصرف وعدم التفضيل وعدم التدريب ومخالفة الشروط والإدانة المذكورة.",
+            "text": "يجب أن تبت الوزارة بالطلب خلال شهر من تقديمه مع مستنداته (المادة 13). وإذا لم يحضر الأجنبي خلال 3 أشهر يمكن للوزارة إلغاء الموافقة، وتعتبر الموافقة ملغاة حكماً إذا لم يطلب الإجازة خلال الأيام العشرة (المادة 6).",
             "cites": [
+              "a5",
+              "a2"
+            ]
+          },
+          {
+            "text": "يتضمن الملف نسخة عن السجل العدلي لا يعود تاريخها إلى أكثر من 6 أشهر (المادة 19)، ويقدم صاحب العمل مع كل طلب إجازة أو تجديد نسختين أصليتين عن عقد التأمين والبوليصة (القرار 52/1 لعام 2009، المادة 5).",
+            "cites": [
+              "a6",
+              "a7"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "من يمكنه الحصول على الإجازة، ولأي مدة؟",
+        "paras": [
+          {
+            "text": "تُمنح الإجازة، مع مراعاة مبدأ تفضيل اللبناني، إذا توفر في الأجنبي أحد شروط المادة 8، ومنها أن يكون اختصاصياً أو خبيراً لا يمكن تأمين عمله بواسطة لبناني، أو متأهلاً من لبنانية منذ سنة على الأقل، أو مولوداً من أم لبنانية.",
+            "cites": [
+              "a8",
               "a9",
               "a10",
-              "a11",
-              "a13",
+              "a11"
+            ]
+          },
+          {
+            "text": "وتشمل الشروط الأخرى مديري الشركات الأجنبية وممثليها وبعض أصحاب الأعمال (المادة 8)، ويحدد الوزير في كانون الأول من كل عام الأعمال والمهن المحصورة باللبنانيين (المادة 9).",
+            "cites": [
+              "a12",
+              "a13"
+            ]
+          },
+          {
+            "text": "مدة الإجازة 3 سنوات كحد أقصى، وتعتبر ملغاة حكماً إذا لم يقدَّم طلب تجديدها قبل شهر على الأقل من انتهائها، فيصبح الأجنبي بدون إجازة عمل (المادة 14). والإجازة امتداد للموافقة المسبقة، فإذا انتهى مفعولها أو رُفض تجديدها بطلت الموافقة أيضاً (المادة 7).",
+            "cites": [
+              "a14",
+              "a15"
+            ]
+          },
+          {
+            "text": "مثال: إذا مُنحت الإجازة لمدة 3 سنوات كاملة، وجب تقديم طلب التجديد قبل شهر على الأقل من انتهاء السنوات الثلاث، وإلا اعتُبرت الإجازة ملغاة.",
+            "cites": [
               "a14"
             ]
           }
         ]
       },
       {
-        "heading": "هل يمكن للعامل تغيير صاحب العمل أو نوع العمل؟",
+        "heading": "هل يمكن للعامل الأجنبي تغيير صاحب العمل، ومتى تُلغى الإجازة؟",
         "paras": [
           {
-            "text": "لا يجوز لحامل الموافقة المسبقة أو الإجازة الانتقال إلى مؤسسة أخرى أو تغيير نوع العمل من دون موافقة وزارة العمل المسبقة. والإجازة امتداد للموافقة؛ فإذا انتهت أو رفض تجديدها بطل مفعول الموافقة ويلزم الحصول على موافقة جديدة. ويبت رئيس دائرة مراقبة عمل الأجانب أو رؤساء الدوائر الإقليمية بإجازات عمال المنازل والزراعة المطابقة للموافقة المسبقة. أما تغيير مكان العمل أو نوعه فيحال إلى رئيس مصلحة القوى العاملة.",
+            "text": "لا يجوز ذلك بحرية: يحظر على حامل الموافقة المسبقة أو إجازة العمل الانتقال إلى مؤسسة أخرى أو تغيير نوع العمل ما لم توافق الوزارة على ذلك مسبقاً (المادة 15).",
             "cites": [
-              "a12",
-              "a15",
-              "a19"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "ما الحماية التي تشمل عاملات المنازل؟",
-        "paras": [
-          {
-            "text": "يستثني قانون العمل في المادة 7 الخدم في بيوت الأفراد. أما الأجراء الأجانب الذين يشملهم القانون، فلهم حقوق اللبنانيين عند الصرف بشرط المعاملة بالمثل وحيازة إجازة عمل. ويعفى اللاجئون الفلسطينيون المسجلون أصولا من شرط المعاملة بالمثل ورسم الإجازة.",
-            "cites": [
-              "a16",
-              "a17"
+              "a16"
             ]
           },
           {
-            "text": "لا تحدد النصوص المتاحة قواعد بشأن احتفاظ صاحب العمل بجواز سفر عاملة المنزل أو مواعيد دفع الأجر أو الراحة الأسبوعية. كما أن نموذج عقد العمل الموحد غير وارد في قاعدة البيانات.",
-            "note": true
+            "text": "تلغى الإجازة في أي وقت عند ظهور مستندات غير صحيحة وكلما قضت مصلحة اليد العاملة اللبنانية بذلك، ومن الحالات أن تصرف المؤسسة أجيراً لبنانياً وتبقي على أجنبي مواز له، أو أن يخالف الأجنبي شروط الإجازة، أو أن يُحكم عليه بجناية أو جريمة شائنة (المادة 17).",
+            "cites": [
+              "a17",
+              "a18"
+            ]
+          },
+          {
+            "text": "يتمتع الأجير الأجنبي عند صرفه بحقوق الأجراء اللبنانيين شرط المعاملة بالمثل وحيازة إجازة عمل، ويُستثنى اللاجئون الفلسطينيون المسجلون من شرط المعاملة بالمثل ومن رسم إجازة العمل (قانون العمل، المادة 59).",
+            "cites": [
+              "a19"
+            ]
+          },
+          {
+            "text": "يحظر على الأجنبي أن يعمل في لبنان ما لم ترخص له وزارة العمل (قانون 10 تموز 1962، المادة 25)، وكل مخالفة لقانون العمل أو قراراته تعرّض صاحب العمل والعامل الأجنبي كليهما لمحضر ضبط بين 2,000,000 و5,000,000 ل.ل. (قانون العمل، المادة 107).",
+            "cites": [
+              "a20",
+              "a21"
+            ]
           }
         ]
       },
       {
-        "heading": "ما واجبات مكاتب الاستقدام وأصحاب العمل؟",
+        "heading": "ما الحماية التي يتمتع بها العمال في الخدمة المنزلية؟",
         "paras": [
           {
-            "text": "على مكاتب الاستقدام إبلاغ الوزارة بالانتهاكات، ومنع العنف أو الإكراه من العاملين لديها، وعدم تقاضي المال أو المنافع العينية من عاملات المنازل. وفي الحالات المحددة، يعيد المكتب العاملة ويؤمن بديلا أو يرد المبلغ بعد حسم قيمة استهلاك العقد وفق القاعدة الثلاثية، من دون كلفة إضافية على صاحب العمل. وخلال 3 أشهر تشمل الحالات مرضا سابقا للدخول، أو مغادرة المنزل من دون موافقة، أو رفض العمل بلا مسوغ قانوني، أو عدم التوافق، أو إعاقة تمنع العمل ولم تنتج عن حادث بعد الدخول. وتمتد مهلة المرض إلى 6 أشهر إذا تعذر اكتشافه في الأشهر الثلاثة الأولى؛ ويسري الحل خلال 6 أشهر على الحمل السابق للدخول أو الانتقال، إلا إذا كان صاحب العمل يعلم به. وقد تؤدي أعمال العنف أو الإكراه إلى تدابير تبدأ بنقطة سوداء وتنتهي بسحب فوري للرخصة دون إنذار.",
+            "text": "الخدم في بيوت الأفراد مستثنون من أحكام قانون العمل (قانون العمل، المادة 7)، فالنصوص التي تحميهم قرارات وزارية تتعلق بمكاتب الاستقدام والتأمين.",
             "cites": [
-              "a20",
-              "a21",
               "a22"
             ]
           },
           {
-            "text": "لا يجوز للمكتب إبقاء العاملة المعادة إليه أو الرافضة للعمل خلال التجربة أكثر من شهر؛ وعليه تأمين عمل جديد لها خلاله، وإلا أعادها إلى بلدها. إذا لم يبدأ صاحب العمل معاملة الإجازة، يبلغ المكتب الوزارة، فتحيل الملف إلى التفتيش لتنظيم محضر بالمخالفة والغرامات واقتراح منع صاحب العمل من الاستقدام وترحيل العاملة على مسؤوليته. وتبلغ الوزارة الأمن العام بالتخلف. وعند تحقق شروط فسخ العقد، يجوز للمكتب طلب أن تطلب الوزارة ترحيل العاملة على مسؤولية صاحب العمل. تقدم الشكاوى إلى التفتيش أو الدوائر الإقليمية، أو عبر الخط الساخن 1741 أو موقع الوزارة. ويمكن إدراج صاحب العمل المخالف ومن يقيم معه في لائحة الممنوعين.",
+            "text": "على مكتب الاستقدام تذكير صاحب العمل بوجوب الاستحصال على إجازة العمل خلال 10 أيام من دخول العاملة، وإبلاغ وزارة العمل عن أي انتهاكات تتعرض لها، ومنع العاملين لديه من تعريضها لأي عنف معنوي أو جسدي أو جنسي، والامتناع عن تقاضي أي مبالغ منها (القرار 41/1 لعام 2022، المادتان 24 و28).",
             "cites": [
-              "a18",
               "a23",
               "a24"
             ]
-          }
-        ]
-      },
-      {
-        "heading": "ما التأمين والعقوبات التي تنص عليها النصوص؟",
-        "paras": [
+          },
           {
-            "text": "يجب أن يغطي التأمين نقل الرفاة إلى الخارج بمبلغ لا يقل عن 8,000 دولار، ويسلم الرصيد إلى الورثة المستوفين للشروط بعد حسم كلفة النقل؛ وعلى صاحب العمل ضمان نقل الرفاة خلال أسبوع من الوفاة. ويكون التأمين للعطل الدائم الناتج عن حادث بمبلغ لا يقل عن 10,000 دولار، ويدفع عن العطل الجزئي بنسبة مئوية. ويغطي الاستشفاء بسبب حادث أو مرض، مع فحص مخبري واحد سنويا، بسقف سنوي لا يقل عن 23,000 دولار لحالة واحدة أو عدة حالات. ويقدم صاحب العمل نسختين أصليتين من عقد التأمين والبوليصة، وصورة بطاقة التأمين أو إيصال الدفع الأصلي، مع طلب الإجازة وتجديدها.",
+            "text": "خلال 3 أشهر من وجودها عند صاحب العمل، على المكتب إعادتها إلى بلدها على نفقته وتأمين بديل عنها، أو رد المبلغ إلى صاحب العمل، في حالات منها عدم التوافق بينهما، ولا يجوز له استبقاء العاملة المعادة إليه أكثر من شهر دون تأمين عمل جديد لها أو إعادتها إلى بلدها (المادتان 29 و27).",
             "cites": [
               "a25",
               "a26",
@@ -426,15 +767,26 @@
             ]
           },
           {
-            "text": "يحظر على الأجنبي غير الفنان العمل من دون ترخيص وزارة العمل. وتنص المادة 107 من قانون العمل على محضر ضبط بحق صاحب العمل والعامل الأجنبي بين 2,000,000 و5,000,000 ليرة لبنانية؛ كما تذكر التسوية بنسبة 20% خلال 15 يوما، والعقوبات القضائية عند عدم التسوية، ومضاعفة العقوبات عند التكرار خلال سنة. وترد في قاعدة البيانات صيغة أقدم للمادة 2 نفسها بغرامة بالمبالغ الواردة فيها بالليرة اللبنانية؛ ولا يرد فيها نص التعديل الذي أتى بالصيغة الأحدث. وتحيل المادة 21 من المرسوم إلى نظام المادة 2 نفسه لمخالفات المرسوم؛ أما مخالفة الموافقة المسبقة فتحال إلى المادة 32 من قانون 1962.",
+            "text": "تقدم الشكاوى إلى دائرة تفتيش العمل في الوزارة أو دوائرها الإقليمية أو عبر الخط الساخن 1741 (المادة 31). ويجب أن تغطي بوليصة التأمين 8,000 دولار على الأقل لنقل الجثمان، و10,000 دولار للعطل الدائم، و23,000 دولار في السنة للاستشفاء (القرار 4/1 لعام 2024، المادة 1).",
             "cites": [
               "a28",
               "a29",
-              "a30"
+              "a30",
+              "a31",
+              "a32"
             ]
+          }
+        ]
+      },
+      {
+        "heading": "ما لا تتناوله هذه الصفحة",
+        "paras": [
+          {
+            "text": "لا يرد لفظ الكفالة في أي نص في قاعدة بياناتنا بمعنى نظام لكفالة العمال، وارتباط العامل بصاحب عمل واحد ينتج عن قواعد الإجازة أعلاه. ولا يتوفر لدينا عقد العمل الموحد للعاملات في الخدمة المنزلية، ولا اللائحة السنوية للمهن المحصورة باللبنانيين، ولا قواعد الإقامة لدى الأمن العام.",
+            "note": true
           },
           {
-            "text": "لا يتضمن هذا العرض نص تعديل صيغة غرامة المادة 107 الأحدث، أو قواعد الإقامة لدى الأمن العام وتأشيرة الخروج أو الاتفاقات الثنائية أو الاجتهادات القضائية.",
+            "text": "المبالغ المحددة بالليرة قبل انهيار العملة، مثل رأس المال البالغ 50,000 ل.ل. الذي تشترطه المادة 8 لبعض أصحاب الأعمال، أصبحت رمزية. ولا تتناول هذه الصفحة إجازات الفنانين والمدرسين في المدارس الخاصة ولا اتفاقيات العمل الثنائية.",
             "note": true
           }
         ]

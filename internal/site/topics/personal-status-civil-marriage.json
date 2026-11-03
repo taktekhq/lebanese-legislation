@@ -2,352 +2,534 @@
   "slug": "personal-status-civil-marriage",
   "order": 6,
   "published": "2026-10-20",
-  "updated": "2026-10-21",
+  "updated": "2026-11-03",
   "articles": [
     {
-      "id": "a1",
+      "id": "c9",
       "law": 244058,
       "article": "9",
-      "quote": "وهي تضمن ايضا للاهلين اختلاف مللهم احترام نظام الاحوال الشخصية والمصالح الدينية"
+      "quote": "وهي تضمن ايضا للاهلين اختلاف مللهم احترام نظام الاحوال الشخصية والمصالح الدينية."
     },
     {
-      "id": "a3",
-      "law": 244457,
+      "id": "r1",
+      "law": 258197,
       "article": "1",
-      "quote": "يخضع السوريون واللبنانيون المنتمون الى الطوائف المعترف بها ذات الاحوال الشخصية لنظام طوائفهم الشرعي في الامور المتعلقة بالاحوال الشخصية ولاحكام القانون المدني في الامور غير الخاضعة لهذا النظام يخضع السوريون واللبنانيون المنتمون الى طائفة تابعة للحق العادي وكذلك السوريون واللبنانيون الذين لا ينتمون لطائفة ما للقانون المدني في الامور المتعلقة بالاحوال الشخصية"
+      "quote": "يختص هذا القانون بتحديد صلاحيات المراجع المذهبية لجميع\n\nالطوائف المسيحية والطائفة الاسرائيلية"
     },
     {
-      "id": "a6",
-      "law": 187138,
-      "article": "1",
-      "quote": "مادة 1: ان القرار عدد 60/L R الصادر في 13 اذار 1936 بتحديد نظام الطوائف الدينية والقرار عدد 146/L R الصادر في 18 تشرين الثاني 1938 بتحوير وتتميم القرار عدد 60/L R لا يطبقان على المسلمين ويظلان غير مطبقين عليهم"
-    },
-    {
-      "id": "a7",
+      "id": "r3",
       "law": 258197,
       "article": "3",
       "quote": "مادة 3: يدخل في اختصاص المراجع المذهبية: اولا- عقد الزواج واحكامه والموجبات الزوجية ثانيا- صحة الزواج وبطلانه ثالثا- فسخ الزواج او انحلال روابطه (الطلاق والافتراق) رابعا- فصل جميع المسائل المتعلقة بالجهاز والمهر والحق اي البائنة ما زالت العلاقات الزوجية قائمة او تبعا للدعاوي الزوجية المذكورة في هذه المادة."
     },
     {
-      "id": "a13",
+      "id": "r4",
       "law": 258197,
       "article": "4",
       "quote": "مادة 4: يدخل في اختصاص المراجع المذهبية: اولا- البنوة وشرعية الاولاد ومفاعيلها ثانيا- التبني ثالثا- السلطة الوالدية على الاولاد. رابعا- حفظ الاولاد وتربيتهم حتى اكتمال سن الرشد اي ثماني عشرة سنة كاملة."
     },
     {
-      "id": "a14",
+      "id": "r5",
       "law": 258197,
       "article": "5",
       "quote": "مادة 5: يدخل في اختصاص المراجع المذهبية: اولا- فرض وتقدير النفقة على احد الزوجين للاخر وذلك في اثناء رؤية دعوى الافتراق والطلاق والبطلان. ثانيا- فرض وتقدير النفقة للوالدين والاولاد (الاصول والفروع). ثالثا- فرض وتقدير التعويض عند الحكم ببطلان الزواج او فسخه."
     },
     {
-      "id": "a15",
+      "id": "r15",
       "law": 258197,
-      "article": "31",
-      "quote": "مادة 31: تطبق المراجع المذهبية في صلاحياتها المعترف بها في هذا القانون قوانينها الطائفية الخاصة على ابنائها دون سواهم مع مراعاة الحالات الخاصة الواردة في هذا القانون."
+      "article": "15",
+      "quote": "مادة 15: في الزيجات المختلطة يجب مبدئيا اجراء العقد امام السلطة الروحية التي ينتمي اليها الرجل ما لم يتفق طالبا الزواج على اختيار سلطة الطائفة التي تنتمي اليها طالبة الزواج بموجب تعهد خطي يوقع عليه الطالبان معا يتضمن الرضوخ لقوانين الطائفة المذكورة."
     },
     {
-      "id": "a10",
+      "id": "r16",
       "law": 258197,
       "article": "16",
       "quote": "مادة 16: يكون باطلا: كل زواج يجريه في لبنان لبناني ينتمي الى احدى الطوائف المسيحية او الى الطائفة الاسرائيلية امام مرجع مدني."
     },
     {
-      "id": "a17",
-      "law": 183853,
-      "article": "24",
-      "quote": "فيما عد الاستثناء المنصوص عليه في المادة 25 ادناه يكون لاغيا وليس له مفعول شرعي الزواج المحتفل به وكذلك الصكوك او الموجبات المتعلقة بالاحوال الشخصية المتممة او المعقودة وفقا لقانون لا يخضع له احد الطرفين المتعاقدين"
+      "id": "r31",
+      "law": 258197,
+      "article": "31",
+      "quote": "مادة 31: تطبق المراجع المذهبية في صلاحياتها المعترف بها في هذا القانون قوانينها الطائفية الخاصة على ابنائها دون سواهم مع مراعاة الحالات الخاصة الواردة في هذا القانون."
     },
     {
-      "id": "a5",
-      "law": 183853,
-      "article": "25",
-      "quote": "اذا عقد في بلد اجنبي زواج بين سوري ولبناني او بين سوري او لبناني واجنبي كان صحيحا اذا احتفل به وفقا للاشكال المتبعة في هذا البلد اذا كان نظام الاحوال الشخصية التابع له الزوج\n\nلا يقبل بشكل الزواج ولا بمفاعيله كما هي ناتجة عن القانون المحتفل بالزواج وفقا له فيكون الزواج خاضعا في سوريا ولبنان للقانون المدني"
+      "id": "s17",
+      "law": 244292,
+      "article": "17",
+      "quote": "يدخل في اختصاص المحاكم الشرعية الدعاوى والمعاملات المتعلقة بالامور الآتية:\n\n1- خطبة النكاح وهديتها.\n\n2- النكاح.\n\n3- الطلاق والفرقة.\n\n4- المهر والجهاز.\n\n5- النفقة والحضانة وضم الفتيان والفتيات الى اوليائهم."
     },
     {
-      "id": "a11",
-      "law": 197742,
-      "article": "26",
-      "quote": "اذا عقد الزواج في بلاد اجنبية وجب على الزوج ان يرسل الى اقرب قنصلية لبنانية الى محل اقامته وثيقة زواج منظمة طبقا لاحكام المادة 22 و23 مع نسخة عن تذكرة هويته ونسخة عن تذكرة هوية زوجته وبعد ان يصدق القنصل على الوثيقة والنسختين يرسلهما الى الحكومة اللبنانية للقيد."
+      "id": "s242",
+      "law": 244292,
+      "article": "242",
+      "quote": "أولا: يصدر القاضي السني حكمه طبقا للأحكام المنصوص عليها في القرارات الصادرة عن المجلس الشرعي الاسلامي الأعلى في الأحوال الشخصية للمسلمين السنة والمتعلقة بتنظيم شؤون الطائفة الدينية سندا للمادة الأولى من أحكام المرسوم الاشتراعي رقم 18/55 المعدل بالقرار الصادر بتاريخ 21 ذي القعدة 1386 الموافق 2 آذار 1967، والقانون الصادر في 28 أيار 1956 والمنشور في الجريدة الرسمية بتاريخ 30 أيار 1956 العدد (22).\n\nفي حال عدم وجود أي نص يرجع القاضي السني الى قانون حقوق العائلة العثماني الصادر في 25/10/1917 والا فيحكم طبقا لأرجح الاقوال من مذهب الامام أبي حنيفة.\n\nثانيا: يصدر القاضي الجعفري حكمه طبقا للمذهب الجعفري، ولما يتلاءم مع هذا المذهب من أحكام قانون العائلة."
     },
     {
-      "id": "a18",
+      "id": "dz1",
+      "law": 177643,
+      "article": "1",
+      "quote": "تحتفظ محاكم الاحوال الشخصية السنية والشيعية بصلاحيتها الحاضرة ازاء المتقاضين من الطائفة التابعين لها - ويكون للمحاكم الدرزية ما لتلك المحاكم من الصلاحية ازاء طائفتهم"
+    },
+    {
+      "id": "dzl",
+      "law": 258196,
+      "article": "1",
+      "quote": "مادة 1: يحوز الخاطب على اهلية الزواج باتمامه الثامنة عشرة والمخطوبة باتمامها السابعة عشرة من العمر."
+    },
+    {
+      "id": "d10",
+      "law": 244457,
+      "article": "1",
+      "quote": "يخضع السوريون واللبنانيون المنتمون الى الطوائف المعترف بها ذات الاحوال الشخصية لنظام طوائفهم الشرعي في الامور المتعلقة بالاحوال الشخصية ولاحكام القانون المدني في الامور غير الخاضعة لهذا النظام يخضع السوريون واللبنانيون المنتمون الى طائفة تابعة للحق العادي وكذلك السوريون واللبنانيون الذين لا ينتمون لطائفة ما للقانون المدني في الامور المتعلقة بالاحوال الشخصية اما الاجانب وان كانوا ينتمون الى طائفة معترف بها ذات نظام للاحوال الشخصية فانهم يخضعون في شؤون الاحوال الشخصية لاحكام قانونهم الوطني."
+    },
+    {
+      "id": "d10h",
+      "law": 244457,
+      "article": "1",
+      "quote": "مادة 1: الغيت المادة 10 من القرار عدد 60/L.R. الصادر في 13 اذار 1936 باقرار نظام الطوائف الدينية وابدلت من الاحكام التالية"
+    },
+    {
+      "id": "d53",
+      "law": 187138,
+      "article": "1",
+      "quote": "مادة 1: ان القرار عدد 60/L R الصادر في 13 اذار 1936 بتحديد نظام الطوائف الدينية والقرار عدد 146/L R الصادر في 18 تشرين الثاني 1938 بتحوير وتتميم القرار عدد 60/L R لا يطبقان على المسلمين ويظلان غير مطبقين عليهم"
+    },
+    {
+      "id": "x11",
       "law": 183853,
       "article": "11",
       "quote": "كل من ادرك سن الرشد وكان متمتعا بقواه العقلية يمكنه ان يترك او يعتنق طائفة ذات نظام شخصي معترف بها ويكون لهذا الترك او الاعتناف مفعوله المدني ويمكنه ان يحصل على تصحيح القيود المختصة به في سجل النفوس وذلك بان يقدم الى دائرة النفوس في محل اقامته صكا يحتوي على تصريح بارادته هذه وعند الاقتضاء على شهادة قبول من السلطة ذات الصلاحية في الطائفة التي يعتنقها"
     },
     {
-      "id": "a19",
+      "id": "x12",
+      "law": 183853,
+      "article": "12",
+      "quote": "في حالة ترك الزوجين طائفتهما او ترك احدهما لها يتبع الاولاد الصغار حالة والدهم وتبقى قيود سجلات الاحوال الشخصية المتعلقة بهم كما كانت او تصحح وفقا لحالة الاب .\n\nتطبق الاحكام السابقة في حالة فك عرى الزواج على اثر وفاة الاب او ابطال الزواج او الطلاق او الهجر حتى ولو كانت حضانة الاولاد او وصايتهم عائدة للام."
+    },
+    {
+      "id": "x23",
       "law": 183853,
       "article": "23",
       "quote": "اذا ترك احد الزوجين طائفته بقي الزواج والصكوك المتعلقة بنظام الاحوال الشخصية خاضعة للقانون الذي احتفل بموجبه بالزواج او تممت او عقدت وفقا له هذه الصكوك اما اذا ترك الزوجان طائفتهما فيكون زواجهما وكذلك الصكوك او الموجبات المتعلقة بالاحوال الشخصية تابعة لقانون نظامهما الجديد ابتداء من التاريخ الذي قيد فيه تركهما لطائفتهما في سجلات الاحوال الشخصية على انه لا يمكن في هذه الحالة ان تنزع عن الاولاد صفة الاولاد الشرعيين بمجرد ترك الابوين طائفتهما"
     },
     {
-      "id": "a12",
+      "id": "x24",
       "law": 183853,
-      "article": "12",
-      "quote": "في حالة ترك الزوجين طائفتهما او ترك احدهما لها يتبع الاولاد الصغار حالة والدهم وتبقى قيود سجلات الاحوال الشخصية المتعلقة بهم كما كانت او تصحح وفقا لحالة الاب .\n\nتطبق الاحكام السابقة في حالة فك عرى الزواج على اثر وفاة الاب او ابطال الزواج او الطلاق او الهجر حتى ولو كانت حضانة الاولاد او وصايتهم عائدة للام."
+      "article": "24",
+      "quote": "فيما عد الاستثناء المنصوص عليه في المادة 25 ادناه يكون لاغيا وليس له مفعول شرعي الزواج المحتفل به وكذلك الصكوك او الموجبات المتعلقة بالاحوال الشخصية المتممة او المعقودة وفقا لقانون لا يخضع له احد الطرفين المتعاقدين يعاقب بالعقوبات المنصوص عليها في المادة 20 خادم الدين او ضابط الاحوال الشخصية الذي احتفل بهذا الزواج او استلم هذه الصكوك او عاينها يزول البطلان المنصوص عليه اعلاه اذا استحصل المتعاقدان فيما بعد على تحوير سجلات الاحوال الشخصية المتعلقة بهما واصبحا خاضعين للقانون الذي احتفل بموجبه بزواجهما او تممت او عقدت وفقا له الصكوك او الموجبات العائدة لنظام الاحوال الشخصية"
+    },
+    {
+      "id": "x25",
+      "law": 183853,
+      "article": "25",
+      "quote": "اذا عقد في بلد اجنبي زواج بين سوري ولبناني او بين سوري او لبناني واجنبي كان صحيحا اذا احتفل به وفقا للاشكال المتبعة في هذا البلد اذا كان نظام الاحوال الشخصية التابع له الزوج\n\nلا يقبل بشكل الزواج ولا بمفاعيله كما هي ناتجة عن القانون المحتفل بالزواج وفقا له فيكون الزواج خاضعا في سوريا ولبنان للقانون المدني"
+    },
+    {
+      "id": "g22",
+      "law": 197742,
+      "article": "22",
+      "quote": "على المتزوج ان يقدم تصريحا بزواجه الى قلم الاحوال الشخصية في خلال شهر يلي تاريخ الزواج ويصدق هذا التصريح من الرئيس الروحي الذي تم على يده العقد ويوقعه المختار وشاهدان."
+    },
+    {
+      "id": "g26",
+      "law": 197742,
+      "article": "26",
+      "quote": "اذا عقد الزواج في بلاد اجنبية وجب على الزوج ان يرسل الى اقرب قنصلية لبنانية الى محل اقامته وثيقة زواج منظمة طبقا لاحكام المادة 22 و23 مع نسخة عن تذكرة هويته ونسخة عن تذكرة هوية زوجته وبعد ان يصدق القنصل على الوثيقة والنسختين يرسلهما الى الحكومة اللبنانية للقيد."
     }
   ],
   "en": {
-    "title": "Personal status law and civil marriage in Lebanon",
-    "question": "Which law governs marriage, divorce and family matters in Lebanon, and is civil marriage allowed?",
-    "description": "Which laws and courts govern marriage, divorce and custody in Lebanon, and when a civil marriage is void or valid.",
+    "title": "Is civil marriage allowed in Lebanon, and which personal status law applies?",
+    "question": "Can a couple marry civilly in Lebanon, is a civil marriage held abroad valid and registered, and which court and law govern marriage, divorce and custody for each community?",
+    "description": "No civil marriage inside Lebanon: each community's law governs marriage. A civil marriage abroad is valid (Decision 60/LR, Art. 25) and registered by a consul.",
     "answer": {
-      "text": "Marriage, divorce, custody and other family matters follow each religious community's personal status system, which Article 9 of the Constitution protects. No text we hold creates a civil marriage in Lebanon, and one held there by a Christian or Jewish Lebanese is void. A marriage held abroad in the local form is valid under Article 25 of Decision 60/LR, which does not apply to Muslims.",
+      "text": "Lebanese law sets out no civil marriage inside Lebanon: marriage, divorce and custody belong to each religious community's courts and law, which Article 9 of the Constitution protects, and Article 16 of the law of 2 April 1951 voids any marriage a Christian or Jewish Lebanese concludes in Lebanon before a civil authority. A marriage celebrated abroad in that country's forms is valid under Article 25 of Decision 60/LR of 1936, and the husband sends it to the nearest Lebanese consulate for registration (Article 26 of the 1951 registration law). Decision 60/LR does not apply to Muslims, whose marriages go to the sharia courts.",
       "cites": [
-        "a1",
-        "a3",
-        "a13",
-        "a10",
-        "a5",
-        "a6"
+        "c9",
+        "r16",
+        "x25",
+        "g26",
+        "d53",
+        "s17"
       ]
     },
     "sections": [
       {
-        "heading": "Which courts decide family matters for Christians and Jews?",
+        "heading": "Which court and law govern marriage and divorce for each community?",
         "paras": [
           {
-            "text": "Article 3 of the 1951 law gives the marriage cases of Christian and Israelite (Jewish) members to their religious authorities. These cover the marriage contract and marital duties, validity and nullity, and divorce and separation. Trousseau, dowry and dot disputes are included.",
+            "text": "Each religious community rules on its members' marriage, divorce and custody under its own law, and Article 9 of the Constitution guarantees respect for these personal status systems.",
             "cites": [
-              "a7"
+              "c9",
+              "r31"
             ]
           },
           {
-            "text": "Article 4 adds filiation and legitimacy, adoption, parental authority, and custody and upbringing of children until 18. Article 5 adds maintenance between spouses in separation, divorce or annulment cases. It also covers maintenance for parents and children, and compensation on annulment or dissolution.",
+            "text": "For Christians and Jews, the law of 2 April 1951 gives the religious authorities the marriage contract, its validity, divorce and separation, dowry, filiation, adoption, parental authority, the custody and upbringing of children until 18, and maintenance (Articles 3 to 5). In a mixed marriage, the contract is made before the man's religious authority unless both sign a written undertaking choosing the woman's community and accepting its laws (Article 15).",
             "cites": [
-              "a13",
-              "a14"
+              "r3",
+              "r4",
+              "r5",
+              "r15"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Who decides marriage and divorce, and under which law",
+          "head": [
+            "Who",
+            "Authority and law"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Christians and Jews (the communities listed in the 1951 law)",
+                "Their community's religious authority, applying its own community law to its own members"
+              ],
+              "cites": [
+                "r1",
+                "r3",
+                "r31"
+              ]
+            },
+            {
+              "cells": [
+                "Sunni Muslims",
+                "Sharia courts, applying the Higher Islamic Sharia Council's decisions, then the Ottoman Family Rights Law of 1917, then the Hanafi school"
+              ],
+              "cites": [
+                "s17",
+                "s242"
+              ]
+            },
+            {
+              "cells": [
+                "Shia Muslims",
+                "Jaafari courts, applying the Jaafari school and the family law provisions that fit it"
+              ],
+              "cites": [
+                "s17",
+                "s242"
+              ]
+            },
+            {
+              "cells": [
+                "Druze",
+                "Druze courts, with the same powers over Druze as the Sunni and Shia courts have over their members; the Druze personal status law dates from 24 February 1948"
+              ],
+              "cites": [
+                "dz1",
+                "dzl"
+              ]
+            },
+            {
+              "cells": [
+                "Lebanese in an ordinary-law community or in no community",
+                "Civil law"
+              ],
+              "cites": [
+                "d10"
+              ]
+            },
+            {
+              "cells": [
+                "Foreigners",
+                "Their own national law, even if they belong to a recognised community"
+              ],
+              "cites": [
+                "d10"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "Can you have a civil marriage inside Lebanon?",
+        "paras": [
+          {
+            "text": "Not if you are a Christian or Jewish Lebanese: Article 16 of the law of 2 April 1951 declares void any marriage that a Lebanese member of a Christian community or of the Jewish community concludes in Lebanon before a civil authority.",
+            "cites": [
+              "r16"
             ]
           },
           {
-            "text": "Under Article 31 of the 1951 law, each religious authority applies its own community laws to its own members only. No text we hold sets a single national family code.",
+            "text": "Article 24 of Decision 60/LR of 1936 also voids a marriage celebrated under a law to which one spouse is not subject, except for marriages abroad under Article 25, and punishes the cleric or registrar who performs it.",
             "cites": [
-              "a15"
+              "x24"
+            ]
+          },
+          {
+            "text": "Article 10 of that decision, as rewritten by Decision 146/LR of 1938, puts Lebanese who belong to an ordinary-law community or to no community under civil law for personal status. Decision 53 of 1939 says Decisions 60/LR and 146/LR do not apply to Muslims.",
+            "cites": [
+              "d10h",
+              "d10",
+              "d53"
             ]
           }
         ]
       },
       {
-        "heading": "Which law applies to Muslims and to people outside a recognised community?",
+        "heading": "Is a civil marriage held abroad valid in Lebanon?",
         "paras": [
           {
-            "text": "Under Article 10 of Decision 60/LR, Lebanese and Syrians in a recognised community follow its personal status system. Civil law covers matters outside that system. Those in an ordinary-law community, or in no community, follow civil law in personal status. No text we hold sets out that civil personal status law.",
+            "text": "Yes, under Article 25 of Decision 60/LR: a marriage concluded in a foreign country between a Lebanese and a foreigner, or between a Lebanese and a Syrian, is valid if it was celebrated in that country's forms. If the husband's personal status system does not accept the form or effects of that marriage, the marriage falls under civil law in Lebanon.",
             "cites": [
-              "a3"
+              "x25"
             ]
           },
           {
-            "text": "Decision 53 of 1939 says Decisions 60/LR and 146/LR do not apply to Muslims. So no rule of Decision 60/LR described on this page governs Muslims.",
+            "text": "Decision 53 of 1939 says Decision 60/LR does not apply to Muslims, and the texts cited here give no other rule for a Muslim's marriage abroad.",
             "cites": [
-              "a6"
+              "d53"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "How is a marriage abroad registered in Lebanon?",
+        "paras": [
+          {
+            "text": "Through the nearest Lebanese consulate. Under Article 26 of the 1951 law on registering personal status documents, the husband sends the marriage document, drawn up under Articles 22 and 23, to the consulate nearest his residence with copies of both spouses' identity cards; the consul certifies them and sends them to the Lebanese government for registration.",
+            "cites": [
+              "g26"
             ]
           },
           {
-            "text": "This page does not cover the laws and courts for Muslim and Druze family matters. The texts we hold do not say whether Druze count as Muslims for this purpose.",
+            "text": "A marriage concluded in Lebanon is declared to the personal status registry within one month, certified by the cleric who performed it and signed by the mukhtar and the witnesses (Article 22).",
+            "cites": [
+              "g22"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What happens when a spouse changes community?",
+        "paras": [
+          {
+            "text": "Any adult of sound mind may leave or join a recognised community, with civil effect, by filing a declaration at the civil registry where they live, with the new community's acceptance where needed (Article 11 of Decision 60/LR).",
+            "cites": [
+              "x11"
+            ]
+          },
+          {
+            "text": "If one spouse changes community, the marriage stays under the law it was celebrated under; if both change, it follows their new law from the date the change is recorded, and the children remain legitimate (Article 23).",
+            "cites": [
+              "x23"
+            ]
+          },
+          {
+            "text": "Minor children follow their father's status when one or both parents leave their community, even after divorce or the father's death and even if the mother has custody (Article 12). Decision 53 of 1939 says these rules do not apply to Muslims.",
+            "cites": [
+              "x12",
+              "d53"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What this page does not cover",
+        "paras": [
+          {
+            "text": "The library holds no enacted civil marriage law or civil family code: Article 10 of Decision 60/LR refers to a civil law for people outside the communities, but no such text is in the library, and Article 25 names a Lebanese marrying a foreigner or a Syrian, not two Lebanese. This page does not set out each community's own rules on divorce, custody or maintenance, or court rulings on civil marriages abroad.",
             "note": true
-          }
-        ]
-      },
-      {
-        "heading": "Can you marry in a civil ceremony inside Lebanon?",
-        "paras": [
-          {
-            "text": "Article 16 of the 1951 law voids a marriage held in Lebanon before a civil authority by a Christian or Israelite (Jewish) Lebanese. No text we hold creates a civil marriage ceremony in Lebanon for anyone else.",
-            "cites": [
-              "a10"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "Is a marriage held abroad valid?",
-        "paras": [
-          {
-            "text": "Article 25 of Decision 60/LR covers a marriage held in a foreign country. The text speaks of a marriage between a Syrian and a Lebanese, or between a Syrian or Lebanese and a foreigner. It is valid if celebrated in that country's forms. The texts we hold do not settle whether this covers a couple who are both Lebanese.",
-            "cites": [
-              "a5"
-            ]
-          },
-          {
-            "text": "If the husband's personal status system rejects that marriage's form or effects, the marriage falls under civil law in Syria and Lebanon. Article 24 voids a marriage celebrated under a law that does not govern one party, except as Article 25 provides. Decision 60/LR does not apply to Muslims.",
-            "cites": [
-              "a5",
-              "a17",
-              "a6"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "How is a marriage abroad reported to the Lebanese state?",
-        "paras": [
-          {
-            "text": "Article 26 of the 1951 registration law puts the duty on the husband. He sends the marriage document, drawn up under Articles 22 and 23, to the Lebanese consulate nearest his residence. Copies of both spouses' identity cards go with it. The consul certifies them and sends them to the Lebanese government for registration.",
-            "cites": [
-              "a11"
-            ]
-          },
-          {
-            "text": "The texts we hold do not say how this reporting duty applies to a civil marriage abroad, or to Muslim spouses.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "What happens when a spouse or parent changes community?",
-        "paras": [
-          {
-            "text": "Under Article 11 of Decision 60/LR, any adult of sound mind may leave or join a recognised community, with civil effect. The person files a declaration at the civil registry where they live. Acceptance from the new community's authority is added where needed.",
-            "cites": [
-              "a18"
-            ]
-          },
-          {
-            "text": "Under Article 23 of Decision 60/LR, if one spouse leaves the community, the marriage stays under the law it was celebrated under. If both leave, it follows their new law from the date the change is recorded. The children remain legitimate.",
-            "cites": [
-              "a19"
-            ]
-          },
-          {
-            "text": "Under Article 12, minor children follow their father's status when one or both parents leave their community. This also applies after the father's death, annulment, divorce or abandonment, even if the mother has custody or guardianship. Decision 60/LR, which holds these rules, does not apply to Muslims.",
-            "cites": [
-              "a12",
-              "a6"
-            ]
           }
         ]
       }
     ]
   },
   "ar": {
-    "title": "الأحوال الشخصية والزواج المدني في لبنان",
-    "question": "ما هو القانون الذي يحكم الزواج والطلاق والأحوال الشخصية في لبنان، وهل الزواج المدني مسموح؟",
-    "description": "تبيّن الصفحة القوانين والمحاكم التي تحكم الزواج والطلاق والحضانة في لبنان، ومتى يبطل الزواج المدني أو يصح.",
+    "title": "هل الزواج المدني مسموح في لبنان، وأي قانون يحكم الأحوال الشخصية؟",
+    "question": "هل يمكن عقد زواج مدني في لبنان، وهل يعتبر الزواج المدني المعقود في الخارج صحيحاً ويسجل، وأي محكمة وقانون يحكمان الزواج والطلاق والحضانة لكل طائفة؟",
+    "description": "لا زواج مدنياً داخل لبنان: قانون كل طائفة يحكم زواج أبنائها. والزواج المدني المعقود في الخارج صحيح (المادة 25 من القرار 60 ل.ر) ويسجل عبر القنصلية.",
     "answer": {
-      "text": "تخضع شؤون الزواج والطلاق والحضانة وسائر مسائل الأسرة لنظام الأحوال الشخصية الخاص بكل طائفة دينية، وتكفل المادة 9 من الدستور احترام هذا النظام. لا تنشئ النصوص المتوفرة لدينا زواجا مدنيا في لبنان، ويكون باطلا الزواج المدني الذي يعقده فيه لبناني مسيحي أو يهودي. أما الزواج المعقود في الخارج وفق الشكل المحلي فصحيح بموجب المادة 25 من القرار 60/ل.ر، وهذا القرار لا يطبَّق على المسلمين.",
+      "text": "لا ينظم القانون اللبناني زواجاً مدنياً داخل لبنان: فالزواج والطلاق والحضانة من اختصاص محاكم كل طائفة وقانونها، وتكفل المادة 9 من الدستور احترام نظام الأحوال الشخصية، وتنص المادة 16 من قانون 2 نيسان 1951 على بطلان كل زواج يجريه في لبنان لبناني ينتمي إلى إحدى الطوائف المسيحية أو الطائفة الإسرائيلية أمام مرجع مدني. ويكون الزواج المعقود في بلد أجنبي وفقاً للأشكال المتبعة فيه صحيحاً بموجب المادة 25 من القرار 60 ل.ر الصادر سنة 1936، ويرسل الزوج وثيقته إلى أقرب قنصلية لبنانية لقيدها (المادة 26 من قانون قيد وثائق الأحوال الشخصية لسنة 1951). ولا يطبق القرار 60 ل.ر على المسلمين، وتنظر المحاكم الشرعية في زواجهم.",
       "cites": [
-        "a1",
-        "a3",
-        "a13",
-        "a10",
-        "a5",
-        "a6"
+        "c9",
+        "r16",
+        "x25",
+        "g26",
+        "d53",
+        "s17"
       ]
     },
     "sections": [
       {
-        "heading": "أي مراجع تنظر في شؤون الأسرة لدى المسيحيين واليهود؟",
+        "heading": "أي محكمة وأي قانون يحكمان الزواج والطلاق لكل طائفة؟",
         "paras": [
           {
-            "text": "تجعل المادة 3 من قانون 1951 قضايا الزواج لأبناء الطوائف المسيحية والطائفة الإسرائيلية (اليهودية) من اختصاص مراجعهم المذهبية. وتشمل عقد الزواج والموجبات الزوجية، وصحة الزواج وبطلانه، والطلاق والافتراق. وتشمل أيضا المسائل المتعلقة بالجهاز والمهر والبائنة.",
+            "text": "تفصل كل طائفة في زواج أبنائها وطلاقهم وحضانة أولادهم وفقاً لقانونها الخاص، وتكفل المادة 9 من الدستور احترام أنظمة الأحوال الشخصية هذه.",
             "cites": [
-              "a7"
+              "c9",
+              "r31"
             ]
           },
           {
-            "text": "وتضيف المادة 4 البنوة وشرعية الأولاد، والتبني، والسلطة الوالدية، وحفظ الأولاد وتربيتهم حتى 18 سنة كاملة. وتضيف المادة 5 النفقة بين الزوجين أثناء دعاوى الافتراق والطلاق والبطلان. وتشمل كذلك نفقة الوالدين والأولاد، والتعويض عند إبطال الزواج أو فسخه.",
+            "text": "وبالنسبة إلى المسيحيين واليهود، يجعل قانون 2 نيسان 1951 من اختصاص المراجع المذهبية عقد الزواج وصحته وبطلانه والطلاق والافتراق والمهر والبنوة والتبني والسلطة الوالدية وحفظ الأولاد حتى ثماني عشرة سنة كاملة والنفقة (المواد 3 و4 و5). وفي الزيجات المختلطة يجرى العقد أمام السلطة الروحية التي ينتمي إليها الرجل، ما لم يتفق الطرفان بتعهد خطي على اختيار سلطة طائفة المرأة والرضوخ لقوانينها (المادة 15).",
             "cites": [
-              "a13",
-              "a14"
-            ]
-          },
-          {
-            "text": "تطبق المراجع المذهبية، بموجب المادة 31 من قانون 1951، قوانينها الطائفية الخاصة على أبنائها دون سواهم. ولا تتضمن النصوص المتوفرة لدينا قانونا وطنيا واحدا للأسرة.",
-            "cites": [
-              "a15"
+              "r3",
+              "r4",
+              "r5",
+              "r15"
             ]
           }
-        ]
-      },
-      {
-        "heading": "ما القانون الذي يطبَّق على المسلمين وعلى من لا ينتمي إلى طائفة معترف بها؟",
-        "paras": [
-          {
-            "text": "بموجب المادة 10 من القرار 60/ل.ر، يخضع اللبنانيون والسوريون المنتمون إلى طائفة معترف بها لنظام طائفتهم في الأحوال الشخصية. ويطبَّق القانون المدني على المسائل الخارجة عن هذا النظام. أما المنتمون إلى طائفة تابعة للحق العادي، ومن لا ينتمون إلى أي طائفة، فيخضعون للقانون المدني في الأحوال الشخصية. ولا تتضمن النصوص المتوفرة لدينا هذا القانون المدني للأحوال الشخصية.",
-            "cites": [
-              "a3"
-            ]
-          },
-          {
-            "text": "ينص القرار 53 لسنة 1939 على أن القرارين 60/ل.ر و146/ل.ر لا يطبقان على المسلمين. فلا يسري على المسلمين أي حكم من أحكام القرار 60/ل.ر الواردة في هذه الصفحة.",
-            "cites": [
-              "a6"
-            ]
-          },
-          {
-            "text": "لا تتناول هذه الصفحة القوانين والمحاكم الخاصة بشؤون الأسرة لدى المسلمين والدروز. والنصوص المتوفرة لدينا لا تبيّن هل يُعدّ الدروز من المسلمين في هذا الشأن.",
-            "note": true
-          }
-        ]
+        ],
+        "table": {
+          "caption": "من يفصل في الزواج والطلاق، وبموجب أي قانون",
+          "head": [
+            "من",
+            "المرجع والقانون"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "المسيحيون واليهود (الطوائف التي يعددها قانون 1951)",
+                "المرجع المذهبي لطائفتهم، ويطبق قوانينه الطائفية على أبنائه دون سواهم"
+              ],
+              "cites": [
+                "r1",
+                "r3",
+                "r31"
+              ]
+            },
+            {
+              "cells": [
+                "المسلمون السنة",
+                "المحاكم الشرعية، ويطبق القاضي قرارات المجلس الشرعي الإسلامي الأعلى، ثم قانون حقوق العائلة العثماني لسنة 1917، ثم أرجح الأقوال في مذهب أبي حنيفة"
+              ],
+              "cites": [
+                "s17",
+                "s242"
+              ]
+            },
+            {
+              "cells": [
+                "المسلمون الشيعة",
+                "المحاكم الجعفرية، ويطبق القاضي المذهب الجعفري وما يتلاءم معه من أحكام قانون العائلة"
+              ],
+              "cites": [
+                "s17",
+                "s242"
+              ]
+            },
+            {
+              "cells": [
+                "الدروز",
+                "المحاكم الدرزية، ولها إزاء الدروز ما للمحاكم السنية والشيعية من صلاحية إزاء أبنائها، وقانون الأحوال الشخصية للطائفة الدرزية صادر في 24 شباط 1948"
+              ],
+              "cites": [
+                "dz1",
+                "dzl"
+              ]
+            },
+            {
+              "cells": [
+                "اللبنانيون المنتمون إلى طائفة تابعة للحق العادي أو غير المنتمين إلى طائفة",
+                "القانون المدني"
+              ],
+              "cites": [
+                "d10"
+              ]
+            },
+            {
+              "cells": [
+                "الأجانب",
+                "قانونهم الوطني، وإن انتموا إلى طائفة معترف بها"
+              ],
+              "cites": [
+                "d10"
+              ]
+            }
+          ]
+        }
       },
       {
         "heading": "هل يمكن عقد زواج مدني داخل لبنان؟",
         "paras": [
           {
-            "text": "تنص المادة 16 من قانون 1951 على بطلان كل زواج يعقده في لبنان لبنانيٌّ ينتمي إلى طائفة مسيحية أو إلى الطائفة الإسرائيلية (اليهودية) أمام مرجع مدني. ولا تنشئ النصوص المتوفرة لدينا مراسم زواج مدني في لبنان لأي شخص آخر.",
+            "text": "لا بالنسبة إلى اللبناني المسيحي أو اليهودي: تنص المادة 16 من قانون 2 نيسان 1951 على بطلان كل زواج يجريه في لبنان لبناني ينتمي إلى إحدى الطوائف المسيحية أو إلى الطائفة الإسرائيلية أمام مرجع مدني.",
             "cites": [
-              "a10"
+              "r16"
+            ]
+          },
+          {
+            "text": "وتعتبر المادة 24 من القرار 60 ل.ر الصادر سنة 1936 لاغياً الزواج المحتفل به وفقاً لقانون لا يخضع له أحد الطرفين، فيما عدا الزواج في الخارج وفقاً للمادة 25، وتعاقب رجل الدين أو ضابط الأحوال الشخصية الذي احتفل به.",
+            "cites": [
+              "x24"
+            ]
+          },
+          {
+            "text": "وتخضع المادة 10 من هذا القرار، كما أبدلها القرار 146 ل.ر الصادر سنة 1938، اللبنانيين المنتمين إلى طائفة تابعة للحق العادي أو غير المنتمين إلى طائفة للقانون المدني في الأحوال الشخصية. وينص القرار 53 الصادر سنة 1939 على أن القرارين 60 ل.ر و146 ل.ر لا يطبقان على المسلمين.",
+            "cites": [
+              "d10h",
+              "d10",
+              "d53"
             ]
           }
         ]
       },
       {
-        "heading": "هل يصح الزواج المعقود في الخارج؟",
+        "heading": "هل الزواج المدني المعقود في الخارج صحيح في لبنان؟",
         "paras": [
           {
-            "text": "تتناول المادة 25 من القرار 60/ل.ر الزواج المعقود في بلد أجنبي. ويتكلم نصها على زواج بين سوري ولبناني، أو بين سوري أو لبناني وأجنبي. ويكون هذا الزواج صحيحا إذا احتُفل به وفق الأشكال المتبعة في ذلك البلد. والنصوص المتوفرة لدينا لا تحسم هل يشمل ذلك زواجا يكون فيه الزوجان لبنانيين.",
+            "text": "نعم، بموجب المادة 25 من القرار 60 ل.ر: الزواج المعقود في بلد أجنبي بين لبناني وأجنبي، أو بين لبناني وسوري، يكون صحيحاً إذا احتفل به وفقاً للأشكال المتبعة في ذلك البلد. وإذا كان نظام الأحوال الشخصية الذي يتبعه الزوج لا يقبل بشكل الزواج ولا بمفاعيله، يخضع الزواج في لبنان للقانون المدني.",
             "cites": [
-              "a5"
+              "x25"
             ]
           },
           {
-            "text": "وإذا كان نظام الأحوال الشخصية الذي يتبعه الزوج لا يقبل شكل هذا الزواج أو مفاعيله، يخضع الزواج في سوريا ولبنان للقانون المدني. وتبطل المادة 24 الزواج المحتفل به وفق قانون لا يخضع له أحد الطرفين، إلا في الحالة التي تنص عليها المادة 25. والقرار 60/ل.ر لا يطبَّق على المسلمين.",
+            "text": "وينص القرار 53 الصادر سنة 1939 على أن القرار 60 ل.ر لا يطبق على المسلمين، ولا تتضمن النصوص المذكورة هنا قاعدة أخرى لزواج المسلم في الخارج.",
             "cites": [
-              "a5",
-              "a17",
-              "a6"
+              "d53"
             ]
           }
         ]
       },
       {
-        "heading": "كيف يُبلَّغ الزواج المعقود في الخارج إلى الدولة اللبنانية؟",
+        "heading": "كيف يسجل الزواج المعقود في الخارج في لبنان؟",
         "paras": [
           {
-            "text": "تلقي المادة 26 من قانون قيد وثائق الأحوال الشخصية لسنة 1951 هذا الواجب على الزوج. فيرسل وثيقة الزواج، المنظمة وفق المادتين 22 و23، إلى أقرب قنصلية لبنانية إلى محل إقامته. ويرفق بها نسخة عن تذكرة هويته ونسخة عن تذكرة هوية زوجته. ويصدّق القنصل الوثيقة والنسختين، ثم يرسلها إلى الحكومة اللبنانية لقيدها.",
+            "text": "عبر أقرب قنصلية لبنانية. فبموجب المادة 26 من قانون قيد وثائق الأحوال الشخصية لسنة 1951، يرسل الزوج وثيقة الزواج المنظمة طبقاً للمادتين 22 و23 إلى أقرب قنصلية لبنانية إلى محل إقامته، مع نسخة عن تذكرة هويته ونسخة عن تذكرة هوية زوجته، فيصدق القنصل عليها ويرسلها إلى الحكومة اللبنانية للقيد.",
             "cites": [
-              "a11"
+              "g26"
             ]
           },
           {
-            "text": "النصوص المتوفرة لدينا لا تبيّن كيف يطبَّق واجب الإبلاغ هذا على زواج مدني معقود في الخارج، ولا على الزوجين المسلمين.",
+            "text": "أما الزواج المعقود في لبنان فيصرح به لقلم الأحوال الشخصية خلال شهر يلي تاريخ الزواج، ويصدق التصريح الرئيس الروحي الذي عقد الزواج، ويوقعه المختار والشاهدان (المادة 22).",
+            "cites": [
+              "g22"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يحدث عندما يغير أحد الزوجين طائفته؟",
+        "paras": [
+          {
+            "text": "يمكن لكل راشد متمتع بقواه العقلية أن يترك طائفة معترفاً بها أو يعتنقها، ويكون لذلك مفعوله المدني، بتقديم تصريح إلى دائرة النفوس في محل إقامته، مع شهادة قبول من الطائفة الجديدة عند الاقتضاء (المادة 11 من القرار 60 ل.ر).",
+            "cites": [
+              "x11"
+            ]
+          },
+          {
+            "text": "إذا ترك أحد الزوجين طائفته بقي الزواج خاضعاً للقانون الذي احتفل به بموجبه، وإذا تركها الزوجان معاً خضع زواجهما لقانونهما الجديد من تاريخ قيد الترك، ولا تنزع عن الأولاد صفة الأولاد الشرعيين (المادة 23).",
+            "cites": [
+              "x23"
+            ]
+          },
+          {
+            "text": "ويتبع الأولاد القاصرون حالة والدهم إذا ترك الوالدان أو أحدهما طائفته، ولو بعد الطلاق أو وفاة الأب، وحتى إذا كانت الحضانة للأم (المادة 12). وينص القرار 53 الصادر سنة 1939 على أن هذه الأحكام لا تطبق على المسلمين.",
+            "cites": [
+              "x12",
+              "d53"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما لا تتناوله هذه الصفحة",
+        "paras": [
+          {
+            "text": "لا تتضمن المكتبة قانوناً نافذاً للزواج المدني أو قانوناً مدنياً للأسرة: فالمادة 10 من القرار 60 ل.ر تحيل إلى قانون مدني لمن هم خارج الطوائف، ولا يوجد هذا النص في المكتبة، والمادة 25 تذكر زواج اللبناني من أجنبي أو سوري لا زواج لبنانيين اثنين. ولا تعرض هذه الصفحة قواعد كل طائفة في الطلاق والحضانة والنفقة، ولا الأحكام القضائية في الزواج المدني المعقود في الخارج.",
             "note": true
-          }
-        ]
-      },
-      {
-        "heading": "ماذا يحصل إذا غيّر أحد الزوجين أو الوالدين طائفته؟",
-        "paras": [
-          {
-            "text": "بموجب المادة 11 من القرار 60/ل.ر، يحق لكل راشد متمتع بقواه العقلية أن يترك طائفة معترف بها أو يعتنقها، ويكون لذلك مفعول مدني. ويقدم لهذه الغاية تصريحا إلى دائرة النفوس في محل إقامته. ويرفق به عند الاقتضاء شهادة قبول من السلطة المختصة في الطائفة الجديدة.",
-            "cites": [
-              "a18"
-            ]
-          },
-          {
-            "text": "بموجب المادة 23 من القرار 60/ل.ر، إذا ترك أحد الزوجين طائفته بقي الزواج خاضعا للقانون الذي عُقد بموجبه. وإذا تركها الزوجان معا، يتبع زواجهما قانونهما الجديد من تاريخ قيد الترك في السجلات. ولا يفقد الأولاد صفتهم الشرعية بسبب ذلك.",
-            "cites": [
-              "a19"
-            ]
-          },
-          {
-            "text": "بموجب المادة 12، يتبع الأولاد القاصرون حالة والدهم إذا ترك أحد الوالدين أو كلاهما الطائفة. ويطبَّق ذلك أيضا بعد وفاة الأب أو إبطال الزواج أو الطلاق أو الهجر، ولو كانت الحضانة أو الوصاية للأم. والقرار 60/ل.ر الذي يتضمن هذه الأحكام لا يطبَّق على المسلمين.",
-            "cites": [
-              "a12",
-              "a6"
-            ]
           }
         ]
       }

@@ -1,6 +1,7 @@
 package site
 
 import (
+	"html/template"
 	"strings"
 	"testing"
 
@@ -51,7 +52,7 @@ func TestHomeTopicsPartial(t *testing.T) {
 			if !strings.Contains(out, `href="`+c.prefix+`/topic/`+r.Slug+`/"`) {
 				t.Errorf("%s home lacks a link to %s", c.lang, r.Slug)
 			}
-			if r.Title == "" || !strings.Contains(out, r.Title) {
+			if r.Title == "" || !strings.Contains(out, template.HTMLEscapeString(r.Title)) { // "tenant's" prints as tenant&#39;s
 				t.Errorf("%s home lacks the title of %s", c.lang, r.Slug)
 			}
 		}

@@ -2,7 +2,7 @@
   "slug": "rent-law",
   "order": 4,
   "published": "2026-10-20",
-  "updated": "2026-10-21",
+  "updated": "2026-11-03",
   "articles": [
     {
       "id": "a1",
@@ -14,520 +14,626 @@
       "id": "a2",
       "law": 270074,
       "article": "2",
-      "quote": "تستثنى من أحكام هذا القانون:\n\nأ) عقود إيجار الأراضي الزراعية والمباني التابعة لها.\n\nب) عقود الإيجار الموسمية العائدة لأماكن الإصطياف والإشتاء.\n\nج) العقود التي بموجبها يقدم أصحاب العمل أماكن لسكن أجرائهم مجاناً أو ببدل.\n\nد) إشغال الأملاك العمومية للدولة والبلديات.\n\nه) عقود إيجار الفيلات التي تتوافر فيها المواصفات الآتية:"
+      "quote": "تستثنى من أحكام هذا القانون:\n\nأ) عقود إيجار الأراضي الزراعية والمباني التابعة لها.\n\nب) عقود الإيجار الموسمية العائدة لأماكن الإصطياف والإشتاء.\n\nج) العقود التي بموجبها يقدم أصحاب العمل أماكن لسكن أجرائهم مجاناً أو ببدل.\n\nد) إشغال الأملاك العمومية للدولة والبلديات.\n\nه) عقود إيجار الفيلات التي تتوافر فيها المواصفات الآتية:\n\nأن تكون مؤلفة من طابق واحد أو أكثر ومؤجرة لسكن مستأجر واحد ولها حديقة ومرآب وجهاز تدفئة وجهاز خاص يؤمن المياه الساخنة وإن كان المستأجر يتحمل نفقات تأمينها شرط توافر هذه المواصفات بتاريخ بدء الإيجار الأساسي."
     },
     {
-      "id": "a3",
+      "id": "c543",
+      "law": 244226,
+      "article": "543",
+      "quote": "تخضع عقود ابجار العقارات المبنية المعدة للسكن ولغير السكن لحرية المتعاقد ولمشيئة المتعاقدين في كل ما لا يتعارض مع الاحكام الالزامية الاتية:\n\nاولا:\n\nالمدة: اذا كانت المدة المحددة في العقد اقل من ثلاث سنوات, تعتبر الاجارة معقودة لفترة زمنية مدتها ثلاث سنوات. اما اذا رغب المستأجر المستفيد من التمديد في ترك المأجور, فعليه ان يعلم المؤجر قبل شهرين من نهاية السنة الممددة ببطاقة مكشوفة مضمونة مع اشعار بالاستلام او بموجب كتاب موجه بواسطة الكاتب العدل."
+    },
+    {
+      "id": "a15",
       "law": 270074,
       "article": "15",
-      "quote": "تمدد لغاية تسع سنوات، والمستفيدين من تقديمات الصندوق لغاية 12 سنة، من تاريخ نفاذ هذا القانون، عقود إيجار الأماكن السكنية على أن يدفع المستأجر قيمة بدل المثل تدريجياً وفقاً لما يلي:"
+      "quote": "تمدد لغاية تسع سنوات، والمستفيدين من تقديمات الصندوق لغاية 12 سنة، من تاريخ نفاذ هذا القانون، عقود إيجار الأماكن السكنية على أن يدفع المستأجر قيمة بدل المثل تدريجياً وفقاً لما يلي:\n\nأ -­ مع مراعاة أحكام المادة (20) من هذا القانون تحدد قيمة بدل المثل، رضاءً أو قضاءً وفقاً لما هو منصوص عليه في المادة (18).\n\nب -­ يزاد بدل الإيجار المتوجب بتاريخ نفاذ هذا القانون سنوياً وتباعاً وفقاً لما يلي:\n\n15% خمسة عشرة بالماية من قيمة فارق الزيادة بين البدل المعمول به قبل نفاذ هذا القانون وبدل المثل المشار إليه أعلاه وذلك عن كل سنة من السنوات التمديدية الأربعة الأولى التي تلي تاريخ نفاذ هذا القانون.\n\n20% عشرون بالماية من قيمة فارق الزيادة المنوه عنها أعلاه وذلك عن كل من السنتين الخامسة والسادسة من الفترة التمديدية حتى يبلغ بدل الإيجار في السنة التمديدية السادسة قيمة بدل المثل المشار اليه في البند (أ) أعلاه.\n\nج -­ يكون بدل الإيجار في السنوات الممددة السابعة والثامنة والتاسعة مساوياً لقيمة بدل المثل المشار إليه في البند (أ) أعلاه.\n\nد -­ بنهاية السنة التمديدية التاسعة يصبح الإيجار حراً."
     },
     {
-      "id": "a4",
+      "id": "a18",
       "law": 270074,
-      "article": "15",
-      "quote": "15% خمسة عشرة بالماية من قيمة فارق الزيادة بين البدل المعمول به قبل نفاذ هذا القانون وبدل المثل المشار إليه أعلاه وذلك عن كل سنة من السنوات التمديدية الأربعة الأولى التي تلي تاريخ نفاذ هذا القانون."
+      "article": "18",
+      "quote": "إذا لم يجرِ التوصل إلى تحديد بدل المثل رضاءً بالإتفاق بين المؤجر والمستأجر خلال الأشهر الثلاثة الأولى التي تلي تاريخ نفاذ هذا القانون، فيكون للمؤجر أن يتبع الإجراءات التالية:\n\n1 -­ يستعين المؤجر بخبيرين من قائمة الخبراء المحليين في المحافظة المسجلين لدى المحاكم، يكون أحدهما مهندساً مدنياً أو معمارياً والثاني ممن يعملون بالتخمين العقاري المسجلين في جدول الخبراء.\n\nيتولى الخبيران وضع تخمين لبدل المثل للمأجور وفق الأصول المنصوص عليها في المادة (19) من هذا القانون.\n\n2 -­ يقوم المؤجر بواسطة الكاتب العدل بإبلاغ تقرير التخمين لبدل المثل إلى المستأجر الذي عليه وفي خلال شهرين من تبلّغه التقرير إما الموافقة عليه واعتماده في تحديد بدل إيجار المثل أو التقدم بتقرير تخمين مقابل"
     },
     {
-      "id": "a5",
+      "id": "a18c",
       "law": 270074,
-      "article": "15",
-      "quote": "20% عشرون بالماية من قيمة فارق الزيادة المنوه عنها أعلاه وذلك عن كل من السنتين الخامسة والسادسة من الفترة التمديدية حتى يبلغ بدل الإيجار في السنة التمديدية السادسة قيمة بدل المثل المشار اليه في البند (أ) أعلاه.\n\nج -­ يكون بدل الإيجار في السنوات الممددة السابعة والثامنة والتاسعة مساوياً لقيمة بدل المثل المشار إليه في البند (أ) أعلاه.\n\nد -­ بنهاية السنة التمديدية التاسعة يصبح الإيجار حراً."
+      "article": "18",
+      "quote": "إذا اختلف التقريران جاز لكل من المؤجر والمستأجر أن يلجأ الى اللجنة المنصوص عليها في المادة 7 من هذا القانون التي يقع المأجور في نطاق اختصاصها وذلك للفصل في النزاع الناشىء عن الاختلاف، على أن يرفق مع طلبه نسخة عن التقريرين ومربوطاتهما بما في ذلك صور وثائق التبليغ.\n\nتطبق على هذا النزاع الاصول الموجزة المشار اليها في المادة 13 من هذا القانون.\n\nيقبل القرار الصادر عن اللجنة بهذا الخصوص الطعن عن طريق الاستئناف."
     },
     {
-      "id": "a6",
+      "id": "a20",
       "law": 270074,
       "article": "20",
       "quote": "يحدد بدل المثل على أساس نسبة (4%) اربعة بالماية من القيمة البيعية للمأجور في حالته القائمة في ما لو كان خالياً."
     },
     {
-      "id": "a7",
+      "id": "a22",
+      "law": 270074,
+      "article": "22",
+      "quote": "مع مراعاة أحكام المادة 32 من هذا القانون، إذا رغب المالك في استرداد المأجور للضرورة العائلية أثناء السنة الأولى من الفترة التمديدية (السنوات التسع)، فعليه أن يدفع للمستأجر تعويضاً يوازي بدل أيجار خمس سنوات محتسبة على أساس بدل المثل الذي جرى تحديده.\n\nأما إذا رغب المالك في استرداد المأجور أثناء السنة الأولى من الفترة التمديدية (السنوات التسع) لأجل هدم البناء الذي يقع فيه المأجور، وإقامة بناء جديد مكانه فعليه أن يدفع للمستأجر تعويضاً يوازي بدل إيجار ست سنوات محتسبة على أساس بدل المثل الذي جرى تحديده على أن يكون هذا التعويض موازياً لبدل ايجار سبع سنوات، محتسبة على أساس بدل المثل الذي جرى تحديده، للمستأجر الذي تتوافر فيه شروط الاستفادة من تقديمات الصندوق."
+    },
+    {
+      "id": "a22n",
+      "law": 270074,
+      "article": "22",
+      "quote": "يستثنى المستأجرون غير اللبنانيين من التعويض."
+    },
+    {
+      "id": "a22e",
+      "law": 270074,
+      "article": "22",
+      "quote": "في حالة طلب استرداد المأجور للضرورة العائلية خلال السنوات الممددة الأخرى، يتناقص التعويض الذي يستحق للمستأجر نسبياً مع المدة المتبقية من المهلة التمديدية، أي بمعدل التسع (1/9) عن كل سنة انقضت من الفتره التمديدية."
+    },
+    {
+      "id": "a32",
+      "law": 270074,
+      "article": "32",
+      "quote": "مع مراعاة أحكام المادة 22 من هذا القانون، للمالك أن يطلب لأجل سكنه أو سكن أحد أولاده استرداد المأجور السكني شرط أن يثبت ضرورة عائلية تضطره إلى استرداده، وأن لا يكون هو أو من يطلب الاسترداد لمصلحته مالكاً مسكناً آخر ملائماً وصالحاً للسكن غير مشغول ومعادلاً في مستواه للمأجور المطلوب استرداده ضمن النطاق البلدي عينه أو نطاق بلدي مجاور."
+    },
+    {
+      "id": "a32c",
+      "law": 270074,
+      "article": "32",
+      "quote": "للمالك أن يطلب إسترداد المأجور لأجل هدم البناء الذي يقع فيه المأجور وإقامة بناء جديد مكانه."
+    },
+    {
+      "id": "a33",
+      "law": 270074,
+      "article": "33",
+      "quote": "يترتب على المالك الذي استرد مأجوره عملاً بأحكام المادة 22 من هذا القانون أن يدفع إلى المستأجر تعويضاً إضافياً يعادل نصف قيمة التعويض الذي دفعه للمستأجر دون أن يكون المستأجر ملزماً بإثبات الضرر الذي أصابه وذلك في الحالتين المبينتين أدناه:\n\n1 -­ إذا كان المأجور قد استرد وفقاً لإحدى الغايتين المنصوص عليهما في الفقرتين (أ) و (ب) من المادة (32) من هذا القانون ولم يستعمله المالك دون مسوغ مشروع وفقاً للغاية المطلوبة بمهلة سنة من تاريخ الإخلاء أو لم يستمر دون مسوغ مشروع في استعماله على ذلك الوجه ثلاث سنوات على الاقل.\n\n2 -­ إذا كان المأجور قد استرد من أجل الهدم وإعادة البناء وفقاً للغاية المنصوص عليها في الفقرة (ج) من المادة (32) من هذا القانون ولم يشرع المالك بالبناء دون مسوّغ مشروع بمهلة ثمانية عشر شهراً من تاريخ إخلاء آخر مستأجر"
+    },
+    {
+      "id": "a34a",
+      "law": 270074,
+      "article": "34",
+      "quote": "يسقط الحق بالتمديد ويُحكم على المستأجر بالإخلاء في الحالات الآتية:\n\nأ -­ إذا لم يدفع ما استحق عليه من بدل الإجارة وذلك خلال شهرين بعد تبلغّه بنفسه أو بواسطة أحد أفراد عائلته الراشدين المقيمين معه، إنذاراً موجها اليه"
+    },
+    {
+      "id": "a34b",
+      "law": 270074,
+      "article": "34",
+      "quote": "إذا أساء المستأجر استعمال المأجور بأن أحدث فيه تخريباً غير ناشىء عن الاستعمال العادي"
+    },
+    {
+      "id": "a34c",
+      "law": 270074,
+      "article": "34",
+      "quote": "إذا تنازل عن المأجور أو أجّره كلياً أو جزئياً دون موافقة المؤجر الخطية"
+    },
+    {
+      "id": "a34d",
+      "law": 270074,
+      "article": "34",
+      "quote": "إذا أنشأ المستأجر بناء للسكن، أو شغر له، أو تملّك بناء شاغراً يملك ثلاثة أرباعه على الأقل ويكون صالحاً وملائماً لسكنه ومعادلاً لمستوى المأجور الذي يشغله في المدينة أو القرية عينها، أو في مكان لا يبعد عن المأجور أكثر من عشرة كيلومترات خطاً شعاعياً."
+    },
+    {
+      "id": "a34e",
+      "law": 270074,
+      "article": "34",
+      "quote": "إذا ترك المأجور مدة سنة بدون انقطاع وذلك رغم استمراره في دفع بدل الإيجار."
+    },
+    {
+      "id": "a55",
+      "law": 270074,
+      "article": "55",
+      "quote": "يمدد العمل بالقانون رقم 160/92 حتى تاريخ 28/12/2014"
+    },
+    {
+      "id": "a58",
       "law": 270074,
       "article": "58",
       "quote": "خلافاً لأي نص مخالف، يعلّق تطبيق أحكام مواد هذا القانون المتصلة بالحساب المساعدات والتقديمات، كما المراجعات القضائية في الأساس أو التنفيذ أو الأحكام التي سبق وأن صدرت والتي تؤدي إلى تحديد بدل إيجار أو إخلاء المستأجر المعني بتقديمات الصندوق المذكور إلى حين دخوله حيز التنفيذ."
     },
     {
-      "id": "a8",
+      "id": "a60",
       "law": 270074,
-      "article": "34",
-      "quote": "يسقط الحق بالتمديد ويُحكم على المستأجر بالإخلاء في الحالات الآتية:\n\nأ -­ إذا لم يدفع ما استحق عليه من بدل الإجارة وذلك خلال شهرين بعد تبلغّه"
+      "article": "60",
+      "quote": "يعمل بهذا القانون فور نشره في الجريدة الرسمية."
     },
     {
-      "id": "a9",
+      "id": "y58",
+      "law": 246516,
+      "article": "58",
+      "quote": "ينشر هذا القانون في الجريدة الرسمية ويعمل به بعد ستة اشهر من تاريخ نشره."
+    },
+    {
+      "id": "n1a",
       "law": 2000197087,
       "article": "1",
-      "quote": "١ - لمدة أقصاها خمس سنوات لعقود الإجارة في الأماكن غير السكنية المعقودة والمنتهية مدتها الأصلية قبل ١٩٩٢/٧/٢٣.\n\n٢ - لمدّة أقصاها ست سنوات لعقود الإيجار الناشئة عن عقود متعلقة بالتفرع عن المؤسسة التجارية وفقا للمرسوم الاشتراعي رقم ٦٧/١١ والمعقودة قبل عشر سنوات على نشر القانون رقم ١١ تاريخ ٢٠٢٥/٦/٥ (قانون الإيجارات للأماكن غير السكنية)."
+      "quote": "أ - تُمدّد الاجارة في الأماكن غير السكنية وفقا لما يلي:\n\n١ - لمدة أقصاها خمس سنوات لعقود الإجارة في الأماكن غير السكنية المعقودة والمنتهية مدتها الأصلية قبل ١٩٩٢/٧/٢٣.\n\n٢ - لمدّة أقصاها ست سنوات لعقود الإيجار الناشئة عن عقود متعلقة بالتفرع عن المؤسسة التجارية وفقا للمرسوم الاشتراعي رقم ٦٧/١١ والمعقودة قبل عشر سنوات على نشر القانون رقم ١١ تاريخ ٢٠٢٥/٦/٥ (قانون الإيجارات للأماكن غير السكنية).\n\n٣ - لمدّة أقصاها سبع سنوات لعقود الإيجار الناشئة\n\nعن عقود متعلقة بالتفرغ عن المؤسسة التجارية وفقا للمرسوم الاشتراعي رقم ٦٧/١١ والمبرمة خلال العشر سنوات السابقة على نشر القانون رقم ١١ تاريخ ٢٠٢٥/٦/٥ (قانون الإيجارات للأماكن غير السكنية).\n\n٤ - لمدّة أقصاها ثماني سنوات لعقود إيجار الأبنية التي يشغلها أشخاص القانون العام، وعقود إيجار المؤسسات التجارية العائدة لمهن حرة منظمة بقانون."
     },
     {
-      "id": "a10",
+      "id": "n1b",
       "law": 2000197087,
       "article": "1",
-      "quote": "لمدّة أقصاها سبع سنوات لعقود الإيجار الناشئة\n\nعن عقود متعلقة بالتفرغ عن المؤسسة التجارية وفقا للمرسوم الاشتراعي رقم ٦٧/١١ والمبرمة خلال العشر سنوات السابقة على نشر القانون رقم ١١ تاريخ ٢٠٢٥/٦/٥ (قانون الإيجارات للأماكن غير السكنية).\n\n٤ - لمدّة أقصاها ثماني سنوات لعقود إيجار الأبنية التي يشغلها أشخاص القانون العام، وعقود إيجار المؤسسات التجارية العائدة لمهن حرة منظمة بقانون."
+      "quote": "ب - خلافا لأي نص آخر، لاسيما البند (أ)، تمدد لمدة ثماني سنوات من تاريخ نفاذ هذا القانون الإجارة في الأماكن غير السكنية التي تتخطى مساحة المأجور فيها ٥٠٠م٢ (خمسمائة(خمسماية مترا مربعا) والتي يكون المتسأجر فيها قد تحمل عن المالك المؤجر تكاليف ونفقات هي، بطبيعتها، على عاتق هذا الأخير"
     },
     {
-      "id": "a11",
+      "id": "n1c",
       "law": 2000197087,
       "article": "1",
-      "quote": "خلافا لأي نص آخر، لاسيما البند (أ)، تمدد لمدة ثماني سنوات من تاريخ نفاذ هذا القانون الإجارة في الأماكن غير السكنية التي تتخطى مساحة المأجور فيها ٥٠٠م٢"
+      "quote": "ج - عند انتهاء المدة المشار إليها في الفقرتين (أ) و(ب) من هذه المادة تصبح الإجارة حرة وخاضعة لإرادة المتعاقدين."
     },
     {
-      "id": "a12",
-      "law": 2000197087,
-      "article": "1",
-      "quote": "عند انتهاء المدة المشار إليها في الفقرتين (أ) و(ب) من هذه المادة تصبح الإجارة حرة وخاضعة لإرادة المتعاقدين."
-    },
-    {
-      "id": "a13",
+      "id": "n2",
       "law": 2000197087,
       "article": "2",
-      "quote": "(خمسة بالماية) من القيمة البيعية للمأجور في حالته الحاضرة فيما لو كان خاليا."
+      "quote": "يُحتسب بدل المثل على أساس نسبة ٥%٥٪ (خمسة بالماية) من القيمة البيعية للمأجور في حالته الحاضرة فيما لو كان خاليا."
     },
     {
-      "id": "a14",
+      "id": "n3",
       "law": 2000197087,
       "article": "3",
-      "quote": "(٣٠٪) ثلاثون بالماية من قيمة فارق الزيادة بين البدل المعمول به قبل نفاذ هذا القانون وبدل المثل المشار إليه أعلاه، وذلك عن السنة التمديدية الأولى التي تلي تاريخ نفاذ هذا القانون.\n\n- (٤٠٪) أربعون بالماية من قيمة فارق الزيادة المنوه عنها أعلاه، وذلك عن السنة التمديدية الثانية.\n\n- (٥٠٪) خمسون بالماية من قيمة فارق الزيادة المبين أعلاه، وذلك عن السنة التمديدية الثالثة."
+      "quote": "خلال مدة تمديد الإجارة وفقا لأحكام الفقرتين (أ) و(ب) من المادة الثالثة من هذا القانون، يزاد بدل الإيجار المتوجب بتاريخ نفاذ هذا القانون سنويا وتباعا وفقا لما يلي:\n\nأ - في الإيجارات المشار إليها في البندين (١) و(٢) من الفقرة (أ) من المادة الثالثة:\n\n- (٣٠٪) ثلاثون بالماية من قيمة فارق الزيادة بين البدل المعمول به قبل نفاذ هذا القانون وبدل المثل المشار إليه أعلاه، وذلك عن السنة التمديدية الأولى التي تلي تاريخ نفاذ هذا القانون.\n\n- (٤٠٪) أربعون بالماية من قيمة فارق الزيادة المنوه عنها أعلاه، وذلك عن السنة التمديدية الثانية.\n\n- (٥٠٪) خمسون بالماية من قيمة فارق الزيادة المبين أعلاه، وذلك عن السنة التمديدية الثالثة."
     }
   ],
   "en": {
-    "title": "Rent law in Lebanon: old leases and the new rent law",
-    "question": "What does Lebanese law say about old (pre-1992) leases, rent increases and eviction under the new rent law, and what happens to non-residential leases?",
-    "description": "How old leases are extended, how their rent rises, when a tenant is evicted, and the current rules for non-residential premises.",
+    "title": "What are a tenant's rights under Lebanese rent law, and can the landlord evict?",
+    "question": "What rights does a tenant have under the Lebanese rent law, how does the rent rise, and when can the landlord evict the tenant or take the premises back?",
+    "description": "Old leases (before 23/7/1992): extension up to 9 years, rent rising to 4% of the sale value, eviction only on listed grounds. Newer leases: at least 3 years.",
     "answer": {
-      "text": "Under Law 2 of 28/2/2017, old residential leases are extended for up to 9 years from the law's entry into force, or 12 years for tenants who benefit from the Fund, with rent rising in steps to replacement rent, and the lease becomes free at the end of year 9. Article 58 suspends the provisions linked to the Fund, and any case or judgment that sets the rent of or evicts a tenant concerned by the Fund, until the Fund comes into operation. Old non-residential leases fall under Law 11 of 5/6/2025 as amended by Law 24/2025, which extends them for a maximum of 5 to 8 years by category, after which the lease becomes free.",
+      "text": "It depends on the lease date: a lease made from 23 July 1992 is a free contract of at least 3 years (Article 543 of the Code of Obligations), while an older residential lease was extended by the rent law, Law 2 of 2017, for up to 9 years, with rent rising in steps to a replacement rent of 4% of the sale value (Articles 15 and 20). During the extension the landlord can evict only on the grounds Article 34 lists, such as rent unpaid 2 months after a formal notice, or take the premises back for family need or demolition against 5 to 7 years of replacement rent in the first extension year (Article 22). Cases that would evict a tenant who qualifies for the tenants' Fund are suspended until the Fund operates (Article 58).",
       "cites": [
-        "a3",
-        "a5",
-        "a7",
-        "a9",
-        "a10",
-        "a12"
+        "a1",
+        "c543",
+        "a15",
+        "a20",
+        "a34a",
+        "a22",
+        "a58"
       ]
     },
     "sections": [
       {
-        "heading": "Which old leases does the rent law cover?",
+        "heading": "Tenant's rights at a glance",
         "paras": [
           {
-            "text": "Law 2 of 28/2/2017 covers all leases of built property made before 23/7/1992. Article 2 excludes leases of agricultural land and its buildings, seasonal summer and winter resort leases, housing that employers give their workers free or for rent, occupation of state and municipal public property, and villas that meet the features Article 2 lists.",
+            "text": "A tenant's rights depend on the date of the lease: before 23 July 1992 the rent law applies, and from that date the lease is a free contract of at least 3 years.",
+            "cites": [
+              "a1",
+              "c543"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Key figures for tenants",
+          "head": [
+            "Question",
+            "What the law says"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Leases the rent law covers",
+                "Built property let before 23/7/1992"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "Lease made from 23/7/1992",
+                "Free contract, but at least 3 years; a tenant leaving gives 2 months' notice before the end of the extended year"
+              ],
+              "cites": [
+                "a1",
+                "c543"
+              ]
+            },
+            {
+              "cells": [
+                "Extension of an old residential lease",
+                "Up to 9 years from the law's entry into force; 12 for tenants who benefit from the Fund"
+              ],
+              "cites": [
+                "a15"
+              ]
+            },
+            {
+              "cells": [
+                "Replacement rent",
+                "4% of the premises' sale value in its current state, as if vacant"
+              ],
+              "cites": [
+                "a20"
+              ]
+            },
+            {
+              "cells": [
+                "Rent rise, extension years 1 to 4",
+                "15% of the gap between the old rent and replacement rent, each year"
+              ],
+              "cites": [
+                "a15"
+              ]
+            },
+            {
+              "cells": [
+                "Rent rise, years 5 and 6",
+                "20% of the gap each year, reaching replacement rent in year 6"
+              ],
+              "cites": [
+                "a15"
+              ]
+            },
+            {
+              "cells": [
+                "Years 7 to 9",
+                "Replacement rent; the lease becomes free at the end of year 9"
+              ],
+              "cites": [
+                "a15"
+              ]
+            },
+            {
+              "cells": [
+                "Eviction for unpaid rent",
+                "Rent due not paid within 2 months of a formal notice"
+              ],
+              "cites": [
+                "a34a"
+              ]
+            },
+            {
+              "cells": [
+                "Recovery for family need or demolition, year 1",
+                "5 years of replacement rent for family need; 6 for demolition, 7 for a tenant who qualifies for the Fund"
+              ],
+              "cites": [
+                "a22"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "Which law covers my lease?",
+        "paras": [
+          {
+            "text": "The rent law, Law 2 of 28 February 2017, covers leases of built property made before 23 July 1992 (Article 1). It excludes farmland, seasonal resort lets, housing employers give their workers, public property and certain villas (Article 2).",
             "cites": [
               "a1",
               "a2"
             ]
+          },
+          {
+            "text": "A lease made from 23 July 1992 is a free contract under Article 543 of the Code of Obligations, but a term shorter than 3 years counts as 3 years.",
+            "cites": [
+              "a1",
+              "c543"
+            ]
           }
         ]
       },
       {
-        "heading": "How long are old residential leases extended, and how does the rent rise?",
+        "heading": "How long is an old residential lease extended, and how does the rent rise?",
         "paras": [
           {
-            "text": "Article 15 extends residential leases for up to 9 years from the law's entry into force, or 12 years for tenants who benefit from the Fund. Article 58 limits this. It suspends the provisions linked to the Fund, including the Fund period, until the Fund comes into operation.",
+            "text": "Up to 9 years, or 12 for tenants who benefit from the Fund (Article 15). The rent rises each year toward the replacement rent, 4% of the premises' sale value as if vacant (Article 20), and at the end of extension year 9 the lease becomes free.",
             "cites": [
-              "a3",
-              "a7"
+              "a15",
+              "a20"
             ]
           },
           {
-            "text": "Rent rises each year by a share of the gap between the old rent and replacement rent. It reaches replacement rent in extension year 6. At the end of extension year 9 the lease becomes free.",
+            "text": "The parties can agree the replacement rent. Failing agreement within the first 3 months, the landlord has 2 experts value it and serves their report through a notary, and the tenant has 2 months to accept it or answer with his own experts' report (Article 18); if the reports differ, the rent committee decides, subject to appeal.",
             "cites": [
-              "a4",
-              "a5"
+              "a18",
+              "a18c"
             ]
           },
           {
-            "text": "We do not hold the article that fixes when this law entered into force, so this page cannot give the year in which the extension ends.",
-            "note": true
-          }
-        ],
-        "table": {
-          "caption": "Rent during the residential extension (Article 15)",
-          "head": [
-            "Extension year",
-            "Rent"
-          ],
-          "rows": [
-            {
-              "cells": [
-                "Years 1 to 4",
-                "Rises each year by 15% of the gap"
-              ],
-              "cites": [
-                "a4"
-              ]
-            },
-            {
-              "cells": [
-                "Years 5 and 6",
-                "Rises each year by 20% of the gap, reaching replacement rent in year 6"
-              ],
-              "cites": [
-                "a5"
-              ]
-            },
-            {
-              "cells": [
-                "Years 7, 8 and 9",
-                "Equal to replacement rent"
-              ],
-              "cites": [
-                "a5"
-              ]
-            },
-            {
-              "cells": [
-                "After year 9",
-                "The lease becomes free"
-              ],
-              "cites": [
-                "a5"
-              ]
-            }
-          ]
-        }
-      },
-      {
-        "heading": "What is replacement rent for an old residential lease?",
-        "paras": [
-          {
-            "text": "Article 20 sets replacement rent at 4% of the sale value of the premises in its current condition, as if it were vacant.",
+            "text": "The years run from the law's entry into force: the 2014 text took effect 6 months after publication (its Article 58), Article 55 extends the old rent law 160/92 to 28 December 2014, and Article 60 makes Law 2 of 2017 effective on publication.",
             "cites": [
-              "a6"
+              "y58",
+              "a55",
+              "a60"
             ]
-          },
-          {
-            "text": "This page does not cover how the landlord and tenant agree on replacement rent, how experts value the premises, or how a dispute goes to the committee and the courts.",
-            "note": true
           }
         ]
       },
       {
-        "heading": "What is suspended until the Fund operates?",
+        "heading": "When can the landlord evict the tenant or take the premises back?",
         "paras": [
           {
-            "text": "Article 58 applies notwithstanding any contrary text. Until the Fund comes into operation, it suspends the provisions of Law 2 of 28/2/2017 tied to the Fund's aid and benefits. It also suspends court actions on the merits or in enforcement, and judgments already issued, that set the rent of or evict a tenant concerned by the Fund.",
+            "text": "Only on the grounds the law lists. Under Article 34 the tenant is evicted if he leaves rent unpaid 2 months after a formal notice, damages the premises, assigns or sublets without written consent, acquires an equivalent home in the same town or within 10 km, or leaves the premises for a year without a break.",
             "cites": [
-              "a7"
+              "a34a",
+              "a34b",
+              "a34c",
+              "a34d",
+              "a34e"
             ]
           },
           {
-            "text": "The texts we hold do not show that the Fund has started operating. This page does not set out who qualifies for the Fund.",
-            "note": true
+            "text": "The landlord may also take the premises back to house himself or a child, if he proves family need and owns no other suitable home nearby, or to demolish and rebuild (Article 32). In the first extension year he pays 5 years of replacement rent for family need, or 6 for demolition (7 for a Fund tenant); non-Lebanese tenants get no compensation (Article 22).",
+            "cites": [
+              "a32",
+              "a32c",
+              "a22",
+              "a22n"
+            ]
+          },
+          {
+            "text": "Worked example: a landlord who takes a flat back for family need after 3 extension years have passed owes 5 years of replacement rent reduced by three ninths, that is two thirds of 5 years' rent (Article 22).",
+            "cites": [
+              "a22",
+              "a22e"
+            ]
+          },
+          {
+            "text": "An unused recovery costs the landlord an extra half of the compensation (Article 33). Article 58 suspends, until the Fund operates, any court case or judgment that would set the rent of, or evict, a tenant concerned by the Fund.",
+            "cites": [
+              "a33",
+              "a58"
+            ]
           }
         ]
       },
       {
-        "heading": "When does a residential tenant lose the extension?",
+        "heading": "What about shops, offices and other non-residential leases?",
         "paras": [
           {
-            "text": "Article 34 says a tenant loses the extension and is evicted if he does not pay rent that is due within 2 months of being served a notice. Article 58 suspends eviction actions and judgments against a tenant concerned by the Fund until the Fund comes into operation.",
+            "text": "Article 3 of Law 11 of 5 June 2025, as rewritten by Law 24 of 14 August 2025, extends old non-residential leases for at most 5 years if made and expired before 23/7/1992; for leases arising from a business transfer under Decree-Law 11/67, 6 years if made more than 10 years before Law 11 was published and 7 if made within those 10 years; and 8 years for public-law bodies and liberal professions. Premises over 500 m² where the tenant bore costs that fall on the landlord get 8 years, and at the end the lease becomes free.",
             "cites": [
-              "a8",
-              "a7"
+              "n1a",
+              "n1b",
+              "n1c"
             ]
           },
           {
-            "text": "This page does not set out the other grounds for eviction in the same article, the rules on serving the notice, or the landlord's right to recover the premises for family need or demolition against compensation.",
-            "note": true
+            "text": "Replacement rent is 5% of the sale value as if vacant. Rent rises by 30% of the gap in extension year 1, 40% in year 2 and 50% in year 3, and reaches replacement rent in year 4, or in year 5 for the longer categories.",
+            "cites": [
+              "n2",
+              "n3"
+            ]
           }
         ]
       },
       {
-        "heading": "What rules apply to old non-residential leases?",
+        "heading": "What this page does not cover",
         "paras": [
           {
-            "text": "Law 24/2025 rewrote Article 3 of Law 11 of 5/6/2025 on non-residential rents. Notwithstanding any other text, and in particular the category list, premises over 500 m² where the tenant bore costs that by nature fall on the landlord are extended for 8 years from the law's entry into force.",
-            "cites": [
-              "a11"
-            ]
-          },
-          {
-            "text": "At the end of the extension, the lease becomes free and depends on the parties' will. Replacement rent is 5% of the sale value of the premises in its current condition, as if vacant. Rent rises by 30% of the gap in extension year 1, 40% in year 2 and 50% in year 3.",
-            "cites": [
-              "a12",
-              "a13",
-              "a14"
-            ]
-          },
-          {
-            "text": "This page does not set out the later years of each increase schedule, recovery and compensation for non-residential premises, or the earlier yearly extensions under the old law. The texts we hold do not include the full text of the non-residential rents law itself.",
+            "text": "The texts give 2 possible start dates for the 9 years, 28 December 2014 and 28 February 2017; from either, the 9 years have passed for tenants outside the Fund, and the library holds no later law extending old residential leases. No text in the library says the Fund has started to pay. The full text of Law 11 of 2025 is not in the library, so non-residential compensation and procedure are not covered.",
             "note": true
           }
-        ],
-        "table": {
-          "caption": "Maximum extension of non-residential leases (Law 24/2025, Article 1)",
-          "head": [
-            "Lease",
-            "Extension"
-          ],
-          "rows": [
-            {
-              "cells": [
-                "Made, and originally expired, before 23/7/1992",
-                "Up to 5 years"
-              ],
-              "cites": [
-                "a9"
-              ]
-            },
-            {
-              "cells": [
-                "Arising from a transfer of a business under Decree-Law 11/67, made more than 10 years before Law 11 was published",
-                "Up to 6 years"
-              ],
-              "cites": [
-                "a9"
-              ]
-            },
-            {
-              "cells": [
-                "Arising from a transfer of a business under Decree-Law 11/67, made in the 10 years before Law 11 was published",
-                "Up to 7 years"
-              ],
-              "cites": [
-                "a10"
-              ]
-            },
-            {
-              "cells": [
-                "Buildings occupied by public-law persons, and businesses of liberal professions regulated by law",
-                "Up to 8 years"
-              ],
-              "cites": [
-                "a10"
-              ]
-            },
-            {
-              "cells": [
-                "Premises over 500 m² where the tenant bore costs that fall on the landlord",
-                "8 years from entry into force, overriding the rows above"
-              ],
-              "cites": [
-                "a11"
-              ]
-            }
-          ]
-        }
+        ]
       }
     ]
   },
   "ar": {
-    "title": "قانون الإيجارات في لبنان: العقود القديمة والقانون الجديد",
-    "question": "ماذا يقول القانون اللبناني عن عقود الإيجار القديمة (قبل 1992) وزيادات البدلات والإخلاء بموجب قانون الإيجارات الجديد، وماذا عن الأماكن غير السكنية؟",
-    "description": "كيف تُمدَّد عقود الإيجار القديمة ويرتفع بدلها، ومتى يُخلى المستأجر، وما القواعد الحالية للأماكن غير السكنية.",
+    "title": "ما هي حقوق المستأجر في قانون الإيجارات اللبناني، وهل يحق للمالك إخلاؤه؟",
+    "question": "ما هي حقوق المستأجر في قانون الإيجارات اللبناني، وكيف يزاد البدل، ومتى يحق للمالك إخلاء المستأجر أو استرداد المأجور؟",
+    "description": "العقود القديمة (قبل 23/7/1992): تمديد حتى تسع سنوات وبدل يرتفع إلى 4% من القيمة البيعية، ولا إخلاء إلا لأسباب محددة. العقود الأحدث: ثلاث سنوات على الأقل.",
     "answer": {
-      "text": "تُمدَّد عقود إيجار الأماكن السكنية القديمة بموجب القانون رقم 2 تاريخ 28/2/2017 حتى 9 سنوات من تاريخ نفاذه، وحتى 12 سنة للمستفيدين من تقديمات الصندوق، ويرتفع البدل تدريجياً حتى يبلغ بدل المثل، ثم يصبح الإيجار حراً بنهاية السنة التمديدية التاسعة. وتعلّق المادة 58، إلى حين دخول الصندوق حيز التنفيذ، الأحكام المتصلة بالصندوق وكل مراجعة قضائية أو حكم يؤدي إلى تحديد بدل إيجار المستأجر المعني بتقديمات الصندوق أو إلى إخلائه. أما عقود الأماكن غير السكنية القديمة فيرعاها القانون رقم 11 تاريخ 5/6/2025 المعدَّل بالقانون رقم 24/2025، وهو يمددها مدة أقصاها بين 5 و8 سنوات بحسب الفئة، ثم تصبح الإجارة حرة.",
+      "text": "يتوقف الجواب على تاريخ العقد: فالعقد المعقود ابتداء من 23 تموز 1992 يخضع لحرية التعاقد لمدة لا تقل عن ثلاث سنوات (المادة 543 من قانون الموجبات والعقود)، أما عقد الإيجار السكني الأقدم فقد مدده قانون الإيجارات، القانون 2 لسنة 2017، لغاية تسع سنوات، مع زيادة البدل تدريجياً حتى بدل المثل البالغ 4% من القيمة البيعية (المادتان 15 و20). وخلال التمديد لا يحق للمالك الإخلاء إلا في الحالات التي تعددها المادة 34، ومنها عدم دفع البدل خلال شهرين من الإنذار، أو استرداد المأجور للضرورة العائلية أو للهدم لقاء تعويض يوازي بدل إيجار خمس إلى سبع سنوات في السنة التمديدية الأولى (المادة 22). وتعلق الدعاوى التي تؤدي إلى إخلاء المستأجر المعني بتقديمات الصندوق إلى حين دخوله حيز التنفيذ (المادة 58).",
       "cites": [
-        "a3",
-        "a5",
-        "a7",
-        "a9",
-        "a10",
-        "a12"
+        "a1",
+        "c543",
+        "a15",
+        "a20",
+        "a34a",
+        "a22",
+        "a58"
       ]
     },
     "sections": [
       {
-        "heading": "ما عقود الإيجار القديمة التي يشملها القانون؟",
+        "heading": "حقوق المستأجر باختصار",
         "paras": [
           {
-            "text": "يشمل القانون رقم 2 تاريخ 28/2/2017 جميع عقود إيجار العقارات المبنية المعقودة قبل 23/7/1992. وتستثني المادة 2 منه عقود إيجار الأراضي الزراعية والمباني التابعة لها، والإيجارات الموسمية في أماكن الاصطياف والاشتاء، والأماكن التي يقدمها أصحاب العمل لسكن أجرائهم مجاناً أو ببدل، وإشغال الأملاك العمومية للدولة والبلديات، والفيلات التي تتوافر فيها المواصفات التي تعدّدها المادة 2.",
+            "text": "تتوقف حقوق المستأجر على تاريخ العقد: فقانون الإيجارات يطبق على العقود المعقودة قبل 23 تموز 1992، وما عقد بعد ذلك يخضع لحرية التعاقد لمدة لا تقل عن ثلاث سنوات.",
             "cites": [
               "a1",
-              "a2"
+              "c543"
             ]
-          }
-        ]
-      },
-      {
-        "heading": "كم تمتد عقود الإيجار السكنية القديمة، وكيف يرتفع البدل؟",
-        "paras": [
-          {
-            "text": "تمدد المادة 15 عقود إيجار الأماكن السكنية حتى 9 سنوات من تاريخ نفاذ القانون، وحتى 12 سنة للمستفيدين من تقديمات الصندوق. وتحدّ المادة 58 من ذلك، إذ تعلّق الأحكام المتصلة بالصندوق، ومنها مدة الصندوق، إلى حين دخوله حيز التنفيذ.",
-            "cites": [
-              "a3",
-              "a7"
-            ]
-          },
-          {
-            "text": "يرتفع البدل كل سنة بنسبة من الفارق بين البدل القديم وبدل المثل، حتى يبلغ بدل المثل في السنة التمديدية السادسة. وبنهاية السنة التمديدية التاسعة يصبح الإيجار حراً.",
-            "cites": [
-              "a4",
-              "a5"
-            ]
-          },
-          {
-            "text": "النصوص المتوفرة لدينا لا تتضمن المادة التي تحدد تاريخ نفاذ هذا القانون، فلا تبيّن هذه الصفحة السنة التي ينتهي فيها التمديد.",
-            "note": true
           }
         ],
         "table": {
-          "caption": "البدل خلال فترة التمديد السكني (المادة 15)",
+          "caption": "أرقام أساسية للمستأجر",
           "head": [
-            "السنة التمديدية",
-            "البدل"
+            "المسألة",
+            "ما ينص عليه القانون"
           ],
           "rows": [
             {
               "cells": [
-                "السنوات من الأولى إلى الرابعة",
-                "يزاد سنوياً بنسبة 15% من الفارق"
+                "العقود التي يشملها قانون الإيجارات",
+                "إيجار العقارات المبنية المعقود قبل 23/7/1992"
               ],
               "cites": [
-                "a4"
+                "a1"
               ]
             },
             {
               "cells": [
-                "السنتان الخامسة والسادسة",
-                "يزاد سنوياً بنسبة 20% من الفارق، حتى يبلغ بدل المثل في السنة السادسة"
+                "العقد المعقود ابتداء من 23/7/1992",
+                "حرية التعاقد، على ألا تقل المدة عن ثلاث سنوات، ويعلم المستأجر الراغب في الترك المؤجر قبل شهرين من نهاية السنة الممددة"
               ],
               "cites": [
-                "a5"
+                "a1",
+                "c543"
+              ]
+            },
+            {
+              "cells": [
+                "تمديد عقد الإيجار السكني القديم",
+                "لغاية تسع سنوات من تاريخ نفاذ القانون، و12 سنة للمستفيدين من تقديمات الصندوق"
+              ],
+              "cites": [
+                "a15"
+              ]
+            },
+            {
+              "cells": [
+                "بدل المثل",
+                "4% من القيمة البيعية للمأجور في حالته القائمة فيما لو كان خالياً"
+              ],
+              "cites": [
+                "a20"
+              ]
+            },
+            {
+              "cells": [
+                "الزيادة في السنوات التمديدية الأربع الأولى",
+                "15% من فارق الزيادة بين البدل القديم وبدل المثل عن كل سنة"
+              ],
+              "cites": [
+                "a15"
+              ]
+            },
+            {
+              "cells": [
+                "الزيادة في السنتين الخامسة والسادسة",
+                "20% من الفارق عن كل سنة، حتى يبلغ البدل بدل المثل في السنة السادسة"
+              ],
+              "cites": [
+                "a15"
               ]
             },
             {
               "cells": [
                 "السنوات السابعة والثامنة والتاسعة",
-                "يساوي بدل المثل"
+                "بدل المثل، ويصبح الإيجار حراً بنهاية السنة التاسعة"
               ],
               "cites": [
-                "a5"
+                "a15"
               ]
             },
             {
               "cells": [
-                "بعد نهاية السنة التاسعة",
-                "يصبح الإيجار حراً"
+                "الإخلاء لعدم دفع البدل",
+                "عدم دفع البدل المستحق خلال شهرين من تبلغ الإنذار"
               ],
               "cites": [
-                "a5"
+                "a34a"
+              ]
+            },
+            {
+              "cells": [
+                "الاسترداد للضرورة العائلية أو للهدم في السنة الأولى",
+                "بدل إيجار خمس سنوات للضرورة العائلية، وست سنوات للهدم، وسبع سنوات للمستأجر المستفيد من الصندوق"
+              ],
+              "cites": [
+                "a22"
               ]
             }
           ]
         }
       },
       {
-        "heading": "ما بدل المثل في الإيجار السكني القديم؟",
+        "heading": "أي قانون يحكم عقدي؟",
         "paras": [
           {
-            "text": "تحدد المادة 20 بدل المثل بنسبة 4% من القيمة البيعية للمأجور في حالته القائمة لو كان خالياً.",
+            "text": "يشمل قانون الإيجارات، القانون 2 تاريخ 28 شباط 2017، عقود إيجار العقارات المبنية المعقودة قبل 23 تموز 1992 (المادة 1). ويستثني الأراضي الزراعية، والإيجارات الموسمية لأماكن الاصطياف والاشتاء، والأماكن التي يقدمها أصحاب العمل لسكن أجرائهم، والأملاك العمومية، وبعض الفيلات (المادة 2).",
             "cites": [
-              "a6"
+              "a1",
+              "a2"
             ]
           },
           {
-            "text": "لا تتناول هذه الصفحة طريقة الاتفاق على بدل المثل بين المالك والمستأجر، ولا تخمين الخبراء، ولا رفع الخلاف إلى اللجنة والمحاكم.",
-            "note": true
+            "text": "أما العقد المعقود ابتداء من 23 تموز 1992 فيخضع لحرية التعاقد وفق المادة 543 من قانون الموجبات والعقود، على أن المدة التي تقل عن ثلاث سنوات تعتبر ثلاث سنوات.",
+            "cites": [
+              "a1",
+              "c543"
+            ]
           }
         ]
       },
       {
-        "heading": "ما الذي يُعلَّق إلى حين عمل الصندوق؟",
+        "heading": "كم يمدد عقد الإيجار السكني القديم، وكيف يزاد البدل؟",
         "paras": [
           {
-            "text": "تسري المادة 58 خلافاً لأي نص مخالف. فهي تعلّق، إلى حين دخول الصندوق حيز التنفيذ، أحكام القانون رقم 2 تاريخ 28/2/2017 المتصلة بمساعدات الصندوق وتقديماته. وتعلّق كذلك المراجعات القضائية في الأساس أو التنفيذ، والأحكام الصادرة سابقاً، التي تؤدي إلى تحديد بدل إيجار المستأجر المعني بتقديمات الصندوق أو إلى إخلائه.",
+            "text": "لغاية تسع سنوات، و12 سنة للمستفيدين من تقديمات الصندوق (المادة 15). ويزاد البدل سنوياً حتى يبلغ بدل المثل، أي 4% من القيمة البيعية للمأجور فيما لو كان خالياً (المادة 20)، وبنهاية السنة التمديدية التاسعة يصبح الإيجار حراً.",
             "cites": [
-              "a7"
+              "a15",
+              "a20"
             ]
           },
           {
-            "text": "النصوص المتوفرة لدينا لا تبيّن أن الصندوق بدأ العمل. ولا تتناول هذه الصفحة شروط الاستفادة منه.",
-            "note": true
+            "text": "يجوز للطرفين الاتفاق على بدل المثل. وإذا لم يتفقا خلال الأشهر الثلاثة الأولى، يستعين المؤجر بخبيرين ويبلغ تقريرهما إلى المستأجر بواسطة الكاتب العدل، وللمستأجر خلال شهرين الموافقة عليه أو تقديم تقرير مقابل من خبيرين (المادة 18)، وإذا اختلف التقريران تفصل اللجنة، ويقبل قرارها الاستئناف.",
+            "cites": [
+              "a18",
+              "a18c"
+            ]
+          },
+          {
+            "text": "وتحتسب السنوات من تاريخ نفاذ القانون: فقد نص قانون 2014 على العمل به بعد ستة أشهر من نشره (المادة 58 منه)، وتمدد المادة 55 العمل بالقانون 160/92 حتى 28/12/2014، وتنص المادة 60 على العمل بالقانون 2 لسنة 2017 فور نشره.",
+            "cites": [
+              "y58",
+              "a55",
+              "a60"
+            ]
           }
         ]
       },
       {
-        "heading": "متى يفقد المستأجر السكني حقه بالتمديد؟",
+        "heading": "متى يحق للمالك إخلاء المستأجر أو استرداد المأجور؟",
         "paras": [
           {
-            "text": "تنص المادة 34 على أن المستأجر يفقد حقه بالتمديد ويُحكم عليه بالإخلاء إذا لم يدفع بدل الإيجار المستحق عليه خلال شهرين من تبلّغه الإنذار. وتعلّق المادة 58 دعاوى الإخلاء وأحكامه بحق المستأجر المعني بتقديمات الصندوق إلى حين دخول الصندوق حيز التنفيذ.",
+            "text": "فقط في الحالات التي يعددها القانون. فبموجب المادة 34 يحكم بإخلاء المستأجر إذا لم يدفع البدل خلال شهرين من تبلغه الإنذار، أو أحدث في المأجور تخريباً، أو تنازل عنه أو أجره دون موافقة خطية، أو تملك مسكناً معادلاً في المدينة أو القرية عينها أو على مسافة لا تتجاوز عشرة كيلومترات، أو ترك المأجور سنة بدون انقطاع.",
             "cites": [
-              "a8",
-              "a7"
+              "a34a",
+              "a34b",
+              "a34c",
+              "a34d",
+              "a34e"
             ]
           },
           {
-            "text": "لا تعرض هذه الصفحة سائر أسباب الإخلاء في المادة نفسها، ولا أصول تبليغ الإنذار، ولا حق المالك في استرداد المأجور للضرورة العائلية أو للهدم لقاء تعويض.",
-            "note": true
+            "text": "ويجوز للمالك استرداد المأجور لسكنه أو سكن أحد أولاده إذا أثبت ضرورة عائلية ولم يكن مالكاً مسكناً آخر ملائماً في النطاق البلدي عينه أو المجاور، أو لهدم البناء وإعادة بنائه (المادة 32). وفي السنة التمديدية الأولى يدفع بدل إيجار خمس سنوات للضرورة العائلية، أو ست سنوات للهدم (وسبع سنوات للمستأجر المستفيد من الصندوق)، ويستثنى المستأجرون غير اللبنانيين من التعويض (المادة 22).",
+            "cites": [
+              "a32",
+              "a32c",
+              "a22",
+              "a22n"
+            ]
+          },
+          {
+            "text": "مثال: مالك يسترد شقة للضرورة العائلية بعد انقضاء ثلاث سنوات تمديدية، يدفع تعويض الخمس سنوات منقوصاً منه ثلاثة أتساع، أي ثلثي بدل إيجار خمس سنوات (المادة 22).",
+            "cites": [
+              "a22",
+              "a22e"
+            ]
+          },
+          {
+            "text": "وإذا لم يستعمل المالك المأجور المسترد للغاية المطلوبة، يدفع تعويضاً إضافياً يعادل نصف التعويض (المادة 33). وتعلق المادة 58، إلى حين دخول الصندوق حيز التنفيذ، كل مراجعة قضائية أو حكم يؤدي إلى تحديد بدل إيجار المستأجر المعني بتقديمات الصندوق أو إخلائه.",
+            "cites": [
+              "a33",
+              "a58"
+            ]
           }
         ]
       },
       {
-        "heading": "ما القواعد التي ترعى عقود الأماكن غير السكنية القديمة؟",
+        "heading": "ماذا عن المحلات والمكاتب وسائر الأماكن غير السكنية؟",
         "paras": [
           {
-            "text": "عدّل القانون رقم 24/2025 المادة 3 من القانون رقم 11 تاريخ 5/6/2025 المتعلق بالإيجارات للأماكن غير السكنية. وخلافاً لأي نص آخر، ولا سيما لائحة الفئات، تُمدَّد لمدة 8 سنوات من تاريخ نفاذ القانون إجارة الأماكن غير السكنية التي تتخطى مساحتها 500 متر مربع إذا تحمّل فيها المستأجر عن المالك تكاليف ونفقات تقع بطبيعتها على عاتقه.",
+            "text": "تمدد المادة 3 من القانون 11 تاريخ 5/6/2025، كما عدلها القانون 24 تاريخ 14/8/2025، عقود الإيجار القديمة لغير السكن لمدة أقصاها خمس سنوات للعقود المعقودة والمنتهية مدتها الأصلية قبل 23/7/1992، وست أو سبع سنوات للعقود الناشئة عن التفرغ عن مؤسسة تجارية وفق المرسوم الاشتراعي 67/11 (بحسب ما إذا عقدت قبل عشر سنوات على نشر القانون 11 أو خلالها)، وثماني سنوات لأشخاص القانون العام والمهن الحرة. ويمدد لثماني سنوات المأجور الذي تتخطى مساحته 500 م² وتحمل فيه المستأجر نفقات هي على عاتق المالك، وعند انتهاء المدة تصبح الإجارة حرة.",
             "cites": [
-              "a11"
+              "n1a",
+              "n1b",
+              "n1c"
             ]
           },
           {
-            "text": "عند انتهاء مدة التمديد تصبح الإجارة حرة وخاضعة لإرادة المتعاقدين. ويُحتسب بدل المثل بنسبة 5% من القيمة البيعية للمأجور في حالته الحاضرة لو كان خالياً. ويزاد البدل بنسبة 30% من الفارق في السنة التمديدية الأولى، و40% في الثانية، و50% في الثالثة.",
+            "text": "ويحتسب بدل المثل بنسبة 5% من القيمة البيعية للمأجور فيما لو كان خالياً. ويزاد البدل بنسبة 30% من فارق الزيادة في السنة التمديدية الأولى، و40% في الثانية، و50% في الثالثة، ويبلغ بدل المثل في السنة الرابعة، أو في السنة الخامسة للفئات الأطول مدة.",
             "cites": [
-              "a12",
-              "a13",
-              "a14"
+              "n2",
+              "n3"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "heading": "ما لا تتناوله هذه الصفحة",
+        "paras": [
           {
-            "text": "لا تعرض هذه الصفحة باقي سنوات جدول الزيادات لكل فئة، ولا قواعد الاسترداد والتعويض في الأماكن غير السكنية، ولا التمديدات السنوية السابقة بموجب القانون القديم. والنصوص المتوفرة لدينا لا تتضمن النص الكامل لقانون الإيجارات للأماكن غير السكنية نفسه.",
+            "text": "تشير النصوص إلى تاريخين محتملين لبدء السنوات التسع، 28 كانون الأول 2014 و28 شباط 2017، وأياً كان التاريخ فقد انقضت السنوات التسع للمستأجرين غير المستفيدين من الصندوق، ولا تتضمن المكتبة قانوناً لاحقاً يمدد عقود الإيجار السكنية القديمة. ولا تتضمن المكتبة نصاً يفيد بأن الصندوق بدأ الدفع. ولا يوجد في المكتبة النص الكامل للقانون 11 لسنة 2025، لذا لا تعرض الصفحة التعويض والإجراءات في الأماكن غير السكنية.",
             "note": true
           }
-        ],
-        "table": {
-          "caption": "المدة القصوى لتمديد عقود الأماكن غير السكنية (المادة 1 من القانون رقم 24/2025)",
-          "head": [
-            "العقد",
-            "مدة التمديد"
-          ],
-          "rows": [
-            {
-              "cells": [
-                "المعقود والمنتهية مدته الأصلية قبل 23/7/1992",
-                "5 سنوات حداً أقصى"
-              ],
-              "cites": [
-                "a9"
-              ]
-            },
-            {
-              "cells": [
-                "الناشئ عن التفرغ عن مؤسسة تجارية وفق المرسوم الاشتراعي رقم 11/67، والمعقود قبل نشر القانون رقم 11 بأكثر من 10 سنوات",
-                "6 سنوات حداً أقصى"
-              ],
-              "cites": [
-                "a9"
-              ]
-            },
-            {
-              "cells": [
-                "الناشئ عن التفرغ عن مؤسسة تجارية وفق المرسوم الاشتراعي رقم 11/67، والمبرم خلال 10 سنوات سبقت نشر القانون رقم 11",
-                "7 سنوات حداً أقصى"
-              ],
-              "cites": [
-                "a10"
-              ]
-            },
-            {
-              "cells": [
-                "الأبنية التي يشغلها أشخاص القانون العام، والمؤسسات العائدة لمهن حرة منظمة بقانون",
-                "8 سنوات حداً أقصى"
-              ],
-              "cites": [
-                "a10"
-              ]
-            },
-            {
-              "cells": [
-                "الأماكن التي تتخطى 500 متر مربع وتحمّل فيها المستأجر نفقات تقع على المالك",
-                "8 سنوات من تاريخ نفاذ القانون، خلافاً للفئات السابقة"
-              ],
-              "cites": [
-                "a11"
-              ]
-            }
-          ]
-        }
+        ]
       }
     ]
   }

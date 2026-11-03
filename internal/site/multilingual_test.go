@@ -10,7 +10,7 @@ import (
 
 func TestSearchTopicsContent(t *testing.T) {
 	for _, tc := range []struct{ q, slug, lang, excerpt string }{
-		{"arduous or unhealthy work", "working-hours-annual-leave", "en", "arduous or unhealthy work"},
+		{"strenuous or unhealthy work", "working-hours-annual-leave", "en", "strenuous or unhealthy work"},
 		{"RESTAURANTS CAFES", "working-hours-annual-leave", "en", "restaurants and cafés"},
 		{"الأشغال المرهقة", "working-hours-annual-leave", "ar", "الأشغال المرهقة"},
 	} {

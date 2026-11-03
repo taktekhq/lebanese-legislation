@@ -2,271 +2,356 @@
   "slug": "code-of-commerce",
   "order": 15,
   "published": "2026-10-20",
-  "updated": "2026-10-21",
+  "updated": "2026-11-03",
   "articles": [
     {
-      "id": "a1",
-      "law": 244586,
-      "article": "9",
-      "quote": "التجار هم:\n\nاولا: الاشخاص الذين تكون مهنتهم القيام باعمال تجارية.\n\nثانيا : الشركات التي يكون موضوعها تجاريا.\n\nاما الشركات التي يكون موضوعها مدنيا ولكنها اتخذت صفة الشركات المغفلة او شركات التوصية المساهة فتخضع لجميع موجبات التجار المعينة في الفصلين الثاني والثالث الآتيين ولاحكام الصلح الاحتياطي والافلاس المقررة في الكتاب الخامس من هذا القانون."
-    },
-    {
-      "id": "a2",
-      "law": 244586,
-      "article": "10",
-      "quote": "ان الافراد الذين يتعاطون تجارة صغيرة او حرفة بسيطة ذات نفقات عامة زهيدة كالبائع الطواف او البائع بالمياومة او الذين يقومون بنقليات صغيرة على البر او سطح الماء لا يخضعون للواجبات المختصة بالدفاتر التجارية ولا لقواعد النشر التي يوجبها هذا القانون."
-    },
-    {
-      "id": "a3",
-      "law": 244586,
-      "article": "24",
-      "quote": "يجب على كل تاجر ان يطلب من كاتب المحكمة التي يكون محله الرئيسي موجودا في منطقتها ان يسجل اسمه في سجل التجارة في خلال شهر من تاريخ فتح المحل او شرائه"
-    },
-    {
-      "id": "a4",
-      "law": 244586,
-      "article": "16",
-      "quote": "وعليه ايضا ان يجري جردة سنوية لجميع عناصر مؤسسته وان يوقف جميع الحسابات بغية وضع الميزانية ووضع \"حساب النتيجة\" ويجب ان تنظم الوثائق المتعلقة بها وان تحفظ طوال المدة المنصوص عليها في المادة 19 من قانون التجارة.\n\n- يصبح مسك الدفاتر التجارية بواسطة التطبيق الرقمي المقررة في هذه المادة الزاميا بعد سنتين من تاريخ صدور هذا القانون."
-    },
-    {
-      "id": "a5",
-      "law": 244586,
-      "article": "19",
-      "quote": "يجب على التاجر ان يحفظ الدفاتر بعد اختتامها سحابة عشر سنوات ."
-    },
-    {
-      "id": "a6",
+      "id": "k26",
       "law": 244586,
       "article": "26",
-      "quote": "ان الشركات التي لها مركز رئيسي في لبنان يجب تسجيلها في سجل التجارة المختص بمنطقة مركزها ويجب على ممثل الشركة القانوني ان يطلب التسجيل في خلال الشهر الذي يلي تأسيسها:"
+      "quote": "ان الشركات التي لها مركز رئيسي في لبنان يجب تسجيلها في سجل التجارة المختص بمنطقة مركزها ويجب على ممثل الشركة القانوني ان يطلب التسجيل في خلال الشهر الذي يلي تأسيسها:\n\nويقدم طالب التسجيل لقلم المحكمة نسخة عن صك التأسيس وخلاصة عنه مكتوبة على نسختين ومشتملة على الطوابع وعلى توقيعه ومتضمنة بوجه خاص البيانات الآتية:\n\n1 - اسم وشهرة كل من الشركاء والمساهمين، وجنسية كل منهم وتاريخ ولادته ومحلها.\n\n2 - اسم الشركة التجارية او تسميتها.\n\n3 - موضوع الشركة.\n\n4 - الاماكن التي فيها للشركة فروع او وكالات سواء كانت في لبنان او في الخارج\n\n5 - اسماء والشركاء او الاشخاص الآخرين المرخص لهم في ادارة الشركة او التوقيع عنها.\n\n6 - رأسمال الشركة والمبالغ او الاوراق المالية المترتب تقديمها على المساهمين او شركاء التوصية وكذلك قيمة ما يقدم للشركة سواء اكان من النقود او من اموال اخرى.\n\n7 - تاريخ ابتداء الشركة وتاريخ انتهائها.\n\n8 - نوع الشركة.\n\n9 - الحد الادنى لرأسمال الشركة اذا كانت ذات رأسمال قابل للتغيير.\n\n10 - عقد ايجار المكان الذي ستمارس فيه الشركة عملها، او مستند بملكيتها له، او مستند يفيد اتخاذها محل اقامة لدى ممثلها القانوني، او اي سند قانوني تجيزه القوانين النافذة يبرر اشغال مركز الشركة.\n\n11 - هوية صاحب او اصحاب الحق الاقتصادي."
     },
     {
-      "id": "a7",
+      "id": "k27",
       "law": 244586,
-      "article": "53",
-      "quote": "كل شريك في شركة تضامن من يعد كأنه يتعاطى بنفسه التجارة تحت عنوان شركة- فكل منهم يكتسب صفة التاجر القانونية. وافلاس الشركة يؤدي الى الافلاس الشخصي لكل من الشركاء."
+      "article": "27",
+      "quote": "يجب ان يذكر ايضا في سجل التجارة:\n\n1 - كل تعديل او تبديل بالامور الواجب تسجيلها بمقتضى المادة السابقة.\n\n2 - الاسم والشهرة وتاريخ الولادة ومحلها والجنسية لكل من مديري اشغال الشركة واعضاء مجلس ادارتها ومديريها المعينين لمدة وجودها.\n\nاما طلب التسجيل فيقدمه ممثل الشركة القانوني في وقت وجوب التسجيل."
     },
     {
-      "id": "a8",
+      "id": "k31",
       "law": 244586,
-      "article": "425",
-      "quote": "ان الشك قابل للايفاء لدى الاطلاع. وكل شرط مخالف يعد لغوا. والشك الذي يقدم للايفاء قبل اليوم المعين كتاريخ للاصدار هو قابل الايفاء في يوم العرض ."
+      "article": "31",
+      "quote": "كل قيد في سجل التجارة لم تحدد له مهلة في المواد السابقة يجب طلبه في خلال شهر يبتديء من تاريخ الصك او العمل الذي يراه قيده. اما الاحكام والقرارات فتبتديء مهلتها من يوم اصدارها."
     },
     {
-      "id": "a9",
+      "id": "k36",
       "law": 244586,
-      "article": "426",
-      "quote": "ان الشك الذي يصدر في لبنان ويكون قابل الايفاء فيه يجب ان يعرض للايفاء في مهلة ثمانية ايام.\n\nاما الشك الذي يصدر في خارج لبنان ويكون قابلا للايفاء فيه فيجب عرضه في مهلة عشرين يوما اذا كان محل اصداره في بلاد متاخمة للبنان او لسوريا او في اوربا او في بلاد واقعة على شاطيء البحر المتوسط.\n\nوتكون المهلة سبعين يوما اذا كان الشك صادرا عن اي بلد آخر."
+      "article": "36",
+      "quote": "كل تاجر وكل شركة ملزمين بالتسجيل يجب عليهما ان يذكرا المكان الذي سجلا فيه ورقم هذا التسجيل في مراسلاتهما وفواتيرهما ومذكرات الايصاء(Notes de commande) والتعريفات والمناشير وسائر المطبوعات الصادرة عنهما."
     },
     {
-      "id": "a10",
+      "id": "k37",
       "law": 244586,
-      "article": "442",
-      "quote": "ان حق حامل الشك قي اقامة الدعوى على المظهرين والساحب وسائر الموجب عليهم يسقط بمرور ستة اشهر تبتدىء من نهاية مهلة العرض .\n\nاما حق الملزمين بايفاء الشك في مداعاة بعضهم لبعض فيسقط بمرور ستة اشهر تبتدىء من يوم دفع الموجب عليه مبلغ الشك او من يوم اقامة الدعوى عليه.\n\nعلى انه في حالة السقوط او مرور الزمن يبقى الحق في اقامة الدعوى على الساحب الذي لم يؤد المؤونة او على سائر الموجب عليهم الذين احرزوا كسبا غير مشروع.\n\nان حق حامل الشك ففي اقامة الدعوى على المسحوب عليه يسقط بمرور ثلاث سنوات تبتدىء من نهاية مهلة العرض ."
+      "article": "37",
+      "quote": "كل تاجر او وكيل شركة او مديرها لا يطلب في المهل المنصوص عليها اجراء القيود الاجبارية او لا يذكر ما يجب ذكره على المراسلات او الفواتير وغيرها من المطبوعات الصادرة عن محله يعاقب بغرامة من خمسين الى الف ليرة لبنانية.\n\nتحكم بهذه الغرامة المحكمة البدائية بناء على طلب الرئيس او القاضي الذي كلف السهر على سجل التجارة بعد سماع اقوال صاحب الشأن او دعوته حسب الاصول.\n\nوتأمر المحكمة باجراء القيد خلال خمسة عشر يوما واذا لم يجر في اثناء هذه المهلة فيحكم بضعف الغرامة التي حكم بها في المرة الاولى."
     },
     {
-      "id": "a11",
+      "id": "k38",
       "law": 244586,
-      "article": "398",
-      "quote": "كل ما ينشأ عن سند السحب من حقوق الادعاء على قابل السند يسقط بمرورثلاث سنوات ابتداء من تاريخ الاستحقاق .\n\nان حقوق حامل السند في الادعاء على المظهرين وعلى الساحب تسقط بمرور سنة ابتداء من تاريخ الاحتجاج المقام في المدة القانونية او ابتداء من تاريخ الاستحقاق اذا وجدت عبارة \"الاعادة بدون نفقة\".\n\nاما حقوق المظهرين في الادعاء بعضهم على بعض وعلى الساحب فتسقط بمرور ستة اشهر ابتداء من اليوم الذي دفع فيه المظهر مبلغ السند او من يوم اقامة الدعوى عليه."
+      "article": "38",
+      "quote": "كل بيان غير صحيح يقدم عن سوء نية للتسجيل او للقيد في سجل التجارة يعاقب بغرامة من مايتين وخمسين ليرة لبنانية الى خمسة الاف ليرة وبالحبس من شهر واحد الى ستة اشهر او احدى هاتين العقوبتين فقط."
     },
     {
-      "id": "a12",
+      "id": "k44",
       "law": 244586,
-      "article": "489",
-      "quote": "مع الاحتفاظ بتطبيق احكام الباب السابق يعتبر في حالة الافلاس كل تاجر ينقطع عن دفع ديونه التجارية, وكل تاجر لا يدعم الثقة المالية به الا بوسائل يظهر بجلاء انها غير مشروعة."
+      "article": "44",
+      "quote": "ان الصكوك التأسيسية لجميع الشركات التجارية - ما عدا شركات المحاصة - يجب نشرها باجراء المعاملات المبينة فيما يلي والا كانت باطلة."
     },
     {
-      "id": "a13",
+      "id": "k45",
       "law": 244586,
-      "article": "490",
-      "quote": "يعلن الافلاس بمقتضى حكم من المحكمة الابتدائية الموجودة في منطقتها المؤسسة التجارية الاصلية. ويكون هذا الحكم معجل التنفيذ."
+      "article": "45",
+      "quote": "ان الاشخاص الذين عملوا باسم شركة قيد التأسيس قبل اكتسابها الشخصية المعنوية يعتبرون مسؤولين شخصيا بالتضامن في ما بينهم عن الاعمال المنفذة ما لم تأخذ الشركة على عاتقها هذه الاعمال بعد تأسيسها وعندئذ تعتبر تلك الاعمال مقررة من قبل الشركة منذ حصولها."
     },
     {
-      "id": "a14",
+      "id": "k48",
       "law": 244586,
-      "article": "491",
-      "quote": "يجوز ان ترفع القضية الى المحكمة بتصريح من التاجر نفسه, ويجب عليه ان يقوم بهذا التصريح في خلال عشرين يوما من تاريخ انقطاعه عن الدفع والا استهدف لارتكاب جنحة الافلاس التقصيري وعليه ان يودع في الوقت نفسه موازنة مفصلة ومصدق على كونها مطابقة لحالة موجوداته والديون المطلوبة منه."
+      "article": "48",
+      "quote": "يجب في خلال الشهر الذي تتأسس فيه الشركة ان تودع صورة او نسخة من الصك التأسيسي لدى قلم المحكمة البدائية في منطقة مركز الشركة."
+    },
+    {
+      "id": "k49",
+      "law": 244586,
+      "article": "49",
+      "quote": "ويجب ايضا في خلال المهلة نفسها ان تسجل الشركة في السجل التجاري المختص بمنطقة مركزها ويكون هذا النشر موجزا ومشتملا على جميع المعلومات التي تهم معرفتها الغير وخصوصا:\n\n(1) اسم كل من الشركاء وشهرته وجنسيته ومحل اقامته وعنوان الشركة.\n\n(2) شكل الشركة.\n\n(3) موضوعها.\n\n(4) مركزها الاصلي ومراكز فروعها ووكالاتها .\n\n(5) مبلغ رأس مالها والقيمة المنسوبة الى مقدمات الشركاء العينية,\n\n(6) اسماء الشركاء واسماء المفوضين الذين يوقعون عن الشركة.\n\n(7) تاريخ التأسيس ومدة الشركة."
+    },
+    {
+      "id": "k79",
+      "law": 244586,
+      "article": "79",
+      "quote": "لا يجوز ان يقل عدد المؤسسين عن ثلاثة, ويمنع على اي شخص ان يشترك في تأسيس شركة مغفلة اذا كان قد اعلن افلاسه ولم يستعد اعتباره منذ عشر سنوات على الاقل او اذا كان محكوما عليه في لبنان او في الخارج منذ اقل من عشر سنوات لارتكابه او لمحاولة ارتكابه جناية او جنحة تطبق عليها عقوبات الاحتيال او اختلاس اموال او قيم او اصدار شيكات دون مؤونة عن سوء نية او النيل من مكانة الدولة المالية بمعنى المادتين 319 و320 من قانون العقوبات او اخفاء الاشياء المحصول عليها بواسطة هذه الجرائم."
+    },
+    {
+      "id": "k80",
+      "law": 244586,
+      "article": "80",
+      "quote": "مع مراعاة احكام القوانين والانظمة التي تخضع ممارسة بعض النشاطات لترخيص مسبق لا يحتاج تأسيس الشركات المغفلة الى ترخيص.\n\nويجب ان يودع ويسجل نظام الشركة المغفلة وكل تعديل لاحق له لدى اي كاتب عدل على الاراضي اللبنانية."
+    },
+    {
+      "id": "k83",
+      "law": 244586,
+      "article": "83",
+      "quote": "لا يجوز ان يكون رأس مال الشركة المغفلة اقل من ثلاثين مليون ليرة لبنانية ويجب الاكتتاب به كاملا."
+    },
+    {
+      "id": "k84",
+      "law": 244586,
+      "article": "84",
+      "quote": "ان الثمن الادنى للسهم الواحد هو الف ليرة لبنانية، وعلى كل مكتتب ان يعجل مبلغ الربع على الاقل من القيمة الاسمية لكل سهم يكتتب به."
+    },
+    {
+      "id": "k85",
+      "law": 244586,
+      "article": "85",
+      "quote": "يجب على المؤسسين ان يودعوا المبالغ المدفوعة من المكتتبين قبل تأليف الشركة بوجه نهائي, احد المصارف المقبولة من الحكومة حسابا مفتوحا باسم الشركة مع جدول بالمكتتبين والمبلغ المدفوع من كل منهم."
+    },
+    {
+      "id": "k93",
+      "law": 244586,
+      "article": "93",
+      "quote": "تعين الجمعية المشار اليها اعضاء مجلس الادارة الاول اذا كانوا لم يعينوا بمقتضى نظام الشركة وتعين ايضا مفوضي المراقبة الاولين. وتصبح الشركة مؤسسة منذ قبولهم."
+    },
+    {
+      "id": "s2",
+      "law": 244904,
+      "article": "2",
+      "quote": "تخضع الشركة المحدودة المسؤولية للقوانين والاعراف التجارية والاحكام المعينة بهذا المرسوم الاشتراعي.\n\nوتثبت هذه الشركة بسند رسمي او سند عادي وتسجل في السجل التجاري."
+    },
+    {
+      "id": "s5",
+      "law": 244904,
+      "article": "5",
+      "quote": "تؤلف هذه الشركة من شخص واحد، يطلق عليه تسمية الشريك الوحيد، او اكثر على ان لا يتجاوز عدد الشركاء العشرين الا في حالة انتقال الحصص بالإرث."
+    },
+    {
+      "id": "s7",
+      "law": 244904,
+      "article": "7",
+      "quote": "لا يجوز ان يقل رأس مال الشركة المحدودة المسؤولية عن خمسة ملايين ليرة لبنانية ويوزع رأس المال مهما كان مقداره الى حصص متساوية."
+    },
+    {
+      "id": "s8",
+      "law": 244904,
+      "article": "8",
+      "quote": "لا تعتبر الشركة مؤسسة بصورة نهائية إلا بعد توزيع الحصص بين الشركاء وتعيين عدد حصص كل منهم او حصرها في الشريك الوحيد وتحرير قيمتها بكاملها وايداع المبالغ المدفوعة في احد المصارف.\n\nيجب ان يعلن المؤسسون صراحة في نظام الشركة أن جميع هذه الشروط قد توفرت.\n\nلا يجوز لمدير الشركة ان يسحب المبالغ المودعة قبل تسجيل الشركة في السجل التجاري.\n\nوإذا لم يتم هذا التسجيل في مهلة ستة اشهر من تاريخ أول إيداع جاز لكل من الشركاء الالتجاء الى قاضي الامور المستعجلة بطلب الترخيص له باسترداد ما دفعه."
+    },
+    {
+      "id": "s11",
+      "law": 244904,
+      "article": "11",
+      "quote": "ما خلا موجب تسجيل الشركات المحدودة المسؤولية في السجل المختص، لا تخضع الشركة المحدودة المسؤولية عند التأسيس لأية قواعد نشر أخرى."
     }
   ],
   "en": {
-    "title": "Lebanese Code of Commerce: merchants, companies, cheques and bankruptcy",
-    "question": "What does the Lebanese Code of Commerce say about who is a merchant, registration, companies, cheques and bills of exchange, and bankruptcy?",
-    "description": "What the Lebanese Code of Commerce says about merchants, registration, books, companies, cheques, bills of exchange and bankruptcy.",
+    "title": "What does Lebanon's Code of Commerce say about registering a company?",
+    "question": "What does Lebanon's Code of Commerce say about registering a company in the commercial register: the deadline, the documents, the minimum capital and the penalties?",
+    "description": "Lebanon's Code of Commerce: register a company within the month after formation (Art. 26). An SAL needs 3 founders and LBP 30 million; an SARL LBP 5 million.",
     "answer": {
-      "text": "A merchant is a person whose profession is commercial acts or a company with a commercial object; petty traders are exempt from book duties. A merchant registers within 1 month and keeps books for 10 years; digital book-keeping becomes compulsory 2 years after Law 126 of 2019. A cheque is payable on sight and, if issued in Lebanon, presented within 8 days; a merchant who stops paying commercial debts is bankrupt.",
+      "text": "Under Article 26 of Lebanon's Code of Commerce (Legislative Decree 304 of 24 December 1942), a company with its head office in Lebanon must be entered in the commercial register for its area, and its legal representative must apply within the month after the company is formed, filing the founding deed and a summary of its partners, object, capital, managers and beneficial owners. A commercial company whose founding deed is not published this way is void (Article 44), and a late entry is fined 50 to 1,000 Lebanese pounds (Article 37). A joint-stock company (SAL) needs at least 3 founders and 30 million pounds of capital, and a limited liability company (SARL) 1 to 20 partners and 5 million pounds (Articles 79 and 83, and Articles 5 and 7 of Legislative Decree 35 of 1967).",
       "cites": [
-        "a1",
-        "a2",
-        "a3",
-        "a4",
-        "a5",
-        "a8",
-        "a9",
-        "a12"
+        "k26",
+        "k44",
+        "k37",
+        "k79",
+        "k83",
+        "s5",
+        "s7"
       ]
     },
     "sections": [
       {
-        "heading": "Who counts as a merchant?",
+        "heading": "Registering a company in Lebanon: deadlines, capital and fines",
         "paras": [
           {
-            "text": "Under Article 9, merchants are people whose profession is commercial acts and companies with a commercial object. A civil-object company formed as a joint-stock company or a partnership limited by shares has the merchant obligations in the chapters that follow. The Code's preventive composition and bankruptcy rules also apply to it.",
+            "text": "The deadlines are counted in months and days, and the capital minimums and fines are in Lebanese pounds fixed decades ago; Article 83 was last amended in 1992.",
             "cites": [
-              "a1"
+              "k26",
+              "k83"
             ]
-          },
-          {
-            "text": "Article 10 exempts small traders and simple crafts with low overheads, such as peddlers, day sellers and small carriers, from book duties and publicity rules.",
-            "cites": [
-              "a2"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "How does a merchant register and keep books?",
-        "paras": [
-          {
-            "text": "A merchant registers within 1 month of opening or buying the establishment, under Article 24. He applies to the clerk of the court where it lies.",
-            "cites": [
-              "a3"
-            ]
-          },
-          {
-            "text": "Article 16 requires an annual inventory, closed accounts, a balance sheet and an income statement. Since Law 126 of 2019, it makes digital book-keeping compulsory 2 years after that law's issue. Article 19 requires books to be kept for 10 years after closing. Article 10 exempts petty traders from these book duties.",
-            "cites": [
-              "a4",
-              "a5",
-              "a2"
-            ]
-          },
-          {
-            "text": "We do not hold the decree on digital standards or the date digital books became compulsory.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "How does a company register, and are partners merchants?",
-        "paras": [
-          {
-            "text": "Under Article 26, a company with its head office in Lebanon registers in that area's commercial register. Its legal representative applies within the month after formation.",
-            "cites": [
-              "a6"
-            ]
-          },
-          {
-            "text": "Under Article 53, each partner in a general partnership is a merchant. The partnership's bankruptcy entails each partner's personal bankruptcy.",
-            "cites": [
-              "a7"
-            ]
-          },
-          {
-            "text": "This page does not cover company capital. The Code articles we hold do not regulate limited liability companies (SARL).",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "When is a cheque paid, and how long do you have to present it?",
-        "paras": [
-          {
-            "text": "Article 425 makes a cheque payable on sight, and any contrary clause is void. A cheque presented before its stated issue date is payable on the day of presentation.",
-            "cites": [
-              "a8"
-            ]
-          },
-          {
-            "text": "Article 426 sets the presentation period for a cheque payable in Lebanon by its place of issue.",
-            "cites": [
-              "a9"
-            ]
-          },
-          {
-            "text": "We do not hold the Penal Code rules on a cheque without funds.",
-            "note": true
           }
         ],
         "table": {
-          "caption": "Cheque presentation periods (Article 426)",
+          "caption": "Key figures for registering a company",
           "head": [
-            "Where the cheque was issued",
-            "Period"
+            "Rule",
+            "Figure"
           ],
           "rows": [
             {
               "cells": [
-                "Lebanon",
-                "8 days"
+                "Company with its head office in Lebanon",
+                "Apply for registration within the month after formation"
               ],
               "cites": [
-                "a9"
+                "k26"
               ]
             },
             {
               "cells": [
-                "A country bordering Lebanon or Syria, Europe, or a country on the Mediterranean coast",
-                "20 days"
+                "Any other entry with no set deadline",
+                "Within 1 month of the deed or act"
               ],
               "cites": [
-                "a9"
+                "k31"
               ]
             },
             {
               "cells": [
-                "Any other country",
-                "70 days"
+                "Joint-stock company (SAL): founders and capital",
+                "At least 3 founders; at least 30 million Lebanese pounds, fully subscribed"
               ],
               "cites": [
-                "a9"
+                "k79",
+                "k83"
+              ]
+            },
+            {
+              "cells": [
+                "SAL shares",
+                "At least 1,000 pounds a share; at least a quarter paid on subscription"
+              ],
+              "cites": [
+                "k84"
+              ]
+            },
+            {
+              "cells": [
+                "Limited liability company (SARL): partners and capital",
+                "1 to 20 partners; at least 5 million Lebanese pounds in equal shares"
+              ],
+              "cites": [
+                "s5",
+                "s7"
+              ]
+            },
+            {
+              "cells": [
+                "SARL not registered within 6 months of the first bank deposit",
+                "Each partner may ask the urgent matters judge to recover his payment"
+              ],
+              "cites": [
+                "s8"
+              ]
+            },
+            {
+              "cells": [
+                "Late registration",
+                "Fine of 50 to 1,000 pounds; doubled if the entry is not made within 15 days of the court's order"
+              ],
+              "cites": [
+                "k37"
+              ]
+            },
+            {
+              "cells": [
+                "False statement made in bad faith",
+                "Fine of 250 to 5,000 pounds, 1 to 6 months in jail, or both"
+              ],
+              "cites": [
+                "k38"
               ]
             }
           ]
         }
       },
       {
-        "heading": "When do claims on a cheque or a bill of exchange lapse?",
+        "heading": "How do you register a company in the commercial register?",
         "paras": [
           {
-            "text": "A cheque holder's claims against endorsers, the drawer and other obligors lapse 6 months after the presentation period. Claims between obligors lapse 6 months from payment or suit. A claim still survives against a drawer who did not provide funds, or obligors unjustly enriched.",
+            "text": "The company's legal representative applies to the court registry for the area of the head office within the month after formation. He files a copy of the founding deed and a signed, stamped summary in 2 copies listing the partners and shareholders, the name, object, branches, managers and signatories, capital and contributions, start and end dates, company type, the lease or title for the head office, and the beneficial owners.",
             "cites": [
-              "a10"
+              "k26"
             ]
           },
           {
-            "text": "A cheque holder's claim against the drawee lapses 3 years after the presentation period. Article 398 bars claims on a bill of exchange against the acceptor 3 years from maturity.",
+            "text": "In the same month, a copy of the founding deed is deposited with the registry of the court of first instance, and the register entry gives third parties the key facts: partners, form, object, seat and branches, capital, signatories, date of formation and duration.",
             "cites": [
-              "a10",
-              "a11"
+              "k48",
+              "k49"
             ]
           },
           {
-            "text": "A bill holder's claims against endorsers and the drawer lapse 1 year from a timely protest. Under a “return without expenses” clause, that year runs from maturity. Endorsers' claims against each other and the drawer lapse 6 months from payment or suit.",
+            "text": "Later changes, including new directors and board members, must also be entered. Every registered company must show where it is registered and its number on letters, invoices and other printed papers.",
             "cites": [
-              "a11"
+              "k27",
+              "k36"
             ]
           }
         ]
       },
       {
-        "heading": "When is a merchant bankrupt, and who declares it?",
+        "heading": "What does a joint-stock company (SAL) need?",
         "paras": [
           {
-            "text": "Under Article 489, a merchant who stops paying commercial debts is bankrupt. So is a merchant who supports his credit only by plainly illegitimate means. The article applies subject to the preceding chapter of the Code, which the texts we hold do not include.",
+            "text": "An SAL needs at least 3 founders. No one may be a founder who was declared bankrupt and has not been rehabilitated for at least 10 years, or who was convicted in the last 10 years of fraud, embezzlement, issuing cheques without funds in bad faith, or related offences.",
             "cites": [
-              "a12"
+              "k79"
             ]
           },
           {
-            "text": "Under Article 490, the court of first instance for the main establishment declares bankruptcy by a provisionally enforceable judgment. Under Article 491, a merchant must declare stopping payment within 20 days, or face the misdemeanour of simple bankruptcy. He files a detailed, certified balance sheet.",
+            "text": "No licence is needed to form an SAL unless its activity needs prior authorisation, and its statutes and every amendment are deposited and registered with any notary in Lebanon.",
             "cites": [
-              "a13",
-              "a14"
+              "k80"
             ]
           },
           {
-            "text": "This page does not cover creditor petitions, the judgment's effects or acts void against creditors.",
+            "text": "Its capital must be at least 30 million Lebanese pounds and fully subscribed; a share costs at least 1,000 pounds, and each subscriber pays at least a quarter of its nominal value. The money is held in a bank account in the company's name, and the company is formed when the first board members and auditors accept their posts.",
+            "cites": [
+              "k83",
+              "k84",
+              "k85",
+              "k93"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What does a limited liability company (SARL) need?",
+        "paras": [
+          {
+            "text": "An SARL is set up by an official or ordinary deed and entered in the commercial register, which is the only publicity it needs at formation (Articles 2 and 11 of Legislative Decree 35 of 1967).",
+            "cites": [
+              "s2",
+              "s11"
+            ]
+          },
+          {
+            "text": "It has 1 partner or more, up to 20 except when shares pass by inheritance, and a capital of at least 5 million Lebanese pounds divided into equal shares.",
+            "cites": [
+              "s5",
+              "s7"
+            ]
+          },
+          {
+            "text": "It is formed only once the shares are allotted and fully paid and the money is deposited in a bank. The manager may not withdraw the deposit before registration, and if the company is not registered within 6 months of the first deposit, each partner may ask the urgent matters judge to let him recover his payment.",
+            "cites": [
+              "s8"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What happens if a company is not registered?",
+        "paras": [
+          {
+            "text": "The founding deeds of every commercial company except a joint venture must be published through these steps, or the company is void (Article 44).",
+            "cites": [
+              "k44"
+            ]
+          },
+          {
+            "text": "People who act in the name of a company before it acquires legal personality are personally and jointly liable for those acts, unless the company takes them over once formed.",
+            "cites": [
+              "k45"
+            ]
+          },
+          {
+            "text": "A company agent or manager who does not request a compulsory entry in time is fined 50 to 1,000 Lebanese pounds; the court orders the entry within 15 days and doubles the fine if it is not made. A false statement made in bad faith is punished by a fine of 250 to 5,000 pounds, 1 to 6 months in jail, or both.",
+            "cites": [
+              "k37",
+              "k38"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What this page does not cover",
+        "paras": [
+          {
+            "text": "The capital minimums and fines are old Lebanese pound amounts, worth very little since the currency collapse after 2019; this page does not say whether a later text updated them.",
+            "note": true
+          },
+          {
+            "text": "This page does not cover partnerships, branches of foreign companies, registration fees, or the decrees that set the register's forms and fees.",
             "note": true
           }
         ]
@@ -274,183 +359,226 @@
     ]
   },
   "ar": {
-    "title": "قانون التجارة البرية اللبناني: التاجر والشركات والشيك والإفلاس",
-    "question": "ماذا يقول قانون التجارة البرية اللبناني عن صفة التاجر والسجل التجاري والشركات والشيك وسند السحب والإفلاس؟",
-    "description": "ما يقوله قانون التجارة البرية عن التاجر والتسجيل والدفاتر والشركات والشيك وسند السحب والإفلاس.",
+    "title": "ماذا يقول قانون التجارة البرية اللبناني عن تسجيل الشركات؟",
+    "question": "ماذا يقول قانون التجارة البرية اللبناني عن تسجيل الشركة في السجل التجاري: المهلة والمستندات والحد الأدنى لرأس المال والعقوبات؟",
+    "description": "قانون التجارة البرية: تسجل الشركة خلال الشهر الذي يلي تأسيسها (المادة 26)، وتحتاج الشركة المغفلة إلى 3 مؤسسين و30 مليون ليرة، والمحدودة المسؤولية إلى 5 ملايين.",
     "answer": {
-      "text": "التاجر هو من تكون مهنته القيام بأعمال تجارية، أو الشركة التي يكون موضوعها تجاريا، ولا يخضع صغار التجار لموجبات الدفاتر. ويسجل التاجر اسمه خلال شهر ويحفظ دفاتره 10 سنوات، ويصبح مسك الدفاتر بالتطبيق الرقمي إلزاميا بعد سنتين من صدور القانون رقم 126 لعام 2019. والشيك قابل للإيفاء لدى الاطلاع، ويعرض خلال 8 أيام إذا صدر في لبنان، ويعد مفلسا التاجر الذي ينقطع عن دفع ديونه التجارية.",
+      "text": "بموجب المادة 26 من قانون التجارة البرية (المرسوم الاشتراعي رقم 304 تاريخ 24 كانون الأول 1942)، يجب تسجيل الشركة التي لها مركز رئيسي في لبنان في سجل التجارة المختص بمنطقة مركزها، وعلى ممثلها القانوني أن يطلب التسجيل خلال الشهر الذي يلي تأسيسها، مقدماً صك التأسيس وخلاصة عنه تتضمن الشركاء والموضوع ورأس المال والمديرين وأصحاب الحق الاقتصادي. والشركة التجارية التي لا تنشر صكوكها التأسيسية على هذا الوجه باطلة (المادة 44)، ويعاقب التأخر في القيد بغرامة من 50 إلى 1,000 ليرة لبنانية (المادة 37). وتحتاج الشركة المغفلة إلى 3 مؤسسين على الأقل ورأسمال لا يقل عن 30 مليون ليرة، والشركة المحدودة المسؤولية إلى شريك واحد حتى 20 شريكاً ورأسمال لا يقل عن 5 ملايين ليرة (المادتان 79 و83، والمادتان 5 و7 من المرسوم الاشتراعي رقم 35 لعام 1967).",
       "cites": [
-        "a1",
-        "a2",
-        "a3",
-        "a4",
-        "a5",
-        "a8",
-        "a9",
-        "a12"
+        "k26",
+        "k44",
+        "k37",
+        "k79",
+        "k83",
+        "s5",
+        "s7"
       ]
     },
     "sections": [
       {
-        "heading": "من هو التاجر؟",
+        "heading": "تسجيل الشركة في لبنان: المهل ورأس المال والغرامات",
         "paras": [
           {
-            "text": "تنص المادة 9 على أن التجار هم الأشخاص الذين تكون مهنتهم القيام بأعمال تجارية، والشركات التي يكون موضوعها تجاريا. والشركة ذات الموضوع المدني التي تتخذ شكل الشركة المغفلة أو شركة التوصية المساهمة تخضع لموجبات التجار الواردة في الفصلين التاليين. وتسري عليها كذلك أحكام الصلح الاحتياطي والإفلاس في هذا القانون.",
+            "text": "تحسب المهل بالأشهر والأيام، أما الحد الأدنى لرأس المال والغرامات فبالليرة اللبنانية وفق مبالغ حُددت منذ عقود، وآخر تعديل للمادة 83 يعود إلى عام 1992.",
             "cites": [
-              "a1"
+              "k26",
+              "k83"
             ]
-          },
-          {
-            "text": "تعفي المادة 10 من يتعاطى تجارة صغيرة أو حرفة بسيطة ذات نفقات عامة زهيدة، كالبائع الطواف والبائع بالمياومة وأصحاب النقليات الصغيرة، من موجبات الدفاتر التجارية وقواعد النشر.",
-            "cites": [
-              "a2"
-            ]
-          }
-        ]
-      },
-      {
-        "heading": "كيف يسجل التاجر اسمه ويمسك دفاتره؟",
-        "paras": [
-          {
-            "text": "يسجل التاجر اسمه في سجل التجارة خلال شهر من فتح المحل أو شرائه، وفق المادة 24. ويقدم الطلب إلى كاتب المحكمة التي يقع المحل الرئيسي في منطقتها.",
-            "cites": [
-              "a3"
-            ]
-          },
-          {
-            "text": "توجب المادة 16 إجراء جردة سنوية وإيقاف الحسابات ووضع الميزانية وحساب النتيجة. ومنذ تعديلها بالقانون رقم 126 لعام 2019، يصبح مسك الدفاتر بالتطبيق الرقمي إلزاميا بعد سنتين من صدور هذا القانون. وتوجب المادة 19 حفظ الدفاتر 10 سنوات بعد اختتامها. ولا تسري موجبات الدفاتر هذه على صغار التجار المذكورين في المادة 10.",
-            "cites": [
-              "a4",
-              "a5",
-              "a2"
-            ]
-          },
-          {
-            "text": "لا نملك المرسوم الذي يحدد معايير التطبيق الرقمي، والنصوص المتوفرة لدينا لا تبيّن تاريخ بدء إلزامية الدفاتر الرقمية.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "كيف تسجل الشركة، وهل الشريك تاجر؟",
-        "paras": [
-          {
-            "text": "توجب المادة 26 تسجيل الشركة التي لها مركز رئيسي في لبنان في سجل التجارة لمنطقة مركزها. ويطلب ممثلها القانوني التسجيل خلال الشهر الذي يلي تأسيسها.",
-            "cites": [
-              "a6"
-            ]
-          },
-          {
-            "text": "تنص المادة 53 على أن كل شريك في شركة التضامن يكتسب صفة التاجر. وإفلاس الشركة يؤدي إلى الإفلاس الشخصي لكل من الشركاء.",
-            "cites": [
-              "a7"
-            ]
-          },
-          {
-            "text": "لا تتناول هذه الصفحة رأسمال الشركات. ومواد القانون المتوفرة لدينا لا تنظم الشركة المحدودة المسؤولية.",
-            "note": true
-          }
-        ]
-      },
-      {
-        "heading": "متى يدفع الشيك، وما مهلة عرضه؟",
-        "paras": [
-          {
-            "text": "تنص المادة 425 على أن الشيك، ويسميه القانون «الشك»، قابل للإيفاء لدى الاطلاع، وكل شرط مخالف يعد لغوا. والشيك الذي يقدم قبل التاريخ المكتوب فيه للإصدار يدفع في يوم عرضه.",
-            "cites": [
-              "a8"
-            ]
-          },
-          {
-            "text": "تحدد المادة 426 مهلة عرض الشيك القابل للإيفاء في لبنان بحسب مكان إصداره.",
-            "cites": [
-              "a9"
-            ]
-          },
-          {
-            "text": "لا نملك نصوص قانون العقوبات المتعلقة بالشيك بلا مؤونة.",
-            "note": true
           }
         ],
         "table": {
-          "caption": "مهل عرض الشيك (المادة 426)",
+          "caption": "أبرز الأرقام في تسجيل الشركة",
           "head": [
-            "مكان إصدار الشيك",
-            "المهلة"
+            "القاعدة",
+            "الرقم"
           ],
           "rows": [
             {
               "cells": [
-                "لبنان",
-                "8 أيام"
+                "شركة لها مركز رئيسي في لبنان",
+                "طلب التسجيل خلال الشهر الذي يلي تأسيسها"
               ],
               "cites": [
-                "a9"
+                "k26"
               ]
             },
             {
               "cells": [
-                "بلد متاخم للبنان أو لسوريا، أو أوروبا، أو بلد على شاطئ البحر المتوسط",
-                "20 يوما"
+                "أي قيد آخر لم تحدد له مهلة",
+                "خلال شهر من تاريخ الصك أو العمل"
               ],
               "cites": [
-                "a9"
+                "k31"
               ]
             },
             {
               "cells": [
-                "أي بلد آخر",
-                "70 يوما"
+                "الشركة المغفلة (ش.م.ل.): المؤسسون ورأس المال",
+                "3 مؤسسين على الأقل، ورأسمال لا يقل عن 30 مليون ليرة لبنانية مكتتب به كاملاً"
               ],
               "cites": [
-                "a9"
+                "k79",
+                "k83"
+              ]
+            },
+            {
+              "cells": [
+                "أسهم الشركة المغفلة",
+                "ألف ليرة على الأقل للسهم، ويعجّل المكتتب الربع على الأقل"
+              ],
+              "cites": [
+                "k84"
+              ]
+            },
+            {
+              "cells": [
+                "الشركة المحدودة المسؤولية (ش.م.م.): الشركاء ورأس المال",
+                "من شريك واحد حتى 20 شريكاً، ورأسمال لا يقل عن 5 ملايين ليرة لبنانية بحصص متساوية"
+              ],
+              "cites": [
+                "s5",
+                "s7"
+              ]
+            },
+            {
+              "cells": [
+                "عدم تسجيل الشركة المحدودة المسؤولية خلال 6 أشهر من أول إيداع",
+                "يحق لكل شريك مراجعة قاضي الأمور المستعجلة لاسترداد ما دفعه"
+              ],
+              "cites": [
+                "s8"
+              ]
+            },
+            {
+              "cells": [
+                "التأخر في القيد",
+                "غرامة من 50 إلى 1,000 ليرة، وتضاعف إذا لم يجرِ القيد خلال 15 يوماً من أمر المحكمة"
+              ],
+              "cites": [
+                "k37"
+              ]
+            },
+            {
+              "cells": [
+                "بيان غير صحيح عن سوء نية",
+                "غرامة من 250 إلى 5,000 ليرة والحبس من شهر إلى 6 أشهر، أو إحدى العقوبتين"
+              ],
+              "cites": [
+                "k38"
               ]
             }
           ]
         }
       },
       {
-        "heading": "متى تسقط الدعاوى الناشئة عن الشيك وسند السحب؟",
+        "heading": "كيف تسجل الشركة في السجل التجاري؟",
         "paras": [
           {
-            "text": "يسقط حق حامل الشيك في الدعوى على المظهرين والساحب وسائر الموجب عليهم بمرور 6 أشهر من نهاية مهلة العرض. ويسقط حق الملزمين بعضهم تجاه بعض بمرور 6 أشهر من يوم الدفع أو من يوم إقامة الدعوى. ويبقى الحق قائما على الساحب الذي لم يؤد المؤونة، وعلى من أحرز كسبا غير مشروع.",
+            "text": "يطلب ممثل الشركة القانوني التسجيل لدى قلم المحكمة في منطقة المركز الرئيسي خلال الشهر الذي يلي التأسيس. ويقدم نسخة عن صك التأسيس وخلاصة عنه على نسختين، موقعة ومشتملة على الطوابع، تتضمن الشركاء والمساهمين، واسم الشركة وموضوعها وفروعها، والمرخص لهم بالإدارة والتوقيع، ورأس المال والمقدمات، وتاريخي الابتداء والانتهاء، ونوع الشركة، وعقد إيجار المركز أو سند إشغاله، وأصحاب الحق الاقتصادي.",
             "cites": [
-              "a10"
+              "k26"
             ]
           },
           {
-            "text": "يسقط حق حامل الشيك في الدعوى على المسحوب عليه بمرور 3 سنوات من نهاية مهلة العرض. وتسقط بموجب المادة 398 حقوق الادعاء على قابل سند السحب بمرور 3 سنوات من تاريخ الاستحقاق.",
+            "text": "وفي الشهر نفسه تودع نسخة عن صك التأسيس لدى قلم المحكمة البدائية، ويتضمن القيد في السجل ما يهم الغير معرفته: الشركاء، وشكل الشركة، وموضوعها، ومركزها وفروعها، ورأسمالها، والمفوضين بالتوقيع، وتاريخ التأسيس ومدة الشركة.",
             "cites": [
-              "a10",
-              "a11"
+              "k48",
+              "k49"
             ]
           },
           {
-            "text": "يسقط حق حامل سند السحب في الادعاء على المظهرين والساحب بمرور سنة من الاحتجاج المقام في المدة القانونية. وإذا تضمن السند عبارة «الإعادة بدون نفقة» تبدأ السنة من تاريخ الاستحقاق. وتسقط حقوق المظهرين بعضهم على بعض وعلى الساحب بمرور 6 أشهر من يوم الدفع أو من يوم إقامة الدعوى.",
+            "text": "ويجب قيد التعديلات اللاحقة أيضاً، ومنها أسماء المديرين وأعضاء مجلس الإدارة. وعلى كل شركة مسجلة أن تذكر مكان تسجيلها ورقمه في مراسلاتها وفواتيرها وسائر مطبوعاتها.",
             "cites": [
-              "a11"
+              "k27",
+              "k36"
             ]
           }
         ]
       },
       {
-        "heading": "متى يكون التاجر مفلسا، ومن يعلن إفلاسه؟",
+        "heading": "ماذا تحتاج الشركة المغفلة (ش.م.ل.)؟",
         "paras": [
           {
-            "text": "تعد المادة 489 في حالة الإفلاس كل تاجر ينقطع عن دفع ديونه التجارية. وكذلك التاجر الذي لا يدعم الثقة المالية به إلا بوسائل يظهر بجلاء أنها غير مشروعة. ويطبق ذلك مع الاحتفاظ بأحكام الباب السابق من القانون، والنصوص المتوفرة لدينا لا تتضمنه.",
+            "text": "لا يجوز أن يقل عدد المؤسسين عن 3. ويمنع الاشتراك في التأسيس على من أعلن إفلاسه ولم يستعد اعتباره منذ 10 سنوات على الأقل، أو حكم عليه منذ أقل من 10 سنوات بجرائم كالاحتيال أو الاختلاس أو إصدار شيكات دون مؤونة عن سوء نية.",
             "cites": [
-              "a12"
+              "k79"
             ]
           },
           {
-            "text": "تعلن الإفلاس، وفق المادة 490، المحكمة الابتدائية التي تقع المؤسسة التجارية الأصلية في منطقتها، بحكم معجل التنفيذ. وتوجب المادة 491 على التاجر أن يصرح بانقطاعه عن الدفع خلال 20 يوما، وإلا استهدف لجنحة الإفلاس التقصيري. ويودع معه موازنة مفصلة ومصدقة.",
+            "text": "ولا يحتاج تأسيس الشركة المغفلة إلى ترخيص، ما لم يكن نشاطها خاضعاً لترخيص مسبق، ويجب إيداع نظامها وكل تعديل لاحق له وتسجيله لدى أي كاتب عدل في لبنان.",
             "cites": [
-              "a13",
-              "a14"
+              "k80"
             ]
           },
           {
-            "text": "لا تتناول هذه الصفحة طلب الدائنين إعلان الإفلاس، ولا آثار حكم الإفلاس، ولا الأعمال الباطلة تجاه جماعة الدائنين.",
+            "text": "ولا يجوز أن يقل رأسمالها عن 30 مليون ليرة لبنانية مكتتب به كاملاً، والثمن الأدنى للسهم ألف ليرة، ويعجّل كل مكتتب الربع على الأقل من قيمته الاسمية. وتودع المبالغ في حساب مصرفي باسم الشركة، وتصبح الشركة مؤسسة منذ قبول أعضاء مجلس الإدارة الأول ومفوضي المراقبة الأولين.",
+            "cites": [
+              "k83",
+              "k84",
+              "k85",
+              "k93"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا تحتاج الشركة المحدودة المسؤولية (ش.م.م.)؟",
+        "paras": [
+          {
+            "text": "تثبت الشركة المحدودة المسؤولية بسند رسمي أو عادي وتسجل في السجل التجاري، وهذا التسجيل هو قاعدة النشر الوحيدة عند تأسيسها (المادتان 2 و11 من المرسوم الاشتراعي رقم 35 لعام 1967).",
+            "cites": [
+              "s2",
+              "s11"
+            ]
+          },
+          {
+            "text": "وتؤلف من شريك واحد أو أكثر، على ألا يتجاوز عدد الشركاء 20 إلا في حالة انتقال الحصص بالإرث، ولا يقل رأسمالها عن 5 ملايين ليرة لبنانية موزعة على حصص متساوية.",
+            "cites": [
+              "s5",
+              "s7"
+            ]
+          },
+          {
+            "text": "ولا تعتبر مؤسسة نهائياً إلا بعد توزيع الحصص وتحرير قيمتها كاملة وإيداع المبالغ في أحد المصارف. ولا يجوز للمدير سحب المبالغ المودعة قبل التسجيل، وإذا لم يتم التسجيل خلال 6 أشهر من أول إيداع، جاز لكل شريك مراجعة قاضي الأمور المستعجلة لاسترداد ما دفعه.",
+            "cites": [
+              "s8"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ماذا يحصل إذا لم تسجل الشركة؟",
+        "paras": [
+          {
+            "text": "يجب نشر الصكوك التأسيسية لجميع الشركات التجارية، ما عدا شركات المحاصة، بإجراء هذه المعاملات، وإلا كانت باطلة (المادة 44).",
+            "cites": [
+              "k44"
+            ]
+          },
+          {
+            "text": "والأشخاص الذين عملوا باسم شركة قيد التأسيس قبل اكتسابها الشخصية المعنوية مسؤولون شخصياً وبالتضامن عن تلك الأعمال، ما لم تأخذها الشركة على عاتقها بعد تأسيسها.",
+            "cites": [
+              "k45"
+            ]
+          },
+          {
+            "text": "ويعاقب وكيل الشركة أو مديرها الذي لا يطلب القيود الإجبارية في مهلها بغرامة من 50 إلى 1,000 ليرة لبنانية، وتأمر المحكمة بإجراء القيد خلال 15 يوماً وإلا ضوعفت الغرامة. ويعاقب البيان غير الصحيح المقدم عن سوء نية بغرامة من 250 إلى 5,000 ليرة والحبس من شهر إلى 6 أشهر، أو بإحدى العقوبتين.",
+            "cites": [
+              "k37",
+              "k38"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما لا تتناوله هذه الصفحة",
+        "paras": [
+          {
+            "text": "الحد الأدنى لرأس المال والغرامات مبالغ قديمة بالليرة اللبنانية فقدت معظم قيمتها منذ انهيار العملة بعد 2019، ولا تبيّن هذه الصفحة ما إذا كان نص لاحق قد عدّلها.",
+            "note": true
+          },
+          {
+            "text": "ولا تتناول هذه الصفحة شركات الأشخاص وفروع الشركات الأجنبية ورسوم التسجيل، ولا المراسيم التي تحدد نماذج السجل ورسومه.",
             "note": true
           }
         ]
