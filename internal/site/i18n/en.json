@@ -488,7 +488,7 @@
   "about.sources_h2": "Where the texts come from",
   "about.sources_p": "Every text here comes from the Lebanese University's Centre for Research and Studies in Legal Informatics (%s), which has catalogued Lebanese legislation, case law and doctrine since 1986. Each page links to the Centre's own record.",
   "about.what_h2": "What is here",
-  "about.what_p": "%s laws, decrees and decisions, %s of them with their full text so far (%s articles); %s court rulings; %s issues of the Official Gazette; %s legal opinions; %s agreements; and %s articles from legal periodicals. Full texts are still arriving from the Centre and are added as they come.",
+  "about.what_p": "%s laws, decrees and decisions, %s of them with their full text so far (%s articles); %s court rulings; %s issues of the Official Gazette; %s legal opinions; %s agreements; and %s articles from legal periodicals. Each of the others is listed with its number, date and title and links to the Centre's record. A nightly update adds new texts and changes from the Centre.",
   "about.not_h2": "What it is not",
   "about.not_p": "Information from published official texts, not legal advice. The Official Gazette remains the authoritative text: check it, or consult a qualified lawyer for your case. No lawyer or law firm reviews, endorses or stands behind this site.",
   "about.privacy_h2": "Privacy",
