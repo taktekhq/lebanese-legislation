@@ -47,7 +47,7 @@ func (s *Server) routes() {
 		m.HandleFunc("POST /search/ai/deep/{$}", s.aiDeepAnswer)
 	}
 	m.HandleFunc("GET /ul/uploads/images/{name...}", s.ulImage)
-	m.HandleFunc("GET /scan/{id}/{file}", s.scanFile)
+	m.HandleFunc("GET /scan/{id}/{file...}", s.scanRedirect)
 	s.seoRoutes()
 	s.apiRoutes()
 	s.mcpRoutes()
@@ -578,15 +578,6 @@ type Scan struct {
 	Pages     int
 	Agreement float64
 	Flagged   int
-}
-
-// PageNumbers counts the page images, from 1, for the template.
-func (c *Scan) PageNumbers() []int {
-	ns := make([]int, c.Pages)
-	for i := range ns {
-		ns[i] = i + 1
-	}
-	return ns
 }
 
 // AgreementPct is the share of words both readings agree on, in percent.

@@ -5,10 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"os"
-	"path/filepath"
-	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -16,34 +12,21 @@ import (
 // the Gazette's own pages (internal/build/scans.go). Their ids start here.
 const scanIDBase = 2_000_000_000
 
-// SetScans names the folder holding the page images: one subfolder per text,
-// named by its id at the source, with page-1.png … and source.pdf.
-func (s *Server) SetScans(dir string) { s.scanDir = dir }
-
-var scanFileName = regexp.MustCompile(`^(?:page-[0-9]{1,3}\.png|source\.pdf)$`)
-
-// scanFile serves a scanned text's page images and its PDF.
-func (s *Server) scanFile(w http.ResponseWriter, r *http.Request) {
+// scanRedirect sends old scan file URLs to the original PDF at the source.
+func (s *Server) scanRedirect(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(r)
-	file := r.PathValue("file")
-	if !ok || id < scanIDBase || s.scanDir == "" || !scanFileName.MatchString(file) {
+	if !ok {
 		s.notFound(w, r)
 		return
 	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-	var src int
-	if err := s.db.QueryRow(ctx, `SELECT source_id FROM legislation_scan WHERE law_id = $1`, id).Scan(&src); err != nil {
+	var sourceURL string
+	if err := s.db.QueryRow(ctx, `SELECT source_url FROM legislation_scan WHERE law_id = $1`, id).Scan(&sourceURL); err != nil {
 		s.notFound(w, r)
 		return
 	}
-	path := filepath.Join(s.scanDir, strconv.Itoa(src), file)
-	if _, err := os.Stat(path); err != nil {
-		s.notFound(w, r)
-		return
-	}
-	w.Header().Set("Cache-Control", "public, max-age=86400")
-	http.ServeFile(w, r, path)
+	http.Redirect(w, r, sourceURL, http.StatusMovedPermanently)
 }
 
 // aliasRedirect sends the old address of a scanned text, which the Centre
@@ -60,7 +43,7 @@ func (s *Server) aliasRedirect(ctx context.Context, w http.ResponseWriter, r *ht
 // marks shows a paragraph of a scanned text. Where the two readings differ
 // (U+E000 one U+E001 two U+E002) both are shown, highlighted, so a word one
 // reader got wrong never passes for the text: the reader settles it against
-// the page image. Text without marks comes out as plain escaped text.
+// the original PDF. Text without marks comes out as plain escaped text.
 func marks(p string) template.HTML {
 	if !strings.ContainsRune(p, '\uE000') {
 		return template.HTML(template.HTMLEscapeString(p))
@@ -87,7 +70,7 @@ func marks(p string) template.HTML {
 			two = "…"
 		}
 		fmt.Fprintf(&b, `<mark class="unsure" title="%s">%s<span class="unsure__or"> / </span>%s</mark>`,
-			template.HTMLEscapeString("قراءتان مختلفتان: راجع صورة الصفحة"), template.HTMLEscapeString(one), template.HTMLEscapeString(two))
+			template.HTMLEscapeString("قراءتان مختلفتان: راجع ملف PDF الأصلي"), template.HTMLEscapeString(one), template.HTMLEscapeString(two))
 		p = rest[j+len("\uE002"):]
 	}
 	b.WriteString(template.HTMLEscapeString(p))

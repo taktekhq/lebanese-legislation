@@ -27,7 +27,7 @@ See [architecture](architecture.md) and the [vectors example](reference.md#vecto
 The website is now the code LebaneseLegislation.com runs, not a copy from 30 October.
 
 - New on the website: the project journal (`/blog/`), topics on the home page, self-hosted fonts and the `-events` usage record with its `/ai/` sign-up form. The contribute page stays at `/contribute/`.
-- `web/` takes the flags and settings the hosted site uses (`-events`, `-scans`, `-official`, `-ruling-files`, `-noindex`, `-auth`, `POSTHOG_KEY`, `LEBLEG_SEARCH_PROVIDER`, `LEBLEG_VECTOR_DSN`). See [`web/README.md`](../web/README.md#flags-and-settings).
+- `web/` takes the flags and settings the hosted site uses (`-events`, `-official`, `-ruling-files`, `-noindex`, `-auth`, `POSTHOG_KEY`, `LEBLEG_SEARCH_PROVIDER`, `LEBLEG_VECTOR_DSN`). See [`web/README.md`](../web/README.md#flags-and-settings).
 - Browser analytics: the images set `ANALYTICS=off`, so a local copy sends nothing to Google Analytics or PostHog and its about page says so. The binary alone loads them, as LebaneseLegislation.com does.
 - All three services compress responses, use at most 8 database connections with JIT off, and finish requests in hand for 8 seconds on stop.
 - The images' defaults are unchanged: no rate limit, links to `http://localhost:8080`, no analytics. The binary alone defaults to the hosted site's (60 requests a minute, links to LebaneseLegislation.com).

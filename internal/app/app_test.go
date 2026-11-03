@@ -26,11 +26,11 @@ func TestFormerServeCommandLine(t *testing.T) {
 	t.Setenv("DATABASE_URL", "")
 	t.Setenv("LEBLEG_DSN", "")
 	cfg, err := parseFlags("website", []string{"serve", "-addr", "0.0.0.0:8765", "-events", "/var/lib/lebleg",
-		"-scans", "/scans", "-ruling-files", "/ruling-files", "-db", "host=postgres user=lebleg_web dbname=lebleg"}, io.Discard)
+		"-ruling-files", "/ruling-files", "-db", "host=postgres user=lebleg_web dbname=lebleg"}, io.Discard)
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := config{mode: "website", addr: "0.0.0.0:8765", events: "/var/lib/lebleg", scans: "/scans",
+	want := config{mode: "website", addr: "0.0.0.0:8765", events: "/var/lib/lebleg",
 		rulingFiles: "/ruling-files", dsn: "host=postgres user=lebleg_web dbname=lebleg"}
 	if cfg != want {
 		t.Fatalf("got %+v\nwant %+v", cfg, want)

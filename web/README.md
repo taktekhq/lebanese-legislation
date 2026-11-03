@@ -35,7 +35,6 @@ Every flag is optional. The same flags work for `api/` and `mcp/`, which serve o
 | `-db` | PostgreSQL connection string. Default `DATABASE_URL`, then `LEBLEG_DSN` |
 | `-addr` | Address to listen on. Default `LISTEN_ADDR`, then `127.0.0.1:8080` (`8000` for the API) |
 | `-events DIR` | Keep the anonymous usage record (search words and result counts, reads, AI sign-ups) in `DIR`, 90 days. Turns on the sign-up form on `/ai/`. `go run ./cmd/usage-stats -events DIR` adds up a day |
-| `-scans DIR` | Page images of texts read from Gazette scans |
 | `-official DIR` | Page images and PDFs of texts published from official scans |
 | `-ruling-files DIR` | Judgment PDFs, served at `/ruling-files/<id>.pdf` |
 | `-noindex` | Keep every page out of search engines |

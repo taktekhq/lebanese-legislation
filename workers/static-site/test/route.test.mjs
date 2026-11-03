@@ -18,8 +18,8 @@ test("only GET and HEAD for a page without a real query are served from files", 
   assert.equal(route("GET", "/law/1/", ""), "static");
   assert.equal(route("HEAD", "/en/decree/2/article/3/", ""), "static");
   assert.equal(route("POST", "/search/", ""), "origin");
-  assert.equal(route("GET", "/scan/2000000001/page-1.png", ""), "static");
-  assert.equal(route("HEAD", "/scan/2000000001/source.pdf", ""), "static");
+  assert.equal(route("GET", "/scan/2000000001/page-1.png", ""), "origin");
+  assert.equal(route("HEAD", "/scan/2000000001/source.pdf", ""), "origin");
   assert.equal(route("GET", "/law/1/", "?utm_source=chatgpt.com"), "static", "ChatGPT referrals stay off the origin");
   assert.equal(route("GET", "/law/1/", "?utm_source=chatgpt.com&gclid=x"), "static");
   assert.equal(route("GET", "/laws/", "?kind=decree"), "origin", "a filter is built by the origin");
