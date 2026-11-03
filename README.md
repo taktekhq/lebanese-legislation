@@ -41,7 +41,7 @@ The same image, `ghcr.io/taktekhq/lebanese-legislation-all`, runs in both. It ho
 |---|---|---|
 | Static pages | built by `static-site.yml` into Cloudflare R2, served by the Worker in `workers/static-site` | rendered on request by the `-all` image |
 | API, MCP, search | the Worker passes them to `-all` (Cloudflare Containers, blue/green, `workers/origin`) | `-all` directly |
-| Run it | `origin.yml` deploys it | `docker compose -f compose.dev.yaml up`, then open http://localhost:8080 |
+| Run it | `origin.yml` deploys it | `docker compose --profile all up all`, then open http://localhost:8080 |
 
 In development every page is rendered on request, which is slower than production but needs nothing besides the image. To get the exact static copy production serves, run `static-export` against the database: see [docs/static-export.md](docs/static-export.md).
 
