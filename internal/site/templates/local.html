@@ -17,24 +17,27 @@
     <h2>{{t "local.start_h2"}}</h2>
     <pre><code>git clone https://github.com/taktekhq/lebanese-legislation.git
 cd lebanese-legislation
-./start</code></pre>
+./setup
+docker compose --profile all up -d all</code></pre>
     <p>{{t "local.start_p"}}</p>
 
     <h2>{{t "local.open_h2"}}</h2>
     <ul>
       <li><strong>{{t "local.open_web"}}</strong>: <code>http://localhost:8080</code></li>
-      <li><strong>{{t "local.open_api"}}</strong>: <code>http://localhost:8000/api/v1/</code></li>
-      <li><strong>MCP</strong>: <code>http://localhost:8001/mcp</code></li>
+      <li><strong>{{t "local.open_api"}}</strong>: <code>http://localhost:8080/api/v1/</code></li>
+      <li><strong>MCP</strong>: <code>http://localhost:8080/mcp</code></li>
     </ul>
+    <p>{{t "local.split_p"}}</p>
+    <pre><code>docker compose up -d --wait db api mcp</code></pre>
     <p>{{t "local.mcp_p"}}</p>
-    <pre><code>claude mcp add --transport http lebanese-legislation-local http://localhost:8001/mcp</code></pre>
+    <pre><code>claude mcp add --transport http lebanese-legislation-local http://localhost:8080/mcp</code></pre>
     <p>{{t "local.ai_key_p"}}</p>
 
     <h2>{{t "local.images_h2"}}</h2>
     <ul class="local-images">
-      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db">{{t "resources.db_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-db:0.4.0</code></li>
-      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-api">{{t "resources.api_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-api:0.4.0</code></li>
-      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-mcp">{{t "resources.mcp_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-mcp:0.4.0</code></li>
+      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db">{{t "resources.db_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-db:latest</code></li>
+      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-api">{{t "resources.api_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-api:latest</code></li>
+      <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-mcp">{{t "resources.mcp_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-mcp:latest</code></li>
       <li><a class="link" href="https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-all">{{t "local.web_image"}}</a>: <code>ghcr.io/taktekhq/lebanese-legislation-all:latest</code></li>
     </ul>
     <p>{{t "local.images_p"}}</p>
