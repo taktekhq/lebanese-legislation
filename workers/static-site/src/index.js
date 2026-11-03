@@ -122,7 +122,12 @@ export default {
     if (!mcpPath && request.method !== "GET" && request.method !== "HEAD" && !(request.method === "POST" && postAllowed)) {
       return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: postAllowed ? "GET, HEAD, POST" : "GET, HEAD" } });
     }
-    if (/shapbot/i.test(request.headers.get("User-Agent") || "")) return new Response(null, { status: 429 });
+    // ShapBot (Parallel's search index, which AI search products read) may crawl
+    // the static pages; it stays off the one origin container, whose search,
+    // API and MCP its crawl rate overloaded on 13 Oct 2026.
+    if (/shapbot/i.test(request.headers.get("User-Agent") || "") && route(request.method, url.pathname, url.search) === "origin") {
+      return new Response(null, { status: 429 });
+    }
     if (env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY) {
       return originFetch(request, env, ctx);
     }
