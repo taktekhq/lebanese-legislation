@@ -50,7 +50,7 @@ In development every page is rendered on request, which is slower than productio
 ```sh
 git clone https://github.com/taktekhq/lebanese-legislation.git
 cd lebanese-legislation
-./start
+./setup
 ```
 
 You need Docker Compose, 8 GB of free memory and 30 GB of free disk. The database image already holds both databases. The first start copies them into an empty volume; later starts reuse it. The website uses the all-in-one image with its own baked database.

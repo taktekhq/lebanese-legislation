@@ -1,4 +1,4 @@
-# The database, API, MCP server and website. Run ./start, or see README.md.
+# The database, API, MCP server and website. Run ./setup, or see README.md.
 name: ${COMPOSE_PROJECT_NAME:-lebanese-legislation}
 services:
   db:
@@ -6,8 +6,8 @@ services:
     environment:
       POSTGRES_USER: lebleg_owner
       POSTGRES_DB: lebleg
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run ./start to generate local credentials}
-      LEBLEG_READER_PASSWORD: ${READER_PASSWORD:?Run ./start to generate local credentials}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run ./setup to generate local credentials}
+      LEBLEG_READER_PASSWORD: ${READER_PASSWORD:?Run ./setup to generate local credentials}
     command: ["postgres", "-c", "shared_buffers=256MB", "-c", "maintenance_work_mem=2GB", "-c", "max_parallel_maintenance_workers=2", "-c", "max_connections=30"]
     shm_size: 3gb
     mem_limit: ${DB_MEMORY:-3g}
