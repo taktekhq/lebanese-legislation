@@ -39,6 +39,33 @@ func gitOutput(ctx context.Context, dir string, args ...string) ([]byte, error) 
 // Unknown schemas/tables fail closed to a full render. The workflow checks out
 // one pinned commit for the plan and every shard, under a single run lock.
 func PlanChanges(ctx context.Context, dir, since string, full bool) (ChangePlan, error) {
+	var frame bool
+	p, e := planChanges(ctx, dir, since, full, &frame)
+	if e != nil || p.Full || !frame {
+		return p, e
+	}
+	// A page stored whole carries the frame in its own bytes: render it again.
+	seen := map[string]bool{}
+	for _, q := range p.Paths {
+		seen[q] = true
+	}
+	for _, q := range WholeFramePages {
+		if !seen[q] {
+			p.Paths = append(p.Paths, q)
+		}
+	}
+	sort.Strings(p.Paths)
+	return p, nil
+}
+
+// WholeFramePages are the pages in the layout that are stored whole, because
+// the export changes them in the frame (the search page's script, added
+// before </body> by SearchShell). A frame-only change renders them again.
+var WholeFramePages = []string{"/search/", "/en/search/"}
+
+// planChanges is PlanChanges; frame is set when layout.html changed in its
+// shared frame only.
+func planChanges(ctx context.Context, dir, since string, full bool, frame *bool) (ChangePlan, error) {
 	if full || since == "" {
 		return ChangePlan{Full: true}, nil
 	}
@@ -52,6 +79,10 @@ func PlanChanges(ctx context.Context, dir, since string, full bool) (ChangePlan,
 		return ChangePlan{}, e
 	}
 	for _, p := range strings.Fields(string(b)) {
+		if p == layoutFile && frameOnlyChange(ctx, dir, since) {
+			*frame = true // every run publishes the frame; no page's parts change
+			continue
+		}
 		for _, prefix := range []string{"internal/site/", "templates/", "static/", "assets/", "cmd/static-export/", "internal/staticexport/", "db/", "data/schema.sql", "data/indexes.sql", "data/TABLES", "data/popular_texts.txt", "data/article_calculated_current.jsonl", "go.mod", "go.sum", ".github/workflows/static-site.yml"} {
 			if strings.HasPrefix(p, prefix) {
 				return ChangePlan{Full: true}, nil
@@ -169,6 +200,48 @@ func PlanChanges(ctx context.Context, dir, since string, full bool) (ChangePlan,
 		tables[r.table] = append(tables[r.table], r.row)
 	}
 	return pathsForRows(tables, changed), nil
+}
+
+// layoutFile is the frame every page shares (internal/site/layoutframe.go).
+const layoutFile = "internal/site/templates/layout.html"
+
+// frameOnlyChange says whether layout.html changed in the shared frame only:
+// both versions are pure frames (no defines, no calls but the "page:" parts)
+// with the same holes, escaped the same way. Then every page's parts are
+// what they were, and the run only has to publish the new frame, which each
+// export with the edge layout does. Anything else, including a version that
+// is not a frame (every one before the edge layout), renders everything.
+// LayoutSchemas reads the frame schemas of a version of layout.html
+// (internal/site.LayoutSchemas). The command sets it; this package does not
+// import the site, which reads the database. Unset, every layout change
+// renders everything.
+var LayoutSchemas func(src string) (map[string]string, error)
+
+func frameOnlyChange(ctx context.Context, dir, since string) bool {
+	schemas := func(rev string) map[string]string {
+		b, e := gitOutput(ctx, dir, "show", rev+":"+layoutFile)
+		if e != nil {
+			return nil
+		}
+		if LayoutSchemas == nil {
+			return nil
+		}
+		s, e := LayoutSchemas(string(b))
+		if e != nil {
+			return nil
+		}
+		return s
+	}
+	a, b := schemas(since), schemas("HEAD")
+	if a == nil || b == nil || len(a) != len(b) {
+		return false
+	}
+	for lang, s := range a {
+		if b[lang] != s {
+			return false
+		}
+	}
+	return true
 }
 
 func scanCopyLines(r io.Reader, fn func(string) error) error {
