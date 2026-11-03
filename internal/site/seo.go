@@ -10,8 +10,8 @@ import (
 // robots.txt, llms.txt and the IndexNow key. The sitemaps are in sitemap.go.
 
 const (
-	// IndexNow key shared by every Taktek site; the file proves we own the host.
-	indexNowKey = "ea77b6da080977a1becb866c3314f534"
+	// IndexNowKey is shared by every Taktek site; the file proves we own the host.
+	IndexNowKey = "ea77b6da080977a1becb866c3314f534"
 )
 
 // The crawlers that feed answer engines, welcomed by name (they also match "*").
@@ -23,9 +23,9 @@ func (s *Server) seoRoutes() {
 	m.HandleFunc("GET /robots.txt", s.robots)
 	m.HandleFunc("GET /llms.txt", s.llms)
 	m.HandleFunc("GET /openapi.json", s.openapi)
-	m.HandleFunc("GET /"+indexNowKey+".txt", func(w http.ResponseWriter, r *http.Request) {
+	m.HandleFunc("GET /"+IndexNowKey+".txt", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		fmt.Fprint(w, indexNowKey)
+		fmt.Fprint(w, IndexNowKey)
 	})
 	m.HandleFunc("GET /sitemap.xml", s.sitemapIndex)
 	m.HandleFunc("GET /sitemaps/{name}", s.sitemap)

@@ -195,6 +195,26 @@ jobs:
           aws s3 cp generation s3://lebleg-site/_export/generation \
             --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
             --content-type text/plain
+  indexnow:
+    # Tell Bing (ChatGPT and Copilot search its index) and the other IndexNow
+    # engines which pages this render changed. Pages no sitemap lists (noindex,
+    # another canonical) are left out. A failure here leaves the site as it is.
+    needs: [plan, render, generation]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.commit }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: export-*
+          path: exports
+      - name: Submit changed pages
+        run: go run ./cmd/static-export indexnow -max 100000 exports/export-*
   rendered-commit:
     needs: [plan, render, generation]
     runs-on: ubuntu-latest
