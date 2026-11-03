@@ -162,6 +162,9 @@ jobs:
       free_disk: true
       pre_build: |
         mkdir -p site-content
-        aws s3 sync s3://lebleg-site site-content --exclude '_build/*' --exclude '_export/*' --include '_export/redirects.json' --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+        # 760,000 small files: the CLI's default of 10 parallel downloads took about 20 minutes.
+        aws configure set default.s3.max_concurrent_requests 256
+        aws configure set default.s3.max_queue_size 20000
+        aws s3 sync --only-show-errors s3://lebleg-site site-content --exclude '_build/*' --exclude '_export/*' --include '_export/redirects.json' --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
         test -s site-content/_export/redirects.json
         df -h .
