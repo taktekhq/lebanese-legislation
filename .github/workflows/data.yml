@@ -22,11 +22,11 @@ on:
         default: false
 permissions:
   contents: read
-concurrency:
-  group: data-${{ github.ref }}
-  cancel-in-progress: true
 jobs:
   build:
+    concurrency:
+      group: data-build-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-24.04
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     timeout-minutes: 90
@@ -93,6 +93,9 @@ jobs:
           path: ${{ runner.temp }}/parquet
           retention-days: 7
   publish:
+    concurrency:
+      group: data-publish-${{ github.ref }}
+      cancel-in-progress: true
     needs: build
     runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.publish)
@@ -130,3 +133,35 @@ jobs:
           hf upload "$HF_REPO" "$RUNNER_TEMP/out" . --repo-type dataset \
             --commit-message "Data from $(git rev-parse --short=12 HEAD), $(date -u +%F)"
           echo "Published https://huggingface.co/datasets/$HF_REPO" | tee -a "$GITHUB_STEP_SUMMARY"
+  db:
+    needs: publish
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    with:
+      image: db
+      context: .
+      dockerfile: db/Dockerfile
+      tags: |
+        ghcr.io/taktekhq/lebanese-legislation-db:latest
+      free_disk: true
+      pre_build: |
+        aws s3 sync s3://lebleg-site/_build/scans db/scans --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+  all:
+    needs: db
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    with:
+      image: all
+      context: .
+      dockerfile: workers/static-site/container/Dockerfile
+      tags: |
+        ghcr.io/taktekhq/lebanese-legislation-all:latest
+      build_args: |
+        DATA_TAG=latest

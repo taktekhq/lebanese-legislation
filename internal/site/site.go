@@ -55,6 +55,7 @@ type Server struct {
 	rulingDir     string                // the judgment PDFs, one per ruling: see rulingfiles.go
 	ph            *phClient             // server errors to PostHog: see phcapture.go
 	titles        titlesEn              // unofficial English titles for the JSON API: see apititles.go
+	pageDates     pageDates             // page_state dates for the JSON API's lists: see lastchanged.go
 	vocab         atomic.Pointer[vocab] // the title words, for typos and Latin spellings: see vocab.go
 
 	// Protection against overload (limiter.go), shared by /mcp (not wired
@@ -228,10 +229,16 @@ type Page struct {
 	// same Arabic text in both interfaces: the English address names the Arabic
 	// one as canonical and the pair carries no hreflang (indexing.go).
 	Translated bool
-	// Set by render: the canonical path with its /en prefix (none for Arabic), and whether the
-	// page is one of an en/ar pair.
-	Canon string
-	Pair  bool
+	// TwinHidden says the other language's version of this page is noindex
+	// (a text's machine-translated English, indexing.go), so the page names
+	// no hreflang: hreflang never points at a hidden page.
+	TwinHidden bool
+	// Set by render: the canonical path with its /en prefix (none for Arabic), whether the
+	// page is one of an en/ar pair, and whether it carries the hreflang links
+	// (a pair where neither side is noindex).
+	Canon    string
+	Pair     bool
+	Hreflang bool
 }
 
 func (s *Server) render(w http.ResponseWriter, r *http.Request, name string, code int, p Page) {
@@ -249,6 +256,7 @@ func (s *Server) execute(r *http.Request, name string, p Page) (string, error) {
 		p.NoIndex = true
 	}
 	p.Canon, p.Pair = s.canonical(r, p)
+	p.Hreflang = p.Pair && !p.NoIndex && !p.TwinHidden
 	p.Title, p.Desc = finishMeta(i18n.New(s.lang(r)), p.Title, p.Desc)
 	pages := s.pages
 	if s.lang(r) == "ar" && s.pagesAr != nil {

@@ -48,6 +48,10 @@ type Options struct {
 	// machine reading of it, loaded into ruling_file and ruling_page
 	// (internal/modelout). Empty: none.
 	RulingFiles string
+	// PopularTexts is the list of texts whose English pages stay open to
+	// search engines (data/popular_texts.txt); every other text's /en/ pages
+	// are noindex (indexing.go). Empty: no list, every English page open.
+	PopularTexts string
 }
 
 type builder struct {
@@ -135,6 +139,12 @@ func Run(ctx context.Context, o Options) (*Report, error) {
 			name string
 			fn   func() error
 		}{"indexing", b.indexing})
+	} else if o.Only == "english" {
+		steps = steps[:0]
+		steps = append(steps, struct {
+			name string
+			fn   func() error
+		}{"english pages", b.englishOnly})
 	} else if o.Only == "scan-gazette" {
 		steps = steps[:0]
 		steps = append(steps, struct {

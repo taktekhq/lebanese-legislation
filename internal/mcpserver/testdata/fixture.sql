@@ -110,3 +110,9 @@ INSERT INTO graph_edge (id, from_key, to_key, relation, source, status, from_typ
   -- the possibly_affected view reads.
   (25, 'law/300', NULL, 'general_repeal', 'parser', 'general', 'legislation', 300, NULL, NULL, NULL, NULL, NULL, NULL),
   (26, 'law/300', 'law/100', 'cites', 'model', 'linked', 'legislation', 300, NULL, 100, NULL, NULL, NULL, NULL);
+
+-- When pages last changed: law 100 and ruling 9000 on 30 Oct 2026; Gazette
+-- issue 500 carries the text's own date an old build seeded, which is never
+-- given as updated_at.
+INSERT INTO page_state (kind, id, content_hash, changed_at) VALUES
+  ('law', 100, 'x', '2026-10-30'), ('ruling', 9000, 'x', '2026-10-30'), ('gazette', 500, 'x', '2001-01-05');

@@ -198,6 +198,7 @@ type apiIssueRow struct {
 	TextCount   int     `json:"text_count"`
 	Source      string  `json:"source"` // "centre", or "scans" for an issue made for texts read from the Gazette's scanned pages
 	URL         string  `json:"url"`
+	UpdatedAt   *string `json:"updated_at,omitempty"` // the day its page last changed here, when known
 }
 
 type apiIssueList struct {
@@ -238,6 +239,7 @@ func (s *Server) listIssues(ctx context.Context, p listParams) (apiIssueList, er
 			g.Source = "scans"
 		}
 		g.URL = Base + "/gazette/" + strconv.Itoa(g.ID) + "/"
+		g.UpdatedAt = s.listedChange(ctx, "gazette", g.ID)
 		out.Issues = append(out.Issues, g)
 	}
 	if err := rows.Err(); err != nil {

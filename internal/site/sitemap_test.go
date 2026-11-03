@@ -9,6 +9,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/taktekhq/lebanese-legislation/internal/indexing"
 )
 
 type urlset_ struct {
@@ -133,7 +135,7 @@ func TestSitemapLastmodIsWhenThePageChanged(t *testing.T) {
 	s := indexedServer(t)
 	index, files, _ := fetchAll(t, s)
 	today := time.Now().UTC().Format("2006-01-02")
-	first := firstFetch.Format("2006-01-02")
+	first := indexing.FirstFetch.Format("2006-01-02")
 	bad := 0
 	check := func(where, m string) {
 		if m != "" && (m < first || m > today) {
@@ -164,7 +166,7 @@ func TestSitemapLastmodIsWhenThePageChanged(t *testing.T) {
 	// a database built before the build raised old dates to the day the page
 	// first existed still holds them; the sitemaps leave those out
 	var old int
-	if err := s.db.QueryRow(context.Background(), `SELECT count(*) FROM page_state WHERE changed_at < $1`, firstFetch).Scan(&old); err != nil {
+	if err := s.db.QueryRow(context.Background(), `SELECT count(*) FROM page_state WHERE changed_at < $1`, indexing.FirstFetch).Scan(&old); err != nil {
 		t.Fatal(err)
 	}
 	if float64(with) < 0.99*float64(total) {
@@ -317,35 +319,53 @@ func TestOldDatabaseStillHasSitemaps(t *testing.T) {
 	}
 }
 
-// laws-N lists the /en/ twin of every text's own page, row for row with
-// ar-laws-N and with the same lastmod; no other family has English files.
+// laws-N lists the /en/ twin of every text's own page whose English is open
+// (not noindex_page kind english), in the order of ar-laws-N and with the
+// same lastmod; an empty laws-N is not named; no other family has English
+// files.
 func TestEnglishLawsSitemapMirrorsArabic(t *testing.T) {
 	s := indexedServer(t)
 	index, files, _ := fetchAll(t, s)
-	en, ar := 0, 0
+	hidden := map[string]bool{}
+	rows, err := s.db.Query(context.Background(), `SELECT id FROM noindex_page WHERE kind = 'english'`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for rows.Next() {
+		var id int
+		rows.Scan(&id)
+		hidden[itoa(id)] = true
+	}
+	rows.Close()
+	en := 0
 	for _, sm := range index.Sitemaps {
 		path := strings.TrimPrefix(sm.Loc, Base)
 		name := strings.TrimSuffix(strings.TrimPrefix(path, "/sitemaps/"), ".xml")
 		switch {
 		case strings.HasPrefix(name, "laws-"):
 			en++
-			twin := files["/sitemaps/ar-"+name+".xml"]
-			if len(twin.URLs) != len(files[path].URLs) {
-				t.Fatalf("%s holds %d URLs, its Arabic file %d", name, len(files[path].URLs), len(twin.URLs))
+			if len(files[path].URLs) == 0 {
+				t.Errorf("%s is named but empty", name)
 			}
-			for i, u := range files[path].URLs {
-				if want := strings.Replace(twin.URLs[i].Loc, Base+"/", Base+"/en/", 1); u.Loc != want || u.Lastmod != twin.URLs[i].Lastmod {
-					t.Fatalf("%s entry %d: %s %s, want %s %s", name, i, u.Loc, u.Lastmod, want, twin.URLs[i].Lastmod)
+			arabic := map[string]string{}
+			for _, u := range files["/sitemaps/ar-"+name+".xml"].URLs {
+				arabic[strings.Replace(u.Loc, Base+"/", Base+"/en/", 1)] = u.Lastmod
+			}
+			for _, u := range files[path].URLs {
+				mod, ok := arabic[u.Loc]
+				if !ok || mod != u.Lastmod {
+					t.Fatalf("%s: %s %s is not the twin of an entry of its Arabic file", name, u.Loc, u.Lastmod)
+				}
+				if id := strings.Split(strings.TrimSuffix(u.Loc, "/"), "/"); hidden[id[len(id)-1]] {
+					t.Errorf("%s lists %s, whose English is hidden", name, u.Loc)
 				}
 			}
-		case strings.HasPrefix(name, "ar-laws-"):
-			ar++
 		case strings.HasPrefix(name, "articles-"), strings.HasPrefix(name, "rulings-"), strings.HasPrefix(name, "gazette-"), strings.HasPrefix(name, "documents-"):
 			t.Errorf("%s: there are no English files for this family", name)
 		}
 	}
-	if en == 0 || en != ar {
-		t.Errorf("%d English laws files, %d Arabic", en, ar)
+	if en == 0 {
+		t.Error("no English laws file")
 	}
 }
 

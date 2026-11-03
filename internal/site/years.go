@@ -85,7 +85,7 @@ func (s *Server) yearIndex(kind string) http.HandlerFunc {
 		lead := s.trOr(r, k.lead, "years.index."+k.key+".lead")
 		many := s.trOr(r, k.many, manyKey)
 		noun := s.trOr(r, k.noun, nounKey)
-		s.render(w, r, "years", 200, Page{Title: s.brandTitle(r, h1), Path: "/" + kind + "/years/",
+		s.render(w, r, "years", 200, Page{Title: s.brandTitle(r, h1), Path: "/" + kind + "/years/", NoIndex: kind == "rulings" && rulingsHidden,
 			Desc: s.trOr(r, fmt.Sprintf("%s %s, by year. Free.", thousands(total), k.many), "years.index.desc", thousands(total), many),
 			Data: map[string]any{"Kind": k.key, "Eyebrow": eyebrow, "H1": h1, "Lead": lead, "Total": total,
 				"Noun": noun, "Many": many, "Decades": decades}})
@@ -148,7 +148,8 @@ func (s *Server) lawsYear(w http.ResponseWriter, r *http.Request) {
 		Path:  pagePath(base, page),
 		Desc: s.trOr(r, fmt.Sprintf("The %s Lebanese laws, decrees and decisions issued in %s. Free.", thousands(total), label),
 			"years.laws_of_desc", thousands(total), label),
-		Data: List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase, Subhubs: subhubs, Back: "/laws/years/", BackLabel: s.trOr(r, "All years", "years.all_years"),
+		Data: List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase, Subhubs: subhubs, Back: "/laws/years/",
+			Updated: s.pageUpdated(r, s.latestChange(ctx, cond, args...), nil), BackLabel: s.trOr(r, "All years", "years.all_years"),
 			Eyebrow: s.trOr(r, "Legislation · "+label, "years.legislation_of", label), Heading: s.trOr(r, "Texts of "+label+".", "years.texts_of", label)}})
 }
 
@@ -212,7 +213,7 @@ func (s *Server) docYear(kind string) http.HandlerFunc {
 		many := s.trOr(r, k.many, k.key+".many")
 		noun := s.trOr(r, k.noun, k.key+".noun")
 		s.render(w, r, "list", 200, Page{Title: s.brandTitle(r, stripNbsp(eyebrow)+" "+label) + s.pageSuffix(r, page),
-			Path: pagePath(base, page),
+			Path: pagePath(base, page), NoIndex: kind == "rulings" && rulingsHidden,
 			Desc: s.trOr(r, fmt.Sprintf("The %s %s of %s. Free.", thousands(total), k.many, label),
 				"years.docs_of_desc", thousands(total), many, label),
 			Data: map[string]any{"Kind": map[string]string{"Eyebrow": eyebrow + " · " + label, "H1": label + ".",

@@ -8,4 +8,4 @@ services:
   mcp:
     build: {context: ., dockerfile: mcp/Dockerfile}
   web:
-    build: {context: ., dockerfile: web/Dockerfile}
+    build: {context: ., dockerfile: workers/static-site/container/Dockerfile}

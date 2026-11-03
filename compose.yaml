@@ -2,15 +2,12 @@
 name: ${COMPOSE_PROJECT_NAME:-lebanese-legislation}
 services:
   db:
-    image: ${DB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-db:0.4.0}
+    image: ${DB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-db:latest}
     environment:
       POSTGRES_USER: lebleg_owner
       POSTGRES_DB: lebleg
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run ./start to generate local credentials}
       LEBLEG_READER_PASSWORD: ${READER_PASSWORD:?Run ./start to generate local credentials}
-      DATASET_REPO: ${DATASET_REPO:-taktekhq/lebanese-legislation}
-      DATASET_REVISION: ${DATASET_REVISION:-main}
-      MANIFEST_PATH: ${MANIFEST_PATH:-releases/latest.json}
     command: ["postgres", "-c", "shared_buffers=256MB", "-c", "maintenance_work_mem=2GB", "-c", "max_parallel_maintenance_workers=2", "-c", "max_connections=30"]
     shm_size: 3gb
     mem_limit: ${DB_MEMORY:-3g}
@@ -29,6 +26,10 @@ services:
       DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"
       # Optional: your own key turns on search by meaning. Exact and citation search need none.
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      LEBLEG_VECTOR_DSN: ${LEBLEG_VECTOR_DSN:-}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:-}
+      LEBLEG_VECTORIZE_TOKEN: ${LEBLEG_VECTORIZE_TOKEN:-}
+      LEBLEG_VECTORIZE_INDEX: ${LEBLEG_VECTORIZE_INDEX:-}
       GEMINI_MAX_CALLS_PER_DAY: ${GEMINI_MAX_CALLS_PER_DAY:-500}
       GEMINI_CONCURRENCY: ${GEMINI_CONCURRENCY:-2}
     ports: ["127.0.0.1:${API_PORT:-8000}:8000"]
@@ -48,6 +49,10 @@ services:
       DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"
       # Optional: your own key turns on search by meaning. Exact and citation search need none.
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      LEBLEG_VECTOR_DSN: ${LEBLEG_VECTOR_DSN:-}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:-}
+      LEBLEG_VECTORIZE_TOKEN: ${LEBLEG_VECTORIZE_TOKEN:-}
+      LEBLEG_VECTORIZE_INDEX: ${LEBLEG_VECTORIZE_INDEX:-}
       GEMINI_MAX_CALLS_PER_DAY: ${GEMINI_MAX_CALLS_PER_DAY:-500}
       GEMINI_CONCURRENCY: ${GEMINI_CONCURRENCY:-2}
     ports: ["127.0.0.1:${MCP_PORT:-8001}:8080"]
@@ -59,25 +64,24 @@ services:
     read_only: true
     security_opt: ["no-new-privileges:true"]
     cap_drop: [ALL]
-  # The website in web/.
+  # The all-in-one image serves the website from its own baked database.
   web:
-    image: ${WEB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-web:0.4.0}
+    image: ${WEB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-all:latest}
     environment:
-      DATABASE_URL: "host=db dbname=lebleg user=lebleg_reader password=${READER_PASSWORD}"
       # Absolute links (canonical, language switcher, sitemap). Set it when you host the site publicly.
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost:${WEB_PORT:-8080}}
       # Optional: your own key turns on search by meaning. Exact and citation search need none.
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      LEBLEG_VECTOR_DSN: ${LEBLEG_VECTOR_DSN:-}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:-}
+      LEBLEG_VECTORIZE_TOKEN: ${LEBLEG_VECTORIZE_TOKEN:-}
+      LEBLEG_VECTORIZE_INDEX: ${LEBLEG_VECTORIZE_INDEX:-}
       GEMINI_MAX_CALLS_PER_DAY: ${GEMINI_MAX_CALLS_PER_DAY:-500}
       GEMINI_CONCURRENCY: ${GEMINI_CONCURRENCY:-2}
     ports: ["127.0.0.1:${WEB_PORT:-8080}:8080"]
-    depends_on:
-      db: {condition: service_healthy}
     restart: unless-stopped
-    user: "65532:65532"
-    mem_limit: 256m
-    read_only: true
+    shm_size: 1gb
+    mem_limit: ${WEB_MEMORY:-3g}
     security_opt: ["no-new-privileges:true"]
-    cap_drop: [ALL]
 volumes:
   db_data:

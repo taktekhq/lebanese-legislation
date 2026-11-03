@@ -9,27 +9,31 @@ import (
 
 func TestHealthzReportsBuildID(t *testing.T) {
 	old := BuildID
-	BuildID = "test-build"
 	t.Cleanup(func() { BuildID = old })
-
-	s, err := New(nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	w := httptest.NewRecorder()
-	s.ServeHTTP(w, httptest.NewRequest("GET", "/healthz", nil))
-	if w.Code != 200 {
-		t.Fatalf("GET /healthz = %d, want 200", w.Code)
-	}
-	var body struct {
-		Status string `json:"status"`
-		Build  string `json:"build"`
-	}
-	if err := json.Unmarshal(w.Body.Bytes(), &body); err != nil {
-		t.Fatal(err)
-	}
-	if body.Status != "ok" || body.Build != "test-build" {
-		t.Fatalf("GET /healthz = %+v, want status ok and build test-build", body)
+	// Exercise both the link-time value and an explicitly injected commit.
+	for _, build := range []string{old, "0123456789abcdef0123456789abcdef01234567"} {
+		t.Run(build, func(t *testing.T) {
+			BuildID = build
+			s, err := New(nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			w := httptest.NewRecorder()
+			s.ServeHTTP(w, httptest.NewRequest("GET", "/healthz", nil))
+			if w.Code != 200 {
+				t.Fatalf("GET /healthz = %d, want 200", w.Code)
+			}
+			var body struct {
+				Status string `json:"status"`
+				Build  string `json:"build"`
+			}
+			if err := json.Unmarshal(w.Body.Bytes(), &body); err != nil {
+				t.Fatal(err)
+			}
+			if body.Status != "ok" || body.Build != build {
+				t.Fatalf("GET /healthz = %+v, want status ok and build %q", body, build)
+			}
+		})
 	}
 }
 

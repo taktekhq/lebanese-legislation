@@ -17,20 +17,34 @@ This folder holds two things: the database's schema with the inputs the build re
 
 `ghcr.io/taktekhq/lebanese-legislation-db` is PostgreSQL 18.6 with pgvector 0.8.2, built from the official `postgres:18.6` image. Both are pinned: the base by digest, the pgvector source by SHA-256.
 
-On first start with an empty volume it reads `releases/latest.json` from the [Hugging Face dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases), downloads that dump, checks its SHA-256 and restores it. The container reports healthy only after the restore passes its checks. Later starts reuse the volume and download nothing.
+Both `lebleg` and `lebleg_search` are baked in at build time from `data/`.
+The former loads `data/load.sh`, `official.sql` and the website SQL; the latter
+uses `cmd/build-search` and the existing semantic corpus, hashes and chunker.
+There are no embedding calls and no embedding column. The accepted comparison
+matched 1,547,916 of 1,547,937 published IDs, with 0 extra and 21 stale IDs.
+The vectors workflow removes those stale IDs from Vectorize on its next sync.
 
-| File | Role |
-| --- | --- |
-| `Dockerfile` | Targets `postgres` (pgvector only), `db` (the published image) and `publisher` (`build-release` and `publish-release` beside PostgreSQL 18.6 clients, used by the [release workflow](../.github/workflows/release.yml)) |
-| `init-reader.sh` | Creates the read-only `lebleg_reader` role when `LEBLEG_READER_PASSWORD` is set |
-| `init-release.sh` | Runs [`restore-release`](../cmd/restore-release/) once, when PostgreSQL initialises an empty volume: download, verify, restore. The restore also adds what the website, API and MCP read (`tools/src/lebleg/sql/web.sql`) |
-| `health.sh` | Healthy only when PostgreSQL answers over TCP, [`check-release`](../cmd/check-release/) finds a valid restore receipt and `web.sql` has run |
-| `web-schema.sh` | Adds those pieces to a database restored by 0.2.0 or older |
+Postgres runs by default. On first start, `start.sh` copies the baked cluster
+into an empty `PGDATA` volume and configures `POSTGRES_USER`,
+`POSTGRES_PASSWORD` and `LEBLEG_READER_PASSWORD`. Later starts reuse it.
+`lebleg_web` and `lebleg_reader` have read access to both databases.
+A new image does not overwrite a populated volume. Back up changes and use a
+fresh volume when replacing the dataset. No release download happens at startup.
 
-Build from the repository root:
+`Dockerfile` retains the `postgres` target for tests and `publisher` for
+legacy contributor tools and image checks. Those targets have no baked data. The default `db`
+target includes the data and runs `ANALYZE`. After a clean shutdown, the build
+resets WAL on this new cluster without forcing it, then copies only the finished
+cluster into the final image. This excludes the bulk load's spare WAL segments
+from published layers. It never resets WAL on a user's running database.
+Optional scans belong in `db/scans/`; the image workflow fetches them from R2.
+`health.sh` checks PostgreSQL and both databases' serving tables.
 
 ```sh
 docker build -f db/Dockerfile -t lebanese-legislation-db .
+docker run --rm -p 127.0.0.1:5433:5432 -e POSTGRES_PASSWORD=local lebanese-legislation-db
 ```
 
-Settings, pinning a release and retrying a failed restore are in the [service reference](../docs/reference.md).
+Read [loading vectors](../vectors/README.md) to add semantic search to your own
+Vectorize index or to pgvector. Portable source tables are available as
+[Parquet on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation).

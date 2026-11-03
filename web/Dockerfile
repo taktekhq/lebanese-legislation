@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
-# The LebaneseLegislation.com website, published as ghcr.io/taktekhq/lebanese-legislation-web.
-# Build from the repository root: docker build -f web/Dockerfile -t lebanese-legislation-web .
+# Test-only website image for checks.yml and the fictional database smoke checks.
+# Compose and published websites use the all-in-one image.
 FROM --platform=$BUILDPLATFORM golang:1.27.1-bookworm AS build
 WORKDIR /src
 COPY go.mod go.sum ./
@@ -9,9 +9,12 @@ COPY internal/ ./internal/
 COPY web/main.go ./web/
 ARG TARGETOS
 ARG TARGETARCH
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags='-s -w' -o /server ./web
+ARG GIT_SHA=unknown
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags="-s -w -X github.com/taktekhq/lebanese-legislation/internal/site.BuildID=${GIT_SHA}" -o /server ./web
 
 FROM gcr.io/distroless/static-debian12:nonroot
+ARG GIT_SHA=unknown
+LABEL org.opencontainers.image.revision="${GIT_SHA}"
 COPY --from=build /server /server
 COPY THIRD_PARTY_NOTICES.txt /THIRD_PARTY_NOTICES.txt
 LABEL org.opencontainers.image.source="https://github.com/taktekhq/lebanese-legislation"

@@ -7,8 +7,10 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/taktekhq/lebanese-legislation/internal/indexing"
 )
 
 // Row shapes and small helpers shared by the tools. Every query reads the
@@ -47,6 +49,7 @@ type lawRow struct {
 	CodeNameFr     *string
 	SourceURL      *string
 	TitleEn        *string
+	Changed        *time.Time // page_state.changed_at: when the text's page last changed
 }
 
 // lawCols and lawFrom select a lawRow (alias l). The join to
@@ -56,7 +59,7 @@ const lawCols = `l.id, l.kind, k.name_en, l.number, to_char(l.issued_on, 'YYYY-M
 	l.gazette_number, to_char(l.gazette_date, 'YYYY-MM-DD'),
 	(SELECT min(ge.issue_id) FROM gazette_entry ge WHERE ge.law_id = l.id),
 	(SELECT count(*) FROM legislation_article la WHERE la.law_id = l.id)::int,
-	c.slug, c.name_en, c.name_fr, sp.url, nullif(te.title_en, '')`
+	c.slug, c.name_en, c.name_fr, sp.url, nullif(te.title_en, ''), ps.changed_at`
 
 const lawFrom = `legislation l ` + lawJoins
 
@@ -64,14 +67,15 @@ const lawFrom = `legislation l ` + lawJoins
 const lawJoins = `JOIN legislation_kind k ON k.name_ar = l.kind
 	LEFT JOIN code c ON c.law_id = l.id
 	LEFT JOIN source_page sp ON sp.doc_type = 'law' AND sp.centre_id = l.id
-	LEFT JOIN legislation_title_en te ON te.law_id = l.id`
+	LEFT JOIN legislation_title_en te ON te.law_id = l.id
+	LEFT JOIN page_state ps ON ps.kind = 'law' AND ps.id = l.id`
 
 // lawDate is the snapshot's coalesce(nullif(gazette_date, ”), issued_on).
 const lawDate = `coalesce(l.gazette_date, l.issued_on)`
 
 func (l *lawRow) dest() []any {
 	return []any{&l.ID, &l.Kind, &l.KindEn, &l.Number, &l.IssuedOn, &l.Title, &l.Status, &l.GazetteNumber, &l.GazetteDate,
-		&l.GazetteIssueID, &l.ArticleCount, &l.CodeSlug, &l.CodeNameEn, &l.CodeNameFr, &l.SourceURL, &l.TitleEn}
+		&l.GazetteIssueID, &l.ArticleCount, &l.CodeSlug, &l.CodeNameEn, &l.CodeNameFr, &l.SourceURL, &l.TitleEn, &l.Changed}
 }
 
 // scanLaws reads rows whose first columns are lawCols, then extra.
@@ -116,7 +120,29 @@ func lawSummary(l *lawRow) obj {
 	o.nonEmpty("issued_on", l.IssuedOn)
 	o.nonEmpty("code", l.CodeNameEn)
 	o.nonEmpty("source_url", l.SourceURL)
+	o.changed(l.Changed)
 	return o
+}
+
+// changed sets updated_at, the day a page last changed here (page_state),
+// when indexing.ChangedOn accepts the date: never the text's own date.
+func (o *obj) changed(t *time.Time) {
+	if t == nil {
+		return
+	}
+	if d := indexing.ChangedOn(*t, time.Now()); d != "" {
+		o.set("updated_at", d)
+	}
+}
+
+// pageChanged is page_state.changed_at of page kind/id, nil when it has none.
+func (s *Server) pageChanged(ctx context.Context, kind string, id int) (*time.Time, error) {
+	var t *time.Time
+	err := s.db.QueryRow(ctx, `SELECT changed_at FROM page_state WHERE kind = $1 AND id = $2`, kind, id).Scan(&t)
+	if isNoRows(err) {
+		return nil, nil
+	}
+	return t, err
 }
 
 // wordForKind is the word in a text's address on the site: /law/ for laws

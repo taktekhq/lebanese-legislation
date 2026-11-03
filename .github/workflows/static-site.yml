@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       shards:
-        description: Shard divisor (the matrix always runs shards 0 through 7)
+        description: Shard divisor (the matrix always runs shards 0 through 23)
         type: number
-        default: 8
+        default: 24
       full:
         description: Unused for now; a shard re-renders only pages whose hash changed
         type: boolean
@@ -23,19 +23,19 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: static-site
-  cancel-in-progress: false
 
 jobs:
   render:
+    concurrency:
+      group: static-site-render-${{ github.ref }}-${{ matrix.shard }}
+      cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 340
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     env:
       DATABASE_URL: postgresql://postgres:ci@127.0.0.1:5432/lebleg
       LEBLEG_DSN: postgresql://postgres:ci@127.0.0.1:5432/lebleg
@@ -51,7 +51,7 @@ jobs:
             -c max_wal_size=8GB -c maintenance_work_mem=1GB
           for i in $(seq 60); do docker exec pg pg_isready -U postgres -d lebleg -q && break; sleep 1; done
           psql --version
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
@@ -60,6 +60,7 @@ jobs:
           ( set +e
             bash -e -o pipefail <<'TASK_EXPORTER' > "$RUNNER_TEMP/exporter.log" 2>&1
           go build -o /tmp/static-export ./cmd/static-export
+          go build -o /tmp/build-db ./cmd/build-db
           TASK_EXPORTER
             echo $? > "$RUNNER_TEMP/exporter.status"
           ) &
@@ -80,10 +81,15 @@ jobs:
           [ "$failed" -eq 0 ]
       - name: Load official publications
         run: psql "$DATABASE_URL" -f db/official.sql
+      # data/ comes from a nightly built without the popular list, so it holds
+      # no english rows: add them here, or every /en/ page stays indexable
+      # (issue #86). Only those rows change; page dates stay as data/ has them.
+      - name: Hide machine English of unpopular texts
+        run: /tmp/build-db -db "$DATABASE_URL" -only english -popular data/popular_texts.txt
       - name: Render and upload shard
         env:
           SHARD: ${{ matrix.shard }}
-          DIVISOR: ${{ inputs.shards || 8 }}
+          DIVISOR: ${{ inputs.shards || 24 }}
           FULL: ${{ inputs.full || false }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -91,6 +97,7 @@ jobs:
           # Each shard reads and writes its own manifest under _export/shard-<i>-of-<n>/.
           /tmp/static-export export \
             -shard "$SHARD/$DIVISOR" \
+            -exchange-timeout 30m \
             -base https://lebaneselegislation.com \
             -workers 8 \
             -max-errors 200 \
@@ -116,3 +123,48 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
 
+
+  generation:
+    concurrency:
+      group: static-site-generation-${{ github.ref }}
+      cancel-in-progress: false
+    # Last: the Worker keys its page cache by this value, so the new pages
+    # show at once instead of after the 12-hour edge cache runs out. Written
+    # when shards failed too, since the others already uploaded new pages.
+    needs: render
+    if: ${{ !cancelled() && needs.render.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark the new export generation
+        env:
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          echo "${{ github.run_id }}-${{ github.run_attempt }}" > generation
+          aws s3 cp generation s3://lebleg-site/_export/generation \
+            --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
+            --content-type text/plain
+  site:
+    needs: [render, generation]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    with:
+      image: site
+      context: .
+      dockerfile: workers/static-site/container/site.Dockerfile
+      tags: |
+        ghcr.io/taktekhq/lebanese-legislation-site:latest
+      free_disk: true
+      pre_build: |
+        mkdir -p site-content
+        # 760,000 small files: the CLI's default of 10 parallel downloads took about 20 minutes.
+        aws configure set default.s3.max_concurrent_requests 256
+        aws configure set default.s3.max_queue_size 20000
+        aws s3 sync --only-show-errors s3://lebleg-site site-content --exclude '_build/*' --exclude '_export/*' --include '_export/redirects.json' --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+        test -s site-content/_export/redirects.json
+        df -h .

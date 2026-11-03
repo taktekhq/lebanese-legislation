@@ -1,6 +1,7 @@
 package build
 
 import (
+	"errors"
 	"strings"
 	"time"
 
@@ -49,7 +50,18 @@ const shownArticle = `SELECT a.law_id, a."position", coalesce(v.text_ar, a.text_
 	           FROM article_version WHERE text_ar IS NOT NULL ORDER BY law_id, article_number, major DESC, minor DESC) v
 	  ON v.law_id = a.law_id AND v.article_number = a.number`
 
+// englishKind widens the kind check of a database made before the kind
+// english existed, so "-only indexing" and "-only english" run on it.
+func (b *builder) englishKind() error {
+	_, err := b.conn.Exec(b.ctx, `ALTER TABLE noindex_page DROP CONSTRAINT IF EXISTS noindex_page_kind_check,
+		ADD CONSTRAINT noindex_page_kind_check CHECK (kind IN ('article', 'ruling', 'opinion', 'agreement', 'doctrine', 'research', 'english'))`)
+	return err
+}
+
 func (b *builder) indexing() error {
+	if err := b.englishKind(); err != nil {
+		return err
+	}
 	if _, err := b.conn.Exec(b.ctx, `TRUNCATE noindex_page`); err != nil {
 		return err
 	}
@@ -72,6 +84,9 @@ func (b *builder) indexing() error {
 			return err
 		}
 	}
+	if err := b.weakPages(); err != nil {
+		return err
+	}
 	if err := b.pageState(); err != nil {
 		return err
 	}
@@ -89,6 +104,50 @@ func (b *builder) indexing() error {
 		b.rep.note("noindex: %d %s pages (%s)", n, kind, reason)
 	}
 	return rows.Err()
+}
+
+// weakPages lists the English pages of every text that is not popular
+// (Options.PopularTexts), kept for visitors and hidden from search engines
+// (internal/indexing/weak.go).
+func (b *builder) weakPages() error {
+	if b.PopularTexts == "" {
+		b.rep.note("noindex: no popular texts list, English pages left open to search engines")
+		return nil
+	}
+	ids, err := indexing.ReadPopular(b.PopularTexts)
+	if err != nil {
+		return err
+	}
+	// One row per text covers its /en/ text page, parts and articles.
+	_, err = b.conn.Exec(b.ctx, `INSERT INTO noindex_page SELECT 'english', id, 0, '`+indexing.ReasonMachineEnglish+`'
+		FROM legislation WHERE id <> ALL($1::int[])`, ids)
+	return err
+}
+
+// englishOnly ("-only english") rewrites the english rows alone, leaving the
+// other rows and page_state as they are. A database restored from data/ gets
+// its english rows this way: the nightly that writes data/ builds without the
+// popular list, and the whole indexing step would move page dates (its
+// lastmod rule reads current_date).
+func (b *builder) englishOnly() error {
+	if b.PopularTexts == "" {
+		return errors.New("no popular texts list (-popular): it would leave every English page open")
+	}
+	if err := b.englishKind(); err != nil {
+		return err
+	}
+	if _, err := b.conn.Exec(b.ctx, `DELETE FROM noindex_page WHERE kind = 'english'`); err != nil {
+		return err
+	}
+	if err := b.weakPages(); err != nil {
+		return err
+	}
+	var n int
+	if err := b.conn.QueryRow(b.ctx, `SELECT count(*) FROM noindex_page WHERE kind = 'english'`).Scan(&n); err != nil {
+		return err
+	}
+	b.rep.note("noindex: %d english pages (%s)", n, indexing.ReasonMachineEnglish)
+	return nil
 }
 
 // thinArticles lists the article pages with nothing to index.

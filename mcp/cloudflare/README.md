@@ -1,6 +1,6 @@
 # MCP on Cloudflare
 
-Part of [LebaneseLegislation.com](https://lebaneselegislation.com/). See the [project README](../../README.md) for the local services, the [PostgreSQL dump](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/releases) and the [Parquet dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation).
+Part of [LebaneseLegislation.com](https://lebaneselegislation.com/). See the [project README](../../README.md) for the local services, the [database image](https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db) and the [Parquet dataset](https://huggingface.co/datasets/taktekhq/lebanese-legislation).
 
 This is a standalone MCP deployment example. The production website container
 is described in [architecture](../../docs/architecture.md).

@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+
+	"github.com/taktekhq/lebanese-legislation/internal/indexing"
 )
 
 // The sitemaps list what is worth indexing, and say when it last changed.
@@ -19,15 +21,23 @@ import (
 //     ar-*.xml list the Arabic (root) addresses, the others the /en/ addresses
 //     of pages with English of their own.
 //   - core.xml and ar-core.xml are small: the list pages, the principal codes,
-//     the most-read texts (Arabic only) and the topic pages. Submit these first.
+//     the most-read texts (Arabic only), the hubs and the blog. Submit these first.
 //   - pages.xml and ar-pages.xml hold the year lists and the other list pages.
-//   - ar-laws-N, ar-articles-N, ar-rulings-N, ar-gazette-N, ar-documents-N hold
+//   - ar-laws-N, ar-articles-N, ar-gazette-N, ar-documents-N hold
 //     the Arabic address of every text. laws-N holds the /en/ address of every
 //     text's own page (same rows, same lastmod as its Arabic twin): those are
 //     self-canonical with an hreflang pair. There are no English files for
 //     articles, rulings, gazette or documents: an article's /en/ twin is
 //     found through the hreflang on its Arabic page; the others carry the
 //     same Arabic text and name the Arabic one as canonical (indexing.go).
+//   - laws-N leaves out the texts whose English is hidden (noindex_page kind
+//     english: every text not in data/popular_texts.txt), so most laws-N
+//     files are empty; the index names only the ones that are not, and an
+//     empty one is a 404. core.xml leaves out such a code's /en/ address.
+//   - The topic pages are in no sitemap: they are generated and hidden
+//     (topics.go). Neither are the rulings, their lists and their years:
+//     every ruling page is hidden (rulingsHidden), so there is no
+//     ar-rulings-N family.
 //
 // Left out: article pages with nothing to index and placeholder documents
 // (noindex_page), the second of two articles whose numbers make the same
@@ -45,7 +55,8 @@ type sitemapSet struct {
 
 var sitemapSets = []sitemapSet{
 	{"laws", `SELECT '/' || CASE WHEN l.kind LIKE 'مرسوم%' THEN 'decree' WHEN l.kind LIKE 'قانون%' OR l.kind IN ('الدستور', 'دستور') THEN 'law' ELSE 'text' END
-		    || '/' || l.id || '/', ps.changed_at
+		    || '/' || l.id || '/', ps.changed_at,
+		    NOT EXISTS (SELECT 1 FROM {ni} n WHERE n.kind = 'english' AND n.id = l.id)
 		 FROM legislation l LEFT JOIN {ps} ps ON ps.kind = 'law' AND ps.id = l.id ORDER BY l.id`},
 	{"articles", `SELECT a.law_id::text || chr(31) || a.number, ps.changed_at
 		 FROM (SELECT DISTINCT ON (law_id, regexp_replace(btrim(number), '\s+', '-', 'g')) law_id, position, number
@@ -53,9 +64,6 @@ var sitemapSets = []sitemapSet{
 		 LEFT JOIN {ni} n ON n.kind = 'article' AND n.id = a.law_id AND n.position = a.position
 		 LEFT JOIN {ps} ps ON ps.kind = 'law' AND ps.id = a.law_id
 		 WHERE n.kind IS NULL ORDER BY a.law_id, a.position`},
-	{"rulings", `SELECT '/ruling/' || r.id || '/', ps.changed_at FROM ruling r
-		 LEFT JOIN {ps} ps ON ps.kind = 'ruling' AND ps.id = r.id
-		 WHERE NOT EXISTS (SELECT 1 FROM {ni} n WHERE n.kind = 'ruling' AND n.id = r.id) ORDER BY r.id`},
 	{"gazette", `SELECT '/gazette/' || g.id || '/', ps.changed_at FROM gazette_issue g
 		 LEFT JOIN {ps} ps ON ps.kind = 'gazette' AND ps.id = g.id ORDER BY g.id`},
 	{"documents", `SELECT path, changed FROM (
@@ -80,8 +88,8 @@ type SitemapURL struct {
 	Mod  time.Time
 }
 
-// AddCoreSitemap lets another part of the site (the topic pages) put its
-// addresses in core.xml. fn returns root paths ("/topics/tax/") and their
+// AddCoreSitemap lets another part of the site (the hubs, the blog) put its
+// addresses in core.xml. fn returns root paths ("/codes/penal/") and their
 // lastmod (zero when unknown); each is listed in both languages.
 func (s *Server) AddCoreSitemap(fn func(ctx context.Context) ([]SitemapURL, error)) {
 	s.coreExtra = append(s.coreExtra, fn)
@@ -196,23 +204,12 @@ func (c *memoCache) getVersioned(key, ver string, ttl time.Duration, fn func() (
 	return v, nil
 }
 
-// firstFetch is the day the scraper first fetched the Centre's pages: no page
-// here existed, so none changed, before it.
-var firstFetch = time.Date(2026, 9, 25, 0, 0, 0, 0, time.UTC)
-
 // lastmod is t as a sitemap date, or "" when t cannot be when the page last
 // changed: unknown, before the page existed (a text's own date, which Search
-// Console counted as 113,297 errors on 28 Oct 2026) or after today.
-func lastmod(t time.Time) string {
-	if t.IsZero() || t.Before(firstFetch) {
-		return ""
-	}
-	d := t.UTC().Format("2006-01-02")
-	if d > time.Now().UTC().Format("2006-01-02") {
-		return ""
-	}
-	return d
-}
+// Console counted as 113,297 errors on 28 Oct 2026) or after today. The rule
+// is indexing.ChangedOn, shared with the pages' "Last updated" line and the
+// API's updated_at.
+func lastmod(t time.Time) string { return indexing.ChangedOn(t, time.Now()) }
 
 func (s *Server) sitemapIndex(w http.ResponseWriter, r *http.Request) {
 	out, err := s.buildIndex(r.Context())
@@ -257,8 +254,8 @@ func (s *Server) buildIndex(ctx context.Context) (string, error) {
 		}
 		for i, f := range files {
 			entry(fmt.Sprintf("/sitemaps/ar-%s-%d.xml", set.name, i+1), f.mod)
-			if set.name == "laws" {
-				entry(fmt.Sprintf("/sitemaps/laws-%d.xml", i+1), f.mod)
+			if set.name == "laws" && f.enN > 0 {
+				entry(fmt.Sprintf("/sitemaps/laws-%d.xml", i+1), f.enMod)
 			}
 		}
 	}
@@ -321,8 +318,8 @@ func (s *Server) sitemap(w http.ResponseWriter, r *http.Request) {
 			s.sitemapFail(w, r, err)
 			return
 		}
-		if n > len(files) {
-			s.notFound(w, r)
+		if n > len(files) || (!arabic && files[n-1].enN == 0) {
+			s.notFound(w, r) // past the last file, or an English file with no open text
 			return
 		}
 		body := files[n-1].ar
@@ -346,7 +343,7 @@ func urlset(prefix string, urls []SitemapURL) string {
 
 // smallSitemap is core.xml or pages.xml, in English (/en/) or Arabic (root). The English
 // files list only pages that are their own canonical in English: the
-// interface pages, the codes and the topics. The Arabic ones add the most-read
+// interface pages, the codes (those whose English is open) and the hubs. The Arabic ones add the most-read
 // texts to core.
 func (s *Server) smallSitemap(ctx context.Context, name string, arabic bool) ([]SitemapURL, error) {
 	v, err := s.sitemapMemo(ctx, fmt.Sprintf("small:%s:%t", name, arabic), func(ctx context.Context) (any, error) {
@@ -365,8 +362,8 @@ func (s *Server) buildSmallSitemap(ctx context.Context, name string, arabic bool
 	}
 	var urls []SitemapURL
 	if name == "core" {
-		for _, p := range []string{"/", "/codes/", "/laws/", "/rulings/", "/gazette/", "/opinions/", "/agreements/", "/doctrine/",
-			"/research/", "/changes/", "/laws/years/", "/rulings/years/", "/gazette/years/"} {
+		for _, p := range []string{"/", "/codes/", "/laws/", "/gazette/", "/opinions/", "/agreements/", "/doctrine/",
+			"/research/", "/changes/", "/laws/years/", "/gazette/years/"} { // no rulings: rulingsHidden
 			urls = append(urls, SitemapURL{p, mods[p]})
 		}
 		rows, err := s.db.Query(ctx, `SELECT c.law_id FROM code c ORDER BY c.position`)
@@ -378,6 +375,18 @@ func (s *Server) buildSmallSitemap(ctx context.Context, name string, arabic bool
 			return nil, err
 		}
 		ids := codes
+		if !arabic { // a code whose English is hidden has no /en/ entry
+			hidden, err := s.hiddenEnglish(ctx, codes)
+			if err != nil {
+				return nil, err
+			}
+			ids = nil
+			for _, id := range codes {
+				if !hidden[id] {
+					ids = append(ids, id)
+				}
+			}
+		}
 		if arabic {
 			read, err := s.mostRead(ctx, 300)
 			if err != nil {
@@ -409,7 +418,7 @@ func (s *Server) buildSmallSitemap(ctx context.Context, name string, arabic bool
 	for _, p := range []string{"/data/", "/ai/", "/run-it-yourself/", "/about/"} {
 		urls = append(urls, SitemapURL{Path: p})
 	}
-	for _, k := range []string{"laws", "rulings", "gazette"} {
+	for _, k := range []string{"laws", "gazette"} { // no rulings: rulingsHidden
 		ys, err := s.Years(ctx, k)
 		if err != nil {
 			return nil, err
@@ -498,6 +507,20 @@ func (s *Server) listMods(ctx context.Context) (map[string]time.Time, error) {
 		return nil, err
 	}
 	return v.(map[string]time.Time), nil
+}
+
+// hiddenEnglish are the texts among ids whose /en/ pages are hidden.
+func (s *Server) hiddenEnglish(ctx context.Context, ids []int) (map[int]bool, error) {
+	rows, err := s.db.Query(ctx, s.indexTables(ctx).Replace(`SELECT id FROM {ni} WHERE kind = 'english' AND id = ANY($1)`), ids)
+	if err != nil {
+		return nil, err
+	}
+	got, err := pgx.CollectRows(rows, pgx.RowTo[int])
+	out := map[int]bool{}
+	for _, id := range got {
+		out[id] = true
+	}
+	return out, err
 }
 
 // lawMods is when each of these texts last changed.

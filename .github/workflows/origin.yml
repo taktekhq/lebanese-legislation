@@ -1,5 +1,9 @@
 name: origin
 'on':
+  workflow_run:
+    workflows: [checks, data]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       route:
@@ -7,11 +11,11 @@ name: origin
         type: string
         default: ''
       image:
-        description: Deploy this already pushed Cloudflare registry image instead of building
+        description: Deploy an already pushed Cloudflare image tagged with its full build commit
         type: string
         default: ''
-      data_tag:
-        description: Data image date tag
+      tag:
+        description: Published lebanese-legislation-all tag
         type: string
         default: latest
       deploy_site_worker:
@@ -22,11 +26,12 @@ name: origin
         description: Origin mode
         type: choice
         options:
-        - hetzner
         - container
-        default: hetzner
+        - hetzner
+        default: container
 permissions:
   contents: read
+  actions: read
   packages: read
 concurrency:
   group: origin
@@ -39,15 +44,39 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
   R2_ENDPOINT: https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
   ORIGIN_TEST_KEY: ${{ secrets.ORIGIN_TEST_KEY }}
-  MODE: ${{ inputs.mode }}
+  MODE: ${{ inputs.mode || 'container' }}
   ROUTES: ${{ inputs.route }}
 jobs:
+  eligible:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    outputs:
+      deploy: ${{ steps.check.outputs.deploy }}
+    steps:
+    - uses: actions/github-script@v7
+      id: check
+      with:
+        script: |
+          if (context.eventName === 'workflow_dispatch') {
+            core.setOutput('deploy', 'true');
+            return;
+          }
+          const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+            ...context.repo,
+            run_id: context.payload.workflow_run.id,
+            filter: 'latest',
+            per_page: 100,
+          });
+          core.setOutput('deploy', jobs.some(job =>
+            job.name === 'all / image-all' && job.conclusion === 'success'));
   image:
-    if: inputs.image == ''
+    needs: eligible
+    if: needs.eligible.outputs.deploy == 'true' && inputs.image == ''
     runs-on: ubuntu-latest
     timeout-minutes: 120
     outputs:
       image: ${{ steps.image.outputs.image }}
+      build: ${{ steps.image.outputs.build }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -65,22 +94,28 @@ jobs:
       run: |
         sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
         docker system prune -af
-    - name: Prepare code build context
-      run: |
-        build=workers/static-site/container/build
-        mkdir -p "$build/src/web"
-        cp go.mod go.sum THIRD_PARTY_NOTICES.txt "$build/src/"
-        cp -R internal "$build/src/internal"
-        cp web/main.go "$build/src/web/"
-    - name: Build and push site image
+    - name: Copy published all-in-one image to Cloudflare
       id: image
       env:
-        DATA_TAG: ${{ inputs.data_tag }}
+        IMAGE_TAG: ${{ inputs.tag || 'latest' }}
       run: |
-        tag="lebleg-static-site-origin:${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-        docker build --build-arg DATA_TAG="$DATA_TAG" -t "$tag" workers/static-site/container
+        docker pull "ghcr.io/taktekhq/lebanese-legislation-all:$IMAGE_TAG"
+        revision=$(docker image inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "ghcr.io/taktekhq/lebanese-legislation-all:$IMAGE_TAG")
+        export REVISION="$revision"
+        build=$(python3 - <<'PYBUILD'
+        import os, runpy
+        deploy = runpy.run_path('workers/static-site/scripts/origin-deploy.py')
+        revision = os.environ['REVISION']
+        if revision == '<no value>':
+            revision = ''
+        print(deploy['image_build']('ghcr.io/taktekhq/lebanese-legislation-all:' + os.environ['IMAGE_TAG'], revision))
+        PYBUILD
+        )
+        tag="lebleg-static-site-origin:${build}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+        docker tag "ghcr.io/taktekhq/lebanese-legislation-all:$IMAGE_TAG" "$tag"
         (cd workers/static-site && npx --yes wrangler@4.151.1 containers push "$tag")
         echo "image=registry.cloudflare.com/$CLOUDFLARE_ACCOUNT_ID/$tag" >> "$GITHUB_OUTPUT"
+        echo "build=$build" >> "$GITHUB_OUTPUT"
   site-worker:
     needs:
     - image
@@ -99,9 +134,10 @@ jobs:
       run: python3 workers/static-site/scripts/origin-deploy.py site-worker
   stage:
     needs:
+    - eligible
     - image
     - site-worker
-    if: ${{ always() && (needs.image.result == 'success' || needs.image.result == 'skipped') && (needs.site-worker.result == 'success' || needs.site-worker.result == 'skipped') }}
+    if: ${{ always() && needs.eligible.outputs.deploy == 'true' && (needs.image.result == 'success' || needs.image.result == 'skipped') && (needs.site-worker.result == 'success' || needs.site-worker.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -116,6 +152,7 @@ jobs:
       id: stage
       env:
         IMAGE: ${{ inputs.image || needs.image.outputs.image }}
+        EXPECTED_BUILD: ${{ inputs.image == '' && needs.image.outputs.build || '' }}
         GEMINI_API_KEY: ${{ secrets.LEBLEG_GEMINI_API_KEY }}
         LEBLEG_VECTORIZE_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
       run: python3 workers/static-site/scripts/origin-deploy.py stage
