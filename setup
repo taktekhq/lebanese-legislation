@@ -14,5 +14,6 @@ else
   chmod 600 .env
   echo 'Kept existing environment values'
 fi
-docker compose up -d --wait --wait-timeout "${STARTUP_TIMEOUT:-7200}"
-printf '%s\n' 'Ready. Website: http://127.0.0.1:8080 (or WEB_PORT). API: http://127.0.0.1:8000/api/v1/ (or API_PORT). MCP: http://127.0.0.1:8001/mcp (or MCP_PORT).'
+echo 'Next, start one of the two:'
+echo '  docker compose --profile all up -d all      the whole site from one image: http://127.0.0.1:8080 (pages, /api/v1/, /mcp)'
+echo '  docker compose up -d --wait db api mcp      the separate services: API http://127.0.0.1:8000/api/v1/, MCP http://127.0.0.1:8001/mcp'

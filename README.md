@@ -33,12 +33,24 @@ See [architecture](docs/architecture.md) for the request and build paths.
 
 Data lives on Hugging Face. Code and Docker images live here. Each GitHub release is a code version, never a data download.
 
+## Production and development
+
+The same image, `ghcr.io/taktekhq/lebanese-legislation-all`, runs in both. It holds PostgreSQL with the data, the API (`/api/v1/`), the MCP server (`/mcp`) and the website server.
+
+| | Production | Development |
+|---|---|---|
+| Static pages | built by `static-site.yml` into Cloudflare R2, served by the Worker in `workers/static-site` | rendered on request by the `-all` image |
+| API, MCP, search | the Worker passes them to `-all` (Cloudflare Containers, blue/green, `workers/origin`) | `-all` directly |
+| Run it | `origin.yml` deploys it | `docker compose --profile all up all`, then open http://localhost:8080 |
+
+In development every page is rendered on request, which is slower than production but needs nothing besides the image. To get the exact static copy production serves, run `static-export` against the database: see [docs/static-export.md](docs/static-export.md).
+
 ## Run the services locally
 
 ```sh
 git clone https://github.com/taktekhq/lebanese-legislation.git
 cd lebanese-legislation
-./start
+./setup
 ```
 
 You need Docker Compose, 8 GB of free memory and 30 GB of free disk. The database image already holds both databases. The first start copies them into an empty volume; later starts reuse it. The website uses the all-in-one image with its own baked database.

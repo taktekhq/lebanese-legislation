@@ -1,4 +1,4 @@
-# The database, API, MCP server and website. Run ./start, or see README.md.
+# The database, API, MCP server and website. Run ./setup, or see README.md.
 name: ${COMPOSE_PROJECT_NAME:-lebanese-legislation}
 services:
   db:
@@ -6,8 +6,8 @@ services:
     environment:
       POSTGRES_USER: lebleg_owner
       POSTGRES_DB: lebleg
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run ./start to generate local credentials}
-      LEBLEG_READER_PASSWORD: ${READER_PASSWORD:?Run ./start to generate local credentials}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run ./setup to generate local credentials}
+      LEBLEG_READER_PASSWORD: ${READER_PASSWORD:?Run ./setup to generate local credentials}
     command: ["postgres", "-c", "shared_buffers=256MB", "-c", "maintenance_work_mem=2GB", "-c", "max_parallel_maintenance_workers=2", "-c", "max_connections=30"]
     shm_size: 3gb
     mem_limit: ${DB_MEMORY:-3g}
@@ -65,23 +65,23 @@ services:
     security_opt: ["no-new-privileges:true"]
     cap_drop: [ALL]
   # The all-in-one image serves the website from its own baked database.
-  web:
-    image: ${WEB_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-all:latest}
+  # The whole site from one image: PostgreSQL with the data, the API, MCP and
+  # the website server, on http://localhost:8080. It has its own database, so
+  # run either this (`docker compose up all`) or the separate db/api/mcp
+  # services (`docker compose up db api mcp`), not both. In production the
+  # same image runs behind the Cloudflare Worker, which serves static pages
+  # from R2 and sends only the API, MCP and search to it.
+  all:
+    image: ${ALL_IMAGE:-ghcr.io/taktekhq/lebanese-legislation-all:latest}
+    profiles: [all]
+    ports: ["127.0.0.1:${ALL_PORT:-8080}:8080"]
     environment:
-      # Absolute links (canonical, language switcher, sitemap). Set it when you host the site publicly.
-      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:${WEB_PORT:-8080}}
-      # Optional: your own key turns on search by meaning. Exact and citation search need none.
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      LEBLEG_VECTOR_DSN: ${LEBLEG_VECTOR_DSN:-}
       CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:-}
       LEBLEG_VECTORIZE_TOKEN: ${LEBLEG_VECTORIZE_TOKEN:-}
       LEBLEG_VECTORIZE_INDEX: ${LEBLEG_VECTORIZE_INDEX:-}
-      GEMINI_MAX_CALLS_PER_DAY: ${GEMINI_MAX_CALLS_PER_DAY:-500}
-      GEMINI_CONCURRENCY: ${GEMINI_CONCURRENCY:-2}
-    ports: ["127.0.0.1:${WEB_PORT:-8080}:8080"]
-    restart: unless-stopped
     shm_size: 1gb
-    mem_limit: ${WEB_MEMORY:-3g}
-    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+
 volumes:
   db_data:

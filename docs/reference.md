@@ -22,10 +22,10 @@ Install Docker with Compose. Allow at least 4 GB of available memory and 30 GB o
 ```sh
 git clone https://github.com/taktekhq/lebanese-legislation.git
 cd lebanese-legislation
-./start
+./setup
 ```
 
-`./start` generates separate random owner and reader passwords in a private `.env`
+`./setup` generates separate random owner and reader passwords in a private `.env`
 file. On an empty volume the DB image copies its baked cluster and sets these
 passwords. API and MCP wait for both serving databases to be ready. Existing
 volumes and credentials are preserved. Select a database image by date with
@@ -83,7 +83,7 @@ Precomputed vectors save the cost of embedding the whole corpus. Query embedding
 
 ## Configuration
 
-Copy the optional settings from `.env.example`. `./start` creates required passwords when `.env` does not exist; an existing manually created `.env` must contain both passwords.
+Copy the optional settings from `.env.example`. `./setup` creates required passwords when `.env` does not exist; an existing manually created `.env` must contain both passwords.
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
