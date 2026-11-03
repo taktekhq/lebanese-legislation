@@ -40,7 +40,7 @@ for requirements, every step, configuration and a nightly user systemd timer.
 | Read the laws | [LebaneseLegislation.com](https://lebaneselegislation.com/) |
 | Connect an AI assistant | The free MCP server at `https://lebaneselegislation.com/mcp`. [Setup](docs/mcp.md) |
 | The data as tables | [Parquet files on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation) |
-| The data as a PostgreSQL database | The `-db` or `-all` image below, with both databases baked from `data/`. |
+| The data as a PostgreSQL database | [PostgreSQL dumps on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/postgres) (`pg_restore`, no embeddings), or the `-db` or `-all` image below, with both databases baked from `data/`. |
 | Semantic search vectors | [vectors/vectors.parquet](https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/vectors/vectors.parquet), 1,547,937 chunks, 768 dimensions, `gemini-embedding-001`. [Read with DuckDB](docs/reference.md#vectors). |
 | The original court scans | [Court scans on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-court-scans) |
 | Every source page as it was served | [Archive dataset on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation-archive) and [its repository](https://github.com/taktekhq/lebanese-legislation-archive) |

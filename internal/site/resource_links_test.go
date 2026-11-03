@@ -23,7 +23,7 @@ func TestPublicResourcesAreDirectAndBilingual(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, dest := range []string{"https://github.com/taktekhq/lebanese-legislation", "https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/data", "https://huggingface.co/datasets/taktekhq/lebanese-court-scans", "https://huggingface.co/collections/taktekhq/lebanese-legislation", prefix + "/run-it-yourself/"} {
+		for _, dest := range []string{"https://github.com/taktekhq/lebanese-legislation", "https://github.com/orgs/taktekhq/packages/container/package/lebanese-legislation-db", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/postgres/lebleg.dump", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/resolve/main/postgres/lebleg_search.dump", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/blob/main/postgres/manifest.json", "https://huggingface.co/datasets/taktekhq/lebanese-legislation/tree/main/data", "https://huggingface.co/datasets/taktekhq/lebanese-court-scans", "https://huggingface.co/collections/taktekhq/lebanese-legislation", prefix + "/run-it-yourself/"} {
 			if !strings.Contains(body, `href="`+dest+`"`) {
 				t.Errorf("%s resource hub missing direct %s", lang, dest)
 			}

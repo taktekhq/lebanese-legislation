@@ -148,6 +148,90 @@ jobs:
       tags: |
         ghcr.io/taktekhq/lebanese-legislation-db:latest
       free_disk: true
+  dump:
+    # PostgreSQL dumps of both databases from the -db image this run just
+    # built, to one fixed path on Hugging Face that each run overwrites
+    # (postgres/). Old versions stay in the dataset's git history. No
+    # embeddings: semantic vectors are in the -vectors image and Vectorize.
+    needs: db
+    if: github.ref == 'refs/heads/main'
+    environment: huggingface
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      HF_REPO: taktekhq/lebanese-legislation
+      IMAGE: ghcr.io/taktekhq/lebanese-legislation-db:latest
+    steps:
+      - name: Need HF_TOKEN
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "No HF_TOKEN secret: no dump uploaded." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+      - name: Free runner disk
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          docker system prune -af
+          df -h /
+      - name: Pull the -db image built from this commit
+        run: |
+          docker pull "$IMAGE"
+          rev=$(docker inspect -f '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$IMAGE")
+          # A stale :latest once shipped old code under a new name: refuse
+          # anything but this commit's build.
+          if [ "$rev" != "$GITHUB_SHA" ]; then
+            echo "::error::$IMAGE is from ${rev:-an unknown commit}, not $GITHUB_SHA"
+            exit 1
+          fi
+      - name: Start PostgreSQL
+        run: |
+          docker run -d --name db -e POSTGRES_PASSWORD=dump "$IMAGE"
+          for i in $(seq 180); do
+            docker exec -u postgres db pg_isready -q && \
+              docker exec -u postgres db psql -d lebleg -Atc 'SELECT 1' >/dev/null 2>&1 && exit 0
+            sleep 5
+          done
+          docker logs db | tail -50
+          exit 1
+      - name: Dump both databases
+        run: |
+          out="$RUNNER_TEMP/postgres"; mkdir -p "$out"
+          for d in lebleg lebleg_search; do
+            docker exec -u postgres db pg_dump -Fc -d "$d" > "$out/$d.dump"
+          done
+          ls -l "$out"
+          python3 - "$out" <<'PY'
+          import hashlib, json, os, subprocess, sys, datetime
+          out = sys.argv[1]
+          def sha(p):
+              h = hashlib.sha256()
+              with open(p, "rb") as f:
+                  for b in iter(lambda: f.read(1 << 20), b""):
+                      h.update(b)
+              return h.hexdigest()
+          pg = subprocess.check_output(["docker", "exec", "db", "pg_dump", "--version"], text=True).split()[-1]
+          files = {}
+          for name in ("lebleg.dump", "lebleg_search.dump"):
+              p = os.path.join(out, name)
+              files[name] = {"bytes": os.path.getsize(p), "sha256": sha(p)}
+          manifest = {"commit": os.environ["GITHUB_SHA"], "date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                      "image": os.environ["IMAGE"], "pg_dump": pg, "format": "custom (pg_restore)", "embeddings": False, "files": files}
+          with open(os.path.join(out, "manifest.json"), "w") as f:
+              json.dump(manifest, f, indent=2)
+              f.write("\n")
+          print(json.dumps(manifest, indent=2))
+          PY
+      - name: Upload to Hugging Face
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv" && . "$RUNNER_TEMP/venv/bin/activate"
+          pip install --quiet "huggingface_hub==1.33.0"
+          hf upload "$HF_REPO" "$RUNNER_TEMP/postgres" postgres --repo-type dataset \
+            --commit-message "PostgreSQL dumps from ${GITHUB_SHA::12}, $(date -u +%F)"
+          echo "Dumps: https://huggingface.co/datasets/$HF_REPO/tree/main/postgres" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Stop PostgreSQL
+        if: always()
+        run: docker rm -f db >/dev/null 2>&1 || true
   all:
     needs: db
     permissions:
