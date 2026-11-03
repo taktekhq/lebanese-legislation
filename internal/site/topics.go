@@ -16,16 +16,17 @@ import (
 // tests there keep each quote an exact piece of the article.
 //
 // The pages are written by a model (cmd/topicgen), so all of them, /topics/
-// and every /topic/<slug>/ in both languages, are `noindex, follow` and out
-// of the sitemaps (issue #86): visitors and the links to the laws keep
-// them, search engines are not offered them.
+// and every /topic/<slug>/ in both languages, are hidden from Google and out
+// of the sitemaps (issue #86). Other engines may index them: Bing is the index
+// ChatGPT and Copilot search, and they are where people ask these questions
+// (Nizar, 3 Nov 2026: "hide them from google, but show them to Bing").
 
 func (s *Server) topicRoutes() {
 	s.mux.HandleFunc("GET /topics/{$}", s.topicsIndex)
 	s.mux.HandleFunc("GET /topic/{slug}/{$}", s.topic)
 }
 
-// topicsHidden: the generated topic pages are not offered to search engines.
+// topicsHidden: the generated topic pages carry a googlebot noindex.
 const topicsHidden = true
 
 // TopicRef is a topic as the article page and the index name it.
@@ -49,7 +50,7 @@ func (s *Server) topicsIndex(w http.ResponseWriter, r *http.Request) {
 	}
 	s.render(w, r, "topics", 200, Page{
 		Title: s.brandTitle(r, s.tr(r, "topics.title")),
-		Desc:  s.tr(r, "topics.desc"), Path: "/topics/", Data: list, NoIndex: topicsHidden,
+		Desc:  s.tr(r, "topics.desc"), Path: "/topics/", Data: list, GoogleNoIndex: topicsHidden,
 		LD: []any{breadcrumbs(s.tr(r, "topics.title"), "/topics/")}})
 }
 
@@ -226,7 +227,7 @@ func (s *Server) topic(w http.ResponseWriter, r *http.Request) {
 	}
 	path := "/topic/" + t.Slug + "/"
 	s.render(w, r, "topic", 200, Page{
-		Title: s.brandTitle(r, c.Title), Desc: c.Description, Path: path, OGType: "article", NoIndex: topicsHidden,
+		Title: s.brandTitle(r, c.Title), Desc: c.Description, Path: path, OGType: "article", GoogleNoIndex: topicsHidden,
 		LD:   []any{s.topicLD(r, t, c, path, ctx), breadcrumbs(s.tr(r, "topics.title"), "/topics/", c.Title, path)},
 		Data: tv})
 }

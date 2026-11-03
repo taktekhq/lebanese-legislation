@@ -34,8 +34,8 @@ import (
 //     english: every text not in data/popular_texts.txt), so most laws-N
 //     files are empty; the index names only the ones that are not, and an
 //     empty one is a 404. core.xml leaves out such a code's /en/ address.
-//   - The topic pages are in no sitemap: they are generated and hidden
-//     (topics.go). Neither are the rulings, their lists and their years:
+//   - The topic pages are in no sitemap: they are generated and hidden from
+//     Google (topics.go); Bing finds them through links and IndexNow. Neither are the rulings, their lists and their years:
 //     every ruling page is hidden (rulingsHidden), so there is no
 //     ar-rulings-N family.
 //
