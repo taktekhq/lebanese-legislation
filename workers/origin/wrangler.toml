@@ -11,7 +11,7 @@ vars = { LEBLEG_VECTORIZE_INDEX = "lebleg-chunks", CLOUDFLARE_ACCOUNT_ID = "5f01
 class_name = "Origin"
 image = "../static-site/container/Dockerfile"
 image_build_context = "../static-site/container"
-instance_type = "standard-4"
+instance_type = "standard-2"
 max_instances = 2
 
 [[env.blue.durable_objects.bindings]]
@@ -31,7 +31,7 @@ vars = { LEBLEG_VECTORIZE_INDEX = "lebleg-chunks", CLOUDFLARE_ACCOUNT_ID = "5f01
 class_name = "Origin"
 image = "../static-site/container/Dockerfile"
 image_build_context = "../static-site/container"
-instance_type = "standard-4"
+instance_type = "standard-2"
 max_instances = 2
 
 [[env.green.durable_objects.bindings]]
