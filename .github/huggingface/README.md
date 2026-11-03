@@ -124,7 +124,7 @@ Most source texts come from the [Centre for Research and Studies in Legal Inform
 
 Source text, machine readings and editorial corrections have different provenance. English titles are machine-generated search aids. Judgment transcriptions and recent Gazette readings may contain errors. They are not reviewed ground truth. Check the page images and authoritative publication before relying on them. Derived amendment links and in-force states also need checking. See [METHODS.md](METHODS.md) for uncertainty markers, corrections, provenance and citation.
 
-The structured dataset is rebuilt nightly. Individual tables can be incomplete. Judgment reading is still under way. Original court PDFs are available separately in [Lebanese Court Scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans).
+The structured dataset is rebuilt and published from the public repository when the source data changes; the commit and date of each upload are in this dataset's history. Individual tables can be incomplete. Judgment reading is still under way. Original court PDFs are available separately in [Lebanese Court Scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans).
 
 You can also use the [JSON API](https://lebaneselegislation.com/developers/) or [MCP server](https://lebaneselegislation.com/ai/). This dataset is not legal advice. Send corrections to nizar@taktek.io.
 

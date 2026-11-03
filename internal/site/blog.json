@@ -102,6 +102,10 @@
       {
         "Heading": "Fewer, better pages for search engines.",
         "Body": "Pages that add little, such as generated topic summaries, badly scanned rulings and machine English for texts few people read, now ask search engines not to index them. They stay on the site and stay linked. English titles remain search aids, never translations."
+      },
+      {
+        "Heading": "One repository.",
+        "Body": "Older journal entries mention a separate starter repository and pending database releases. Both are gone. Everything, the scraper, the build, the website, the API, the MCP server and the data as text, is in github.com/taktekhq/lebanese-legislation, and the original source pages are in the archive repository next to it."
       }
     ],
     "SectionsAr": [
@@ -124,6 +128,10 @@
       {
         "Heading": "صفحات أقل وأفضل لمحركات البحث.",
         "Body": "الصفحات التي لا تضيف الكثير، مثل ملخصات المواضيع المولّدة والأحكام الممسوحة بشكل سيئ والإنكليزية الآلية للنصوص القليلة القراءة، تطلب الآن من محركات البحث ألا تفهرسها. وتبقى على الموقع ومرتبطة بغيرها. وتبقى العناوين الإنكليزية أدوات بحث، لا ترجمات."
+      },
+      {
+        "Heading": "مستودع واحد.",
+        "Body": "تذكر مدخلات أقدم في السجل مستودعاً تمهيدياً منفصلاً وإصدارات قاعدة بيانات قيد الانتظار. لم يعد أيّ منهما موجوداً. كل شيء، أداة جمع البيانات والبناء والموقع وواجهة البرمجة وخادم MCP والبيانات بصيغة نصية، موجود في github.com/taktekhq/lebanese-legislation، وصفحات المصدر الأصلية في مستودع الأرشيف إلى جانبه."
       }
     ],
     "Action": "Run it yourself",
