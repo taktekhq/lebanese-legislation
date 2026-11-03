@@ -163,6 +163,22 @@ fi
   RULINGS="${LEBLEG_RULINGS:-$REPO/manual/rulings}"
   RULING_PDFS="${LEBLEG_RULING_PDFS:-$RULINGS}"
   mkdir -p "$RULINGS"
+  # The build keeps a page's changed_at from page_state in the database it is
+  # about to replace. Seed that table from the published data/ first, so a
+  # local database that is missing, stale or half built (a failed night) never
+  # marks every page changed: that would move every sitemap date and re-render
+  # the whole site.
+  if [ -d "$REPO/data/tables/page_state" ]; then
+    { echo "BEGIN;"
+      sed -n '/^CREATE TABLE page_state (/,/^);/p' "$REPO/data/schema.sql" | sed '1s/CREATE TABLE/CREATE TABLE IF NOT EXISTS/'
+      echo "TRUNCATE page_state;"
+      echo "\\copy page_state (kind, id, content_hash, changed_at) FROM STDIN"
+      cat "$REPO"/data/tables/page_state/*.tsv
+      echo '\.'
+      echo "COMMIT;"
+    } | psql -X -q -v ON_ERROR_STOP=1 "$LEBLEG_DSN" \
+      || { FAIL_WHY="could not seed page_state from data/"; echo "$FAIL_WHY" >&2; exit 1; }
+  fi
   # One build runs steps 5 to 12. Exit 2: it finished and its checks failed (the
   # build gate); any other failure stopped it, so what comes after is held.
   brc=0
