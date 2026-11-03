@@ -44,6 +44,10 @@ func (s *Server) robots(w http.ResponseWriter, r *http.Request) {
 	for _, bot := range aiCrawlers {
 		b.WriteString("User-agent: " + bot + "\n" + rules + "\n")
 	}
+	// ShapBot (Parallel's index for AI search and agents) may also read search,
+	// the API and the MCP server, so the agents that use Parallel learn them
+	// (Nizar, 4 Nov 2026: "let ShapBot call them").
+	b.WriteString("User-agent: ShapBot\nAllow: /\nDisallow: /changes/review/\nDisallow: /en/changes/review/\n\n")
 	b.WriteString("Sitemap: " + Base + "/sitemap.xml\n")
 	b.WriteString("Sitemap: " + Base + "/blog-sitemap.xml\n")
 	fmt.Fprint(w, b.String())
