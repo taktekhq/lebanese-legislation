@@ -40,6 +40,33 @@ func gitOutput(ctx context.Context, dir string, args ...string) ([]byte, error) 
 // Unknown schemas/tables fail closed to a full render. The workflow checks out
 // one pinned commit for the plan and every shard, under a single run lock.
 func PlanChanges(ctx context.Context, dir, since string, full bool) (ChangePlan, error) {
+	var frame bool
+	p, e := planChanges(ctx, dir, since, full, &frame)
+	if e != nil || p.Full || !frame {
+		return p, e
+	}
+	// A page stored whole carries the frame in its own bytes: render it again.
+	seen := map[string]bool{}
+	for _, q := range p.Paths {
+		seen[q] = true
+	}
+	for _, q := range WholeFramePages {
+		if !seen[q] {
+			p.Paths = append(p.Paths, q)
+		}
+	}
+	sort.Strings(p.Paths)
+	return p, nil
+}
+
+// WholeFramePages are the pages in the layout that are stored whole, because
+// the export changes them in the frame (the search page's script, added
+// before </body> by SearchShell). A frame-only change renders them again.
+var WholeFramePages = []string{"/search/", "/en/search/"}
+
+// planChanges is PlanChanges; frame is set when layout.html changed in its
+// shared frame only.
+func planChanges(ctx context.Context, dir, since string, full bool, frame *bool) (ChangePlan, error) {
 	if full || since == "" {
 		return ChangePlan{Full: true}, nil
 	}
@@ -54,7 +81,8 @@ func PlanChanges(ctx context.Context, dir, since string, full bool) (ChangePlan,
 	}
 	for _, p := range strings.Fields(string(b)) {
 		if p == layoutFile && frameOnlyChange(ctx, dir, since) {
-			continue // the frame is published by every run; no page changes
+			*frame = true // every run publishes the frame; no page's parts change
+			continue
 		}
 		for _, prefix := range []string{"internal/site/", "templates/", "static/", "assets/", "cmd/static-export/", "internal/staticexport/", "db/", "data/schema.sql", "data/indexes.sql", "data/TABLES", "data/popular_texts.txt", "data/article_calculated_current.jsonl", "go.mod", "go.sum", ".github/workflows/static-site.yml"} {
 			if strings.HasPrefix(p, prefix) {

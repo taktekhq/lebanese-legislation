@@ -39,6 +39,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -507,6 +508,10 @@ func (ex *exporter) ok(p string, rec *httptest.ResponseRecorder, e Entry) error 
 		if parts, key, ok := ex.o.Layout.Split(body); ok {
 			stored, e.Layout = parts, key
 			atomic.AddInt64(&ex.st.Parts, 1)
+		} else if !slices.Contains(WholeFramePages, p) {
+			// A frame-only change renders no page (changes.go), so a page
+			// stored whole would keep the old header and footer.
+			return fmt.Errorf("%s: the page does not fit the layout frame; list it in WholeFramePages or render it through layout.html", p)
 		}
 	}
 	atomic.AddInt64(&ex.st.Stored, int64(len(stored)))

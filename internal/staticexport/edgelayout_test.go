@@ -78,7 +78,7 @@ func TestSplitLeavesOtherPagesWhole(t *testing.T) {
 	}
 	w := httptest.NewRecorder()
 	s.ServeHTTP(w, httptest.NewRequest("GET", "/blog/", nil))
-	tr :=SearchShell("")("/search/", "text/html", w.Body.Bytes())
+	tr := SearchShell("")("/search/", "text/html", w.Body.Bytes())
 	if _, _, ok := l.Split(tr); ok {
 		t.Error("a page with a script added to the frame was split")
 	}
@@ -223,8 +223,8 @@ func TestLayoutFrameOnlyChange(t *testing.T) {
 
 	write(layoutFile, strings.Replace(src, `<footer class="footer">`, `<footer class="footer"><p class="tiny">{{t "brand.name"}}</p>`, 1))
 	git("commit", "-qam", "footer")
-	if p := plan(); p.Full || len(p.Paths) != 0 {
-		t.Fatalf("a footer change: %+v, want no page", p)
+	if p := plan(); p.Full || strings.Join(p.Paths, " ") != "/en/search/ /search/" {
+		t.Fatalf("a footer change: %+v, want only the pages stored whole", p)
 	}
 	write(layoutFile, strings.Replace(src, `<script defer src="/main.js?v={{assetVersion}}"></script>`, `<script defer src="/main2.js?v={{assetVersion}}"></script>`, 1))
 	git("commit", "-qam", "scripts")

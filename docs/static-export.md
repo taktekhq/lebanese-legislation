@@ -68,8 +68,109 @@ existing R2 path exchange for crawl discovery.
 
 A missing baseline, `workflow_dispatch` with `full=true`, or a renderer change
 (`internal/site`, templates, assets, `cmd/static-export`, `internal/staticexport`)
-forces a full render. Schema, rendering dependencies and unmapped table changes
+forces a full render. The one exception is a change to the shared frame of
+`internal/site/templates/layout.html` alone (see below): it renders only the
+two search pages, which are stored whole. Schema, rendering dependencies and unmapped table changes
 also fall back to a full render. The workflow serializes runs and keeps 24 owners,
 matching the stored manifests. Only after all shards and the generation job
 succeed does the final job write `_export/rendered-commit`. A failed run leaves
 the baseline unchanged, so its changes are retried.
+
+## Edge layout: one frame for every page
+
+Every page wraps its own content in `layout.html`: the head, the header and
+menu, the footer, the analytics tags. Stored whole, a one-word change to the
+footer changes the bytes, and so the hash, of all 760,000 pages, and the next
+run uploads every one of them again: about 760,000 R2 writes (Class A, about
+$3.40 at $4.50 a million) after a 3 to 4 hour full render. With the edge
+layout the same change uploads two small objects.
+
+**Frame and parts.** `layout.html` is a frame: it may use only what is the
+same on every page of a language (`t`, `u`, `uilang`, `assetVersion`,
+`analytics` and the like). Everything it takes from the page goes through
+the `page:` templates of `_page.html`: title, description, canonical,
+hreflang, robots, `og:type`, the Arabic text font, JSON-LD, the two language
+links, and the content. `internal/site/layoutframe.go` renders the frame of
+each language with no page at all (a field used outside a `page:` template
+fails there) and a mark in each hole, which gives the pieces of shared HTML
+between the holes. Shared blocks the content uses (`lawrow`, `article`,
+`pager`...) moved to `_blocks.html`, so they count as page content.
+
+**Stored form.** The exporter cuts each rendered HTML page at the pieces of
+its frame and stores only what lies between them, after checking that the
+pieces and the parts give back the rendered page byte for byte:
+
+```
+LLP1 <lang> <schema> <len>,<len>,...\n<part><part>...
+```
+
+The manifest hash covers this object only. The frame of each language is an
+immutable `_layout/<id>.json` (`id` from its SHA-256), and
+`_export/layout.json` names the frame for each `lang/schema`. The schema
+names the holes and how each one is escaped where it stands (a probe string
+is printed into each hole), so a page cut under one schema fits every frame
+of the same schema. Older schemas stay listed (four per language) for pages
+not yet cut again. Sitemaps, feeds, `robots.txt` and the two search pages
+(their script is added before `</body>`, in the frame) are stored whole. Any
+other HTML page that does not fit the frame stops the export, because a
+frame-only change would leave it with the old footer.
+
+**At the edge.** The Worker (`workers/static-site/src/layout.js`) reads the
+object; when it starts with `LLP1 ` it fetches the frame named by
+`_export/layout.json` (read once a minute, frames kept in memory) and joins
+the bytes. Anything else, including every page stored before the change, is
+served as it is. A page in parts whose frame cannot be found goes to the
+origin, never out as parts. The page cache key carries the export generation
+and the ETag of `_export/layout.json`, so a new frame shows at once; with no
+`_export/layout.json` the key is what it was before. The page's ETag gains
+the frame id. Analytics tags (`ga.js`, `load.js`, `data-ph`) are in the frame,
+so every page served carries them; `TestLayoutFramesRebuildPages` checks it.
+
+**What a change costs now.** `static-export changes` compares the schemas of
+`layout.html` at both commits. A change to the frame alone (header, footer,
+menu, analytics tags, stylesheet links) is not a renderer change: the plan
+holds the two search pages, the run stores the new frames and
+`_export/layout.json` before any page (only shard 0 writes them), and uploads
+no other page. That is 2 frames, the pointer and 2 pages, plus the support
+files and manifests every run writes. A change that adds, removes or moves a
+hole, touches `_page.html`, `_blocks.html`, a page template, the i18n
+strings or Go code still renders everything; even then, a page whose parts
+did not change has the same hash and is not uploaded.
+
+**Byte for byte.** `TestEdgeLayoutThroughWorker` (cmd/static-export) exports
+the pages that need no database whole and in parts and runs the Worker's own
+code (`test/edgelayout.test.mjs`) over a bucket made of the parts. On a corpus
+sample the same test compared 3,284 HTML pages, Arabic and English, of every
+kind (laws, decrees, texts and their articles, rulings, Gazette issues, year
+and pager lists, codes, opinions, agreements, doctrine, research, home,
+about, data, changes), rendered whole by the main branch's exporter, with what
+the Worker answers from this exporter's parts: all 3,284 identical, 3,282 of
+them stored in parts. Stored bytes fell from 119.5 MB to 84.1 MB. To repeat it:
+
+```sh
+static-export-main export -out proof/whole -paths paths.txt -crawl=false -search-shell
+static-export      export -out proof/parts -paths paths.txt -crawl=false -search-shell -edge-layout on
+cd workers/static-site && EDGE_LAYOUT_DIR=../../proof node --test test/edgelayout.test.mjs
+```
+
+### Cutover
+
+1. Merge. `-edge-layout auto` (the default with `-r2-bucket`) asks the live
+   Worker for `/_build/layout`; the old Worker answers 404, so pages are still
+   stored whole. The merge touches `internal/site`, so the next run is a full
+   render, but the whole pages are byte for byte the same, so it uploads no
+   page.
+2. Deploy the Worker (origin workflow, `deploy_site_worker`). It serves the
+   whole pages as before, with the same cache keys while
+   `_export/layout.json` does not exist.
+3. Run the static-site workflow with `full=true`. The exporter now finds the
+   Worker, writes the frames and `_export/layout.json`, then stores every HTML
+   page in parts: a one-time rewrite of every page, as any full render was
+   before. During the run some pages are whole and some in parts; the Worker
+   serves both.
+4. Optional: pass `-edge-layout on` in the workflow, so a run never depends on
+   reaching the live site.
+
+To roll the Worker back to a version without the edge layout, first run a
+full render with `-edge-layout off` (pages stored whole again), then roll it
+back. An older Worker would serve pages in parts as they are.

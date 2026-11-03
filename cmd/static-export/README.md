@@ -88,6 +88,17 @@ so paths reached through other owners, redirects and cycles are included once.
 `-exchange-timeout` (default `30m`) bounds each exchange wait, not rendering.
 If it expires, the error lists the shards that have not reported for that round.
 Coordination objects live under `_export/discovery/<id>/of-<n>/`.
+
+`-edge-layout` stores each HTML page as its own parts (title, description,
+canonical, hreflang, robots, JSON-LD, language links, content) instead of the
+whole page, and the Worker puts them into the shared frame of the page's
+language when it answers. A change to the header, footer, menu or analytics
+tags then uploads one frame per language and no page. `on` and `off` force
+it; `auto`, the default, is on with `-r2-bucket` only once the live Worker
+answers `<base>/_build/layout` (an older Worker would serve the parts as
+they are). The frames are written to `.export/_layout/` and `.export/layout.json`
+as well, so `compare` reads an export in parts as whole pages. See
+[edge layout](../../docs/static-export.md#edge-layout-one-frame-for-every-page).
 Local independent shards can use `-crawl=false` for sitemap-only exports;
 coordinated crawling requires R2 and cannot use `-dry-run` or `-limit`.
 At about 760,000 pages, 24 shards average about 31,667 pages each.
@@ -101,3 +112,6 @@ cd workers/static-site && node --test test/*.test.mjs
 
 The exporter's tests use a fake site, so they need no database. The signer is
 checked against the example in the AWS Signature Version 4 documentation.
+`TestEdgeLayoutThroughWorker` exports the pages that need no database whole
+and in parts and runs the Worker's own code on them (`node` 20.6 or later on
+the `PATH`, or `LEBLEG_NODE`; skipped without one).
