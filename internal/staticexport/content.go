@@ -567,14 +567,14 @@ func templateFuncKeys(dirs ...string) (map[string]*keyUse, error) {
 					}
 				case *ast.Ident:
 					for _, d := range decls[n.Name] {
-						if !seen[d] {
+						if !seen[d] && d.Body != nil {
 							seen[d] = true
 							collect(d.Body)
 						}
 					}
 				case *ast.SelectorExpr:
 					for _, d := range decls[n.Sel.Name] {
-						if !seen[d] {
+						if !seen[d] && d.Body != nil {
 							seen[d] = true
 							collect(d.Body)
 						}
@@ -679,11 +679,12 @@ func topicPaths(ctx context.Context, dir, since string, files []string, manifest
 		if err != nil && !os.IsNotExist(err) {
 			return nil, nil, err
 		}
+		nok := err == nil
 		o, err := read(ob, ook)
 		if err != nil {
 			return nil, nil, fmt.Errorf("%s at %s: %w", f, since, err)
 		}
-		n, err := read(nb, err == nil)
+		n, err := read(nb, nok)
 		if err != nil {
 			return nil, nil, fmt.Errorf("%s: %w", f, err)
 		}

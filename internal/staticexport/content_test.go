@@ -175,6 +175,14 @@ func TestPlanContent(t *testing.T) {
 		"/topic/rent/", "/topic/inheritance/", "/topics/", "/", "/law/8/article/5/")
 	reset()
 
+	if err := os.Remove(filepath.Join(dir, topicsDir, "rent.json")); err != nil {
+		t.Fatal(err)
+	}
+	commit("guide removed")
+	want("a guide removed", plan(topicsDir+"rent.json"),
+		"/topic/rent/", "/topic/inheritance/", "/topics/", "/", "/law/8/article/5/")
+	reset()
+
 	write(templateDir+"_shared.html", `{{define "shared"}}<aside></aside>{{end}}`)
 	write(templateDir+"law.html", `{{define "content"}}<h1>{{t "law.title"}}</h1>{{template "lawbits" .}}{{template "shared"}}{{end}}`)
 	write(templateDir+"about.html", `{{define "content"}}<h1>{{t "about.title"}}</h1>{{template "shared"}}{{end}}`)
