@@ -209,6 +209,7 @@ func TestAIQuestionGoesToPostHog(t *testing.T) {
 	v := url.Values{"q": {"How much annual leave does an employee get?"}, "ph": {"visitor-1"}}
 	r := httptest.NewRequest("POST", "/en/search/ai/", strings.NewReader(v.Encode()))
 	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Set("CF-Connecting-IP", "203.0.113.5")
 	s.ServeHTTP(httptest.NewRecorder(), r)
 	for range 50 {
 		mu.Lock()
@@ -227,6 +228,10 @@ func TestAIQuestionGoesToPostHog(t *testing.T) {
 	p := got[0]["properties"].(map[string]any)
 	if p["outcome"] != "answered" || p["distinct_id"] != "visitor-1" || p["question_lang"] != "latin" || p["questions_left"] != float64(9) || p["question"] == nil {
 		t.Fatalf("properties: %+v", p)
+	}
+	// The visitor's IP, not the container's own address PostHog would see.
+	if p["$ip"] != "203.0.113.5" || p["$geoip_disable"] != false {
+		t.Fatalf("visitor IP: %+v", p)
 	}
 }
 

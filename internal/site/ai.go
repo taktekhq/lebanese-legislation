@@ -367,7 +367,9 @@ const (
 
 // trackAI sends one ai_question event to PostHog for every question the box
 // answers or declines: what happened, what it cost, and how long it took.
-// The browser's PostHog ID (form field ph) ties it to the visitor's session.
+// The browser's PostHog ID (form field ph) ties it to the visitor's session,
+// and the visitor's IP gives PostHog their country: without $ip PostHog takes
+// the address the event came from, the container's own (104.28.x.x).
 func (s *Server) trackAI(r *http.Request, q string, v aiView, u *nlsearch.Usage, reason error, took time.Duration) {
 	outcome := "answered"
 	switch {
@@ -415,6 +417,8 @@ func (s *Server) trackAI(r *http.Request, q string, v aiView, u *nlsearch.Usage,
 		"wait_minutes":    v.WaitH*60 + v.WaitM,
 		"brought_results": v.Results != nil,
 		"bot":             IsBot(r),
+		"$ip":             clientIP(r),
+		"$geoip_disable":  false,
 	}
 	if reason != nil {
 		props["reason"] = cut(reason.Error(), 120)
