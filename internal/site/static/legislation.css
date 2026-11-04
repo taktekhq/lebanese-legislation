@@ -166,7 +166,7 @@
 .pager__nums { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .lawparts { margin-block: 20px 0; }
 .lawparts ul { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 8px 0 0; padding: 0; list-style: none; }
-.pager__gap { align-self: center; color: var(--muted-2); }
+.pager__gap { align-self: center; color: var(--faint); }
 .chip[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--canvas); }
 
 /* --- Home ---------------------------------------------------------------- */
@@ -258,7 +258,7 @@ pre.snippet {
    item's starting side, so it never dangles at the end of a wrapped line and
    sits on the right in Arabic rows, on the left in English ones. */
 .seps { gap: 4px 0; }
-.seps > * + *::before { content: "·"; margin-inline: 8px; color: var(--muted-2); font-weight: 400; }
+.seps > * + *::before { content: "·"; margin-inline: 8px; color: var(--faint); font-weight: 400; }
 
 /* On phones the status gets its own line, so the facts line has the width. */
 @media (max-width: 600px) {
@@ -295,7 +295,7 @@ pre.snippet {
 .chg__by span { color: var(--muted); }
 .chg__by:hover b { text-decoration: underline; text-underline-offset: 3px; }
 .chg__targets { list-style: none; margin: 6px 0 0; padding: 0; font-family: var(--font-ar); line-height: 1.9; }
-.chg__targets li::before { content: "← "; color: var(--muted-2); }
+.chg__targets li::before { content: "← "; color: var(--faint); }
 .rv__key { display: inline-block; margin-top: 6px; font-size: 0.6875rem; color: var(--muted-2); white-space: pre; direction: ltr; }
 .rv__why { margin-top: 6px; font-size: 0.8125rem; color: var(--muted); text-align: start; }
 

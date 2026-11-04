@@ -16,8 +16,13 @@
   --surface-2:   #101010;
   --ink:         #111113;
   --ink-soft:    #1d1d1f;
-  --muted:       #6e6e73;
-  --muted-2:     #8a8a8f;
+  /* Text greys pass 4.5:1 on canvas, panel-hi and panel. --muted-2 was a
+     lighter tier (3.0 to 3.4:1), which fails for text, so it now matches
+     --muted; --faint keeps the light grey for marks nobody has to read
+     (chevrons, separators, borders, icons; 3:1 is enough for those). */
+  --muted:       #6d6d72;
+  --muted-2:     #6d6d72;
+  --faint:       #8a8a8f;
   --line:        rgba(0, 0, 0, 0.09);
   --line-strong: rgba(0, 0, 0, 0.16);
   --accent:      #2b5c97;
@@ -51,7 +56,8 @@
     --ink:         #f5f5f7;
     --ink-soft:    #ededf0;
     --muted:       #8e8e93;
-    --muted-2:     #6e6e73;
+    --muted-2:     #8e8e93;
+    --faint:       #6e6e73;
     --line:        rgba(255, 255, 255, 0.12);
     --line-strong: rgba(255, 255, 255, 0.22);
     --accent:      #8ab4e8;
@@ -1386,7 +1392,7 @@ table.ref .ar {
   height: 2px;
   border: 0;
   transform: none;
-  background: var(--muted-2);
+  background: var(--faint);
 }
 
 /* --- Justified prose -----------------------------------------------------
@@ -1556,7 +1562,7 @@ table.ref .ar {
   transition: background-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
 .search:focus-within { background: var(--panel-hi); box-shadow: var(--lift-hi), 0 0 0 2px var(--accent); }
-.search svg { width: 18px; height: 18px; flex: none; color: var(--muted-2); }
+.search svg { width: 18px; height: 18px; flex: none; color: var(--faint); }
 .search input {
   flex: 1;
   min-width: 0;
@@ -1767,8 +1773,8 @@ table.ref .ar {
 .item__chev {
   width: 8px;
   height: 8px;
-  border-top: 1.5px solid var(--muted-2);
-  border-right: 1.5px solid var(--muted-2);
+  border-top: 1.5px solid var(--faint);
+  border-right: 1.5px solid var(--faint);
   transform: rotate(45deg);
   justify-self: end;
 }
@@ -2008,7 +2014,7 @@ table.ref .ar {
 }
 .notice p { color: var(--ink); }
 .notice p + p { margin-top: 8px; color: var(--muted); }
-.notice--err { border-inline-start-color: var(--muted-2); }
+.notice--err { border-inline-start-color: var(--faint); }
 
 /* The practice site's padding-heavy footer, trimmed for a phone. */
 @media (max-width: 759px) {
