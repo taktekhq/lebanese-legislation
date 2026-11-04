@@ -95,6 +95,14 @@ type Options struct {
 	// Layout, when set, stores each HTML page that fits one of its frames as
 	// the page's own parts (edgelayout.go); the edge puts them back.
 	Layout *Layout
+	// Record, when set, gives each page's request a record of what the page
+	// used, and done returns it. The run keeps those names per Group(path) in
+	// <Out>/.export/deps.json (see Deps).
+	Record func(r *http.Request) (req *http.Request, done func() []string)
+	Group  func(path string) string
+	// PrevDeps is the previous record. A run of listed Paths adds to it, as
+	// the routes it did not visit keep theirs; a whole render starts afresh.
+	PrevDeps Deps
 	// Host is the Host header of the in-process requests.
 	Host string
 	// Log receives progress lines; nil is silent.
@@ -170,7 +178,7 @@ func Run(ctx context.Context, h http.Handler, o Options) (*Stats, error) {
 	}
 	start := time.Now()
 	ex := &exporter{h: h, o: o, logf: logf, seen: newSeen(), st: &Stats{ByKind: map[string]*KindStats{}}, start: start,
-		crawling: o.Crawl && o.Paths == nil && o.Sample == 0}
+		crawling: o.Crawl && o.Paths == nil && o.Sample == 0, deps: Deps{}}
 	if err := os.MkdirAll(filepath.Join(o.Out, ".export"), 0o755); err != nil {
 		return nil, err
 	}
@@ -232,6 +240,7 @@ type exporter struct {
 
 	removedMu sync.Mutex
 	removed   []string // pages that were files and no longer are
+	deps      Deps     // what pages used, by route (Options.Record)
 	changed   []string // HTML pages new or different since the previous manifest, for IndexNow
 
 	mu      sync.Mutex
@@ -440,8 +449,18 @@ func (ex *exporter) get(p string) *httptest.ResponseRecorder {
 	req := httptest.NewRequest(http.MethodGet, p, nil)
 	req.Host = ex.o.Host
 	req.RemoteAddr = "127.0.0.1:1"
+	var done func() []string
+	if ex.o.Record != nil && ex.o.Group != nil {
+		req, done = ex.o.Record(req)
+	}
 	rec := httptest.NewRecorder()
 	ex.h.ServeHTTP(rec, req)
+	if done != nil {
+		names, group := done(), ex.o.Group(p)
+		ex.removedMu.Lock()
+		ex.deps.add(group, names)
+		ex.removedMu.Unlock()
+	}
 	return rec
 }
 
@@ -835,6 +854,27 @@ func (ex *exporter) finish(partial bool) error {
 		return err
 	}
 	_ = os.Remove(filepath.Join(dir, "manifest.jsonl.new"))
+	if ex.o.Record != nil {
+		d := Deps{}
+		if partial {
+			prev := ex.o.PrevDeps
+			if prev == nil {
+				var err error
+				if prev, err = ReadDeps(filepath.Join(dir, "deps.json")); err != nil {
+					return err
+				}
+			}
+			d.Merge(prev)
+		}
+		d.Merge(ex.deps)
+		b, err := json.Marshal(d)
+		if err != nil {
+			return err
+		}
+		if err := os.WriteFile(filepath.Join(dir, "deps.json"), b, 0o644); err != nil {
+			return err
+		}
+	}
 	b, _ := json.MarshalIndent(ex.st, "", "  ")
 	return os.WriteFile(filepath.Join(dir, "stats.json"), b, 0o644)
 }

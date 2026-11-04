@@ -22,6 +22,10 @@ import (
 type ChangePlan struct {
 	Full  bool
 	Paths []string
+	// Content are changed templates, strings, topic guides and assets: what
+	// they touch needs the render record (PlanContent), so the command maps
+	// them. Paths holds only what the data changes touch.
+	Content []string
 }
 type changeRow map[string]string
 type tableRow struct {
@@ -82,6 +86,7 @@ func planChanges(ctx context.Context, dir, since string, full bool, frame *bool)
 	if e != nil {
 		return ChangePlan{}, e
 	}
+	var content []string
 	for _, line := range strings.Split(strings.TrimSpace(string(b)), "\n") {
 		status, p, ok := strings.Cut(line, "\t")
 		if !ok {
@@ -89,6 +94,10 @@ func planChanges(ctx context.Context, dir, since string, full bool, frame *bool)
 		}
 		if p == layoutFile && frameOnlyChange(ctx, dir, since) {
 			*frame = true // every run publishes the frame; no page's parts change
+			continue
+		}
+		if src.changes(p, status == "D") && contentFile(p) {
+			content = append(content, p)
 			continue
 		}
 		if src.changes(p, status == "D") || renderInputs[p] {
@@ -155,7 +164,7 @@ func planChanges(ctx context.Context, dir, since string, full bool, frame *bool)
 		return ChangePlan{}, we
 	}
 	if len(changed) == 0 {
-		return ChangePlan{Paths: []string{}}, nil
+		return ChangePlan{Paths: []string{}, Content: content}, nil
 	}
 	tables := map[string][]changeRow{}
 	// Only fields used for ownership, membership or links are retained. Large
@@ -205,7 +214,9 @@ func planChanges(ctx context.Context, dir, since string, full bool, frame *bool)
 	for _, r := range changed {
 		tables[r.table] = append(tables[r.table], r.row)
 	}
-	return pathsForRows(tables, changed), nil
+	p := pathsForRows(tables, changed)
+	p.Content = content
+	return p, nil
 }
 
 // layoutFile is the frame every page shares (internal/site/layoutframe.go).

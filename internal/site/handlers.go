@@ -16,7 +16,6 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/taktekhq/lebanese-legislation/internal/amend"
-	"github.com/taktekhq/lebanese-legislation/internal/site/i18n"
 )
 
 const perPage = 40
@@ -794,7 +793,7 @@ func (s *Server) lawPage(w http.ResponseWriter, r *http.Request, part int) {
 		}
 	}
 	s.trackRead(r, l, "")
-	bn := i18n.New(s.lang(r))
+	bn := s.bundle(r)
 	l.Answer = lawAnswer(bn, l)
 	l.Updated = s.pageUpdated(r, l.Changed, l.lastAmendment())
 	ld := legislationLD(l, s.u(r, lawPath(l.ID)), l.Answer)
@@ -937,7 +936,7 @@ func (s *Server) articlePage(r *http.Request, l *Law, i int) Page {
 	}
 	name := "المادة " + a.Number + " من " + l.CiteName()
 	path := artPath(l.ID, a.Number)
-	bn := i18n.New(s.lang(r))
+	bn := s.bundle(r)
 	answer := articleAnswer(bn, l, a.Number)
 	parent := legislationLD(l, lawPath(l.ID), "")
 	ld := map[string]any{"@context": "https://schema.org", "@type": "Legislation", "@id": Base + path, "url": Base + path,

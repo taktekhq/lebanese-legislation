@@ -63,6 +63,7 @@ func splitItems(sizes []int, chapter []bool, budget int) [][2]int {
 
 // itemSizes is the HTML each item of a text takes on its page.
 func (s *Server) itemSizes(r *http.Request, l *Law) (sizes []int, chapter []bool, err error) {
+	noteDep(r.Context(), "set:law") // the law template's article sizes split long laws into parts
 	pages := s.pages
 	if s.lang(r) == "ar" && s.pagesAr != nil {
 		pages = s.pagesAr

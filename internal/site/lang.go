@@ -4,8 +4,6 @@ import (
 	"context"
 	"net/http"
 	"strings"
-
-	"github.com/taktekhq/lebanese-legislation/internal/site/i18n"
 )
 
 // Arabic is the site's default: its pages live at the root (/law/12/). The
@@ -94,7 +92,7 @@ func (s *Server) lang(r *http.Request) string { return langFromContext(r.Context
 // tr looks up a UI string in the request's language, for the Go-side
 // titles and descriptions built in handlers.go, docs.go, versions.go.
 func (s *Server) tr(r *http.Request, key string, args ...any) string {
-	return i18n.New(s.lang(r)).T(key, args...)
+	return s.bundle(r).T(key, args...)
 }
 
 // trOr returns en, unchanged, on the English site, and the Arabic

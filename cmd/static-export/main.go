@@ -171,7 +171,8 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 	o := staticexport.Options{Out: *out, Workers: *workers, Crawl: *crawl, Sample: *sampleN, Seed: *seed, Limit: *limit, Shard: shard, Shards: shards,
 		Extra:  []string{"/", "/en/", "/robots.txt", "/llms.txt", "/openapi.json", "/ai/", "/en/ai/", "/run-it-yourself/", "/en/run-it-yourself/", "/about/", "/en/about/", "/data/", "/search/", "/en/search/"},
 		Assets: site.StaticFiles(),
-		Log:    func(f string, a ...any) { fmt.Fprintf(stderr, time.Now().Format("15:04:05 ")+f+"\n", a...) }}
+		Record: site.RecordDeps, Group: srv.Route,
+		Log: func(f string, a ...any) { fmt.Fprintf(stderr, time.Now().Format("15:04:05 ")+f+"\n", a...) }}
 	if *meaningNotice {
 		// Only the flag matters for rendering: the Gemini client is never called,
 		// because the export makes no search, so the key is a placeholder.
@@ -210,6 +211,17 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 				return fmt.Errorf("reading the previous manifest: %w", err)
 			default:
 				if o.PrevEntries, err = staticexport.ParseManifest(bytes.NewReader(b), meta+"manifest.jsonl"); err != nil {
+					return err
+				}
+			}
+			// What each route's pages used, for the planner (changes -r2-bucket).
+			switch b, err := r2.Get(ctx, meta+"deps.json"); {
+			case errors.Is(err, staticexport.ErrNotFound):
+				o.PrevDeps = staticexport.Deps{}
+			case err != nil:
+				return fmt.Errorf("reading the previous deps.json: %w", err)
+			default:
+				if o.PrevDeps, err = staticexport.ParseDeps(b, meta+"deps.json"); err != nil {
 					return err
 				}
 			}
@@ -337,7 +349,7 @@ func publish(ctx context.Context, r2 *staticexport.R2, out, meta string, removed
 	if first != nil {
 		return first
 	}
-	for _, name := range []string{"redirects.json", "stats.json", "removed.txt", "manifest.jsonl"} { // the manifest last
+	for _, name := range []string{"redirects.json", "stats.json", "removed.txt", "deps.json", "manifest.jsonl"} { // the manifest last
 		p := filepath.Join(out, ".export", name)
 		b, err := os.ReadFile(p)
 		if errors.Is(err, os.ErrNotExist) {
@@ -770,12 +782,40 @@ func changes(ctx context.Context, args []string, stdout, stderr io.Writer) error
 	since := fs.String("since", "", "last successfully rendered git commit; empty means full")
 	full := fs.Bool("full", false, "force a full render")
 	out := fs.String("out", "plan", "plan directory")
+	r2bucket := fs.String("r2-bucket", "", "bucket holding the shards' manifests and render records, to map changed templates, strings and topic guides to pages (without it they render everything)")
+	r2endpoint := fs.String("r2-endpoint", os.Getenv("R2_ENDPOINT"), "R2 endpoint (default $R2_ENDPOINT)")
+	shards := fs.Int("shards", 24, "shards whose manifests and records to read")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
 	p, err := staticexport.PlanChanges(ctx, ".", strings.TrimSpace(*since), *full)
 	if err != nil {
 		return err
+	}
+	var why []string
+	assets := false
+	if !p.Full && len(p.Content) > 0 {
+		cp, err := planContent(ctx, strings.TrimSpace(*since), p.Content, *r2bucket, *r2endpoint, *shards)
+		if err != nil {
+			return err
+		}
+		why = cp.Why
+		if cp.Full {
+			p = staticexport.ChangePlan{Full: true}
+		} else {
+			seen := map[string]bool{}
+			for _, q := range p.Paths {
+				seen[q] = true
+			}
+			for _, q := range cp.Paths {
+				if !seen[q] {
+					seen[q] = true
+					p.Paths = append(p.Paths, q)
+				}
+			}
+			sort.Strings(p.Paths)
+			assets = cp.Assets
+		}
 	}
 	if err := os.MkdirAll(*out, 0755); err != nil {
 		return err
@@ -794,8 +834,63 @@ func changes(ctx context.Context, args []string, stdout, stderr io.Writer) error
 	if err := os.WriteFile(filepath.Join(*out, "paths.txt"), []byte(body), 0644); err != nil {
 		return err
 	}
+	if assets { // no page changes, but the run must upload the assets
+		if err := os.WriteFile(filepath.Join(*out, "assets"), nil, 0644); err != nil {
+			return err
+		}
+	}
+	if err := os.WriteFile(filepath.Join(*out, "why.txt"), []byte(strings.Join(why, "\n")+"\n"), 0644); err != nil {
+		return err
+	}
+	for _, w := range why {
+		fmt.Fprintln(stdout, w)
+	}
 	fmt.Fprintf(stdout, "%s: %d paths\n", mode, len(p.Paths))
 	return nil
+}
+
+// planContent maps changed templates, strings, topic guides and assets to
+// pages, from every shard's manifest and render record in the bucket.
+func planContent(ctx context.Context, since string, files []string, bucket, endpoint string, shards int) (staticexport.ContentPlan, error) {
+	if bucket == "" {
+		return staticexport.ContentPlan{Full: true, Why: []string{"content changed and no -r2-bucket to read the render record from: render everything"}}, nil
+	}
+	r2, err := staticexport.NewR2(endpoint, bucket, os.Getenv)
+	if err != nil {
+		return staticexport.ContentPlan{}, err
+	}
+	manifest := map[string]staticexport.Entry{}
+	deps := staticexport.Deps{}
+	for i := 0; i < shards; i++ {
+		meta := fmt.Sprintf("_export/shard-%d-of-%d/", i, shards)
+		b, err := r2.Get(ctx, meta+"deps.json")
+		if errors.Is(err, staticexport.ErrNotFound) {
+			return staticexport.ContentPlan{Full: true, Why: []string{fmt.Sprintf("shard %d has no render record yet: render everything once", i)}}, nil
+		}
+		if err != nil {
+			return staticexport.ContentPlan{}, fmt.Errorf("%sdeps.json: %w", meta, err)
+		}
+		d, err := staticexport.ParseDeps(b, meta+"deps.json")
+		if err != nil {
+			return staticexport.ContentPlan{}, err
+		}
+		deps.Merge(d)
+		if b, err = r2.Get(ctx, meta+"manifest.jsonl"); err != nil {
+			return staticexport.ContentPlan{}, fmt.Errorf("%smanifest.jsonl: %w", meta, err)
+		}
+		m, err := staticexport.ParseManifest(bytes.NewReader(b), meta+"manifest.jsonl")
+		if err != nil {
+			return staticexport.ContentPlan{}, err
+		}
+		for p, e := range m {
+			manifest[p] = e
+		}
+	}
+	srv, err := site.New(nil) // only its routes: no page is rendered here
+	if err != nil {
+		return staticexport.ContentPlan{}, err
+	}
+	return staticexport.PlanContent(ctx, staticexport.ContentInput{Dir: ".", Since: since, Files: files, Deps: deps, Manifest: manifest, Route: srv.Route})
 }
 
 // indexNow submits to IndexNow the pages one render changed. Each argument is

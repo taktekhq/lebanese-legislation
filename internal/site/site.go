@@ -20,8 +20,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-
-	"github.com/taktekhq/lebanese-legislation/internal/site/i18n"
 )
 
 //go:embed templates/*.html
@@ -262,7 +260,8 @@ func (s *Server) execute(r *http.Request, name string, p Page) (string, error) {
 	}
 	p.Canon, p.Pair = s.canonical(r, p)
 	p.Hreflang = p.Pair && !p.NoIndex && !p.TwinHidden
-	p.Title, p.Desc = finishMeta(i18n.New(s.lang(r)), p.Title, p.Desc)
+	p.Title, p.Desc = finishMeta(s.bundle(r), p.Title, p.Desc)
+	noteDep(r.Context(), "set:"+name)
 	pages := s.pages
 	if s.lang(r) == "ar" && s.pagesAr != nil {
 		pages = s.pagesAr
