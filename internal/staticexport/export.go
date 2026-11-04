@@ -259,12 +259,15 @@ func (ex *exporter) run(ctx context.Context) error {
 	defer mf.Close()
 	ex.entries = make(chan Entry, 256)
 	var wgm sync.WaitGroup
+	var writeErr error // the first failed manifest write (a full disk), read after wgm.Wait
 	wgm.Add(1)
 	go func() { // one writer: manifest lines in the order pages finish
 		defer wgm.Done()
 		enc := json.NewEncoder(mf)
 		for e := range ex.entries {
-			_ = enc.Encode(e)
+			if err := enc.Encode(e); err != nil && writeErr == nil {
+				writeErr = err
+			}
 		}
 	}()
 
@@ -373,6 +376,9 @@ func (ex *exporter) run(ctx context.Context) error {
 	}
 
 	shutdown()
+	if writeErr != nil {
+		return fmt.Errorf("writing the manifest: %w", writeErr)
+	}
 	if err := mf.Close(); err != nil {
 		return err
 	}
