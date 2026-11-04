@@ -260,6 +260,12 @@ func TestContentRealSite(t *testing.T) {
 			t.Errorf("template function %s: %s not found", f, k)
 		}
 	}
+	// privacy.lead is in privacy.html only. The layout's static function
+	// returns a variable named static; a site method of that name builds
+	// keys ending in .lead and must not be read as the function's.
+	if sets[layoutSet].usesKey("privacy.lead", funcs) {
+		t.Error("the layout claims privacy.lead")
+	}
 }
 
 // A run records what each route's pages noted, and a run of listed paths keeps
