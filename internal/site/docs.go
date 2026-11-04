@@ -426,7 +426,11 @@ func rulingLD(d Doc, path string, on *time.Time, court *string, year *int) map[s
 		ld["abstract"] = cut(a, 300)
 	}
 	if d.File != nil {
-		ld["encoding"] = map[string]any{"@type": "MediaObject", "contentUrl": Base + d.File.URL, "encodingFormat": "application/pdf"}
+		u := d.File.URL
+		if !strings.HasPrefix(u, "http") { // ours, or the scan on the University's site (ULRulingPDF)
+			u = Base + u
+		}
+		ld["encoding"] = map[string]any{"@type": "MediaObject", "contentUrl": u, "encodingFormat": "application/pdf"}
 	}
 	return ld
 }
@@ -982,9 +986,15 @@ func (s *Server) data(w http.ResponseWriter, r *http.Request) {
 	}
 	ds := map[string]any{"@context": "https://schema.org", "@type": "Dataset", "@id": Base + "/data/#dataset", "url": Base + "/data/",
 		"name":        "Lebanese Legislation: the relational database of Lebanese law",
-		"description": "Every Lebanese law, decree and decision with its chapters and articles (Arabic, and French where published), the Official Gazette, court rulings, advisory opinions, agreements and doctrine, as one PostgreSQL database, with the references between them and the source page of every row.",
-		"keywords":    []string{"Lebanon", "Lebanese law", "legislation", "case law", "Official Gazette", "التشريعات اللبنانية", "القانون اللبناني", "législation libanaise"},
-		"inLanguage":  []string{"ar", "fr", "en"}, "isAccessibleForFree": true,
+		"description": "Every Lebanese law, decree and decision with its chapters and articles (Arabic, and French where published), the Official Gazette, court rulings, advisory opinions, agreements and doctrine, with the references between them and the source page of every row: Parquet tables on Hugging Face and one PostgreSQL database.",
+		"sameAs":      []string{hfDataset, "https://github.com/taktekhq/lebanese-legislation"},
+		"distribution": []any{
+			map[string]any{"@type": "DataDownload", "name": "Parquet tables", "encodingFormat": "application/vnd.apache.parquet", "contentUrl": hfDataset + "/tree/main/data"},
+			map[string]any{"@type": "DataDownload", "name": "legislation.parquet", "encodingFormat": "application/vnd.apache.parquet", "contentUrl": hfDataset + "/resolve/main/data/legislation.parquet"},
+			map[string]any{"@type": "DataDownload", "name": "legislation_article.parquet", "encodingFormat": "application/vnd.apache.parquet", "contentUrl": hfDataset + "/resolve/main/data/legislation_article.parquet"},
+		},
+		"keywords":   []string{"Lebanon", "Lebanese law", "legislation", "case law", "Official Gazette", "التشريعات اللبنانية", "القانون اللبناني", "législation libanaise"},
+		"inLanguage": []string{"ar", "fr", "en"}, "isAccessibleForFree": true,
 		"spatialCoverage": map[string]any{"@type": "Place", "name": "Lebanon"}, "temporalCoverage": "1904/..",
 		"creator":            map[string]any{"@type": "Organization", "name": "Taktek, LLC", "url": "https://taktek.io/"},
 		"isBasedOn":          map[string]any{"@type": "WebSite", "name": "Lebanese legislation database of the Centre for Research and Studies in Legal Informatics", "url": "https://legallaw.ul.edu.lb/"},
@@ -995,6 +1005,9 @@ func (s *Server) data(w http.ResponseWriter, r *http.Request) {
 	s.render(w, r, "data", 200, Page{Title: s.brandTitle(r, s.trOr(r, "The database", "data.title_suffix")), Path: "/data/", LD: []any{ds},
 		Desc: s.trOr(r, "All of Lebanese law as one relational PostgreSQL database: its tables, row counts and example queries.", "data.desc"), Data: tables})
 }
+
+// hfDataset is the dataset's page on Hugging Face, where the tables are published.
+const hfDataset = "https://huggingface.co/datasets/taktekhq/lebanese-legislation"
 
 var tableNotes = map[string]string{
 	"legislation":          "Every law, decree and decision: kind, number, date, title, status, Official Gazette publication.",
