@@ -136,11 +136,28 @@
     box.removeAttribute("aria-busy");
     if (wait) wait.remove();
   }
-  /* PostHog, when loaded: the server sends ai_question with the same ID */
-  var ph = window.posthog && window.posthog.get_distinct_id ? window.posthog : null;
-  function track(name, props) { if (ph && ph.capture) ph.capture(name, props); }
+  /* PostHog loads after the first touch or two idle seconds (assets/load.js),
+     usually after this runs, so look it up on every call: until then
+     window.posthog is load.js's queue, and ph.js sends what is in it. */
+  function track(name, props) {
+    var ph = window.posthog;
+    if (ph && ph.capture) ph.capture(name, props);
+  }
+  /* The visitor's PostHog ID, so the server's ai_question joins their
+     session: from PostHog once it has loaded, else from the cookie it kept
+     on an earlier page. A first page has neither and sends none. */
+  function visitorID() {
+    var ph = window.posthog;
+    try { if (ph && ph.__loaded && ph.get_distinct_id) return ph.get_distinct_id() || ""; } catch (e) {}
+    try {
+      var m = document.cookie.match(/(?:^|;\s*)ph_phc_[A-Za-z0-9]+_posthog=([^;]*)/);
+      if (m) return JSON.parse(decodeURIComponent(m[1])).distinct_id || "";
+    } catch (e) {}
+    return "";
+  }
   var body = new URLSearchParams({q: section.getAttribute("data-q"), empty: section.getAttribute("data-empty") || ""});
-  try { if (ph) body.set("ph", ph.get_distinct_id() || ""); } catch (e) {}
+  var visitor = visitorID();
+  if (visitor) body.set("ph", visitor);
   var controller = new AbortController();
   var timeout = setTimeout(function () { controller.abort(); }, 30000);
   fetch(section.getAttribute("data-url"), {
