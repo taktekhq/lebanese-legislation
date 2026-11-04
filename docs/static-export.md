@@ -104,7 +104,12 @@ every one of the 116 article pages the full render changed in the three shards
 checked, at about two planned pages per changed one. Every Sunday at 02:41 UTC
 the workflow renders everything regardless, so a page a missed dependency left
 stale is put right within a week; that run's `indexnow` line counts the pages it
-changed. The one exception is a change to the shared frame of
+changed.
+
+On a pull request that touches what the site is built from,
+[deploy-preview.yml](../.github/workflows/deploy-preview.yml) runs the same plan
+from the live site's commit to the pull request merged into main, and comments
+what merging it would render and why. It renders nothing. The one exception is a change to the shared frame of
 `internal/site/templates/layout.html` alone (see below): it renders only the
 two search pages, which are stored whole. Schema, rendering dependencies and unmapped table changes
 also fall back to a full render. The workflow serializes runs and keeps 24 owners,
