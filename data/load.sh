@@ -20,5 +20,11 @@ while read -r t; do
   echo "loaded $t"
 done < TABLES
 run -f indexes.sql
+# The unofficial English of popular texts' articles (article_en.jsonl, made by
+# cmd/translate-en), kept where the Arabic it was made from is still the text.
+if [ -f article_en.jsonl ]; then
+  run -f article_en.sql
+  echo "loaded article_en"
+fi
 run -c "ANALYZE"
 echo "done"

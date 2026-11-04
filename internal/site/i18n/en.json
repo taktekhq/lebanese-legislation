@@ -158,6 +158,7 @@
   "law.related_title": "More from the same year.",
   "law.case_law_count": "%s rulings",
   "art.cite": "Cite",
+  "art.en_label": "Unofficial English translation, made by machine (Gemini) on %s. The Arabic text is the official one.",
   "art.in_force_since": "In force since %s",
   "art.repealed_word": "Repealed",
   "art.centre_error": "Error in the source:",

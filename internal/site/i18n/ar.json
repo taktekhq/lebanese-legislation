@@ -157,6 +157,7 @@
   "law.related_title": "نصوص أخرى من السنة نفسها.",
   "law.case_law_count": "%s حكم",
   "art.cite": "استشهاد",
+  "art.en_label": "ترجمة إنكليزية غير رسمية، آلية (Gemini) بتاريخ %s. النص العربي هو النص الرسمي.",
   "art.in_force_since": "نافذ منذ %s",
   "art.repealed_word": "ملغاة",
   "art.centre_error": "خطأ في المصدر:",

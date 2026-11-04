@@ -284,6 +284,18 @@ func articleDesc(b *i18n.Bundle, l *Law, number, subject, text string) string {
 	return fitDesc(lead, append(words, f[1:]...), descMax)
 }
 
+// articleDescEnglish is the English page's description when the article has
+// an unofficial English translation: which article, then its English words.
+func articleDescEnglish(b *i18n.Bundle, l *Law, number, en string) string {
+	f := articleFacts(b, l, number)
+	en = strings.Join(strings.Fields(en), " ")
+	words := []string{}
+	if room := descMax - len([]rune(f[0])) - 1; room >= 30 {
+		words = append(words, cutWords(en, room))
+	}
+	return fitDesc(f[0], append(words, f[1:]...), descMax)
+}
+
 // articleTitle is an article page's <title>: artTitle, then in Arabic the
 // article's subject when there is room for it.
 func articleTitle(b *i18n.Bundle, l *Law, number, subject string) string {

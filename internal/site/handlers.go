@@ -448,6 +448,17 @@ type Article struct {
 	RulingCount int         // how many rulings applied it
 	CentreError *CentreError
 	Council     []CouncilRuling // the Constitutional Council's decisions on this article
+	En          string          // unofficial machine English of TextAr (article_en), "" when none
+	EnOn        *time.Time      // when it was translated
+}
+
+// English is the unofficial translation to show, "" when there is none or
+// when the page shows a newer wording than the one translated (Ahead).
+func (a *Article) English() string {
+	if a.En == "" || a.Ahead() {
+		return ""
+	}
+	return a.En
 }
 
 // CouncilRuling is a Constitutional Council decision on a text or one of
@@ -674,6 +685,24 @@ func (s *Server) loadLawWith(ctx context.Context, id int, withText, rulings bool
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
+	}
+	// The unofficial English of popular texts (data/article_en.jsonl, loaded
+	// only where the Arabic it was made from is still the text). An older
+	// database has no article_en: the articles show without it.
+	if rows, err := s.db.Query(ctx, `SELECT position, en, translated_on FROM article_en WHERE law_id = $1`, id); err == nil {
+		byPos := map[int]*Article{}
+		for _, a := range l.List {
+			byPos[a.Position] = a
+		}
+		for rows.Next() {
+			var pos int
+			var en string
+			var on time.Time
+			if rows.Scan(&pos, &en, &on) == nil && byPos[pos] != nil {
+				byPos[pos].En, byPos[pos].EnOn = en, &on
+			}
+		}
+		rows.Close()
 	}
 	// An older database has no centre_error: the articles show without it.
 	if rows, err := s.db.Query(ctx, `SELECT number, note_en, note_ar FROM centre_error WHERE law_id = $1`, id); err == nil {
@@ -963,6 +992,9 @@ func (s *Server) articlePage(r *http.Request, l *Law, i int) Page {
 	}
 	subject := articleSubject(l, a)
 	desc := articleDesc(bn, l, a.Number, subject, strings.ReplaceAll(text, "\n", " "))
+	if en := a.English(); en != "" && bn.Lang != "ar" {
+		desc = articleDescEnglish(bn, l, a.Number, en)
+	}
 	return Page{Title: articleTitle(bn, l, a.Number, subject), Desc: desc, Path: path, OGType: "article", Lang: "ar", Translated: true,
 		LD: []any{ld, breadcrumbs(cut(l.Title, 80), lawPath(l.ID), "المادة "+a.Number, path)},
 		Data: map[string]any{"Law": l, "A": a, "Prev": prev, "Next": next, "Answer": answer,
