@@ -98,7 +98,8 @@ func TestMutationBatches(t *testing.T) {
 	if err := c.DeleteByIDs(context.Background(), ids); err != nil {
 		t.Fatal(err)
 	}
-	if fmt.Sprint(upserts) != "[1000 1]" || fmt.Sprint(deletes) != "[1000 1]" {
+	// Cloudflare takes 1,000 vectors per upsert but only 100 ids per delete.
+	if fmt.Sprint(upserts) != "[1000 1]" || fmt.Sprint(deletes) != "[100 100 100 100 100 100 100 100 100 100 1]" {
 		t.Fatal(upserts, deletes)
 	}
 }
