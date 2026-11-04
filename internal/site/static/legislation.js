@@ -181,6 +181,11 @@
   function thank(rate, said) {
     rate.querySelector('[data-rate="down"]').focus();
     rate.querySelector("[data-ai-why]").hidden = true;
+    /* reset, so a later thumbs down starts from the reasons again */
+    var form = rate.querySelector("[data-ai-note]");
+    form.hidden = true;
+    form.querySelector("textarea").value = "";
+    rate.querySelector('[data-reason="other"]').setAttribute("aria-expanded", "false");
     rate.querySelector("[data-ai-thanks]").textContent = rate.getAttribute(said);
   }
   box.addEventListener("click", function (e) {

@@ -53,7 +53,7 @@ async function page() {
     setAttribute(n) { if (n === 'data-rated') rated = true; },
     hasAttribute(n) { return n === 'data-rated' && rated; },
     querySelectorAll(s) { return s === '[data-rate]' ? [up, down] : []; },
-    querySelector(s) { return s === '[data-ai-why]' ? why : s === '[data-ai-note]' ? form : s === '[data-ai-thanks]' ? thanks : s === '[data-rate="down"]' ? down : null; }
+    querySelector(s) { return s === '[data-ai-why]' ? why : s === '[data-ai-note]' ? form : s === '[data-ai-thanks]' ? thanks : s === '[data-rate="down"]' ? down : s === '[data-reason="other"]' ? reasons.other : null; }
   });
   let answered = false;
   const target = el({
@@ -143,6 +143,10 @@ test('"Something else" opens the box; the note goes to PostHog, an empty one sen
   assert.equal(note[1].reason, 'other');
   assert.equal(note[1].note, 'It cited a repealed law.');
   assert.equal(p.thanks.textContent, 'Thanks, we got your note.');
+  // a later thumbs down starts from the reasons again
+  assert.equal(p.form.hidden, true);
+  assert.equal(p.textarea.value, '');
+  assert.equal(p.expanded.other, 'false');
 
   const q = await page();
   q.fire('click', q.down);
