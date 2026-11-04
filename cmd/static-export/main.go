@@ -793,13 +793,16 @@ func changes(ctx context.Context, args []string, stdout, stderr io.Writer) error
 		return err
 	}
 	var why []string
+	if p.Why != "" {
+		why = append(why, p.Why)
+	}
 	assets := false
 	if !p.Full && len(p.Content) > 0 {
 		cp, err := planContent(ctx, strings.TrimSpace(*since), p.Content, *r2bucket, *r2endpoint, *shards)
 		if err != nil {
 			return err
 		}
-		why = cp.Why
+		why = append(why, cp.Why...)
 		if cp.Full {
 			p = staticexport.ChangePlan{Full: true}
 		} else {
@@ -839,7 +842,11 @@ func changes(ctx context.Context, args []string, stdout, stderr io.Writer) error
 			return err
 		}
 	}
-	if err := os.WriteFile(filepath.Join(*out, "why.txt"), []byte(strings.Join(why, "\n")+"\n"), 0644); err != nil {
+	whyText := ""
+	if len(why) > 0 {
+		whyText = strings.Join(why, "\n") + "\n"
+	}
+	if err := os.WriteFile(filepath.Join(*out, "why.txt"), []byte(whyText), 0644); err != nil {
 		return err
 	}
 	for _, w := range why {
