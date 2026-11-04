@@ -124,11 +124,11 @@ wording receive no record. Older dataset snapshots may omit this file.
 
 Most source texts come from the [Centre for Research and Studies in Legal Informatics, Lebanese University](https://legallaw.ul.edu.lb/). Please credit the Centre when reusing them. This is an independent, unofficial dataset, without state or University endorsement. The licence is `other`; we add no rights or restrictions over source documents.
 
-Source text, machine readings and editorial corrections have different provenance. English titles are machine-generated search aids. Judgment transcriptions and recent Gazette readings may contain errors. They are not reviewed ground truth. Check the page images and authoritative publication before relying on them. Derived amendment links and in-force states also need checking. See [METHODS.md](METHODS.md) for uncertainty markers, corrections, provenance and citation.
+Source text, machine readings and editorial corrections have different provenance. English titles are machine-generated search aids. Judgment transcriptions and recent Gazette readings may contain errors. They are not reviewed ground truth. Check the original PDF (the judgment scans, or the Gazette PDF on SaderLex that each scanned text links) and the authoritative publication before relying on them. Derived amendment links and in-force states also need checking. See [METHODS.md](METHODS.md) for uncertainty markers, corrections, provenance and citation.
 
-The structured dataset is rebuilt and published from the public repository when the source data changes; the commit and date of each upload are in this dataset's history. Individual tables can be incomplete. Judgment reading is still under way. Original court PDFs are available separately in [Lebanese Court Scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans).
+The structured dataset is rebuilt and published from the public repository when the source data changes; the commit and date of each upload are in this dataset's history. The update itself is public: [`scripts/nightly.sh`](https://github.com/taktekhq/lebanese-legislation/blob/main/docs/update-data.md) rebuilds the tables and opens a pull request, and the upload follows its merge. Individual tables can be incomplete. Judgment reading is still under way. Original court PDFs are available separately in [Lebanese Court Scans](https://huggingface.co/datasets/taktekhq/lebanese-court-scans).
 
-You can also use the [JSON API](https://lebaneselegislation.com/developers/) or [MCP server](https://lebaneselegislation.com/ai/). This dataset is not legal advice. Send corrections to nizar@taktek.io.
+You can also use the [JSON API](https://lebaneselegislation.com/developers/) or [MCP server](https://lebaneselegislation.com/ai/), free and without a key, under the site's [terms of use](https://lebaneselegislation.com/en/terms/). This dataset is not legal advice. Send corrections to nizar@taktek.io.
 
 Studying law or political science at a Lebanese university? We pay current students to study with the site and tell us what to fix, instead of spending on ads: [the student program](https://lebaneselegislation.com/contribute/#students).
 
@@ -150,4 +150,6 @@ LIMIT 5;
 The hosted search uses Cloudflare Vectorize index `lebleg-chunks` instead of
 storing vectors in PostgreSQL. The [vectors workflow](https://github.com/taktekhq/lebanese-legislation/blob/main/.github/workflows/vectors.yml)
 runs `build`, then `publish` and `vectorize`. `cmd/export-vectors` exports the
-chunks; `cmd/vectorize-sync` uploads only changed vectors on later runs.
+chunks; `cmd/embed-missing` embeds new chunks under a daily budget ($1, 20,000
+chunks), and nothing is published while a current chunk has no vector;
+`cmd/vectorize-sync` uploads only changed vectors on later runs.

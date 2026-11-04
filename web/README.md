@@ -62,7 +62,7 @@ A leading `serve` is accepted, so `web serve -addr ... -db ...` works too.
 | [`cmd/topicgen`](../cmd/topicgen/) | Writes and checks the topic pages (`internal/site/topics`) with a model that sees only the cited articles |
 | [`cmd/check-english`](../cmd/check-english/) | Checks that English stays an unofficial aid |
 
-The database needs the tables in [`schema/`](schema/). A restore of the public dump adds what the dump lacks ([`web.sql`](../tools/src/lebleg/sql/web.sql)). Four tables stay empty there because their data is not public: Constitutional Council rulings, noindex marks, page change dates and official Gazette texts.
+The database needs the tables in [`schema/`](schema/). Build it from `data/` with `data/load.sh`, then apply `db/official.sql` and [`web.sql`](../tools/src/lebleg/sql/web.sql), or run the `-db` image, which does all three.
 
 Build the image from the repository root:
 

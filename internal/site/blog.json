@@ -1,5 +1,319 @@
 [
   {
+    "Slug": "ai-crawlers-read-everything",
+    "Milestone": "2026-11-04",
+    "Published": "2026-11-04",
+    "Commit": "2334b5e",
+    "EvidenceKind": "public-commit",
+    "Title": "Every AI crawler may now read the whole site",
+    "TitleAr": "صار بإمكان كل برامج الزحف التابعة للذكاء الاصطناعي قراءة الموقع كاملاً",
+    "Summary": "On 4 November we stopped refusing ShapBot and opened search, the API and the MCP server to every AI crawler named in our robots.txt. Bing now hears about every changed page after each render.",
+    "SummaryAr": "في 4 تشرين الثاني توقفنا عن رفض ShapBot وفتحنا البحث وواجهة البرمجة وخادم MCP لكل برنامج زحف تابع للذكاء الاصطناعي يسمّيه ملف robots.txt لدينا. ويعلم Bing الآن بكل صفحة تتغيّر بعد كل عملية بناء.",
+    "Sections": [
+      {
+        "Heading": "ShapBot was blocked by mistake.",
+        "Body": "ShapBot is the crawler behind Parallel's AI search API. Since 13 October our site Worker answered it with 429, a line copied from the setup of the old single server, and a Cloudflare rule answered it with 403. We removed both on 4 November."
+      },
+      {
+        "Heading": "Search, the API and MCP are open to them.",
+        "Body": "robots.txt now gives each named AI crawler its own group that allows everything except our internal review pages: search, /api/v1/, /mcp and addresses with query strings. That covers GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, Claude-User, PerplexityBot, Perplexity-User, CCBot, ShapBot, DuckAssistBot and MistralAI-User. Search engines keep the old rules and stay out of /api/ and /search/."
+      },
+      {
+        "Heading": "The same limit for everyone.",
+        "Body": "Opening the doors did not remove the rate limit. Search, the API and MCP still allow every client, person or crawler, 30 requests per 10 seconds from one address."
+      },
+      {
+        "Heading": "Bing hears about every change.",
+        "Body": "ChatGPT search reads Bing's index, and 749 of our 1,289 page views on 3 November came from ChatGPT. On 31 October Bing had indexed 3,768 of the 410,503 pages in our sitemaps. On 3 November we sent all 410,503 to IndexNow in 41 batches, and every batch was accepted. Each render now sends the pages it changed to Bing, Yandex, Naver and Seznam."
+      },
+      {
+        "Heading": "Topic pages: open to Bing, hidden from Google.",
+        "Body": "Since 2 November our 30 topic pages had asked every search engine not to index them. Now only Google is asked, with a googlebot meta tag. Bing, which ChatGPT and Copilot search, can index them. They stay out of the sitemaps, which Google reads."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "حُجب ShapBot عن طريق الخطأ.",
+        "Body": "ShapBot هو برنامج الزحف الذي يغذّي واجهة البحث بالذكاء الاصطناعي لدى Parallel. منذ 13 تشرين الأول كان Worker الموقع يردّ عليه بالرمز 429، في سطر منسوخ من إعدادات الخادم الوحيد القديم، وكانت قاعدة في Cloudflare تردّ عليه بالرمز 403. أزلنا الاثنين في 4 تشرين الثاني."
+      },
+      {
+        "Heading": "البحث وواجهة البرمجة وMCP مفتوحة لها.",
+        "Body": "يعطي ملف robots.txt الآن كل برنامج زحف مسمّى تابع للذكاء الاصطناعي مجموعة خاصة به تسمح بكل شيء ما عدا صفحات المراجعة الداخلية: البحث و/api/v1/ و/mcp والعناوين التي تحمل استعلامات. ويشمل ذلك GPTBot وOAI-SearchBot وChatGPT-User وClaudeBot وClaude-SearchBot وClaude-User وPerplexityBot وPerplexity-User وCCBot وShapBot وDuckAssistBot وMistralAI-User. أما محركات البحث فتبقى على القواعد السابقة وخارج /api/ و/search/."
+      },
+      {
+        "Heading": "الحدّ نفسه للجميع.",
+        "Body": "فتح الأبواب لم يُلغِ حدّ الطلبات. ما زال البحث وواجهة البرمجة وMCP تسمح لكل مستخدم، إنساناً كان أو برنامج زحف، بـ30 طلباً كل 10 ثوانٍ من العنوان الواحد."
+      },
+      {
+        "Heading": "يعلم Bing بكل تغيير.",
+        "Body": "يقرأ بحث ChatGPT فهرس Bing، وقد جاءت 749 من أصل 1,289 مشاهدة صفحة على موقعنا في 3 تشرين الثاني من ChatGPT. في 31 تشرين الأول كان Bing قد فهرس 3,768 صفحة فقط من أصل 410,503 صفحات في خرائط موقعنا. وفي 3 تشرين الثاني أرسلنا الصفحات الـ410,503 كلها إلى IndexNow على 41 دفعة، وقُبلت كل دفعة. وترسل كل عملية بناء الآن الصفحات التي غيّرتها إلى Bing وYandex وNaver وSeznam."
+      },
+      {
+        "Heading": "صفحات المواضيع: مفتوحة لـBing ومخفية عن Google.",
+        "Body": "منذ 2 تشرين الثاني كانت صفحات المواضيع الثلاثون تطلب من كل محركات البحث ألا تفهرسها. أما الآن فالطلب موجّه إلى Google وحده، عبر وسم googlebot. ويستطيع Bing، الذي يبحث فيه ChatGPT وCopilot، فهرستها. وتبقى خارج خرائط الموقع لأن Google يقرأها."
+      }
+    ],
+    "Action": "Connect your AI assistant",
+    "ActionPath": "/ai/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/121",
+        "Label": "The change that opened the site to AI crawlers",
+        "LabelAr": "التغيير الذي فتح الموقع لبرامج الزحف"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/116",
+        "Label": "IndexNow after every render",
+        "LabelAr": "IndexNow بعد كل عملية بناء"
+      },
+      {
+        "URL": "https://lebaneselegislation.com/robots.txt",
+        "Label": "Our robots.txt",
+        "LabelAr": "ملف robots.txt لدينا"
+      }
+    ],
+    "ResourceURL": "",
+    "ResourceLabel": "",
+    "ResourceLabelAr": "",
+    "Updated": "2026-11-04"
+  },
+  {
+    "Slug": "small-changes-deploy-in-minutes",
+    "Milestone": "2026-11-04",
+    "Published": "2026-11-04",
+    "Commit": "f351de7",
+    "EvidenceKind": "public-commit",
+    "Title": "A small change now goes live in minutes",
+    "TitleAr": "التغيير الصغير يصل الآن إلى الموقع خلال دقائق",
+    "Summary": "Until 4 November most code changes waited for someone to start a deploy, and any change to the site's look rendered every page again. Now a merge deploys itself, a template or wording change renders only the pages it touches, and a footer edit uploads one frame instead of 760,000 pages.",
+    "SummaryAr": "حتى 4 تشرين الثاني كانت معظم تغييرات الشيفرة تنتظر من يطلق النشر يدوياً، وكان أي تغيير في شكل الموقع يعيد بناء كل الصفحات. أما الآن فالدمج ينشر نفسه، وتغيير القالب أو النص لا يعيد بناء إلا الصفحات التي يمسّها، وتعديل التذييل يرفع إطاراً واحداً بدلاً من 760,000 صفحة.",
+    "Sections": [
+      {
+        "Heading": "Merges deploy themselves.",
+        "Body": "Code merges used to deploy only after a data change, so on 2 and 3 November 6 of 7 deploys were started by hand. Now every push to main that touches the site's code starts a deploy. When a deploy finishes, a check compares the live site with main and starts another if it is behind. A failed deploy has its failed jobs rerun once; a second failure turns the check red."
+      },
+      {
+        "Heading": "One frame for the header and footer.",
+        "Body": "Every page used to carry its own copy of the header and footer, so a one-word footer change re-rendered and re-uploaded about 760,000 pages, about $3.40 of storage writes each time. Pages are now stored as parts, and the Worker joins them with one shared frame per language. The same footer change now uploads 2 frames, the frame list and the 2 search pages."
+      },
+      {
+        "Heading": "Only the pages a change touches.",
+        "Body": "Each render now records which templates and interface strings every kind of page used. A change to a template, a string or a topic guide renders only the pages that used it: a test edit to the privacy and terms pages planned exactly 4 pages, both pages in both languages. A change to Go code still renders everything. Knowing which pages a Go function reaches would need a call graph, and a miss would leave a stale page online."
+      },
+      {
+        "Heading": "Faster renders.",
+        "Body": "Up to 5,000 pages now render on one runner instead of 24. Each render used to spend 3 to 6 minutes loading the database from data/; it now pulls the database image built from that exact data and starts in about 2 minutes. Re-rendering the About page in both languages took 6 minutes 34 seconds from start to upload. A full render of every page takes about 28 minutes."
+      },
+      {
+        "Heading": "Checks in 3 minutes.",
+        "Body": "Pull request checks ran twice per commit and loaded the whole database four times, 12 to 13 minutes each time. They now run once, without the data, in under 3 minutes. The full database check runs only when the data or the code that builds the database changes."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الدمج ينشر نفسه.",
+        "Body": "كان دمج الشيفرة لا يُنشر إلا بعد تغيير في البيانات، فأُطلقت 6 من 7 عمليات نشر يدوياً في 2 و3 تشرين الثاني. أما الآن فكل دفع إلى main يمسّ شيفرة الموقع يطلق النشر. وعند انتهاء النشر يقارن فحصٌ الموقعَ الحيّ بـmain ويطلق نشراً جديداً إن كان متأخراً. وإذا فشل النشر أُعيد تشغيل مهامه الفاشلة مرة واحدة، ويتحوّل الفحص إلى الأحمر عند الفشل الثاني."
+      },
+      {
+        "Heading": "إطار واحد للترويسة والتذييل.",
+        "Body": "كانت كل صفحة تحمل نسختها الخاصة من الترويسة والتذييل، فكان تغيير كلمة واحدة في التذييل يعيد بناء نحو 760,000 صفحة ورفعها، بنحو 3.40 دولار من عمليات الكتابة في التخزين في كل مرة. أما الآن فتُخزَّن الصفحات أجزاءً، ويجمعها الـWorker بإطار مشترك واحد لكل لغة. والتغيير نفسه في التذييل يرفع الآن إطارين وقائمة الإطارات وصفحتي البحث."
+      },
+      {
+        "Heading": "الصفحات التي يمسّها التغيير فقط.",
+        "Body": "تسجّل كل عملية بناء الآن القوالب ونصوص الواجهة التي استخدمها كل نوع من الصفحات. فتغيير قالب أو نص أو دليل موضوع لا يعيد بناء إلا الصفحات التي استخدمته: تعديل تجريبي على صفحتي الخصوصية والشروط خطّط لبناء 4 صفحات بالضبط، الصفحتين باللغتين. أما تغيير شيفرة Go فما زال يعيد بناء كل شيء، لأن معرفة الصفحات التي تبلغها دالة في Go تحتاج إلى مخطط استدعاءات، وأي خطأ فيه يترك صفحة قديمة على الموقع."
+      },
+      {
+        "Heading": "بناء أسرع.",
+        "Body": "صار بناء ما يصل إلى 5,000 صفحة يجري على جهاز واحد بدلاً من 24. وكانت كل عملية بناء تمضي من 3 إلى 6 دقائق في تحميل قاعدة البيانات من data/؛ أما الآن فتسحب صورة قاعدة البيانات المبنية من تلك البيانات نفسها وتبدأ في نحو دقيقتين. واستغرقت إعادة بناء صفحة «حول» باللغتين 6 دقائق و34 ثانية من البداية حتى الرفع. ويستغرق بناء كل الصفحات نحو 28 دقيقة."
+      },
+      {
+        "Heading": "فحوص في 3 دقائق.",
+        "Body": "كانت فحوص طلبات الدمج تعمل مرتين لكل التزام وتحمّل قاعدة البيانات كاملة أربع مرات، فتستغرق من 12 إلى 13 دقيقة في كل مرة. أما الآن فتعمل مرة واحدة، من دون البيانات، في أقل من 3 دقائق. ولا يعمل فحص قاعدة البيانات الكامل إلا عندما تتغيّر البيانات أو الشيفرة التي تبني قاعدة البيانات."
+      }
+    ],
+    "Action": "Run it yourself",
+    "ActionPath": "/run-it-yourself/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/114",
+        "Label": "One frame for every page's header and footer",
+        "LabelAr": "إطار واحد لترويسة كل صفحة وتذييلها"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/126",
+        "Label": "Render only the pages a template, string or guide touches",
+        "LabelAr": "بناء الصفحات التي يمسّها القالب أو النص أو الدليل فقط"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/130",
+        "Label": "The catch-up check after every deploy",
+        "LabelAr": "فحص اللحاق بعد كل نشر"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/122",
+        "Label": "Checks once per pull request",
+        "LabelAr": "الفحوص مرة واحدة لكل طلب دمج"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/static-export.md",
+    "ResourceLabel": "How the static site is built",
+    "ResourceLabelAr": "كيف يُبنى الموقع الثابت",
+    "Updated": "2026-11-04"
+  },
+  {
+    "Slug": "topic-guides-answer-first",
+    "Milestone": "2026-11-03",
+    "Published": "2026-11-04",
+    "Commit": "d99efff",
+    "EvidenceKind": "public-commit",
+    "Title": "Topic guides now open with the answer",
+    "TitleAr": "أدلة المواضيع تبدأ الآن بالجواب",
+    "Summary": "We rewrote 22 topic guides in English and Arabic. Each opens with the figure and the article it comes from, and every worked example uses only figures from the cited texts. Gazette scans now link to the original PDF on SaderLex, and the site has a privacy policy and terms of use.",
+    "SummaryAr": "أعدنا كتابة 22 دليلاً من أدلة المواضيع بالعربية والإنكليزية. يبدأ كل دليل بالرقم والمادة التي ورد فيها، ولا يستخدم أيّ مثال تطبيقي إلا أرقاماً من النصوص المذكورة. وصارت مسوح الجريدة الرسمية تحيل إلى ملف PDF الأصلي على SaderLex، وصار للموقع سياسة خصوصية وشروط استخدام.",
+    "Sections": [
+      {
+        "Heading": "The question is the title.",
+        "Body": "Each guide is now titled with the question people ask, such as \"How is end-of-service indemnity calculated in Lebanon?\" Its first two or three sentences give the figure and name the law and article. A table of the figures follows, then one section per sub-question, each opening with a one-sentence answer. The caveats now sit in one closing note, \"What this page does not cover\", instead of in every section."
+      },
+      {
+        "Heading": "Every number comes from a cited article.",
+        "Body": "Every quote was copied from the database, and worked examples use only figures from the articles a guide cites. Our checker, go run ./cmd/topicgen check, passes on all 22: each quote is exact and each number appears in a cited article. The page addresses did not change."
+      },
+      {
+        "Heading": "What we found on the way.",
+        "Body": "Law 324/2024, article 42, multiplies every Traffic Law fine by ten, with a floor of 250,000 LBP. Our amendment table does not link it to the Traffic Law yet, so the law's article pages do not show it; the traffic fines guide does. The consolidated texts of article 85 of the Code of Commerce and article 9 of the Social Security law are out of date, so those guides cite the amending law instead."
+      },
+      {
+        "Heading": "Gazette scans link to their source.",
+        "Body": "Texts read from Official Gazette scans used to show our copies of the page images. They now show our machine reading and one link to the original Gazette PDF on SaderLex. Old /scan/ links redirect to that PDF, and we deleted the 5,696 hosted files. Older journal entries say to check a reading against the page images: open the SaderLex PDF instead."
+      },
+      {
+        "Heading": "A privacy policy and terms of use.",
+        "Body": "/privacy/ says what we measure, what we keep and how to ask for it to be deleted. /terms/ says the site is information, not legal advice, that the Official Gazette is the authoritative text, and that the API and MCP server are free, limited per client and provided as they are. Reuse of the data follows the licence on /data/. Both pages are linked in the footer."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "السؤال هو العنوان.",
+        "Body": "صار عنوان كل دليل هو السؤال كما يطرحه الناس، مثل «كيف يُحتسب تعويض نهاية الخدمة في لبنان؟». تعطي الجمل الأولى، اثنتان أو ثلاث، الرقمَ وتسمّي القانون والمادة. يليها جدول بالأرقام، ثم قسم لكل سؤال فرعي يبدأ بجواب من جملة واحدة. أما التحفظات فصارت في ملاحظة ختامية واحدة، «ما لا تتناوله هذه الصفحة»، بدلاً من تكرارها في كل قسم."
+      },
+      {
+        "Heading": "كل رقم من مادة مذكورة.",
+        "Body": "نُسخ كل اقتباس من قاعدة البيانات، ولا تستخدم الأمثلة التطبيقية إلا أرقاماً من المواد التي يذكرها الدليل. ويمرّ المدقّق go run ./cmd/topicgen check على الأدلة الـ22 كلها: كل اقتباس مطابق، وكل رقم موجود في مادة مذكورة. ولم تتغيّر عناوين الصفحات."
+      },
+      {
+        "Heading": "ما وجدناه في الطريق.",
+        "Body": "تضاعف المادة 42 من القانون 324/2024 كل غرامات قانون السير عشر مرات، بحدّ أدنى قدره 250,000 ليرة لبنانية. لا يربطها جدول التعديلات لدينا بقانون السير بعد، فلا تظهر في صفحات مواده؛ لكن دليل غرامات السير يذكرها. والنصّان المجمّعان للمادة 85 من قانون التجارة والمادة 9 من قانون الضمان الاجتماعي قديمان، فيستشهد الدليلان بالقانون المعدِّل بدلاً منهما."
+      },
+      {
+        "Heading": "مسوح الجريدة الرسمية تحيل إلى مصدرها.",
+        "Body": "كانت النصوص المقروءة من مسوح الجريدة الرسمية تعرض نسخنا من صور الصفحات. أما الآن فتعرض قراءتنا الآلية ورابطاً واحداً إلى ملف PDF الأصلي للجريدة على SaderLex. وتُحوَّل روابط /scan/ القديمة إلى ذلك الملف، وحذفنا الملفات المستضافة وعددها 5,696. تنصح مدخلات أقدم في السجل بمقارنة القراءة بصور الصفحات: افتح ملف SaderLex بدلاً منها."
+      },
+      {
+        "Heading": "سياسة خصوصية وشروط استخدام.",
+        "Body": "تشرح الصفحة /privacy/ ما نقيسه وما نحتفظ به وكيف تطلب حذفه. وتنصّ الصفحة /terms/ على أن الموقع معلومات لا استشارة قانونية، وأن الجريدة الرسمية هي النص المرجعي، وأن واجهة البرمجة وخادم MCP مجانيان ومحدودان لكل مستخدم ومقدَّمان كما هما. وتخضع إعادة استخدام البيانات للترخيص المنشور في /data/. والصفحتان مرتبطتان في أسفل كل صفحة."
+      }
+    ],
+    "Action": "Browse the topic guides",
+    "ActionPath": "/topics/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/120",
+        "Label": "The 22 rewritten guides",
+        "LabelAr": "الأدلة الـ22 المعاد كتابتها"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/108",
+        "Label": "Gazette scans linked to SaderLex",
+        "LabelAr": "ربط مسوح الجريدة الرسمية بـSaderLex"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/119",
+        "Label": "The privacy policy and terms of use",
+        "LabelAr": "سياسة الخصوصية وشروط الاستخدام"
+      }
+    ],
+    "ResourceURL": "",
+    "ResourceLabel": "",
+    "ResourceLabelAr": "",
+    "Updated": "2026-11-04"
+  },
+  {
+    "Slug": "data-update-script-public",
+    "Milestone": "2026-11-03",
+    "Published": "2026-11-04",
+    "Commit": "eae02f8",
+    "EvidenceKind": "public-commit",
+    "Title": "The data update script is public",
+    "TitleAr": "برنامج تحديث البيانات صار علنياً",
+    "Summary": "scripts/nightly.sh scrapes the Lebanese University's site, rebuilds the database, checks it and opens a pull request that changes only the data. Its first two dry runs caught two serious mistakes before anything was pushed.",
+    "SummaryAr": "يجمع scripts/nightly.sh صفحات موقع الجامعة اللبنانية، ويعيد بناء قاعدة البيانات ويفحصها، ثم يفتح طلب دمج لا يغيّر إلا البيانات. وقد كشفت أول تجربتين له خطأين جسيمين قبل دفع أي شيء.",
+    "Sections": [
+      {
+        "Heading": "One script, ending in a pull request.",
+        "Body": "The data update used to run from a private repository. scripts/nightly.sh in the public repository now does the same work: scrape the Centre's site, rebuild data/, run the checks, export, and open a pull request that changes only data/. A maintainer merges it, then the workflows publish the site, the Hugging Face dataset and the images. --dry-run does all of it locally without pushing. The script refuses to run inside GitHub Actions."
+      },
+      {
+        "Heading": "Models read amendments and citations.",
+        "Body": "After the build checks pass, the script asks a model to judge proposed amendments and to read article citations: Gemini through the agy command first, Claude when agy is out of quota. Only unanswered inputs are asked. The answers go in db/model/ inside the same data pull request, so a person sees them before they reach the site. A failed model step keeps what was read and never blocks the export."
+      },
+      {
+        "Heading": "Two dry runs, two catches.",
+        "Body": "The first dry run pointed the scraper at a partial copy of its store, and the export removed 93,487 laws from the local archive, keeping only the 9,710 that copy held. The build check failed on the missing laws, and nothing was exported. The second run reset the last-changed date of 164,305 of 165,855 unchanged pages to that day. Shipped, every sitemap date would have moved and every page would have rendered again. The script now loads page dates from the published data/ before it builds, and LEBLEG_SCRAPE=0 builds from the published archive when another job already scrapes."
+      },
+      {
+        "Heading": "New text gets vectors under a daily cap.",
+        "Body": "Search by meaning needs a vector for every passage. The vectors workflow now finds passages without one and embeds them with gemini-embedding-001, at most $1 and 20,000 passages a day. A run that reaches the cap resumes the next day without paying twice, and nothing is published while any current passage lacks a vector."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "برنامج واحد ينتهي بطلب دمج.",
+        "Body": "كان تحديث البيانات يجري من مستودع خاص. أما الآن فيقوم scripts/nightly.sh في المستودع العام بالعمل نفسه: يجمع صفحات موقع المركز، ويعيد بناء data/، ويجري الفحوص، ويصدّر، ثم يفتح طلب دمج لا يغيّر إلا data/. يدمجه أحد المشرفين، فتنشر مسارات العمل الموقعَ ومجموعة بيانات Hugging Face والصور. ويؤدي الخيار --dry-run كل ذلك محلياً من دون دفع. ويرفض البرنامج العمل داخل GitHub Actions."
+      },
+      {
+        "Heading": "النماذج تقرأ التعديلات والإحالات.",
+        "Body": "بعد نجاح فحوص البناء يطلب البرنامج من نموذج أن يحكم على التعديلات المقترحة وأن يقرأ الإحالات بين المواد: Gemini عبر الأمر agy أولاً، ثم Claude عندما تنفد حصة agy. ولا يُسأل النموذج إلا عمّا لم يُجَب عنه بعد. وتُحفظ الأجوبة في db/model/ ضمن طلب دمج البيانات نفسه، فيراها شخص قبل أن تصل إلى الموقع. وإذا فشلت خطوة النموذج احتُفظ بما قُرئ ولا يتوقف التصدير."
+      },
+      {
+        "Heading": "تجربتان وخطآن مكشوفان.",
+        "Body": "وجّهت التجربة الأولى أداة الجمع إلى نسخة جزئية من مخزنها، فأزال التصدير 93,487 قانوناً من الأرشيف المحلي ولم يُبقِ إلا 9,710 قوانين كانت في تلك النسخة. وفشل فحص البناء بسبب القوانين الناقصة، فلم يُصدَّر شيء. وأعادت التجربة الثانية تاريخ آخر تغيير لـ164,305 صفحات من أصل 165,855 صفحة لم تتغيّر إلى يوم التشغيل. ولو نُشر ذلك لتغيّر كل تاريخ في خرائط الموقع ولأُعيد بناء كل الصفحات. أما الآن فيحمّل البرنامج تواريخ الصفحات من data/ المنشورة قبل البناء، ويبني الخيار LEBLEG_SCRAPE=0 من الأرشيف المنشور عندما تتولى مهمة أخرى جمع الصفحات."
+      },
+      {
+        "Heading": "النص الجديد يحصل على متجهاته ضمن سقف يومي.",
+        "Body": "يحتاج البحث بالمعنى إلى متجه لكل مقطع. يجد مسار عمل المتجهات الآن المقاطع التي لا متجه لها ويحوّلها بـgemini-embedding-001، بحدّ أقصى دولار واحد و20,000 مقطع في اليوم. والتشغيل الذي يبلغ السقف يُستأنف في اليوم التالي من دون الدفع مرتين، ولا يُنشر شيء ما دام أي مقطع حالي بلا متجه."
+      }
+    ],
+    "Action": "Run it yourself",
+    "ActionPath": "/run-it-yourself/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/105",
+        "Label": "The public update script",
+        "LabelAr": "برنامج التحديث العلني"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/109",
+        "Label": "Model readings in the data pull request",
+        "LabelAr": "قراءات النموذج في طلب دمج البيانات"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/115",
+        "Label": "Page dates kept from the published data",
+        "LabelAr": "الإبقاء على تواريخ الصفحات من البيانات المنشورة"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/107",
+        "Label": "Vectors for new text under a daily budget",
+        "LabelAr": "متجهات النص الجديد ضمن ميزانية يومية"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/update-data.md",
+    "ResourceLabel": "How to update the data",
+    "ResourceLabelAr": "كيف تحدّث البيانات",
+    "Updated": "2026-11-04"
+  },
+  {
     "Slug": "students-paid-instead-of-ads",
     "Milestone": "2026-11-03",
     "Published": "2026-11-03",
