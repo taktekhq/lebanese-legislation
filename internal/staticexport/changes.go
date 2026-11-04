@@ -74,19 +74,25 @@ func planChanges(ctx context.Context, dir, since string, full bool, frame *bool)
 		return ChangePlan{Full: true}, nil
 	}
 	since = strings.TrimSpace(string(b))
-	b, e = gitOutput(ctx, dir, "diff", "--name-only", since, "HEAD")
+	b, e = gitOutput(ctx, dir, "diff", "--name-status", "--no-renames", since, "HEAD")
 	if e != nil {
 		return ChangePlan{}, e
 	}
-	for _, p := range strings.Fields(string(b)) {
+	src, e := renderSources(ctx, dir)
+	if e != nil {
+		return ChangePlan{}, e
+	}
+	for _, line := range strings.Split(strings.TrimSpace(string(b)), "\n") {
+		status, p, ok := strings.Cut(line, "\t")
+		if !ok {
+			continue
+		}
 		if p == layoutFile && frameOnlyChange(ctx, dir, since) {
 			*frame = true // every run publishes the frame; no page's parts change
 			continue
 		}
-		for _, prefix := range []string{"internal/site/", "templates/", "static/", "assets/", "cmd/static-export/", "internal/staticexport/", "db/", "data/schema.sql", "data/indexes.sql", "data/TABLES", "data/popular_texts.txt", "data/article_calculated_current.jsonl", "go.mod", "go.sum", ".github/workflows/static-site.yml"} {
-			if strings.HasPrefix(p, prefix) {
-				return ChangePlan{Full: true}, nil
-			}
+		if src.changes(p, status == "D") || renderInputs[p] {
+			return ChangePlan{Full: true}, nil
 		}
 		if strings.HasPrefix(p, "data/tables/") && (!strings.HasSuffix(p, ".tsv")) {
 			return ChangePlan{Full: true}, nil

@@ -57,6 +57,7 @@ See [architecture](architecture.md) for the current request and build paths.
 | Workflow | What it does |
 | --- | --- |
 | [static-site.yml](../.github/workflows/static-site.yml) | Renders about 760,000 pages from `data/` with `cmd/static-export`, in 24 parallel shards, into R2 bucket `lebleg-site`. |
+| [static-site-catchup.yml](../.github/workflows/static-site-catchup.yml) | Every two hours, starts static-site when the live site is behind main and nothing is queued or running. |
 | [origin.yml](../.github/workflows/origin.yml) | Deploys one Cloudflare Container with PostgreSQL 18.6, a baked-in database and the Go website server. |
 | [vectors.yml](../.github/workflows/vectors.yml) | `build` then `publish` and `vectorize`: exports vectors, publishes `vectors/vectors.parquet` to Hugging Face and loads Vectorize index `lebleg-chunks`. Later syncs upload only changed vectors. |
 

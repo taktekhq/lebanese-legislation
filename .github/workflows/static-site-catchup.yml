@@ -1,0 +1,88 @@
+name: static-site catch-up
+# Every two hours, starts a static-site deploy when the live site is behind
+# main: the deploy for the newest change failed, was cancelled or never
+# started. It waits while a deploy is queued or running, and while the newest
+# data change has not passed the data workflow. A failed deploy has its failed
+# jobs run once more; a second failure turns this check red instead.
+on:
+  schedule:
+    - cron: '23 */2 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: static-site-catchup
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: .github
+      - name: Compare the live site with main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          set -euo pipefail
+          say() { echo "$*" | tee -a "$GITHUB_STEP_SUMMARY"; }
+          head=$(git rev-parse HEAD)
+          rendered=""
+          if aws s3api get-object --bucket lebleg-site --key _export/rendered-commit \
+              --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
+              rendered-commit >/dev/null 2>read-error; then
+            rendered=$(cat rendered-commit)
+          elif ! grep -Eq 'NoSuchKey|\(404\)' read-error; then
+            cat read-error >&2
+            exit 1
+          fi
+          if [ "$rendered" = "$head" ]; then
+            say "Up to date: the live site was rendered from $head."
+            exit 0
+          fi
+
+          busy=$(gh run list -w static-site.yml -L 20 --json status --jq '[.[] | select(.status != "completed")] | length')
+          if [ "$busy" -gt 0 ]; then
+            say "A deploy is queued or running; the next check looks again."
+            exit 0
+          fi
+
+          # The newest data change must have passed the data workflow first.
+          if [ -n "$rendered" ] && git cat-file -e "$rendered^{commit}" 2>/dev/null; then
+            data=$(git log -1 --format=%H "$rendered..$head" -- data/)
+          else
+            data=$(git log -1 --format=%H "$head" -- data/)
+          fi
+          if [ -n "$data" ]; then
+            checked=false
+            for sha in $(gh run list -w data.yml -b main -s success -L 30 --json headSha --jq '.[].headSha'); do
+              if git merge-base --is-ancestor "$data" "$sha" 2>/dev/null; then checked=true; break; fi
+            done
+            if [ "$checked" = false ]; then
+              say "Data commit $data has not passed the data workflow yet; waiting."
+              exit 0
+            fi
+          fi
+
+          read -r id conclusion attempt < <(gh run list -w static-site.yml -L 1 \
+            --json databaseId,conclusion,attempt --jq '.[0] | "\(.databaseId) \(.conclusion) \(.attempt)"')
+          if [ "$conclusion" = failure ]; then
+            if [ "$attempt" -lt 2 ]; then
+              gh run rerun "$id" --failed
+              say "Deploy run $id failed; running its failed jobs again."
+              exit 0
+            fi
+            say "Deploy run $id failed twice; not retrying. Read its log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/$id"
+            exit 1
+          fi
+
+          gh workflow run static-site.yml -r main -f commit="$head"
+          say "Started a deploy of $head (the live site was rendered from ${rendered:-nothing yet})."
