@@ -31,6 +31,11 @@ import (
 //     open); and every generated topic page, /topics/ and /topic/<slug>/ in
 //     both languages (topics.go). The English home, list pages, code and
 //     year hubs and info pages stay open.
+//   - The article pages of a short text, one of 3 articles or fewer, are
+//     hidden the same way and left out of the sitemaps (shortTextHidden):
+//     the text's own page already shows every article whole, so each such
+//     page repeated it (92,053 of 289,082 article URLs in the sitemaps on
+//     4 Nov 2026; Nizar, 4 Nov 2026). Long texts' articles stay open.
 //   - A page that is noindex, or whose twin in the other language is, names
 //     no hreflang (Page.Hreflang): hreflang never points at a hidden page. A
 //     hidden English text page stays its own canonical: a noindex page whose
@@ -65,6 +70,14 @@ func (s *Server) noindexed(ctx context.Context, kind string, id, pos int) bool {
 // engines too (Nizar, 2 Nov 2026, issue #86). The pages stay for visitors
 // and the laws keep linking to them.
 const rulingsHidden = true
+
+// shortTextArticles is the most articles a text may have for its article
+// pages to be hidden as copies of its own page.
+const shortTextArticles = 3
+
+// shortTextHidden reports whether the article pages of a text with this many
+// articles are hidden: the text's page holds them all.
+func shortTextHidden(articles int) bool { return articles <= shortTextArticles }
 
 // englishHidden reports whether a text's machine-translated /en/ pages are
 // hidden from search engines (it is not a popular text).

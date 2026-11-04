@@ -278,11 +278,32 @@ func TestSitemapLeavesOutWhatIsNotIndexed(t *testing.T) {
 			articles += len(f.URLs)
 		}
 	}
-	var total, thin, dup int
-	s.db.QueryRow(ctx, `SELECT (SELECT count(*) FROM legislation_article), (SELECT count(*) FROM noindex_page WHERE kind = 'article')`).Scan(&total, &thin)
-	dup = total - thin - articles
+	var total, thin, short, dup int
+	s.db.QueryRow(ctx, `SELECT (SELECT count(*) FROM legislation_article), (SELECT count(*) FROM noindex_page WHERE kind = 'article'),
+		(SELECT count(*) FROM legislation_article a
+		  WHERE a.law_id IN (SELECT law_id FROM legislation_article GROUP BY law_id HAVING count(*) <= $1)
+		    AND NOT EXISTS (SELECT 1 FROM noindex_page n WHERE n.kind = 'article' AND n.id = a.law_id AND n.position = a.position))`,
+		shortTextArticles).Scan(&total, &thin, &short)
+	dup = total - thin - short - articles
 	if dup < 0 || dup > 1000 {
-		t.Errorf("articles %d, thin %d, of %d: %d unexplained", articles, thin, total, dup)
+		t.Errorf("articles %d, thin %d, short texts' %d, of %d: %d unexplained", articles, thin, short, total, dup)
+	}
+	// no article of a short text is listed
+	short3, err := s.db.Query(ctx, `SELECT a.law_id, a.number FROM legislation_article a
+		WHERE a.law_id IN (SELECT law_id FROM legislation_article GROUP BY law_id HAVING count(*) <= $1) ORDER BY random() LIMIT 200`, shortTextArticles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer short3.Close()
+	for short3.Next() {
+		var id int
+		var num string
+		if err := short3.Scan(&id, &num); err != nil {
+			t.Fatal(err)
+		}
+		if p := artPath(id, num); all[Base+p] || all[Base+"/en"+p] {
+			t.Errorf("%s is an article of a short text and in a sitemap", p)
+		}
 	}
 }
 

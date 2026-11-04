@@ -414,3 +414,11 @@ func onpageServer(t *testing.T) *Server {
 	}
 	return s
 }
+
+func TestShortTextHidden(t *testing.T) {
+	for n, want := range map[int]bool{1: true, 2: true, 3: true, 4: false, 787: false} {
+		if got := shortTextHidden(n); got != want {
+			t.Errorf("shortTextHidden(%d) = %v, want %v", n, got, want)
+		}
+	}
+}
