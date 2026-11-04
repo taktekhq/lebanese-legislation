@@ -20,3 +20,11 @@ posthog.init("phc_pTpSY5wVsQrG8LN58z4zWXdMWjvqR6uPCY2eXV25sBV5", {
   capture_pageleave: true,
   session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
 });
+/* A paid student editor's code (legislation.js keeps it from their link), on
+   every event they send, so their study days and reports can be counted. */
+(function () {
+  try {
+    var editor = localStorage.getItem("lebleg_editor");
+    if (editor) posthog.register({ editor: editor });
+  } catch (e) {}
+})();

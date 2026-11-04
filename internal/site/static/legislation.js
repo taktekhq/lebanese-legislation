@@ -303,3 +303,57 @@
     settle();
   }).finally(function () { clearTimeout(timeout); });
 })();
+
+/* Editors and error reports.
+
+   An editor (a paid student reviewer) gets a personal link that ends in
+   ?editor=CODE. The code, not a name, is kept in this browser and ph.js sends
+   it with every PostHog event, so their study days and reports can be counted.
+   The address is cleaned so the code is not shared with the page.
+
+   "Report an error on this page" in the footer sends the note to PostHog as
+   error_report (with the page, the language and the editor code if any).
+   Only PostHog gets the text: GA4 must not hold free text. */
+(function () {
+  "use strict";
+  try {
+    var m = location.search.match(/[?&]editor=([A-Za-z0-9-]{3,24})(?=&|$)/);
+    if (m) {
+      localStorage.setItem("lebleg_editor", m[1].toLowerCase());
+      var rest = location.search.replace(/([?&])editor=[^&]*&?/, "$1").replace(/[?&]$/, "");
+      history.replaceState(null, "", location.pathname + rest + location.hash);
+    }
+  } catch (e) {}
+
+  var box = document.querySelector("[data-report]");
+  if (!box) return;
+  var open = box.querySelector("[data-report-open]");
+  var form = box.querySelector("[data-report-form]");
+  var done = box.querySelector("[data-report-done]");
+  open.addEventListener("click", function () {
+    var show = form.hidden;
+    form.hidden = !show;
+    done.hidden = true;
+    open.setAttribute("aria-expanded", String(show));
+    if (show && matchMedia("(hover: hover)").matches) form.querySelector("textarea").focus();
+  });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var note = form.querySelector("textarea").value.trim();
+    if (!note) return;
+    var ph = window.posthog;
+    var sent = !!(ph && ph.capture);
+    if (sent) {
+      ph.capture("error_report", {
+        note: note.slice(0, 1000),
+        page: location.pathname,
+        language: document.documentElement.lang === "ar" ? "ar" : "en"
+      });
+      form.querySelector("textarea").value = "";
+      form.hidden = true;
+      open.setAttribute("aria-expanded", "false");
+    }
+    done.textContent = done.getAttribute(sent ? "data-thanks" : "data-failed");
+    done.hidden = false;
+  });
+})();
