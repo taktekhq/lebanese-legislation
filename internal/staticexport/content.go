@@ -19,9 +19,9 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/site/topics"
 )
 
-// Content changes are the site's templates, UI strings, topic guides and
-// assets. A change to Go code still renders everything; these four are mapped
-// to the pages they touch:
+// Content changes are the site's templates, UI strings, topic guides, the
+// journal and assets. A change to Go code still renders everything; these five
+// are mapped to the pages they touch:
 //
 //   - a page template: the routes whose pages executed a page template that
 //     reaches it (the record each render leaves, Deps, says which routes
@@ -33,6 +33,8 @@ import (
 //   - a topic guide: its own pages, the topic index and the article pages it
 //     quotes, before and after (every topic page and the index when a title,
 //     a question or the set of guides changes);
+//   - the journal (blog.json): every journal page, its entries before and
+//     after, and the sitemaps that list or date them;
 //   - an asset: no page; every run uploads the assets.
 //
 // Anything it cannot place renders the whole site, and says why.
@@ -42,11 +44,14 @@ const (
 	i18nDir     = "internal/site/i18n/"
 	topicsDir   = "internal/site/topics/"
 	staticDir   = "internal/site/static/"
+	journalFile = "internal/site/blog.json"
 )
 
 // contentFile says whether a changed source is one the content planner maps.
 func contentFile(p string) bool {
 	switch {
+	case p == journalFile:
+		return true
 	case strings.HasPrefix(p, templateDir):
 		return strings.HasSuffix(p, ".html") && p != layoutFile && !strings.Contains(p[len(templateDir):], "/")
 	case strings.HasPrefix(p, i18nDir):
@@ -86,8 +91,11 @@ func PlanContent(ctx context.Context, in ContentInput) (ContentPlan, error) {
 		return full("no record yet of what each route's pages use: render everything once")
 	}
 	var tmplFiles, i18nFiles, topicFiles []string
+	journal := false
 	for _, f := range in.Files {
 		switch {
+		case f == journalFile:
+			journal = true
 		case strings.HasPrefix(f, staticDir):
 			p.Assets = true
 		case strings.HasPrefix(f, templateDir):
@@ -155,6 +163,14 @@ func PlanContent(ctx context.Context, in ContentInput) (ContentPlan, error) {
 		}
 		p.Paths = append(p.Paths, paths...)
 		p.Why = append(p.Why, why...)
+	}
+	if journal {
+		paths, err := journalPaths(ctx, in.Dir, in.Since, in.Manifest)
+		if err != nil {
+			return full("journal: " + err.Error())
+		}
+		p.Paths = append(p.Paths, paths...)
+		p.Why = append(p.Why, fmt.Sprintf("the journal changed: %d journal pages and the sitemaps that list them", len(paths)))
 	}
 
 	if len(names) > 0 {
@@ -770,4 +786,46 @@ func topicPaths(ctx context.Context, dir, since string, files []string, manifest
 		why = append(why, "a guide's title, question or the set of guides changed: every topic page, the topic index and the home pages")
 	}
 	return paths, why, nil
+}
+
+// journalSitemaps list the journal's pages or date them: the journal's own
+// sitemap, the core sitemaps that also list its pages, and the index.
+var journalSitemaps = []string{"/blog-sitemap.xml", "/sitemaps/core.xml", "/sitemaps/ar-core.xml", "/sitemap.xml"}
+
+// journalPaths are the pages that read the journal: every journal page the
+// last render made (the index, the feed, a removed entry), every entry in the
+// file before and after, and the sitemaps that list them.
+func journalPaths(ctx context.Context, dir, since string, manifest map[string]Entry) ([]string, error) {
+	paths := append([]string{"/blog/", "/en/blog/"}, journalSitemaps...)
+	for p := range manifest {
+		if strings.HasPrefix(p, "/blog/") || strings.HasPrefix(p, "/en/blog/") {
+			paths = append(paths, p)
+		}
+	}
+	ob, ook, err := gitShow(ctx, dir, since, journalFile)
+	if err != nil {
+		return nil, err
+	}
+	var versions [][]byte
+	if ook {
+		versions = append(versions, ob)
+	}
+	switch nb, err := os.ReadFile(filepath.Join(dir, journalFile)); {
+	case err == nil:
+		versions = append(versions, nb)
+	case !os.IsNotExist(err):
+		return nil, err
+	}
+	for _, b := range versions {
+		var posts []struct{ Slug string }
+		if err := json.Unmarshal(b, &posts); err != nil {
+			return nil, fmt.Errorf("%s: %w", journalFile, err)
+		}
+		for _, e := range posts {
+			if e.Slug != "" {
+				paths = append(paths, "/blog/"+e.Slug+"/", "/en/blog/"+e.Slug+"/")
+			}
+		}
+	}
+	return paths, nil
 }

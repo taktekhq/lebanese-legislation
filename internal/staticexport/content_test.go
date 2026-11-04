@@ -48,6 +48,7 @@ func contentFixture(t *testing.T) (dir string, commit func(msg string) string, w
 	write(templateDir+"_lawbits.html", `{{define "lawbits"}}<p>{{t "law.bits"}} {{statusText .S}}</p>{{end}}`)
 	write(templateDir+"law.html", `{{define "content"}}<h1>{{t "law.title"}}</h1>{{template "lawbits" .}}{{t (printf "datefix.%s" .M)}}{{end}}`)
 	write(templateDir+"about.html", `{{define "content"}}<h1>{{t "about.title"}}</h1>{{end}}`)
+	write(journalFile, `[{"Slug":"old"},{"Slug":"kept"}]`)
 	write("internal/site/funcs.go", `package site
 
 import "html/template"
@@ -139,6 +140,30 @@ func TestPlanContent(t *testing.T) {
 	want("a page template", plan(templateDir+"about.html"), "/about/")
 	reset()
 
+	// The journal: its pages, the entry it lost, the entry it gained, and the
+	// sitemaps; no other page.
+	write(journalFile, `[{"Slug":"new"},{"Slug":"kept"}]`)
+	commit("journal")
+	{
+		in := contentInput(dir, base, []string{journalFile})
+		for _, q := range []string{"/blog/", "/blog/feed.xml", "/blog/old/", "/blog/kept/"} {
+			in.Manifest[q] = Entry{Path: q, Status: http.StatusOK}
+			in.Manifest["/en"+q] = Entry{Path: "/en" + q, Status: http.StatusOK}
+		}
+		p, err := PlanContent(context.Background(), in)
+		if err != nil {
+			t.Fatal(err)
+		}
+		exp := []string{"/blog-sitemap.xml",
+			"/blog/", "/blog/feed.xml", "/blog/kept/", "/blog/new/", "/blog/old/",
+			"/en/blog/", "/en/blog/feed.xml", "/en/blog/kept/", "/en/blog/new/", "/en/blog/old/",
+			"/sitemap.xml", "/sitemaps/ar-core.xml", "/sitemaps/core.xml"}
+		if p.Full || strings.Join(p.Paths, " ") != strings.Join(exp, " ") {
+			t.Fatalf("the journal:\n got  %v\n want %v\n why  %v", p.Paths, exp, p.Why)
+		}
+	}
+	reset()
+
 	write(templateDir+"_lawbits.html", `{{define "lawbits"}}<p>{{t "law.bits"}}!</p>{{end}}`)
 	commit("partial")
 	want("a partial only the law template reaches", plan(templateDir+"_lawbits.html"),
@@ -216,9 +241,10 @@ func TestPlanChangesContent(t *testing.T) {
 	base := commit("base")
 	write(templateDir+"about.html", `{{define "content"}}x{{end}}`)
 	write(topicsDir+"rent.json", `{"slug":"rent"}`)
+	write(journalFile, `[{"Slug":"new"}]`)
 	commit("content")
 	p, err := PlanChanges(context.Background(), dir, base, false)
-	if err != nil || p.Full || !slices.Equal(p.Content, []string{templateDir + "about.html", topicsDir + "rent.json"}) {
+	if err != nil || p.Full || !slices.Equal(p.Content, []string{journalFile, templateDir + "about.html", topicsDir + "rent.json"}) {
 		t.Fatalf("%+v %v", p, err)
 	}
 	write("internal/site/funcs.go", "package site\n")
