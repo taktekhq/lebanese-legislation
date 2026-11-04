@@ -39,13 +39,17 @@ import (
 //     every ruling page is hidden (rulingsHidden), so there is no
 //     ar-rulings-N family.
 //
-// Left out: article pages with nothing to index and placeholder documents
+// Left out: the article pages of short texts (shortTextHidden), article
+// pages with nothing to index and placeholder documents
 // (noindex_page), the second of two articles whose numbers make the same
 // address. lastmod is page_state.changed_at: when the page's content last
 // changed here, never the text's own date. A page whose date is not known, or
 // is before the page existed or after today, has no lastmod.
 
 const sitemapSize = 45000 // under the 50,000 URLs a sitemap may hold
+
+// shortTextLimit is shortTextArticles for the articles query.
+var shortTextLimit = strconv.Itoa(shortTextArticles)
 
 // sitemapSet is one family of Arabic URLs, split into numbered files.
 type sitemapSet struct {
@@ -62,6 +66,7 @@ var sitemapSets = []sitemapSet{
 		 FROM (SELECT DISTINCT ON (law_id, regexp_replace(btrim(number), '\s+', '-', 'g')) law_id, position, number
 		       FROM legislation_article ORDER BY law_id, regexp_replace(btrim(number), '\s+', '-', 'g'), position) a
 		 LEFT JOIN {ni} n ON n.kind = 'article' AND n.id = a.law_id AND n.position = a.position
+		 JOIN (SELECT law_id FROM legislation_article GROUP BY law_id HAVING count(*) > ` + shortTextLimit + `) big USING (law_id)
 		 LEFT JOIN {ps} ps ON ps.kind = 'law' AND ps.id = a.law_id
 		 WHERE n.kind IS NULL ORDER BY a.law_id, a.position`},
 	{"gazette", `SELECT '/gazette/' || g.id || '/', ps.changed_at FROM gazette_issue g

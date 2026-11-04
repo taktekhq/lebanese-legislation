@@ -899,7 +899,7 @@ func (s *Server) article(w http.ResponseWriter, r *http.Request) {
 		}
 		p := s.articlePage(r, l, i)
 		s.trackRead(r, l, a.Number)
-		p.NoIndex = s.noindexed(ctx, "article", l.ID, a.Position)
+		p.NoIndex = shortTextHidden(len(l.List)) || s.noindexed(ctx, "article", l.ID, a.Position)
 		s.weakText(ctx, r, &p, l.ID)
 		p.Data.(map[string]any)["Topics"] = s.topicsFor(r, l.ID, a.Number)
 		if l.CodeSlug != nil && !s.isStatic {
