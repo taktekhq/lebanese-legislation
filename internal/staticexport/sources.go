@@ -18,16 +18,17 @@ import (
 // database load and its extra steps in .github/workflows/static-site.yml, and
 // the workflow itself. A change to any of them renders the whole site.
 var renderInputs = map[string]bool{
-	"db/official.sql":                       true,
-	"data/load.sh":                          true,
-	"data/schema.sql":                       true,
-	"data/indexes.sql":                      true,
-	"data/TABLES":                           true,
-	"data/popular_texts.txt":                true,
-	"data/article_calculated_current.jsonl": true,
-	"go.mod":                                true,
-	"go.sum":                                true,
-	".github/workflows/static-site.yml":     true,
+	"db/official.sql":                         true,
+	"data/load.sh":                            true,
+	"data/schema.sql":                         true,
+	"data/indexes.sql":                        true,
+	"data/TABLES":                             true,
+	"data/popular_texts.txt":                  true,
+	"data/article_calculated_current.jsonl":   true,
+	"go.mod":                                  true,
+	"go.sum":                                  true,
+	".github/workflows/static-site.yml":       true,
+	".github/actions/render-setup/action.yml": true,
 }
 
 // renderCommands are the commands a render runs: the exporter, and build-db

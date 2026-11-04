@@ -40,6 +40,7 @@ on:
       - 'go.mod'
       - 'go.sum'
       - '.github/workflows/static-site.yml'
+      - '.github/actions/render-setup/**'
 
 concurrency:
   group: static-site
