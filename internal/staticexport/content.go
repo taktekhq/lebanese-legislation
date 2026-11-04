@@ -541,6 +541,17 @@ func templateFuncKeys(dirs ...string) (map[string]*keyUse, error) {
 		}
 		seen := map[*ast.FuncDecl]bool{}
 		var collect func(n ast.Node)
+		// follow reads the functions a name may call: functions and methods
+		// alike, by name. Only called names are followed; a bare name in a
+		// body is usually a variable (funcs["static"] returns one).
+		follow := func(name string) {
+			for _, d := range decls[name] {
+				if !seen[d] && d.Body != nil {
+					seen[d] = true
+					collect(d.Body)
+				}
+			}
+		}
 		collect = func(n ast.Node) {
 			ast.Inspect(n, func(n ast.Node) bool {
 				switch n := n.(type) {
@@ -565,25 +576,24 @@ func templateFuncKeys(dirs ...string) (map[string]*keyUse, error) {
 							}
 						}
 					}
-				case *ast.Ident:
-					for _, d := range decls[n.Name] {
-						if !seen[d] && d.Body != nil {
-							seen[d] = true
-							collect(d.Body)
-						}
-					}
-				case *ast.SelectorExpr:
-					for _, d := range decls[n.Sel.Name] {
-						if !seen[d] && d.Body != nil {
-							seen[d] = true
-							collect(d.Body)
-						}
+					switch f := n.Fun.(type) {
+					case *ast.Ident:
+						follow(f.Name)
+					case *ast.SelectorExpr:
+						follow(f.Sel.Name)
 					}
 				}
 				return true
 			})
 		}
-		collect(e.expr)
+		switch v := e.expr.(type) { // "lawURL": lawURL names the function itself
+		case *ast.Ident:
+			follow(v.Name)
+		case *ast.SelectorExpr:
+			follow(v.Sel.Name)
+		default:
+			collect(v)
+		}
 	}
 	return out, nil
 }
