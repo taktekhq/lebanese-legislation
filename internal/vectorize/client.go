@@ -76,9 +76,14 @@ func (c *Client) Upsert(ctx context.Context, vectors []Vector) error {
 	return nil
 }
 
+// deleteBatch is Cloudflare's cap on ids per delete_by_ids request
+// ("40007 too many ids in payload; max id count is 100"), lower than the
+// 1,000 vectors an upsert takes.
+const deleteBatch = 100
+
 func (c *Client) DeleteByIDs(ctx context.Context, ids []string) error {
 	for len(ids) > 0 {
-		n := min(len(ids), 1000)
+		n := min(len(ids), deleteBatch)
 		body, err := json.Marshal(struct {
 			IDs []string `json:"ids"`
 		}{ids[:n]})
