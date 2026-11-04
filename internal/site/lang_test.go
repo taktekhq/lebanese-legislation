@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -86,6 +87,7 @@ func langCases(t *testing.T, s *Server) []langCase {
 		func(id int, _ string) langCase { return langCase{"law", lawPath(id), true, false} })
 	one("article", `SELECT a.law_id, a.number FROM legislation_article a WHERE NOT EXISTS (SELECT 1 FROM code c WHERE c.law_id = a.law_id)
 		AND NOT EXISTS (SELECT 1 FROM noindex_page n WHERE (n.kind = 'english' AND n.id = a.law_id) OR (n.kind = 'article' AND n.id = a.law_id AND n.position = a.position))
+		AND (SELECT count(*) FROM legislation_article b WHERE b.law_id = a.law_id) > `+strconv.Itoa(shortTextArticles)+` -- a short text's articles are hidden (shortTextHidden)
 		ORDER BY a.law_id, a.position LIMIT 1`,
 		func(id int, n string) langCase { return langCase{"article", artPath(id, n), true, false} })
 	one("code", `SELECT law_id, '' FROM code ORDER BY position LIMIT 1`,
