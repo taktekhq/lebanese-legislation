@@ -3,7 +3,8 @@ name: checks
 # A branch push without a pull request runs nothing; a new commit on a pull
 # request cancels the run for the previous one.
 #
-# Every job checks out without data/ (1.4 GB): no check here reads it. The db
+# Every job checks out without data/ (1.4 GB): only internal/indexing's test
+# reads data/popular_texts.txt, which is kept. The db
 # image, which bakes data/ into PostgreSQL, is tested by db.yml, only when its
 # inputs change.
 on:
@@ -24,7 +25,8 @@ jobs:
         with:
           sparse-checkout: |
             /*
-            !/data/
+            !/data/*
+            /data/popular_texts.txt
           sparse-checkout-cone-mode: false
       - uses: actions/setup-go@v5
         with:
@@ -47,7 +49,8 @@ jobs:
         with:
           sparse-checkout: |
             /*
-            !/data/
+            !/data/*
+            /data/popular_texts.txt
           sparse-checkout-cone-mode: false
       - uses: actions/setup-go@v5
         with:
@@ -79,7 +82,8 @@ jobs:
         with:
           sparse-checkout: |
             /*
-            !/data/
+            !/data/*
+            /data/popular_texts.txt
           sparse-checkout-cone-mode: false
       - name: Build independent smoke images
         run: |
@@ -141,7 +145,8 @@ jobs:
         with:
           sparse-checkout: |
             /*
-            !/data/
+            !/data/*
+            /data/popular_texts.txt
           sparse-checkout-cone-mode: false
       - uses: actions/setup-go@v5
         with:
