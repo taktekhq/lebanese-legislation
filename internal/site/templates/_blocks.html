@@ -51,7 +51,8 @@
   {{else}}{{with .Shown}}<div class="art__ar">{{range paras (ptr .)}}<p>{{marks .}}</p>{{end}}</div>{{end}}{{end}}
   {{if $amounts}}<details class="art__history"><summary lang="{{uilang}}" dir="{{dir}}">{{t "art.amounts_original"}}</summary><div class="art__ar">{{range paras (ptr .Shown)}}<p>{{marks .}}</p>{{end}}</div></details>{{end}}
   {{if not .Ahead}}{{range .Images}}<p class="art__img"><a href="{{img .}}" rel="noopener"><img src="{{img .}}" alt="Text of the article as published, an image" loading="lazy"></a></p>{{end}}
-  {{with .TextFr}}<div class="art__fr" lang="fr" dir="ltr">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}{{end}}
+  {{with .TextFr}}<div class="art__fr" lang="fr" dir="ltr">{{range paras .}}<p>{{.}}</p>{{end}}</div>{{end}}
+  {{if ne uilang "ar"}}{{with .English}}<div class="art__en" lang="en" dir="ltr"><p class="art__en-label">{{t "art.en_label" (date $.A.EnOn)}}</p>{{range paras (ptr .)}}<p>{{.}}</p>{{end}}</div>{{end}}{{end}}{{end}}
   {{range .Affected}}<p class="art__amend art__amend--check" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "law.possibly_affected"}}:</strong> <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a> {{t "art.affected_full"}}</p>{{end}}
   {{end}}
   {{if or .Versions .Links .Pending .Unsure}}<details class="art__amendments">

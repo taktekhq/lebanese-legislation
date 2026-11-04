@@ -97,6 +97,11 @@
 
 .art { padding-block: 22px; border-bottom: 1px solid var(--line); scroll-margin-top: 8px; }
 .art ~ .art { content-visibility: auto; contain-intrinsic-size: auto 260px; }
+/* The unofficial English of a popular text's article (English pages only),
+   under the official Arabic. */
+.art__en { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); text-align: left; }
+.art__en p { margin-top: 8px; line-height: 1.6; }
+.art__en-label { font-size: 0.8125rem; color: var(--muted); margin-top: 0; }
 .art:target { background: color-mix(in srgb, var(--accent) 7%, transparent); border-radius: 12px; padding-inline: 16px; margin-inline: -16px; }
 .art__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .art__no { font-family: var(--font-ar); font-weight: 600; font-size: 1.0625rem; color: var(--ink); }

@@ -25,6 +25,8 @@ var renderInputs = map[string]bool{
 	"data/TABLES":                             true,
 	"data/popular_texts.txt":                  true,
 	"data/article_calculated_current.jsonl":   true,
+	"data/article_en.jsonl":                   true,
+	"data/article_en.sql":                     true,
 	"go.mod":                                  true,
 	"go.sum":                                  true,
 	".github/workflows/static-site.yml":       true,
