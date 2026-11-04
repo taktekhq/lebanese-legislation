@@ -269,19 +269,33 @@ func TestUnpopularEnglishIsHidden(t *testing.T) {
 }
 
 // An article under a text is a pair like the text's own page: its /en/
-// address is self-canonical and both name the same hreflang set.
+// address is self-canonical and both name the same hreflang set. The penal
+// code is long and popular, so neither rule hides its articles.
 func TestArticlePagesArePairs(t *testing.T) {
 	s := indexedServer(t)
-	_, en := get(t, s, "/en/decree/9440/article/1/")
-	if canon, _, hl := head(en); canon != Base+"/en/decree/9440/article/1/" || hl != 3 {
+	_, en := get(t, s, "/en/decree/244611/article/655/")
+	if canon, _, hl := head(en); canon != Base+"/en/decree/244611/article/655/" || hl != 3 {
 		t.Errorf("English article page: canonical %q, %d hreflang", canon, hl)
 	}
-	assertHreflangPair(t, en, "/decree/9440/article/1/", "/en/decree/9440/article/1/")
-	_, ar := get(t, s, "/decree/9440/article/1/")
-	if canon, _, hl := head(ar); canon != Base+"/decree/9440/article/1/" || hl != 3 {
+	assertHreflangPair(t, en, "/decree/244611/article/655/", "/en/decree/244611/article/655/")
+	_, ar := get(t, s, "/decree/244611/article/655/")
+	if canon, _, hl := head(ar); canon != Base+"/decree/244611/article/655/" || hl != 3 {
 		t.Errorf("Arabic article page: canonical %q, %d hreflang", canon, hl)
 	}
-	assertHreflangPair(t, ar, "/decree/9440/article/1/", "/en/decree/9440/article/1/")
+	assertHreflangPair(t, ar, "/decree/244611/article/655/", "/en/decree/244611/article/655/")
+}
+
+// An article of a short text (decree 9440 has 2) is hidden in both languages:
+// noindex, follow, its own canonical and no hreflang (shortTextHidden).
+func TestShortTextArticlesAreHidden(t *testing.T) {
+	s := indexedServer(t)
+	for _, path := range []string{"/decree/9440/article/1/", "/en/decree/9440/article/1/"} {
+		_, body := get(t, s, path)
+		canon, robots, hl := head(body)
+		if !strings.HasPrefix(robots, "noindex, follow") || canon != Base+path || hl != 0 {
+			t.Errorf("%s: robots %q, canonical %q, %d hreflang", path, robots, canon, hl)
+		}
+	}
 }
 
 func TestCodeKeepsItsEnglishPair(t *testing.T) {
