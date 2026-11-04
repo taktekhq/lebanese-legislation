@@ -331,7 +331,10 @@ jobs:
     # Tell Bing (ChatGPT and Copilot search its index) and the other IndexNow
     # engines which pages this render changed. Pages no sitemap lists (noindex,
     # another canonical) are left out. A failure here leaves the site as it is.
+    # One of the two render jobs is always skipped, and GitHub skips a job
+    # after a skipped one unless it says when to run.
     needs: [plan, generation]
+    if: ${{ !cancelled() && needs.generation.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
