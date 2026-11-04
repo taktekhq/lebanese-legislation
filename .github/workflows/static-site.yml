@@ -15,10 +15,27 @@ on:
         description: Optional Worker route
         type: string
         default: ""
+      commit:
+        description: Render this commit instead of the branch head (the catch-up check pins the one it checked)
+        type: string
+        default: ""
+  # Data changes deploy after the data workflow has checked them.
   workflow_run:
     workflows: [data]
     types: [completed]
     branches: [main]
+  # Code changes deploy on their own. The plan decides what they touch; a push
+  # that also changes data/ waits for the data workflow instead.
+  push:
+    branches: [main]
+    paths:
+      - 'internal/**'
+      - 'cmd/static-export/**'
+      - 'cmd/build-db/**'
+      - 'db/**'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/static-site.yml'
 
 concurrency:
   group: static-site
@@ -30,14 +47,18 @@ permissions:
 
 jobs:
   plan:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     outputs:
       commit: ${{ steps.commit.outputs.sha }}
+      # planned: the plan ran. work: something to render (a full render, a
+      # changed page, or changed data, which shard 0's redirect data reads).
+      planned: ${{ steps.plan.outputs.planned }}
+      work: ${{ steps.plan.outputs.work }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ github.event.workflow_run.head_sha || inputs.commit || github.sha }}
           fetch-depth: 0
       - uses: actions/setup-go@v5
         with:
@@ -46,7 +67,22 @@ jobs:
       - name: Pin the render commit
         id: commit
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Leave a push that changes data/ to the data workflow
+        id: gate
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          wait=false
+          if [ "$EVENT" = push ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null \
+              && ! git diff --quiet "$BEFORE" HEAD -- data/; then
+            wait=true
+            echo "This push changes data/: the data workflow checks it and starts the deploy." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "wait=$wait" >> "$GITHUB_OUTPUT"
       - name: Read last successful render and map changed rows
+        id: plan
+        if: steps.gate.outputs.wait == 'false'
         env:
           AWS_DEFAULT_REGION: auto
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -65,7 +101,15 @@ jobs:
             exit 1
           fi
           go run ./cmd/static-export changes -since "$previous" -full="$FULL" -out plan
+          work=false
+          if [ "$(cat plan/mode)" = full ] || [ -s plan/paths.txt ] || ! git diff --quiet "$previous" HEAD -- data/; then
+            work=true
+          fi
+          echo "planned=true" >> "$GITHUB_OUTPUT"
+          echo "work=$work" >> "$GITHUB_OUTPUT"
+          echo "Plan: $(cat plan/mode), $(grep -c . plan/paths.txt || true) paths, render: $work (since ${previous:-nothing})" | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
+        if: steps.plan.outputs.work == 'true'
         with:
           name: render-plan
           path: plan
@@ -73,6 +117,7 @@ jobs:
 
   render:
     needs: plan
+    if: needs.plan.outputs.work == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 340
     strategy:
@@ -216,7 +261,12 @@ jobs:
       - name: Submit changed pages
         run: go run ./cmd/static-export indexnow -max 100000 exports/export-*
   rendered-commit:
+    # After a render, or straight after a plan with nothing to render, so the
+    # next plan starts from this commit.
     needs: [plan, render, generation]
+    if: >-
+      !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.planned == 'true' &&
+      (needs.plan.outputs.work != 'true' || (needs.render.result == 'success' && needs.generation.result == 'success'))
     runs-on: ubuntu-latest
     steps:
       - name: Record the successfully rendered commit

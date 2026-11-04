@@ -67,14 +67,27 @@ that become redirects are deleted from R2 by their owner. Full renders retain th
 existing R2 path exchange for crawl discovery.
 
 A missing baseline, `workflow_dispatch` with `full=true`, or a renderer change
-(`internal/site`, templates, assets, `cmd/static-export`, `internal/staticexport`)
-forces a full render. The one exception is a change to the shared frame of
+forces a full render. The renderer is every Go and embedded file (templates,
+strings, topics, assets) of the packages `cmd/static-export` and `cmd/build-db`
+are built from, as `go list -deps` reports them, plus the inputs the workflow
+loads (`db/official.sql`, `data/load.sh`, the schema files). Tests and notes beside
+that code change nothing. The one exception is a change to the shared frame of
 `internal/site/templates/layout.html` alone (see below): it renders only the
 two search pages, which are stored whole. Schema, rendering dependencies and unmapped table changes
 also fall back to a full render. The workflow serializes runs and keeps 24 owners,
 matching the stored manifests. Only after all shards and the generation job
 succeed does the final job write `_export/rendered-commit`. A failed run leaves
-the baseline unchanged, so its changes are retried.
+the baseline unchanged, so its changes are retried. A plan with nothing to render
+writes it straight away.
+
+Deploys start on their own. A data change deploys after the data workflow has
+checked it (`workflow_run`). A push to main that changes code the site is built
+from deploys straight away; one that also changes `data/` waits for the data
+workflow. Every two hours, [static-site-catchup.yml](../.github/workflows/static-site-catchup.yml)
+compares `_export/rendered-commit` with main and starts a deploy when the site is
+behind and no deploy is queued or running, once the newest data change has passed
+the data workflow. A failed deploy has its failed jobs run once more; a second
+failure turns the check red.
 
 ## Edge layout: one frame for every page
 
