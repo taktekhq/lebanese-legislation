@@ -611,7 +611,7 @@
   "search.ai_rate_up": "مفيدة",
   "search.ai_rate_down": "غير مفيدة",
   "search.ai_rate_thanks": "شكراً على تقييم هذه الإجابة.",
-  "search.ai_rate_why": "ما المشكلة فيها؟ اختياري، ويساعدنا على إصلاحها.",
+  "search.ai_rate_why": "ما المشكلة فيها؟ اختياري، ويساعدنا على إصلاحها. لا تكتب أسماء أو تفاصيل شخصية.",
   "search.ai_rate_send": "أرسل",
   "search.ai_rate_sent": "شكراً، وصلتنا ملاحظتك.",
   "resources.database": "صورة قاعدة بيانات PostgreSQL (-db)",

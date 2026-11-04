@@ -167,7 +167,9 @@
     why.hidden = value !== "down";
     thanks.hidden = value === "down";
     thanks.textContent = rate.getAttribute("data-thanks");
-    if (value === "down") why.querySelector("textarea").focus();
+    /* focus the note only with a mouse: on a phone it would zoom and open
+       the keyboard for something optional */
+    if (value === "down" && matchMedia("(hover: hover)").matches) why.querySelector("textarea").focus();
   });
   box.addEventListener("submit", function (e) {
     var form = e.target.closest("[data-ai-why]");

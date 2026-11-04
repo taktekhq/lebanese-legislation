@@ -611,7 +611,7 @@
   "search.ai_rate_up": "Helpful",
   "search.ai_rate_down": "Not helpful",
   "search.ai_rate_thanks": "Thanks for rating this answer.",
-  "search.ai_rate_why": "What was wrong with it? Optional, it helps us fix it.",
+  "search.ai_rate_why": "What was wrong with it? Optional, it helps us fix it. Please leave out names and personal details.",
   "search.ai_rate_send": "Send",
   "search.ai_rate_sent": "Thanks, we got your note.",
   "resources.database": "PostgreSQL database image (-db)",
