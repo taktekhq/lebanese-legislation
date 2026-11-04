@@ -3,7 +3,7 @@
 # The services run against a throwaway PostgreSQL holding the website's
 # fictional fixture (web/schema, web/testdata/synthetic.sql), never real data.
 set -euo pipefail
-[ -n "${API_IMAGE:-}${MCP_IMAGE:-}" ] || { echo "Set API_IMAGE or MCP_IMAGE" >&2; exit 1; }
+[ -n "${API_IMAGE:-}${MCP_IMAGE:-}${WEB_IMAGE:-}${DB_IMAGE:-}" ] || { echo "Set API_IMAGE, MCP_IMAGE, WEB_IMAGE or DB_IMAGE" >&2; exit 1; }
 root=$(cd "$(dirname "$0")/../.." && pwd)
 net=lebleg-smoke-$$
 pg=lebleg-smoke-pg-$$
@@ -71,7 +71,7 @@ for architecture in ${SMOKE_ARCHITECTURES:-amd64 arm64}; do
 
   fi
 
-  docker rm -f "${services[@]}" >/dev/null
+  [ "${#services[@]}" -eq 0 ] || docker rm -f "${services[@]}" >/dev/null
   services=()
   echo "$platform: requested image checks passed"
 done

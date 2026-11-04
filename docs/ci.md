@@ -42,8 +42,12 @@ Files it writes in the checkout belong to root afterwards; give them back with
 `docker run --rm -v "$PWD:/d" alpine chown -R "$(id -u):$(id -g)" /d`.
 
 The XPS scrape-build-and-PR job rebuilds and proposes changes to `data/`.
-The `checks.yml` workflow runs on pushes and pull requests; its final `ci-ok`
-job requires all seven parallel check jobs to succeed. `data.yml` publishes Parquet tables on Hugging Face. PostgreSQL is distributed
+The `checks.yml` workflow runs on pull requests and pushes to main; its final
+`ci-ok` job requires all four parallel check jobs to succeed. Its jobs check out
+without `data/`. `db.yml` bakes `data/` into the `-db` image and checks its first
+boot, only when `data/`, `db/` or a Go package built into the image changes;
+`.github/scripts/db-paths-check.sh` (run by `checks.yml`) fails when a package
+in the image is missing from its path lists. `data.yml` publishes Parquet tables on Hugging Face. PostgreSQL is distributed
 in the [`-db` and `-all` images](../README.md#images).
 
 ## Cloudflare hosting and vectors

@@ -1,0 +1,107 @@
+name: db
+# Builds the db image with all of data/ baked into PostgreSQL (about 7 minutes)
+# and checks that it boots, serves its laws and survives a restart. It runs only
+# when something baked into the image changes: data/, db/, the serving schema,
+# or a Go package the image's commands are built from. On main, data/ changes
+# are left to data.yml, which bakes and publishes the image itself.
+#
+# The checks workflow fails when a package built into the image is missing from
+# these lists (.github/scripts/db-paths-check.sh), so keep both lists in step.
+on:
+  pull_request:
+    paths:
+      - 'data/**'
+      - 'db/**'
+      - 'tools/src/lebleg/sql/web.sql'
+      - 'cmd/build-search/**'
+      - 'cmd/restore-release/**'
+      - 'cmd/check-release/**'
+      - 'cmd/build-release/**'
+      - 'cmd/publish-release/**'
+      - 'internal/amend/**'
+      - 'internal/archive/**'
+      - 'internal/build/**'
+      - 'internal/cite/**'
+      - 'internal/cli/**'
+      - 'internal/embedding/**'
+      - 'internal/hfhub/**'
+      - 'internal/indexing/**'
+      - 'internal/judge/**'
+      - 'internal/modelout/**'
+      - 'internal/page/**'
+      - 'internal/parse/**'
+      - 'internal/provenance/**'
+      - 'internal/release/**'
+      - 'internal/releasedb/**'
+      - 'internal/rulingfile/**'
+      - 'internal/semantic/**'
+      - 'internal/site/topics/**'
+      - 'internal/text/**'
+      - 'internal/vectorize/**'
+      - 'go.mod'
+      - 'go.sum'
+      - '.dockerignore'
+      - '.github/workflows/db.yml'
+      - '.github/scripts/smoke-images.sh'
+  push:
+    branches: [main]
+    paths:
+      - 'db/**'
+      - 'tools/src/lebleg/sql/web.sql'
+      - 'cmd/build-search/**'
+      - 'cmd/restore-release/**'
+      - 'cmd/check-release/**'
+      - 'cmd/build-release/**'
+      - 'cmd/publish-release/**'
+      - 'internal/amend/**'
+      - 'internal/archive/**'
+      - 'internal/build/**'
+      - 'internal/cite/**'
+      - 'internal/cli/**'
+      - 'internal/embedding/**'
+      - 'internal/hfhub/**'
+      - 'internal/indexing/**'
+      - 'internal/judge/**'
+      - 'internal/modelout/**'
+      - 'internal/page/**'
+      - 'internal/parse/**'
+      - 'internal/provenance/**'
+      - 'internal/release/**'
+      - 'internal/releasedb/**'
+      - 'internal/rulingfile/**'
+      - 'internal/semantic/**'
+      - 'internal/site/topics/**'
+      - 'internal/text/**'
+      - 'internal/vectorize/**'
+      - 'go.mod'
+      - 'go.sum'
+      - '.dockerignore'
+      - '.github/workflows/db.yml'
+      - '.github/scripts/smoke-images.sh'
+  workflow_dispatch:
+concurrency:
+  group: db-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Bake the db image
+        run: docker build -f db/Dockerfile --target db -t lebleg-test-db .
+      - name: Release commands run in the image
+        env:
+          DB_IMAGE: lebleg-test-db
+          SMOKE_ARCHITECTURES: amd64
+        run: bash .github/scripts/smoke-images.sh
+      - name: First boot and restart
+        run: go test -count=1 -run TestDBImageFirstBootAndRestart ./internal/releasedb/
+        env:
+          LEBLEG_TEST_DB_IMAGE: lebleg-test-db
