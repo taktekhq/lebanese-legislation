@@ -1,6 +1,6 @@
 # Architecture
 
-Current setup after the changes of 1-2 November 2026. The former private
+Current setup after the changes of 1 to 4 November 2026. The former private
 `taktekhq/lebaneselegislation` repository is folded into this public repository:
 code, scraper, build pipeline, website and MCP.
 
@@ -11,7 +11,9 @@ Worker in [`workers/static-site`](../workers/static-site/) serves a static page
 from the R2 bucket `lebleg-site`, or sends a dynamic request to one Cloudflare
 Container. Ruling PDFs are also served from R2 by the same Worker.
 
-Search pages, `/api/v1/`, filters and Gazette scans go to the container.
+Search pages, `/api/v1/`, `/mcp`, badges, filters and old `/scan/` links go to
+the container. A `/scan/` link answers with a 301 to the original Gazette PDF on
+SaderLex; Gazette page images are no longer hosted.
 Its [Dockerfile](../workers/static-site/container/Dockerfile) packages
 PostgreSQL 18.6 with the database baked into the image and the Go website server.
 Semantic search uses Cloudflare Vectorize index `lebleg-chunks`: 1,547,937 chunks,
@@ -22,23 +24,34 @@ PostgreSQL into Vectorize.
 
 `data/` is the input for the site build. GitHub Actions renders about 760,000
 static pages through `cmd/static-export` in 24 parallel shards and uploads them
-to `lebleg-site`. Nightly runs render only paths affected by changed table rows;
-full runs render the whole corpus. See [static export](static-export.md) for the
+to `lebleg-site`. Each run renders only what changed: the paths whose table
+rows changed, the pages that used a changed template, UI string or topic guide
+(from each render's `deps.json`), or everything after a Go change. A plan of up
+to 5,000 paths renders on one runner. A header or footer change uploads only the
+shared layout frames. Every render starts its database from the `-db` image
+tagged for that commit's data (`data-<hash>`), or loads `data/` when no such image
+exists, and sends its changed pages to IndexNow. Pushes to main that touch the
+site start a deploy; `static-site-catchup.yml` runs after each deploy and every
+two hours, and reruns a failed one. See [static export](static-export.md) for the
 R2 commit baseline, dependency mapping and local rendering instructions.
 Image-producing workflows publish their own images; origin deploys `-all`.
 The vectors workflow filters the public vectors to IDs generated from current `data/`,
 publishes Parquet on Hugging Face and loads Vectorize through the vectors image.
 Later syncs upload changed vectors and delete IDs absent from the current set.
-Missing embeddings stop the workflow before publication or sync. The 21 stale
+`cmd/embed-missing` embeds chunks that have no vector yet with Gemini, at most
+$1 and 20,000 chunks a day; a run stopped by the budget resumes from the Actions
+cache. Any chunk still missing a vector stops the workflow before publication or sync. The 21 stale
 archive IDs found in the comparison are included in the deletion baseline.
 
 | Workflow | Output |
 | --- | --- |
-| [static-site.yml](../.github/workflows/static-site.yml) | `data/` to static pages in R2, using `cmd/static-export` and 24 parallel shards. |
+| [static-site.yml](../.github/workflows/static-site.yml) | `data/` to static pages in R2, using `cmd/static-export` and 24 shards (one runner for small plans), then IndexNow. |
+| [static-site-catchup.yml](../.github/workflows/static-site-catchup.yml) | After each deploy and every two hours: starts static-site when the live site is behind main, reruns a failed deploy once. |
 | [images.yml](../.github/workflows/images.yml) | Manual button to publish one selected image through `build-image.yml`. |
 | [origin.yml](../.github/workflows/origin.yml) | Container image with the database and Go website server, deployed to Cloudflare Containers. |
 | [vectors.yml](../.github/workflows/vectors.yml) | `build` then `vectorize` and `publish`: current chunk IDs filter the public Parquet, Hugging Face receives `vectors/vectors.parquet`, and the vectors image syncs `lebleg-chunks`. |
-| [data.yml](../.github/workflows/data.yml) | `data/` to the source-table Parquet files on Hugging Face. |
+| [data.yml](../.github/workflows/data.yml) | `data/` to the source-table Parquet files on Hugging Face, then the `-db` and `-all` images. |
+| [hf-card.yml](../.github/workflows/hf-card.yml) | The dataset card, `METHODS.md` and `SCHEMA.md` from `.github/huggingface/` to Hugging Face. |
 
 ## Origin deployment
 
@@ -76,7 +89,7 @@ The vectors file has columns `id`, `document`, `model`, `hash` and `values`
 (`FLOAT[768]`). See the [service reference](reference.md#vectors) for a DuckDB
 example. Compose and the hosted container use the same database image.
 The all-in-one server mounts `internal/mcpserver` over its canonical database.
-Cloudflare `/mcp` and badge routes stay on the existing Worker until issue #51.
+The site Worker sends `/mcp` and the badge routes to that container.
 
 ## Images
 
@@ -84,7 +97,7 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 
 | Image | Holds | Used by |
 | --- | --- | --- |
-| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings, optional scans | Compose, database users and the base of `-all` |
+| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings | Compose, database users, the static render and the base of `-all` |
 | `-api` | Standalone API server, unchanged Dockerfile and amd64/arm64 support | Compose and API users with a separate database |
 | `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
 | `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
@@ -93,11 +106,11 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 Image builds use the reusable `build-image.yml` workflow. Each image has its own
 `images-<name>` job concurrency group across callers; pushes cancel an older
 build of that image. Producer jobs have separate locks, so a slow image never
-holds a workflow-wide lock. Scans come from R2.
+holds a workflow-wide lock.
 
 | Image | Built in workflow | When |
 | --- | --- | --- |
-| `-db` | `data.yml` | After `publish` succeeds on main. |
+| `-db` | `data.yml` | After `publish` succeeds on main. Also tagged `data-<hash>` (`.github/scripts/render-db-tag.sh`) for the static render. |
 | `-api` | `checks.yml` (`checks`) | After `ci-ok` succeeds on a push to main. |
 | `-mcp` | `checks.yml` (`checks`) | After `ci-ok` succeeds on a push to main. |
 | `-all` | `data.yml`, `checks.yml` | After `-db` succeeds, or after `ci-ok` on a push to main. Always pulls `-db:latest`. |

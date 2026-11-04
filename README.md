@@ -106,7 +106,9 @@ flowchart LR
   W --> U[Readers, AI assistants,<br>API clients]
 ```
 
-Cloudflare serves the static pages and ruling PDFs from R2 through the Worker in [`workers/static-site`](workers/static-site/). Search, `/api/v1/`, filters, scans and `/mcp` go through `workers/origin` to a blue/green Cloudflare Container running the `-all` image. [static-site.yml](.github/workflows/static-site.yml) renders `data/` with `cmd/static-export` in parallel shards, only the pages that changed. [vectors.yml](.github/workflows/vectors.yml) publishes the vectors and loads Cloudflare Vectorize. See [architecture](docs/architecture.md).
+Cloudflare serves the static pages and ruling PDFs from R2 through the Worker in [`workers/static-site`](workers/static-site/). Search, `/api/v1/`, filters, scans and `/mcp` go through `workers/origin` to a blue/green Cloudflare Container running the `-all` image. [static-site.yml](.github/workflows/static-site.yml) renders `data/` with `cmd/static-export`, only the pages that changed: a data change renders the pages its rows touch, a template, string or topic guide change the pages that used it, and a Go change every page. It starts on every push to main that touches the site, and a catch-up check after each deploy reruns a failed one. Changed pages go to IndexNow. [vectors.yml](.github/workflows/vectors.yml) embeds new passages, publishes the vectors and loads Cloudflare Vectorize. See [architecture](docs/architecture.md) and [static export](docs/static-export.md).
+
+AI crawlers are welcome. `robots.txt` lets every named AI crawler (GPTBot, ClaudeBot, PerplexityBot, ShapBot and others) read the pages, search, the API and the MCP server. Every client gets the same limit on dynamic paths: 30 requests per 10 seconds from one address.
 
 ## Update the data yourself
 
@@ -154,7 +156,7 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 
 | Image | Holds | Used by |
 | --- | --- | --- |
-| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings, optional scans | Compose, database users and the base of `-all` |
+| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings | Compose, database users, the static render and the base of `-all` |
 | `-api` | Standalone API server, unchanged Dockerfile and amd64/arm64 support | Compose and API users with a separate database |
 | `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
 | `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
@@ -206,4 +208,4 @@ of ads. [Apply on LinkedIn](https://www.linkedin.com/jobs/view/4483994893/).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Code is [MIT licensed](LICENSE), by Taktek and Nizar Mahmoud. The data has its own [terms and attribution](https://huggingface.co/datasets/taktekhq/lebanese-legislation#what-to-check): credit the Centre for Research and Studies in Legal Informatics, Lebanese University, for the texts. The code licence does not cover the legal texts or court scans. This is not legal advice or an official publication.
+Code is [MIT licensed](LICENSE), by Taktek and Nizar Mahmoud. The data has its own [terms and attribution](https://huggingface.co/datasets/taktekhq/lebanese-legislation#what-to-check): credit the Centre for Research and Studies in Legal Informatics, Lebanese University, for the texts. The code licence does not cover the legal texts or court scans. This is not legal advice or an official publication. The site's [privacy policy](https://lebaneselegislation.com/en/privacy/) and [terms of use](https://lebaneselegislation.com/en/terms/) also cover the API and MCP server.

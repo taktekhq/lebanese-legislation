@@ -4,10 +4,10 @@ Some jobs need a secret: an upload token, a model API key, or Cloudflare
 credentials. Each is a GitHub Actions workflow in `.github/workflows/` that does
 nothing harmful without its secret: it says which secret is missing and stops.
 
-Until the secrets live in GitHub, we run these workflows on our own machine
-with [act](https://github.com/nektos/act), which runs a workflow in Docker
-the way GitHub does. Moving one to GitHub later means adding its secrets in
-the repository settings; the workflow stays the same.
+On this repository the secrets live in GitHub, so these workflows run there.
+In a fork, or to try one before merging, run it on your own machine with
+[act](https://github.com/nektos/act), which runs a workflow in Docker the way
+GitHub does; the workflow stays the same.
 
 ## Run one with act
 
@@ -29,11 +29,14 @@ act workflow_dispatch -W .github/workflows/data.yml --input publish=true \
 | Workflow | What it does | Secrets |
 | --- | --- | --- |
 | `data.yml` | Loads `data/` into PostgreSQL, exports and checks the Parquet tables, and (job `publish`) uploads them to Hugging Face. | `HF_TOKEN` (write token for the dataset) |
+| `hf-card.yml` | Uploads the dataset card, `METHODS.md` and `SCHEMA.md` from `.github/huggingface/` when they change on main, keeping the card's release block. | `HF_TOKEN` |
+| `vectors.yml` | Embeds missing chunks, publishes `vectors/vectors.parquet` and syncs Vectorize. | `LEBLEG_GEMINI_API_KEY`, `HF_TOKEN`, R2 and Cloudflare tokens |
+| `stats.yml` | Daily GitHub and Hugging Face counters to PostHog. | `GH_STATS_TOKEN` (optional, for traffic) |
 
 On GitHub, `HF_TOKEN` lives only in the `huggingface` environment, which
 deploys from `main` only, and the token can write to the
 `taktekhq/lebanese-legislation` dataset and nothing else. Jobs that publish
-(`data.yml` publish, `vectors.yml` publish) use that environment
+(`data.yml` publish, `hf-card.yml`, `vectors.yml` publish) use that environment
 on `main`; on other branches they run without the token and upload nothing.
 
 Under act, run it from a checkout whose git objects are all its own (no
@@ -41,10 +44,13 @@ Under act, run it from a checkout whose git objects are all its own (no
 Files it writes in the checkout belong to root afterwards; give them back with
 `docker run --rm -v "$PWD:/d" alpine chown -R "$(id -u):$(id -g)" /d`.
 
-The XPS scrape-build-and-PR job rebuilds and proposes changes to `data/`.
-The `checks.yml` workflow runs on pull requests and pushes to main; its final
-`ci-ok` job requires all four parallel check jobs to succeed. Its jobs check out
-without `data/`. `db.yml` bakes `data/` into the `-db` image and checks its first
+[`scripts/nightly.sh`](../scripts/nightly.sh) runs on a maintainer's machine,
+never in Actions: it rebuilds `data/` and opens a data-only pull request. See
+[Update the data](update-data.md).
+The `checks.yml` workflow runs once per pull request commit and on pushes to
+main; its final `ci-ok` job requires its four check jobs (`unit`, `postgres`,
+`images`, `serving`) to succeed. Its jobs check out without `data/`, so a pull
+request is checked in about 3 minutes. `db.yml` bakes `data/` into the `-db` image and checks its first
 boot, only when `data/`, `db/` or a Go package built into the image changes;
 `.github/scripts/db-paths-check.sh` (run by `checks.yml`) fails when a package
 in the image is missing from its path lists. `data.yml` publishes Parquet tables on Hugging Face. PostgreSQL is distributed
@@ -92,7 +98,7 @@ pushes tags and records the digest in its job summary.
 
 | Image | Built in workflow | When |
 | --- | --- | --- |
-| `-db` | `data.yml` | After `publish` succeeds on main. R2 supplies scans. |
+| `-db` | `data.yml` | After `publish` succeeds on main. Also tagged `data-<hash>` for the static render. |
 | `-api` | `checks.yml` (`checks`) | Push to main after `ci-ok` succeeds. |
 | `-mcp` | `checks.yml` (`checks`) | Push to main after `ci-ok` succeeds. |
 | `-all` | `data.yml`, `checks.yml` | After `-db`, or push to main after `ci-ok`. Pulls `-db:latest`. |

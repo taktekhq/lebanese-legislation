@@ -1,0 +1,60 @@
+name: hf-card
+# The dataset card (README.md), METHODS.md and SCHEMA.md in .github/huggingface/
+# to the Hugging Face dataset, when they change on main. data.yml uploads the
+# card too, but only after a data change. The card keeps the release block of
+# the card now on Hugging Face (.github/scripts/hf-card.py).
+on:
+  push:
+    branches: [main]
+    paths: [".github/huggingface/**", ".github/scripts/hf-card.py", ".github/workflows/hf-card.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hf-card
+  cancel-in-progress: false
+jobs:
+  upload:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    # HF_TOKEN lives only in this environment, which deploys from main only. The
+    # token is scoped on Hugging Face to write on this one dataset.
+    environment: huggingface
+    timeout-minutes: 10
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      HF_REPO: taktekhq/lebanese-legislation
+    steps:
+      - name: Need HF_TOKEN
+        id: token
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "No HF_TOKEN secret: nothing uploaded." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.token.outputs.ok == 'true'
+        with:
+          sparse-checkout: .github
+      - name: Upload the card files
+        if: steps.token.outputs.ok == 'true'
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv" && . "$RUNNER_TEMP/venv/bin/activate"
+          pip install --quiet "huggingface_hub==1.33.0"
+          mkdir -p "$RUNNER_TEMP/card"
+          curl -fsS "https://huggingface.co/datasets/$HF_REPO/raw/main/README.md" -o "$RUNNER_TEMP/live.md" || true
+          python3 .github/scripts/hf-card.py .github/huggingface/README.md "$RUNNER_TEMP/live.md" "$RUNNER_TEMP/card/README.md"
+          cp .github/huggingface/METHODS.md .github/huggingface/SCHEMA.md "$RUNNER_TEMP/card/"
+          hf upload "$HF_REPO" "$RUNNER_TEMP/card" . --repo-type dataset \
+            --commit-message "Card from $(git rev-parse --short=12 HEAD), $(date -u +%F)"
+          # Read each file back anonymously; the Hub can take a few seconds to serve a new commit.
+          for f in README.md METHODS.md SCHEMA.md; do
+            for try in 1 2 3 4 5 6; do
+              curl -fsS "https://huggingface.co/datasets/$HF_REPO/raw/main/$f" | cmp -s - "$RUNNER_TEMP/card/$f" && break
+              [ "$try" = 6 ] && { echo "$f on Hugging Face differs from the uploaded file"; exit 1; }
+              sleep 10
+            done
+          done
+          echo "Card published: https://huggingface.co/datasets/$HF_REPO" | tee -a "$GITHUB_STEP_SUMMARY"

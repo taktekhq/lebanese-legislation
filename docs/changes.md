@@ -1,5 +1,18 @@
 # Changes
 
+## 3-4 November 2026
+
+- AI crawlers may read everything. `robots.txt` gives each named AI crawler (GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, Claude-User, PerplexityBot, Perplexity-User, CCBot, ShapBot, DuckAssistBot, MistralAI-User) a group that allows search, `/api/v1/`, `/mcp` and query strings; only `/changes/review/` stays closed. The site Worker no longer answers ShapBot with 429. The per-address limit on dynamic paths (30 requests per 10 seconds) is unchanged.
+- Deploys start on their own. `static-site.yml` runs on pushes to main that touch the site's code, not only after a data change. [static-site-catchup.yml](../.github/workflows/static-site-catchup.yml) runs after each deploy and every two hours, starts a deploy when the live site is behind main and reruns a failed one once.
+- Renders do less. Each render records which templates and UI strings each route used (`deps.json`), so a template, string or topic guide change renders only those pages; a Go change still renders everything. Plans of up to 5,000 paths run on one runner. Pages are stored as parts inside a shared layout frame, so a header or footer change uploads the frames instead of about 760,000 pages. The render database starts from the `-db` image tagged `data-<hash>` for its commit, else from `data/`. See [static export](static-export.md).
+- Checks run once per pull request commit, without `data/`, in about 3 minutes (was 12 to 13). [db.yml](../.github/workflows/db.yml) bakes and smoke-tests the `-db` image only when `data/`, `db/` or a package built into it changes.
+- Gazette scans are no longer hosted. A text read from Gazette scans shows its machine reading and links the original PDF on SaderLex (`legislation_scan.source_url`); old `/scan/...` links redirect there with a 301. The images carry no scans.
+- [scripts/nightly.sh](../scripts/nightly.sh) is the data update, in public: scrape, rebuild `data/`, check, export, and open a data-only pull request. It judges amendments and reads citations with Gemini (agy) or Claude, keeps page change dates from the published `data/`, and `LEBLEG_SCRAPE=0` builds from the published archive. See [update the data](update-data.md).
+- `vectors.yml` embeds chunks without a vector (`cmd/embed-missing`), at most $1 and 20,000 chunks a day, and still publishes nothing while a current chunk lacks one.
+- 22 topic guides rewritten to open with the answer, with figures tables and worked examples taken only from the cited articles. `/privacy/` and `/terms/` are new and linked in the footer.
+- README and dataset card show live counts from `/badge/`; `stats.yml` sends daily GitHub and Hugging Face counters to PostHog.
+- The dataset card, `METHODS.md` and `SCHEMA.md` live in `.github/huggingface/`; [hf-card.yml](../.github/workflows/hf-card.yml) uploads them when they change.
+
 ## 2-3 November 2026
 
 - Hetzner is gone. Every part of LebaneseLegislation.com runs on Cloudflare: static pages and ruling PDFs from R2, everything dynamic in the `-all` image on Cloudflare Containers, deployed blue/green by [origin.yml](../.github/workflows/origin.yml). The public MCP server at `/mcp` is the Go server in that container; the old MCP Worker with its D1 snapshot is removed.
