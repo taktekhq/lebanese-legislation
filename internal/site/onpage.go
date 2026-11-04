@@ -269,6 +269,7 @@ func articleAnswer(b *i18n.Bundle, l *Law, number string) string {
 // room.
 func articleDesc(b *i18n.Bundle, l *Law, number, subject, text string) string {
 	f := articleFacts(b, l, number)
+	text = strings.Join(strings.Fields(text), " ") // paragraphs and double spaces to single spaces
 	if b.Lang != "ar" {
 		return fitDesc(f[0], append(f[1:], cutWords(text, 80)), descMax)
 	}

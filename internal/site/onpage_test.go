@@ -198,6 +198,9 @@ func TestMetaDescription(t *testing.T) {
 	if !strings.HasPrefix(d, "المادة 655 من ") || !strings.Contains(d, "(الاحتيال). كل من حمل الغير") || len([]rune(d)) > descMax {
 		t.Errorf("Arabic article description: %q", d)
 	}
+	if d := articleDesc(ar, l, "547", "القتل قصدا", "من قتل إنساناً قصداً عوقب بالأشغال الشاقة.  \nتكون العقوبة"); strings.Contains(d, "  ") || !strings.Contains(d, "الشاقة. تكون") {
+		t.Errorf("Arabic article description keeps double spaces: %q", d)
+	}
 	if d := articleDesc(ar, l, "1", "", "ينشر هذا المرسوم"); !strings.Contains(d, ". ينشر هذا المرسوم") {
 		t.Errorf("Arabic article description without a subject: %q", d)
 	}
