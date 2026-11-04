@@ -731,6 +731,11 @@
   "legal.updated": "Last updated: 3 November 2026.",
   "footer.info.privacy": "Privacy",
   "footer.info.terms": "Terms of use",
+  "report.open": "Report an error on this page",
+  "report.label": "What is wrong? Quote the words, and say what the official text says if you know it.",
+  "report.send": "Send",
+  "report.thanks": "Thank you. We check every report against the official text.",
+  "report.failed": "It could not be sent. Please email nizar@taktek.io instead.",
   "about.privacy_short": "We measure visits to improve the site. We do not run ads or sell data.",
   "about.privacy_link": "Read the privacy policy"
 }

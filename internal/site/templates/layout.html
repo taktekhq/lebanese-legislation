@@ -83,6 +83,15 @@
       <div><h2>{{t "footer.use_heading"}}</h2><ul><li><a href="{{u "/data/"}}">{{t "footer.use.database"}}</a></li><li><a href="{{datasetURL}}" rel="noopener" data-ga="dataset_download">{{t "footer.use.download"}}</a></li><li><a href="{{u "/ai/"}}">{{t "footer.use.ai"}}</a></li><li><a href="{{u "/run-it-yourself/"}}">{{t "footer.use.run"}}</a></li></ul></div>
       <div><h2>{{t "footer.info_heading"}}</h2><ul><li><a href="{{u "/blog/"}}">{{if eq (uilang) "ar"}}سجل المشروع{{else}}Project journal{{end}}</a></li><li><a href="{{u "/about/"}}">{{t "footer.info.about"}}</a></li><li><a href="https://github.com/taktekhq/lebanese-legislation" rel="noopener">{{t "footer.info.github"}}</a></li><li><a href="https://huggingface.co/taktekhq" rel="noopener">{{t "footer.info.hf"}}</a></li><li><a href="{{u "/privacy/"}}">{{t "footer.info.privacy"}}</a></li><li><a href="{{u "/terms/"}}">{{t "footer.info.terms"}}</a></li></ul></div>
     </div>
+    <div class="footer__report" data-report>
+      <button type="button" data-report-open aria-expanded="false" aria-controls="report-form">{{t "report.open"}}</button>
+      <form id="report-form" class="footer__report-form" data-report-form hidden>
+        <label class="tiny" for="report-note">{{t "report.label"}}</label>
+        <textarea id="report-note" name="note" rows="3" maxlength="1000" dir="auto" required></textarea>
+        <button type="submit" class="btn btn--ghost btn--sm">{{t "report.send"}}</button>
+      </form>
+      <p class="tiny" data-report-done data-thanks="{{t "report.thanks"}}" data-failed="{{t "report.failed"}}" role="status" hidden></p>
+    </div>
     <div class="footer__legal footer__notice">
       <p class="tiny" lang="ar" dir="rtl">معلومات مأخوذة من نصوص رسمية منشورة، وليست استشارة قانونية. راجع الجريدة الرسمية أو استشر محامياً مؤهلاً في حالتك.</p>
       <p class="tiny" lang="fr">Informations tirées de textes officiels publiés, pas un avis juridique. Vérifiez le Journal officiel ou consultez un avocat qualifié pour votre cas.</p>

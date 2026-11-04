@@ -958,6 +958,44 @@ a { color: inherit; text-decoration: none; }
 
 .footer__legal p { max-width: 90ch; }
 
+/* "Report an error on this page": a link that opens a short note, sent to
+   PostHog (legislation.js). Without JavaScript nothing could send it, so it
+   only shows with the js class. */
+.footer__report { display: none; padding-bottom: 28px; }
+.js .footer__report { display: grid; gap: 10px; justify-items: start; }
+.footer__report [data-report-open] {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 5px 0;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: color 0.2s var(--ease);
+}
+.footer__report [data-report-open]:hover { color: var(--ink); }
+.footer__report [data-report-open]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.footer__report-form { display: grid; gap: 8px; justify-items: start; width: min(100%, 560px); }
+.footer__report-form textarea {
+  width: 100%;
+  min-height: 88px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+.footer__report-form textarea:focus { outline: 2px solid transparent; box-shadow: 0 0 0 2px var(--accent); }
+
 /* --- Reveal ------------------------------------------------------------- */
 
 /* Hidden only once JS has confirmed it can animate. Without JS the class is
