@@ -704,7 +704,7 @@
   "about.infrastructure_p": "Cloudflare serves about 760,000 static pages and ruling PDFs from R2 through a JavaScript Worker. Search pages, the API, filters and Gazette scans go to one Cloudflare Container with PostgreSQL 18.6 and the Go website server. Semantic search vectors are stored in Cloudflare Vectorize and published openly on Hugging Face.",
   "privacy.title": "Privacy policy",
   "privacy.desc": "What Lebanese Legislation measures about visits, what it keeps, and how to ask us to delete it.",
-  "privacy.lead": "We measure visits to improve the site. We do not run ads, sell data or ask you to sign in.",
+  "privacy.lead": "We measure visits to improve the site. We do not run ads, sell data or ask you to sign in. (preview test)",
   "privacy.collect_h2": "What we collect",
   "privacy.choices_h2": "Your choices",
   "privacy.choices_p": "You can block cookies in your browser and the site keeps working. To ask what we hold about you, or to have it deleted, write to %s and we will reply and act on it.",
