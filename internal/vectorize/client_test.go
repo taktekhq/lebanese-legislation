@@ -116,8 +116,12 @@ func TestRetriesAndErrors(t *testing.T) {
 			c, _ := New("a", "i", "t")
 			c.baseURL = server.URL
 			c.backoff = time.Microsecond
-			if _, err := c.Query(context.Background(), []float32{1}, 1); err == nil {
+			_, err := c.Query(context.Background(), []float32{1}, 1)
+			if err == nil {
 				t.Fatal("expected error")
+			}
+			if !strings.Contains(err.Error(), "1000 failed") {
+				t.Fatalf("the error does not carry Cloudflare's message: %v", err)
 			}
 			want := 1
 			if status == 429 || status == 500 {
