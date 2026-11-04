@@ -77,6 +77,9 @@ jobs:
               if [ "$IMAGE" = all ]; then
                 echo "ghcr.io/$GITHUB_REPOSITORY-$IMAGE:$(git rev-parse --short HEAD)"
               fi
+              if [ "$IMAGE" = db ]; then # the tag a static-site render looks for
+                echo "ghcr.io/$GITHUB_REPOSITORY-$IMAGE:$(bash .github/scripts/render-db-tag.sh)"
+              fi
             fi
             echo IMAGE_TAGS
           } >> "$GITHUB_OUTPUT"
