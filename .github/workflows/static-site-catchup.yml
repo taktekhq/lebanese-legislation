@@ -1,10 +1,17 @@
 name: static-site catch-up
-# Every two hours, starts a static-site deploy when the live site is behind
-# main: the deploy for the newest change failed, was cancelled or never
-# started. It waits while a deploy is queued or running, and while the newest
-# data change has not passed the data workflow. A failed deploy has its failed
-# jobs run once more; a second failure turns this check red instead.
+# Starts a static-site deploy when the live site is behind main: the deploy
+# for the newest change failed, was cancelled or never started. It runs as
+# soon as a deploy on main finishes, and every two hours as a backstop (GitHub
+# starts this repository's scheduled runs hours late: on 4 Nov stats ran 8
+# hours after its time). It waits while a deploy is queued or running, and
+# while the newest data change has not passed the data workflow. A failed
+# deploy has its failed jobs run once more; a second failure turns this check
+# red instead. A finished deploy that leaves the site up to date ends here.
 on:
+  workflow_run:
+    workflows: [static-site]
+    types: [completed]
+    branches: [main]
   schedule:
     - cron: '23 */2 * * *'
   workflow_dispatch:

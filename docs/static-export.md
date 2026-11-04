@@ -121,7 +121,8 @@ writes it straight away.
 Deploys start on their own. A data change deploys after the data workflow has
 checked it (`workflow_run`). A push to main that changes code the site is built
 from deploys straight away; one that also changes `data/` waits for the data
-workflow. Every two hours, [static-site-catchup.yml](../.github/workflows/static-site-catchup.yml)
+workflow. When a deploy on main finishes, and every two hours as a backstop,
+[static-site-catchup.yml](../.github/workflows/static-site-catchup.yml)
 compares `_export/rendered-commit` with main and starts a deploy when the site is
 behind and no deploy is queued or running, once the newest data change has passed
 the data workflow. A failed deploy has its failed jobs run once more; a second
