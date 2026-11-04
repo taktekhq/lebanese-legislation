@@ -1,0 +1,72 @@
+name: render-db proof
+# One-off proof for the db image in renders: the same 3,000 sampled pages are
+# rendered from a database loaded from data/ and from the db image, and every
+# page's hash is compared. Removed before merge.
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/render-db-proof.yml'
+      - '.github/actions/render-setup/**'
+      - '.github/scripts/render-db-tag.sh'
+permissions:
+  contents: read
+jobs:
+  render:
+    strategy:
+      fail-fast: false
+      matrix:
+        db: [load, image]
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:ci@127.0.0.1:5432/lebleg
+      LEBLEG_DSN: postgresql://postgres:ci@127.0.0.1:5432/lebleg
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pick the database
+        id: pick
+        env:
+          DB: ${{ matrix.db }}
+        run: |
+          if [ "$DB" = load ]; then echo "image=load" >> "$GITHUB_OUTPUT"; exit 0; fi
+          tag=$(bash .github/scripts/render-db-tag.sh)
+          img=ghcr.io/taktekhq/lebanese-legislation-db
+          if docker pull -q "$img:$tag"; then echo "image=$img:$tag" >> "$GITHUB_OUTPUT"; exit 0; fi
+          # No data-<hash> tag yet: :latest will do if it was baked from the same inputs.
+          docker pull -q "$img:latest"
+          rev=$(docker inspect -f '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$img:latest")
+          git fetch -q --depth=1 origin "$rev"
+          echo "this commit: $tag, latest ($rev): $(bash .github/scripts/render-db-tag.sh "$rev")"
+          [ "$(bash .github/scripts/render-db-tag.sh "$rev")" = "$tag" ]
+          echo "image=$img:latest" >> "$GITHUB_OUTPUT"
+      - uses: ./.github/actions/render-setup
+        with:
+          image: ${{ steps.pick.outputs.image }}
+      - name: Render a sample
+        run: |
+          time /tmp/static-export export -sample 3000 -seed 7 -crawl=false \
+            -base https://lebaneselegislation.com -workers 8 -max-errors 0 -search-shell -out site
+          df -h / | tail -1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: proof-${{ matrix.db }}
+          path: site/.export/manifest.jsonl
+          include-hidden-files: true
+  compare:
+    needs: render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: proof-*
+          path: proof
+      - name: Every page must be byte for byte the same
+        run: |
+          for d in load image; do jq -r '[.p, .s, .h] | @tsv' "proof/proof-$d/manifest.jsonl" | sort > "$d.tsv"; done
+          wc -l load.tsv image.tsv
+          if diff load.tsv image.tsv > diff.txt; then
+            echo "Identical: $(wc -l < load.tsv) pages" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Different: $(grep -c '^<' diff.txt) lines from data/, $(grep -c '^>' diff.txt) from the image" | tee -a "$GITHUB_STEP_SUMMARY"
+            head -40 diff.txt
+            exit 1
+          fi
