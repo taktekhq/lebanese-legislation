@@ -233,8 +233,8 @@ CREATE TABLE ruling (
 
 -- The full judgment behind a ruling page («نص الحكم كاملا»): a scanned PDF the
 -- Centre serves at RulingFile.aspx?RuliID=N, kept outside git and served at
--- /ruling-files/<ruling_id>.pdf (`lebleg ruling-files`, loaded by
--- `lebleg build -ruling-files`). The scan is the reference.
+-- /ruling-files/<ruling_id>.pdf (`ruling-files`, loaded by
+-- `build-db -ruling-files`). The scan is the reference.
 CREATE TABLE ruling_file (
   ruling_id   integer PRIMARY KEY REFERENCES ruling (id),
   pages       smallint,                   -- NULL until the scan has been read
@@ -243,7 +243,7 @@ CREATE TABLE ruling_file (
   fetched_at  timestamptz NOT NULL
 );
 
--- A machine reading (Gemini) of the scan, one row per page (`lebleg ruling-read`).
+-- A machine reading (Gemini) of the scan, one row per page (`ruling-read`).
 -- It may contain errors: nothing here is corrected or rewritten, and the scan
 -- stays the reference. Pages the reader could not read are not loaded.
 -- search_stem is for finding a ruling by words only its judgment holds.
@@ -399,7 +399,7 @@ FROM legislation_article a JOIN legislation l ON l.id = a.law_id;
 
 -- Amendments and article versions: the layer the build derives from the
 -- amending articles (internal/amend). Created after schema.sql, and again
--- on its own by "lebleg build -only amendments".
+-- on its own by "build-db -only amendments".
 
 DROP VIEW IF EXISTS legislation_version;
 DROP VIEW IF EXISTS article_in_force;
@@ -520,7 +520,7 @@ GROUP BY law_id, effective_on;
 -- The graph: every link we know between two items of the corpus, in one
 -- table, so the whole graph comes out of the database with one query.
 -- Created after amendments.sql, and again on its own by
--- "lebleg build -only graph".
+-- "build-db -only graph".
 --
 -- An item is addressed by a key that says what it is:
 --   law/<id>                 a text (law, decree, decision...)
