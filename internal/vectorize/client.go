@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -120,9 +121,6 @@ func (c *Client) request(ctx context.Context, operation, contentType string, bod
 		if readErr != nil {
 			return readErr
 		}
-		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-			return fmt.Errorf("Vectorize %s: HTTP %d", operation, resp.StatusCode)
-		}
 		var envelope struct {
 			Success bool `json:"success"`
 			Errors  []struct {
@@ -130,6 +128,17 @@ func (c *Client) request(ctx context.Context, operation, contentType string, bod
 				Message string `json:"message"`
 			} `json:"errors"`
 			Result json.RawMessage `json:"result"`
+		}
+		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+			// Say what Cloudflare said: a bare status leaves a failed sync unexplained.
+			why := strings.TrimSpace(string(data))
+			if json.Unmarshal(data, &envelope) == nil && len(envelope.Errors) > 0 {
+				why = fmt.Sprintf("%v", envelope.Errors)
+			}
+			if len(why) > 500 {
+				why = why[:500]
+			}
+			return fmt.Errorf("Vectorize %s: HTTP %d: %s", operation, resp.StatusCode, why)
 		}
 		if err = json.Unmarshal(data, &envelope); err != nil {
 			return fmt.Errorf("Vectorize %s response: %w", operation, err)
