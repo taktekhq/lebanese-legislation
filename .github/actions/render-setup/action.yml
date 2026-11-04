@@ -1,0 +1,56 @@
+name: render database
+description: >-
+  Starts PostgreSQL 18.6, loads data/ with the rows every render adds, and
+  builds /tmp/static-export and /tmp/build-db. The job sets DATABASE_URL.
+runs:
+  using: composite
+  steps:
+    - name: Start PostgreSQL 18.6
+      shell: bash
+      run: |
+        # GitHub's runner has psql; act's smaller image does not.
+        command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client >/dev/null; }
+        docker rm -f pg >/dev/null 2>&1 || true
+        docker run -d --name pg -e POSTGRES_PASSWORD=ci -e POSTGRES_DB=lebleg -p 127.0.0.1:5432:5432 \
+          --shm-size=1g postgres:18.6 -c fsync=off -c synchronous_commit=off -c full_page_writes=off \
+          -c max_wal_size=8GB -c maintenance_work_mem=1GB
+        for i in $(seq 60); do docker exec pg pg_isready -U postgres -d lebleg -q && break; sleep 1; done
+        psql --version
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+        cache: false
+    - name: Build static exporter while loading the database
+      shell: bash
+      run: |
+        ( set +e
+          bash -e -o pipefail <<'TASK_EXPORTER' > "$RUNNER_TEMP/exporter.log" 2>&1
+        go build -o /tmp/static-export ./cmd/static-export
+        go build -o /tmp/build-db ./cmd/build-db
+        TASK_EXPORTER
+          echo $? > "$RUNNER_TEMP/exporter.status"
+        ) &
+        ( set +e
+          bash -e -o pipefail <<'TASK_LOAD' > "$RUNNER_TEMP/load.log" 2>&1
+        time data/load.sh "$DATABASE_URL"
+        TASK_LOAD
+          echo $? > "$RUNNER_TEMP/load.status"
+        ) &
+        wait
+        failed=0
+        until [ -f "$RUNNER_TEMP/exporter.status" ]; do sleep 1; done
+        cat "$RUNNER_TEMP/exporter.log"
+        [ "$(cat "$RUNNER_TEMP/exporter.status")" -eq 0 ] || failed=1
+        until [ -f "$RUNNER_TEMP/load.status" ]; do sleep 1; done
+        cat "$RUNNER_TEMP/load.log"
+        [ "$(cat "$RUNNER_TEMP/load.status")" -eq 0 ] || failed=1
+        [ "$failed" -eq 0 ]
+    - name: Load official publications
+      shell: bash
+      run: psql "$DATABASE_URL" -f db/official.sql
+    # data/ comes from a nightly built without the popular list, so it holds
+    # no english rows: add them here, or every /en/ page stays indexable
+    # (issue #86). Only those rows change; page dates stay as data/ has them.
+    - name: Hide machine English of unpopular texts
+      shell: bash
+      run: /tmp/build-db -db "$DATABASE_URL" -only english -popular data/popular_texts.txt
