@@ -15,9 +15,15 @@ tags:
 - knowledge-graph
 size_categories:
 - 100K<n<1M
+task_categories:
+- text-retrieval
+- text-generation
+task_ids:
+- document-retrieval
 configs:
 - config_name: legislation
   data_files: data/legislation.parquet
+  default: true
 - config_name: legislation_title_en
   data_files: data/legislation_title_en.parquet
 - config_name: legislation_version
@@ -78,11 +84,13 @@ configs:
   data_files: data/date_correction.parquet
 ---
 
-# Lebanese Legislation
+# Lebanese Legislation (التشريع اللبناني)
 
 [![Legislation](https://lebaneselegislation.com/badge/legislation.svg?src=hf)](https://lebaneselegislation.com/laws/) [![Articles](https://lebaneselegislation.com/badge/articles.svg)](https://lebaneselegislation.com/laws/) [![Court rulings](https://lebaneselegislation.com/badge/rulings.svg)](https://lebaneselegislation.com/rulings/) [![Last updated](https://lebaneselegislation.com/badge/updated.svg)](https://huggingface.co/datasets/taktekhq/lebanese-legislation/commits/main) [![MCP server](https://lebaneselegislation.com/badge/mcp.svg)](https://lebaneselegislation.com/ai/) [![GitHub](https://img.shields.io/badge/code-GitHub-181717?logo=github)](https://github.com/taktekhq/lebanese-legislation)
 
-Lebanese law in Parquet: laws, decrees and decisions with their articles, court rulings, Official Gazette issues and the links between texts (amendments, repeals, citations). Coverage runs from 1904 to today, in Arabic and French where published. The badges above show the current counts.
+Lebanese law in Parquet: laws, decrees and decisions with their articles, court rulings, Official Gazette issues and the links between texts (amendments, repeals, citations). Coverage runs from 1904 to today, in Arabic and French where published: more than 100,000 laws, decrees and decisions, 389,000 articles, 47,000 court rulings and 6,800 Official Gazette issues on 4 November 2026 (the badges above show today's counts).
+
+القوانين والمراسيم والقرارات اللبنانية مع موادها، والأحكام القضائية، وأعداد الجريدة الرسمية، والروابط بين النصوص (التعديل والإلغاء والإحالة)، بالعربية والفرنسية حيث نُشرت، كجداول Parquet مفتوحة.
 
 Use it to search texts, follow amendments or build legal research tools. This is the dataset behind [lebaneselegislation.com](https://lebaneselegislation.com), maintained by [Taktek](https://taktek.io). Browse the related datasets and the handwriting demo in the [collection](https://huggingface.co/collections/taktekhq/lebanese-legislation).
 
@@ -153,3 +161,19 @@ runs `build`, then `publish` and `vectorize`. `cmd/export-vectors` exports the
 chunks; `cmd/embed-missing` embeds new chunks under a daily budget ($1, 20,000
 chunks), and nothing is published while a current chunk has no vector;
 `cmd/vectorize-sync` uploads only changed vectors on later runs.
+
+## Citation
+
+Credit the Centre for the texts, and cite the dataset as:
+
+```bibtex
+@dataset{lebanese_legislation,
+  title        = {Lebanese Legislation: the relational database of Lebanese law},
+  author       = {{Taktek, LLC}},
+  year         = {2026},
+  url          = {https://huggingface.co/datasets/taktekhq/lebanese-legislation},
+  note         = {Texts: Centre for Research and Studies in Legal Informatics, Lebanese University}
+}
+```
+
+To cite one law or article, use its address on [lebaneselegislation.com](https://lebaneselegislation.com): `/law/<id>/` and `/law/<id>/article/<n>/` do not change.

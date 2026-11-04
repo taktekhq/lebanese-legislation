@@ -9,6 +9,10 @@
   The open code and data behind <a href="https://lebaneselegislation.com/">LebaneseLegislation.com</a>: laws, decrees, court rulings and the Official Gazette, in Arabic and French, with search, a JSON API and an MCP server for AI assistants.
 </p>
 
+<p align="center" dir="rtl">
+  التشريع اللبناني: القوانين والمراسيم والأحكام القضائية والجريدة الرسمية، بالعربية والفرنسية، كبيانات مفتوحة وواجهة برمجية وخادم MCP لمساعدي الذكاء الاصطناعي.
+</p>
+
 <p align="center">
   <a href="https://lebaneselegislation.com/laws/"><img src="https://lebaneselegislation.com/badge/legislation.svg?src=gh" alt="Legislation"></a>
   <a href="https://lebaneselegislation.com/laws/"><img src="https://lebaneselegislation.com/badge/articles.svg" alt="Articles"></a>

@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this data or code, please cite it as below, and credit the Centre for Research and Studies in Legal Informatics, Lebanese University, for the legal texts."
+type: dataset
+title: "Lebanese Legislation: the relational database of Lebanese law"
+abstract: "Lebanese laws, decrees, court rulings and Official Gazette issues in Arabic and French, with the amendment, repeal and citation links between texts: Parquet tables, a PostgreSQL database, a JSON API and an MCP server. The legal texts are from the Centre for Research and Studies in Legal Informatics, Lebanese University."
+authors:
+  - name: "Taktek, LLC"
+    website: "https://taktek.io"
+repository-code: "https://github.com/taktekhq/lebanese-legislation"
+repository: "https://huggingface.co/datasets/taktekhq/lebanese-legislation"
+url: "https://lebaneselegislation.com/data/"
+license: MIT
+keywords:
+  - Lebanon
+  - Lebanese law
+  - legislation
+  - legal data
+  - Official Gazette
+  - court rulings
+  - Arabic
+  - open data
+  - MCP

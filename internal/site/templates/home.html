@@ -1,9 +1,9 @@
 {{define "content"}}{{with .Data}}
 <section class="wrap ls-hero">
-  <p class="badge" data-reveal><span class="dot"></span><span>{{t "home.badge" (num .Stats.Laws) (num .Stats.Rulings)}}<span class="badge__date"> &middot; {{t "home.badge_since" (printf "%d" .Stats.Since)}}</span></span></p>
-  <h1 data-reveal style="--d:60ms">{{t "home.h1"}}</h1>
-  <p class="sub" data-reveal style="--d:120ms">{{t "home.sub"}}</p>
-  <div data-reveal style="--d:180ms">{{template "search" ""}}</div>
+  <p class="badge"><span class="dot"></span><span>{{t "home.badge" (num .Stats.Laws) (num .Stats.Rulings)}}<span class="badge__date"> &middot; {{t "home.badge_since" (printf "%d" .Stats.Since)}}</span></span></p>
+  <h1>{{t "home.h1"}}</h1>
+  <p class="sub">{{t "home.sub"}}</p>
+  <div>{{template "search" ""}}</div>
 </section>
 
 <section class="wrap sec" id="codes">

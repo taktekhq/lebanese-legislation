@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -255,11 +256,132 @@ func articleAnswer(b *i18n.Bundle, l *Law, number string) string {
 	return strings.Join(articleFacts(b, l, number), " ")
 }
 
-// articleDesc is the meta description of an article's page: the same facts,
-// then the start of the article if there is room.
-func articleDesc(b *i18n.Bundle, l *Law, number, text string) string {
+// articleDesc is the meta description of an article's page. In Arabic: which
+// article, its subject when the text has one, then the article's own words,
+// so each article's description is its own (with the facts first, every
+// article of a text shared one description but for its number). In English,
+// where the article's words are Arabic: the facts, then the words if there is
+// room.
+func articleDesc(b *i18n.Bundle, l *Law, number, subject, text string) string {
 	f := articleFacts(b, l, number)
-	return fitDesc(f[0], append(f[1:], cutWords(text, 80)), descMax)
+	if b.Lang != "ar" {
+		return fitDesc(f[0], append(f[1:], cutWords(text, 80)), descMax)
+	}
+	lead := f[0]
+	if subject != "" {
+		lead = strings.TrimSuffix(lead, ".") + " (" + cutWords(subject, 40) + ")."
+	}
+	words := []string{}
+	if room := descMax - len([]rune(lead)) - 1; room >= 30 && strings.TrimSpace(text) != "" {
+		words = append(words, cutWords(text, room))
+	}
+	return fitDesc(lead, append(words, f[1:]...), descMax)
+}
+
+// articleTitle is an article page's <title>: artTitle, then in Arabic the
+// article's subject when there is room for it.
+func articleTitle(b *i18n.Bundle, l *Law, number, subject string) string {
+	t := artTitle(b, l, number)
+	if b.Lang != "ar" {
+		return t
+	}
+	return fitTitle(t, subject, titleMax)
+}
+
+// articleSubject is what an article is about, in the Centre's own words: the
+// heading of the nearest chapter above it that names a subject, without its
+// numbering ("النبذة 1 : - في الاحتيال" gives "الاحتيال"). "" when none does:
+// most texts have a single section, "المواد".
+func articleSubject(l *Law, a *Article) string {
+	if a.SectionID == nil {
+		return ""
+	}
+	i := -1
+	for j, s := range l.Sections {
+		if s.ID == *a.SectionID {
+			i = j
+			break
+		}
+	}
+	if i < 0 {
+		return ""
+	}
+	depth := l.Sections[i].Depth + 1
+	for j := i; j >= 0 && depth > 0; j-- {
+		if l.Sections[j].Depth >= depth {
+			continue
+		}
+		depth = l.Sections[j].Depth
+		if s := headingSubject(l.Sections[j].Heading); s != "" {
+			return s
+		}
+	}
+	return ""
+}
+
+// sectionLabels are the words a chapter heading's numbering starts with.
+var sectionLabels = []string{"الكتاب", "الباب", "الفصل", "النبذة", "النبدة", "القسم", "الجزء", "الفرع", "البند", "الفقرة", "المبحث", "المطلب"}
+
+// numbering is a heading's own number when it has no label: "3- ", "رابعا: - ".
+var numbering = regexp.MustCompile(`^(?:[0-9٠-٩]+|[اأ]ولا|ثانيا|ثالثا|رابعا|خامسا|سادسا|سابعا|ثامنا|تاسعا|عاشرا)["”]?\s*[-–:.)]+[\s:\-–]*`)
+
+// genericHeadings name no subject; so does "احكام" or "الاحكام" followed
+// only by genericWords ("احكام انتقالية وختامية"). Both are compared with
+// hamza on alef removed.
+var genericHeadings = map[string]bool{
+	"المواد": true, "مواد": true, "مواد اصدار": true, "مواد الاصدار": true,
+	"تعاريف": true, "التعاريف": true, "احكام شاملة للنبذات السابقة": true,
+}
+
+var genericWords = map[string]bool{
+	"عامة": true, "خاصة": true, "انتقالية": true, "ختامية": true, "متفرقة": true, "مختلفة": true,
+	"نهائية": true, "شاملة": true, "تمهيدية": true, "اولية": true, "مشتركة": true, "مؤقتة": true,
+	"العامة": true, "الخاصة": true, "الانتقالية": true, "الختامية": true, "المتفرقة": true, "المختلفة": true,
+	"النهائية": true, "الشاملة": true, "التمهيدية": true, "الاولية": true, "المشتركة": true, "المؤقتة": true,
+}
+
+var noHamza = strings.NewReplacer("أ", "ا", "إ", "ا", "آ", "ا")
+
+func genericHeading(h string) bool {
+	h = noHamza.Replace(h)
+	if genericHeadings[h] {
+		return true
+	}
+	w := strings.Fields(h)
+	if len(w) == 0 || (w[0] != "احكام" && w[0] != "الاحكام") {
+		return false
+	}
+	for _, x := range w[1:] {
+		if !genericWords[x] && !genericWords[strings.TrimPrefix(x, "و")] {
+			return false
+		}
+	}
+	return true
+}
+
+// headingSubject is a chapter heading without its numbering and a leading
+// "في", or "" when what is left names no subject.
+func headingSubject(h string) string {
+	h = strings.Join(strings.Fields(h), " ")
+	for _, label := range sectionLabels {
+		if !strings.HasPrefix(h, label) {
+			continue
+		}
+		if i := strings.IndexAny(h, ":-–"); i > 0 && len([]rune(h[:i])) <= 30 {
+			h = h[i+1:]
+		} else {
+			return "" // a number and nothing else: "الفصل الاول"
+		}
+		break
+	}
+	h = strings.Trim(h, " :-–.")
+	h = strings.TrimSpace(numbering.ReplaceAllString(h, ""))
+	h = strings.TrimPrefix(h, "في ")
+	h = strings.TrimSpace(h)
+	if h == "" || genericHeading(h) {
+		return ""
+	}
+	return h
 }
 
 func nonEmpty(in []string) []string {

@@ -188,9 +188,67 @@ func TestMetaDescription(t *testing.T) {
 			t.Errorf("%s description lacks the Gazette issue: %q", b.Lang, d)
 		}
 	}
-	// Article description: facts first, the article's words only if they fit.
-	if d := articleDesc(en, l, "1", "ينشر هذا المرسوم"); !strings.HasPrefix(d, "Article 1 of Decree No. 16436") || len([]rune(d)) > descMax {
+	// English article description: facts first, the (Arabic) words only if they fit.
+	if d := articleDesc(en, l, "1", "الاحتيال", "ينشر هذا المرسوم"); !strings.HasPrefix(d, "Article 1 of Decree No. 16436") || strings.Contains(d, "الاحتيال") || len([]rune(d)) > descMax {
 		t.Errorf("article description: %q", d)
+	}
+	// Arabic: the article, its subject, then its own words.
+	text := "كل من حمل الغير بالمناورات الاحتيالية على تسليمه مالا منقولا او غير منقول او اسنادا تتضمن تعهدا او ابراء او منفعة واستولى عليها يعاقب بالحبس من ستة اشهر الى ثلاث سنوات"
+	d := articleDesc(ar, l, "655", "الاحتيال", text)
+	if !strings.HasPrefix(d, "المادة 655 من ") || !strings.Contains(d, "(الاحتيال). كل من حمل الغير") || len([]rune(d)) > descMax {
+		t.Errorf("Arabic article description: %q", d)
+	}
+	if d := articleDesc(ar, l, "1", "", "ينشر هذا المرسوم"); !strings.Contains(d, ". ينشر هذا المرسوم") {
+		t.Errorf("Arabic article description without a subject: %q", d)
+	}
+}
+
+func TestArticleSubject(t *testing.T) {
+	for _, c := range []struct{ heading, want string }{
+		{"النبذة 1 : - في الاحتيال", "الاحتيال"},
+		{"الباب الاول: - في الشريعة الجزائية", "الشريعة الجزائية"},
+		{"الكتاب الاول - الاحكام العامة", ""},
+		{"الفصل الاول : - احكام عامة", ""},
+		{"الفصل الأول: - أحكام عامة", ""},
+		{"المواد", ""},
+		{"احكام شاملة", ""},
+		{"الفصل الثالث", ""},
+		{"في الجرائم الواقعة على الاموال", "الجرائم الواقعة على الاموال"},
+		{"3- في الغرامات", "الغرامات"},
+		{"رابعا\": - احكام عامة وانتقالية", ""},
+		{"الفقرة الخامسة: - في تكوين المال الاحتياطي", "تكوين المال الاحتياطي"},
+		{"1 - المحتسبون المحليون", "المحتسبون المحليون"},
+		{"احكام انتقالية وختامية", ""},
+		{"احكام خاصة", ""},
+		{"احكام عامة تتعلق بالمؤسسات العامة", "احكام عامة تتعلق بالمؤسسات العامة"},
+	} {
+		if got := headingSubject(c.heading); got != c.want {
+			t.Errorf("headingSubject(%q) = %q, want %q", c.heading, got, c.want)
+		}
+	}
+	sec := func(id int) *int { return &id }
+	l := &Law{Sections: []Section{
+		{ID: 1, Depth: 0, Heading: "الكتاب الثاني - احكام خاصة"},
+		{ID: 2, Depth: 1, Heading: "الباب الحادي عشر: - في الجرائم الواقعة على الاموال"},
+		{ID: 3, Depth: 2, Heading: "الفصل الثاني : - في الاحتيال وسائر ضروب الغش"},
+		{ID: 4, Depth: 3, Heading: "احكام شاملة"},
+		{ID: 5, Depth: 0, Heading: "المواد"},
+	}}
+	for _, c := range []struct {
+		section *int
+		want    string
+	}{{sec(3), "الاحتيال وسائر ضروب الغش"}, {sec(4), "الاحتيال وسائر ضروب الغش"}, {sec(5), ""}, {nil, ""}, {sec(9), ""}} {
+		if got := articleSubject(l, &Article{SectionID: c.section}); got != c.want {
+			t.Errorf("articleSubject(section %v) = %q, want %q", c.section, got, c.want)
+		}
+	}
+	pc := decree()
+	pc.Code = ptr("Penal Code")
+	if got := articleTitle(en, pc, "655", "الاحتيال"); got != "Art. 655, Penal Code" {
+		t.Errorf("English title takes no Arabic subject: %q", got)
+	}
+	if got := articleTitle(ar, pc, "655", "الاحتيال"); !strings.HasSuffix(got, " · الاحتيال") || len([]rune(got)) > titleMax {
+		t.Errorf("Arabic title: %q", got)
 	}
 }
 
