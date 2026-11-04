@@ -347,7 +347,7 @@ func (s *Server) updated(r *http.Request, kind string) *Updated {
 	if t.IsZero() {
 		return nil
 	}
-	b := i18n.New(s.lang(r))
+	b := s.bundle(r)
 	return &Updated{Label: b.T("seo.updated", enDate(b, &t)), ISO: t.Format("2006-01-02")}
 }
 

@@ -22,6 +22,12 @@ import (
 type ChangePlan struct {
 	Full  bool
 	Paths []string
+	// Content are changed templates, strings, topic guides and assets: what
+	// they touch needs the render record (PlanContent), so the command maps
+	// them. Paths holds only what the data changes touch.
+	Content []string
+	// Why says why a render is full.
+	Why string
 }
 type changeRow map[string]string
 type tableRow struct {
@@ -66,12 +72,15 @@ var WholeFramePages = []string{"/search/", "/en/search/"}
 // planChanges is PlanChanges; frame is set when layout.html changed in its
 // shared frame only.
 func planChanges(ctx context.Context, dir, since string, full bool, frame *bool) (ChangePlan, error) {
-	if full || since == "" {
-		return ChangePlan{Full: true}, nil
+	if full {
+		return ChangePlan{Full: true, Why: "a full render was asked for"}, nil
+	}
+	if since == "" {
+		return ChangePlan{Full: true, Why: "no earlier render to start from"}, nil
 	}
 	b, e := gitOutput(ctx, dir, "rev-parse", "--verify", since+"^{commit}")
 	if e != nil {
-		return ChangePlan{Full: true}, nil
+		return ChangePlan{Full: true, Why: "the last rendered commit " + since + " is not in this repository"}, nil
 	}
 	since = strings.TrimSpace(string(b))
 	b, e = gitOutput(ctx, dir, "diff", "--name-status", "--no-renames", since, "HEAD")
@@ -82,6 +91,7 @@ func planChanges(ctx context.Context, dir, since string, full bool, frame *bool)
 	if e != nil {
 		return ChangePlan{}, e
 	}
+	var content []string
 	for _, line := range strings.Split(strings.TrimSpace(string(b)), "\n") {
 		status, p, ok := strings.Cut(line, "\t")
 		if !ok {
@@ -91,11 +101,18 @@ func planChanges(ctx context.Context, dir, since string, full bool, frame *bool)
 			*frame = true // every run publishes the frame; no page's parts change
 			continue
 		}
-		if src.changes(p, status == "D") || renderInputs[p] {
-			return ChangePlan{Full: true}, nil
+		if src.changes(p, status == "D") && contentFile(p) {
+			content = append(content, p)
+			continue
+		}
+		if src.changes(p, status == "D") {
+			return ChangePlan{Full: true, Why: p + " is code the site is built from: a Go change renders everything"}, nil
+		}
+		if renderInputs[p] {
+			return ChangePlan{Full: true, Why: p + " is read by every render"}, nil
 		}
 		if strings.HasPrefix(p, "data/tables/") && (!strings.HasSuffix(p, ".tsv")) {
-			return ChangePlan{Full: true}, nil
+			return ChangePlan{Full: true, Why: p + " changes a table's layout"}, nil
 		}
 	}
 	cols := map[string][]string{}
@@ -155,7 +172,7 @@ func planChanges(ctx context.Context, dir, since string, full bool, frame *bool)
 		return ChangePlan{}, we
 	}
 	if len(changed) == 0 {
-		return ChangePlan{Paths: []string{}}, nil
+		return ChangePlan{Paths: []string{}, Content: content}, nil
 	}
 	tables := map[string][]changeRow{}
 	// Only fields used for ownership, membership or links are retained. Large
@@ -205,7 +222,9 @@ func planChanges(ctx context.Context, dir, since string, full bool, frame *bool)
 	for _, r := range changed {
 		tables[r.table] = append(tables[r.table], r.row)
 	}
-	return pathsForRows(tables, changed), nil
+	p := pathsForRows(tables, changed)
+	p.Content = content
+	return p, nil
 }
 
 // layoutFile is the frame every page shares (internal/site/layoutframe.go).

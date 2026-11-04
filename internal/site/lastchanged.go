@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/taktekhq/lebanese-legislation/internal/indexing"
-	"github.com/taktekhq/lebanese-legislation/internal/site/i18n"
 )
 
 // When a page's content last changed: page_state.changed_at, which the build
@@ -95,7 +94,7 @@ func (s *Server) pageUpdated(r *http.Request, t *time.Time, by *LawRow) *Updated
 	if iso == nil {
 		return nil
 	}
-	b := i18n.New(s.lang(r))
+	b := s.bundle(r)
 	day := longDate(b.Lang, *t)
 	return &Updated{Label: b.T("seo.updated", day), ISO: *iso, Date: day, By: by}
 }

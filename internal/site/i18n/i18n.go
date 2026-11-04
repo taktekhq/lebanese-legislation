@@ -48,6 +48,15 @@ func load(name string) map[string]string {
 type Bundle struct {
 	Lang  string // "en" or "ar"
 	table map[string]string
+	note  func(key string)
+}
+
+// Noting returns a copy of b that tells note every key it looks up (the
+// static export records which strings a page used).
+func (b *Bundle) Noting(note func(key string)) *Bundle {
+	c := *b
+	c.note = note
+	return &c
 }
 
 // New returns the bundle for "en" or "ar" (anything else behaves as "en").
@@ -62,6 +71,9 @@ func New(lang string) *Bundle {
 // A key missing from the bundle's language falls back to English, then to
 // the key itself so a typo is visible on the page instead of blank.
 func (b *Bundle) T(key string, args ...any) string {
+	if b.note != nil {
+		b.note(key)
+	}
 	s, ok := b.table[key]
 	if !ok {
 		s, ok = English[key]

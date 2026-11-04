@@ -248,7 +248,9 @@ func TestLayoutFrameOnlyChange(t *testing.T) {
 	write("internal/site/templates/_page.html", "x")
 	git("add", ".")
 	git("commit", "-qm", "parts")
-	if p := plan(); !p.Full {
-		t.Fatal("a change to the page parts must render every page")
+	// The page parts are content: the command maps them through the render
+	// record (PlanContent), and a partial every page reaches renders them all.
+	if p := plan(); p.Full || strings.Join(p.Content, " ") != "internal/site/templates/_page.html" {
+		t.Fatalf("a change to the page parts goes to the content planner: %+v", p)
 	}
 }

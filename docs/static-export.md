@@ -77,7 +77,39 @@ forces a full render. The renderer is every Go and embedded file (templates,
 strings, topics, assets) of the packages `cmd/static-export` and `cmd/build-db`
 are built from, as `go list -deps` reports them, plus the inputs the workflow
 loads (`db/official.sql`, `data/load.sh`, the schema files). Tests and notes beside
-that code change nothing. The one exception is a change to the shared frame of
+that code change nothing.
+
+Templates, UI strings, topic guides and assets are the exception: they are mapped
+to the pages they touch, and a change to Go code still renders everything. Every
+render leaves a record beside each shard's manifest, `deps.json`: for each route,
+the page templates its pages executed and the UI strings Go code looked up for
+them (`site.RecordDeps`, noted in `execute` and in `s.bundle`). The planner
+(`static-export changes -r2-bucket`, `internal/staticexport/content.go`) reads all
+24 records and manifests and maps:
+
+- a template file to the routes whose page templates reach it (it parses the
+  templates from `layout.html` and the blocks Go executes by name);
+- a changed string to the routes whose Go code looked it up, and the routes whose
+  templates use it, directly, through `printf`, or inside a template function
+  (it reads the `FuncMap` entries and the functions they call, i18n included);
+- a topic guide to its own pages and the article pages it quotes or stopped
+  quoting; a changed title, question or set of guides adds every topic page, the
+  topic index and the home pages;
+- an asset to no page: the run uploads the assets (`?v=` is the fixed build id).
+
+A string in the shared layout, a partial most pages reach, a missing record or
+more than half the pages renders everything. `plan/why.txt` and the run summary
+say what was decided and why. On PR #120's 22 guide edits, the guide rule planned
+every one of the 116 article pages the full render changed in the three shards
+checked, at about two planned pages per changed one. Every Sunday at 02:41 UTC
+the workflow renders everything regardless, so a page a missed dependency left
+stale is put right within a week; that run's `indexnow` line counts the pages it
+changed.
+
+On a pull request that touches what the site is built from,
+[deploy-preview.yml](../.github/workflows/deploy-preview.yml) runs the same plan
+from the live site's commit to the pull request merged into main, and comments
+what merging it would render and why. It renders nothing. The one exception is a change to the shared frame of
 `internal/site/templates/layout.html` alone (see below): it renders only the
 two search pages, which are stored whole. Schema, rendering dependencies and unmapped table changes
 also fall back to a full render. The workflow serializes runs and keeps 24 owners,

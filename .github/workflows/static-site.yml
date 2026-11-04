@@ -30,6 +30,10 @@ on:
     branches: [main]
   # Code changes deploy on their own. The plan decides what they touch; a push
   # that also changes data/ waits for the data workflow instead.
+  # Once a week everything renders, whatever the plan would say: a page a
+  # missed dependency left stale is put right within a week.
+  schedule:
+    - cron: '41 2 * * 0'
   push:
     branches: [main]
     paths:
@@ -98,7 +102,10 @@ jobs:
           AWS_DEFAULT_REGION: auto
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          FULL: ${{ inputs.full || false }}
+          # The content planner reads every shard's manifest and render record.
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          FULL: ${{ inputs.full || github.event_name == 'schedule' }}
           PATHS: ${{ inputs.paths }}
         run: |
           if [ -n "$PATHS" ]; then
@@ -128,9 +135,10 @@ jobs:
             cat read-error >&2
             exit 1
           fi
-          go run ./cmd/static-export changes -since "$previous" -full="$FULL" -out plan
+          go run ./cmd/static-export changes -since "$previous" -full="$FULL" -out plan \
+            -r2-bucket lebleg-site -r2-endpoint "$endpoint"
           work=false
-          if [ "$(cat plan/mode)" = full ] || [ -s plan/paths.txt ] || ! git diff --quiet "$previous" HEAD -- data/; then
+          if [ "$(cat plan/mode)" = full ] || [ -s plan/paths.txt ] || [ -e plan/assets ] || ! git diff --quiet "$previous" HEAD -- data/; then
             work=true
           fi
           n=$(grep -c . plan/paths.txt || true)
@@ -142,6 +150,7 @@ jobs:
           echo "work=$work" >> "$GITHUB_OUTPUT"
           echo "size=$size" >> "$GITHUB_OUTPUT"
           echo "Plan: $(cat plan/mode), $n paths, render: $work, $size (since ${previous:-nothing})" | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ -s plan/why.txt ]; then sed 's/^/- /' plan/why.txt >> "$GITHUB_STEP_SUMMARY"; fi
       - name: Ask the live Worker once whether it puts pages together
         # Every shard must store pages the same way, so the edge layout is
         # decided here, with retries, not by each shard (one timed-out probe

@@ -1,0 +1,80 @@
+name: deploy preview
+# On a pull request that touches what the site is built from, says what
+# merging it would render: the static-site plan from the live site's commit to
+# this pull request merged into main. It renders and uploads nothing.
+on:
+  pull_request:
+    paths:
+      - 'data/**'
+      - 'internal/**'
+      - 'cmd/static-export/**'
+      - 'cmd/build-db/**'
+      - 'db/**'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/static-site.yml'
+      - '.github/actions/render-setup/**'
+      - '.github/scripts/render-db-tag.sh'
+
+concurrency:
+  group: deploy-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  plan:
+    # The plan reads the bucket, so it needs the repository's secrets.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Plan the deploy and comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          endpoint=https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
+          aws s3api get-object --bucket lebleg-site --key _export/rendered-commit \
+            --endpoint-url "$endpoint" rendered-commit >/dev/null
+          previous=$(cat rendered-commit)
+          go run ./cmd/static-export changes -since "$previous" -out plan -r2-bucket lebleg-site -r2-endpoint "$endpoint"
+          n=$(grep -c . plan/paths.txt || true)
+          {
+            echo "**Deploy preview.** Merging this, with main as it is now, would render:"
+            echo
+            if [ "$(cat plan/mode)" = full ]; then
+              echo "**every page** (a full render, about 31 minutes on 24 runners)."
+            elif [ "$n" -le 5000 ]; then
+              echo "**$n pages** on one runner."
+            else
+              echo "**$n pages** on 24 runners."
+            fi
+            [ -e plan/assets ] && echo "Assets are uploaded too."
+            if [ -s plan/why.txt ]; then echo; sed 's/^/- /' plan/why.txt; fi
+            if [ "$(cat plan/mode)" = paths ] && [ "$n" -gt 0 ]; then
+              echo
+              echo "<details><summary>Pages</summary>"
+              echo
+              head -200 plan/paths.txt | sed 's/^/    /'
+              [ "$n" -gt 200 ] && echo "    ... and $((n - 200)) more"
+              echo "</details>"
+            fi
+            echo
+            echo "<sub>From the live site's commit ${previous:0:7}. Nothing was rendered.</sub>"
+          } > comment.md
+          cat comment.md >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment "$PR" --edit-last --create-if-none --body-file comment.md
