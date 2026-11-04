@@ -60,7 +60,13 @@ sitemaps are refreshed too. List pagination is refreshed as a group when its
 membership or labels change, so insertions and removals cannot leave stale pages.
 
 Each shard exports the planned list with `-paths`, using the existing `Owner`
-function. This does not crawl the site. It discovers only new parts of selected
+function. A changed-only plan of at most 5,000 paths (`SMALL_PLAN`) runs on one
+runner instead of 24: the database loads once and the 24 shards run one after
+another, each with its own manifest, so the result is the same as the matrix.
+The plan job asks the live Worker once whether it puts pages together
+(`-edge-layout on` or `off` for every shard). Run workflow also takes `paths`, a
+space-separated list of pages to render now; it leaves `_export/rendered-commit`
+where it is. This does not crawl the site. It discovers only new parts of selected
 long laws, and includes old parts and list pagination from its manifest to remove
 obsolete files. Unvisited manifest entries are retained. Removed pages and pages
 that become redirects are deleted from R2 by their owner. Full renders retain the

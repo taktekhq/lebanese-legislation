@@ -19,6 +19,10 @@ on:
         description: Render this commit instead of the branch head (the catch-up check pins the one it checked)
         type: string
         default: ""
+      paths:
+        description: Render only these paths, separated by spaces (/about/ /en/about/); the baseline stays where it is
+        type: string
+        default: ""
   # Data changes deploy after the data workflow has checked them.
   workflow_run:
     workflows: [data]
@@ -36,6 +40,7 @@ on:
       - 'go.mod'
       - 'go.sum'
       - '.github/workflows/static-site.yml'
+      - '.github/actions/render-setup/**'
 
 concurrency:
   group: static-site
@@ -55,6 +60,10 @@ jobs:
       # changed page, or changed data, which shard 0's redirect data reads).
       planned: ${{ steps.plan.outputs.planned }}
       work: ${{ steps.plan.outputs.work }}
+      # small: a changed-only plan of at most SMALL_PLAN paths, rendered on one
+      # runner. large: the 24-runner matrix.
+      size: ${{ steps.plan.outputs.size }}
+      edge: ${{ steps.edge.outputs.edge }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -84,11 +93,29 @@ jobs:
         id: plan
         if: steps.gate.outputs.wait == 'false'
         env:
+          SMALL_PLAN: 5000
           AWS_DEFAULT_REGION: auto
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           FULL: ${{ inputs.full || false }}
+          PATHS: ${{ inputs.paths }}
         run: |
+          if [ -n "$PATHS" ]; then
+            # A hand-picked list renders those pages only. It is not a plan from
+            # the baseline, so rendered-commit is left as it is.
+            mkdir -p plan
+            echo paths > plan/mode
+            set -f # a path is never a file pattern
+            for p in $PATHS; do
+              case "$p" in /*) echo "$p" ;; *) echo "not a path: $p" >&2; exit 1 ;; esac
+            done > plan/paths.txt
+            n=$(grep -c . plan/paths.txt)
+            size=large
+            [ "$n" -le "$SMALL_PLAN" ] && size=small
+            { echo "planned=false"; echo "work=true"; echo "size=$size"; } >> "$GITHUB_OUTPUT"
+            echo "Plan: $n hand-picked paths, $size; the baseline stays where it is" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           endpoint=https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com
           # Only a missing key means first render. Authentication/network errors fail.
           if aws s3api get-object --bucket lebleg-site --key _export/rendered-commit \
@@ -105,9 +132,34 @@ jobs:
           if [ "$(cat plan/mode)" = full ] || [ -s plan/paths.txt ] || ! git diff --quiet "$previous" HEAD -- data/; then
             work=true
           fi
+          n=$(grep -c . plan/paths.txt || true)
+          size=large
+          if [ "$(cat plan/mode)" = paths ] && [ "$n" -le "$SMALL_PLAN" ]; then
+            size=small
+          fi
           echo "planned=true" >> "$GITHUB_OUTPUT"
           echo "work=$work" >> "$GITHUB_OUTPUT"
-          echo "Plan: $(cat plan/mode), $(grep -c . plan/paths.txt || true) paths, render: $work (since ${previous:-nothing})" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "size=$size" >> "$GITHUB_OUTPUT"
+          echo "Plan: $(cat plan/mode), $n paths, render: $work, $size (since ${previous:-nothing})" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Ask the live Worker once whether it puts pages together
+        # Every shard must store pages the same way, so the edge layout is
+        # decided here, with retries, not by each shard (one timed-out probe
+        # failed a 24-shard run on 3 Nov).
+        id: edge
+        if: steps.plan.outputs.work == 'true'
+        run: |
+          code=$(curl -sS -o layout-probe -w '%{http_code}' --retry 5 --retry-all-errors --max-time 30 \
+            https://lebaneselegislation.com/_build/layout)
+          if [ "$code" = 200 ] && [ "$(head -c 4 layout-probe)" = LLP1 ]; then
+            edge=on
+          elif [ "$code" = 404 ]; then
+            edge=off
+          else
+            echo "edge layout: https://lebaneselegislation.com/_build/layout answered $code" >&2
+            exit 1
+          fi
+          echo "edge=$edge" >> "$GITHUB_OUTPUT"
+          echo "Edge layout: $edge" | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: steps.plan.outputs.work == 'true'
         with:
@@ -117,7 +169,7 @@ jobs:
 
   render:
     needs: plan
-    if: needs.plan.outputs.work == 'true'
+    if: needs.plan.outputs.work == 'true' && needs.plan.outputs.size != 'small'
     runs-on: ubuntu-latest
     timeout-minutes: 340
     strategy:
@@ -139,55 +191,12 @@ jobs:
         env:
           DIVISOR: ${{ inputs.shards || 24 }}
         run: test "$DIVISOR" = 24
-      - name: Start PostgreSQL 18.6
-        run: |
-          # GitHub's runner has psql; act's smaller image does not.
-          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client >/dev/null; }
-          docker rm -f pg >/dev/null 2>&1 || true
-          docker run -d --name pg -e POSTGRES_PASSWORD=ci -e POSTGRES_DB=lebleg -p 127.0.0.1:5432:5432 \
-            --shm-size=1g postgres:18.6 -c fsync=off -c synchronous_commit=off -c full_page_writes=off \
-            -c max_wal_size=8GB -c maintenance_work_mem=1GB
-          for i in $(seq 60); do docker exec pg pg_isready -U postgres -d lebleg -q && break; sleep 1; done
-          psql --version
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          cache: false
-      - name: Build static exporter while loading the database
-        run: |
-          ( set +e
-            bash -e -o pipefail <<'TASK_EXPORTER' > "$RUNNER_TEMP/exporter.log" 2>&1
-          go build -o /tmp/static-export ./cmd/static-export
-          go build -o /tmp/build-db ./cmd/build-db
-          TASK_EXPORTER
-            echo $? > "$RUNNER_TEMP/exporter.status"
-          ) &
-          ( set +e
-            bash -e -o pipefail <<'TASK_LOAD' > "$RUNNER_TEMP/load.log" 2>&1
-          time data/load.sh "$DATABASE_URL"
-          TASK_LOAD
-            echo $? > "$RUNNER_TEMP/load.status"
-          ) &
-          wait
-          failed=0
-          until [ -f "$RUNNER_TEMP/exporter.status" ]; do sleep 1; done
-          cat "$RUNNER_TEMP/exporter.log"
-          [ "$(cat "$RUNNER_TEMP/exporter.status")" -eq 0 ] || failed=1
-          until [ -f "$RUNNER_TEMP/load.status" ]; do sleep 1; done
-          cat "$RUNNER_TEMP/load.log"
-          [ "$(cat "$RUNNER_TEMP/load.status")" -eq 0 ] || failed=1
-          [ "$failed" -eq 0 ]
-      - name: Load official publications
-        run: psql "$DATABASE_URL" -f db/official.sql
-      # data/ comes from a nightly built without the popular list, so it holds
-      # no english rows: add them here, or every /en/ page stays indexable
-      # (issue #86). Only those rows change; page dates stay as data/ has them.
-      - name: Hide machine English of unpopular texts
-        run: /tmp/build-db -db "$DATABASE_URL" -only english -popular data/popular_texts.txt
+      - uses: ./.github/actions/render-setup
       - name: Render and upload shard
         env:
           SHARD: ${{ matrix.shard }}
           DIVISOR: ${{ inputs.shards || 24 }}
+          EDGE: ${{ needs.plan.outputs.edge }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
@@ -203,6 +212,7 @@ jobs:
             -workers 8 \
             -max-errors 0 \
             -search-shell \
+            -edge-layout "$EDGE" \
             -r2-bucket lebleg-site \
             -r2-endpoint https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
             -out site
@@ -225,9 +235,76 @@ jobs:
           if-no-files-found: error
 
 
+  render-small:
+    # A short changed-only plan renders on one runner: the database loads once
+    # and the 24 shards run one after another, each with its own manifest,
+    # exactly as the matrix jobs would. Each shard still finds the old parts
+    # and pages in its own manifest and the new parts of changed laws.
+    needs: plan
+    if: needs.plan.outputs.work == 'true' && needs.plan.outputs.size == 'small'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      DATABASE_URL: postgresql://postgres:ci@127.0.0.1:5432/lebleg
+      LEBLEG_DSN: postgresql://postgres:ci@127.0.0.1:5432/lebleg
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.commit }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: render-plan
+          path: plan
+      - name: Check shard divisor
+        env:
+          DIVISOR: ${{ inputs.shards || 24 }}
+        run: test "$DIVISOR" = 24
+      - uses: ./.github/actions/render-setup
+      - name: Render and upload the 24 shards one after another
+        env:
+          EDGE: ${{ needs.plan.outputs.edge }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          mkdir -p exports
+          for shard in $(seq 0 23); do
+            echo "::group::shard $shard of 24"
+            /tmp/static-export export -paths plan/paths.txt -crawl=false \
+              -shard "$shard/24" \
+              -base https://lebaneselegislation.com \
+              -workers 8 \
+              -max-errors 0 \
+              -search-shell \
+              -edge-layout "$EDGE" \
+              -r2-bucket lebleg-site \
+              -r2-endpoint https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
+              -out "site/$shard"
+            cp -r "site/$shard/.export" "exports/export-$shard"
+            echo "::endgroup::"
+          done
+      - name: Redirect data for the Worker
+        env:
+          AWS_DEFAULT_REGION: auto
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          /tmp/static-export redirects -out site/0 -db "$LEBLEG_DSN"
+          aws s3 cp site/0/.export/redirects.json s3://lebleg-site/_export/redirects.json \
+            --endpoint-url https://5f012a200d9622ea6aecef1a02693e26.r2.cloudflarestorage.com \
+            --content-type application/json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: export-small
+          path: exports
+          include-hidden-files: true
+          if-no-files-found: error
+
   generation:
     # Commit the baseline last, after every shard and cache generation succeed.
-    needs: [plan, render]
+    needs: [plan, render, render-small]
+    if: >-
+      !cancelled() && needs.plan.outputs.work == 'true' &&
+      (needs.render.result == 'success' || needs.render-small.result == 'success')
     runs-on: ubuntu-latest
     steps:
       - name: Mark the new export generation
@@ -244,7 +321,7 @@ jobs:
     # Tell Bing (ChatGPT and Copilot search its index) and the other IndexNow
     # engines which pages this render changed. Pages no sitemap lists (noindex,
     # another canonical) are left out. A failure here leaves the site as it is.
-    needs: [plan, render, generation]
+    needs: [plan, generation]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -259,14 +336,15 @@ jobs:
           pattern: export-*
           path: exports
       - name: Submit changed pages
-        run: go run ./cmd/static-export indexnow -max 100000 exports/export-*
+        # export-<shard> from the matrix, or export-small/export-<shard>.
+        run: go run ./cmd/static-export indexnow -max 100000 exports/export-* exports/export-small/export-*
   rendered-commit:
     # After a render, or straight after a plan with nothing to render, so the
     # next plan starts from this commit.
-    needs: [plan, render, generation]
+    needs: [plan, generation]
     if: >-
       !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.planned == 'true' &&
-      (needs.plan.outputs.work != 'true' || (needs.render.result == 'success' && needs.generation.result == 'success'))
+      (needs.plan.outputs.work != 'true' || needs.generation.result == 'success')
     runs-on: ubuntu-latest
     steps:
       - name: Record the successfully rendered commit
