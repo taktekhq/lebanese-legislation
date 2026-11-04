@@ -55,7 +55,7 @@ async function frameFor(env, key) {
   if (!f) {
     const obj = await env.SITE.get("_layout/" + id + ".json");
     if (!obj) throw new Error("frame object missing: " + id);
-    f = { id, ...prepareFrame(await obj.json()) };
+    f = { id, uploaded: obj.uploaded, ...prepareFrame(await obj.json()) };
     if (frames.size >= FRAMES_KEPT) frames.delete(frames.keys().next().value);
     frames.set(id, f);
   }
@@ -73,14 +73,48 @@ async function redirectData(env) {
   return redirects.data;
 }
 
-function withHeaders(obj, request, body = obj.body, etag = obj.httpEtag) {
+// notModified reports whether a conditional request already holds the page
+// these headers describe. If-None-Match wins when sent, compared the weak way
+// (Cloudflare marks an ETag W/ when it compresses the body, and crawlers send
+// back what they got); otherwise If-Modified-Since against Last-Modified.
+// Googlebot sends both, and a 304 spares it the body of a page that did not
+// change, so its visits go to pages that did.
+export function notModified(request, headers) {
+  const inm = request.headers.get("If-None-Match");
+  if (inm) {
+    const etag = headers.get("ETag");
+    if (!etag) return false;
+    const bare = (t) => t.trim().replace(/^W\//, "");
+    return inm.trim() === "*" || inm.split(",").some((t) => bare(t) === bare(etag));
+  }
+  const ims = Date.parse(request.headers.get("If-Modified-Since") || "");
+  const lm = Date.parse(headers.get("Last-Modified") || "");
+  return !Number.isNaN(ims) && !Number.isNaN(lm) && lm <= ims;
+}
+
+function notModifiedResponse(headers) {
+  const h = new Headers(headers);
+  h.delete("Content-Length");
+  h.delete("Content-Encoding");
+  return new Response(null, { status: 304, headers: h });
+}
+
+// lastModified is the later of the dates given (R2 upload times: the uploader
+// skips a page whose bytes did not change, so it is when the page last
+// changed), as an HTTP date, or "" when none is known.
+function lastModified(...dates) {
+  const t = Math.max(...dates.map((d) => (d instanceof Date ? d.getTime() : NaN)).filter((n) => !Number.isNaN(n)));
+  return Number.isFinite(t) ? new Date(t).toUTCString() : "";
+}
+
+function withHeaders(obj, request, body = obj.body, etag = obj.httpEtag, modified = lastModified(obj.uploaded)) {
   const h = new Headers(SECURITY_HEADERS);
   h.set("Content-Type", obj.httpMetadata?.contentType || "application/octet-stream");
   h.set("Cache-Control", obj.httpMetadata?.cacheControl || "public, max-age=300");
   h.set("ETag", etag);
+  if (modified) h.set("Last-Modified", modified);
   h.set("X-Served-By", "static"); // for the cutover; drop it once routes are final
-  const match = request.headers.get("If-None-Match");
-  if (match && match === etag) return new Response(null, { status: 304, headers: h });
+  if (notModified(request, h)) return notModifiedResponse(h);
   return new Response(request.method === "HEAD" ? null : body, { status: 200, headers: h });
 }
 
@@ -95,7 +129,7 @@ export async function pageResponse(obj, request, env) {
   const page = parseParts(bytes);
   const frame = await frameFor(env, page.key);
   const etag = obj.httpEtag.replace(/"$/, "") + "-" + frame.id.slice(0, 12) + '"';
-  return withHeaders(obj, request, assemble(frame, page), etag);
+  return withHeaders(obj, request, assemble(frame, page), etag, lastModified(obj.uploaded, frame.uploaded));
 }
 
 export default {
@@ -138,7 +172,7 @@ export default {
         const qs = q.toString();
         const cacheKey = new Request(url.origin + url.pathname + (qs ? "?" + qs : ""), { method: "GET" });
         const hit = await cache.match(cacheKey);
-        if (hit && request.method === "GET") return hit;
+        if (hit && request.method === "GET") return notModified(request, hit.headers) ? notModifiedResponse(hit.headers) : hit;
         const obj = await env.SITE.get(key);
         if (obj) {
           const res = await pageResponse(obj, request, env);
