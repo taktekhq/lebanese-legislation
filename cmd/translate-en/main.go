@@ -17,20 +17,18 @@ package main
 import (
 	"bufio"
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/taktekhq/lebanese-legislation/internal/datatables"
 	"github.com/taktekhq/lebanese-legislation/internal/judge"
 )
 
@@ -46,12 +44,7 @@ type Line struct {
 	Checks     []string `json:"checks,omitempty"` // numbers in the Arabic that the English lacks
 }
 
-type article struct {
-	law, pos int
-	number   string
-	text     string
-	hash     string
-}
+type article = datatables.Article
 
 func main() {
 	data := flag.String("data", "data", "the data/ directory")
@@ -69,11 +62,11 @@ func main() {
 	if err != nil {
 		fail(err)
 	}
-	titles, err := readTitles(filepath.Join(*data, "tables", "legislation"), popular)
+	titles, err := datatables.Titles(*data, popular)
 	if err != nil {
 		fail(err)
 	}
-	arts, err := readArticles(filepath.Join(*data, "tables", "legislation_article"), popular)
+	arts, err := datatables.Articles(*data, popular)
 	if err != nil {
 		fail(err)
 	}
@@ -84,10 +77,10 @@ func main() {
 	var todo []article
 	nDoneBefore := 0
 	for _, a := range arts {
-		if done[key(a.law, a.pos, a.hash)] {
+		if done[key(a.Law, a.Position, a.Hash)] {
 			nDoneBefore++
 		}
-		if !done[key(a.law, a.pos, a.hash)] {
+		if !done[key(a.Law, a.Position, a.Hash)] {
 			todo = append(todo, a)
 		}
 	}
@@ -120,11 +113,11 @@ func main() {
 				if ctx.Err() != nil {
 					continue
 				}
-				lines, err := translate(ctx, agy, titles[b[0].law], b)
+				lines, err := translate(ctx, agy, titles[b[0].Law], b)
 				mu.Lock()
 				if err != nil {
 					nFail += len(b)
-					fmt.Fprintf(os.Stderr, "translate-en: text %d from position %d: %v\n", b[0].law, b[0].pos, err)
+					fmt.Fprintf(os.Stderr, "translate-en: text %d from position %d: %v\n", b[0].Law, b[0].Position, err)
 					if quota(err) && stopErr == nil {
 						stopErr = err
 						cancel()
@@ -193,7 +186,7 @@ func translate(ctx context.Context, agy *judge.Agy, title string, b []article) (
 	var p strings.Builder
 	fmt.Fprintf(&p, "The articles below are from the Lebanese text: %s\nTranslate each one. Return one entry per article with the same key.\n\n", title)
 	for _, a := range b {
-		fmt.Fprintf(&p, "### key: %d\n%s\n\n", a.pos, a.text)
+		fmt.Fprintf(&p, "### key: %d\n%s\n\n", a.Position, a.Text)
 	}
 	var got struct {
 		Articles []struct {
@@ -211,12 +204,12 @@ func translate(ctx context.Context, agy *judge.Agy, title string, b []article) (
 	var out []Line
 	var missing []string
 	for _, a := range b {
-		en := byKey[strconv.Itoa(a.pos)]
+		en := byKey[strconv.Itoa(a.Position)]
 		if en == "" {
-			missing = append(missing, a.number)
+			missing = append(missing, a.Number)
 			continue
 		}
-		out = append(out, Line{LawID: a.law, Position: a.pos, Number: a.number, SourceHash: a.hash, En: en, Checks: numberChecks(a.text, en)})
+		out = append(out, Line{LawID: a.Law, Position: a.Position, Number: a.Number, SourceHash: a.Hash, En: en, Checks: numberChecks(a.Text, en)})
 	}
 	if len(missing) > 0 {
 		return out, fmt.Errorf("no translation for articles %s", strings.Join(missing, ", "))
@@ -253,8 +246,8 @@ func makeBatches(arts []article, chars, max int) [][]article {
 	var cur []article
 	n := 0
 	for _, a := range arts {
-		l := len([]rune(a.text))
-		if len(cur) > 0 && (cur[0].law != a.law || n+l > chars || len(cur) >= max) {
+		l := len([]rune(a.Text))
+		if len(cur) > 0 && (cur[0].Law != a.Law || n+l > chars || len(cur) >= max) {
 			out = append(out, cur)
 			cur, n = nil, 0
 		}
@@ -296,93 +289,6 @@ func readIDs(path, list string) (map[int]bool, error) {
 		ids[id] = true
 	}
 	return ids, nil
-}
-
-// eachRow calls fn with the fields of every row of a table directory (PostgreSQL
-// COPY text format, the COLUMNS file names them).
-func eachRow(dir string, fn func(col map[string]int, f []string) error) error {
-	cols, err := os.ReadFile(filepath.Join(dir, "COLUMNS"))
-	if err != nil {
-		return err
-	}
-	col := map[string]int{}
-	for i, c := range strings.Split(strings.TrimSpace(string(cols)), ",") {
-		col[c] = i
-	}
-	files, err := filepath.Glob(filepath.Join(dir, "*.tsv"))
-	if err != nil {
-		return err
-	}
-	sort.Strings(files)
-	for _, name := range files {
-		fh, err := os.Open(name)
-		if err != nil {
-			return err
-		}
-		sc := bufio.NewScanner(fh)
-		sc.Buffer(make([]byte, 1<<20), 64<<20)
-		for sc.Scan() {
-			f := strings.Split(sc.Text(), "\t")
-			for i := range f {
-				f[i] = unescape(f[i])
-			}
-			if err := fn(col, f); err != nil {
-				fh.Close()
-				return err
-			}
-		}
-		fh.Close()
-		if err := sc.Err(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-var copyEsc = strings.NewReplacer(`\\`, `\`, `\n`, "\n", `\t`, "\t", `\r`, "\r")
-
-func unescape(s string) string {
-	if s == `\N` {
-		return ""
-	}
-	return copyEsc.Replace(s)
-}
-
-func readTitles(dir string, ids map[int]bool) (map[int]string, error) {
-	out := map[int]string{}
-	err := eachRow(dir, func(col map[string]int, f []string) error {
-		id, _ := strconv.Atoi(f[col["id"]])
-		if ids[id] {
-			out[id] = f[col["title"]]
-		}
-		return nil
-	})
-	return out, err
-}
-
-func readArticles(dir string, ids map[int]bool) ([]article, error) {
-	var out []article
-	err := eachRow(dir, func(col map[string]int, f []string) error {
-		law, _ := strconv.Atoi(f[col["law_id"]])
-		if !ids[law] {
-			return nil
-		}
-		text := strings.TrimSpace(f[col["text_ar"]])
-		if text == "" {
-			return nil
-		}
-		pos, _ := strconv.Atoi(f[col["position"]])
-		sum := sha256.Sum256([]byte(f[col["text_ar"]]))
-		out = append(out, article{law: law, pos: pos, number: f[col["number"]], text: text, hash: hex.EncodeToString(sum[:])})
-		return nil
-	})
-	sort.Slice(out, func(i, j int) bool {
-		if out[i].law != out[j].law {
-			return out[i].law < out[j].law
-		}
-		return out[i].pos < out[j].pos
-	})
-	return out, err
 }
 
 func readDone(path string) (map[string]bool, error) {
