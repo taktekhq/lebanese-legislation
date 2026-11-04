@@ -125,7 +125,7 @@ func TestAIAnswerAsksForARating(t *testing.T) {
 	q := "How much annual leave does an employee get?"
 	me := strings.Repeat("c", 32)
 	body := askAs(s, me, "1.1.1.1", q)
-	for _, want := range []string{`data-ai-rate data-mode="quick"`, `data-rate="up"`, `aria-label="Helpful"`, `data-rate="down"`, `aria-label="Not helpful"`, "Was this answer helpful?", `data-ai-why hidden`} {
+	for _, want := range []string{`data-ai-rate data-mode="quick"`, `data-rate="up"`, `aria-label="Helpful"`, `data-rate="down"`, `aria-label="Not helpful"`, "Was this answer helpful?", `data-ai-why hidden`, `data-reason="wrong_law"`, `data-reason="other" aria-expanded="false"`, `data-ai-note hidden`, `class="ai-box__form"`, `data-ai-thanks role="status"></p>`} {
 		if !strings.Contains(body, want) {
 			t.Fatalf("no %q under the answer: %.800s", want, body)
 		}

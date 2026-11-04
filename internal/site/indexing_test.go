@@ -356,7 +356,8 @@ func TestThinPagesAreNoindexFollow(t *testing.T) {
 	var gnum string
 	if err := s.db.QueryRow(ctx, `SELECT a.law_id, a.number FROM legislation_article a
 		WHERE length(a.text_ar) > 1500 AND NOT EXISTS (SELECT 1 FROM noindex_page n WHERE n.kind = 'article' AND n.id = a.law_id AND n.position = a.position)
-		ORDER BY a.law_id LIMIT 1`).Scan(&good, &gnum); err == nil {
+		AND (SELECT count(*) FROM legislation_article b WHERE b.law_id = a.law_id) > $1
+		ORDER BY a.law_id LIMIT 1`, shortTextArticles).Scan(&good, &gnum); err == nil {
 		_, body := get(t, s, artPath(good, gnum))
 		if _, robots, _ := head(body); !strings.HasPrefix(robots, "index") {
 			t.Errorf("a long article %d/%s is %q", good, gnum, robots)

@@ -165,28 +165,54 @@
     var why = rate.querySelector("[data-ai-why]");
     var thanks = rate.querySelector("[data-ai-thanks]");
     why.hidden = value !== "down";
-    thanks.hidden = value === "down";
-    thanks.textContent = rate.getAttribute("data-thanks");
-    /* focus the note only with a mouse: on a phone it would zoom and open
-       the keyboard for something optional */
-    if (value === "down" && matchMedia("(hover: hover)").matches) why.querySelector("textarea").focus();
+    thanks.textContent = value === "down" ? "" : rate.getAttribute("data-thanks");
+  });
+  /* After a thumbs down: one tap on a reason sends it; "Something else"
+     opens a box for their own words. */
+  function noted(rate, reason, note) {
+    var props = rated(rate);
+    props.rating = "down";
+    props.reason = reason;
+    props.note = note.slice(0, 500);
+    track("ai_answer_note", props);
+  }
+  /* the thanks line is a live region that is always there, so a screen
+     reader hears it; focus goes back to the thumb before the reasons go */
+  function thank(rate, said) {
+    rate.querySelector('[data-rate="down"]').focus();
+    rate.querySelector("[data-ai-why]").hidden = true;
+    /* reset, so a later thumbs down starts from the reasons again */
+    var form = rate.querySelector("[data-ai-note]");
+    form.hidden = true;
+    form.querySelector("textarea").value = "";
+    rate.querySelector('[data-reason="other"]').setAttribute("aria-expanded", "false");
+    rate.querySelector("[data-ai-thanks]").textContent = rate.getAttribute(said);
+  }
+  box.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-reason]");
+    if (!btn) return;
+    var rate = btn.closest("[data-ai-rate]");
+    var reason = btn.getAttribute("data-reason");
+    if (reason !== "other") {
+      noted(rate, reason, "");
+      thank(rate, "data-reason-sent");
+      return;
+    }
+    var form = rate.querySelector("[data-ai-note]");
+    form.hidden = !form.hidden;
+    btn.setAttribute("aria-expanded", String(!form.hidden));
+    /* focus the box only with a mouse: on a phone it would zoom and open
+       the keyboard before they chose to type */
+    if (!form.hidden && matchMedia("(hover: hover)").matches) form.querySelector("textarea").focus();
   });
   box.addEventListener("submit", function (e) {
-    var form = e.target.closest("[data-ai-why]");
+    var form = e.target.closest("[data-ai-note]");
     if (!form) return;
     e.preventDefault();
     var rate = form.closest("[data-ai-rate]");
     var note = form.querySelector("textarea").value.trim();
-    if (note) {
-      var props = rated(rate);
-      props.rating = "down";
-      props.note = note.slice(0, 500);
-      track("ai_answer_note", props);
-    }
-    form.hidden = true;
-    var thanks = rate.querySelector("[data-ai-thanks]");
-    thanks.textContent = rate.getAttribute(note ? "data-sent" : "data-thanks");
-    thanks.hidden = false;
+    if (note) noted(rate, "other", note);
+    thank(rate, note ? "data-sent" : "data-thanks");
   });
 
   function settle() {
