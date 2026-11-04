@@ -79,7 +79,7 @@ are built from, as `go list -deps` reports them, plus the inputs the workflow
 loads (`db/official.sql`, `data/load.sh`, the schema files). Tests and notes beside
 that code change nothing.
 
-Templates, UI strings, topic guides and assets are the exception: they are mapped
+Templates, UI strings, topic guides, the journal and assets are the exception: they are mapped
 to the pages they touch, and a change to Go code still renders everything. Every
 render leaves a record beside each shard's manifest, `deps.json`: for each route,
 the page templates its pages executed and the UI strings Go code looked up for
@@ -95,6 +95,10 @@ them (`site.RecordDeps`, noted in `execute` and in `s.bundle`). The planner
 - a topic guide to its own pages and the article pages it quotes or stopped
   quoting; a changed title, question or set of guides adds every topic page, the
   topic index and the home pages;
+- the journal (`internal/site/blog.json`) to every `/blog/` page in the manifests,
+  each entry before and after the change, and the sitemaps that list or date
+  them (`/blog-sitemap.xml`, `/sitemaps/core.xml`, `/sitemaps/ar-core.xml`,
+  `/sitemap.xml`): a new entry is a small plan, not a full render;
 - an asset to no page: the run uploads the assets (`?v=` is the fixed build id).
 
 A string in the shared layout, a partial most pages reach, a missing record or
