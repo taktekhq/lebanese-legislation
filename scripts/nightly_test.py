@@ -113,7 +113,7 @@ case "$name" in
 esac
 ''')
         self.env["COMMAND_STUB"] = str(stub)
-        self.branch = "data/" + datetime.datetime.now(datetime.timezone.utc).strftime("%F")
+        self.branch = "data/nightly"
 
     def git(self, *args):
         result = run(GIT, *args, cwd=self.repo, env=self.env)
@@ -297,8 +297,42 @@ exit {rc}
         (self.root / "calls").write_text("")
         result = self.nightly()
         self.assertEqual(result.returncode, 0, result.stdout)
-        self.assertNotIn("gh ", self.calls())
+        self.assertNotIn("gh pr create", self.calls())
+        self.assertNotIn("gh pr edit", self.calls())
+        self.assertNotIn("gh pr close", self.calls())
         self.assertEqual(self.git("ls-remote", "--heads", "origin", self.branch), "")
+
+    def open_pr(self, number):
+        """gh answers that the data branch already has an open PR."""
+        executable(self.mocks / "gh", f'''#!/bin/bash
+printf "gh %s\\n" "$*" >> "$CALLS"
+if [ "$1 $2" = "pr list" ]; then echo {number}; fi
+''')
+
+    def test_next_night_updates_the_open_pr(self):
+        self.assertEqual(self.nightly().returncode, 0)
+        self.open_pr(42)
+        (self.root / "calls").write_text("")
+        result = self.nightly()
+        self.assertEqual(result.returncode, 0, result.stdout)
+        night = datetime.datetime.now(datetime.timezone.utc).strftime("%F")
+        self.assertIn(f"gh pr edit 42 --repo taktekhq/lebanese-legislation --title data: {night}", self.calls())
+        self.assertNotIn("gh pr create", self.calls())
+        # The branch was rebuilt from main and replaced, not stacked on.
+        self.git("fetch", "-q", "origin", self.branch)
+        self.assertEqual(self.git("rev-list", "--count", "main..FETCH_HEAD").strip(), "1")
+
+    def test_no_change_closes_an_out_of_date_pr(self):
+        self.assertEqual(self.nightly("--dry-run").returncode, 0)
+        self.git("reset", "--hard", self.branch)
+        self.git("push", "origin", "main")
+        self.git("branch", "-D", self.branch)
+        self.open_pr(7)
+        (self.root / "calls").write_text("")
+        result = self.nightly()
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("gh pr close 7 --repo taktekhq/lebanese-legislation", self.calls())
+        self.assertNotIn("gh pr create", self.calls())
 
 
 if __name__ == "__main__":
