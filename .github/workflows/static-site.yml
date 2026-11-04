@@ -41,6 +41,7 @@ on:
       - 'go.sum'
       - '.github/workflows/static-site.yml'
       - '.github/actions/render-setup/**'
+      - '.github/scripts/render-db-tag.sh'
 
 concurrency:
   group: static-site

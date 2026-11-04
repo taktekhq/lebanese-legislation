@@ -29,6 +29,7 @@ var renderInputs = map[string]bool{
 	"go.sum":                                  true,
 	".github/workflows/static-site.yml":       true,
 	".github/actions/render-setup/action.yml": true,
+	".github/scripts/render-db-tag.sh":        true,
 }
 
 // renderCommands are the commands a render runs: the exporter, and build-db
