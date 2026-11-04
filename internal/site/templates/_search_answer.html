@@ -20,7 +20,9 @@
    only: the server never sees it. */}}
 {{define "ai_rate"}}<div class="ai-box__rate" data-ai-rate data-mode="{{if .Deep}}deep{{else}}quick{{end}}" data-thanks="{{t "search.ai_rate_thanks"}}" data-sent="{{t "search.ai_rate_sent"}}">
 <div class="ai-box__ask" role="group" aria-label="{{t "search.ai_rate_q"}}"><span class="tiny" aria-hidden="true">{{t "search.ai_rate_q"}}</span><button type="button" class="ai-box__thumb" data-rate="up" aria-pressed="false" aria-label="{{t "search.ai_rate_up"}}" title="{{t "search.ai_rate_up"}}">{{template "ai_thumb"}}</button><button type="button" class="ai-box__thumb ai-box__thumb--down" data-rate="down" aria-pressed="false" aria-label="{{t "search.ai_rate_down"}}" title="{{t "search.ai_rate_down"}}">{{template "ai_thumb"}}</button></div>
-<form class="ai-box__why" data-ai-why hidden><label class="tiny" for="ai-why">{{t "search.ai_rate_why"}}</label><textarea id="ai-why" name="why" rows="2" maxlength="500" dir="auto"></textarea><button type="submit" class="btn btn--ghost btn--sm">{{t "search.ai_rate_send"}}</button></form>
+<div class="ai-box__why" data-ai-why hidden><p class="tiny" id="ai-why-q">{{t "search.ai_rate_why_q"}}</p>
+<div class="ai-box__reasons" role="group" aria-labelledby="ai-why-q"><button type="button" class="chip" data-reason="wrong_law">{{t "search.ai_rate_r_wrong_law"}}</button><button type="button" class="chip" data-reason="out_of_date">{{t "search.ai_rate_r_out_of_date"}}</button><button type="button" class="chip" data-reason="no_answer">{{t "search.ai_rate_r_no_answer"}}</button><button type="button" class="chip" data-reason="other" aria-expanded="false" aria-controls="ai-why-form">{{t "search.ai_rate_r_other"}}</button></div>
+<form class="ai-box__note" id="ai-why-form" data-ai-note hidden><label class="tiny" for="ai-why">{{t "search.ai_rate_why"}}</label><textarea id="ai-why" name="why" rows="2" maxlength="500" dir="auto"></textarea><button type="submit" class="btn btn--ghost btn--sm">{{t "search.ai_rate_send"}}</button></form></div>
 <p class="tiny ai-box__thanks" data-ai-thanks role="status" hidden></p>
 </div>{{end}}
 

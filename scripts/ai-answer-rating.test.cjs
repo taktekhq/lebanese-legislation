@@ -1,6 +1,6 @@
 // Run with node --test scripts/ai-answer-rating.test.cjs.
 // "Was this answer helpful?" under an AI answer (legislation.js) sends the
-// rating and the optional note to PostHog only. These tests click the thumbs
+// rating, a one-tap reason or a note to PostHog only. These tests click the thumbs
 // on a fake page and check what lands in PostHog's queue.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
@@ -32,7 +32,15 @@ async function page() {
     closest(s) { return s === '[data-rate]' ? this : s === '[data-ai-rate]' ? rate : null; }
   });
   const textarea = { value: '', focus() {} };
-  const why = el({ hidden: true, querySelector() { return textarea; }, closest(s) { return s === '[data-ai-why]' ? why : s === '[data-ai-rate]' ? rate : null; } });
+  const why = el({ hidden: true });
+  const form = el({ hidden: true, querySelector() { return textarea; }, closest(s) { return s === '[data-ai-note]' ? form : s === '[data-ai-rate]' ? rate : null; } });
+  const expanded = {};
+  const reason = (value) => el({
+    getAttribute(n) { return n === 'data-reason' ? value : null; },
+    setAttribute(n, v) { if (n === 'aria-expanded') expanded[value] = v; },
+    closest(s) { return s === '[data-reason]' ? this : s === '[data-ai-rate]' ? rate : null; }
+  });
+  const reasons = { wrong_law: reason('wrong_law'), out_of_date: reason('out_of_date'), no_answer: reason('no_answer'), other: reason('other') };
   const thanks = el({ hidden: true });
   let rated = false;
   const rateAttrs = { 'data-mode': 'quick', 'data-thanks': 'Thanks for rating this answer.', 'data-sent': 'Thanks, we got your note.' };
@@ -43,7 +51,7 @@ async function page() {
     setAttribute(n) { if (n === 'data-rated') rated = true; },
     hasAttribute(n) { return n === 'data-rated' && rated; },
     querySelectorAll(s) { return s === '[data-rate]' ? [up, down] : []; },
-    querySelector(s) { return s === '[data-ai-why]' ? why : s === '[data-ai-thanks]' ? thanks : null; }
+    querySelector(s) { return s === '[data-ai-why]' ? why : s === '[data-ai-note]' ? form : s === '[data-ai-thanks]' ? thanks : null; }
   });
   let answered = false;
   const target = el({
@@ -83,7 +91,7 @@ async function page() {
   });
   await finished;
   const fire = (type, target) => box.on[type].forEach(fn => fn({ target, preventDefault() {} }));
-  return { box, rate, up, down, why, thanks, textarea, queue, fire };
+  return { box, rate, up, down, why, form, reasons, expanded, thanks, textarea, queue, fire };
 }
 
 test('the rating row moves below the box so a collapsed answer can be rated', async () => {
@@ -106,18 +114,38 @@ test('thumbs down sends the rating with the question, answer and sources, then a
   assert.equal(thanks.hidden, true);
 });
 
-test('the note goes to PostHog, an empty one sends nothing', async () => {
+test('one tap on a reason sends it and says thanks', async () => {
   const p = await page();
   p.fire('click', p.down);
-  p.textarea.value = '  It cited a repealed law.  ';
-  p.fire('submit', p.why);
+  p.fire('click', p.reasons.out_of_date);
   const note = p.queue.find(c => c[0] === 'ai_answer_note');
+  assert.equal(note[1].reason, 'out_of_date');
+  assert.equal(note[1].note, '');
+  assert.equal(note[1].rating, 'down');
+  assert.equal(note[1].question, 'هل يحق للأجير بدل التدريب؟');
+  assert.equal(p.why.hidden, true);
+  assert.equal(p.thanks.hidden, false);
+  assert.equal(p.thanks.textContent, 'Thanks, we got your note.');
+});
+
+test('"Something else" opens the box; the note goes to PostHog, an empty one sends nothing', async () => {
+  const p = await page();
+  p.fire('click', p.down);
+  p.fire('click', p.reasons.other);
+  assert.equal(p.form.hidden, false);
+  assert.equal(p.expanded.other, 'true');
+  assert.equal(p.queue.some(c => c[0] === 'ai_answer_note'), false);
+  p.textarea.value = '  It cited a repealed law.  ';
+  p.fire('submit', p.form);
+  const note = p.queue.find(c => c[0] === 'ai_answer_note');
+  assert.equal(note[1].reason, 'other');
   assert.equal(note[1].note, 'It cited a repealed law.');
   assert.equal(p.thanks.textContent, 'Thanks, we got your note.');
 
   const q = await page();
   q.fire('click', q.down);
-  q.fire('submit', q.why);
+  q.fire('click', q.reasons.other);
+  q.fire('submit', q.form);
   assert.equal(q.queue.some(c => c[0] === 'ai_answer_note'), false);
   assert.equal(q.thanks.textContent, 'Thanks for rating this answer.');
 });
