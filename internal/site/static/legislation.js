@@ -165,8 +165,7 @@
     var why = rate.querySelector("[data-ai-why]");
     var thanks = rate.querySelector("[data-ai-thanks]");
     why.hidden = value !== "down";
-    thanks.hidden = value === "down";
-    thanks.textContent = rate.getAttribute("data-thanks");
+    thanks.textContent = value === "down" ? "" : rate.getAttribute("data-thanks");
   });
   /* After a thumbs down: one tap on a reason sends it; "Something else"
      opens a box for their own words. */
@@ -177,11 +176,12 @@
     props.note = note.slice(0, 500);
     track("ai_answer_note", props);
   }
-  function thank(rate, sent) {
+  /* the thanks line is a live region that is always there, so a screen
+     reader hears it; focus goes back to the thumb before the reasons go */
+  function thank(rate, said) {
+    rate.querySelector('[data-rate="down"]').focus();
     rate.querySelector("[data-ai-why]").hidden = true;
-    var thanks = rate.querySelector("[data-ai-thanks]");
-    thanks.textContent = rate.getAttribute(sent ? "data-sent" : "data-thanks");
-    thanks.hidden = false;
+    rate.querySelector("[data-ai-thanks]").textContent = rate.getAttribute(said);
   }
   box.addEventListener("click", function (e) {
     var btn = e.target.closest("[data-reason]");
@@ -190,7 +190,7 @@
     var reason = btn.getAttribute("data-reason");
     if (reason !== "other") {
       noted(rate, reason, "");
-      thank(rate, true);
+      thank(rate, "data-reason-sent");
       return;
     }
     var form = rate.querySelector("[data-ai-note]");
@@ -207,7 +207,7 @@
     var rate = form.closest("[data-ai-rate]");
     var note = form.querySelector("textarea").value.trim();
     if (note) noted(rate, "other", note);
-    thank(rate, !!note);
+    thank(rate, note ? "data-sent" : "data-thanks");
   });
 
   function settle() {

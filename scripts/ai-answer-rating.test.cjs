@@ -29,8 +29,10 @@ async function page() {
   const thumb = (value) => el({
     getAttribute(n) { return n === 'data-rate' ? value : n === 'aria-pressed' ? String(!!pressed[value]) : null; },
     setAttribute(n, v) { if (n === 'aria-pressed') pressed[value] = v === 'true'; },
-    closest(s) { return s === '[data-rate]' ? this : s === '[data-ai-rate]' ? rate : null; }
+    closest(s) { return s === '[data-rate]' ? this : s === '[data-ai-rate]' ? rate : null; },
+    focus() { focused = value; }
   });
+  let focused = null;
   const textarea = { value: '', focus() {} };
   const why = el({ hidden: true });
   const form = el({ hidden: true, querySelector() { return textarea; }, closest(s) { return s === '[data-ai-note]' ? form : s === '[data-ai-rate]' ? rate : null; } });
@@ -41,9 +43,9 @@ async function page() {
     closest(s) { return s === '[data-reason]' ? this : s === '[data-ai-rate]' ? rate : null; }
   });
   const reasons = { wrong_law: reason('wrong_law'), out_of_date: reason('out_of_date'), no_answer: reason('no_answer'), other: reason('other') };
-  const thanks = el({ hidden: true });
+  const thanks = el();
   let rated = false;
-  const rateAttrs = { 'data-mode': 'quick', 'data-thanks': 'Thanks for rating this answer.', 'data-sent': 'Thanks, we got your note.' };
+  const rateAttrs = { 'data-mode': 'quick', 'data-thanks': 'Thanks for rating this answer.', 'data-sent': 'Thanks, we got your note.', 'data-reason-sent': 'Thanks, that tells us what to fix.' };
   const up = thumb('up');
   const down = thumb('down');
   const rate = el({
@@ -51,7 +53,7 @@ async function page() {
     setAttribute(n) { if (n === 'data-rated') rated = true; },
     hasAttribute(n) { return n === 'data-rated' && rated; },
     querySelectorAll(s) { return s === '[data-rate]' ? [up, down] : []; },
-    querySelector(s) { return s === '[data-ai-why]' ? why : s === '[data-ai-note]' ? form : s === '[data-ai-thanks]' ? thanks : null; }
+    querySelector(s) { return s === '[data-ai-why]' ? why : s === '[data-ai-note]' ? form : s === '[data-ai-thanks]' ? thanks : s === '[data-rate="down"]' ? down : null; }
   });
   let answered = false;
   const target = el({
@@ -91,7 +93,7 @@ async function page() {
   });
   await finished;
   const fire = (type, target) => box.on[type].forEach(fn => fn({ target, preventDefault() {} }));
-  return { box, rate, up, down, why, form, reasons, expanded, thanks, textarea, queue, fire };
+  return { box, rate, up, down, why, form, reasons, expanded, thanks, textarea, queue, fire, focused: () => focused };
 }
 
 test('the rating row moves below the box so a collapsed answer can be rated', async () => {
@@ -111,7 +113,7 @@ test('thumbs down sends the rating with the question, answer and sources, then a
   assert.equal(props.answer, 'Yes, the employer pays it back.');
   assert.deepEqual([...props.sources], ['/law/12/']); // an array from the page's own realm
   assert.equal(why.hidden, false);
-  assert.equal(thanks.hidden, true);
+  assert.equal(thanks.textContent, '', 'the live thanks line stays empty while the reasons show');
 });
 
 test('one tap on a reason sends it and says thanks', async () => {
@@ -124,8 +126,8 @@ test('one tap on a reason sends it and says thanks', async () => {
   assert.equal(note[1].rating, 'down');
   assert.equal(note[1].question, 'هل يحق للأجير بدل التدريب؟');
   assert.equal(p.why.hidden, true);
-  assert.equal(p.thanks.hidden, false);
-  assert.equal(p.thanks.textContent, 'Thanks, we got your note.');
+  assert.equal(p.thanks.textContent, 'Thanks, that tells us what to fix.');
+  assert.equal(p.focused(), 'down', 'focus goes back to the thumb before the reasons go');
 });
 
 test('"Something else" opens the box; the note goes to PostHog, an empty one sends nothing', async () => {

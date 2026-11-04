@@ -621,6 +621,7 @@
   "search.ai_rate_r_other": "شيء آخر",
   "search.ai_rate_send": "أرسل",
   "search.ai_rate_sent": "شكراً، وصلتنا ملاحظتك.",
+  "search.ai_rate_reason_sent": "شكراً، هذا يساعدنا على إصلاحها.",
   "resources.database": "صورة قاعدة بيانات PostgreSQL (-db)",
   "resources.database_note": "تتضمن صورتا -db و-all قاعدتي البيانات المبنيتين من جداول المصدر. تتوفر جداول Parquet ومتجهات البحث على Hugging Face.",
   "resources.heading": "استخدم الموارد العامة في مشروعك",

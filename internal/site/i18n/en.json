@@ -621,6 +621,7 @@
   "search.ai_rate_r_other": "Something else",
   "search.ai_rate_send": "Send",
   "search.ai_rate_sent": "Thanks, we got your note.",
+  "search.ai_rate_reason_sent": "Thanks, that tells us what to fix.",
   "resources.database": "PostgreSQL database image (-db)",
   "resources.database_note": "The -db and -all images include both databases built from the source tables. Parquet tables and semantic vectors are available on Hugging Face.",
   "resources.heading": "Build with the public resources",
