@@ -26,25 +26,30 @@ const titleMax = 60
 const descMax = 155
 
 // descMin is the shortest meta description a page ships; descCap the longest.
+// Ahrefs reports a description under 110 characters as too short (its 3 Nov
+// 2026 audit flagged 989 pages of 72 to 97 characters).
 const (
-	descMin = 70
+	descMin = 110
 	descCap = 160
 )
 
 // finishMeta puts a page's title and description inside the limits search
 // engines and the Ahrefs audit check: a title of at most titleMax characters,
 // a description of descMin to descCap. A short description gets the site's
-// one-line description after it; nothing is invented per page.
+// site lines after it, each whole and only while it is still short, so none
+// is cut; nothing is invented per page.
 func finishMeta(b *i18n.Bundle, title, desc string) (string, string) {
 	if len([]rune(title)) > titleMax {
 		title = cutWords(title, titleMax)
 	}
 	desc = strings.TrimSpace(desc)
-	if len([]rune(desc)) < descMin {
-		if desc != "" && !strings.HasSuffix(desc, ".") {
-			desc += "."
+	if len([]rune(desc)) < descMin && desc != "" && !strings.HasSuffix(desc, ".") {
+		desc += "."
+	}
+	for _, k := range []string{"meta.pad", "meta.pad2", "meta.pad3"} {
+		if line := b.T(k); len([]rune(desc)) < descMin && len([]rune(desc))+1+len([]rune(line)) <= descCap {
+			desc = strings.TrimSpace(desc + " " + line)
 		}
-		desc = strings.TrimSpace(desc + " " + b.T("meta.pad"))
 	}
 	if len([]rune(desc)) > descCap {
 		desc = cutWords(desc, descCap)

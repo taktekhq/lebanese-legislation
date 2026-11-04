@@ -79,13 +79,17 @@ func TestFinishMetaLimits(t *testing.T) {
 	}{{"en", en}, {"ar", ar}} {
 		for _, c := range []struct{ title, desc string }{
 			{"x", ""}, {"x", "Short."}, {long, long}, {"Law", strings.Repeat("a ", 69)}, {"Law", strings.Repeat("a", 70)},
+			{"Law", strings.Repeat("a", 97)}, {"Law", strings.Repeat("a ", 54)}, {"Law", strings.Repeat("a", 110)},
 		} {
 			title, desc := finishMeta(b.bundle, c.title, c.desc)
 			if n := len([]rune(title)); n > 60 {
 				t.Errorf("%s: title %d characters", b.name, n)
 			}
-			if n := len([]rune(desc)); n < 70 || n > 160 {
+			if n := len([]rune(desc)); n < descMin || n > descCap {
 				t.Errorf("%s: description %d characters for %q", b.name, n, c.desc)
+			}
+			if n := len([]rune(c.desc)); n < descMin && n <= descCap && strings.HasSuffix(desc, "…") {
+				t.Errorf("%s: a padded description was cut: %q", b.name, desc)
 			}
 		}
 	}
