@@ -24,6 +24,21 @@ runs:
         fast=(-c fsync=off -c synchronous_commit=off -c full_page_writes=off -c max_wal_size=8GB -c maintenance_work_mem=1GB)
         image=${IMAGE:-ghcr.io/taktekhq/lebanese-legislation-db:$(bash .github/scripts/render-db-tag.sh)}
         baked=false
+        # The baked database needs room: the unpacked image (about 8 GB) and
+        # the files PostgreSQL rewrites in the container's own layer while
+        # pages render. Most runners have 145 GB; some have 72 GB with about
+        # 14 GB free, where it filled the disk (run 41845603511). Those first
+        # drop the toolchains no render uses, then load data/ if still short.
+        need=25
+        avail() { df --output=avail -BG / | tail -1 | tr -dc 0-9; }
+        if [ "$image" != load ] && [ "$(avail)" -lt "$need" ]; then
+          echo "$(avail) GB free: removing unused toolchains"
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          if [ "$(avail)" -lt "$need" ]; then
+            echo "Database: $(avail) GB free, under $need GB for the db image; loading data/" | tee -a "$GITHUB_STEP_SUMMARY"
+            image=load
+          fi
+        fi
         if [ "$image" != load ] && docker pull -q "$image"; then
           # The baked cluster runs in place (no copy). Its pg_hba trusts
           # 127.0.0.1, which host networking makes this runner.
