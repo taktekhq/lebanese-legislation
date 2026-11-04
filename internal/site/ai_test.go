@@ -115,6 +115,29 @@ func askAs(s *Server, cookie, ip, q string) string {
 	return w.Body.String()
 }
 
+// An answer asks whether it helped. The rating goes from the browser to
+// PostHog, so the server only renders the question and the two thumbs, and
+// only under a real answer.
+func TestAIAnswerAsksForARating(t *testing.T) {
+	s := testServer(t)
+	f := &composeFake{fakeRewrite: fakeRewrite{queries: []string{"الإجازة السنوية"}}}
+	s.SetMeaningSearch(f, "Google Gemini", false, 1000)
+	q := "How much annual leave does an employee get?"
+	me := strings.Repeat("c", 32)
+	body := askAs(s, me, "1.1.1.1", q)
+	for _, want := range []string{`data-ai-rate data-mode="quick"`, `data-rate="up"`, `aria-label="Helpful"`, `data-rate="down"`, `aria-label="Not helpful"`, "Was this answer helpful?", `data-ai-why hidden`} {
+		if !strings.Contains(body, want) {
+			t.Fatalf("no %q under the answer: %.800s", want, body)
+		}
+	}
+	for range 10 {
+		body = askAs(s, me, "1.1.1.1", q)
+	}
+	if !strings.Contains(body, "used your 10 AI questions") || strings.Contains(body, "data-ai-rate") {
+		t.Fatalf("a limit message must not ask for a rating: %.600s", body)
+	}
+}
+
 func TestAILimitIsTenADayPerDevice(t *testing.T) {
 	s := testServer(t)
 	f := &composeFake{fakeRewrite: fakeRewrite{queries: []string{"الإجازة السنوية"}}}

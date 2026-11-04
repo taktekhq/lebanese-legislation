@@ -132,6 +132,61 @@
     wait.textContent = section.getAttribute("data-finding");
     fallback.parentNode.insertBefore(wait, fallback);
   }
+
+  /* "Was this answer helpful?": the answer brings it, and it moves below the
+     box so a collapsed answer can still be rated. Ratings and notes go to
+     PostHog only, with the question and the answer they are about; our
+     server never stores them. */
+  function placeRating() {
+    box.querySelectorAll(":scope > [data-ai-rate]").forEach(function (el) { el.remove(); });
+    var rate = target.querySelector("[data-ai-rate]");
+    if (rate) box.append(rate);
+  }
+  function rated(rate) {
+    var text = target.querySelector(".ai-box__text");
+    return {
+      question: section.getAttribute("data-q"),
+      mode: rate.getAttribute("data-mode"),
+      answer: text ? text.innerText.slice(0, 3000) : "",
+      sources: [].map.call(target.querySelectorAll(".ai-box__src"), function (a) { return a.getAttribute("href"); })
+    };
+  }
+  box.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-rate]");
+    if (!btn || btn.getAttribute("aria-pressed") === "true") return;
+    var rate = btn.closest("[data-ai-rate]");
+    var value = btn.getAttribute("data-rate");
+    rate.querySelectorAll("[data-rate]").forEach(function (b) { b.setAttribute("aria-pressed", String(b === btn)); });
+    var props = rated(rate);
+    props.rating = value;
+    props.changed = rate.hasAttribute("data-rated");
+    track("ai_answer_rated", props);
+    rate.setAttribute("data-rated", "");
+    var why = rate.querySelector("[data-ai-why]");
+    var thanks = rate.querySelector("[data-ai-thanks]");
+    why.hidden = value !== "down";
+    thanks.hidden = value === "down";
+    thanks.textContent = rate.getAttribute("data-thanks");
+    if (value === "down") why.querySelector("textarea").focus();
+  });
+  box.addEventListener("submit", function (e) {
+    var form = e.target.closest("[data-ai-why]");
+    if (!form) return;
+    e.preventDefault();
+    var rate = form.closest("[data-ai-rate]");
+    var note = form.querySelector("textarea").value.trim();
+    if (note) {
+      var props = rated(rate);
+      props.rating = "down";
+      props.note = note.slice(0, 500);
+      track("ai_answer_note", props);
+    }
+    form.hidden = true;
+    var thanks = rate.querySelector("[data-ai-thanks]");
+    thanks.textContent = rate.getAttribute(note ? "data-sent" : "data-thanks");
+    thanks.hidden = false;
+  });
+
   function settle() {
     box.removeAttribute("aria-busy");
     if (wait) wait.remove();
@@ -178,6 +233,7 @@
     }
     if (fallback) fallback.hidden = false;
     settle();
+    placeRating();
     var text = target.querySelector(".ai-box__text");
     track(text ? "ai_answer_shown" : target.querySelector(".ai-box__limit") ? "ai_limit_shown" : "ai_no_answer_shown",
       { sources: target.querySelectorAll(".ai-box__src").length, brought_results: !!results });
@@ -201,6 +257,7 @@
       wait.textContent = section.getAttribute("data-deep-loading");
       target.textContent = "";
       target.append(wait);
+      placeRating();
       var dc = new AbortController();
       var dt = setTimeout(function () { dc.abort(); }, 90000);
       fetch(section.getAttribute("data-deep-url"), { method: "POST", credentials: "same-origin", body: deepBody, signal: dc.signal })
@@ -210,6 +267,7 @@
           t2.innerHTML = html;
           target.textContent = "";
           target.append(t2.content);
+          placeRating();
           track(target.querySelector(".ai-box__text") ? "ai_deep_shown" : "ai_deep_no_answer", { sources: target.querySelectorAll(".ai-box__src").length });
         })
         .catch(function () { target.textContent = section.getAttribute("data-error"); })
@@ -232,7 +290,7 @@
       more.textContent = section.getAttribute(open ? "data-less" : "data-more");
       if (open) track("ai_answer_expanded", {});
     });
-    box.append(more);
+    box.insertBefore(more, box.querySelector(":scope > [data-ai-rate]"));
     /* a citation number opens the box before jumping to its source */
     target.addEventListener("click", function (e) {
       if (e.target.closest(".ai-box__ref") && box.classList.contains("ai-box--collapsed")) more.click();
