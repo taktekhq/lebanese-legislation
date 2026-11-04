@@ -32,13 +32,17 @@ scripts/nightly.sh --dry-run
 scripts/nightly.sh
 ```
 
+There is one standing data PR. Every run rebuilds the branch `data/nightly`
+(`LEBLEG_BRANCH`) from the base, commits that night's data on it and force-pushes
+it, so the open PR always holds the newest night: the run updates the PR's title
+and body, or opens the PR when none is open. A night whose data equals the base
+closes an open data PR as out of date. The branch belongs to the nightly; commits
+pushed to it by hand are replaced on the next run.
+
 `--dry-run` still scrapes, rebuilds PostgreSQL, exports and commits the data to
-`data/YYYY-MM-DD`. It only skips the push and PR. It leaves that local branch
-for review and removes its temporary worktree. Before running again that day,
-review and delete that local branch (`git branch -D data/YYYY-MM-DD`), or use
-another date on the next night. Normal runs also refuse an existing local branch
-rather than overwrite a previous run. No code from your working branch is
-included in the data commit.
+the local branch `data/nightly`. It only skips the push and PR. It leaves that
+local branch for review and removes its temporary worktree; the next run resets
+it. No code from your working branch is included in the data commit.
 
 ## Configuration
 
@@ -59,7 +63,8 @@ checkout root. Add Go and PostgreSQL tools to `PATH` when using a scheduler.
 | `LEBLEG_REPO` | `taktekhq/lebanese-legislation` | Target repository for `gh pr create` |
 | `LEBLEG_REMOTE` | `origin` | Git remote fetched and pushed; configure a fork remote if needed |
 | `LEBLEG_BASE` | `main` | Base branch for the clean data worktree and PR |
-| `LEBLEG_HEAD_OWNER` | unset | Fork owner, to create the PR from `owner:data/YYYY-MM-DD` |
+| `LEBLEG_BRANCH` | `data/nightly` | The data PR's branch, replaced by every run |
+| `LEBLEG_HEAD_OWNER` | unset | Fork owner, to create the PR from `owner:data/nightly` |
 | `LEBLEG_TIMEZONE` | `UTC` | Time zone for the date in the branch name |
 | `LEBLEG_SCRAPE_MINUTES` | `180` | Daily scraper budget |
 | `LEBLEG_ARTICLE_MINUTES` | `30` | Full-text scraper budget |
@@ -112,10 +117,12 @@ It only reads public Hugging Face metadata. It never uploads anything.
    generated data files, including removed table shards; keep curated files
    such as `popular_texts.txt`, README and `load.sh`.
    Copy `db/model/judgements.jsonl` and `db/model/citations.jsonl` into the same
-   worktree and stage them with `data/`. If neither changed, stop. Otherwise commit
-   `data/YYYY-MM-DD` with the `data/` diff summary and restore the clone's model files from Git after
-   committing, in both dry and real runs. Retry a failed push up to three times,
-   and open a PR. Cleanup removes the worktree even on failure. The local branch and commit remain available for recovery.
+   worktree and stage them with `data/`. If neither changed, stop, and close an
+   open data PR as out of date. Otherwise commit `data/nightly` with the `data/`
+   diff summary and restore the clone's model files from Git after committing, in
+   both dry and real runs. Force-push the branch, retrying a failed push up to three
+   times, then update the open data PR or open one. Cleanup removes the worktree
+   even on failure. The local branch and commit remain available for recovery.
 
 This retains the private nightly's order and error handling for the surviving
 steps. `flock` replaces its private pipeline lock, and local marks replace

@@ -418,10 +418,12 @@ fi
   BASE="${LEBLEG_BASE:-main}"
   REMOTE="${LEBLEG_REMOTE:-origin}"
   git fetch "$REMOTE" "$BASE"
-  branch="data/$NIGHT"
+  # One standing data PR: every run rebuilds the same branch from the base and
+  # replaces it, so the open PR always holds the newest night until it merges.
+  branch="${LEBLEG_BRANCH:-data/nightly}"
   WORKTREE=$(mktemp -d "${TMPDIR:-/tmp}/lebleg-data.XXXXXXXX")
   rmdir "$WORKTREE"
-  git worktree add -b "$branch" "$WORKTREE" "FETCH_HEAD"
+  git worktree add -B "$branch" "$WORKTREE" "FETCH_HEAD"
   # Mirror the export, including deletions, without publishing anything yet.
   rsync -a --delete --include='/tables/***' --include='/TABLES' \
     --include='/schema.sql' --include='/indexes.sql' --include='/shards.json' \
@@ -434,7 +436,14 @@ fi
     echo "no changes"
     git -C "$REPO" worktree remove "$WORKTREE"
     WORKTREE=""
-    git branch -d "$branch"
+    git branch -D "$branch"
+    if [ "$DRY_RUN" -eq 0 ]; then
+      # The base already holds tonight's data: an open data PR is out of date.
+      open_pr=$(gh pr list --repo "$LEBLEG_REPO" --head "$branch" --state open --json number --jq '.[0].number // empty')
+      if [ -n "$open_pr" ]; then
+        gh pr close "$open_pr" --repo "$LEBLEG_REPO" --comment "Closed by the nightly of $NIGHT: $BASE already has this data."
+      fi
+    fi
     exit 0
   fi
   stats=$(git -C "$WORKTREE" diff --cached --shortstat -- data/)
@@ -444,7 +453,8 @@ fi
     exit 0
   fi
   push_attempt=1
-  while ! git -C "$WORKTREE" push -u "$REMOTE" "$branch"; do
+  # The branch belongs to the nightly: tonight's commit replaces the last one.
+  while ! git -C "$WORKTREE" push --force -u "$REMOTE" "$branch"; do
     if [ "$push_attempt" -ge 3 ]; then
       FAIL_WHY="data push failed"
       echo "$FAIL_WHY after $push_attempt attempts"
@@ -455,7 +465,13 @@ fi
     sleep 15
   done
   head="${LEBLEG_HEAD_OWNER:+$LEBLEG_HEAD_OWNER:}$branch"
-  gh pr create --repo "$LEBLEG_REPO" --base "$BASE" --head "$head" \
-    --title "data: $NIGHT" \
-    --body "Nightly scrape and rebuild. $stats. Build gates, indexing and provenance checks ran before export. Model judgements and citations read tonight are in db/model/. Maintainers merge this PR; workflows publish the data."
+  body="Nightly scrape and rebuild of $NIGHT against $BASE: $stats. Build gates, indexing and provenance checks ran before export. Model judgements and citations read tonight are in db/model/. Each nightly replaces this branch and updates this PR until it merges; maintainers merge it, then the workflows publish the data."
+  open_pr=$(gh pr list --repo "$LEBLEG_REPO" --head "$branch" --state open --json number --jq '.[0].number // empty')
+  if [ -n "$open_pr" ]; then
+    gh pr edit "$open_pr" --repo "$LEBLEG_REPO" --title "data: $NIGHT" --body "$body"
+    echo "updated PR #$open_pr"
+  else
+    gh pr create --repo "$LEBLEG_REPO" --base "$BASE" --head "$head" \
+      --title "data: $NIGHT" --body "$body"
+  fi
 } >> "$LOG" 2>&1
