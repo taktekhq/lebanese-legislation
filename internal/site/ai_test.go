@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/taktekhq/lebanese-legislation/internal/indexing"
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 )
 
@@ -297,5 +298,29 @@ func TestVectorPassagesComeFirst(t *testing.T) {
 	got := vectorFirst(v, k, 3)
 	if len(got) != 3 || got[0].Text != "v1" || got[1].Text != "v2" || got[2].Text != "k1" || got[2].ID != "s3" {
 		t.Fatalf("got %+v", got)
+	}
+}
+
+// "Out of date" shows each source's "Last updated" line: the date its page
+// last changed and the text that last amended it. A source we know nothing
+// about gets no line.
+func TestAISourcesCarryTheirDates(t *testing.T) {
+	s := testServer(t)
+	var law int
+	if err := s.db.QueryRow(context.Background(), `SELECT m.law_id FROM amendment m
+		JOIN legislation b ON b.id = m.by_law_id
+		JOIN page_state p ON p.kind = 'law' AND p.id = m.law_id
+		WHERE m.status IN ('applied', 'partial') AND m.by_law_id <> m.law_id
+		AND coalesce(m.effective_on, b.issued_on) <= current_date AND p.changed_at >= $1
+		ORDER BY m.law_id LIMIT 1`, indexing.FirstFetch).Scan(&law); err != nil {
+		t.Skip("no amended text with a page date in this database")
+	}
+	sources := []aiSource{{answerSource: answerSource{Path: lawPath(law)}}, {answerSource: answerSource{Path: "/ruling/999999999/"}}}
+	s.dateSources(httptest.NewRequest("POST", "/en/search/ai/", nil), sources)
+	if u := sources[0].Updated; u == nil || u.By == nil || !strings.HasPrefix(u.Label, "Last updated") {
+		t.Fatalf("text %d: updated %+v", law, u)
+	}
+	if sources[1].Updated != nil {
+		t.Fatalf("an unknown ruling got a date: %+v", sources[1].Updated)
 	}
 }

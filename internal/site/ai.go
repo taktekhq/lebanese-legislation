@@ -9,6 +9,8 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/url"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -39,7 +41,8 @@ type aiPara struct {
 // aiSource is a cited page and the exact words of it the answer quotes.
 type aiSource struct {
 	answerSource
-	Quotes []string
+	Quotes  []string
+	Updated *Updated // when we last updated the source and the text that last amended it; shown after "Out of date"
 }
 
 type aiView struct {
@@ -180,6 +183,9 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 		ts := s.pages
 		if s.lang(r) == "ar" {
 			ts = s.pagesAr
+		}
+		if len(view.Paras) > 0 {
+			s.dateSources(r, view.Sources)
 		}
 		if err := ts["search"].ExecuteTemplate(w, "ai_answer", view); err != nil {
 			s.captureError(r, "ai answer render", err)
@@ -488,4 +494,57 @@ func numberSources(paras []nlsearch.Para, byID map[string]answerSource) ([]aiPar
 		out = append(out, ap)
 	}
 	return out, sources
+}
+
+// pageKinds names the page_state kind of a source address's first word;
+// any other word with an id is a text (law, decree, ...), kind "law".
+var pageKinds = map[string]string{"ruling": "ruling", "gazette": "gazette", "opinion": "opinion", "doctrine": "doctrine", "agreement": "agreement", "research": "research"}
+
+// dateSources gives each source of an answer its "Last updated" line: the
+// date its page last changed and, for a text or one of its articles, the
+// text that last amended it. A reader who taps "Out of date" sees them.
+func (s *Server) dateSources(r *http.Request, sources []aiSource) {
+	ctx := r.Context()
+	for i := range sources {
+		p := strings.TrimPrefix(sources[i].Path, "/en")
+		parts := strings.SplitN(p, "/", 4) // "", word, id, rest
+		if len(parts) < 4 {
+			continue
+		}
+		id, err := strconv.Atoi(parts[2])
+		if err != nil || id <= 0 {
+			continue
+		}
+		kind, ok := pageKinds[parts[1]]
+		var by *LawRow
+		if !ok {
+			kind = "law"
+			by = s.lastAmendedBy(ctx, id, strings.TrimSuffix(strings.TrimPrefix(parts[3], "article/"), "/"), strings.HasPrefix(parts[3], "article/"))
+		}
+		sources[i].Updated = s.pageUpdated(r, s.changedOn(ctx, kind, id), by)
+	}
+}
+
+// lastAmendedBy is the text whose applied change to law id (or to one of its
+// articles) came into force last, by today; nil when none is known.
+func (s *Server) lastAmendedBy(ctx context.Context, id int, slug string, article bool) *LawRow {
+	if s.db == nil {
+		return nil
+	}
+	if !article {
+		slug = ""
+	} else if u, err := url.PathUnescape(slug); err == nil {
+		slug = u
+	}
+	var x LawRow
+	err := s.db.QueryRow(ctx, `SELECT `+lawRowCols+` FROM amendment m JOIN legislation l ON l.id = m.by_law_id
+		JOIN legislation_kind k ON k.name_ar = l.kind
+		WHERE m.law_id = $1 AND m.by_law_id <> $1 AND m.status IN ('applied', 'partial')
+		AND ($2 = '' OR replace(m.article_number, ' ', '-') = $2)
+		AND coalesce(m.effective_on, l.issued_on) <= current_date
+		ORDER BY coalesce(m.effective_on, l.issued_on) DESC LIMIT 1`, id, slug).Scan(lawRowDest(&x)...)
+	if err != nil {
+		return nil
+	}
+	return &x
 }

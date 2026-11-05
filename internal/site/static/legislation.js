@@ -177,9 +177,10 @@
     track("ai_answer_note", props);
   }
   /* the thanks line is a live region that is always there, so a screen
-     reader hears it; focus goes back to the thumb before the reasons go */
-  function thank(rate, said) {
-    rate.querySelector('[data-rate="down"]').focus();
+     reader hears it; focus moves (to the thumb, or to what the reply points
+     at) before the reasons go */
+  function thank(rate, said, focus) {
+    (focus || rate.querySelector('[data-rate="down"]')).focus();
     rate.querySelector("[data-ai-why]").hidden = true;
     /* reset, so a later thumbs down starts from the reasons again */
     var form = rate.querySelector("[data-ai-note]");
@@ -188,6 +189,34 @@
     rate.querySelector('[data-reason="other"]').setAttribute("aria-expanded", "false");
     rate.querySelector("[data-ai-thanks]").textContent = rate.getAttribute(said);
   }
+  /* Answer the reason where it was given: a wrong law shows the laws the
+     answer used, out of date shows when each was last updated and amended,
+     no answer points to the deep answer when one is left. */
+  function openBox() {
+    var more = box.querySelector(".ai-box__more");
+    if (more && box.classList.contains("ai-box--collapsed")) more.click();
+  }
+  function reply(reason) {
+    var list = target.querySelector(".ai-box__sources");
+    var first = list && list.querySelector(".ai-box__src");
+    if (reason === "wrong_law" && first) {
+      openBox();
+      [].forEach.call(list.children, function (li) { li.classList.add("ai-box__flash"); });
+      return { said: "data-reply-wrong_law", focus: first };
+    }
+    var dates = target.querySelectorAll("[data-ai-updated]");
+    if (reason === "out_of_date" && dates.length && first) {
+      openBox();
+      [].forEach.call(dates, function (d) { d.hidden = false; });
+      return { said: "data-reply-out_of_date", focus: first };
+    }
+    var deep = target.querySelector("[data-ai-deep]:not([disabled])");
+    if (reason === "no_answer" && deep) {
+      openBox();
+      return { said: "data-reply-no_answer", focus: deep };
+    }
+    return { said: "data-reason-sent" };
+  }
   box.addEventListener("click", function (e) {
     var btn = e.target.closest("[data-reason]");
     if (!btn) return;
@@ -195,7 +224,8 @@
     var reason = btn.getAttribute("data-reason");
     if (reason !== "other") {
       noted(rate, reason, "");
-      thank(rate, "data-reason-sent");
+      var r = reply(reason);
+      thank(rate, r.said, r.focus);
       return;
     }
     var form = rate.querySelector("[data-ai-note]");
