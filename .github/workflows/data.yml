@@ -165,6 +165,11 @@ jobs:
         run: |
           python3 -m venv "$RUNNER_TEMP/venv" && . "$RUNNER_TEMP/venv/bin/activate"
           pip install --quiet "huggingface_hub==1.33.0"
+          # The card files come from main as it is now, not from this commit: a
+          # data run that started before a card change would otherwise upload the
+          # older card over the newer one (5 Nov 2026: #164's data over #165's card).
+          git fetch --quiet --depth=1 origin main
+          git checkout FETCH_HEAD -- .github/huggingface .github/scripts/hf-card.py
           curl -fsS "https://huggingface.co/datasets/$HF_REPO/raw/main/README.md" -o "$RUNNER_TEMP/live.md" || true
           python3 .github/scripts/hf-card.py .github/huggingface/README.md "$RUNNER_TEMP/live.md" "$RUNNER_TEMP/out/README.md"
           cp .github/huggingface/METHODS.md .github/huggingface/SCHEMA.md "$RUNNER_TEMP/out/"
