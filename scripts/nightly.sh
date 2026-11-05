@@ -179,6 +179,38 @@ fi
     } | psql -X -q -v ON_ERROR_STOP=1 "$LEBLEG_DSN" \
       || { FAIL_WHY="could not seed page_state from data/"; echo "$FAIL_WHY" >&2; exit 1; }
   fi
+  # Model answers read on an earlier night whose data PR is not merged yet live
+  # only on the data branch. Take them, so tonight neither pays to ask the same
+  # questions again nor gets a different answer to one. Only keys main lacks
+  # are added: main's answers are reviewed and never replaced.
+  carry_branch="${LEBLEG_BRANCH:-data/nightly}"
+  carry_ref="refs/remotes/${LEBLEG_REMOTE:-origin}/$carry_branch"
+  if git -C "$REPO" fetch -q "${LEBLEG_REMOTE:-origin}" "+refs/heads/$carry_branch:$carry_ref" 2>/dev/null \
+      && ! git -C "$REPO" merge-base --is-ancestor "$carry_ref" HEAD; then
+    for f in db/model/judgements.jsonl db/model/citations.jsonl; do
+      if git -C "$REPO" show "$carry_ref:$f" > "$LOG_DIR/carry.jsonl" 2>/dev/null; then
+        python3 - "$REPO/$f" "$LOG_DIR/carry.jsonl" <<'PYCARRY' || echo "model answers: could not carry $f from $carry_branch"
+import json, sys
+mine, theirs = sys.argv[1], sys.argv[2]
+rows, had = {}, 0
+for path in (mine, theirs):
+    try:
+        lines = open(path, encoding="utf-8").read().splitlines()
+    except FileNotFoundError:
+        continue
+    for line in lines:
+        if line.strip():
+            rows.setdefault(json.loads(line).get("key", line), line)
+    if path == mine:
+        had = len(rows)
+added = len(rows) - had
+open(mine, "w", encoding="utf-8").write("".join(rows[k] + "\n" for k in sorted(rows)))
+print(f"model answers: {mine.rsplit('/', 1)[-1]} {added:+d} rows from the unmerged data branch")
+PYCARRY
+      fi
+    done
+    rm -f "$LOG_DIR/carry.jsonl"
+  fi
   # One build runs steps 5 to 12. Exit 2: it finished and its checks failed (the
   # build gate); any other failure stopped it, so what comes after is held.
   brc=0

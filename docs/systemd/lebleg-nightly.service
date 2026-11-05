@@ -2,6 +2,8 @@
 Description=Scrape and rebuild Lebanese Legislation data, then propose a PR
 Wants=network-online.target
 After=network-online.target
+# Review the data PR and merge it when it passes. Remove to merge by hand.
+OnSuccess=lebleg-merge-data-pr.service
 
 [Service]
 Type=oneshot
