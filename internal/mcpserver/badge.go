@@ -185,6 +185,10 @@ func svgResponse(w http.ResponseWriter, r *http.Request, svg string, status int)
 	// number), not a browser or edge cache.
 	h.Set("Cache-Control", "no-store, max-age=0")
 	h.Set("Access-Control-Allow-Origin", "*")
+	// Badges are embedded on other sites (the Hugging Face card loads them
+	// straight from the browser). The edge adds same-site to every response
+	// without its own value, which hides them everywhere but GitHub's proxy.
+	h.Set("Cross-Origin-Resource-Policy", "cross-origin")
 	w.WriteHeader(status)
 	if r.Method != http.MethodHead {
 		_, _ = w.Write([]byte(svg))

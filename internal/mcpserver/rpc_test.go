@@ -561,6 +561,9 @@ func TestBadges(t *testing.T) {
 		!strings.Contains(rec.Body.String(), `aria-label="MCP server: online"`) {
 		t.Errorf("mcp badge: %d %v", rec.Code, rec.Header())
 	}
+	if got := rec.Header().Get("Cross-Origin-Resource-Policy"); got != "cross-origin" {
+		t.Errorf("badge CORP %q: browsers hide it on other sites", got)
+	}
 	get(s, "/badge/mcp.svg", map[string]string{"User-Agent": browserUA})
 	get(s, "/badge/mcp.svg?src=hf", map[string]string{"User-Agent": "Googlebot-Image/1.0"})
 	s.Flush()
