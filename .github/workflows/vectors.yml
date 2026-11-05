@@ -12,6 +12,7 @@ on:
 permissions:
   contents: read
   packages: read
+  actions: read # publish asks whether this commit's data run has published
 jobs:
   build:
     concurrency:
@@ -162,6 +163,11 @@ jobs:
           path: ${{ runner.temp }}/out/vectors
       - name: Remove sync baseline from publication
         run: rm -f "$RUNNER_TEMP/out/vectors/archive-manifest.tsv"
+      - name: Let a data publish of this commit carry the vectors
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/hf-wait-for-data.sh
       - name: Upload to Hugging Face
         run: |
           if [ -z "$HF_TOKEN" ]; then
