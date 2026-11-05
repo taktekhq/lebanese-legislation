@@ -231,10 +231,10 @@ func otherReadings(raw []byte, shown map[string]string, replaced bool) []AnnexRe
 	sort.Strings(fields)
 	var out []AnnexReading
 	for _, f := range fields {
-		seen := map[string]bool{strings.Join(strings.Fields(shown[f]), " "): true}
+		seen := map[string]bool{foldReading(shown[f]): true}
 		for _, c := range rd[f].Candidates {
 			isf := strings.HasPrefix(c.Source, "ISF")
-			v := strings.Join(strings.Fields(c.Value), " ")
+			v := foldReading(c.Value)
 			if seen[v] || isf && replaced {
 				continue
 			}
@@ -248,6 +248,23 @@ func otherReadings(raw []byte, shown map[string]string, replaced bool) []AnnexRe
 	}
 	return out
 }
+
+// foldReading is a reading as compared with another: spaces, hamza and alef
+// forms, final yaa and taa marbuta, tatweel and short vowels do not make two
+// readings differ (the ISF's typed copy writes أثناء where the page prints
+// اثناء, the same word).
+func foldReading(s string) string {
+	s = readingFold.Replace(s)
+	s = strings.Map(func(r rune) rune {
+		if r == 'ـ' || r >= '\u064B' && r <= '\u0652' {
+			return -1
+		}
+		return r
+	}, s)
+	return strings.Join(strings.Fields(s), " ")
+}
+
+var readingFold = strings.NewReplacer("أ", "ا", "إ", "ا", "آ", "ا", "ٱ", "ا", "ى", "ي", "ة", "ه", "ؤ", "و", "ئ", "ي")
 
 func uniqInts(xs []int) []int {
 	out := xs[:0]

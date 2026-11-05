@@ -60,7 +60,9 @@
   .lawside { position: sticky; top: 88px; max-height: calc(100vh - 110px); grid-template-rows: auto minmax(0, 1fr); }
   .lawtoc { overflow: auto; padding-inline-end: 6px; min-height: 0; }
 }
-.goto { display: grid; gap: 8px; }
+/* minmax(0, 1fr): the track never grows to the input's own width, which put
+   Arabic law pages 63 px past a 390 px screen (seen 5 Nov 2026). */
+.goto { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); }
 .goto label { font-size: 0.8125rem; font-weight: 600; color: var(--muted); direction: ltr; text-align: right; }
 .goto__row { display: flex; gap: 8px; }
 .goto input {
@@ -337,12 +339,40 @@ mark.unsure { background: color-mix(in srgb, var(--accent) 22%, transparent); co
 .annex table.ref tbody th, .annex td { font-family: var(--font-ar); }
 .annex .annex__n, .annex .annex__pts { text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .annex .annex__arts { white-space: nowrap; }
+.annex .annex__v { width: 58%; }
+.annex .annex__notes { min-width: 9em; }
 .annex tbody tr { scroll-margin-top: 8px; }
 .annex tbody tr:target { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .annex tr.annex__decided > th { box-shadow: inset -3px 0 0 color-mix(in srgb, var(--accent) 70%, transparent); }
 .annex__mark { display: block; margin-top: 6px; font-family: var(--font); font-size: 0.8125rem; line-height: 1.6; color: var(--muted); text-align: start; }
 .annex__mark bdi { font-family: var(--font-ar); color: var(--ink); }
-@media (max-width: 480px) { .annex .annex__arts { white-space: normal; min-width: 3.5em; } }
+/* On a phone five columns leave the violation a few words a line: each row
+   becomes a block, its number, article and points on one line (labelled in
+   the page's language), the violation and notes under them. */
+html[lang="en"] .annex { --l-n: "No."; --l-art: "Article"; --l-pts: "Points"; --l-notes: "Notes:"; }
+html[lang="ar"] .annex { --l-n: "الرقم"; --l-art: "المادة"; --l-pts: "سحب نقاط"; --l-notes: "ملاحظات:"; }
+@media (max-width: 640px) {
+  .annex table.ref, .annex table.ref tbody { display: block; }
+  .annex table.ref caption { display: block; }
+  .annex table.ref thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .annex table.ref tbody tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; padding: 12px 14px; border-bottom: 1px solid var(--divider); }
+  .annex table.ref tbody tr:last-child { border-bottom: 0; }
+  .annex table.ref tbody tr > * { padding: 0; border: 0; width: auto; text-align: start; }
+  html[lang="en"] .annex tbody tr { direction: ltr; }
+  .annex .annex__n, .annex .annex__arts, .annex .annex__pts { font-size: 0.8125rem; color: var(--muted); white-space: nowrap; }
+  .annex .annex__n::before { content: var(--l-n) " "; font-family: var(--font); }
+  .annex .annex__arts::before { content: var(--l-art) " "; font-family: var(--font); }
+  .annex .annex__pts::before { content: var(--l-pts) " "; font-family: var(--font); }
+  .annex .annex__notes::before { content: var(--l-notes) " "; font-family: var(--font); color: var(--muted); }
+  .annex .annex__pts:empty, .annex .annex__notes:empty { display: none; }
+  .annex .annex__v, .annex .annex__notes { flex-basis: 100%; }
+  .annex .annex__v { direction: rtl; }
+  .annex .annex__v { order: 1; font-size: 1rem; line-height: 1.75; }
+  .annex .annex__notes { order: 2; font-size: 0.875rem; }
+  .annex tr.annex__decided { box-shadow: inset -3px 0 0 color-mix(in srgb, var(--accent) 70%, transparent); }
+  html[lang="en"] .annex tr.annex__decided { box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent) 70%, transparent); }
+  .annex tr.annex__decided > th { box-shadow: none; }
+}
 /* An article's wording as first published, folded under the text in force. */
 .art__original { margin-top: 14px; }
 .art__original summary { cursor: pointer; width: fit-content; font-family: var(--font); font-size: 0.8125rem; color: var(--muted); }

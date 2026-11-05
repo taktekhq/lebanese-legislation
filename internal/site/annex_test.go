@@ -176,6 +176,10 @@ func TestAnnexPagesAndReadings(t *testing.T) {
 	if got := otherReadings(isf, map[string]string{"violation": "أ"}, true); len(got) != 0 {
 		t.Errorf("a replaced row lists the ISF's 2014 wording: %+v", got)
 	}
+	near := []byte(`{"violation":{"candidates":[{"source":"ISF consolidated copy","value":"عدم نقل رخصة السوق أثناء القيادة"}]}}`)
+	if got := otherReadings(near, map[string]string{"violation": "عدم نقل رخصة السوق اثناء القيادة"}, false); len(got) != 0 {
+		t.Errorf("a reading that differs only by a hamza is listed: %+v", got)
+	}
 	if plainNumber("١٣٣") != "133" || plainNumber("٣٤ و٦٨") != "" {
 		t.Error("plainNumber")
 	}
