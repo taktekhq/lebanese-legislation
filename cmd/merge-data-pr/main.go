@@ -127,12 +127,14 @@ func env(name, def string) string {
 
 // reviewFailed is a review that found reasons not to merge.
 type reviewFailed struct {
+	repo    string
 	pr      int
 	reasons []string
 }
 
 func (r reviewFailed) Error() string {
-	return fmt.Sprintf("data PR #%d not merged:\n- %s", r.pr, strings.Join(r.reasons, "\n- "))
+	return fmt.Sprintf("Lebanese Legislation data PR #%d (https://github.com/%s/pull/%d) was not merged by the nightly review:\n- %s",
+		r.pr, r.repo, r.pr, strings.Join(r.reasons, "\n- "))
 }
 
 // review is what reviewData found: why not to merge, and the changes to report.
@@ -196,7 +198,7 @@ func run(ctx context.Context, gh *github, o options, reviewer func(base, head st
 		fmt.Println("  " + s)
 	}
 	if len(reasons) > 0 {
-		failed := reviewFailed{pr: pr.Number, reasons: reasons}
+		failed := reviewFailed{repo: gh.repo, pr: pr.Number, reasons: reasons}
 		fmt.Println(failed.Error())
 		if !o.dryRun {
 			body := "**Not merged by the nightly review.**\n\n- " + strings.Join(reasons, "\n- ") +
