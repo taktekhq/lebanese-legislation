@@ -60,6 +60,14 @@ report() {
   # Answers read on a night that opened no PR are dropped, so the next run's
   # pull from main never stops on these files; they are asked again then.
   git -C "$REPO" checkout -- db/model/judgements.jsonl db/model/citations.jsonl 2>/dev/null || true
+  # The export into the clone's own data/ is in the PR's commit by now. Put
+  # data/ back as Git has it, or the next run's pull from main stops on these
+  # files once the PR merges (5 Nov: "Please commit your changes or stash
+  # them before you merge", and that night never ran).
+  if [ "${DATA:-}" = "$REPO/data" ]; then
+    git -C "$REPO" checkout -- data/ 2>/dev/null || true
+    git -C "$REPO" clean -fdq -- data/ 2>/dev/null || true
+  fi
   mark nightly-run "$([ "$rc" -eq 0 ] && echo ran || echo failed)" "exit $rc${FAIL_WHY:+: $FAIL_WHY}" || true
   exit $rc
 }
