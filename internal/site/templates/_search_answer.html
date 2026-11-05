@@ -18,7 +18,7 @@
 {{/* ai_rate asks whether an answer helped. legislation.js moves it below the
    box (so a collapsed answer can be rated) and sends the rating to PostHog
    only: the server never sees it. */}}
-{{define "ai_rate"}}<div class="ai-box__rate" data-ai-rate data-mode="{{if .Deep}}deep{{else}}quick{{end}}" data-thanks="{{t "search.ai_rate_thanks"}}" data-sent="{{t "search.ai_rate_sent"}}" data-reason-sent="{{t "search.ai_rate_reason_sent"}}">
+{{define "ai_rate"}}<div class="ai-box__rate" data-ai-rate data-mode="{{if .Deep}}deep{{else}}quick{{end}}" data-thanks="{{t "search.ai_rate_thanks"}}" data-sent="{{t "search.ai_rate_sent"}}" data-reason-sent="{{t "search.ai_rate_reason_sent"}}" data-reply-wrong_law="{{t "search.ai_reply_wrong_law"}}" data-reply-out_of_date="{{t "search.ai_reply_out_of_date"}}" data-reply-no_answer="{{t "search.ai_reply_no_answer"}}">
 <div class="ai-box__ask" role="group" aria-label="{{t "search.ai_rate_q"}}"><span class="tiny" aria-hidden="true">{{t "search.ai_rate_q"}}</span><button type="button" class="ai-box__thumb" data-rate="up" aria-pressed="false" aria-label="{{t "search.ai_rate_up"}}" title="{{t "search.ai_rate_up"}}">{{template "ai_thumb"}}</button><button type="button" class="ai-box__thumb ai-box__thumb--down" data-rate="down" aria-pressed="false" aria-label="{{t "search.ai_rate_down"}}" title="{{t "search.ai_rate_down"}}">{{template "ai_thumb"}}</button></div>
 <div class="ai-box__why" data-ai-why hidden><p class="tiny" id="ai-why-q">{{t "search.ai_rate_why_q"}}</p>
 <div class="ai-box__reasons" role="group" aria-labelledby="ai-why-q"><button type="button" class="chip" data-reason="wrong_law">{{t "search.ai_rate_r_wrong_law"}}</button><button type="button" class="chip" data-reason="out_of_date">{{t "search.ai_rate_r_out_of_date"}}</button><button type="button" class="chip" data-reason="no_answer">{{t "search.ai_rate_r_no_answer"}}</button><button type="button" class="chip" data-reason="other" aria-expanded="false" aria-controls="ai-why-form">{{t "search.ai_rate_r_other"}}</button></div>
@@ -38,7 +38,7 @@
 {{else if .Missing}}<p class="tiny">{{t "search.answer_missing"}}</p>
 {{else if .Paras}}{{$src := .Sources}}
 <div class="ai-box__text" dir="auto">{{range .Paras}}<p>{{.Text}}{{range .Refs}}<a class="ai-box__ref" href="#ai-src-{{.}}" aria-label="{{t "search.ai_source" .}}">{{.}}</a>{{end}}</p>{{end}}</div>
-<ol class="ai-box__sources">{{range $i, $s := $src}}<li id="ai-src-{{add $i 1}}"><a class="ai-box__src" href="{{$s.Path}}" dir="auto"><span class="ai-box__n">{{add $i 1}}</span><span class="ai-box__srctitle">{{$s.Title}}</span>{{if $s.Unofficial}}<span class="tiny">{{t "search.unofficial"}}</span>{{end}}</a>{{range $s.Quotes}}<blockquote class="ai-box__quote" lang="{{$s.Lang}}" dir="auto">{{.}}</blockquote>{{end}}</li>{{end}}</ol>
+<ol class="ai-box__sources">{{range $i, $s := $src}}<li id="ai-src-{{add $i 1}}"><a class="ai-box__src" href="{{$s.Path}}" dir="auto"><span class="ai-box__n">{{add $i 1}}</span><span class="ai-box__srctitle">{{$s.Title}}</span>{{if $s.Unofficial}}<span class="tiny">{{t "search.unofficial"}}</span>{{end}}</a>{{range $s.Quotes}}<blockquote class="ai-box__quote" lang="{{$s.Lang}}" dir="auto">{{.}}</blockquote>{{end}}{{with $s.Updated}}<div class="ai-box__updated" data-ai-updated hidden>{{template "updated-line" .}}</div>{{end}}</li>{{end}}</ol>
 <p class="tiny ai-box__note">{{t "search.ai_note" (meaningProvider)}}</p>
 {{template "ai_rate" .}}
 {{else}}<p class="tiny">{{t "search.answer_insufficient"}}</p>{{end}}
