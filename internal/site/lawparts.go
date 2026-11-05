@@ -184,7 +184,10 @@ func (s *Server) serveLaw(w http.ResponseWriter, r *http.Request, l *Law, p Page
 		p.Desc = cut(l.Title+": "+s.tr(r, "law.part_desc", strconv.Itoa(n), strconv.Itoa(len(runs))), 155)
 	}
 	if n < len(runs) {
-		l.Closing = nil
+		if l.Annex != nil { // both follow the last article; the other parts link the tables
+			l.AnnexPart = pagePartPath(l.ID, len(runs))
+		}
+		l.Closing, l.Annex = nil, nil
 	}
 	s.render(w, r, "law", 200, p)
 }

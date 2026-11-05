@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -59,10 +60,93 @@ type CiteView struct {
 	N      int    // the order of first use on the page
 	Quote  string // Arabic, as printed
 	Number string
+	Label  string // how a Gazette reading is named (citeTarget); "" for an article
 	Path   string // the article's address
 	Law    string // how the law is cited, in Arabic
 	LawEn  string // the code's English name, when it has one
 	Hidden bool   // already quoted higher up the page
+}
+
+// citeTarget is where a cite points and, for a Gazette reading
+// (topics.ParseReading), its label in the page's language: an annexed
+// table's row is on the text's page, after the articles (annex.go), and an
+// article's first wording under the article on its own page.
+func (s *Server) citeTarget(ctx context.Context, r *http.Request, ct *topics.Cite) (path, label string) {
+	rd, ok := topics.ParseReading(ct.Article)
+	switch {
+	case !ok:
+		return artPath(ct.Law, ct.Article), ""
+	case rd.Kind == "annex" && rd.Category == "p":
+		return s.annexPath(ctx, r, ct.Law) + "#" + ct.Article, s.tr(r, "topic.annex_p", rd.Serial)
+	case rd.Kind == "annex":
+		return s.annexPath(ctx, r, ct.Law) + "#" + ct.Article, s.tr(r, "topic.annex", rd.Category, rd.Serial)
+	}
+	path = artPath(ct.Law, rd.Number) + "#" + ct.Article
+	if y := s.readingYear(ctx, ct.Law, ct.Article); y != "" {
+		return path, s.tr(r, "topic.original", rd.Number, y)
+	}
+	return path, s.tr(r, "topic.original_bare", rd.Number)
+}
+
+// readingNameAr is a Gazette reading's name in Arabic, for the page's
+// schema.org citations, which name every article in Arabic.
+func readingNameAr(article string) string {
+	rd, _ := topics.ParseReading(article)
+	switch {
+	case rd.Kind == "annex" && rd.Category == "p":
+		return arBundle.T("topic.annex_p", rd.Serial)
+	case rd.Kind == "annex":
+		return arBundle.T("topic.annex", rd.Category, rd.Serial)
+	}
+	return arBundle.T("topic.original_bare", rd.Number)
+}
+
+var annexPaths, readingYears sync.Map
+
+// annexPath is the page a text's annexed tables are on: its own page, or the
+// last part of a text long enough to be cut into parts (lawparts.go), where
+// they follow the last article. Law 243/2012 is cut in two.
+func (s *Server) annexPath(ctx context.Context, r *http.Request, id int) string {
+	noteDep(r.Context(), "set:law") // the parts follow the law template's article sizes
+	key := fmt.Sprintf("%d/%s", id, s.lang(r))
+	if v, ok := annexPaths.Load(key); ok {
+		return v.(string)
+	}
+	p := lawPath(id)
+	if s.db == nil {
+		return p
+	}
+	l, err := s.loadLaw(ctx, id, true)
+	if err != nil {
+		return p
+	}
+	runs, err := s.partsOf(r, l, 0)
+	if err != nil {
+		return p
+	}
+	if len(runs) > 1 {
+		p = pagePartPath(id, len(runs))
+	}
+	annexPaths.Store(key, p)
+	return p
+}
+
+// readingYear is the year a Gazette reading was published, "" when the
+// database does not say (an older one has no gazette_annex).
+func (s *Server) readingYear(ctx context.Context, law int, anchor string) string {
+	key := fmt.Sprintf("%d/%s", law, anchor)
+	if v, ok := readingYears.Load(key); ok {
+		return v.(string)
+	}
+	if s.db == nil {
+		return ""
+	}
+	var y int
+	if s.db.QueryRow(ctx, `SELECT extract(year FROM gazette_date)::int FROM gazette_annex WHERE law_id = $1 AND anchor = $2`, law, anchor).Scan(&y) != nil {
+		return ""
+	}
+	readingYears.Store(key, strconv.Itoa(y))
+	return strconv.Itoa(y)
 }
 
 // ParaView is a paragraph with the articles it rests on.
@@ -177,7 +261,8 @@ func (s *Server) topic(w http.ResponseWriter, r *http.Request) {
 			order[id] = n
 		}
 		law := s.topicLaw(ctx, ct.Law)
-		v := CiteView{N: order[id], Quote: ct.Quote, Number: ct.Article, Path: artPath(ct.Law, ct.Article), Law: law.cite, LawEn: law.en}
+		path, label := s.citeTarget(ctx, r, ct)
+		v := CiteView{N: order[id], Quote: ct.Quote, Number: ct.Article, Label: label, Path: path, Law: law.cite, LawEn: law.en}
 		first := !shown[id]
 		if quote {
 			shown[id] = true
@@ -237,13 +322,17 @@ func (s *Server) topic(w http.ResponseWriter, r *http.Request) {
 func (s *Server) topicLD(r *http.Request, t *topics.Topic, c *topics.Content, path string, ctx context.Context) map[string]any {
 	var cites []any
 	seen := map[string]bool{}
-	for _, ct := range t.Articles {
-		p := artPath(ct.Law, ct.Article)
+	for i := range t.Articles {
+		ct := &t.Articles[i]
+		p, label := s.citeTarget(ctx, r, ct)
 		if seen[p] {
 			continue
 		}
 		seen[p] = true
 		name := "المادة " + ct.Article + " من " + s.topicLaw(ctx, ct.Law).cite
+		if label != "" {
+			name = readingNameAr(ct.Article) + " من " + s.topicLaw(ctx, ct.Law).cite
+		}
 		cites = append(cites, map[string]any{"@type": "Legislation", "@id": Base + p, "url": Base + p, "name": name,
 			"inLanguage": "ar", "isPartOf": map[string]any{"@type": "Legislation", "@id": Base + lawPath(ct.Law)}})
 	}

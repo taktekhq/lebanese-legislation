@@ -2,7 +2,7 @@
   "slug": "traffic-fines",
   "order": 8,
   "published": "2026-10-20",
-  "updated": "2026-11-03",
+  "updated": "2026-11-05",
   "articles": [
     {
       "id": "f374",
@@ -129,6 +129,96 @@
       "law": 246455,
       "article": "382",
       "quote": "لا يجوز تخفيض قيمة الغرامة المتوجبة عن أي مخالفة مثبتة في حال الاعتراض إلى ما دون الحدّ الأدنى المحدّد في فئات المخالفات."
+    },
+    {
+      "id": "s2_11",
+      "law": 246455,
+      "article": "annex-2-11",
+      "quote": "تجاوز السرعة المحددة بأقل من ۲۰ كلم/س"
+    },
+    {
+      "id": "s3_40",
+      "law": 246455,
+      "article": "annex-3-40",
+      "quote": "تجاوز السرعة المحددة بين ۲۰ واقل من ٤٠ كلم/س"
+    },
+    {
+      "id": "s4_6",
+      "law": 246455,
+      "article": "annex-4-6",
+      "quote": "تجاوز السرعة المحددة بين ٤٠ واقل من ٦٠ كلم/س"
+    },
+    {
+      "id": "s5_4",
+      "law": 246455,
+      "article": "annex-5-4",
+      "quote": "تجاوز السرعة المحددة بأكثر من ٦٠ كلم/س"
+    },
+    {
+      "id": "p3_22",
+      "law": 246455,
+      "article": "annex-3-22",
+      "quote": "استعمال أي جهاز من اجهزة الاتصال اثناء القيادة."
+    },
+    {
+      "id": "a3_18",
+      "law": 246455,
+      "article": "annex-3-18",
+      "quote": "قيادة مركبة تحت تأثير الكحول بنسبة تزيد عن ٠,٥ غ ل وحتى ٠,٨ غ /ل ."
+    },
+    {
+      "id": "a3_19",
+      "law": 246455,
+      "article": "annex-3-19",
+      "quote": "قيادة مركبة تحت تأثير الكحول بنسبة تزيد عن ٠ غ /ل وحتى ٠,٨ غ /ل للسائقين الجدد وسائقي الباصات ومركبات النقل العام والشاحنات التي يزيد وزنها عن ٧,٥ طن والمركبات التي تنقل مواد خطرة"
+    },
+    {
+      "id": "a4_4",
+      "law": 246455,
+      "article": "annex-4-4",
+      "quote": "قيادة مركبة تحت تأثير الكحول بنسبة تتراوح بين ٠,٨غ/ل و ١غ/ل."
+    },
+    {
+      "id": "a5_1",
+      "law": 246455,
+      "article": "annex-5-1",
+      "quote": "قيادة مركبة تحت تأثير الكحول بنسبة بنسبة تتعدى ١غ /ل"
+    },
+    {
+      "id": "d5_2",
+      "law": 246455,
+      "article": "annex-5-2",
+      "quote": "قيادة مركبة تحت تأثير المخدرات"
+    },
+    {
+      "id": "b3_59",
+      "law": 246455,
+      "article": "annex-3-59",
+      "quote": "عدم استخدام حزام الأمان في المقاعد الامامية والخلفية\n\nاذا كان الراكب قاصراً يغرم السائق"
+    },
+    {
+      "id": "l4_15",
+      "law": 246455,
+      "article": "annex-4-15",
+      "quote": "عدم الالتزام بالاشارات الضوئية"
+    },
+    {
+      "id": "w4_26",
+      "law": 246455,
+      "article": "annex-4-26",
+      "quote": "السير بعكس وجهة المرور"
+    },
+    {
+      "id": "h3_25",
+      "law": 246455,
+      "article": "annex-3-25",
+      "quote": "عدم اعتمار الخوذة الواقية من قبل سائق او راكب دراجة آلية أو ا ت ف ."
+    },
+    {
+      "id": "c2_65",
+      "law": 246455,
+      "article": "annex-2-65",
+      "quote": "عدم وضع الاطفال في كرسي الامان بشكل سليم."
     }
   ],
   "en": {
@@ -136,11 +226,12 @@
     "question": "How much are traffic fines under Lebanon's new traffic law, how much is the fine for speeding, and have the amounts gone up since 2024?",
     "description": "Traffic Law 243 of 2012 sets fines of 50,000 to 3,000,000 LBP by category. The 2024 budget law multiplies them by ten, with a 250,000 LBP floor.",
     "answer": {
-      "text": "Article 374 of Lebanon's Traffic Law 243 of 2012 sets each fine by category: 50,000 to 100,000 LBP for pedestrian violations, 100,000 to 150,000 LBP in category 1, rising to 1,000,000 to 3,000,000 LBP plus 1 month to 2 years in prison in category 5. Article 42 of the 2024 budget law (Law 324) multiplies every fine in the traffic law by ten, and no fine may be under 250,000 LBP. A speeding fine, like any other, is the range of the category that the violation tables annexed to the law give the offence.",
+      "text": "Article 374 of Lebanon's Traffic Law 243 of 2012 sets each fine by category: 50,000 to 100,000 LBP for pedestrian violations, 100,000 to 150,000 LBP in category 1, rising to 1,000,000 to 3,000,000 LBP plus 1 month to 2 years in prison in category 5. Article 42 of the 2024 budget law (Law 324) multiplies every fine in the traffic law by ten, and no fine may be under 250,000 LBP. In the violation tables annexed to the law, speeding by less than 20 km/h is category 2 and costs 2 points, and speeding by more than 60 km/h is category 5 and costs 6 points.",
       "cites": [
         "f374",
         "b42",
-        "f375"
+        "s2_11",
+        "s5_4"
       ]
     },
     "sections": [
@@ -268,17 +359,38 @@
               "f377",
               "b42"
             ]
+          },
+          {
+            "text": "The tables on this page show the 2012 face values: we hold no implementing text on how Article 42 of Law 324 of 2024 is applied to tickets, and later budget laws we do not hold may have changed the amounts again.",
+            "note": true
+          },
+          {
+            "text": "The Constitutional Council's decision 3 of 4/4/2024 on the 2024 budget law annulled other articles, not Article 42.",
+            "note": true
           }
         ]
       },
       {
-        "heading": "How much is the fine for speeding, drink-driving or using a phone?",
+        "heading": "Which category and how many points for speeding, phone use, alcohol, seat belts and red lights?",
         "paras": [
           {
             "text": "The law's articles give these offences no amount of their own: the annexed tables put each one in a category and set its points, and Article 374 gives that category's fine.",
             "cites": [
               "f374",
               "f375"
+            ]
+          },
+          {
+            "text": "We read the annexed tables ourselves from the Official Gazette's page images (issue 45 of 25/10/2012), with two Gemini readings compared word by word; where they differed, a Gemini model decided from the page. This copy is unofficial: the law's page shows every row and links the original PDF.",
+            "note": true
+          },
+          {
+            "text": "Speeding is graded by how far the driver goes over the limit: by less than 20 km/h it is category 2 and costs 2 points, from 20 to under 40 km/h category 3 and 3 points, from 40 to under 60 km/h category 4 and 4 points, and by more than 60 km/h category 5 and 6 points.",
+            "cites": [
+              "s2_11",
+              "s3_40",
+              "s4_6",
+              "s5_4"
             ]
           },
           {
@@ -292,6 +404,231 @@
             "text": "Article 17 bans driving with more than half a gram of alcohol per litre of blood, and any alcohol at all for drivers licensed less than 3 years and for drivers of buses, public transport, trucks over 7.5 tonnes and vehicles carrying dangerous goods. It also bans using any communication device while driving.",
             "cites": [
               "f17"
+            ]
+          },
+          {
+            "text": "Using a phone or any other communication device while driving is category 3 and costs 3 points. Alcohol over 0.5 and up to 0.8 g/l is category 3 and 3 points, as is anything over 0 up to 0.8 g/l for new drivers and drivers of buses, public transport, trucks over 7.5 tonnes and vehicles carrying dangerous goods. From 0.8 to 1 g/l it is category 4 and 4 points, and over 1 g/l category 5 and 6 points; driving under the influence of drugs is category 5 and 12 points.",
+            "cites": [
+              "p3_22",
+              "a3_18",
+              "a3_19",
+              "a4_4",
+              "a5_1",
+              "d5_2"
+            ]
+          },
+          {
+            "text": "Not wearing a seat belt in the front or back seats is category 3 and costs 3 points, and when the passenger is a minor the driver is fined. Not obeying traffic lights, which covers running a red light, is category 4 and 4 points, as is driving against the direction of traffic. A motorcycle or ATV rider or passenger without a helmet is category 3 and 3 points, and children not properly secured in a safety seat is category 2, with no points listed.",
+            "cites": [
+              "b3_59",
+              "l4_15",
+              "w4_26",
+              "h3_25",
+              "c2_65"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Category, points and 2012 fine of common offences, from the annexed tables (LBP, before the 2024 tenfold rise)",
+          "head": [
+            "Offence",
+            "Category",
+            "Points",
+            "Fine in 2012"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Speeding by less than 20 km/h",
+                "2",
+                "2",
+                "200,000 to 300,000"
+              ],
+              "cites": [
+                "s2_11",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Speeding by 20 to under 40 km/h",
+                "3",
+                "3",
+                "350,000 to 450,000"
+              ],
+              "cites": [
+                "s3_40",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Speeding by 40 to under 60 km/h",
+                "4",
+                "4",
+                "500,000 to 700,000"
+              ],
+              "cites": [
+                "s4_6",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Speeding by more than 60 km/h",
+                "5",
+                "6",
+                "1,000,000 to 3,000,000, plus 1 month to 2 years in prison"
+              ],
+              "cites": [
+                "s5_4",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Using a phone or other communication device while driving",
+                "3",
+                "3",
+                "350,000 to 450,000"
+              ],
+              "cites": [
+                "p3_22",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Alcohol over 0.5 and up to 0.8 g/l",
+                "3",
+                "3",
+                "350,000 to 450,000"
+              ],
+              "cites": [
+                "a3_18",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Alcohol over 0 and up to 0.8 g/l, new and professional drivers",
+                "3",
+                "3",
+                "350,000 to 450,000"
+              ],
+              "cites": [
+                "a3_19",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Alcohol from 0.8 to 1 g/l",
+                "4",
+                "4",
+                "500,000 to 700,000"
+              ],
+              "cites": [
+                "a4_4",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Alcohol over 1 g/l",
+                "5",
+                "6",
+                "1,000,000 to 3,000,000, plus 1 month to 2 years in prison"
+              ],
+              "cites": [
+                "a5_1",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Driving under the influence of drugs",
+                "5",
+                "12",
+                "1,000,000 to 3,000,000, plus 1 month to 2 years in prison"
+              ],
+              "cites": [
+                "d5_2",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "No seat belt, front or back seats",
+                "3",
+                "3",
+                "350,000 to 450,000"
+              ],
+              "cites": [
+                "b3_59",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Not obeying traffic lights",
+                "4",
+                "4",
+                "500,000 to 700,000"
+              ],
+              "cites": [
+                "l4_15",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Driving against the direction of traffic",
+                "4",
+                "4",
+                "500,000 to 700,000"
+              ],
+              "cites": [
+                "w4_26",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "No helmet on a motorcycle or ATV",
+                "3",
+                "3",
+                "350,000 to 450,000"
+              ],
+              "cites": [
+                "h3_25",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "Children not properly secured in a safety seat",
+                "2",
+                "None listed",
+                "200,000 to 300,000"
+              ],
+              "cites": [
+                "c2_65",
+                "f374"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "Which offences carry a penalty written into the law's own articles?",
+        "paras": [
+          {
+            "text": "A few offences are punished by the law's articles directly, not by a category of the tables, and some of them also carry prison.",
+            "cites": [
+              "f385",
+              "f344",
+              "f345"
             ]
           }
         ],
@@ -432,19 +769,6 @@
             ]
           }
         ]
-      },
-      {
-        "heading": "What this page does not cover",
-        "paras": [
-          {
-            "text": "We do not hold the violation tables annexed to Law 243, so this page cannot say which category speeding, phone use, drink-driving or a seat belt offence falls in, or how many points each costs. The tables above show the 2012 face values: we hold no implementing text on how Article 42 of Law 324 of 2024 is applied to tickets, and later budget laws we do not hold may have changed the amounts again.",
-            "note": true
-          },
-          {
-            "text": "The Constitutional Council's decision 3 of 4/4/2024 on the 2024 budget law annulled other articles, not Article 42.",
-            "note": true
-          }
-        ]
       }
     ]
   },
@@ -453,11 +777,12 @@
     "question": "كم تبلغ غرامات السير بحسب قانون السير الجديد في لبنان، وكم غرامة السرعة الزائدة، وهل ارتفعت المبالغ منذ عام 2024؟",
     "description": "يحدّد قانون السير رقم 243 لعام 2012 الغرامات بين 50,000 و3,000,000 ل.ل. بحسب الفئة، وقد ضربها قانون موازنة 2024 بعشرة مع حدّ أدنى قدره 250,000 ل.ل.",
     "answer": {
-      "text": "تحدّد المادة 374 من قانون السير رقم 243 لعام 2012 الغرامة بحسب فئة المخالفة: من 50,000 إلى 100,000 ليرة لمخالفات المشاة، ومن 100,000 إلى 150,000 ليرة في الفئة الأولى، وصولاً إلى ما بين 1,000,000 و3,000,000 ليرة مع الحبس من شهر إلى سنتين في الفئة الخامسة. وتضرب المادة 42 من قانون موازنة عام 2024 (القانون رقم 324) كل غرامة في قانون السير بعشرة أضعاف، على ألا تقل أي غرامة عن 250,000 ليرة. وغرامة السرعة الزائدة، كسائر المخالفات، هي غرامة الفئة التي تضع فيها الجداول الملحقة بالقانون هذه المخالفة.",
+      "text": "تحدّد المادة 374 من قانون السير رقم 243 لعام 2012 الغرامة بحسب فئة المخالفة: من 50,000 إلى 100,000 ليرة لمخالفات المشاة، ومن 100,000 إلى 150,000 ليرة في الفئة الأولى، وصولاً إلى ما بين 1,000,000 و3,000,000 ليرة مع الحبس من شهر إلى سنتين في الفئة الخامسة. وتضرب المادة 42 من قانون موازنة عام 2024 (القانون رقم 324) كل غرامة في قانون السير بعشرة أضعاف، على ألا تقل أي غرامة عن 250,000 ليرة. وفي جداول المخالفات الملحقة بالقانون، يقع تجاوز السرعة المحددة بأقل من 20 كلم/س في الفئة الثانية ويُسحب عنه نقطتان، ويقع تجاوزها بأكثر من 60 كلم/س في الفئة الخامسة وتُسحب عنه 6 نقاط.",
       "cites": [
         "f374",
         "b42",
-        "f375"
+        "s2_11",
+        "s5_4"
       ]
     },
     "sections": [
@@ -585,17 +910,38 @@
               "f377",
               "b42"
             ]
+          },
+          {
+            "text": "تعرض الجداول في هذه الصفحة المبالغ كما وردت عام 2012: لا نملك نصاً تطبيقياً يبيّن كيف تُطبَّق المادة 42 من القانون رقم 324 لعام 2024 على المحاضر، وقد تكون قوانين موازنة لاحقة لا نملكها عدّلت المبالغ مجدداً.",
+            "note": true
+          },
+          {
+            "text": "أبطل المجلس الدستوري في قراره رقم 3 تاريخ 4/4/2024 بشأن قانون موازنة عام 2024 مواد أخرى، ولم يبطل المادة 42.",
+            "note": true
           }
         ]
       },
       {
-        "heading": "كم غرامة السرعة الزائدة والقيادة تحت تأثير الكحول واستعمال الهاتف؟",
+        "heading": "ما فئة السرعة الزائدة واستعمال الهاتف والكحول وحزام الأمان والإشارة الضوئية، وكم نقطة تُسحب عنها؟",
         "paras": [
           {
             "text": "لا تحدّد مواد القانون مبلغاً خاصاً بهذه المخالفات: فالجداول الملحقة تضع كل مخالفة في فئة وتحدّد نقاطها، والمادة 374 تحدّد غرامة تلك الفئة.",
             "cites": [
               "f374",
               "f375"
+            ]
+          },
+          {
+            "text": "قرأنا الجداول الملحقة بأنفسنا من صور صفحات الجريدة الرسمية (العدد 45 تاريخ 25/10/2012)، بقراءتين بنموذج Gemini قارنّاهما كلمةً كلمة، وحيث اختلفتا قرّر نموذج Gemini من صورة الصفحة. هذه نسخة غير رسمية: صفحة القانون تعرض كل البنود وترتبط بملف PDF الأصلي.",
+            "note": true
+          },
+          {
+            "text": "تتدرّج مخالفة السرعة بحسب مقدار تجاوز السرعة المحددة: بأقل من 20 كلم/س تقع في الفئة الثانية ويُسحب عنها نقطتان، ومن 20 إلى أقل من 40 كلم/س في الفئة الثالثة مع 3 نقاط، ومن 40 إلى أقل من 60 كلم/س في الفئة الرابعة مع 4 نقاط، وبأكثر من 60 كلم/س في الفئة الخامسة مع 6 نقاط.",
+            "cites": [
+              "s2_11",
+              "s3_40",
+              "s4_6",
+              "s5_4"
             ]
           },
           {
@@ -609,6 +955,231 @@
             "text": "تمنع المادة 17 القيادة تحت تأثير الكحول بنسبة تتعدى نصف غرام لكل ليتر دم، وتخفض هذه النسبة إلى صفر للسائقين الذين لم تمضِ 3 سنوات على استلامهم الرخصة ولسائقي الباصات ومركبات النقل العام والشاحنات التي يزيد وزنها عن 7.5 طن والمركبات التي تنقل مواد خطرة. وتمنع أيضاً استعمال أي من أجهزة الاتصالات أثناء القيادة.",
             "cites": [
               "f17"
+            ]
+          },
+          {
+            "text": "استعمال الهاتف أو أي جهاز اتصال آخر أثناء القيادة من الفئة الثالثة ويُسحب عنه 3 نقاط. والقيادة تحت تأثير الكحول بنسبة تزيد عن 0.5 وحتى 0.8 غ/ل من الفئة الثالثة مع 3 نقاط، وكذلك أي نسبة تزيد عن صفر وحتى 0.8 غ/ل للسائقين الجدد وسائقي الباصات ومركبات النقل العام والشاحنات التي يزيد وزنها عن 7.5 طن والمركبات التي تنقل مواد خطرة. ومن 0.8 إلى 1 غ/ل تقع في الفئة الرابعة مع 4 نقاط، وبأكثر من 1 غ/ل في الفئة الخامسة مع 6 نقاط، أما القيادة تحت تأثير المخدرات فمن الفئة الخامسة ويُسحب عنها 12 نقطة.",
+            "cites": [
+              "p3_22",
+              "a3_18",
+              "a3_19",
+              "a4_4",
+              "a5_1",
+              "d5_2"
+            ]
+          },
+          {
+            "text": "عدم استخدام حزام الأمان في المقاعد الأمامية والخلفية من الفئة الثالثة ويُسحب عنه 3 نقاط، وإذا كان الراكب قاصراً يُغرَّم السائق. وعدم الالتزام بالإشارات الضوئية، ومنه تجاوز الإشارة الحمراء، من الفئة الرابعة مع 4 نقاط، وكذلك السير بعكس وجهة المرور. وعدم اعتمار الخوذة الواقية من قبل سائق أو راكب دراجة آلية أو ATV من الفئة الثالثة مع 3 نقاط، وعدم وضع الأطفال في كرسي الأمان بشكل سليم من الفئة الثانية ولا تذكر الجداول نقاطاً له.",
+            "cites": [
+              "b3_59",
+              "l4_15",
+              "w4_26",
+              "h3_25",
+              "c2_65"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "فئة المخالفات الشائعة ونقاطها وغرامتها عام 2012، من الجداول الملحقة (بالليرة اللبنانية، قبل ضربها بعشرة عام 2024)",
+          "head": [
+            "المخالفة",
+            "الفئة",
+            "النقاط",
+            "الغرامة عام 2012"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "تجاوز السرعة المحددة بأقل من 20 كلم/س",
+                "الثانية",
+                "نقطتان",
+                "من 200,000 إلى 300,000"
+              ],
+              "cites": [
+                "s2_11",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "تجاوز السرعة المحددة من 20 إلى أقل من 40 كلم/س",
+                "الثالثة",
+                "3",
+                "من 350,000 إلى 450,000"
+              ],
+              "cites": [
+                "s3_40",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "تجاوز السرعة المحددة من 40 إلى أقل من 60 كلم/س",
+                "الرابعة",
+                "4",
+                "من 500,000 إلى 700,000"
+              ],
+              "cites": [
+                "s4_6",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "تجاوز السرعة المحددة بأكثر من 60 كلم/س",
+                "الخامسة",
+                "6",
+                "من 1,000,000 إلى 3,000,000، مع الحبس من شهر إلى سنتين"
+              ],
+              "cites": [
+                "s5_4",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "استعمال الهاتف أو أي جهاز اتصال أثناء القيادة",
+                "الثالثة",
+                "3",
+                "من 350,000 إلى 450,000"
+              ],
+              "cites": [
+                "p3_22",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "الكحول بنسبة تزيد عن 0.5 وحتى 0.8 غ/ل",
+                "الثالثة",
+                "3",
+                "من 350,000 إلى 450,000"
+              ],
+              "cites": [
+                "a3_18",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "الكحول بنسبة تزيد عن صفر وحتى 0.8 غ/ل للسائقين الجدد والمهنيين",
+                "الثالثة",
+                "3",
+                "من 350,000 إلى 450,000"
+              ],
+              "cites": [
+                "a3_19",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "الكحول بنسبة بين 0.8 و1 غ/ل",
+                "الرابعة",
+                "4",
+                "من 500,000 إلى 700,000"
+              ],
+              "cites": [
+                "a4_4",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "الكحول بنسبة تتعدى 1 غ/ل",
+                "الخامسة",
+                "6",
+                "من 1,000,000 إلى 3,000,000، مع الحبس من شهر إلى سنتين"
+              ],
+              "cites": [
+                "a5_1",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "القيادة تحت تأثير المخدرات",
+                "الخامسة",
+                "12",
+                "من 1,000,000 إلى 3,000,000، مع الحبس من شهر إلى سنتين"
+              ],
+              "cites": [
+                "d5_2",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "عدم استخدام حزام الأمان في المقاعد الأمامية والخلفية",
+                "الثالثة",
+                "3",
+                "من 350,000 إلى 450,000"
+              ],
+              "cites": [
+                "b3_59",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "عدم الالتزام بالإشارات الضوئية",
+                "الرابعة",
+                "4",
+                "من 500,000 إلى 700,000"
+              ],
+              "cites": [
+                "l4_15",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "السير بعكس وجهة المرور",
+                "الرابعة",
+                "4",
+                "من 500,000 إلى 700,000"
+              ],
+              "cites": [
+                "w4_26",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "عدم اعتمار الخوذة على دراجة آلية أو ATV",
+                "الثالثة",
+                "3",
+                "من 350,000 إلى 450,000"
+              ],
+              "cites": [
+                "h3_25",
+                "f374"
+              ]
+            },
+            {
+              "cells": [
+                "عدم وضع الأطفال في كرسي الأمان بشكل سليم",
+                "الثانية",
+                "لا نقاط مذكورة",
+                "من 200,000 إلى 300,000"
+              ],
+              "cites": [
+                "c2_65",
+                "f374"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "ما المخالفات التي وردت عقوبتها في مواد القانون نفسها؟",
+        "paras": [
+          {
+            "text": "تعاقب مواد القانون مباشرةً على بعض المخالفات، لا عبر فئة من فئات الجداول، ويقترن بعضها بالحبس.",
+            "cites": [
+              "f385",
+              "f344",
+              "f345"
             ]
           }
         ],
@@ -747,19 +1318,6 @@
               "f403",
               "f382"
             ]
-          }
-        ]
-      },
-      {
-        "heading": "ما الذي لا تغطيه هذه الصفحة",
-        "paras": [
-          {
-            "text": "لا نملك جداول المخالفات الملحقة بالقانون رقم 243، لذلك لا تحدّد هذه الصفحة فئة السرعة الزائدة أو استعمال الهاتف أو القيادة تحت تأثير الكحول أو عدم وضع حزام الأمان، ولا عدد النقاط المسحوبة عن كل منها. والجداول أعلاه تعرض المبالغ كما وردت عام 2012: لا نملك نصاً تطبيقياً يبيّن كيف تُطبَّق المادة 42 من القانون رقم 324 لعام 2024 على المحاضر، وقد تكون قوانين موازنة لاحقة لا نملكها عدّلت المبالغ مجدداً.",
-            "note": true
-          },
-          {
-            "text": "أبطل المجلس الدستوري في قراره رقم 3 تاريخ 4/4/2024 بشأن قانون موازنة عام 2024 مواد أخرى، ولم يبطل المادة 42.",
-            "note": true
           }
         ]
       }

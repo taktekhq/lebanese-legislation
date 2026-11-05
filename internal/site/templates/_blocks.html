@@ -55,6 +55,12 @@
   {{if ne uilang "ar"}}{{with .English}}<div class="art__en" lang="en" dir="ltr"><p class="art__en-label">{{t "art.en_label" (date $.A.EnOn)}}</p>{{range paras (ptr .)}}<p>{{.}}</p>{{end}}</div>{{end}}{{end}}{{end}}
   {{range .Affected}}<p class="art__amend art__amend--check" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "law.possibly_affected"}}:</strong> <a class="link" href="{{artURL .By.ID .ByArticle}}"><bdi lang="ar">{{.By.Ident}}</bdi>, {{t "art.article_label" .ByArticle}}</a> {{t "art.affected_full"}}</p>{{end}}
   {{end}}
+  {{with .Original}}<details class="art__original"><summary lang="{{uilang}}" dir="{{dir}}">{{t "art.original_summary" .Year}}</summary>
+    <div class="art__original-body" id="{{.Anchor}}">
+    <p class="art__original-note" lang="{{uilang}}" dir="{{dir}}">{{if .Supplement}}{{t "art.original_issue_supp" .Issue (date .Date) .Pages}}{{else}}{{t "art.original_issue" .Issue (date .Date) .Pages}}{{end}} {{t "art.original_note"}} <a class="link" href="{{.PDF}}" rel="noopener">{{t "law.scan_source_link"}} <span aria-hidden="true">&nearr;</span></a></p>
+    <div class="art__ar" lang="ar" dir="rtl">{{range paras (ptr .Text)}}<p>{{.}}</p>{{end}}</div>
+    </div>
+  </details>{{end}}
   {{if or .Versions .Links .Pending .Unsure}}<details class="art__amendments">
     <summary class="art__amendments-toggle" lang="{{uilang}}" dir="{{dir}}"><strong>{{t "art.amendments_versions"}}</strong> <span class="art__expand">{{t "art.show_amendments"}}</span><span class="art__collapse">{{t "art.hide_amendments"}}</span></summary>
     <div class="art__amendments-body">

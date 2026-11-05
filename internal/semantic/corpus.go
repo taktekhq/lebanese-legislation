@@ -132,6 +132,16 @@ func validTopic(ctx context.Context, corpus *pgxpool.Pool, t *topics.Topic) erro
 		return errors.New("canonical database unavailable")
 	}
 	for _, cite := range t.Articles {
+		if _, ok := topics.ParseReading(cite.Article); ok { // a reading of the Gazette's pages (gazette_annex)
+			f, found, err := topics.DB{Pool: corpus}.Article(cite.Law, cite.Article)
+			if err != nil {
+				return err
+			}
+			if !found || cite.Quote == "" || !strings.Contains(f.Text, cite.Quote) {
+				return errors.New("topic citation no longer matches the Gazette reading")
+			}
+			continue
+		}
 		d, err := Load(ctx, corpus, Document{Kind: "article", ID: cite.Law, Part: cite.Article, Lang: "ar"})
 		if err != nil {
 			return err

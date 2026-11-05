@@ -2,7 +2,7 @@
   "slug": "end-of-service-indemnity",
   "order": 1,
   "published": "2026-10-20",
-  "updated": "2026-11-03",
+  "updated": "2026-11-05",
   "articles": [
     {
       "id": "a1",
@@ -165,6 +165,60 @@
       "law": 244971,
       "article": "54-6",
       "quote": "بعد مرور سنة من تاريخ إصدار الـمرسوم التطبيقي الـمذكور في الفقرة (3) اعلاه، توضع موضع التنفيذ أحكام الـمادة الثالثة منه"
+    },
+    {
+      "id": "o50",
+      "law": 244971,
+      "article": "original-50",
+      "quote": "لكل اجير خاضع لنظام تعويض نهاية الخدمة اما بصورة الزامية واما باختياره ، الحق بتعويض نهاية الخدمة اذا توفر فيه احد الشروط الاتية :\n\nآ - ان يكون مجموع سني عمله عشرين سنة على الاقل وذلك باضافة مدة اشتراكه في الصندوق على سنوات الخدمة لدى رب العمل الذي كان يستخدمه بتاريخ وضع الفرع المذكور موضع التنفيذ للفئة الخاصة به .\n\nب - ان يكون مصابا بعجز بمعدل ٥٠ ٪ على الاقل يمنعه من القيام بعمله او بعمل مماثل مع مراعاة وضعه المهني .\n\nج - يجب ان تتثبت من هذا العجز اللجنة الطبية المنصوص عليها في الفقرة الاولى من المادة ٣٥ من هذا القانون .\n\nد - بالنسبة للمرأة الاجير ان تكون قد تزوجت وتركت عملها خلال الاثني عشر شهرا التي تلي تاريخ زواجها .\n\nهـ - ان يكون المضمون قد بلغ الستين من عمره والمضمونة الخامسة والخمسين"
+    },
+    {
+      "id": "o50d",
+      "law": 244971,
+      "article": "original-50",
+      "quote": "في حال وفاة الاجير المضمون الزاميا او اختياريا يستحق لاصحاب الحق المعينين في الفقرة ٢ من المادة ٣١ اعلاه تعويض نهاية الخدمة"
+    },
+    {
+      "id": "o51",
+      "law": 244971,
+      "article": "original-51",
+      "quote": "انه يعادل عن كل سنة خدمة الاجر الذي تقاضاه صاحب العلاقة خلال الشهر الذي سبق تاريخ نشوء الحق بالتعويض"
+    },
+    {
+      "id": "o51b",
+      "law": 244971,
+      "article": "original-51",
+      "quote": "ويحق للمضمون الذي بلغ الستين من العمر ( او الخامسة والخمسين اذا كانت اجيرة ) ان يتقاضى تعويضا اضافيا قدره نصف شهر عن كل سنة خدمة لاحقة للعشرين سنة الاولى"
+    },
+    {
+      "id": "o51m",
+      "law": 244971,
+      "article": "original-51",
+      "quote": "يجب ان يكون التعويض معادلا على الاقل لاجر عشرين شهرا"
+    },
+    {
+      "id": "o52",
+      "law": 244971,
+      "article": "original-52",
+      "quote": "عندما يثبت الاجير انه ترك عمله نهائيا دون قصد الرجوع الى أي عمل مأجور آخر ، يبلغ التعويض :\n\n- ٥٠ ٪ من التعويض المذكور اذا اشترك خمس سنوات على الاكثر .\n\n- ٦٥ ٪ من التعويض المذكور اذا اشترك اكثر من خمس سنوات وعشر سنوات على الاكثر .\n\n- ٧٥ ٪ من التعويض المذكور اذا اشترك فيه اكثر من عشر سنوات وخمس عشرة سنة على الاكثر .\n\n- ٨٥ ٪ من التعويض المذكور اذا اشترك فيه اكثر من خمس عشرة سنة واقل من عشرين سنة"
+    },
+    {
+      "id": "o52t",
+      "law": 244971,
+      "article": "original-52",
+      "quote": "اذا ترك من تلقاء نفسه المؤسسة التي تدرب فيها قبل انقضاء سنتين اعتبارا من نهاية تدربه فيها . أو اذا كان مضمونا اختياريا وترك عمله من تلقاء نفسه قبل نهاية الاثني عشر شهرا التي تلي تاريخ انتسابه الى النظام المقرر في هذا الباب ، فيبلغ تعويضه ثلث تعويض نهاية الخدمة المحدد في المادة ٥١ اعلاه"
+    },
+    {
+      "id": "l319",
+      "law": 329314,
+      "article": "12",
+      "quote": "يستمر العمل في فرع تعويض نهاية الخدمة بكافة أحكامه الـمنصوص عليها في قانون الضمان الاجتماعي لحين الانتهاء من إقرار الـمراسيم كافة ووضع هذا النظام موضع التنفيذ الفعلي"
+    },
+    {
+      "id": "l2",
+      "law": 181460,
+      "article": "1",
+      "quote": "ينتهي خضوع المضمون الى فرع تعويض نهاية الخدمة ويصفى التعويض حكما عند بلوغ الرابعة والستين مكتملة, ويحق له طلب تصفية التعويض عند بلوغ الستين من العمر مكتملة"
     }
   ],
   "en": {
@@ -172,7 +226,7 @@
     "question": "How is end-of-service indemnity calculated under Lebanese labour law, and how much notice must be given before dismissal?",
     "description": "Labour Code: 1 month's wage per year of service, on the last wage, after at least 1 year. Notice is 1 to 4 months by length of service.",
     "answer": {
-      "text": "Under Article 54 of the Labour Code, a dismissed worker is owed 1 month's wage for each year of service, on the last wage paid before the dismissal or notice (Article 57), after at least 1 year of continuous service (Article 56). No indemnity is due for the faults in Article 74, and either side must give 1 to 4 months' written notice by length of service (Article 50). For workers in the NSSF end-of-service scheme, which employers alone fund, Article 63 of the Social Security Law repeals these Labour Code rules to the extent the scheme applies.",
+      "text": "Under Article 54 of the Labour Code, a dismissed worker is owed 1 month's wage for each year of service, on the last wage paid before the dismissal or notice (Article 57), after at least 1 year of continuous service (Article 56). No indemnity is due for the faults in Article 74, and either side must give 1 to 4 months' written notice by length of service (Article 50). For workers in the NSSF end-of-service scheme, which employers alone fund, Article 63 of the Social Security Law repeals these Labour Code rules to the extent the scheme applies. In that scheme's 1963 wording, the indemnity is 1 month of the last wage for each year of service, cut to 50% to 85% for a worker who leaves work for good before 20 years.",
       "cites": [
         "a1",
         "a3",
@@ -181,7 +235,9 @@
         "a13",
         "a14",
         "a19",
-        "a20"
+        "a20",
+        "o51",
+        "o52"
       ]
     },
     "sections": [
@@ -335,6 +391,16 @@
               "cites": [
                 "a20"
               ]
+            },
+            {
+              "cells": [
+                "NSSF indemnity for leaving work for good before 20 years (1963 wording)",
+                "50% to 85% of the full indemnity, by years of contributions",
+                "Social Security Law, Article 52 as first published"
+              ],
+              "cites": [
+                "o52"
+              ]
             }
           ]
         }
@@ -438,10 +504,10 @@
         ]
       },
       {
-        "heading": "Does the NSSF end-of-service fund or the new pension change this?",
+        "heading": "How does the NSSF end-of-service indemnity work?",
         "paras": [
           {
-            "text": "Yes, for insured workers: Article 63 of the Social Security Law repeals the Labour Code dismissal-indemnity provisions for those insured in the NSSF end-of-service scheme, to the extent the scheme applies to them.",
+            "text": "For insured workers, Article 63 of the Social Security Law repeals the Labour Code dismissal-indemnity provisions for those insured in the NSSF end-of-service scheme, to the extent the scheme applies to them.",
             "cites": [
               "a19"
             ]
@@ -454,11 +520,89 @@
             ]
           },
           {
+            "text": "As first published in 1963, the Social Security Law pays the indemnity once the worker has 20 years of work, counting the years with the same employer before joining; on an incapacity of at least 50% that prevents the work, confirmed by the medical committee; to a woman who marries and leaves her work within 12 months of the marriage; at 60 for a man or 55 for a woman; and, on death, to the entitled heirs (Article 50).",
+            "cites": [
+              "o50",
+              "o50d"
+            ]
+          },
+          {
+            "text": "For each year of service, it equals the wage of the month before the right arose. An insured person of 60, or 55 for a woman, gets an extra half month for each year after the first 20, and on a 50% incapacity the indemnity is at least 20 months' wages (Article 51).",
+            "cites": [
+              "o51",
+              "o51b",
+              "o51m"
+            ]
+          },
+          {
+            "text": "A worker who proves they have left work for good, with no intention of other paid work, gets only a share of it, by years of contributions: 50% for 5 years or less, 65% for more than 5 and up to 10, 75% for more than 10 and up to 15, and 85% for more than 15 and under 20. Leaving of one's own will within 2 years of the end of one's training, or a voluntary member within 12 months of joining, gets one third (Article 52).",
+            "cites": [
+              "o52",
+              "o52t"
+            ]
+          },
+          {
+            "text": "Law 2 of 1987 later changed the ages: the indemnity is settled automatically at 64, and the insured person may ask for it from 60.",
+            "cites": [
+              "l2"
+            ]
+          },
+          {
             "text": "When a worker joins the scheme voluntarily, the employer computes the indemnity for the earlier service under the Labour Code rules on dismissal indemnity (Article 53).",
             "cites": [
               "a22"
             ]
-          },
+          }
+        ],
+        "table": {
+          "caption": "Reduced NSSF indemnity for a worker who leaves work for good, 1963 wording",
+          "head": [
+            "Years of contributions",
+            "Share of the indemnity"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "5 years or less",
+                "50%"
+              ],
+              "cites": [
+                "o52"
+              ]
+            },
+            {
+              "cells": [
+                "More than 5, up to 10",
+                "65%"
+              ],
+              "cites": [
+                "o52"
+              ]
+            },
+            {
+              "cells": [
+                "More than 10, up to 15",
+                "75%"
+              ],
+              "cites": [
+                "o52"
+              ]
+            },
+            {
+              "cells": [
+                "More than 15, under 20",
+                "85%"
+              ],
+              "cites": [
+                "o52"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "Does the 2023 pension law change this, and what is not covered?",
+        "paras": [
           {
             "text": "A 2023 amendment creates a pension scheme to replace the end-of-service scheme (Article 49). Once in effect, it is compulsory for first-time workers and for insured persons under 49, while others may stay in the old scheme, and Article 54-6 ties its start to an implementing decree.",
             "cites": [
@@ -468,14 +612,15 @@
               "a26",
               "a27"
             ]
-          }
-        ]
-      },
-      {
-        "heading": "What this page does not cover",
-        "paras": [
+          },
           {
-            "text": "The NSSF scheme's own amount rules were in the old Social Security Law Articles 51 and 52, which Article 53 still cites. Since the 2023 amendment those numbers hold pension articles in our copy, so we lack the old wording.",
+            "text": "Until all its decrees are passed and the pension scheme is actually in force, Article 12 of Law 319 of 2023 keeps the end-of-service branch running with all its provisions in the Social Security Law.",
+            "cites": [
+              "l319"
+            ]
+          },
+          {
+            "text": "Articles 50 to 52 above are quoted as first published in 1963, which we read ourselves from the Official Gazette's page images: since the 2023 amendment those numbers hold pension articles in our copy. Laws between 1963 and 2023, such as Law 2 of 1987, changed parts of them, and we do not hold every amended wording.",
             "note": true
           },
           {
@@ -495,7 +640,7 @@
     "question": "كيف يُحتسب تعويض الصرف أو نهاية الخدمة وفق قانون العمل اللبناني، وما مهلة الإنذار الواجبة قبل الصرف؟",
     "description": "قانون العمل: أجرة شهر عن كل سنة خدمة على أساس الأجر الأخير، بعد سنة خدمة على الأقل. والإنذار من شهر إلى 4 أشهر بحسب مدة الخدمة.",
     "answer": {
-      "text": "وفق المادة 54 من قانون العمل، يستحق الأجير المصروف أجرة شهر عن كل سنة خدمة على أساس الأجر الأخير المدفوع قبل الصرف أو الإنذار (المادة 57)، بعد خدمة مستمرة سنة على الأقل (المادة 56). ولا يُستحق التعويض في حالات الصرف الواردة في المادة 74، وعلى كل من الطرفين توجيه إنذار خطي من شهر إلى 4 أشهر بحسب مدة الخدمة (المادة 50). أما المضمونون في نظام تعويض نهاية الخدمة في الضمان الاجتماعي، الذي يموّله أرباب العمل وحدهم، فقد ألغت المادة 63 من قانون الضمان الاجتماعي بحقهم أحكام قانون العمل هذه بقدر ما يطبَّق عليهم النظام.",
+      "text": "وفق المادة 54 من قانون العمل، يستحق الأجير المصروف أجرة شهر عن كل سنة خدمة على أساس الأجر الأخير المدفوع قبل الصرف أو الإنذار (المادة 57)، بعد خدمة مستمرة سنة على الأقل (المادة 56). ولا يُستحق التعويض في حالات الصرف الواردة في المادة 74، وعلى كل من الطرفين توجيه إنذار خطي من شهر إلى 4 أشهر بحسب مدة الخدمة (المادة 50). أما المضمونون في نظام تعويض نهاية الخدمة في الضمان الاجتماعي، الذي يموّله أرباب العمل وحدهم، فقد ألغت المادة 63 من قانون الضمان الاجتماعي بحقهم أحكام قانون العمل هذه بقدر ما يطبَّق عليهم النظام. وفي النص الأصلي لهذا النظام عام 1963، يعادل التعويض أجر الشهر الأخير عن كل سنة خدمة، ويُخفَّض إلى ما بين 50% و85% للأجير الذي يترك العمل نهائياً قبل 20 سنة.",
       "cites": [
         "a1",
         "a3",
@@ -504,7 +649,9 @@
         "a13",
         "a14",
         "a19",
-        "a20"
+        "a20",
+        "o51",
+        "o52"
       ]
     },
     "sections": [
@@ -658,6 +805,16 @@
               "cites": [
                 "a20"
               ]
+            },
+            {
+              "cells": [
+                "تعويض الضمان لمن يترك العمل نهائياً قبل 20 سنة (نص عام 1963)",
+                "من 50% إلى 85% من التعويض الكامل، بحسب سنوات الاشتراك",
+                "قانون الضمان الاجتماعي، المادة 52 كما نُشرت أول مرة"
+              ],
+              "cites": [
+                "o52"
+              ]
             }
           ]
         }
@@ -761,10 +918,10 @@
         ]
       },
       {
-        "heading": "هل يغيّر صندوق نهاية الخدمة في الضمان أو نظام التقاعد الجديد هذه القواعد؟",
+        "heading": "كيف يعمل تعويض نهاية الخدمة في الضمان الاجتماعي؟",
         "paras": [
           {
-            "text": "نعم بالنسبة إلى المضمونين: تلغي المادة 63 من قانون الضمان الاجتماعي أحكام قانون العمل المتعلقة بتعويض الصرف بالنسبة إلى المضمونين في نظام تعويض نهاية الخدمة، بقدر ما يطبَّق عليهم النظام.",
+            "text": "بالنسبة إلى المضمونين، تلغي المادة 63 من قانون الضمان الاجتماعي أحكام قانون العمل المتعلقة بتعويض الصرف بالنسبة إلى المضمونين في نظام تعويض نهاية الخدمة، بقدر ما يطبَّق عليهم النظام.",
             "cites": [
               "a19"
             ]
@@ -777,11 +934,89 @@
             ]
           },
           {
+            "text": "وفق قانون الضمان الاجتماعي كما نُشر عام 1963، يُستحق التعويض متى بلغ مجموع سني عمل الأجير 20 سنة، مع احتساب سنوات خدمته لدى رب العمل نفسه قبل الانتساب؛ أو عند الإصابة بعجز لا يقل عن 50% يمنعه من عمله وتتثبت منه اللجنة الطبية؛ أو للمرأة الأجيرة التي تتزوج وتترك عملها خلال 12 شهراً من زواجها؛ أو عند بلوغ المضمون 60 عاماً والمضمونة 55 عاماً؛ وعند الوفاة يُستحق لأصحاب الحق (المادة 50).",
+            "cites": [
+              "o50",
+              "o50d"
+            ]
+          },
+          {
+            "text": "ويعادل التعويض عن كل سنة خدمة الأجر الذي تقاضاه الأجير خلال الشهر الذي سبق نشوء الحق به. ويتقاضى المضمون الذي بلغ 60 عاماً، أو 55 عاماً للأجيرة، تعويضاً إضافياً قدره نصف شهر عن كل سنة خدمة بعد أول 20 سنة، وفي حالة العجز بنسبة 50% لا يقل التعويض عن أجر 20 شهراً (المادة 51).",
+            "cites": [
+              "o51",
+              "o51b",
+              "o51m"
+            ]
+          },
+          {
+            "text": "أما الأجير الذي يثبت أنه ترك عمله نهائياً دون قصد الرجوع إلى أي عمل مأجور آخر، فلا ينال إلا نسبة من التعويض بحسب سنوات اشتراكه: 50% لخمس سنوات على الأكثر، و65% لأكثر من 5 سنوات حتى 10، و75% لأكثر من 10 سنوات حتى 15، و85% لأكثر من 15 سنة وأقل من 20. ومن يترك من تلقاء نفسه المؤسسة التي تدرّب فيها قبل انقضاء سنتين على نهاية تدرّبه، أو المضمون اختيارياً الذي يترك عمله خلال 12 شهراً من انتسابه، ينال ثلث التعويض (المادة 52).",
+            "cites": [
+              "o52",
+              "o52t"
+            ]
+          },
+          {
+            "text": "وعدّل القانون رقم 2 لعام 1987 لاحقاً هذه السن: يُصفّى التعويض حكماً عند بلوغ 64 عاماً مكتملة، ويحق للمضمون طلب تصفيته عند بلوغ 60 عاماً مكتملة.",
+            "cites": [
+              "l2"
+            ]
+          },
+          {
             "text": "عند انتساب الأجراء الاختياري إلى النظام، ينظم رب العمل حساب التعويض عن خدمتهم السابقة وفق أحكام قانون العمل المتعلقة بتعويض الصرف (المادة 53).",
             "cites": [
               "a22"
             ]
-          },
+          }
+        ],
+        "table": {
+          "caption": "تعويض نهاية الخدمة المخفَّض لمن يترك العمل نهائياً، نص عام 1963",
+          "head": [
+            "سنوات الاشتراك",
+            "نسبة التعويض"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "5 سنوات على الأكثر",
+                "50%"
+              ],
+              "cites": [
+                "o52"
+              ]
+            },
+            {
+              "cells": [
+                "أكثر من 5 حتى 10",
+                "65%"
+              ],
+              "cites": [
+                "o52"
+              ]
+            },
+            {
+              "cells": [
+                "أكثر من 10 حتى 15",
+                "75%"
+              ],
+              "cites": [
+                "o52"
+              ]
+            },
+            {
+              "cells": [
+                "أكثر من 15 وأقل من 20",
+                "85%"
+              ],
+              "cites": [
+                "o52"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "هل يغيّر قانون التقاعد لعام 2023 هذه القواعد، وما الذي لا تتناوله الصفحة؟",
+        "paras": [
           {
             "text": "أنشأ تعديل عام 2023 نظاماً للتقاعد يحل محل نظام تعويض نهاية الخدمة (المادة 49). وعند وضعه موضع التنفيذ يخضع له إلزامياً من يدخل العمل لأول مرة والمضمونون دون سن 49، وللآخرين البقاء في النظام القديم، وتربط المادة 54-6 بدء التنفيذ بمرسوم تطبيقي.",
             "cites": [
@@ -791,14 +1026,15 @@
               "a26",
               "a27"
             ]
-          }
-        ]
-      },
-      {
-        "heading": "ما لا تتناوله هذه الصفحة",
-        "paras": [
+          },
           {
-            "text": "كانت قواعد مقدار التعويض في نظام نهاية الخدمة ترد في المادتين 51 و52 القديمتين من قانون الضمان الاجتماعي، وما زالت المادة 53 تحيل إليهما. ومنذ تعديل عام 2023 صار هذان الرقمان يحملان مواد التقاعد في نسختنا، فلا تتوفر لدينا الصيغة القديمة.",
+            "text": "وإلى حين إقرار جميع المراسيم ووضع نظام التقاعد موضع التنفيذ الفعلي، تُبقي المادة 12 من القانون رقم 319 لعام 2023 العمل بفرع تعويض نهاية الخدمة بكافة أحكامه الواردة في قانون الضمان الاجتماعي.",
+            "cites": [
+              "l319"
+            ]
+          },
+          {
+            "text": "نقتبس المواد 50 إلى 52 أعلاه كما نُشرت أول مرة عام 1963، وقد قرأناها بأنفسنا من صور صفحات الجريدة الرسمية: فمنذ تعديل عام 2023 صارت هذه الأرقام تحمل مواد التقاعد في نسختنا. وقد عدّلت قوانين صدرت بين 1963 و2023، ومنها القانون رقم 2 لعام 1987، أجزاءً منها، ولا نملك كل صيغها المعدّلة.",
             "note": true
           },
           {

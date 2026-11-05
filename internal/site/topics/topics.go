@@ -19,7 +19,8 @@ var files embed.FS
 
 // Cite is one article a topic relies on, with the words quoted from it. The
 // quote is Arabic, as printed, and must be an exact piece of the article's
-// current text.
+// current text. Article may instead name a reading of the Official Gazette's
+// pages, an annexed table's row or an article's first wording (reading.go).
 type Cite struct {
 	ID      string `json:"id"`
 	Law     int    `json:"law"`
@@ -156,12 +157,13 @@ func Get(slug string) *Topic {
 	return nil
 }
 
-// ByArticle lists the topics that quote an article.
+// ByArticle lists the topics that quote an article, its own text or its
+// wording as first published ("original-<number>", reading.go).
 func ByArticle(law int, number string) []*Topic {
 	var out []*Topic
 	for _, t := range All() {
 		for _, c := range t.Articles {
-			if c.Law == law && c.Article == number {
+			if c.Law == law && (c.Article == number || c.Article == "original-"+number) {
 				out = append(out, t)
 				break
 			}

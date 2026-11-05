@@ -37,7 +37,7 @@
 <section class="wrap">
   <nav class="lawparts" aria-label="{{t "law.parts"}}" lang="{{uilang}}" dir="{{dir}}">
     <p class="tiny">{{t "law.parts_intro" (num (len .Parts))}}</p>
-    <ul>{{range .Parts}}<li>{{if .Current $law.Part}}<b aria-current="page">{{t "law.part_label" (num .N) (str .First) (str .Last)}}</b>{{else}}<a class="link" href="{{u .Path}}">{{t "law.part_label" (num .N) (str .First) (str .Last)}}</a>{{end}}</li>{{end}}</ul>
+    <ul>{{range .Parts}}<li>{{if .Current $law.Part}}<b aria-current="page">{{t "law.part_label" (num .N) (str .First) (str .Last)}}</b>{{else}}<a class="link" href="{{u .Path}}">{{t "law.part_label" (num .N) (str .First) (str .Last)}}</a>{{end}}</li>{{end}}{{with .AnnexPart}}<li><a class="link" href="{{u .}}#annex">{{t "annex.title"}}</a></li>{{end}}</ul>
   </nav>
 </section>
 {{end}}
@@ -75,6 +75,22 @@
 </section>
 {{end}}
 
+{{with .Annex}}{{$a := .}}
+<section class="wrap sec annex" id="annex">
+  <div class="sec__head"><div><p class="eyebrow">{{t "annex.eyebrow"}}</p><h2 class="sec__title">{{t "annex.title"}}</h2></div></div>
+  <p class="scannote" lang="{{uilang}}" dir="{{dir}}"><b>{{t "law.scan_title"}}</b> {{t "annex.scan_body" .Issue (date .Date) (.PagesIn uilang) (num .Decided)}} <a class="link" href="{{.PDF}}" rel="noopener">{{t "law.scan_source_link"}} <span aria-hidden="true">&nearr;</span></a></p>
+  {{if .Traffic}}<p class="annex__amounts" lang="{{uilang}}" dir="{{dir}}">{{t "annex.amounts" (artURL $law.ID "374") (artURL 330076 "42")}}</p>{{end}}
+  {{range .Tables}}
+  <div class="tablewrap"><table class="ref annex__table" id="annex-{{.Category}}" lang="ar" dir="rtl">
+    <caption lang="{{uilang}}" dir="{{dir}}"><b>{{t (printf "annex.cat_%s" .Category)}}</b> <bdi lang="ar">({{.Title}})</bdi>: {{t "annex.fine" (num .FineMin) (num .FineMax)}}{{if eq .Category "5"}}{{t "annex.prison_5"}}{{end}} {{if $a.Traffic}}{{t "annex.art374" (artURL $law.ID "374")}}{{end}}. <a class="link" href="{{.PDF}}" rel="noopener">{{if eq .First .Last}}{{t "annex.page" .Pages}}{{else}}{{t "annex.pages" .Pages}}{{end}}</a>.</caption>
+    <thead lang="{{uilang}}"><tr><th scope="col" dir="{{dir}}">{{t "annex.col_n"}}</th><th scope="col" dir="{{dir}}">{{t "annex.col_articles"}}</th><th scope="col" dir="{{dir}}">{{t "annex.col_violation"}}</th><th scope="col" dir="{{dir}}">{{t "annex.col_points"}}</th><th scope="col" dir="{{dir}}">{{t "annex.col_notes"}}</th></tr></thead>
+    <tbody>{{range .Rows}}
+      <tr id="{{.Anchor}}"{{if or .DecidedBy .ReplacedBy}} class="{{if .DecidedBy}}annex__decided{{end}}{{if .ReplacedBy}} annex__replaced{{end}}"{{end}}><th scope="row" class="annex__n">{{.Serial}}</th><td class="annex__arts">{{if .ArticleNum}}<a class="link" href="{{artURL $law.ID .ArticleNum}}">{{.Article}}</a>{{else}}{{.Article}}{{end}}{{with .Extra}} {{.}}{{end}}</td><td class="annex__v">{{.Violation}}{{with .ReplacedBy}}<span class="annex__mark" lang="{{uilang}}" dir="{{dir}}">{{t "annex.replaced" (artURL .LawID .Article) .Article (safe .Cite)}}</span>{{end}}{{if .DecidedBy}}<span class="annex__mark" lang="{{uilang}}" dir="{{dir}}">{{t "annex.decided"}}{{range .Others}} {{t "annex.other" (t (printf "annex.field_%s" .Field)) (t (printf "annex.src_%s" .Source))}} <bdi lang="ar">{{if .Value}}{{.Value}}{{else}}{{t "annex.blank"}}{{end}}</bdi>{{end}}</span>{{end}}</td><td class="annex__pts">{{.Points}}</td><td class="annex__notes">{{.Notes}}</td></tr>{{end}}
+    </tbody>
+  </table></div>
+  {{end}}
+</section>
+{{end}}
 {{with .Scan}}
 <section class="wrap sec" id="pages">
   <div class="sec__head"><div><p class="eyebrow">{{t "law.scan_pages_eyebrow"}}</p><h2 class="sec__title"><a class="link" href="{{.SourceURL}}" rel="noopener" dir="ltr">{{.SourceName}} <span aria-hidden="true">&nearr;</span></a></h2></div></div>
