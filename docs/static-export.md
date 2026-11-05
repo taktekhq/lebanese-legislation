@@ -129,8 +129,9 @@ workflow. When a deploy on main finishes, and every two hours as a backstop,
 [static-site-catchup.yml](../.github/workflows/static-site-catchup.yml)
 compares `_export/rendered-commit` with main and starts a deploy when the site is
 behind and no deploy is queued or running, once the newest data change has passed
-the data workflow. A failed deploy has its failed jobs run once more; a second
-failure turns the check red.
+the data workflow (its build job passed). A failed deploy runs once more, all of
+it: a full render's shards exchange crawl paths per run attempt, so one shard
+rerun alone cannot finish. A second failure turns the check red.
 
 ## Edge layout: one frame for every page
 

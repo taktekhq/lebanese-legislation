@@ -5,8 +5,8 @@ name: static-site catch-up
 # starts this repository's scheduled runs hours late: on 4 Nov stats ran 8
 # hours after its time). It waits while a deploy is queued or running, and
 # while the newest data change has not passed the data workflow. A failed
-# deploy has its failed jobs run once more; a second failure turns this check
-# red instead. A finished deploy that leaves the site up to date ends here.
+# deploy is run once more, all of it; a second failure turns this check red
+# instead. A finished deploy that leaves the site up to date ends here.
 on:
   workflow_run:
     workflows: [static-site]
@@ -90,8 +90,12 @@ jobs:
             --json databaseId,conclusion,attempt --jq '.[0] | "\(.databaseId) \(.conclusion) \(.attempt)"')
           if [ "$conclusion" = failure ]; then
             if [ "$attempt" -lt 2 ]; then
-              gh run rerun "$id" --failed
-              say "Deploy run $id failed; running its failed jobs again."
+              # The whole run, not --failed: a full render's shards exchange
+              # crawl paths under a prefix keyed by run attempt, so one shard
+              # rerun alone waits 30 minutes for partners that never come and
+              # fails (run 41936815634, 5 Nov). Unchanged pages upload nothing.
+              gh run rerun "$id"
+              say "Deploy run $id failed; running it again."
               exit 0
             fi
             say "Deploy run $id failed twice; not retrying. Read its log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/$id"
