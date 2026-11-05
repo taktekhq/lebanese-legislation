@@ -365,7 +365,8 @@
    An editor (a paid student reviewer) gets a personal link that ends in
    ?editor=CODE. The code, not a name, is kept in this browser and ph.js sends
    it with every PostHog event, so their study days and reports can be counted.
-   The address is cleaned so the code is not shared with the page.
+   The address is cleaned so the code is not shared with the page, and a
+   small "Editor: <Name>" pill, named from the code, shows the link worked.
 
    "Report an error on this page" in the footer sends the note to PostHog as
    error_report (with the page, the language and the editor code if any).
@@ -378,6 +379,23 @@
       localStorage.setItem("lebleg_editor", m[1].toLowerCase());
       var rest = location.search.replace(/([?&])editor=[^&]*&?/, "$1").replace(/[?&]$/, "");
       history.replaceState(null, "", location.pathname + rest + location.hash);
+    }
+    // Show the editor their name, so they can see the link worked:
+    // "rachele-kotaiche" reads "Editor: Rachele Kotaiche".
+    var code = localStorage.getItem("lebleg_editor");
+    if (code) {
+      var name = code.split("-").filter(Boolean).map(function (w) {
+        return w.charAt(0).toUpperCase() + w.slice(1);
+      }).join(" ");
+      var badge = document.createElement("p");
+      badge.className = "status editor-badge";
+      badge.setAttribute("data-editor-badge", "");
+      var ar = document.documentElement.lang === "ar";
+      badge.appendChild(document.createTextNode(ar ? "المحرّر: " : "Editor: "));
+      var who = document.createElement("bdi");
+      who.textContent = name;
+      badge.appendChild(who);
+      document.body.appendChild(badge);
     }
   } catch (e) {}
 
