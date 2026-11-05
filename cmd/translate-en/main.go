@@ -56,6 +56,7 @@ func main() {
 	maxBatch := flag.Int("max-batch", 25, "articles per call at most")
 	limit := flag.Int("limit", 0, "translate at most this many articles (0: all)")
 	ids := flag.String("ids", "", "comma-separated text ids instead of data/popular_texts.txt")
+	timeout := flag.Duration("timeout", 4*time.Minute, "per agy call; a call usually takes under a minute, and a stalled one is retried")
 	flag.Parse()
 
 	popular, err := readIDs(filepath.Join(*data, "popular_texts.txt"), *ids)
@@ -99,7 +100,7 @@ func main() {
 	var mu sync.Mutex
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	agy := &judge.Agy{Bin: *bin, Model: *model, Dir: os.TempDir(), Timeout: 10 * time.Minute}
+	agy := &judge.Agy{Bin: *bin, Model: *model, Dir: os.TempDir(), Timeout: *timeout}
 	jobs := make(chan []article)
 	var wg sync.WaitGroup
 	var nDone, nFail int
@@ -219,11 +220,18 @@ func translate(ctx context.Context, agy *judge.Agy, title string, b []article) (
 
 var digits = strings.NewReplacer("٠", "0", "١", "1", "٢", "2", "٣", "3", "٤", "4", "٥", "5", "٦", "6", "٧", "7", "٨", "8", "٩", "9")
 var numRe = regexp.MustCompile(`\d+`)
+var monthRe = regexp.MustCompile(`[كت]\s*[12١٢]\b`)
+var headRe = regexp.MustCompile(`^\s*(?:ال)?مادة\s+[0-9٠-٩]+[^:\n]{0,12}:`)
 
 // numberChecks lists the numbers of the Arabic text that the English does
 // not contain, for a reviewer: a dropped amount or date is the error that
-// matters most in a law.
+// matters most in a law. Two kinds are not errors and are left out: the
+// article's own number (many texts start "مادة 207:", a heading the English
+// leaves out) and a month written as ك1, ك2, ت1, ت2 (December, January,
+// October, November in the English).
 func numberChecks(ar, en string) []string {
+	ar = monthRe.ReplaceAllString(ar, " ")
+	ar = headRe.ReplaceAllString(ar, "")
 	have := map[string]bool{}
 	for _, n := range numRe.FindAllString(strings.ReplaceAll(en, ",", ""), -1) {
 		have[strings.TrimLeft(n, "0")] = true
