@@ -279,6 +279,10 @@ exit {rc}
         self.assertEqual(self.git("worktree", "list", "--porcelain").count("worktree "), 1)
         self.assertEqual(self.git("show", f"{self.branch}:data/README.md"), "curated\n")
         self.assertNotIn("old.tsv", self.git("ls-tree", "-r", self.branch, "data/tables"))
+        # The export into the clone's data/ is in the commit; data/ is back as
+        # Git has it, so the next pull from main never stops on it.
+        self.assertEqual(self.git("status", "--porcelain", "--", "data/"), "")
+        self.assertEqual((self.repo / "unrelated-code").read_text(), "local\n")
 
     def test_push_and_pr_with_external_export(self):
         result = self.nightly(LEBLEG_DATA=str(self.root / "export"), LEBLEG_HEAD_OWNER="contributor")
