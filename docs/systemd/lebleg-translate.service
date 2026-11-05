@@ -6,13 +6,16 @@ After=network-online.target
 [Service]
 Type=oneshot
 WorkingDirectory=%h/lebleg-translate
-# One slice at a time; 2 workers and a 100-minute cap keep the agy seat from
+# agy runs in the temp folder and scans it as its workspace: in /tmp (thousands
+# of entries) every call stalled past the timeout (5 Nov 2026).
+Environment=TMPDIR=%h/lebleg-translate/tmp
+# One slice at a time; 3 workers and a 100-minute cap keep the agy seat from
 # throttling (5 Nov: 4-6 workers for hours slowed calls past 4 minutes).
 # The data is a worktree of the repository moved to the newest main first, so
 # the Arabic hashes match the live text.
 ExecStartPre=/usr/bin/git -C %h/lebleg-translate/repo fetch -q origin main
 ExecStartPre=/usr/bin/git -C %h/lebleg-translate/repo checkout -q --detach FETCH_HEAD
-ExecStart=/usr/bin/flock -n %h/lebleg-translate/.lock /usr/bin/timeout 100m %h/lebleg-translate/translate-en -data %h/lebleg-translate/repo/data -out article_en.jsonl -workers 2 -timeout 4m -model gemini-4-argon-low -agy %h/.local/bin/agy
+ExecStart=/usr/bin/flock -n %h/lebleg-translate/.lock /usr/bin/timeout 100m %h/lebleg-translate/translate-en -data %h/lebleg-translate/repo/data -out article_en.jsonl -workers 3 -timeout 4m -model gemini-4-argon-medium -agy %h/.local/bin/agy
 SuccessExitStatus=1 3 124
 StandardOutput=append:%h/lebleg-translate/run.log
 StandardError=append:%h/lebleg-translate/run.log
