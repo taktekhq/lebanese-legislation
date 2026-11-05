@@ -53,11 +53,11 @@
 {{end}}{{end}}
 
 {{/* The articles a paragraph rests on, as links. */}}
-{{define "topicrefs"}}{{if .Refs}}<p class="topic__refs tiny">{{range .Refs}}<a href="{{u .Path}}" class="topic__ref"><span>{{t "topic.art" .Number}}</span> <bdi lang="ar" dir="rtl">{{.Law}}</bdi></a>{{end}}</p>{{end}}{{end}}
+{{define "topicrefs"}}{{if .Refs}}<p class="topic__refs tiny">{{range .Refs}}<a href="{{u .Path}}" class="topic__ref"><span>{{if .Label}}{{.Label}}{{else}}{{t "topic.art" .Number}}{{end}}</span> <bdi lang="ar" dir="rtl">{{.Law}}</bdi></a>{{end}}</p>{{end}}{{end}}
 
 {{/* The words of articles, as they are printed. */}}
 {{define "topicquotes"}}{{range .}}
 <figure class="topic__quote">
   <blockquote lang="ar" dir="rtl">{{.Quote}}</blockquote>
-  <figcaption><a href="{{u .Path}}">{{t "topic.art" .Number}}</a> <bdi lang="ar" dir="rtl">{{.Law}}</bdi>{{if and .LawEn (ne (uilang) "ar")}} <span>({{.LawEn}})</span>{{end}}</figcaption>
+  <figcaption><a href="{{u .Path}}">{{if .Label}}{{.Label}}{{else}}{{t "topic.art" .Number}}{{end}}</a> <bdi lang="ar" dir="rtl">{{.Law}}</bdi>{{if and .LawEn (ne (uilang) "ar")}} <span>({{.LawEn}})</span>{{end}}</figcaption>
 </figure>{{end}}{{end}}

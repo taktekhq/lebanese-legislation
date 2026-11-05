@@ -323,6 +323,33 @@ mark.unsure { background: color-mix(in srgb, var(--accent) 22%, transparent); co
 .scanpages { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 16px; }
 .scanpages img { display: block; width: 100%; height: auto; border-radius: 8px; background: #fff; border: 1px solid var(--line); }
 .scancredit { margin-top: 14px; font-size: 0.875rem; color: var(--muted); }
+/* Tables annexed to a text, read from the Gazette's pages (annex.go): Arabic
+   rows right to left in both languages, wrapped so a 390 px screen scrolls the
+   table, never the page. A row a model decided, or a later text replaced,
+   carries a line saying so. */
+.annex__amounts { margin-top: 12px; font-size: 0.875rem; line-height: 1.7; color: var(--muted); max-width: 76ch; }
+.annex .tablewrap { margin-top: 20px; }
+.annex table.ref { min-width: 0; font-size: 0.9375rem; }
+.annex table.ref caption { text-align: start; padding: 14px clamp(12px, 2vw, 20px) 6px; color: var(--muted); font-size: 0.875rem; line-height: 1.6; }
+.annex table.ref caption b { color: var(--ink); font-weight: 600; }
+.annex table.ref th, .annex table.ref td { padding: 10px clamp(8px, 1.5vw, 16px); text-align: right; }
+.annex table.ref thead th { white-space: normal; font-size: 0.8125rem; }
+.annex table.ref tbody th, .annex td { font-family: var(--font-ar); }
+.annex .annex__n, .annex .annex__pts { text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.annex .annex__arts { white-space: nowrap; }
+.annex tbody tr { scroll-margin-top: 8px; }
+.annex tbody tr:target { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.annex tr.annex__decided > th { box-shadow: inset -3px 0 0 color-mix(in srgb, var(--accent) 70%, transparent); }
+.annex__mark { display: block; margin-top: 6px; font-family: var(--font); font-size: 0.8125rem; line-height: 1.6; color: var(--muted); text-align: start; }
+.annex__mark bdi { font-family: var(--font-ar); color: var(--ink); }
+@media (max-width: 480px) { .annex .annex__arts { white-space: normal; min-width: 3.5em; } }
+/* An article's wording as first published, folded under the text in force. */
+.art__original { margin-top: 14px; }
+.art__original summary { cursor: pointer; width: fit-content; font-family: var(--font); font-size: 0.8125rem; color: var(--muted); }
+.art__original summary:hover { color: var(--ink); }
+.art__original-body { margin-top: 10px; padding: 14px 16px; border-radius: 12px; background: var(--panel); border-inline-start: 3px solid var(--line); }
+.art__original-note { font-family: var(--font); font-size: 0.8125rem; line-height: 1.7; color: var(--muted); text-align: start; }
+.art__original-body .art__ar { margin-top: 10px; font-size: 1.0625rem; color: var(--ink); }
 /* texts published from official page scans: the page image beside the text read from it */
 .opage { margin: 36px 0; border-top: 1px solid var(--line, #ddd); padding-top: 14px; }
 .opage__n { font-size: 1rem; margin: 0 0 12px; opacity: .7; }

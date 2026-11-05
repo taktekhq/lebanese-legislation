@@ -267,8 +267,17 @@ func (s *Server) answerSources(ctx context.Context, q string, res Results) ([]an
 		if v, ok := cache[key]; ok {
 			return v
 		}
-		a, b, c, d, e := s.answerArticle(ctx, id, num)
-		v := articleBody{a, b, c, d, e}
+		var v articleBody
+		if _, ok := topics.ParseReading(num); ok { // a topic's cite of a Gazette reading (gazette_annex)
+			f, found, err := topics.DB{Pool: s.db}.Article(id, num)
+			if err == nil && !found {
+				err = errors.New("no such Gazette reading")
+			}
+			v = articleBody{ar: f.Text, err: err}
+		} else {
+			a, b, c, d, e := s.answerArticle(ctx, id, num)
+			v = articleBody{a, b, c, d, e}
+		}
 		cache[key] = v
 		return v
 	}

@@ -450,6 +450,7 @@ type Article struct {
 	Council     []CouncilRuling // the Constitutional Council's decisions on this article
 	En          string          // unofficial machine English of TextAr (article_en), "" when none
 	EnOn        *time.Time      // when it was translated
+	Original    *Original       // its wording as first published, read from the Gazette's pages (annex.go)
 }
 
 // English is the unofficial translation to show, "" when there is none or
@@ -558,6 +559,8 @@ type Law struct {
 	TitleEn          *string // unofficial English title of the subject line (db/titles_en.tsv)
 	Answer           string  // the answer line at the top of the page, from record fields only
 	Scan             *Scan   // set when the text was read from Gazette scans
+	Annex            *Annex  // the tables annexed to it, read from the Gazette's pages (annex.go)
+	AnnexPart        string  // the part they are on, when it is another part of a long text
 	DateFixes        []DateFix
 	Council          []CouncilDecision // the Constitutional Council's decisions on it, newest first
 	Part             int               // the part shown, when the text is cut into parts (lawparts.go)
@@ -721,6 +724,7 @@ func (s *Server) loadLawWith(ctx context.Context, id int, withText, rulings bool
 		}
 		rows.Close()
 	}
+	s.attachGazette(ctx, l)
 	// An older database has no council_ruling: the page shows without it.
 	if rows, err := s.db.Query(ctx, `SELECT number, effect, decision, decided_on, source_url, note_en, note_ar
 		FROM council_ruling WHERE law_id = $1 ORDER BY decided_on, decision, number = '' DESC, number`, id); err == nil {

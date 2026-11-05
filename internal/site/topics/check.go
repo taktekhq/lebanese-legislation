@@ -64,6 +64,9 @@ func Structure(t *Topic) []string {
 		if c.Law <= 0 || strings.TrimSpace(c.Article) == "" {
 			add("cite %s has no law or article", c.ID)
 		}
+		if _, ok := ParseReading(c.Article); isReadingLike(c.Article) && !ok {
+			add("cite %s: %q is neither annex-<category>-<serial> nor original-<number>", c.ID, c.Article)
+		}
 		if utf8.RuneCountInString(strings.TrimSpace(c.Quote)) < 8 {
 			add("cite %s: quote is empty or too short", c.ID)
 		}
