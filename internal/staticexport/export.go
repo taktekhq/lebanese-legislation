@@ -470,11 +470,21 @@ func (ex *exporter) get(p string) *httptest.ResponseRecorder {
 	return rec
 }
 
+// retryWaits are the pauses before each new try of a page that answered 5xx.
+var retryWaits = []time.Duration{time.Second, 4 * time.Second}
+
 // page renders one path and records it.
 func (ex *exporter) page(p string) error {
 	rec := ex.get(p)
-	if rec.Code >= 500 { // one retry: a pool timeout under load is not a page's fault
-		time.Sleep(200 * time.Millisecond)
+	// A 5xx under load is rarely the page's fault: a pool timeout, or PostgreSQL
+	// on the db image's overlay layer failing to open a table file mid copy-up
+	// ("could not open file base/...: Interrupted system call", 4 Nov, twice
+	// in a row 200 ms apart). Wait long enough for the copy to finish.
+	for _, wait := range retryWaits {
+		if rec.Code < 500 {
+			break
+		}
+		time.Sleep(wait)
 		rec = ex.get(p)
 	}
 	e := Entry{Path: p, Status: rec.Code, Type: rec.Header().Get("Content-Type"), Cache: rec.Header().Get("Cache-Control")}

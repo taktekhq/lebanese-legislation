@@ -410,3 +410,32 @@ func TestShardsPartitionCrossOwnerCrawl(t *testing.T) {
 		}
 	}
 }
+
+// A page that fails twice and then renders is exported; one that keeps failing
+// counts as an error after every try.
+func TestFlakyPageIsRetried(t *testing.T) {
+	saved := retryWaits
+	retryWaits = []time.Duration{time.Millisecond, time.Millisecond}
+	t.Cleanup(func() { retryWaits = saved })
+	var mu sync.Mutex
+	tries := map[string]int{}
+	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		tries[r.URL.Path]++
+		n := tries[r.URL.Path]
+		mu.Unlock()
+		if r.URL.Path == "/broken/" || n <= 2 {
+			http.Error(w, "could not open file", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		fmt.Fprint(w, "<html><body>ok</body></html>")
+	})
+	st, _ := run(t, h, Options{Paths: []string{"/flaky/", "/broken/"}})
+	if st.Pages != 1 || st.Errors != 1 {
+		t.Fatalf("pages %d errors %d, want 1 and 1: %v", st.Pages, st.Errors, st.FirstErrs)
+	}
+	if tries["/flaky/"] != 3 || tries["/broken/"] != 3 {
+		t.Fatalf("tries %v, want 3 each", tries)
+	}
+}
