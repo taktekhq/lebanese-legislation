@@ -100,12 +100,12 @@ configs:
 </p>
 
 <p align="center">
-  <a href="https://lebaneselegislation.com/laws/"><img src="https://lebaneselegislation.com/badge/legislation.svg?src=hf" alt="Legislation" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
-  <a href="https://lebaneselegislation.com/laws/"><img src="https://lebaneselegislation.com/badge/articles.svg" alt="Articles" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
-  <a href="https://lebaneselegislation.com/rulings/"><img src="https://lebaneselegislation.com/badge/rulings.svg" alt="Court rulings" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
-  <a href="https://huggingface.co/datasets/taktekhq/lebanese-legislation/commits/main"><img src="https://lebaneselegislation.com/badge/updated.svg" alt="Data last updated" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
-  <a href="https://lebaneselegislation.com/ai/"><img src="https://lebaneselegislation.com/badge/mcp.svg" alt="MCP server" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
-  <a href="https://github.com/taktekhq/lebanese-legislation"><img src="https://img.shields.io/github/stars/taktekhq/lebanese-legislation?style=flat&logo=github&label=code" alt="Code on GitHub" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
+  <a style="display: inline-block;" href="https://lebaneselegislation.com/laws/"><img src="https://lebaneselegislation.com/badge/legislation.svg?src=hf" alt="Legislation" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
+  <a style="display: inline-block;" href="https://lebaneselegislation.com/laws/"><img src="https://lebaneselegislation.com/badge/articles.svg" alt="Articles" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
+  <a style="display: inline-block;" href="https://lebaneselegislation.com/rulings/"><img src="https://lebaneselegislation.com/badge/rulings.svg" alt="Court rulings" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
+  <a style="display: inline-block;" href="https://huggingface.co/datasets/taktekhq/lebanese-legislation/commits/main"><img src="https://lebaneselegislation.com/badge/updated.svg" alt="Data last updated" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
+  <a style="display: inline-block;" href="https://lebaneselegislation.com/ai/"><img src="https://lebaneselegislation.com/badge/mcp.svg" alt="MCP server" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
+  <a style="display: inline-block;" href="https://github.com/taktekhq/lebanese-legislation"><img src="https://img.shields.io/github/stars/taktekhq/lebanese-legislation?style=flat&logo=github&label=code" alt="Code on GitHub" style="display: inline-block; vertical-align: middle; margin: 2px;"></a>
 </p>
 
 <p align="center">
