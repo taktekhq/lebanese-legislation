@@ -243,6 +243,15 @@ jobs:
           path: site/.export
           include-hidden-files: true
           if-no-files-found: error
+      # A failed shard keeps the site's log (errors and slow pages). Not named
+      # export-*, so the indexnow job's download skips it.
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: serverlog-${{ matrix.shard }}-attempt-${{ github.run_attempt }}
+          path: site/.export/server.log
+          include-hidden-files: true
+          if-no-files-found: ignore
 
 
   render-small:
@@ -308,6 +317,13 @@ jobs:
           path: exports
           include-hidden-files: true
           if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: serverlog-small-attempt-${{ github.run_attempt }}
+          path: site/*/.export/server.log
+          include-hidden-files: true
+          if-no-files-found: ignore
 
   generation:
     # Commit the baseline last, after every shard and cache generation succeed.

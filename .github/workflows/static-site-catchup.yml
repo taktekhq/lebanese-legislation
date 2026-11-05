@@ -69,9 +69,16 @@ jobs:
             data=$(git log -1 --format=%H "$head" -- data/)
           fi
           if [ -n "$data" ]; then
+            # Passed means the data workflow's build job (its checks) succeeded on
+            # this commit or a later one. Its image jobs can be cancelled by a
+            # newer push building the same image (4 Nov: #146's data run ended
+            # "cancelled" in image-all and this check waited for good).
             checked=false
-            for sha in $(gh run list -w data.yml -b main -s success -L 30 --json headSha --jq '.[].headSha'); do
-              if git merge-base --is-ancestor "$data" "$sha" 2>/dev/null; then checked=true; break; fi
+            for run in $(gh run list -w data.yml -b main -L 30 --json databaseId,headSha,status \
+                --jq '.[] | select(.status == "completed") | "\(.databaseId):\(.headSha)"'); do
+              git merge-base --is-ancestor "$data" "${run#*:}" 2>/dev/null || continue
+              build=$(gh run view "${run%%:*}" --json jobs --jq '[.jobs[] | select(.name == "build") | .conclusion][0]')
+              if [ "$build" = success ]; then checked=true; break; fi
             done
             if [ "$checked" = false ]; then
               say "Data commit $data has not passed the data workflow yet; waiting."
