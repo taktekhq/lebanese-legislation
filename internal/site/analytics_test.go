@@ -69,6 +69,12 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 	if !strings.Contains(ph, "window.posthog||[]") {
 		t.Error("ph.js must end PostHog's snippet with window.posthog||[]")
 	}
+	// A paid editor's sessions are all recorded and identified (5 Nov 2026).
+	for _, want := range []string{`localStorage.getItem("lebleg_editor")`, `posthog.identify("editor:" + editor`, `posthog.startSessionRecording(true)`} {
+		if !strings.Contains(ph, want) {
+			t.Errorf("ph.js must contain %s", want)
+		}
+	}
 
 	load := get("/assets/load.js")
 	if !strings.Contains(load, "https://www.googletagmanager.com/gtag/js?id=G-RDYRK422NP") || !strings.Contains(load, "data-ph") {
