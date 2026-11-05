@@ -67,7 +67,7 @@ The server itself is [`web/`](../web/README.md) (with `api/` and `mcp/`); these 
 | [`vectorize-sync`](vectorize-sync/) | Upserts changed vectors and deletes removed IDs in Cloudflare Vectorize, using an id/hash manifest. **key**: `LEBLEG_VECTORIZE_TOKEN`. |
 | `searchindex` | Builds the semantic search index in its own pgvector database (`GEMINI_API_KEY`). **key** |
 | `topicgen` | Writes and checks the topic pages with a model that sees only the cited articles (claude, codex or agy CLI). **key** |
-| `translate-en` | Writes the unofficial English of the popular texts' articles to `data/article_en.jsonl` through Gemini in agy; resumable, stops on the agy quota. `data/load.sh` loads it where the Arabic is unchanged. |
+| `translate-en` | Writes the unofficial English of the popular texts' articles to `data/article_en.jsonl` through Gemini in agy; resumable, stops on the agy quota. `data/load.sh` loads it where the Arabic is unchanged. Runs in slices from [docs/systemd/lebleg-translate.timer](../docs/systemd/lebleg-translate.timer) until every article is done. |
 | `check-english` | Checks that English stays an unofficial aid: flagged surfaces, English titles for new texts, no Latin article bodies. |
 
 ## Hosted builds
