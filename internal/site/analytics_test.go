@@ -69,8 +69,9 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 	if !strings.Contains(ph, "window.posthog||[]") {
 		t.Error("ph.js must end PostHog's snippet with window.posthog||[]")
 	}
-	// A paid editor's sessions are all recorded and identified (5 Nov 2026).
-	for _, want := range []string{`localStorage.getItem("lebleg_editor")`, `posthog.identify("editor:" + editor`, `posthog.startSessionRecording(true)`} {
+	// A paid editor's sessions are all recorded and identified; long pages are
+	// not recorded for anyone else (5 Nov 2026).
+	for _, want := range []string{`localStorage.getItem("lebleg_editor")`, `posthog.identify("editor:" + editor`, `posthog.startSessionRecording(true)`, `disable_session_recording: long && !editor`} {
 		if !strings.Contains(ph, want) {
 			t.Errorf("ph.js must contain %s", want)
 		}
