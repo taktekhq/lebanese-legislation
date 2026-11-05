@@ -52,8 +52,8 @@ func main() {
 	model := flag.String("model", "gemini-4-argon-high", "agy model")
 	bin := flag.String("agy", "agy", "agy binary")
 	workers := flag.Int("workers", 2, "agy calls at a time")
-	batchChars := flag.Int("batch-chars", 6000, "Arabic characters per call, about")
-	maxBatch := flag.Int("max-batch", 25, "articles per call at most")
+	batchChars := flag.Int("batch-chars", 2000, "Arabic characters per call, about")
+	maxBatch := flag.Int("max-batch", 8, "articles per call at most")
 	limit := flag.Int("limit", 0, "translate at most this many articles (0: all)")
 	ids := flag.String("ids", "", "comma-separated text ids instead of data/popular_texts.txt")
 	timeout := flag.Duration("timeout", 4*time.Minute, "per agy call; a call usually takes under a minute, and a stalled one is retried")
@@ -110,14 +110,27 @@ func main() {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for b := range jobs {
+			// run translates a batch; a batch that fails (not on quota) is
+			// split in two and each half tried again, down to one article.
+			// 5 Nov 2026: batches of 25 articles (6,000 characters) stalled
+			// past the timeout every time while 8 short ones took a minute,
+			// and the failed batches came first in every new run.
+			var run func(b []article)
+			run = func(b []article) {
 				if ctx.Err() != nil {
-					continue
+					return
 				}
 				lines, err := translate(ctx, agy, titles[b[0].Law], b)
+				if err != nil && !quota(err) && len(lines) == 0 && len(b) > 1 {
+					fmt.Fprintf(os.Stderr, "translate-en: text %d from position %d: %v; splitting the %d articles\n", b[0].Law, b[0].Position, err, len(b))
+					run(b[:len(b)/2])
+					run(b[len(b)/2:])
+					return
+				}
 				mu.Lock()
+				defer mu.Unlock()
 				if err != nil {
-					nFail += len(b)
+					nFail += len(b) - len(lines)
 					fmt.Fprintf(os.Stderr, "translate-en: text %d from position %d: %v\n", b[0].Law, b[0].Position, err)
 					if quota(err) && stopErr == nil {
 						stopErr = err
@@ -131,7 +144,9 @@ func main() {
 					nDone++
 				}
 				fmt.Fprintf(os.Stderr, "translate-en: %d done, %d failed, %s\n", nDone, nFail, time.Since(start).Round(time.Second))
-				mu.Unlock()
+			}
+			for b := range jobs {
+				run(b)
 			}
 		}()
 	}

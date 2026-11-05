@@ -2,7 +2,9 @@
 Description=Translate LebLeg popular texts into English, a slice every 2 hours, until done
 
 [Timer]
-OnCalendar=*-*-* 00/2:15:00
+# Every 2 hours, but not 06:00 to 10:00: the nightly judge (06:40) uses
+# gemini-4-argon-medium too and should have its quota.
+OnCalendar=*-*-* 00,02,04,10,12,14,16,18,20,22:15:00
 Persistent=true
 
 [Install]
