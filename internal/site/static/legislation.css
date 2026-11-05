@@ -27,6 +27,13 @@
 .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
 .status--repealed::before { background: var(--off); }
 .status--repealed { color: var(--off); }
+.editor-badge {
+  position: fixed; z-index: 50; margin: 0;
+  inset-block-end: calc(12px + env(safe-area-inset-bottom));
+  inset-inline-start: 12px;
+  max-width: calc(100vw - 24px); overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.15);
+}
 
 .kicker { font-size: 0.8125rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
 .kicker b { color: var(--ink); font-weight: 500; }
