@@ -65,3 +65,33 @@ func TestFooterReportForm(t *testing.T) {
 		}
 	}
 }
+
+// The page has its own share image per language, named before the
+// site-wide og.png: link previews take the first og:image.
+func TestContributeShareImage(t *testing.T) {
+	s, err := New(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for path, lang := range map[string]string{"/contribute/": "ar", "/en/contribute/": "en"} {
+		rec := httptest.NewRecorder()
+		s.ServeHTTP(rec, httptest.NewRequest("GET", path, nil))
+		body := rec.Body.String()
+		own := `<meta property="og:image" content="` + Base + `/assets/og-contribute-` + lang + `.png">`
+		i, j := strings.Index(body, own), strings.Index(body, `<meta property="og:image" content="`+Base+`/assets/og.png">`)
+		if i < 0 || j < 0 || i > j {
+			t.Errorf("%s: own og:image at %d, site-wide at %d; want own first", path, i, j)
+		}
+		if !strings.Contains(body, `<meta name="twitter:image" content="`+Base+`/assets/og-contribute-`+lang+`.png">`) {
+			t.Errorf("%s: no twitter:image", path)
+		}
+		if strings.Contains(body, `og:image:alt" content="">`) {
+			t.Errorf("%s: empty image alt", path)
+		}
+		img := httptest.NewRecorder()
+		s.ServeHTTP(img, httptest.NewRequest("GET", "/assets/og-contribute-"+lang+".png", nil))
+		if img.Code != 200 || !strings.HasPrefix(img.Body.String(), "\x89PNG") {
+			t.Errorf("%s: image answers %d", path, img.Code)
+		}
+	}
+}

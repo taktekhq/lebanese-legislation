@@ -226,6 +226,11 @@ type Page struct {
 	Data          any
 	Lang          string // the main content's language ("ar" for a text's pages); "en" when empty
 
+	// OGImage is the page's own 1200x630 share image, a path under /assets/,
+	// with OGImageAlt its description; the site-wide og.png when empty.
+	OGImage    string
+	OGImageAlt string
+
 	// Translated says an Arabic-content page also has real English content (a
 	// principal code's summary, a topic page): it stays self-canonical in both
 	// languages with an hreflang pair. Any other page with Lang "ar" is the

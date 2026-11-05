@@ -646,6 +646,7 @@
   "contribute.title": "Contribute",
   "contribute.desc": "Improve search and code, review public scans, or build with Lebanese legal datasets.",
   "contribute.lead": "Four ways to help make Lebanese legal texts easier to find and use.",
+  "contribute.og_alt": "Help make Lebanese law easier to find and use: $10 a week for students accepted into our program, search and code, public scans, open data.",
   "contribute.code_h2": "Improve search and code",
   "contribute.code_p": "Report a search that missed its text, fix a bug, or improve the website, API or MCP server. Include the query, source link and expected result.",
   "contribute.code_link": "Open the code repository",

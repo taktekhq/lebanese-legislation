@@ -9,8 +9,16 @@
 {{define "page:desc"}}{{.Desc}}{{end}}
 {{define "page:canon"}}{{absURL .Canon}}{{end}}
 {{/* page:hreflang is the page's own slot in the head, so it also carries the
-     googlebot meta: a new slot would change the frame and rewrite every page. */}}
+     googlebot meta and a page's own share image: a new slot would change the
+     frame and rewrite every page. The image comes before the frame's og.png,
+     and link previews take the first og:image. */}}
 {{define "page:hreflang"}}{{if and .GoogleNoIndex (not .NoIndex)}}<meta name="googlebot" content="noindex, follow">
+{{end}}{{if .OGImage}}<meta property="og:image" content="{{absURL .OGImage}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{.OGImageAlt}}">
+<meta name="twitter:image" content="{{absURL .OGImage}}">
+<meta name="twitter:image:alt" content="{{.OGImageAlt}}">
 {{end}}{{if .Hreflang}}<link rel="alternate" hreflang="en" href="{{enURL .Path}}">
 <link rel="alternate" hreflang="ar" href="{{arURL .Path}}">
 <link rel="alternate" hreflang="x-default" href="{{arURL .Path}}">
