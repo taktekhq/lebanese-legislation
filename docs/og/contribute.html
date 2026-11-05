@@ -1,0 +1,86 @@
+<!doctype html>
+<!-- Source of the /contribute/ share images, static/assets/og-contribute-{en,ar}.png.
+     Render both with: node scripts/og-image.cjs (1200x630, ?lang=en or ?lang=ar). -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+@font-face{font-family:Inter;font-weight:300 700;src:url(../../internal/site/static/assets/fonts/inter-latin.woff2) format('woff2')}
+@font-face{font-family:Mono;font-weight:700;src:url(../../internal/site/static/assets/fonts/jetbrains-mono-700-latin.woff2) format('woff2')}
+@font-face{font-family:Plex;font-weight:400;src:url(../../internal/site/static/assets/fonts/plex-arabic-400-arabic.woff2) format('woff2')}
+@font-face{font-family:Plex;font-weight:500;src:url(../../internal/site/static/assets/fonts/plex-arabic-500-arabic.woff2) format('woff2')}
+@font-face{font-family:Plex;font-weight:600;src:url(../../internal/site/static/assets/fonts/plex-arabic-600-arabic.woff2) format('woff2')}
+:root{--blue:#2B5C97;--ink:#111;--mut:#6e6e73;--chip:#f2f2f4;--line:#e3e3e8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1200px;height:630px;overflow:hidden;background:#fff;color:var(--ink)}
+body{font-family:Inter,Plex,sans-serif;position:relative;padding:64px 72px 0}
+[lang=ar] body,body[dir=rtl]{font-family:Plex,Inter,sans-serif}
+.top{display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:20px}
+.brand svg{width:76px;height:76px;flex:none}
+.name{font-size:29px;line-height:1.15;letter-spacing:-.01em}
+.name b{font-weight:700}
+.name span{color:var(--mut);font-weight:400}
+.by{font-size:19px;color:var(--mut);margin-top:3px}
+.by code{font-family:Mono;color:var(--blue);font-size:19px}
+.tag{font-size:22px;font-weight:600;color:var(--blue);border:2px solid var(--blue);border-radius:999px;padding:7px 22px}
+h1{font-size:74px;line-height:1.04;letter-spacing:-.035em;font-weight:700;margin-top:52px}
+h1 em{font-style:normal;color:var(--blue)}
+[dir=rtl] h1{font-size:68px;line-height:1.3;letter-spacing:0;font-weight:600;margin-top:40px}
+.ways{position:absolute;inset-inline:72px;bottom:58px;display:grid;grid-template-columns:1.22fr 1fr 1fr 1fr;gap:14px}
+.way{border:2px solid var(--line);border-radius:18px;padding:18px 20px 19px;min-height:118px}
+.way b{display:block;font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.way span{display:block;font-size:17px;color:var(--mut);margin-top:9px;line-height:1.3}
+[dir=rtl] .way b{font-size:29px;font-weight:600;letter-spacing:0;line-height:1.3}
+[dir=rtl] .way span{font-size:19px;margin-top:5px}
+.way.pay{background:var(--blue);border-color:var(--blue);color:#fff}
+.way.pay span{color:#dbe6f3}
+.bar{position:absolute;left:0;right:0;bottom:0;height:10px;background:var(--blue)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#2B5C97"/><circle cx="32" cy="32" r="19" fill="none" stroke="#fff" stroke-width="3"/><path d="M27.5 22V41H38" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="square"/></svg>
+    <div>
+      <div class="name" data-l="name"></div>
+      <div class="by"><span data-l="by"></span> <code>taktek</code></div>
+    </div>
+  </div>
+  <div class="tag" data-l="tag"></div>
+</header>
+<h1 data-l="h1"></h1>
+<section class="ways">
+  <div class="way pay"><b data-l="w1"></b><span data-l="w1s"></span></div>
+  <div class="way"><b data-l="w2"></b><span data-l="w2s"></span></div>
+  <div class="way"><b data-l="w3"></b><span data-l="w3s"></span></div>
+  <div class="way"><b data-l="w4"></b><span data-l="w4s"></span></div>
+</section>
+<div class="bar"></div>
+<script>
+// Copy follows the page's own strings (internal/site/i18n, contribute.*).
+const copy = {
+  en: {
+    name: '<span>Lebanese</span> <b>Legislation</b>', by: 'by', tag: 'Contribute',
+    h1: 'Help make Lebanese law<br><em>easier to find and use.</em>',
+    w1: '$10 per week', w1s: 'Through the student program',
+    w2: 'Search & code', w2s: 'Report misses, fix bugs',
+    w3: 'Public scans', w3s: 'Transcribe and review',
+    w4: 'Open data', w4s: 'Build with the datasets',
+  },
+  ar: {
+    name: '<b>التشريعات اللبنانية</b>', by: 'من', tag: 'ساهم',
+    h1: 'ساعد في جعل القانون اللبناني<br><em>أسهل في الإيجاد والاستخدام.</em>',
+    w1: '10 دولارات في الأسبوع', w1s: 'عبر برنامج الطلاب',
+    w2: 'البحث والشيفرة', w2s: 'أبلغ عن نقص أو أصلح خطأ',
+    w3: 'الصور المنشورة', w3s: 'انسخها وراجع القراءات',
+    w4: 'البيانات المفتوحة', w4s: 'ابنِ بمجموعات البيانات',
+  },
+};
+const lang = new URLSearchParams(location.search).get('lang') === 'ar' ? 'ar' : 'en';
+document.documentElement.lang = lang;
+document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+for (const el of document.querySelectorAll('[data-l]')) el.innerHTML = copy[lang][el.dataset.l];
+</script>
+</body>
+</html>
