@@ -1,0 +1,9 @@
+[Unit]
+Description=Translate LebLeg popular texts into English, a slice every 2 hours, until done
+
+[Timer]
+OnCalendar=*-*-* 00/2:15:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
