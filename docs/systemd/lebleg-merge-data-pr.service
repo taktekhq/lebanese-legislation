@@ -1,0 +1,14 @@
+[Unit]
+Description=Review the nightly Lebanese Legislation data PR and merge it when it passes
+# Started by lebleg-nightly.service when it succeeds (OnSuccess= there).
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/src/lebanese-legislation
+EnvironmentFile=%h/.config/lebleg/nightly.env
+# Waits up to 3 hours for the PR's checks, then reviews the data and merges.
+ExecStart=/usr/bin/env go run ./cmd/merge-data-pr -dir .
+TimeoutStartSec=4h
+UMask=0077

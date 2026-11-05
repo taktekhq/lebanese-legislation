@@ -302,6 +302,23 @@ exit {rc}
         self.assertNotIn("gh pr close", self.calls())
         self.assertEqual(self.git("ls-remote", "--heads", "origin", self.branch), "")
 
+    def test_unmerged_branch_answers_are_carried(self):
+        model = self.repo / "db/model/judgements.jsonl"
+        self.git("checkout", "-q", "-b", self.branch)
+        model.write_text('{"key":"a","v":"branch"}\n{"key":"b","v":"branch"}\n')
+        self.git("commit", "-qam", "an unmerged night")
+        self.git("push", "-q", "origin", self.branch)
+        self.git("checkout", "-q", "main")
+        model.write_text('{"key":"a","v":"main"}\n')
+        self.git("commit", "-qam", "reviewed answer on main")
+        self.git("push", "-q", "origin", "main")
+        result = self.nightly("--dry-run")
+        self.assertEqual(result.returncode, 0, result.stdout)
+        # Main's answer stays; the branch adds only the key main lacks.
+        self.assertEqual(self.git("show", f"{self.branch}:db/model/judgements.jsonl"),
+                         '{"key":"a","v":"main"}\n{"key":"b","v":"branch"}\n')
+        self.assertEqual(model.read_text(), '{"key":"a","v":"main"}\n')
+
     def open_pr(self, number):
         """gh answers that the data branch already has an open PR."""
         executable(self.mocks / "gh", f'''#!/bin/bash

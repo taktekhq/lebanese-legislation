@@ -146,10 +146,44 @@ Before merging the first data PR:
 - Check that the data PR passes the repository checks. Maintainers merge it;
   publishing happens through the workflows after merge.
 
+## Review and merge the data PR automatically
+
+[`cmd/merge-data-pr`](../cmd/merge-data-pr/main.go) does that review and merges
+the PR when it passes. It needs `GH_TOKEN` (a token that can merge) and a clone
+with the remote `origin`:
+
+```bash
+go run ./cmd/merge-data-pr -dir .                       # wait for the checks, review, merge
+go run ./cmd/merge-data-pr -dry-run                     # review only
+go run ./cmd/merge-data-pr -review main..data/nightly   # review two commits, no GitHub
+```
+
+It merges only when every rule holds, at the exact commit it reviewed:
+
+| Rule | Default |
+| --- | --- |
+| The PR changes only `data/` and `db/model/` | |
+| Every check finished without failing; `build` and `ci-ok` succeeded (`-require`) | waits up to 3 h (`-wait`) |
+| No table in `data/stats.json` loses more than a share of its rows | 1% (`-max-drop`), and 50 rows are always allowed (`-min-drop`) |
+| Laws, and rulings, that disappear | at most 25 each (`-max-removed`) |
+| Page last-changed dates that move | at most 5% (`-max-dates`) |
+
+The limits catch a source outage or a partial store that drops laws, and a
+rebuild that resets every page's date. A PR that fails gets a comment with the
+reasons and stays open; the command exits 1 and runs `-notify` with the reasons
+on its input. A passing PR gets a comment with the row changes, then is merged.
+[systemd/lebleg-merge-data-pr.service](systemd/lebleg-merge-data-pr.service)
+runs it when the nightly succeeds (`OnSuccess=` in the nightly service).
+
+Model answers on the data branch of a PR that is not merged yet are carried
+into the next night's build, adding only keys main lacks, so the same question
+is not asked, and paid for, twice.
+
 ## Nightly user timer
 
 Examples are in [systemd/lebleg-nightly.service](systemd/lebleg-nightly.service),
-[systemd/lebleg-nightly.timer](systemd/lebleg-nightly.timer) and
+[systemd/lebleg-nightly.timer](systemd/lebleg-nightly.timer),
+[systemd/lebleg-merge-data-pr.service](systemd/lebleg-merge-data-pr.service) and
 [systemd/lebleg-nightly.env.example](systemd/lebleg-nightly.env.example).
 Edit the service checkout path and environment file for your machine. Copy the
 units to `~/.config/systemd/user/`, save the environment file as
