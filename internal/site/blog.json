@@ -1,5 +1,85 @@
 [
   {
+    "Slug": "nightly-runs-again-one-pr",
+    "Milestone": "2026-11-04",
+    "Published": "2026-11-05",
+    "Commit": "7ed9b12",
+    "EvidenceKind": "public-commit",
+    "Title": "The nightly update runs again, as one pull request",
+    "TitleAr": "التحديث الليلي يعمل من جديد، في طلب دمج واحد",
+    "Summary": "The data had not been updated since 2 November. The update runs again every night at 06:40 Beirut time and keeps one pull request up to date until it is merged. Its first run removed two decrees the Lebanese University no longer publishes.",
+    "SummaryAr": "لم تُحدَّث البيانات منذ 2 تشرين الثاني. أما الآن فيعمل التحديث من جديد كل ليلة عند الساعة 06:40 بتوقيت بيروت، ويُبقي طلب دمج واحداً محدَّثاً إلى أن يُدمج. وقد أزال تشغيله الأول مرسومين لم تعد الجامعة اللبنانية تنشرهما.",
+    "Sections": [
+      {
+        "Heading": "One pull request, updated every night.",
+        "Body": "Each run rebuilds the same branch, data/nightly, from the main branch and replaces it, so the open pull request always holds the newest night. When a night's data equals what is already published, the run closes the pull request. Before, every night opened its own pull request, and unmerged nights piled up."
+      },
+      {
+        "Heading": "What the first run changed.",
+        "Body": "The first run, on 4 November, changed 50 data files. It marked 102,808 machine-English pages of rarely read texts as not for search engines and replaced 27 links between texts with 25, following Centre pages that changed between 2 and 4 November. It removed two extradition decrees, 180938 and 186684: since 2 November the Centre has served empty pages for them while its other pages load normally, so we follow the source."
+      },
+      {
+        "Heading": "Cloudflare deletes 100 at a time.",
+        "Body": "Search by meaning keeps one vector per passage in Cloudflare Vectorize. After the first run, the sync had to delete 266 vectors, including the removed decrees' passages, and Cloudflare refused: it takes at most 100 ids per delete request, a limit its documentation does not list. Deletes now go 100 at a time. The index holds 1,547,867 vectors, one for every current passage."
+      },
+      {
+        "Heading": "Deploys that recover on their own.",
+        "Body": "Twice, one ruling page failed with a database error during a full render and stopped it. A page that fails is now tried again after 1 and 4 seconds. A failed deploy is rerun in full, because the 24 parallel jobs of a full render coordinate with each other and one cannot be rerun alone. And a journal entry like this one now renders only the journal's pages and the sitemaps that list them."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "طلب دمج واحد يُحدَّث كل ليلة.",
+        "Body": "يعيد كل تشغيل بناء الفرع نفسه، data/nightly، انطلاقاً من الفرع الرئيسي ويستبدله، فيحمل طلب الدمج المفتوح دائماً أحدث ليلة. وإذا تطابقت بيانات ليلة ما مع المنشور أصلاً، أغلق التشغيل طلب الدمج. في السابق كانت كل ليلة تفتح طلب دمج خاصاً بها، فتتراكم الليالي غير المدموجة."
+      },
+      {
+        "Heading": "ما غيّره التشغيل الأول.",
+        "Body": "غيّر التشغيل الأول، في 4 تشرين الثاني، 50 ملف بيانات. فوسم 102,808 صفحات إنكليزية آلية لنصوص قليلة القراءة بأنها ليست لمحركات البحث، واستبدل بـ27 رابطاً بين النصوص 25 رابطاً تبعاً لصفحات في موقع المركز تغيّرت بين 2 و4 تشرين الثاني. وأزال مرسومَي تسليم، 180938 و186684: فمنذ 2 تشرين الثاني يعرض المركز صفحتين فارغتين لهما بينما تعمل صفحاته الأخرى كالمعتاد، فنتبع المصدر."
+      },
+      {
+        "Heading": "يحذف Cloudflare مئة في كل مرة.",
+        "Body": "يحفظ البحث بالمعنى متجهاً لكل مقطع في Cloudflare Vectorize. بعد التشغيل الأول كان على المزامنة أن تحذف 266 متجهاً، منها مقاطع المرسومين المحذوفين، فرفض Cloudflare: فهو لا يقبل أكثر من 100 معرّف في طلب الحذف الواحد، وهو حدّ لا تذكره وثائقه. صار الحذف يجري 100 في كل مرة. ويضم الفهرس 1,547,867 متجهاً، واحداً لكل مقطع حالي."
+      },
+      {
+        "Heading": "عمليات نشر تتعافى وحدها.",
+        "Body": "مرتين، فشلت صفحة حكم واحدة بخطأ في قاعدة البيانات أثناء بناء كامل فأوقفته. صارت الصفحة التي تفشل تُجرَّب من جديد بعد ثانية ثم بعد 4 ثوانٍ. ويُعاد تشغيل النشر الفاشل كاملاً، لأن المهام الـ24 المتوازية في البناء الكامل تنسّق في ما بينها ولا يمكن إعادة تشغيل واحدة منها وحدها. وصار مدخل في السجل مثل هذا لا يعيد بناء إلا صفحات السجل وخرائط الموقع التي تذكرها."
+      }
+    ],
+    "Action": "Run it yourself",
+    "ActionPath": "/run-it-yourself/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/138",
+        "Label": "One standing data pull request",
+        "LabelAr": "طلب دمج واحد للبيانات"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/141",
+        "Label": "The first data pull request after the pause",
+        "LabelAr": "أول طلب دمج للبيانات بعد التوقف"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/148",
+        "Label": "Vectorize deletes, 100 ids at a time",
+        "LabelAr": "حذف المتجهات 100 معرّف في كل مرة"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/149",
+        "Label": "Retries for a failing page",
+        "LabelAr": "إعادة المحاولة لصفحة تفشل"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/137",
+        "Label": "Journal edits render only the journal",
+        "LabelAr": "تعديلات السجل لا تعيد بناء إلا السجل"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/update-data.md",
+    "ResourceLabel": "How to update the data",
+    "ResourceLabelAr": "كيف تحدّث البيانات",
+    "Updated": "2026-11-05"
+  },
+  {
     "Slug": "ai-crawlers-read-everything",
     "Milestone": "2026-11-04",
     "Published": "2026-11-04",
