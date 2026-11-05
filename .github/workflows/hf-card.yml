@@ -10,6 +10,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: hf-card
   cancel-in-progress: false
@@ -38,6 +39,11 @@ jobs:
         if: steps.token.outputs.ok == 'true'
         with:
           sparse-checkout: .github
+      - name: Let a data publish of this commit carry the card
+        if: steps.token.outputs.ok == 'true' && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/hf-wait-for-data.sh
       - name: Upload the card files
         if: steps.token.outputs.ok == 'true'
         run: |

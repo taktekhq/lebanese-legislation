@@ -102,7 +102,11 @@ jobs:
     # HF_TOKEN lives only in this environment, which deploys from main only. The
     # token is scoped on Hugging Face to write on this one dataset.
     environment: huggingface
-    timeout-minutes: 30
+    # actions: read, to find this commit's vectors run and take its artifact.
+    permissions:
+      contents: read
+      actions: read
+    timeout-minutes: 60
     env:
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
       HF_REPO: taktekhq/lebanese-legislation
@@ -123,6 +127,39 @@ jobs:
         with:
           name: parquet
           path: ${{ runner.temp }}/out/data
+      - name: Wait for this commit's vectors
+        # One Hugging Face commit per publish: every commit restarts the dataset
+        # viewer for about 33 minutes. A data push also runs vectors.yml, whose
+        # publish waits for this job (.github/scripts/hf-wait-for-data.sh), so
+        # this upload carries its vectors: wait for its Vectorize sync (about 16
+        # minutes after the push) and take its vectors-parquet artifact.
+        id: vectors
+        if: steps.token.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for _ in $(seq 60); do
+            run=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/vectors.yml/runs?head_sha=$GITHUB_SHA&event=push" --jq '.workflow_runs[0].id // empty')
+            if [ -n "$run" ]; then
+              state=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/jobs" --jq '[.jobs[] | select(.name == "vectorize")][0] | (.status // "") + " " + (.conclusion // "")')
+              case "$state" in
+                "completed success") echo "run=$run" >> "$GITHUB_OUTPUT"; exit 0 ;;
+                completed*) echo "Vectors run $run ended ($state): publishing without vectors." | tee -a "$GITHUB_STEP_SUMMARY"; exit 0 ;;
+              esac
+            fi
+            sleep 30
+          done
+          echo "No finished vectors run for $GITHUB_SHA after 30 minutes: publishing without vectors." | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/download-artifact@v4
+        if: steps.vectors.outputs.run != ''
+        with:
+          name: vectors-parquet
+          path: ${{ runner.temp }}/out/vectors
+          run-id: ${{ steps.vectors.outputs.run }}
+          github-token: ${{ github.token }}
+      - name: Leave the vectors sync baseline out
+        if: steps.vectors.outputs.run != ''
+        run: rm -f "$RUNNER_TEMP/out/vectors/archive-manifest.tsv"
       - name: Upload to Hugging Face
         if: steps.token.outputs.ok == 'true'
         run: |
@@ -130,6 +167,7 @@ jobs:
           pip install --quiet "huggingface_hub==1.33.0"
           curl -fsS "https://huggingface.co/datasets/$HF_REPO/raw/main/README.md" -o "$RUNNER_TEMP/live.md" || true
           python3 .github/scripts/hf-card.py .github/huggingface/README.md "$RUNNER_TEMP/live.md" "$RUNNER_TEMP/out/README.md"
+          cp .github/huggingface/METHODS.md .github/huggingface/SCHEMA.md "$RUNNER_TEMP/out/"
           hf upload "$HF_REPO" "$RUNNER_TEMP/out" . --repo-type dataset \
             --commit-message "Data from $(git rev-parse --short=12 HEAD), $(date -u +%F)"
           echo "Published https://huggingface.co/datasets/$HF_REPO" | tee -a "$GITHUB_STEP_SUMMARY"
