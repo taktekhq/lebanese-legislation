@@ -27,6 +27,8 @@ var renderInputs = map[string]bool{
 	"data/article_calculated_current.jsonl":   true,
 	"data/article_en.jsonl":                   true,
 	"data/article_en.sql":                     true,
+	"data/gazette_annex.jsonl":                true,
+	"data/gazette_annex.sql":                  true,
 	"go.mod":                                  true,
 	"go.sum":                                  true,
 	".github/workflows/static-site.yml":       true,

@@ -26,5 +26,12 @@ if [ -f article_en.jsonl ]; then
   run -f article_en.sql
   echo "loaded article_en"
 fi
+# What we read from the Official Gazette's page images (gazette_annex.jsonl,
+# made in taktekhq/lebgazette-data): tables annexed to a text and articles'
+# first-published wording, kept where the text is in the database.
+if [ -f gazette_annex.jsonl ]; then
+  run -f gazette_annex.sql
+  echo "loaded gazette_annex"
+fi
 run -c "ANALYZE"
 echo "done"

@@ -40,6 +40,7 @@ tables and checks the row counts against `stats.json`.
 | `stats.json` | rows per table |
 | `article_calculated_current.jsonl` | current monetary amounts calculated under decree 13909/2024 ([details](../docs/calculated-current-release.md)) |
 | `article_en.jsonl` | the unofficial English translation of the popular texts' articles, by machine (Gemini); loaded by `load.sh` (`article_en.sql`) only where the Arabic it was made from is unchanged. The Arabic is the official text |
+| `gazette_annex.jsonl` | what we read ourselves from the Official Gazette's page images where the typed text lacks it: the violation tables annexed to Law 243/2012 (389 rows) and Articles 49 to 54 of the Social Security Law as first published in 1963. Machine transcription (two Gemini readings; where they differed, Gemini decided from the page), unofficial; made by `lebleg_annex.py` in [taktekhq/lebgazette-data](https://github.com/taktekhq/lebgazette-data), loaded by `load.sh` (`gazette_annex.sql`) where the text is in the database |
 | `popular_texts.txt` | the texts whose English pages search engines may index (5+ views in 60 days); `build-db` reads it. The nightly that writes `tables/` builds without it, so `tables/noindex_page` holds no `english` rows: after loading, `build-db -only english` adds them (the static-site workflow does) |
 
 Search vectors (`search_exact`, `search_stem`, `search_fr`) are generated
