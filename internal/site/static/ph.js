@@ -20,11 +20,18 @@ posthog.init("phc_pTpSY5wVsQrG8LN58z4zWXdMWjvqR6uPCY2eXV25sBV5", {
   capture_pageleave: true,
   session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
 });
-/* A paid student editor's code (legislation.js keeps it from their link), on
-   every event they send, so their study days and reports can be counted. */
+/* A paid student editor (legislation.js keeps their code from their link in
+   localStorage, so later visits count too): every event carries the code,
+   the visitor is identified as editor:CODE so all their sessions sit under
+   one person, and every session is recorded, whatever the project's replay
+   sampling (Nizar, 5 Nov 2026: "These sessions need to be recorded by
+   posthog, and logged by posthog. All of them."). */
 (function () {
   try {
     var editor = localStorage.getItem("lebleg_editor");
-    if (editor) posthog.register({ editor: editor });
+    if (!editor) return;
+    posthog.register({ editor: editor });
+    posthog.identify("editor:" + editor, { editor: editor });
+    posthog.startSessionRecording(true);
   } catch (e) {}
 })();
