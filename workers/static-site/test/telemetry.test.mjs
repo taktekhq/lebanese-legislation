@@ -5,7 +5,7 @@ import { originFetch, requestRoute } from '../src/origin.js';
 register('./workers-loader.mjs', import.meta.url);
 const { default: worker } = await import('../src/index.js');
 
-async function run(t, { path = '/healthz', duration = 0, random = 0.9, status = 200, hit = false, fail = false, r2 = false, staticPage = false, serviceFail = false } = {}) {
+async function run(t, { path = '/healthz', duration = 0, random = 0.9, status = 200, hit = false, fail = false, r2 = false, staticPage = false, serviceFail = false, probe = false } = {}) {
   let now = 100_000;
   const events = [], pending = [];
   t.mock.method(Date, 'now', () => now);
@@ -24,11 +24,11 @@ async function run(t, { path = '/healthz', duration = 0, random = 0.9, status = 
   } };
   t.after(() => { globalThis.caches = saved; });
   const service = { fetch: async () => { now += duration; if (serviceFail) throw Error('offline'); return new Response('origin', { status }); } };
-  const env = { POSTHOG_KEY: 'test-key',
+  const env = { POSTHOG_KEY: 'test-key', ORIGIN_TEST_KEY: 'probe-key',
     SITE: { get: async key => key === '_export/generation' || key === '_export/layout.json' ? null : key === '_build/live-side' ? { text: async () => 'green' }
       : (r2 || staticPage) ? { body: 'file', httpEtag: '"x"' } : null },
     ORIGIN_BLUE: service, ORIGIN_GREEN: service };
-  const request = new Request('https://example.com' + path);
+  const request = new Request('https://example.com' + path, probe ? { headers: { 'x-origin-test': 'probe-key', 'x-origin-side': 'blue' } } : {});
   Object.defineProperty(request, 'cf', { value: { colo: 'BEY' } });
   const response = await (staticPage ? worker.fetch(request, env, { waitUntil: p => pending.push(p) })
     : originFetch(request, env, { waitUntil: p => pending.push(p) }));
@@ -67,6 +67,11 @@ for (const [path, route] of [
     assert.equal(requestRoute(new URL('https://example.com' + path)), route);
   });
 }
+test('our own probes with the test header send no event', async t => {
+  const { response, events } = await run(t, { path: '/api/v1/search/?limit=1&q=law', duration: 2600, probe: true });
+  assert.equal(response.status, 200);
+  assert.deepEqual(events, []);
+});
 test('server errors are always sent', async t => {
   const { events } = await run(t, { status: 503 });
   assert.equal(events[0].properties.sample_rate, 1);
