@@ -941,8 +941,14 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 		return toolResult{}, err
 	}
 	params = append(params, limit, offset)
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, to_char(`+lawDate+`, 'YYYY-MM-DD') FROM `+lawFrom+` WHERE `+w+
-		fmt.Sprintf(` ORDER BY %s %s, l.id %s LIMIT $%d OFFSET $%d`, lawDate, dir, dir, len(params)-1, len(params)), params...)
+	// The page's ids are picked first and only those rows are read in full:
+	// in one query Postgres worked out lawCols (two subqueries and four joins)
+	// for every row the offset skips. Every join is one row per law, so the
+	// rows and their order are the same (internal/site/handlers.go, laws).
+	order := fmt.Sprintf(` ORDER BY %s %s, l.id %s`, lawDate, dir, dir)
+	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, to_char(`+lawDate+`, 'YYYY-MM-DD')
+		FROM (SELECT l.id FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind WHERE `+w+order+
+		fmt.Sprintf(` LIMIT $%d OFFSET $%d`, len(params)-1, len(params))+`) p JOIN legislation l ON l.id = p.id `+lawJoins+order, params...)
 	if err != nil {
 		return toolResult{}, err
 	}
@@ -1010,9 +1016,12 @@ func (s *Server) listGazetteIssues(ctx context.Context, a args) (toolResult, err
 		return toolResult{}, err
 	}
 	params = append(params, limit, offset)
+	// ids first, then the page's rows, as listLegislation
+	order := fmt.Sprintf(` ORDER BY g.published_on %s, g.id %s`, dir, dir)
 	rows, err := s.db.Query(ctx, `SELECT g.id, g.number, to_char(g.published_on, 'YYYY-MM-DD'),
 		(SELECT count(*) FROM gazette_entry e WHERE e.issue_id = g.id)::int
-		FROM gazette_issue g WHERE `+w+fmt.Sprintf(` ORDER BY g.published_on %s, g.id %s LIMIT $%d OFFSET $%d`, dir, dir, len(params)-1, len(params)), params...)
+		FROM (SELECT g.id FROM gazette_issue g WHERE `+w+order+fmt.Sprintf(` LIMIT $%d OFFSET $%d`, len(params)-1, len(params))+
+		`) p JOIN gazette_issue g ON g.id = p.id`+order, params...)
 	if err != nil {
 		return toolResult{}, err
 	}

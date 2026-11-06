@@ -146,9 +146,12 @@ func (s *Server) listLaws(ctx context.Context, p listParams) (apiLawList, error)
 	if err := s.db.QueryRow(ctx, "SELECT count(*)"+from, args...).Scan(&out.Total); err != nil {
 		return out, err
 	}
+	// ids first, then the page's rows, as /laws/ (handlers.go)
+	order := fmt.Sprintf(" ORDER BY %s %s NULLS LAST, l.id %s", date, p.dir(), p.dir())
 	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+`, l.gazette_number, l.gazette_date,
-		(SELECT min(e.issue_id) FROM gazette_entry e WHERE e.law_id = l.id), `+date+from+
-		fmt.Sprintf(" ORDER BY %s %s NULLS LAST, l.id %s LIMIT %d OFFSET %d", date, p.dir(), p.dir(), p.limit, p.offset), args...)
+		(SELECT min(e.issue_id) FROM gazette_entry e WHERE e.law_id = l.id), `+date+
+		` FROM (SELECT l.id`+from+order+fmt.Sprintf(" LIMIT %d OFFSET %d", p.limit, p.offset)+
+		`) p JOIN legislation l ON l.id = p.id JOIN legislation_kind k ON k.name_ar = l.kind`+order, args...)
 	if err != nil {
 		return out, err
 	}
@@ -221,8 +224,11 @@ func (s *Server) listIssues(ctx context.Context, p listParams) (apiIssueList, er
 	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM gazette_issue g"+where, args...).Scan(&out.Total); err != nil {
 		return out, err
 	}
+	// ids first, then the page's rows, as /laws/ (handlers.go)
+	order := fmt.Sprintf(" ORDER BY g.published_on %s NULLS LAST, g.id %s", p.dir(), p.dir())
 	rows, err := s.db.Query(ctx, `SELECT g.id, g.number, g.published_on, (SELECT count(*) FROM gazette_entry e WHERE e.issue_id = g.id)::int
-		FROM gazette_issue g`+where+fmt.Sprintf(" ORDER BY g.published_on %s NULLS LAST, g.id %s LIMIT %d OFFSET %d", p.dir(), p.dir(), p.limit, p.offset), args...)
+		FROM (SELECT g.id FROM gazette_issue g`+where+order+fmt.Sprintf(" LIMIT %d OFFSET %d", p.limit, p.offset)+
+		`) p JOIN gazette_issue g ON g.id = p.id`+order, args...)
 	if err != nil {
 		return out, err
 	}

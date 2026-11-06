@@ -304,8 +304,11 @@ func (s *Server) rulings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	page := min(pageNo(q), max(1, (total+perPage-1)/perPage)) // ?page=, as /laws/ (handlers.go)
-	rows, err := s.db.Query(ctx, `SELECT 'ruling', id, title, coalesce(president, ''), decided_on, left(text_ar, 220) FROM ruling`+cond+
-		fmt.Sprintf(" ORDER BY decided_on DESC NULLS LAST, id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage), args...)
+	// ids first, then the page's rows, as /laws/ (handlers.go): left(text_ar)
+	// for every skipped ruling read each whole text, 286 ms at page 750 against 18
+	rows, err := s.db.Query(ctx, `SELECT 'ruling', r.id, r.title, coalesce(r.president, ''), r.decided_on, left(r.text_ar, 220)
+		FROM (SELECT id FROM ruling`+cond+fmt.Sprintf(" ORDER BY decided_on DESC NULLS LAST, id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage)+
+		`) p JOIN ruling r ON r.id = p.id ORDER BY r.decided_on DESC NULLS LAST, r.id DESC`, args...)
 	if err != nil {
 		s.fail(w, r, err)
 		return
@@ -453,9 +456,11 @@ func (s *Server) gazettes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	page := min(pageNo(q), max(1, (total+perPage-1)/perPage)) // ?page=, as /laws/ (handlers.go)
+	// ids first, then the page's rows, as /laws/ (handlers.go)
 	rows, err := s.db.Query(ctx, `SELECT 'gazette', g.id, 'الجريدة الرسمية، العدد ' || coalesce(g.number, '؟'),
 		(SELECT count(*) FROM gazette_entry e WHERE e.issue_id = g.id)::text || ' texts', g.published_on, NULL
-		FROM gazette_issue g`+cond+fmt.Sprintf(" ORDER BY g.published_on DESC NULLS LAST, g.id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage), args...)
+		FROM (SELECT id FROM gazette_issue`+cond+fmt.Sprintf(" ORDER BY published_on DESC NULLS LAST, id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage)+
+		`) p JOIN gazette_issue g ON g.id = p.id ORDER BY g.published_on DESC NULLS LAST, g.id DESC`, args...)
 	if err != nil {
 		s.fail(w, r, err)
 		return
