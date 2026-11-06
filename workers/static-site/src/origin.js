@@ -45,6 +45,11 @@ function originEvent(request, env, ctx, side, status, duration_ms, cache) {
   // Telemetry is best effort, including synchronous scheduling failures.
   try {
     if (!env.POSTHOG_KEY || !ctx?.waitUntil) return;
+    // Our own probes (the secret test header: deploy warm-up and checks of the
+    // idle side) are not visitors. On 6 Nov 2026 a warm-up probe of a cold
+    // container, 2.6 s, was the only slow API request of the hour and fired
+    // the API p95 alert.
+    if (env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY) return;
     const url = new URL(request.url);
     const kind = requestKind(url);
     const sample_rate = status >= 500 || duration_ms >= 2000 || kind === "mcp" || kind === "answer" ? 1 : 0.1;
