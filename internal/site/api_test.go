@@ -277,11 +277,17 @@ func TestRulingJudgmentSearch(t *testing.T) {
 	if !strings.Contains(out.Rulings[1].Snippet, word) {
 		t.Errorf("the judgment hit's excerpt should come from the page: %q", out.Rulings[1].Snippet)
 	}
-	// Offset skips the summary match; the judgment-only one is next.
+	// The next page after the summary match is the judgment-only one.
 	out = apiSearchResult{}
-	getJSON(t, s, "/api/v1/search/?type=rulings&limit=1&offset=1&q="+word, &out)
-	if len(out.Rulings) != 1 || out.Rulings[0].ID != a {
-		t.Errorf("offset 1: %+v", out.Rulings)
+	getJSON(t, s, "/api/v1/search/?type=rulings&limit=1&q="+word, &out)
+	if len(out.Rulings) != 1 || out.Rulings[0].ID != b || out.NextCursor == "" {
+		t.Fatalf("page 1: %+v next %q", out.Rulings, out.NextCursor)
+	}
+	next := out.NextCursor
+	out = apiSearchResult{}
+	getJSON(t, s, "/api/v1/search/?type=rulings&limit=1&cursor="+next+"&q="+word, &out)
+	if len(out.Rulings) != 1 || out.Rulings[0].ID != a || out.NextCursor != "" {
+		t.Errorf("page 2: %+v next %q", out.Rulings, out.NextCursor)
 	}
 	// Western digits find the Arabic-Indic ones in a judgment.
 	out = apiSearchResult{}

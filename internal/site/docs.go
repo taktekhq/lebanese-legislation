@@ -979,7 +979,7 @@ func (s *Server) findArticles(ctx context.Context, res *Results) error {
 }
 
 func (s *Server) findRulings(ctx context.Context, res *Results) error {
-	n, hits, err := s.searchRulings(ctx, res.Q, 10, 0)
+	n, hits, _, err := s.searchRulings(ctx, res.Q, 10, nil)
 	if err != nil {
 		return err
 	}

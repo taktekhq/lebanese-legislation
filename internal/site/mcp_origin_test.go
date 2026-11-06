@@ -1,6 +1,7 @@
 package site
 
 import (
+	"encoding/json"
 	"net/http/httptest"
 	"testing"
 )
@@ -51,24 +52,48 @@ func TestLawOutlineIsWholeUnlessPaged(t *testing.T) {
 	law := func() *apiLawDetail {
 		out := &apiLawDetail{}
 		for i := 0; i < 1044; i++ {
-			out.Articles = append(out.Articles, apiArticleRef{})
+			out.Articles = append(out.Articles, apiArticleRef{Position: i + 1})
 		}
 		return out
 	}
 	full := law()
-	pageLawArticles(full, 0, 0)
-	if len(full.Articles) != 1044 {
-		t.Fatalf("default: %d articles, want all 1044", len(full.Articles))
+	if next := pageLawArticles(full, 0, 0); len(full.Articles) != 1044 || next != -1 {
+		t.Fatalf("default: %d articles next %d, want all 1044", len(full.Articles), next)
 	}
 	page := law()
-	pageLawArticles(page, 1000, 100)
-	if len(page.Articles) != 44 {
-		t.Fatalf("last page: %d", len(page.Articles))
+	if next := pageLawArticles(page, 900, 100); len(page.Articles) != 100 || page.Articles[0].Position != 901 || next != 1000 {
+		t.Fatalf("a middle page: %d from %d, next %d", len(page.Articles), page.Articles[0].Position, next)
+	}
+	last := law()
+	if next := pageLawArticles(last, 1000, 100); len(last.Articles) != 44 || next != -1 {
+		t.Fatalf("last page: %d next %d", len(last.Articles), next)
+	}
+	exact := law()
+	if next := pageLawArticles(exact, 944, 100); len(exact.Articles) != 100 || next != -1 {
+		t.Fatalf("a last page that is full: %d next %d", len(exact.Articles), next)
 	}
 	past := law()
-	pageLawArticles(past, 5000, 10)
-	if len(past.Articles) != 0 {
-		t.Fatalf("past the end: %d", len(past.Articles))
+	if next := pageLawArticles(past, 5000, 10); len(past.Articles) != 0 || next != -1 {
+		t.Fatalf("past the end: %d next %d", len(past.Articles), next)
+	}
+}
+
+// get_law pages its outline by articles_cursor; articles_offset is refused
+// with what to pass instead, before anything is read.
+func TestGetLawArticlesOffsetRemoved(t *testing.T) {
+	s := &Server{}
+	for raw, want := range map[string]string{
+		`{"id": 1, "articles_offset": 100}`:       articlesOffsetRemoved,
+		`{"id": 1, "articles_offset": 0}`:         articlesOffsetRemoved,
+		`{"id": 1, "articles_cursor": "nope"}`:    "articles_cursor is not one this server made; pass articles_next_cursor unchanged",
+		`{"id": 1, "articles_cursor": 5}`:         "articles_cursor must be a string and articles_limit a non-negative integer",
+		`{"id": 1, "articles_limit": -1}`:         "articles_cursor must be a string and articles_limit a non-negative integer",
+		`{"id": 1, "articles_cursor": "djF8LTE"}`: "articles_cursor is not one this server made; pass articles_next_cursor unchanged", // "v1|-1"
+	} {
+		res, isErr, err := s.toolGetLaw(t.Context(), json.RawMessage(raw))
+		if err != nil || !isErr || res.(map[string]any)["error"] != want {
+			t.Errorf("%s: %v %v %v, want %q", raw, res, isErr, err, want)
+		}
 	}
 }
 
