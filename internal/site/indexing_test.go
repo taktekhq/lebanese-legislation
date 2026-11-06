@@ -2,6 +2,7 @@ package site
 
 import (
 	"context"
+	"html"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -379,63 +380,126 @@ func TestPlaceholderDocumentsAreNoindex(t *testing.T) {
 	}
 }
 
-func TestOldPageQueryRedirects(t *testing.T) {
+// Lists page by cursor (keyset.go): every old numbered address, by path or by
+// ?page=, moves to its list's first page with the list's other parameters.
+func TestOldPageAddressesMoveToTheFirstPage(t *testing.T) {
 	s := indexedServer(t)
 	for _, c := range []struct{ from, to string }{
-		{"/opinions/?page=2", "/opinions/page/2/"},
-		{"/agreements/?page=3", "/agreements/page/3/"},
+		{"/opinions/?page=2", "/opinions/"},
+		{"/agreements/?page=3", "/agreements/"},
 		{"/doctrine/?page=1", "/doctrine/"},
-		{"/opinions/page/1/", "/opinions/"},
-		{"/en/opinions/?page=2", "/en/opinions/page/2/"},
-		{"/en/opinions/page/1/", "/en/opinions/"},
+		{"/opinions/page/2/", "/opinions/"},
+		{"/opinions/page/9999/", "/opinions/"},
+		{"/opinions/page/x/", "/opinions/"},
+		{"/en/opinions/?page=2", "/en/opinions/"},
+		{"/en/opinions/page/3/", "/en/opinions/"},
 		{"/en/laws/year/2005/page/1/", "/en/laws/year/2005/"},
-		{"/laws/year/2005/?page=2", "/laws/year/2005/page/2/"},
-		{"/laws/year/2005/page/1/", "/laws/year/2005/"},
+		{"/laws/year/2005/?page=2", "/laws/year/2005/"},
+		{"/laws/year/2005/page/2/", "/laws/year/2005/"},
+		{"/laws/year/2005/decree/page/2/", "/laws/year/2005/decree/"},
+		{"/laws/?page=2000", "/laws/"},
+		{"/laws/?kind=%D9%85%D8%B1%D8%B3%D9%88%D9%85&page=20", "/laws/?kind=%D9%85%D8%B1%D8%B3%D9%88%D9%85"},
+		{"/rulings/?decade=2010&page=2", "/rulings/?decade=2010"},
+		{"/gazette/?page=150", "/gazette/"},
 	} {
 		resp, _ := get(t, s, c.from)
 		if resp.StatusCode != 301 || resp.Header.Get("Location") != c.to {
 			t.Errorf("%s: %d %q, want 301 %q", c.from, resp.StatusCode, resp.Header.Get("Location"), c.to)
 		}
 	}
-	for _, p := range []string{"/opinions/page/9999/", "/opinions/page/0/", "/opinions/page/x/", "/laws/year/2005/page/99/"} {
-		if resp, _ := get(t, s, p); resp.StatusCode != 404 {
-			t.Errorf("%s: %d, want 404", p, resp.StatusCode)
+	// a token this site did not make goes to the first page too
+	for _, p := range []string{"/laws/?after=x", "/opinions/?before=Zm9v", "/laws/year/2005/?after=&before="} {
+		if resp, _ := get(t, s, p); resp.StatusCode != http.StatusFound {
+			t.Errorf("%s: %d, want 302", p, resp.StatusCode)
 		}
 	}
 }
 
-func TestPaginatedPagesAreIndexableAndLinked(t *testing.T) {
+var (
+	olderRe = regexp.MustCompile(`rel="next" href="([^"]+)"`)
+	newerRe = regexp.MustCompile(`rel="prev" href="([^"]+)"`)
+	rowRe   = regexp.MustCompile(`class="docrow" href="[^"]*/([0-9]+)/"`)
+)
+
+// walk reads a list from its first page to its last by the Older links and
+// returns the ids of its rows in order, and each page's address.
+func walk(t *testing.T, s *Server, first string, max int) (ids []string, pages []string) {
+	t.Helper()
+	path := first
+	for len(pages) < max {
+		resp, body := get(t, s, path)
+		if resp.StatusCode != 200 {
+			t.Fatalf("%s: %d", path, resp.StatusCode)
+		}
+		pages = append(pages, path)
+		for _, m := range rowRe.FindAllStringSubmatch(body, -1) {
+			ids = append(ids, m[1])
+		}
+		m := olderRe.FindStringSubmatch(body)
+		if m == nil {
+			return ids, pages
+		}
+		path = strings.SplitN(first, "?", 2)[0] + html.UnescapeString(m[1])
+	}
+	return ids, pages
+}
+
+// Walking a list by its cursors gives every row once, in the list's order,
+// and the Newer link of a later page leads back to the rows before it.
+func TestCursorPagesWalkTheWholeList(t *testing.T) {
 	s := indexedServer(t)
-	resp, body := get(t, s, "/opinions/page/3/")
-	canon, robots, hl := head(body)
-	if resp.StatusCode != 200 || canon != Base+"/opinions/page/3/" || !strings.HasPrefix(robots, "index") || hl != 3 {
-		t.Errorf("/opinions/page/3/: %d canonical %q robots %q hreflang %d", resp.StatusCode, canon, robots, hl)
-	}
-	for _, link := range []string{`href="/opinions/page/2/"`, `href="/opinions/page/4/"`, `href="/opinions/"`} {
-		if !strings.Contains(body, link) {
-			t.Errorf("page 3 does not link %s with a plain <a>", link)
+	ctx := context.Background()
+	for _, c := range []struct{ first, sql string }{
+		{"/opinions/", `SELECT id FROM opinion ORDER BY coalesce(issued_on, date '0001-01-01') DESC, id DESC`},
+		{"/doctrine/", `SELECT id FROM doctrine_article ORDER BY id DESC`},
+		{"/laws/year/2005/", `SELECT id FROM legislation WHERE issued_on >= '2005-01-01' AND issued_on < '2006-01-01' ORDER BY issued_on DESC, id DESC`},
+		{"/en/laws/?decade=1990&status=repealed", `SELECT id FROM legislation WHERE issued_on >= '1990-01-01' AND issued_on < '2000-01-01' AND status = 'repealed' ORDER BY issued_on DESC, id DESC`},
+		{"/gazette/?year=1995", `SELECT id FROM gazette_issue WHERE published_on >= '1995-01-01' AND published_on < '1996-01-01' ORDER BY published_on DESC, id DESC`},
+	} {
+		rows, err := s.db.Query(ctx, c.sql)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var want []string
+		for rows.Next() {
+			var id int
+			if err := rows.Scan(&id); err != nil {
+				t.Fatal(err)
+			}
+			want = append(want, strconv.Itoa(id))
+		}
+		rows.Close()
+		got, pages := walk(t, s, c.first, 400)
+		if strings.Join(got, ",") != strings.Join(want, ",") {
+			t.Errorf("%s: walked %d rows over %d pages, want %d in order", c.first, len(got), len(pages), len(want))
+			continue
+		}
+		if len(pages) < 2 {
+			continue
+		}
+		// the second page: noindex, links both ways, and Newer leads to the first page
+		resp, body := get(t, s, pages[1])
+		if _, robots, _ := head(body); resp.StatusCode != 200 || robots != "noindex, follow" {
+			t.Errorf("%s: %d robots %q", pages[1], resp.StatusCode, robots)
+		}
+		m := newerRe.FindStringSubmatch(body)
+		if m == nil {
+			t.Errorf("%s has no Newer link", pages[1])
+			continue
+		}
+		back := strings.SplitN(c.first, "?", 2)[0] + html.UnescapeString(m[1])
+		if resp, _ := get(t, s, back); resp.StatusCode != http.StatusFound || resp.Header.Get("Location") != c.first {
+			t.Errorf("%s: Newer %s answers %d %q, want 302 to %s", pages[1], back, resp.StatusCode, resp.Header.Get("Location"), c.first)
 		}
 	}
-	if strings.Contains(body, "?page=") {
-		t.Error("the pager still uses ?page=")
+	// the first page is the one in the index; it links Older with a plain <a>
+	resp, body := get(t, s, "/opinions/")
+	canon, robots, _ := head(body)
+	if resp.StatusCode != 200 || canon != Base+"/opinions/" || !strings.HasPrefix(robots, "index") || !olderRe.MatchString(body) {
+		t.Errorf("/opinions/: %d canonical %q robots %q", resp.StatusCode, canon, robots)
 	}
-	if _, en := get(t, s, "/en/opinions/page/3/"); !strings.Contains(en, `href="/en/opinions/page/4/"`) {
-		t.Error("the English pager does not stay under /en")
-	}
-	// a filtered list keeps ?page= and stays out of the index
-	_, f := get(t, s, "/rulings/?decade=2010&page=2")
-	if _, robots, _ := head(f); robots != "noindex, follow" {
-		t.Errorf("filtered page: robots %q", robots)
-	}
-	// the long lists the years cover keep ?page=, blocked by robots.txt and noindex
-	for _, p := range []string{"/laws/?page=2", "/rulings/?page=2", "/gazette/?page=2"} {
-		resp, deep := get(t, s, p)
-		if _, robots, _ := head(deep); resp.StatusCode != 200 || robots != "noindex, follow" {
-			t.Errorf("%s: %d robots %q", p, resp.StatusCode, robots)
-		}
-	}
-	if resp, _ := get(t, s, "/laws/page/2/"); resp.StatusCode != 404 {
-		t.Errorf("/laws/page/2/: %d", resp.StatusCode)
+	if _, en := get(t, s, "/en/opinions/"); !strings.Contains(en, `rel="next" href="?after=`) {
+		t.Error("the English first page has no Older link")
 	}
 }
 
@@ -458,24 +522,13 @@ func TestRobotsAllowsPaginationPaths(t *testing.T) {
 
 func TestYearListsArePaged(t *testing.T) {
 	s := indexedServer(t)
-	for _, p := range []string{"/laws/year/2005/", "/laws/year/2005/page/2/", "/en/laws/year/2005/page/2/"} {
+	for _, p := range []string{"/laws/year/2005/", "/en/laws/year/2005/"} {
 		resp, body := get(t, s, p)
 		if resp.StatusCode != 200 || len(body) > 400_000 {
 			t.Errorf("%s: %d, %d bytes", p, resp.StatusCode, len(body))
 		}
 		if n := strings.Count(body, `class="docrow"`); n > yearPageSize {
 			t.Errorf("%s lists %d texts", p, n)
-		}
-	}
-	// every page of the year is linked from its first page
-	_, first := get(t, s, "/laws/year/2005/")
-	var total int
-	if err := s.db.QueryRow(context.Background(), `SELECT count(*) FROM legislation WHERE issued_on >= '2005-01-01' AND issued_on < '2006-01-01'`).Scan(&total); err != nil {
-		t.Fatal(err)
-	}
-	for n := 2; n <= (total+yearPageSize-1)/yearPageSize; n++ {
-		if !strings.Contains(first, `href="/laws/year/2005/page/`+strconv.Itoa(n)+`/"`) {
-			t.Errorf("year 2005 page 1 does not link page %d", n)
 		}
 	}
 }

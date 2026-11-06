@@ -41,7 +41,6 @@ type CodeHub struct {
 }
 
 func init() {
-	baseFuncs["yearPageList"] = yearPageList
 	baseFuncs["kindWord"] = wordForKind
 	baseFuncs["derefStr"] = func(p *string) string {
 		if p == nil {
@@ -61,17 +60,6 @@ func (s *Server) hubRoutes() {
 	m.HandleFunc("GET /laws/year/{year}/{word}/{$}", s.yearKindHub)
 	m.HandleFunc("GET /laws/year/{year}/{word}/page/{page}/{$}", s.yearKindHub)
 	s.AddCoreSitemap(s.hubSitemapRows)
-}
-
-// yearPageList are the page numbers after the first of a year's list of n
-// documents: the years index links each one, so a text on any page of its year
-// is three clicks from the home page (home, index, page, text).
-func yearPageList(n int) []int {
-	var out []int
-	for p := 2; p <= (n+yearPageSize-1)/yearPageSize; p++ {
-		out = append(out, p)
-	}
-	return out
 }
 
 // codeHubPath is page n of a code's hub.
@@ -98,9 +86,12 @@ func (s *Server) codeHub(w http.ResponseWriter, r *http.Request) {
 	if done {
 		return
 	}
+	// The only numbered pages left (keyset.go): page n is articles
+	// (n-1)*100+1 to n*100 by position, which runs 1..n in every text, so
+	// it is a range on the primary key (law_id, position), not an OFFSET.
 	rows, err := s.db.Query(ctx, `SELECT a.number, coalesce(a.section_id, 0), coalesce(sec.heading, '')
 		FROM legislation_article a LEFT JOIN legislation_section sec ON sec.id = a.section_id
-		WHERE a.law_id = $1 ORDER BY a.position LIMIT $2 OFFSET $3`, c.LawID, codeHubSize, (page-1)*codeHubSize)
+		WHERE a.law_id = $1 AND a.position > $2 AND a.position <= $3 ORDER BY a.position`, c.LawID, (page-1)*codeHubSize, page*codeHubSize)
 	if err != nil {
 		s.fail(w, r, err)
 		return
@@ -204,9 +195,14 @@ func (s *Server) yearKindHub(w http.ResponseWriter, r *http.Request) {
 		s.notFound(w, r)
 		return
 	}
+	pg, done := s.cursorPaging(w, r, true)
+	if done {
+		return
+	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-	const cond = `l.issued_on >= make_date($1, 1, 1) AND l.issued_on < make_date($1 + 1, 1, 1) AND ` + kindWordSQL + ` = $2`
+	key := dateKey("l.issued_on")
+	cond := key + ` >= make_date($1, 1, 1) AND ` + key + ` < make_date($1 + 1, 1, 1) AND ` + kindWordSQL + ` = $2`
 	var total int
 	if err := s.db.QueryRow(ctx, `SELECT count(*)::int FROM legislation l WHERE `+cond, y, word).Scan(&total); err != nil {
 		s.fail(w, r, err)
@@ -217,12 +213,10 @@ func (s *Server) yearKindHub(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	base := kindYearPath(y, word)
-	page, pages, listBase, done := s.listPaging(w, r, base, r.URL.Query(), total, s.yearSize())
-	if done {
-		return
-	}
-	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind
-		WHERE `+cond+` ORDER BY l.issued_on DESC, l.id DESC LIMIT $3 OFFSET $4`, y, word, s.yearSize(), (page-1)*s.yearSize())
+	args := []any{y, word}
+	page := pg.where(key, "l.id", &args)
+	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM (SELECT l.id FROM legislation l`+and(cond, page)+pg.order(key, "l.id")+
+		fmt.Sprintf(" LIMIT %d", s.yearSize()+1)+`) p JOIN legislation l ON l.id = p.id JOIN legislation_kind k ON k.name_ar = l.kind`+pg.order(key, "l.id"), args...)
 	if err != nil {
 		s.fail(w, r, err)
 		return
@@ -232,17 +226,23 @@ func (s *Server) yearKindHub(w http.ResponseWriter, r *http.Request) {
 		s.fail(w, r, err)
 		return
 	}
+	list, olderOK, newerOK, top := settle(pg, list, s.yearSize())
+	if top {
+		s.toFirstPage(w, r)
+		return
+	}
+	older, newer := lawPageLinks(r.URL.Query(), list, olderOK, newerOK)
 	label := strconv.Itoa(y)
 	kind := s.tr(r, "hub.kind."+word)
 	enKind := i18nKindEn[word]
 	title := s.trOr(r, fmt.Sprintf("%s of %s", enKind, label), "hub.year.title", kind, label)
 	s.render(w, r, "laws", 200, Page{
-		Title: s.brandTitle(r, title) + s.pageSuffix(r, page),
-		Path:  pagePath(base, page),
+		Title: s.brandTitle(r, title),
+		Path:  base, NoIndex: !pg.first(),
 		Desc: s.trOr(r, fmt.Sprintf("The %s %s issued in Lebanon in %s, newest first, each linked to its text. Free.", thousands(total), lowerFirst(enKind), label),
 			"hub.year.desc", thousands(total), kind, label),
 		LD: []any{breadcrumbs("Legislation", "/laws/", label, fmt.Sprintf("/laws/year/%d/", y), enKind, base)},
-		Data: List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase, Updated: s.pageUpdated(r, s.latestChange(ctx, cond, y, word), nil),
+		Data: List{Total: total, Older: older, Newer: newer, Rows: list, Updated: s.pageUpdated(r, s.latestChange(ctx, cond, y, word), nil),
 			Back: fmt.Sprintf("/laws/year/%d/", y), BackLabel: s.trOr(r, "All texts of "+label, "hub.year.back", label),
 			Eyebrow: s.trOr(r, "Legislation · "+label, "years.legislation_of", label), Heading: title + "."}})
 }
@@ -295,9 +295,7 @@ func (s *Server) hubSitemapRows(ctx context.Context) ([]SitemapURL, error) {
 		if err := rows.Scan(&y, &word, &n); err != nil {
 			return nil, err
 		}
-		for p := 1; p <= max(1, (n+yearPageSize-1)/yearPageSize); p++ {
-			urls = append(urls, SitemapURL{Path: pagePath(kindYearPath(y, word), p)})
-		}
+		urls = append(urls, SitemapURL{Path: kindYearPath(y, word)}) // later pages are cursor pages (keyset.go)
 	}
 	return urls, rows.Err()
 }

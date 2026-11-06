@@ -309,7 +309,9 @@ func TestSitemapLeavesOutWhatIsNotIndexed(t *testing.T) {
 
 func itoa(n int) string { return strconv.Itoa(n) }
 
-func TestSitemapPagesHoldThePaginationPaths(t *testing.T) {
+// Lists page by cursor (keyset.go): the sitemaps hold their first pages and no
+// numbered page, except a code's article hub, whose pages are article ranges.
+func TestSitemapsHoldFirstPagesOfLists(t *testing.T) {
 	s := indexedServer(t)
 	_, files, _ := fetchAll(t, s)
 	all := map[string]bool{}
@@ -318,9 +320,14 @@ func TestSitemapPagesHoldThePaginationPaths(t *testing.T) {
 			all[u.Loc] = true
 		}
 	}
-	for _, p := range []string{"/opinions/page/2/", "/agreements/page/2/", "/doctrine/page/2/", "/laws/year/2005/page/2/"} {
+	for _, p := range []string{"/opinions/", "/agreements/", "/doctrine/", "/laws/year/2005/"} {
 		if !all[Base+p] || !all[Base+"/en"+p] {
 			t.Errorf("%s is not in the sitemaps", p)
+		}
+	}
+	for loc := range all {
+		if strings.Contains(loc, "/page/") && !strings.Contains(loc, "/codes/") {
+			t.Errorf("a sitemap lists a numbered page: %s", loc)
 		}
 	}
 	for loc := range all {

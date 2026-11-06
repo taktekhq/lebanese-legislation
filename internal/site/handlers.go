@@ -318,9 +318,10 @@ type List struct {
 	Selected         map[string]string
 	Params           []string // filter parameter per row of chips
 	Rows             any
-	Updated          *Updated // "Last updated": when the source records last changed
-	Base             string   // the list's path, when its pages are paths (/opinions/page/2/); empty: ?page=
-	Subhubs          []Chip   // links to the lists this one divides into (a year's kinds); Value is a path
+	Updated          *Updated     // "Last updated": when the source records last changed
+	Base             string       // the code hubs' numbered pages (/codes/x/page/2/), the only ones left; keyset.go
+	Older, Newer     template.URL // the pager of every other list: ?after= and ?before= (keyset.go)
+	Subhubs          []Chip       // links to the lists this one divides into (a year's kinds); Value is a path
 }
 
 // Path is page n's address when the list paginates by path.
@@ -335,9 +336,14 @@ func pageNo(q url.Values) int {
 }
 
 func (s *Server) laws(w http.ResponseWriter, r *http.Request) {
+	pg, done := s.cursorPaging(w, r, true)
+	if done {
+		return
+	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
 	q := r.URL.Query()
+	key := dateKey("l.issued_on")
 	var where []string
 	var args []any
 	arg := func(v any) string { args = append(args, v); return "$" + strconv.Itoa(len(args)) }
@@ -348,35 +354,24 @@ func (s *Server) laws(w http.ResponseWriter, r *http.Request) {
 		where = append(where, "l.status = "+arg(v))
 	}
 	if v, err := strconv.Atoi(q.Get("decade")); err == nil && v >= 1800 && v < 2100 {
-		where = append(where, "l.issued_on >= make_date("+arg(v)+", 1, 1) AND l.issued_on < make_date("+arg(v+10)+", 1, 1)")
+		// on the sort key, so the list's index answers it (no dates are before 1800)
+		where = append(where, key+" >= make_date("+arg(v)+", 1, 1) AND "+key+" < make_date("+arg(v+10)+", 1, 1)")
 	}
 	if q.Get("text") == "1" {
 		where = append(where, "EXISTS (SELECT 1 FROM legislation_article a WHERE a.law_id = l.id)")
 	}
-	cond := ""
-	if len(where) > 0 {
-		cond = " WHERE " + strings.Join(where, " AND ")
-	}
+	cond := strings.Join(where, " AND ")
 	var total int
-	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l"+cond, args...).Scan(&total); err != nil {
+	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l"+and(cond), args...).Scan(&total); err != nil {
 		s.fail(w, r, err)
 		return
 	}
-	// /laws/ is browsed by year (the years' lists are paged by path); its own
-	// pages stay ?page=, which robots.txt blocks, but crawlers that ignore it
-	// ask for all 2,500 of them.
-	//
-	// The page's ids are picked first and only those 40 rows are read in full.
-	// With the whole row in one query, Postgres worked out lawRowCols (an
-	// article count and a code name per law) for every row the OFFSET skips:
-	// page 2,000 counted the articles of 80,040 laws and sorted 20 MB on disk,
-	// 835 ms on the XPS and 3 to 9 s on the container under a crawl (6 Nov
-	// 2026). Picking the ids first takes 62 ms. Every join is one row per law,
-	// so the rows and their order are the same.
-	page := min(pageNo(q), max(1, (total+perPage-1)/perPage))
-	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM (SELECT l.id FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind`+cond+
-		fmt.Sprintf(" ORDER BY l.issued_on DESC NULLS LAST, l.id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage)+
-		`) p JOIN legislation l ON l.id = p.id JOIN legislation_kind k ON k.name_ar = l.kind ORDER BY l.issued_on DESC NULLS LAST, l.id DESC`, args...)
+	// The page's ids come from the index on the sort key (keyset.go), then
+	// only those rows are read in full: lawRowCols counts each text's articles.
+	page := pg.where(key, "l.id", &args)
+	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM (SELECT l.id FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind`+
+		and(cond, page)+pg.order(key, "l.id")+fmt.Sprintf(" LIMIT %d", perPage+1)+
+		`) p JOIN legislation l ON l.id = p.id JOIN legislation_kind k ON k.name_ar = l.kind`+pg.order(key, "l.id"), args...)
 	if err != nil {
 		s.fail(w, r, err)
 		return
@@ -386,6 +381,12 @@ func (s *Server) laws(w http.ResponseWriter, r *http.Request) {
 		s.fail(w, r, err)
 		return
 	}
+	list, olderOK, newerOK, top := settle(pg, list, perPage)
+	if top {
+		s.toFirstPage(w, r)
+		return
+	}
+	older, newer := lawPageLinks(q, list, olderOK, newerOK)
 	kindLabelSQL := "kind || coalesce(' · ' || k.name_en, '')"
 	if s.lang(r) == "ar" { // the Arabic data already names the kind; no English needed too
 		kindLabelSQL = "kind"
@@ -405,7 +406,7 @@ func (s *Server) laws(w http.ResponseWriter, r *http.Request) {
 		NoIndex: r.URL.RawQuery != "",
 		Desc: s.trOr(r, fmt.Sprintf("Browse %s Lebanese laws, decrees and decisions by kind, decade and status. Free.", thousands(total)),
 			"laws.desc", thousands(total)),
-		Data: List{Q: q, Total: total, Page: page, Pages: (total + perPage - 1) / perPage, Rows: list, Updated: s.updated(r, "laws"),
+		Data: List{Q: q, Total: total, Older: older, Newer: newer, Rows: list, Updated: s.updated(r, "laws"),
 			Params:   []string{"kind", "status", "decade"},
 			Selected: map[string]string{"kind": q.Get("kind"), "status": q.Get("status"), "decade": q.Get("decade")},
 			Filters: [][]Chip{prepend(Chip{Label: s.trOr(r, "All kinds", "chip.all_kinds")}, kinds),
@@ -416,6 +417,15 @@ func (s *Server) laws(w http.ResponseWriter, r *http.Request) {
 }
 
 func prepend(c Chip, cs []Chip) []Chip { return append([]Chip{c}, cs...) }
+
+// lawPageLinks are the pager of a list of texts sorted by issue date.
+func lawPageLinks(q url.Values, list []LawRow, older, newer bool) (template.URL, template.URL) {
+	if len(list) == 0 {
+		return "", ""
+	}
+	a, b := list[0], list[len(list)-1]
+	return pageLinks(q, dateTok(a.IssuedOn, a.ID), dateTok(b.IssuedOn, b.ID), older, newer)
+}
 
 func (s *Server) chips(ctx context.Context, sql string, args ...any) ([]Chip, error) {
 	rows, err := s.db.Query(ctx, sql, args...)

@@ -3,6 +3,7 @@ package site
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"strings"
@@ -130,21 +131,9 @@ func TestKindYearHubsDivideTheYear(t *testing.T) {
 			t.Fatal(err)
 		}
 		sum += n
-		pages := (n + yearPageSize - 1) / yearPageSize
-		rows := 0
-		for p := 1; p <= pages; p++ {
-			pp := pagePath(path, p)
-			resp, b := get(t, s, pp)
-			if resp.StatusCode != 200 {
-				t.Fatalf("%s: %d", pp, resp.StatusCode)
-			}
-			rows += strings.Count(b, `class="docrow"`)
-		}
-		if rows != n {
-			t.Errorf("%s lists %d texts over %d pages, want %d", path, rows, pages, n)
-		}
-		if resp, _ := get(t, s, pagePath(path, pages+1)); resp.StatusCode != 404 {
-			t.Errorf("%s: a page past the end: %d", path, resp.StatusCode)
+		ids, pages := walk(t, s, path, 100)
+		if len(ids) != n {
+			t.Errorf("%s lists %d texts over %d pages, want %d", path, len(ids), len(pages), n)
 		}
 	}
 	if sum != yearTotal {
@@ -195,8 +184,8 @@ func TestHubsLeaveEveryOldAddressAlone(t *testing.T) {
 	}
 	for _, w := range []want{
 		{"/", 200, ""}, {"/codes/", 200, ""}, {"/laws/", 200, ""}, {"/laws/years/", 200, ""},
-		{"/laws/year/2005/", 200, ""}, {"/laws/year/2005/page/2/", 200, ""}, {"/laws/year/2005/page/1/", 301, "/laws/year/2005/"},
-		{"/laws/year/2005/?page=2", 301, "/laws/year/2005/page/2/"},
+		{"/laws/year/2005/", 200, ""}, {"/laws/year/2005/page/2/", 301, "/laws/year/2005/"}, {"/laws/year/2005/page/1/", 301, "/laws/year/2005/"},
+		{"/laws/year/2005/?page=2", 301, "/laws/year/2005/"},
 		{"/rulings/year/2005/", 200, ""}, {"/gazette/years/", 200, ""}, {"/topics/", 200, ""},
 		{"/code/" + slug + "/", 302, lawPath(id)},
 		{lawPath(id), 200, ""}, {"/en" + lawPath(id), 200, ""},
@@ -255,9 +244,10 @@ func TestHubsAreInTheCoreSitemap(t *testing.T) {
 	}
 }
 
-// The years index links every page of every year, for laws, rulings and the
-// Gazette, so a text on page 12 of a year is not behind a pager.
-func TestYearsIndexLinksEveryPage(t *testing.T) {
+// The years index links each year's list, not numbered pages: lists page by
+// cursor (keyset.go), and an old numbered address moves to the year's first
+// page.
+func TestYearsIndexLinksYearsNotPages(t *testing.T) {
 	s := indexedServer(t)
 	for _, kind := range []string{"laws", "rulings", "gazette"} {
 		path := "/" + kind + "/years/"
@@ -265,38 +255,29 @@ func TestYearsIndexLinksEveryPage(t *testing.T) {
 		if resp.StatusCode != 200 || len(body) > 500_000 {
 			t.Fatalf("%s: %d, %d bytes", path, resp.StatusCode, len(body))
 		}
+		if strings.Contains(body, "/page/") {
+			t.Errorf("%s still links numbered pages", path)
+		}
 		ys, err := s.Years(context.Background(), kind)
 		if err != nil {
 			t.Fatal(err)
 		}
-		want := 0
 		for _, y := range ys {
-			for _, p := range yearPageList(y.Count) {
-				want++
-				if l := fmt.Sprintf(`href="/%s/year/%d/page/%d/"`, kind, y.Year, p); !strings.Contains(body, l) {
-					t.Errorf("%s does not link %s", path, l)
-				}
+			if l := fmt.Sprintf(`href="/%s/year/%d/"`, kind, y.Year); !strings.Contains(body, l) {
+				t.Errorf("%s does not link %s", path, l)
 			}
 		}
-		if got := strings.Count(body, `/page/`); got != want {
-			t.Errorf("%s has %d page links, want %d", path, got, want)
-		}
-		if _, en := get(t, s, "/en"+path); want > 0 && !strings.Contains(en, `href="/en/`+kind+`/year/`) {
+		if _, en := get(t, s, "/en"+path); len(ys) > 0 && !strings.Contains(en, `href="/en/`+kind+`/year/`) {
 			t.Errorf("/en%s does not stay under /en", path)
 		}
 	}
-	// the page links answer
-	for _, p := range []string{"/laws/year/2005/page/2/", "/rulings/year/2005/page/2/"} {
-		if resp, _ := get(t, s, p); resp.StatusCode != 200 && resp.StatusCode != 404 {
-			t.Errorf("%s: %d", p, resp.StatusCode)
-		}
-	}
-}
-
-func TestYearPageList(t *testing.T) {
-	for n, want := range map[int]int{0: 0, 1: 0, 300: 0, 301: 1, 3581: 11, 600: 1} {
-		if got := len(yearPageList(n)); got != want {
-			t.Errorf("yearPageList(%d) has %d pages, want %d", n, got, want)
+	for old, want := range map[string]string{
+		"/laws/year/2005/page/2/":       "/laws/year/2005/",
+		"/en/rulings/year/2005/page/2/": "/en/rulings/year/2005/",
+	} {
+		resp, _ := get(t, s, old)
+		if resp.StatusCode != http.StatusMovedPermanently || resp.Header.Get("Location") != want {
+			t.Errorf("%s: %d to %q, want 301 to %s", old, resp.StatusCode, resp.Header.Get("Location"), want)
 		}
 	}
 }

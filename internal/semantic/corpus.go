@@ -3,6 +3,8 @@ package semantic
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -171,15 +173,27 @@ func topicDocument(t *topics.Topic, lang string) Document {
 	return Document{Kind: "topic", Part: t.Slug, Lang: lang, Title: c.Title, Text: strings.Join(parts, "\n\n")}
 }
 
-// walkCorpus streams one row at a time with deterministic pagination. The caller
-// can stop by returning an error; it never materializes the corpus in Go memory.
-func walkCorpus(ctx context.Context, corpus *pgxpool.Pool, offset, limit int, visit func(Document) error) error {
-	rows, err := corpus.Query(ctx, `SELECT kind,source_id,part,lang,title,body FROM (`+corpusSQL+`) corpus WHERE btrim(coalesce(body,''))<>'' ORDER BY kind,source_id,part,lang OFFSET $1 LIMIT $2`, offset, func() any {
-		if limit > 0 {
-			return limit
-		}
-		return nil
-	}())
+// walkCorpus streams one row at a time in a deterministic order, from the
+// document after after (none: from the start). The caller can stop by
+// returning an error; it never materializes the corpus in Go memory. A resumed
+// run starts after a document's key, not after a count of documents: a count
+// shifts when the corpus changes between runs, and there is no OFFSET
+// anywhere in the project (internal/cursor).
+func walkCorpus(ctx context.Context, corpus *pgxpool.Pool, after DocKey, limit int, visit func(Document) error) error {
+	// The walk is the SQL corpus in key order, then the embedded topics in
+	// their own order. After a topic, the SQL part is done.
+	afterTopic := after.Kind == "topic"
+	var lim any
+	if limit > 0 {
+		lim = limit
+	}
+	cond, args := "", []any{lim}
+	if afterTopic {
+		cond = " AND false"
+	} else if after != (DocKey{}) {
+		cond, args = " AND (kind,source_id,part,lang) > ($2,$3,$4,$5)", append(args, after.Kind, after.ID, after.Part, after.Lang)
+	}
+	rows, err := corpus.Query(ctx, `SELECT kind,source_id,part,lang,title,body FROM (`+corpusSQL+`) corpus WHERE btrim(coalesce(body,''))<>''`+cond+` ORDER BY kind,source_id,part,lang LIMIT $1`, args...)
 	if err != nil {
 		return err
 	}
@@ -204,14 +218,7 @@ func walkCorpus(ctx context.Context, corpus *pgxpool.Pool, offset, limit int, vi
 	if limit > 0 && count >= limit {
 		return nil
 	}
-	// Offset may lie beyond the SQL corpus and within the embedded topic tail.
-	var dbCount int
-	if offset > 0 {
-		if err = corpus.QueryRow(ctx, `SELECT count(*) FROM (`+corpusSQL+`) corpus WHERE btrim(coalesce(body,''))<>''`).Scan(&dbCount); err != nil {
-			return err
-		}
-	}
-	topicOffset := max(0, offset-dbCount)
+	skipping := afterTopic // up to and including the topic the walk resumes after
 	for _, t := range topics.All() {
 		if err := validTopic(ctx, corpus, t); err != nil {
 			if ctx.Err() != nil {
@@ -220,8 +227,8 @@ func walkCorpus(ctx context.Context, corpus *pgxpool.Pool, offset, limit int, vi
 			continue
 		}
 		for _, lang := range []string{"ar", "en"} {
-			if topicOffset > 0 {
-				topicOffset--
+			if skipping {
+				skipping = DocKey{Kind: "topic", Part: t.Slug, Lang: lang} != after
 				continue
 			}
 			if limit > 0 && count >= limit {
@@ -235,3 +242,28 @@ func walkCorpus(ctx context.Context, corpus *pgxpool.Pool, offset, limit int, vi
 	}
 	return nil
 }
+
+// DocKey is a corpus document's place in the walk: kind, id, part, language.
+type DocKey struct {
+	Kind string
+	ID   int
+	Part string
+	Lang string
+}
+
+// ParseDocKey reads "kind/id/part/lang", as -after takes it (part and lang may
+// be empty: "law/244611//ar").
+func ParseDocKey(s string) (DocKey, error) {
+	f := strings.Split(s, "/")
+	if len(f) != 4 || f[0] == "" {
+		return DocKey{}, fmt.Errorf("document key %q: want kind/id/part/lang", s)
+	}
+	id, err := strconv.Atoi(f[1])
+	if err != nil {
+		return DocKey{}, fmt.Errorf("document key %q: id %q is not a number", s, f[1])
+	}
+	return DocKey{Kind: f[0], ID: id, Part: f[2], Lang: f[3]}, nil
+}
+
+// String is the key as ParseDocKey reads it.
+func (k DocKey) String() string { return fmt.Sprintf("%s/%d/%s/%s", k.Kind, k.ID, k.Part, k.Lang) }

@@ -12,7 +12,7 @@
   {{with .Heading}}<h2 class="sec__title" lang="ar" dir="rtl">{{.}}</h2>{{end}}
   <ul class="pager__nums" dir="rtl" lang="ar">{{range .Numbers}}<li id="a-{{slug .}}"><a class="chip" href="{{artURL $law .}}">المادة {{.}}</a></li>{{end}}</ul>
   {{end}}
-  {{template "pager" .}}
+  {{template "numpager" .}}
 </section>
 <div style="height:var(--section-y)"></div>
 {{end}}{{end}}

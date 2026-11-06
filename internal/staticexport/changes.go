@@ -519,13 +519,8 @@ func pathsForRows(tables map[string][]changeRow, changed []tableRow) ChangePlan 
 		}
 		positions[id][r["position"]] = true
 	}
-	counts := map[string]map[string]bool{}
 	dirtyLists := map[string]bool{}
-	count := func(base, id string, dirty bool) {
-		if counts[base] == nil {
-			counts[base] = map[string]bool{}
-		}
-		counts[base][id] = true
+	count := func(base, _ string, dirty bool) { // the lists a changed row is in
 		if dirty {
 			dirtyLists[base] = true
 		}
@@ -573,18 +568,12 @@ func pathsForRows(tables map[string][]changeRow, changed []tableRow) ChangePlan 
 			}
 		}
 	}
+	// A list's later pages are cursor pages the origin answers (internal/site,
+	// keyset.go): only its first page is stored. Its old numbered pages still
+	// in the manifest are selected by ExpandChangedPaths, render as a move to
+	// the first page, and so leave the bucket.
 	for base := range dirtyLists {
-		size := 300
-		if !strings.Contains(base, "/year/") {
-			size = 40
-		}
-		for i := 1; i <= max(1, (len(counts[base])+size-1)/size); i++ {
-			p := base
-			if i > 1 {
-				p += fmt.Sprintf("page/%d/", i)
-			}
-			add(p)
-		}
+		add(base)
 	}
 	for _, r := range tables["code"] {
 		id := r["law_id"]

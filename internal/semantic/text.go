@@ -42,7 +42,7 @@ func BuildText(ctx context.Context, corpus, index *pgxpool.Pool, model string) (
 		docs, chunks = nil, nil
 		return nil
 	}
-	err = walkCorpus(ctx, corpus, 0, 0, func(d Document) error {
+	err = walkCorpus(ctx, corpus, DocKey{}, 0, func(d Document) error {
 		docs = append(docs, []any{model, d.Kind, d.ID, d.Part, d.Lang, Hash(d.Text), "data"})
 		stats.Documents++
 		for _, c := range Chunks(d) {
