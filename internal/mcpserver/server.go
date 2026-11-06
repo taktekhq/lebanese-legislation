@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/taktekhq/lebanese-legislation/internal/memo"
 )
 
 const (
@@ -112,6 +113,7 @@ type Server struct {
 	codeCache  codeList
 	calcCache  calcIndex
 	englishMem memCache
+	counts     memo.Map // the paged tools' totals (count.go)
 	frenchMem  memCache
 
 	badgeMu    sync.Mutex

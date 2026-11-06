@@ -16,6 +16,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/taktekhq/lebanese-legislation/internal/amend"
+	"github.com/taktekhq/lebanese-legislation/internal/memo"
 )
 
 const perPage = 40
@@ -361,8 +362,8 @@ func (s *Server) laws(w http.ResponseWriter, r *http.Request) {
 		where = append(where, "EXISTS (SELECT 1 FROM legislation_article a WHERE a.law_id = l.id)")
 	}
 	cond := strings.Join(where, " AND ")
-	var total int
-	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l"+and(cond), args...).Scan(&total); err != nil {
+	total, err := s.countRows(ctx, "SELECT count(*) FROM legislation l"+and(cond), args...)
+	if err != nil {
 		s.fail(w, r, err)
 		return
 	}
@@ -427,16 +428,26 @@ func lawPageLinks(q url.Values, list []LawRow, older, newer bool) (template.URL,
 	return pageLinks(q, dateTok(a.IssuedOn, a.ID), dateTok(b.IssuedOn, b.ID), older, newer)
 }
 
+// chips are a list's filter options with their counts, kept by s.counts
+// (internal/memo): the same on every page of the list.
 func (s *Server) chips(ctx context.Context, sql string, args ...any) ([]Chip, error) {
+	k := memo.Key(sql, args...)
+	if v, ok := s.counts.Get(k); ok {
+		return v.([]Chip), nil
+	}
 	rows, err := s.db.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
-	return pgx.CollectRows(rows, func(row pgx.CollectableRow) (Chip, error) {
+	cs, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (Chip, error) {
 		var c Chip
 		err := row.Scan(&c.Value, &c.Label, &c.Count)
 		return c, err
 	})
+	if err == nil {
+		s.counts.Put(k, cs)
+	}
+	return cs, err
 }
 
 // ---------------------------------------------------------------- one law

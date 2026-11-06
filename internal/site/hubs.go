@@ -203,8 +203,8 @@ func (s *Server) yearKindHub(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 	key := dateKey("l.issued_on")
 	cond := key + ` >= make_date($1, 1, 1) AND ` + key + ` < make_date($1 + 1, 1, 1) AND ` + kindWordSQL + ` = $2`
-	var total int
-	if err := s.db.QueryRow(ctx, `SELECT count(*)::int FROM legislation l WHERE `+cond, y, word).Scan(&total); err != nil {
+	total, err := s.countRows(ctx, `SELECT count(*)::int FROM legislation l WHERE `+cond, y, word)
+	if err != nil {
 		s.fail(w, r, err)
 		return
 	}

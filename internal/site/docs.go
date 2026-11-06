@@ -101,8 +101,8 @@ func (s *Server) docList(k docKind) http.HandlerFunc {
 		ctx, cancel := s.ctx(r)
 		defer cancel()
 		q := r.URL.Query()
-		var total int
-		if err := s.db.QueryRow(ctx, "SELECT count(*) FROM "+k.table).Scan(&total); err != nil {
+		total, err := s.countRows(ctx, "SELECT count(*) FROM "+k.table)
+		if err != nil {
 			s.fail(w, r, err)
 			return
 		}
@@ -327,8 +327,8 @@ func (s *Server) rulings(w http.ResponseWriter, r *http.Request) {
 		where = append(where, fmt.Sprintf("year >= $%d AND year < $%d + 10", len(args), len(args)))
 	}
 	cond := strings.Join(where, " AND ")
-	var total int
-	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM ruling"+and(cond), args...).Scan(&total); err != nil {
+	total, err := s.countRows(ctx, "SELECT count(*) FROM ruling"+and(cond), args...)
+	if err != nil {
 		s.fail(w, r, err)
 		return
 	}
@@ -492,8 +492,8 @@ func (s *Server) gazettes(w http.ResponseWriter, r *http.Request) {
 		args = append(args, v)
 		cond = key + " >= make_date($1, 1, 1) AND " + key + " < make_date($1 + 1, 1, 1)"
 	}
-	var total int
-	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM gazette_issue"+and(cond), args...).Scan(&total); err != nil {
+	total, err := s.countRows(ctx, "SELECT count(*) FROM gazette_issue"+and(cond), args...)
+	if err != nil {
 		s.fail(w, r, err)
 		return
 	}

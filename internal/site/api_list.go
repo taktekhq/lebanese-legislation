@@ -199,9 +199,11 @@ func (s *Server) listLaws(ctx context.Context, p listParams) (apiLawList, error)
 		}
 	}
 	where := " WHERE " + strings.Join(conds, " AND ")
-	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l"+where, args...).Scan(&out.Total); err != nil {
+	total, err := s.countRows(ctx, "SELECT count(*) FROM legislation l"+where, args...) // countcache.go
+	if err != nil {
 		return out, err
 	}
+	out.Total = total
 	if p.after {
 		args = append(args, p.afterDate, p.afterID)
 		where += fmt.Sprintf(" AND (%s, l.id) %s ($%d::date, $%d::int)", date, p.cmp(), len(args)-1, len(args))
@@ -284,9 +286,11 @@ func (s *Server) listIssues(ctx context.Context, p listParams) (apiIssueList, er
 	if cond != "" {
 		where = " WHERE " + cond
 	}
-	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM gazette_issue g"+where, args...).Scan(&out.Total); err != nil {
+	total, err := s.countRows(ctx, "SELECT count(*) FROM gazette_issue g"+where, args...) // countcache.go
+	if err != nil {
 		return out, err
 	}
+	out.Total = total
 	dir, n := p.dir(), p.limit+1
 	dated := []string{"g.published_on IS NOT NULL"}
 	if cond != "" {

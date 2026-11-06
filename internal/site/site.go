@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/taktekhq/lebanese-legislation/internal/memo"
 )
 
 //go:embed templates/*.html
@@ -40,6 +41,7 @@ type Server struct {
 	vector        vectorSearcher
 	meaning       *meaningSearch // explicitly requested natural language interpretation
 	scache        searchCache    // answers to recent searches
+	counts        memo.Map       // lists' totals and filter chips (countcache.go)
 	db            *pgxpool.Pool
 	pages         map[string]*template.Template // English, at the plain paths
 	pagesAr       map[string]*template.Template // Arabic, at the root and /ar/...; s.pages is English (/en/...); pagesAr is nil when isStatic

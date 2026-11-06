@@ -340,8 +340,8 @@ func (s *Server) getLawTexts(ctx context.Context, a args) (toolResult, error) {
 		return fail("law " + shown + " not found"), nil
 	}
 	limit := clampInt(a["limit"], 50, 1, 200)
-	var total int
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM legislation_article WHERE law_id = $1`, id).Scan(&total); err != nil {
+	total, err := s.count(ctx, `SELECT count(*) FROM legislation_article WHERE law_id = $1`, id)
+	if err != nil {
 		return toolResult{}, err
 	}
 	// The primary key (law_id, position) answers the page at any depth; one
@@ -782,8 +782,8 @@ func (s *Server) getLinks(ctx context.Context, a args) (toolResult, error) {
 		cond += fmt.Sprintf(" AND ge.relation = $%d", len(params))
 	}
 	const date = "coalesce(l.gazette_date, l.issued_on)"
-	var count int
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM graph_edge ge WHERE `+cond, params...).Scan(&count); err != nil {
+	count, err := s.count(ctx, `SELECT count(*) FROM graph_edge ge WHERE `+cond, params...)
+	if err != nil {
 		return fail(fmt.Sprintf("could not read the links of %s: %s; try a smaller limit", key, jsSlice(err.Error(), 200))), nil
 	}
 	// The order is the texts with a date first, by date, then by edge id,
@@ -1021,8 +1021,8 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 	}
 	// lawJoins is one row per law and every law has its kind (a foreign key),
 	// so legislation alone counts the same rows.
-	var total int
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM legislation l WHERE `+w, params...).Scan(&total); err != nil {
+	total, err := s.count(ctx, `SELECT count(*) FROM legislation l WHERE `+w, params...)
+	if err != nil {
 		return toolResult{}, err
 	}
 	if after {
@@ -1109,8 +1109,8 @@ func (s *Server) listGazetteIssues(ctx context.Context, a args) (toolResult, err
 	if r.order == "oldest" {
 		dir, cmp = "ASC", ">"
 	}
-	var total int
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM gazette_issue g WHERE `+w, params...).Scan(&total); err != nil {
+	total, err := s.count(ctx, `SELECT count(*) FROM gazette_issue g WHERE `+w, params...)
+	if err != nil {
 		return toolResult{}, err
 	}
 	if after {

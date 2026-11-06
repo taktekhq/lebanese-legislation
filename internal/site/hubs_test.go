@@ -131,7 +131,7 @@ func TestKindYearHubsDivideTheYear(t *testing.T) {
 			t.Fatal(err)
 		}
 		sum += n
-		ids, pages := walk(t, s, path, 100)
+		ids, pages := walkPages(t, s, path, 100)
 		if len(ids) != n {
 			t.Errorf("%s lists %d texts over %d pages, want %d", path, len(ids), len(pages), n)
 		}

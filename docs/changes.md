@@ -1,5 +1,15 @@
 # Changes
 
+## 6 November 2026
+
+- No OFFSET anywhere. Every list pages with a cursor: the sort key of the last row shown, read back as a condition that an index answers (`internal/cursor`, the "Lists" indexes in `db/indexes.sql`). A page costs about the same at any depth: 0.1 to 0.7 ms on a copy of the data, where page 2,000 of `/laws/` by OFFSET read 80,000 laws (835 ms, and 3 to 9 s on the container under a crawl).
+- The API: `/api/v1/laws/`, `/api/v1/gazette/` and `/api/v1/search/` take `cursor` (the previous answer's `next_cursor`) and answer `next_cursor` while more follows. `offset` and `next_offset` are gone: a request with `offset` answers 400 and says what to send instead. A search's cursor carries each kind it searched. See [api/README.md](../api/README.md).
+- The MCP server is 2.0.0. `get_law_texts`, `get_links`, `list_legislation` and `list_gazette_issues` take `cursor` and answer `next_cursor`; a call with `offset` is a tool error that says to pass `next_cursor`, or `since` and `until` to jump to a period. The tool descriptions and the initialize instructions say so. See [mcp/README.md](../mcp/README.md).
+- The website's lists show Newer and Older (`?before=`, `?after=`) instead of page numbers. Their first page stays the indexed, static one; later pages are noindex, and every document is in a sitemap. `/x/page/N/` and `?page=N` move to the list's first page. A code's article hub (`/codes/x/page/2/`) keeps its numbered pages, which are ranges of article positions.
+- A list's total and filter counts are kept for ten minutes (`internal/memo`); the served database is read-only, so they cannot go stale while a container runs.
+- `origin_request` events carry a `route` (the API endpoint or the address's first word), so each endpoint is timed apart on the PostHog dashboard "LebLeg origin by type".
+- `cmd/searchindex -offset` is now `-after kind/id/part/lang`.
+
 ## 3-4 November 2026
 
 - AI crawlers may read everything. `robots.txt` gives each named AI crawler (GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, Claude-User, PerplexityBot, Perplexity-User, CCBot, ShapBot, DuckAssistBot, MistralAI-User) a group that allows search, `/api/v1/`, `/mcp` and query strings; only `/changes/review/` stays closed. The site Worker no longer answers ShapBot with 429. The per-address limit on dynamic paths (30 requests per 10 seconds) is unchanged.

@@ -421,9 +421,9 @@ var (
 	rowRe   = regexp.MustCompile(`class="docrow" href="[^"]*/([0-9]+)/"`)
 )
 
-// walk reads a list from its first page to its last by the Older links and
+// walkPages reads a list from its first page to its last by the Older links and
 // returns the ids of its rows in order, and each page's address.
-func walk(t *testing.T, s *Server, first string, max int) (ids []string, pages []string) {
+func walkPages(t *testing.T, s *Server, first string, max int) (ids []string, pages []string) {
 	t.Helper()
 	path := first
 	for len(pages) < max {
@@ -469,7 +469,7 @@ func TestCursorPagesWalkTheWholeList(t *testing.T) {
 			want = append(want, strconv.Itoa(id))
 		}
 		rows.Close()
-		got, pages := walk(t, s, c.first, 400)
+		got, pages := walkPages(t, s, c.first, 400)
 		if strings.Join(got, ",") != strings.Join(want, ",") {
 			t.Errorf("%s: walked %d rows over %d pages, want %d in order", c.first, len(got), len(pages), len(want))
 			continue

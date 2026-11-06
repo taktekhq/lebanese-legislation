@@ -117,8 +117,8 @@ func (s *Server) lawsYear(w http.ResponseWriter, r *http.Request) {
 	if y > 0 {
 		cond, args = key+" >= make_date($1, 1, 1) AND "+key+" < make_date($1 + 1, 1, 1)", []any{y}
 	}
-	var total int
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM legislation l WHERE `+cond, args...).Scan(&total); err != nil {
+	total, err := s.countRows(ctx, `SELECT count(*) FROM legislation l WHERE `+cond, args...)
+	if err != nil {
 		s.fail(w, r, err)
 		return
 	}
@@ -205,12 +205,12 @@ func (s *Server) docYear(kind string) http.HandlerFunc {
 				(SELECT count(*) FROM gazette_entry e WHERE e.issue_id = g.id)::text || ' texts', g.published_on, NULL
 				FROM gazette_issue g JOIN (%s) p ON p.id = g.id`
 		}
-		var total int
 		args := []any{y}
 		if y == 0 && kind == "gazette" {
 			args = nil
 		}
-		if err := s.db.QueryRow(ctx, "SELECT count(*) FROM "+table+and(cond), args...).Scan(&total); err != nil {
+		total, err := s.countRows(ctx, "SELECT count(*) FROM "+table+and(cond), args...)
+		if err != nil {
 			s.fail(w, r, err)
 			return
 		}
