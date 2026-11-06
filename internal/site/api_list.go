@@ -9,11 +9,19 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/taktekhq/lebanese-legislation/internal/cursor"
 )
 
 // Listing by date: GET /api/v1/laws/ and GET /api/v1/gazette/. The same
 // shapes as the hosted MCP server's tools list_legislation and
 // list_gazette_issues, so a client can use either.
+//
+// Both page with a cursor, never an OFFSET: next_cursor is the date and id of
+// the page's last row, and the next page is a WHERE on (date, id) that an
+// index answers at any depth. Page 800 of /api/v1/laws/?limit=100 by OFFSET
+// read 80,000 laws: 0.85 s, 0.14 s once the ids were picked first (#172).
 
 const (
 	listDefaultLimit = 50
@@ -43,18 +51,36 @@ func parseDateBound(s string, end bool) (time.Time, error) {
 
 // listParams are the parameters both listings share.
 type listParams struct {
-	since, until  string // as the caller wrote them
-	from, to      *time.Time
-	order         string // "newest" or "oldest"
-	limit, offset int
-	kind          string
+	since, until string // as the caller wrote them
+	from, to     *time.Time
+	order        string // "newest" or "oldest"
+	limit        int
+	kind         string
+	// after is the sort key of the previous page's last row, read from its
+	// next_cursor; the page starts right after it. afterDate is
+	// cursor.NoDate for a Gazette issue with no date.
+	after     bool
+	afterDate time.Time
+	afterNone bool // afterDate is cursor.NoDate
+	afterID   int64
 }
 
 func readListParams(r *http.Request) (listParams, error) {
 	q := r.URL.Query()
 	p := listParams{since: strings.TrimSpace(q.Get("since")), until: strings.TrimSpace(q.Get("until")),
 		order: "newest", kind: strings.TrimSpace(q.Get("kind")),
-		limit: clampInt(q.Get("limit"), listDefaultLimit, 1, listMaxLimit), offset: clampInt(q.Get("offset"), 0, 0, 1<<30)}
+		limit: clampInt(q.Get("limit"), listDefaultLimit, 1, listMaxLimit)}
+	if q.Has("offset") {
+		return p, errOffsetRemoved
+	}
+	if c := q.Get("cursor"); c != "" {
+		d, id, ok := cursor.ParseDateID(c)
+		if !ok || id <= 0 {
+			return p, errBadCursor
+		}
+		p.after, p.afterID, p.afterNone = true, id, d == cursor.NoDate
+		p.afterDate, _ = time.Parse("2006-01-02", d)
+	}
 	if o := q.Get("order"); o == "oldest" {
 		p.order = "oldest"
 	} else if o != "" && o != "newest" {
@@ -105,6 +131,15 @@ func (p listParams) dir() string {
 	return "DESC"
 }
 
+// cmp is how a row after the cursor compares with it: below it newest
+// first, above it oldest first.
+func (p listParams) cmp() string {
+	if p.order == "oldest" {
+		return ">"
+	}
+	return "<"
+}
+
 // ---------------------------------------------------------------- texts
 
 type apiListedLaw struct {
@@ -121,14 +156,27 @@ type apiLawList struct {
 	Kind       *string        `json:"kind"`
 	Order      string         `json:"order"`
 	Total      int            `json:"total"`
-	Offset     int            `json:"offset"`
-	NextOffset *int           `json:"next_offset,omitempty"`
+	NextCursor string         `json:"next_cursor,omitempty"`
 	Laws       []apiListedLaw `json:"laws"`
+}
+
+// kindNames are the Arabic names of the kinds name stands for: the Arabic
+// name itself, or every kind whose English name it is ("Constitution" is
+// two). The list filters on these names rather than joining
+// legislation_kind, so a page is one scan of legislation_pub_kind: decrees
+// before 1990 by the join read 9,293 rows and sorted them (16 ms), by
+// kind = $1 they read the 101 of the page (0.4 ms).
+func (s *Server) kindNames(ctx context.Context, name string) ([]string, error) {
+	rows, err := s.db.Query(ctx, `SELECT name_ar FROM legislation_kind WHERE name_ar = $1 OR lower(name_en) = lower($1) ORDER BY name_ar`, name)
+	if err != nil {
+		return nil, err
+	}
+	return pgx.CollectRows(rows, pgx.RowTo[string])
 }
 
 func (s *Server) listLaws(ctx context.Context, p listParams) (apiLawList, error) {
 	out := apiLawList{Since: nilIfEmpty(p.since), Until: nilIfEmpty(p.until), Kind: nilIfEmpty(p.kind),
-		Order: p.order, Offset: p.offset, Laws: []apiListedLaw{}}
+		Order: p.order, Laws: []apiListedLaw{}}
 	const date = "coalesce(l.gazette_date, l.issued_on)"
 	cond, args := p.where(date, nil)
 	// a list by date leaves out the texts with no date, as the MCP Worker's
@@ -138,19 +186,32 @@ func (s *Server) listLaws(ctx context.Context, p listParams) (apiLawList, error)
 		conds = append(conds, cond)
 	}
 	if p.kind != "" {
-		args = append(args, p.kind)
-		conds = append(conds, fmt.Sprintf("(l.kind = $%d OR lower(k.name_en) = lower($%d))", len(args), len(args)))
+		kinds, err := s.kindNames(ctx, p.kind)
+		if err != nil || len(kinds) == 0 {
+			return out, err
+		}
+		if len(kinds) == 1 {
+			args = append(args, kinds[0])
+			conds = append(conds, fmt.Sprintf("l.kind = $%d", len(args)))
+		} else {
+			args = append(args, kinds)
+			conds = append(conds, fmt.Sprintf("l.kind = ANY($%d)", len(args)))
+		}
 	}
 	where := " WHERE " + strings.Join(conds, " AND ")
-	from := ` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind` + where
-	if err := s.db.QueryRow(ctx, "SELECT count(*)"+from, args...).Scan(&out.Total); err != nil {
+	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l"+where, args...).Scan(&out.Total); err != nil {
 		return out, err
 	}
-	// ids first, then the page's rows, as /laws/ (handlers.go)
-	order := fmt.Sprintf(" ORDER BY %s %s NULLS LAST, l.id %s", date, p.dir(), p.dir())
+	if p.after {
+		args = append(args, p.afterDate, p.afterID)
+		where += fmt.Sprintf(" AND (%s, l.id) %s ($%d::date, $%d::int)", date, p.cmp(), len(args)-1, len(args))
+	}
+	// ids first, one more than the page to know there is a next, then the
+	// page's rows, as /laws/ (handlers.go)
+	order := fmt.Sprintf(" ORDER BY %s %s, l.id %s", date, p.dir(), p.dir())
 	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+`, l.gazette_number, l.gazette_date,
 		(SELECT min(e.issue_id) FROM gazette_entry e WHERE e.law_id = l.id), `+date+
-		` FROM (SELECT l.id`+from+order+fmt.Sprintf(" LIMIT %d OFFSET %d", p.limit, p.offset)+
+		` FROM (SELECT l.id FROM legislation l`+where+order+fmt.Sprintf(" LIMIT %d", p.limit+1)+
 		`) p JOIN legislation l ON l.id = p.id JOIN legislation_kind k ON k.name_ar = l.kind`+order, args...)
 	if err != nil {
 		return out, err
@@ -164,16 +225,15 @@ func (s *Server) listLaws(ctx context.Context, p listParams) (apiLawList, error)
 		if err := rows.Scan(append(lawRowDest(&l), &gn, &gd, &gi, &d)...); err != nil {
 			return out, err
 		}
+		if len(out.Laws) == p.limit { // the row after the page
+			last := out.Laws[len(out.Laws)-1]
+			out.NextCursor = cursor.DateID(*last.Date, int64(last.ID))
+			break
+		}
 		out.Laws = append(out.Laws, apiListedLaw{apiLawSummary: s.lawSum(ctx, l, ""), GazetteNumber: gn,
 			GazetteDate: ymd(gd), GazetteIssueID: gi, Date: ymd(d)})
 	}
-	if err := rows.Err(); err != nil {
-		return out, err
-	}
-	if next := p.offset + len(out.Laws); next < out.Total && len(out.Laws) > 0 {
-		out.NextOffset = &next
-	}
-	return out, nil
+	return out, rows.Err()
 }
 
 func (s *Server) apiLaws(w http.ResponseWriter, r *http.Request) {
@@ -209,13 +269,16 @@ type apiIssueList struct {
 	Until      *string       `json:"until"`
 	Order      string        `json:"order"`
 	Total      int           `json:"total"`
-	Offset     int           `json:"offset"`
-	NextOffset *int          `json:"next_offset,omitempty"`
+	NextCursor string        `json:"next_cursor,omitempty"`
 	Issues     []apiIssueRow `json:"issues"`
 }
 
+// listIssues lists the issues by date, then id. With no since or until the
+// issues with no date (3 of 6,851) come last in either order: the dated by
+// (published_on, id), then the undated by id, both read from
+// gazette_pub_date. A cursor among the undated has the date cursor.NoDate.
 func (s *Server) listIssues(ctx context.Context, p listParams) (apiIssueList, error) {
-	out := apiIssueList{Since: nilIfEmpty(p.since), Until: nilIfEmpty(p.until), Order: p.order, Offset: p.offset, Issues: []apiIssueRow{}}
+	out := apiIssueList{Since: nilIfEmpty(p.since), Until: nilIfEmpty(p.until), Order: p.order, Issues: []apiIssueRow{}}
 	cond, args := p.where("g.published_on", nil)
 	where := ""
 	if cond != "" {
@@ -224,10 +287,39 @@ func (s *Server) listIssues(ctx context.Context, p listParams) (apiIssueList, er
 	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM gazette_issue g"+where, args...).Scan(&out.Total); err != nil {
 		return out, err
 	}
-	// ids first, then the page's rows, as /laws/ (handlers.go)
-	order := fmt.Sprintf(" ORDER BY g.published_on %s NULLS LAST, g.id %s", p.dir(), p.dir())
+	dir, n := p.dir(), p.limit+1
+	dated := []string{"g.published_on IS NOT NULL"}
+	if cond != "" {
+		dated = append(dated, cond)
+	}
+	undated := []string{"g.published_on IS NULL"}
+	switch {
+	case p.after && p.afterNone: // the previous page ended among the undated
+		dated = nil
+		args = append(args, p.afterID)
+		undated = append(undated, fmt.Sprintf("g.id %s $%d::int", p.cmp(), len(args)))
+	case p.after:
+		args = append(args, p.afterDate, p.afterID)
+		dated = append(dated, fmt.Sprintf("(g.published_on, g.id) %s ($%d::date, $%d::int)", p.cmp(), len(args)-1, len(args)))
+	}
+	if cond != "" { // a bound leaves out the undated, as published_on >= $1 does
+		undated = nil
+	}
+	var parts []string
+	if dated != nil {
+		parts = append(parts, fmt.Sprintf("(SELECT g.id, g.published_on FROM gazette_issue g WHERE %s ORDER BY g.published_on %s, g.id %s LIMIT %d)",
+			strings.Join(dated, " AND "), dir, dir, n))
+	}
+	if undated != nil {
+		parts = append(parts, fmt.Sprintf("(SELECT g.id, g.published_on FROM gazette_issue g WHERE %s ORDER BY g.id %s LIMIT %d)",
+			strings.Join(undated, " AND "), dir, n))
+	}
+	if len(parts) == 0 {
+		return out, nil
+	}
+	order := fmt.Sprintf(" ORDER BY g.published_on %s NULLS LAST, g.id %s", dir, dir)
 	rows, err := s.db.Query(ctx, `SELECT g.id, g.number, g.published_on, (SELECT count(*) FROM gazette_entry e WHERE e.issue_id = g.id)::int
-		FROM (SELECT g.id FROM gazette_issue g`+where+order+fmt.Sprintf(" LIMIT %d OFFSET %d", p.limit, p.offset)+
+		FROM (SELECT * FROM (`+strings.Join(parts, " UNION ALL ")+`) g`+order+fmt.Sprintf(" LIMIT %d", n)+
 		`) p JOIN gazette_issue g ON g.id = p.id`+order, args...)
 	if err != nil {
 		return out, err
@@ -239,6 +331,15 @@ func (s *Server) listIssues(ctx context.Context, p listParams) (apiIssueList, er
 		if err := rows.Scan(&g.ID, &g.Number, &on, &g.TextCount); err != nil {
 			return out, err
 		}
+		if len(out.Issues) == p.limit { // the row after the page
+			last := out.Issues[len(out.Issues)-1]
+			d := cursor.NoDate
+			if last.PublishedOn != nil {
+				d = *last.PublishedOn
+			}
+			out.NextCursor = cursor.DateID(d, int64(last.ID))
+			break
+		}
 		g.PublishedOn = ymd(on)
 		g.Source = "centre"
 		if g.ID >= scanIDBase {
@@ -248,13 +349,7 @@ func (s *Server) listIssues(ctx context.Context, p listParams) (apiIssueList, er
 		g.UpdatedAt = s.listedChange(ctx, "gazette", g.ID)
 		out.Issues = append(out.Issues, g)
 	}
-	if err := rows.Err(); err != nil {
-		return out, err
-	}
-	if next := p.offset + len(out.Issues); next < out.Total && len(out.Issues) > 0 {
-		out.NextOffset = &next
-	}
-	return out, nil
+	return out, rows.Err()
 }
 
 func (s *Server) apiGazettes(w http.ResponseWriter, r *http.Request) {

@@ -80,7 +80,12 @@ func TestCybercrimeFindsLaw81(t *testing.T) {
 		t.Errorf("cybercrime: law 81 listed %d times among %d laws", n, len(out.Laws))
 	}
 	// Another year does not pin it; a later page does not repeat it.
-	for _, path := range []string{"/api/v1/search/?type=laws&year=1999&q=cybercrime", "/api/v1/search/?type=laws&offset=1&q=cybercrime"} {
+	var first apiSearchResult
+	getJSON(t, s, "/api/v1/search/?type=laws&limit=1&q=cybercrime", &first)
+	if len(first.Laws) != 1 || first.Laws[0].ID != lawEtransactions || first.NextCursor == "" {
+		t.Fatalf("cybercrime, one a page: %+v next %q", first.Laws, first.NextCursor)
+	}
+	for _, path := range []string{"/api/v1/search/?type=laws&year=1999&q=cybercrime", "/api/v1/search/?type=laws&limit=50&q=cybercrime&cursor=" + first.NextCursor} {
 		var y apiSearchResult
 		getJSON(t, s, path, &y)
 		for _, l := range y.Laws {

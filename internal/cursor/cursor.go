@@ -22,7 +22,7 @@ import (
 
 const (
 	version = "v1"
-	maxLen  = 200 // a real token is under 60 characters
+	maxLen  = 400 // a list token is under 60 characters; a search token for all four parts, up to about 210
 )
 
 // Encode joins a row's sort key into a token.

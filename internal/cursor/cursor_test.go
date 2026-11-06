@@ -27,7 +27,7 @@ func TestRoundTrip(t *testing.T) {
 
 func TestRejects(t *testing.T) {
 	for _, tok := range []string{
-		"", "x", "!!!", strings.Repeat("A", 300),
+		"", "x", "!!!", strings.Repeat("A", 500),
 		Encode("2020-05-03"),               // one part, two wanted
 		Encode("2020-05-03", "1", "2"),     // three parts
 		Encode("2020-13-40", "1"),          // not a date

@@ -17,6 +17,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"slices"
@@ -27,6 +28,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/taktekhq/lebanese-legislation/internal/calculatedcurrent"
+	"github.com/taktekhq/lebanese-legislation/internal/cursor"
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 )
 
@@ -142,17 +144,18 @@ func (s *Server) apiRoot(w http.ResponseWriter, r *http.Request) {
 		"openapi":    Base + "/api/v1/openapi.json",
 		"mcp":        Base + "/mcp",
 		"not_advice": notLegalAdvice,
-		"notes":      []string{titleEnNote, updatedAtNote, "search: when q finds nothing it is read again (English and French terms to Arabic, names, a year, a typo) and searched_instead says what was searched."},
+		"notes": []string{titleEnNote, updatedAtNote, "search: when q finds nothing it is read again (English and French terms to Arabic, names, a year, a typo) and searched_instead says what was searched.",
+			pagingNote},
 		"endpoints": []string{
-			"GET /api/v1/search/?q=&type=laws|rulings|gazette|articles&year=&limit=&offset=",
+			"GET /api/v1/search/?q=&type=laws|rulings|gazette|articles&year=&limit=&cursor=",
 			"GET /api/v1/law/{id}/",
 			"GET /api/v1/law/{id}/calculated-current/",
 			"GET /api/v1/openapi.json",
 			"GET /api/v1/law/{id}/article/{n}/",
 			"GET /api/v1/ruling/{id}/",
 			"GET /api/v1/gazette/{id}/",
-			"GET /api/v1/laws/?since=&until=&kind=&order=newest|oldest&limit=&offset=",
-			"GET /api/v1/gazette/?since=&until=&order=newest|oldest&limit=&offset=",
+			"GET /api/v1/laws/?since=&until=&kind=&order=newest|oldest&limit=&cursor=",
+			"GET /api/v1/gazette/?since=&until=&order=newest|oldest&limit=&cursor=",
 		},
 	})
 }
@@ -266,7 +269,19 @@ type apiSearchResult struct {
 	// Selection is "ok" when a model kept only the related passages that
 	// answer q (select=true), or "unavailable" when it could not.
 	Selection string `json:"selection,omitempty"`
+	// NextCursor, passed as cursor, is the next page of every part that has
+	// more; absent on the last page.
+	NextCursor string `json:"next_cursor,omitempty"`
+	// next is where each part stands after this page (searchcursor.go).
+	// Each part's search writes only its own.
+	next [4]searchPos
+	// lookedUp are the laws the first page shows because they were looked
+	// up, not ranked: every page leaves them out of its ranked laws.
+	lookedUp []int
 }
+
+// pagingNote is how every list and search pages; the API root repeats it.
+const pagingNote = "paging: pass next_cursor back as cursor for the next page; it is absent on the last page. offset was removed on 6 Nov 2026."
 
 // apiPassage is one related passage, verbatim from its source.
 type apiPassage struct {
@@ -322,20 +337,35 @@ func (s *Server) addRelated(ctx context.Context, q string, choose bool, out *api
 }
 
 func (s *Server) apiSearch(w http.ResponseWriter, r *http.Request) {
-	semanticWanted := r.URL.Query().Get("semantic") == "true"
-	selectWanted := r.URL.Query().Get("select") == "true"
+	params := r.URL.Query()
+	if params.Has("offset") {
+		s.writeJSON(w, http.StatusBadRequest, apiErrorBody{Error: errOffsetRemoved.Error()})
+		return
+	}
+	typ := params.Get("type")
+	if len(searchedParts(typ)) != 1 {
+		typ = "" // all four, as an unknown type always searched
+	}
+	var cur *searchCursor
+	if c := params.Get("cursor"); c != "" {
+		var ok bool
+		if cur, ok = decodeSearchCursor(c, typ); !ok {
+			s.writeJSON(w, http.StatusBadRequest, apiErrorBody{Error: errBadCursor.Error()})
+			return
+		}
+	}
+	semanticWanted := params.Get("semantic") == "true"
+	selectWanted := params.Get("select") == "true"
 	ctx, cancel := s.ctx(r)
 	if semanticWanted { // embedding the question and choosing passages take longer
 		cancel()
 		ctx, cancel = context.WithTimeout(r.Context(), 25*time.Second)
 	}
 	defer cancel()
-	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	q := strings.TrimSpace(params.Get("q"))
 	question := q
-	typ := r.URL.Query().Get("type")
-	year := clampInt(r.URL.Query().Get("year"), 0, 0, 2100)
-	limit := clampInt(r.URL.Query().Get("limit"), 10, 1, 50)
-	offset := clampInt(r.URL.Query().Get("offset"), 0, 0, 10_000)
+	year := clampInt(params.Get("year"), 0, 0, 2100)
+	limit := clampInt(params.Get("limit"), 10, 1, 50)
 	out := apiSearchResult{Q: q}
 	if q == "" || len([]rune(q)) >= 200 {
 		s.writeJSON(w, 200, out)
@@ -347,30 +377,31 @@ func (s *Server) apiSearch(w http.ResponseWriter, r *http.Request) {
 	var err error
 	switch typ {
 	case "laws":
-		err = s.apiFindLaws(ctx, q, year, limit, offset, &out)
+		err = s.apiFindLaws(ctx, q, year, limit, cur.pos(partLaws), &out)
 	case "articles":
-		err = s.apiFindArticles(ctx, q, limit, offset, &out)
+		err = s.apiFindArticles(ctx, q, limit, cur.pos(partArticles), &out)
 	case "rulings":
-		err = s.apiFindRulings(ctx, q, limit, offset, &out)
+		err = s.apiFindRulings(ctx, q, limit, cur.pos(partRulings), &out)
 	case "gazette":
-		err = s.apiFindGazette(ctx, q, limit, offset, &out)
+		err = s.apiFindGazette(ctx, q, limit, cur.pos(partGazette), &out)
 	default:
-		err = s.apiFindAll(ctx, q, year, limit, offset, &out)
+		err = s.apiFindAll(ctx, q, year, limit, cur, &out)
 	}
 	if err != nil {
 		s.apiFail(w, r, err)
 		return
 	}
-	s.apiRescue(ctx, q, typ, year, offset, limit, &out)
+	s.apiRescue(ctx, q, typ, year, cur == nil, limit, &out)
 	if typ == "" || typ == "laws" {
-		s.apiFindLawsEn(ctx, q, year, limit, offset, &out)
+		s.apiFindLawsEn(ctx, q, year, limit, &out)
 	}
-	if semanticWanted && offset == 0 {
+	if semanticWanted && cur == nil {
 		s.addRelated(ctx, question, selectWanted, &out)
 		if len(out.Related) > limit {
 			out.Related = out.Related[:limit]
 		}
 	}
+	out.NextCursor = encodeSearchCursor(typ, out.next)
 	s.track(r, map[string]any{"k": "search", "q": NormQuery(q), "api": true,
 		"n": out.LawCount + out.ArtCount + out.RulCount + out.GazCount})
 	s.writeJSON(w, 200, out)
@@ -378,13 +409,14 @@ func (s *Server) apiSearch(w http.ResponseWriter, r *http.Request) {
 
 // apiFindAll searches the four kinds at once, each on its own connection
 // (each fills its own fields of out). One after the other, a common word
-// ("قانون") took 5.4 to 6.9 s on the production server, past the MCP's 5 s budget.
-func (s *Server) apiFindAll(ctx context.Context, q string, year, limit, offset int, out *apiSearchResult) error {
+// ("قانون") took 5.4 to 6.9 s on the production server, past the MCP's 5 s
+// budget. cur is nil on the first page.
+func (s *Server) apiFindAll(ctx context.Context, q string, year, limit int, cur *searchCursor, out *apiSearchResult) error {
 	errs := make(chan error, 4)
-	go func() { errs <- s.apiFindLaws(ctx, q, year, limit, offset, out) }()
-	go func() { errs <- s.apiFindArticles(ctx, q, limit, offset, out) }()
-	go func() { errs <- s.apiFindRulings(ctx, q, limit, offset, out) }()
-	go func() { errs <- s.apiFindGazette(ctx, q, limit, offset, out) }()
+	go func() { errs <- s.apiFindLaws(ctx, q, year, limit, cur.pos(partLaws), out) }()
+	go func() { errs <- s.apiFindArticles(ctx, q, limit, cur.pos(partArticles), out) }()
+	go func() { errs <- s.apiFindRulings(ctx, q, limit, cur.pos(partRulings), out) }()
+	go func() { errs <- s.apiFindGazette(ctx, q, limit, cur.pos(partGazette), out) }()
 	var err error
 	for range 4 {
 		if e := <-errs; e != nil && err == nil {
@@ -394,99 +426,164 @@ func (s *Server) apiFindAll(ctx context.Context, q string, year, limit, offset i
 	return err
 }
 
-// apiFindLaws mirrors findLaws in docs.go: every word of q, spelling folded,
-// anywhere in the title. year, when > 0, narrows to laws issued that year
-// (the MCP search_legislation tool's year filter; the HTTP API takes it as
-// ?year=).
-func (s *Server) apiFindLaws(ctx context.Context, q string, year, limit, offset int, out *apiSearchResult) error {
-	if err := s.apiFindLawsBase(ctx, q, year, limit, offset, out); err != nil || offset > 0 {
-		return err
-	}
-	// A question that names one text ("cybercrime") has it first (glosspins.go).
-	if pin := s.pinnedRow(ctx, q, year); pin != nil {
-		first := s.lawSum(ctx, *pin, s.source(ctx, "law", pin.ID))
-		laws := []apiLawSummary{first}
-		added := true
-		for _, l := range out.Laws {
-			if l.ID == pin.ID {
-				added = false
-				continue
-			}
-			laws = append(laws, l)
-		}
-		if len(laws) > limit {
-			laws = laws[:limit]
-		}
-		out.Laws = laws
-		if added {
-			out.LawCount++
-		}
-	}
-	return nil
+// rankedLaw is a law found by the words of its title, with its rank: a
+// code first, then the closest title, the newest, the highest id.
+type rankedLaw struct {
+	LawRow
+	code int
+	sim  float32
+	on   time.Time
 }
 
-func (s *Server) apiFindLawsBase(ctx context.Context, q string, year, limit, offset int, out *apiSearchResult) error {
-	// A citation ("law 28 of 10/2/2017", "رقم 175 تاريخ 8/5/2020") is looked up exactly, as on the site.
-	if rq := readQuery(q); rq.lawCite() && year == 0 && offset == 0 {
-		var res Results
-		ok, err := s.findLawCite(ctx, &res, rq)
-		if err != nil {
-			return err
-		}
-		if ok {
-			out.LawCount = res.LawCount
-			for _, l := range res.Laws[:min(limit, len(res.Laws))] {
-				out.Laws = append(out.Laws, s.lawSum(ctx, l, s.source(ctx, "law", l.ID)))
-			}
-			return nil
-		}
-	}
-	// A law's id, and the codes by their English or French name ("Penal
-	// Code", "code penal"), as the MCP's search_legislation finds them.
-	if year == 0 && offset == 0 {
-		found, err := s.apiFindLawByIDOrCode(ctx, q)
-		if err != nil {
-			return err
-		}
-		for _, l := range found[:min(limit, len(found))] {
-			out.Laws = append(out.Laws, s.lawSum(ctx, l, s.source(ctx, "law", l.ID)))
-		}
-		out.LawCount = len(found)
-		if len(found) > 0 && (isDigits(q) || !hasArabic(q)) {
-			return nil
-		}
-	}
-	conds, args := titleConds(strings.Fields(q), 1)
+func (l rankedLaw) key() []string {
+	return []string{keyInt(l.code), keyReal(l.sim), keyDate(&l.on), keyInt(l.ID)}
+}
+
+// lawTitleWhere is the condition the Arabic title search ranks: every word of
+// q in the title (titleConds), and the year; empty when no word is left to
+// search. Its arguments are numbered from start.
+func lawTitleWhere(q string, year, start int) (string, []any) {
+	conds, args := titleConds(strings.Fields(q), start)
 	if len(conds) == 0 {
-		return nil
+		return "", nil
 	}
 	if year > 0 {
 		args = append(args, year)
-		conds = append(conds, "extract(year from l.issued_on)::int = $"+strconv.Itoa(len(args)))
+		conds = append(conds, "extract(year from l.issued_on)::int = $"+strconv.Itoa(start+len(args)-1))
 	}
-	cond := strings.Join(conds, " AND ")
-	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l WHERE "+cond, args...).Scan(&out.LawCount); err != nil {
-		return err
-	}
-	simArg := len(args) + 1
-	args = append(args, q, limit, offset)
-	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind
-		WHERE `+cond+` ORDER BY (EXISTS (SELECT 1 FROM code c WHERE c.law_id = l.id)) DESC,
-		similarity(ar_norm(l.title), ar_norm($`+strconv.Itoa(simArg)+`)) DESC, l.issued_on DESC NULLS LAST
-		LIMIT $`+strconv.Itoa(simArg+1)+` OFFSET $`+strconv.Itoa(simArg+2), args...)
+	return strings.Join(conds, " AND "), args
+}
+
+// apiFindLaws mirrors findLaws in docs.go: every word of q, spelling folded,
+// anywhere in the title. year, when > 0, narrows to laws issued that year
+// (the MCP search_legislation tool's year filter; the HTTP API takes it as
+// ?year=). The first page (pos nil) starts with what is looked up rather
+// than ranked: a citation, a law's id or a code's name, the text a question
+// names (glosspins.go). Those are looked up again on a later page only to
+// leave them out of its ranked rows, so no text is listed twice. The English
+// titles follow in apiFindLawsEn.
+func (s *Server) apiFindLaws(ctx context.Context, q string, year, limit int, pos *searchPos, out *apiSearchResult) error {
+	first := pos == nil
+	looked, titles, err := s.apiLookUpLaws(ctx, q, year, limit, out)
 	if err != nil {
 		return err
 	}
-	rowsOut, err := scanLawRows(rows)
-	if err != nil {
-		return err
+	next := searchPos{phase: lawsEnglishOnly}
+	var ranked []rankedLaw
+	fetched := limit + 1
+	cond, args := lawTitleWhere(q, year, 1)
+	if titles && cond != "" {
+		next.phase = lawsEnglish
+		if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l WHERE "+cond, args...).Scan(&out.LawCount); err != nil {
+			return err
+		}
+		if first || pos.phase == phaseRanked {
+			if ranked, err = s.rankLawTitles(ctx, q, cond, args, fetched, pos); err != nil {
+				return err
+			}
+		}
 	}
-	for _, l := range rowsOut {
-		if !slices.ContainsFunc(out.Laws, func(x apiLawSummary) bool { return x.ID == l.ID }) {
+	// A question that names one text ("cybercrime") has it first.
+	if pin := s.pinnedRow(ctx, q, year); pin != nil {
+		var found bool // already counted: looked up, or among the titles
+		if slices.ContainsFunc(looked, func(l LawRow) bool { return l.ID == pin.ID }) {
+			found = true
+		} else if titles && cond != "" {
+			if err := s.db.QueryRow(ctx, "SELECT EXISTS (SELECT 1 FROM legislation l WHERE l.id = $"+strconv.Itoa(len(args)+1)+" AND "+cond+")",
+				append(args, pin.ID)...).Scan(&found); err != nil {
+				return err
+			}
+		}
+		looked, _ = withPin(looked, pin, 0)
+		if !found {
+			out.LawCount++
+		}
+	}
+	looked = looked[:min(limit, len(looked))]
+	seen := map[int]bool{}
+	for _, l := range looked {
+		out.lookedUp = append(out.lookedUp, l.ID)
+		seen[l.ID] = true
+		if first {
 			out.Laws = append(out.Laws, s.lawSum(ctx, l, s.source(ctx, "law", l.ID)))
 		}
 	}
+	if !first && pos.phase != phaseRanked { // the English titles, or done
+		out.next[partLaws] = *pos
+		return nil
+	}
+	if next.phase == lawsEnglish {
+		last, more := fill(len(out.Laws), limit, ranked, fetched, func(l rankedLaw) bool { return seen[l.ID] }, func(l rankedLaw) {
+			out.Laws = append(out.Laws, s.lawSum(ctx, l.LawRow, s.source(ctx, "law", l.ID)))
+			seen[l.ID] = true
+		})
+		if more {
+			next = after(pos, phaseRanked, last, func(i int) []string { return ranked[i].key() })
+		}
+	}
+	out.next[partLaws] = next
 	return nil
+}
+
+// apiLookUpLaws is what a law search looks up before ranking titles: a
+// citation ("law 28 of 10/2/2017", "رقم 175 تاريخ 8/5/2020"), looked up
+// exactly as on the site, else a law's id and the codes by their English or
+// French name ("Penal Code", "code penal"), as the MCP's search_legislation
+// finds them. It sets the count, and says whether the Arabic titles are
+// still searched. On a page after the first it costs a primary key lookup
+// or a read of the code table (24 rows), the citation's queries only when q
+// reads as one.
+func (s *Server) apiLookUpLaws(ctx context.Context, q string, year, limit int, out *apiSearchResult) ([]LawRow, bool, error) {
+	if year != 0 {
+		return nil, true, nil
+	}
+	if rq := readQuery(q); rq.lawCite() {
+		var res Results
+		ok, err := s.findLawCite(ctx, &res, rq)
+		if err != nil {
+			return nil, false, err
+		}
+		if ok {
+			out.LawCount = res.LawCount
+			return res.Laws[:min(limit, len(res.Laws))], false, nil
+		}
+	}
+	found, err := s.apiFindLawByIDOrCode(ctx, q)
+	if err != nil {
+		return nil, false, err
+	}
+	out.LawCount = len(found)
+	return found[:min(limit, len(found))], len(found) == 0 || (!isDigits(q) && hasArabic(q)), nil
+}
+
+// rankLawTitles ranks the laws matching cond (lawTitleWhere, its arguments
+// args): codes first, then the title closest to q, the newest, the highest
+// id; the first n after pos's key.
+func (s *Server) rankLawTitles(ctx context.Context, q, cond string, args []any, n int, pos *searchPos) ([]rankedLaw, error) {
+	args = append(args, q)
+	sim := "$" + strconv.Itoa(len(args))
+	keyset := ""
+	if pos != nil && pos.key != nil {
+		k := pos.key
+		args = append(args, argInt(k[0]), argReal(k[1]), argDate(k[2]), argInt(k[3]))
+		keyset = fmt.Sprintf(" WHERE (t.is_code, t.sim, t.d, t.id) < ($%d::int, $%d::real, $%d::date, $%d::int)",
+			len(args)-3, len(args)-2, len(args)-1, len(args))
+	}
+	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+`, p.is_code, p.sim, p.d FROM (
+		SELECT t.* FROM (SELECT l.id, (EXISTS (SELECT 1 FROM code c WHERE c.law_id = l.id))::int AS is_code,
+			similarity(ar_norm(l.title), ar_norm(`+sim+`)) AS sim, coalesce(l.issued_on, date '0001-01-01') AS d
+			FROM legislation l WHERE `+cond+`) t`+keyset+`
+		ORDER BY t.is_code DESC, t.sim DESC, t.d DESC, t.id DESC LIMIT `+strconv.Itoa(n)+`) p
+		JOIN legislation l ON l.id = p.id JOIN legislation_kind k ON k.name_ar = l.kind
+		ORDER BY p.is_code DESC, p.sim DESC, p.d DESC, p.id DESC`, args...)
+	if err != nil {
+		return nil, err
+	}
+	return pgx.CollectRows(rows, func(row pgx.CollectableRow) (rankedLaw, error) {
+		var l rankedLaw
+		err := row.Scan(append(lawRowDest(&l.LawRow), &l.code, &l.sim, &l.on)...)
+		return l, err
+	})
 }
 
 func isDigits(s string) bool {
@@ -554,8 +651,10 @@ func (s *Server) apiFindLawByIDOrCode(ctx context.Context, q string) ([]LawRow, 
 	return found, nil
 }
 
-// apiFindArticles mirrors findArticles in docs.go.
-func (s *Server) apiFindArticles(ctx context.Context, q string, limit, offset int, out *apiSearchResult) error {
+// apiFindArticles mirrors findArticles in docs.go: ranked by score, a
+// code's article first on a tie, then law id and position, all highest
+// first.
+func (s *Server) apiFindArticles(ctx context.Context, q string, limit int, pos *searchPos, out *apiSearchResult) error {
 	const artWhere = `(a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1))
 		OR a.search_stem @@ websearch_to_tsquery('arabic', ar_light($1))
 		OR a.search_fr @@ websearch_to_tsquery('french', $1))`
@@ -563,61 +662,72 @@ func (s *Server) apiFindArticles(ctx context.Context, q string, limit, offset in
 		Scan(&out.ArtCount); err != nil {
 		return err
 	}
-	rows, err := s.db.Query(ctx, `WITH hits AS (
-		SELECT a.law_id, a.number, a.text_ar,
-		       (a.search_exact @@ phraseto_tsquery('simple', ar_norm($1)))::int * 4
-		     + (a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1)))::int * 2
-		     + ts_rank(a.search_stem, websearch_to_tsquery('arabic', ar_light($1)))
-		     + (EXISTS (SELECT 1 FROM code c WHERE c.law_id = a.law_id))::int AS score,
-		       (EXISTS (SELECT 1 FROM code c WHERE c.law_id = a.law_id))::int AS is_code
-		FROM `+articleSource(q, artWhere)+` WHERE `+artWhere+`
-		ORDER BY score DESC, is_code DESC LIMIT $2 OFFSET $3)
-		SELECT `+lawRowCols+`, h.number, ts_headline('arabic', h.text_ar, websearch_to_tsquery('arabic', ar_light($1)),
-		       '`+headlineMarks+`, MaxWords=40, MinWords=18, ShortWord=2')
-		FROM hits h JOIN legislation l ON l.id = h.law_id JOIN legislation_kind k ON k.name_ar = l.kind
-		ORDER BY h.score DESC, h.is_code DESC`, q, limit, offset)
-	if err != nil {
-		return err
-	}
-	type hitRow struct {
-		x   LawRow
-		art string
-		hl  string
-	}
-	rs, err := pgx.CollectRows(rows, func(r pgx.CollectableRow) (hitRow, error) {
-		var out hitRow
-		err := r.Scan(&out.x.ID, &out.x.Kind, &out.x.KindEn, &out.x.Number, &out.x.IssuedOn, &out.x.Title, &out.x.Status,
-			&out.x.Articles, &out.x.Code, &out.art, &out.hl)
-		return out, err
-	})
-	if err != nil {
-		return err
-	}
 	// An article the query cites, and articles whose calculated amount
-	// matches it, come first, once each.
-	var first []apiArticleHit
-	if offset == 0 {
-		if hit, ok := s.citedArticle(ctx, q); ok {
-			first = append(first, hit)
-		}
-		first = append(first, s.calculatedMatches(ctx, q)...)
+	// matches it, come first on the first page, once each; every page leaves
+	// them out of its ranked articles.
+	var looked []apiArticleHit
+	if hit, ok := s.citedArticle(ctx, q); ok {
+		looked = append(looked, hit)
 	}
+	looked = append(looked, s.calculatedMatches(ctx, q)...)
 	seen := map[string]bool{}
-	var extra int
-	for _, h := range first {
+	for _, h := range looked {
 		key := strconv.Itoa(h.Law.ID) + "/" + h.Number
 		if seen[key] {
 			continue
 		}
 		seen[key] = true
-		out.Articles = append(out.Articles, h)
-		extra++
+		out.ArtCount++
+		if pos == nil && len(out.Articles) < limit {
+			out.Articles = append(out.Articles, h)
+		}
+	}
+	if pos != nil && pos.phase == phaseDone {
+		return nil
+	}
+	fetched := limit + 1
+	args := []any{q, fetched}
+	keyset := ""
+	if pos != nil && pos.key != nil {
+		k := pos.key
+		args = append(args, argDouble(k[0]), argInt(k[1]), argInt(k[2]), argInt(k[3]))
+		keyset = ` WHERE (h.score, h.is_code, h.law_id, h.position) < ($3::float8, $4::int, $5::int, $6::int)`
+	}
+	rows, err := s.db.Query(ctx, `WITH hits AS (
+		SELECT * FROM (SELECT a.law_id, a.position, a.number, a.text_ar,
+		       (a.search_exact @@ phraseto_tsquery('simple', ar_norm($1)))::int * 4
+		     + (a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1)))::int * 2
+		     + ts_rank(a.search_stem, websearch_to_tsquery('arabic', ar_light($1)))
+		     + (EXISTS (SELECT 1 FROM code c WHERE c.law_id = a.law_id))::int AS score,
+		       (EXISTS (SELECT 1 FROM code c WHERE c.law_id = a.law_id))::int AS is_code
+		FROM `+articleSource(q, artWhere)+` WHERE `+artWhere+`) h`+keyset+`
+		ORDER BY h.score DESC, h.is_code DESC, h.law_id DESC, h.position DESC LIMIT $2)
+		SELECT `+lawRowCols+`, h.number, ts_headline('arabic', h.text_ar, websearch_to_tsquery('arabic', ar_light($1)),
+		       '`+headlineMarks+`, MaxWords=40, MinWords=18, ShortWord=2'), h.score, h.is_code, h.position
+		FROM hits h JOIN legislation l ON l.id = h.law_id JOIN legislation_kind k ON k.name_ar = l.kind
+		ORDER BY h.score DESC, h.is_code DESC, h.law_id DESC, h.position DESC`, args...)
+	if err != nil {
+		return err
+	}
+	type hitRow struct {
+		x     LawRow
+		art   string
+		hl    string
+		score float64
+		code  int
+		pos   int
+	}
+	rs, err := pgx.CollectRows(rows, func(r pgx.CollectableRow) (hitRow, error) {
+		var out hitRow
+		err := r.Scan(&out.x.ID, &out.x.Kind, &out.x.KindEn, &out.x.Number, &out.x.IssuedOn, &out.x.Title, &out.x.Status,
+			&out.x.Articles, &out.x.Code, &out.art, &out.hl, &out.score, &out.code, &out.pos)
+		return out, err
+	})
+	if err != nil {
+		return err
 	}
 	calculated := s.apiHitCalculator(ctx)
-	for _, r := range rs {
-		if seen[strconv.Itoa(r.x.ID)+"/"+r.art] {
-			continue
-		}
+	last, more := fill(len(out.Articles), limit, rs, fetched, func(r hitRow) bool { return seen[strconv.Itoa(r.x.ID)+"/"+r.art] }, func(r hitRow) {
 		out.Articles = append(out.Articles, apiArticleHit{
 			Law:               s.lawSum(ctx, r.x, s.source(ctx, "law", r.x.ID)),
 			Number:            r.art,
@@ -625,20 +735,31 @@ func (s *Server) apiFindArticles(ctx context.Context, q string, limit, offset in
 			Snippet:           stripMarks(r.hl),
 			URL:               Base + artPath(r.x.ID, r.art),
 		})
+	})
+	if more {
+		out.next[partArticles] = after(pos, phaseRanked, last, func(i int) []string {
+			return []string{keyDouble(rs[i].score), keyInt(rs[i].code), keyInt(rs[i].x.ID), keyInt(rs[i].pos)}
+		})
 	}
-	if len(out.Articles) > limit {
-		out.Articles = out.Articles[:limit]
-	}
-	out.ArtCount += extra
 	return nil
 }
 
-func (s *Server) apiFindRulings(ctx context.Context, q string, limit, offset int, out *apiSearchResult) error {
-	n, hits, err := s.searchRulings(ctx, q, limit, offset)
+func (s *Server) apiFindRulings(ctx context.Context, q string, limit int, pos *searchPos, out *apiSearchResult) error {
+	var from *rulingKey
+	if pos != nil && pos.phase == phaseDone {
+		limit = 0 // count only
+	} else if pos != nil && pos.key != nil {
+		k := pos.key
+		from = &rulingKey{tier: argInt(k[0]), ph: argInt(k[1]), rk: argReal(k[2]), on: argDate(k[3]), id: argInt(k[4])}
+	}
+	n, hits, more, err := s.searchRulings(ctx, q, limit, from)
 	if err != nil {
 		return err
 	}
 	out.RulCount = n
+	if more {
+		out.next[partRulings] = searchPos{phase: phaseRanked, key: hits[len(hits)-1].key.fields()}
+	}
 	ids := make([]int, len(hits))
 	for i, r := range hits {
 		ids[i] = r.ID
@@ -669,13 +790,23 @@ func (s *Server) apiFindRulings(ctx context.Context, q string, limit, offset int
 
 // apiFindGazette has no HTML equivalent (the search page only covers laws,
 // articles and rulings): a loose match on the issue's own number, since
-// gazette issues carry no body text of their own to search.
-func (s *Server) apiFindGazette(ctx context.Context, q string, limit, offset int, out *apiSearchResult) error {
+// gazette issues carry no body text of their own to search. Newest first,
+// the undated last, then the highest id.
+func (s *Server) apiFindGazette(ctx context.Context, q string, limit int, pos *searchPos, out *apiSearchResult) error {
 	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM gazette_issue WHERE number ILIKE '%' || $1 || '%'`, q).Scan(&out.GazCount); err != nil {
 		return err
 	}
-	rows, err := s.db.Query(ctx, `SELECT id, number, published_on FROM gazette_issue WHERE number ILIKE '%' || $1 || '%'
-		ORDER BY published_on DESC NULLS LAST LIMIT $2 OFFSET $3`, q, limit, offset)
+	if pos != nil && pos.phase == phaseDone {
+		return nil
+	}
+	args := []any{q, limit + 1}
+	keyset := ""
+	if pos != nil && pos.key != nil {
+		args = append(args, argDate(pos.key[0]), argInt(pos.key[1]))
+		keyset = ` AND (coalesce(published_on, date '0001-01-01'), id) < ($3::date, $4::int)`
+	}
+	rows, err := s.db.Query(ctx, `SELECT id, number, published_on FROM gazette_issue WHERE number ILIKE '%' || $1 || '%'`+keyset+`
+		ORDER BY coalesce(published_on, date '0001-01-01') DESC, id DESC LIMIT $2`, args...)
 	if err != nil {
 		return err
 	}
@@ -686,6 +817,15 @@ func (s *Server) apiFindGazette(ctx context.Context, q string, limit, offset int
 		var on *time.Time
 		if err := rows.Scan(&id, &number, &on); err != nil {
 			return err
+		}
+		if len(out.Gazette) == limit { // the row after the page
+			g := out.Gazette[len(out.Gazette)-1]
+			d := cursor.NoDate
+			if g.PublishedOn != "" {
+				d = g.PublishedOn
+			}
+			out.next[partGazette] = searchPos{phase: phaseRanked, key: []string{d, keyInt(g.ID)}}
+			break
 		}
 		h := apiGazetteHit{ID: id, URL: Base + "/gazette/" + strconv.Itoa(id) + "/", UpdatedAt: s.listedChange(ctx, "gazette", id)}
 		if number != nil {
