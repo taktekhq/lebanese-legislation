@@ -537,6 +537,8 @@ func TestCursorWalkFixture(t *testing.T) {
 		{"تجربة", "articles", 7}, // 240 articles in three ranks
 		{"تجربة", "rulings", 7},  // 30 by summary, then 40 by the judgment only; the change falls inside page 5
 		{"تجربة", "rulings", 1},  //
+		{"تجربة", "rulings", 10}, // the summaries fill page 3 exactly
+		{"تجربة", "rulings", 15}, //
 		{"1", "gazette", 7},      // one undated among them
 		{"تجربة", "", 7},         // the parts end on different pages
 		{"pilot", "", 3},         //
