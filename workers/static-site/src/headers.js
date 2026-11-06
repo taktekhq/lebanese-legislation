@@ -12,3 +12,8 @@ export const SECURITY_HEADERS = {
   "Cross-Origin-Resource-Policy": "same-site",
   "Content-Security-Policy": CSP,
 };
+
+// Files other sites show. The MCP Registry entry (server.json) points at these
+// as the server's icons, and directory sites (mcptry, Glama) and MCP clients
+// load them from their own pages. same-site would leave a blank square there.
+export const EMBEDDABLE = new Set(["/assets/mark.png", "/assets/favicon.svg"]);

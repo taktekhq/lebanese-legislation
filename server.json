@@ -8,7 +8,23 @@
     "source": "github"
   },
   "websiteUrl": "https://lebaneselegislation.com",
-  "version": "1.1.1",
+  "icons": [
+    {
+      "src": "https://lebaneselegislation.com/assets/mark.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ]
+    },
+    {
+      "src": "https://lebaneselegislation.com/assets/favicon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": [
+        "any"
+      ]
+    }
+  ],
+  "version": "1.2.0",
   "remotes": [
     {
       "type": "streamable-http",
