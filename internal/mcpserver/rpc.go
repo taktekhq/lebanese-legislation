@@ -25,8 +25,8 @@ const (
 	rpcInternalError  = -32603
 )
 
-// toolsJSON is the tools/list answer's tools, byte for byte the Worker's
-// (names, descriptions and input schemas).
+// toolsJSON is the tools/list answer's tools, byte for byte as written
+// (names, titles, descriptions, input schemas and annotations).
 //
 //go:embed tools.json
 var toolsJSON []byte

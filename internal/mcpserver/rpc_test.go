@@ -155,13 +155,39 @@ func TestJSONRPCMethods(t *testing.T) {
 	}
 }
 
-// The tools/list answer is the Worker's byte for byte, and the calculated
-// amounts guidance is in the three tools that return them.
+// The tools/list answer is tools.json as written, every tool has a title and
+// says it only reads (clients such as ChatGPT ask the user to confirm any tool
+// not marked read-only), and the calculated amounts guidance is in the three
+// tools that return them.
 func TestToolDefinitions(t *testing.T) {
 	s := noDBServer(Config{})
 	body := post(s, map[string]any{"jsonrpc": "2.0", "id": 3, "method": "tools/list"}, nil).Body.String()
-	if !strings.HasPrefix(body, `{"jsonrpc":"2.0","id":3,"result":{"tools":[{"name":"search_legislation","description":"When calculated_current is present`) {
+	if !strings.HasPrefix(body, `{"jsonrpc":"2.0","id":3,"result":{"tools":[{"name":"search_legislation","title":"Search Lebanese legislation","description":"When calculated_current is present`) {
 		t.Errorf("tools/list starts %s", body[:200])
+	}
+	var list struct {
+		Result struct {
+			Tools []struct {
+				Name        string          `json:"name"`
+				Title       string          `json:"title"`
+				Annotations map[string]bool `json:"annotations"`
+			} `json:"tools"`
+		} `json:"result"`
+	}
+	if err := json.Unmarshal([]byte(body), &list); err != nil {
+		t.Fatal(err)
+	}
+	if len(list.Result.Tools) != 10 {
+		t.Errorf("%d tools", len(list.Result.Tools))
+	}
+	want := map[string]bool{"readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false}
+	for _, tool := range list.Result.Tools {
+		if tool.Title == "" {
+			t.Errorf("%s: no title", tool.Name)
+		}
+		if fmt.Sprint(tool.Annotations) != fmt.Sprint(want) {
+			t.Errorf("%s: annotations %v, want %v", tool.Name, tool.Annotations, want)
+		}
 	}
 	var defs []struct {
 		Name        string `json:"name"`

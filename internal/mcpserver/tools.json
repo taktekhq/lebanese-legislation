@@ -1,6 +1,7 @@
 [
  {
   "name": "search_legislation",
+  "title": "Search Lebanese legislation",
   "description": "When calculated_current is present, use its text_ar for current monetary amounts and cite its authority.url. Identify this as calculated under the authority, never as verbatim published wording. The article text_ar and source fields remain published wording. Search Lebanese legislation (laws, decrees, decisions), their articles, court rulings, or Official Gazette issues, by keyword: Arabic words, French words (articles the Centre published in French, and the codes' French or English names), or a law's numeric id. Returns verbatim snippets from the Lebanese University's database, never an AI-written summary. A ruling hit's pdf_url is its full judgment's scan on the Lebanese University's site: always pass it on with any answer that cites the ruling. English words work too: they are read into Arabic through a glossary, matched against the unofficial English titles, and when nothing matches the result says what was searched instead (searched_instead). A code named in the query (\"قانون العقوبات 670\", \"أصول محاكمات مدنية صورية\") narrows the articles to that code; when none of its articles holds the other words, articles_not_in_code names it and the articles listed are from other texts. Each law carries title_en, an unofficial English title a model wrote from the Arabic title alone: the Arabic title and text are official and more accurate; cite the Arabic. A search of the gazette category with a bare year (\"2025\") lists that year's issues, and \"22/2025\" is issue 22 of 2025; to list texts by date use list_legislation instead. Not legal advice.",
   "inputSchema": {
    "type": "object",
@@ -34,10 +35,17 @@
    "required": [
     "query"
    ]
+  },
+  "annotations": {
+   "readOnlyHint": true,
+   "destructiveHint": false,
+   "idempotentHint": true,
+   "openWorldHint": false
   }
  },
  {
   "name": "get_law",
+  "title": "Get a law",
   "description": "Get a law, decree or similar text's metadata (kind, number, date, status), its table of contents (the chapters: id, parent_id, depth, heading), its articles in order (number, and the section_id of the chapter each sits under) and the texts it amended or was amended by (amended_by / amended: one entry per text and relation, with articles listing the articles of this law it touches, or of the other law for amended; no articles means the whole law). Use get_article to read one article's verbatim text, or get_law_texts to read all of them. title_en is an unofficial English title (a model's rendering of the Arabic one); the Arabic title and text are official and more accurate. Not legal advice.",
   "inputSchema": {
    "type": "object",
@@ -50,10 +58,17 @@
    "required": [
     "id"
    ]
+  },
+  "annotations": {
+   "readOnlyHint": true,
+   "destructiveHint": false,
+   "idempotentHint": true,
+   "openWorldHint": false
   }
  },
  {
   "name": "get_article",
+  "title": "Get an article",
   "description": "When calculated_current is present, use its text_ar for current monetary amounts and cite its authority.url. Identify this as calculated under the authority, never as verbatim published wording. The article text_ar and source fields remain published wording. Get one article's verbatim Arabic text as in force today (and French, when the Centre published it and no amendment has replaced it), its in-force status, amendment history, and the canonical and source URLs. When an amendment replaced the wording, text_ar is the new wording and centre_text_ar the earlier one the Centre's site still shows. centre_error, when present, notes an error in the Centre's own text (one article repeating another, a stray letter); the text itself is left as published. The text is copied exactly from the database; nothing here is AI-written. Laws with ids from 2000000000 are ones the Lebanese University has not published yet, read by machine from scans of the Official Gazette's pages (unofficial copies; the law's page links the original Gazette PDF on SaderLex); where the two readings differ the text shows both as ⟦reading one | reading two⟧: quote neither as certain. Not legal advice.",
   "inputSchema": {
    "type": "object",
@@ -71,10 +86,17 @@
     "law_id",
     "number"
    ]
+  },
+  "annotations": {
+   "readOnlyHint": true,
+   "destructiveHint": false,
+   "idempotentHint": true,
+   "openWorldHint": false
   }
  },
  {
   "name": "get_law_texts",
+  "title": "Get a law's article texts",
   "description": "When calculated_current is present, use its text_ar for current monetary amounts and cite its authority.url. Identify this as calculated under the authority, never as verbatim published wording. The article text_ar and source fields remain published wording. Get the verbatim texts of a law's articles in order, a page at a time: for each article its number, section_id, note, and the same text fields as get_article (text_ar in force today, text_fr, centre_text_ar when an amendment replaced the wording, version, repealed). Follow next_offset until it is absent to read the whole law. Amendment history stays in get_article. Not legal advice.",
   "inputSchema": {
    "type": "object",
@@ -100,10 +122,17 @@
    "required": [
     "law_id"
    ]
+  },
+  "annotations": {
+   "readOnlyHint": true,
+   "destructiveHint": false,
+   "idempotentHint": true,
+   "openWorldHint": false
   }
  },
  {
   "name": "get_ruling",
+  "title": "Get a court ruling",
   "description": "Get one court ruling (judgment) by id: court, number, date, panel, and its verbatim text when the Centre holds it as typed text. When available, pages returns the scanned judgment's machine reading, with low_confidence: true on hard-to-read pages where errors are expected. pdf_url is the full judgment's scan on the Lebanese University's site: always give it to the user with any answer about the ruling, so they can open the original. Not legal advice.",
   "inputSchema": {
    "type": "object",
@@ -116,10 +145,17 @@
    "required": [
     "id"
    ]
+  },
+  "annotations": {
+   "readOnlyHint": true,
+   "destructiveHint": false,
+   "idempotentHint": true,
+   "openWorldHint": false
   }
  },
  {
   "name": "get_gazette_issue",
+  "title": "Get an Official Gazette issue",
   "description": "Get one Official Gazette issue by id: its number, publication date, and the laws, decrees and decisions it published. Not legal advice.",
   "inputSchema": {
    "type": "object",
@@ -132,10 +168,17 @@
    "required": [
     "id"
    ]
+  },
+  "annotations": {
+   "readOnlyHint": true,
+   "destructiveHint": false,
+   "idempotentHint": true,
+   "openWorldHint": false
   }
  },
  {
   "name": "get_links",
+  "title": "Get citations and amendments",
   "description": "Get the graph edges into or out of one item: a law, an article, a ruling, an opinion, a research study or a Gazette issue. Use this to walk citations and amendments directly, instead of only what get_law and get_article attach automatically. For a law key (\"law/<id>\") the default scope \"all\" includes the edges of its articles too (each link keeps its real to_key, e.g. \"law/244611/art/37\"); scope \"law\" is the law itself only. Newest first by the date of the text each edge comes from; page with offset and next_offset, total is the number of edges. Not legal advice.",
   "inputSchema": {
    "type": "object",
@@ -191,10 +234,17 @@
    "required": [
     "key"
    ]
+  },
+  "annotations": {
+   "readOnlyHint": true,
+   "destructiveHint": false,
+   "idempotentHint": true,
+   "openWorldHint": false
   }
  },
  {
   "name": "list_legislation",
+  "title": "List legislation by date",
   "description": "List laws, decrees and decisions by date, newest first: for \"everything published since January 2025\" call with since \"2025-01\". The date is the publication date: the Official Gazette date, else the issue date (each entry's date, with gazette_number, gazette_date and gazette_issue_id). Recent texts come from machine readings of Gazette scans (ids from 2000000000, unofficial) because the Lebanese University's Centre lags about a year, so a recent period lists mostly those. since and until accept YYYY, YYYY-MM or YYYY-MM-DD, inclusive. kind narrows to one kind, in Arabic (\"قانون\", \"مرسوم\") or English (\"Law\", \"Decree\"). Page with offset and next_offset; total is the whole count. Not legal advice.",
   "inputSchema": {
    "type": "object",
@@ -234,10 +284,17 @@
      "description": "texts per page, at most 100"
     }
    }
+  },
+  "annotations": {
+   "readOnlyHint": true,
+   "destructiveHint": false,
+   "idempotentHint": true,
+   "openWorldHint": false
   }
  },
  {
   "name": "list_gazette_issues",
+  "title": "List Official Gazette issues",
   "description": "List Official Gazette issues by publication date, newest first, with the number of texts each carries (text_count) and where the issue comes from: source \"centre\" (the Lebanese University's Centre, whose issues stop about a year back) or \"scans\" (issues seen in Gazette scans, ids from 2000000000, which cover recent months). since and until accept YYYY, YYYY-MM or YYYY-MM-DD, inclusive; \"everything since January 2025\" is since \"2025-01\". Page with offset and next_offset. get_gazette_issue reads one issue's texts. Not legal advice.",
   "inputSchema": {
    "type": "object",
@@ -273,10 +330,17 @@
      "description": "issues per page, at most 100"
     }
    }
+  },
+  "annotations": {
+   "readOnlyHint": true,
+   "destructiveHint": false,
+   "idempotentHint": true,
+   "openWorldHint": false
   }
  },
  {
   "name": "possibly_affected",
+  "title": "Find general repeals that may touch a law",
   "description": "Get the general repeals that may touch a law: earlier texts with a \"all provisions contrary to this law are repealed\" clause pointing at it. A list to check, never a finding that anything was actually repealed. Not legal advice.",
   "inputSchema": {
    "type": "object",
@@ -289,6 +353,12 @@
    "required": [
     "law_id"
    ]
+  },
+  "annotations": {
+   "readOnlyHint": true,
+   "destructiveHint": false,
+   "idempotentHint": true,
+   "openWorldHint": false
   }
  }
 ]

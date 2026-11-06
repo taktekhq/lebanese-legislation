@@ -13,7 +13,7 @@ export class OriginGreen extends DurableObject {}
 // at a time, and removing its route puts the origin back in charge.
 
 import { route, keyFor, resolve, indexRedirectData } from "./route.js";
-import { SECURITY_HEADERS } from "./headers.js";
+import { SECURITY_HEADERS, EMBEDDABLE } from "./headers.js";
 import { originFetch } from "./origin.js";
 import { isParts, parseParts, prepareFrame, assemble, indexPointer } from "./layout.js";
 
@@ -109,6 +109,10 @@ function lastModified(...dates) {
 
 function withHeaders(obj, request, body = obj.body, etag = obj.httpEtag, modified = lastModified(obj.uploaded)) {
   const h = new Headers(SECURITY_HEADERS);
+  if (EMBEDDABLE.has(new URL(request.url).pathname)) {
+    h.set("Cross-Origin-Resource-Policy", "cross-origin");
+    h.set("Access-Control-Allow-Origin", "*");
+  }
   h.set("Content-Type", obj.httpMetadata?.contentType || "application/octet-stream");
   h.set("Cache-Control", obj.httpMetadata?.cacheControl || "public, max-age=300");
   h.set("ETag", etag);

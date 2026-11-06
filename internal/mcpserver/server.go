@@ -29,7 +29,7 @@ import (
 const (
 	// ServerName and ServerVersion are what initialize reports.
 	ServerName    = "lebaneselegislation"
-	ServerVersion = "1.1.0"
+	ServerVersion = "1.2.0"
 
 	maxBody         = 64 * 1024        // request body cap
 	callTimeout     = 5 * time.Second  // per tools/call budget
