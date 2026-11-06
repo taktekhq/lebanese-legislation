@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { register } from 'node:module';
-import { originFetch } from '../src/origin.js';
+import { originFetch, requestRoute } from '../src/origin.js';
 register('./workers-loader.mjs', import.meta.url);
 const { default: worker } = await import('../src/index.js');
 
@@ -40,7 +40,7 @@ test('slow service requests send only anonymous header timing properties', async
   const { response, events } = await run(t, { path: '/en/api/v1/search/?q=private', duration: 2000 });
   assert.equal(response.status, 200);
   assert.deepEqual(events, [{ api_key: 'test-key', event: 'origin_request', distinct_id: 'lebleg-origin', properties: {
-    kind: 'api', status: 200, duration_ms: 2000, side: 'green', cache: 'miss', colo: 'BEY', method: 'GET',
+    kind: 'api', route: '/api/v1/search/?', status: 200, duration_ms: 2000, side: 'green', cache: 'miss', colo: 'BEY', method: 'GET',
     $lib: 'lebleg-static-site-worker', sample_rate: 1,
   } }]);
 });
@@ -56,6 +56,15 @@ for (const [path, kind] of [['/mcp', 'mcp'], ['/en/search/answer/', 'answer'], [
     const { events } = await run(t, { path, random: 0 });
     assert.equal(events[0].properties.kind, kind);
     assert.equal(events[0].properties.sample_rate, ['mcp', 'answer'].includes(kind) ? 1 : 0.1);
+  });
+}
+for (const [path, route] of [
+  ['/en/api/v1/laws/?cursor=abc', '/api/v1/laws/?'], ['/api/v1/law/244611/', '/api/v1/law/'], ['/api/v1/', '/api/v1/'],
+  ['/mcp', '/mcp'], ['/en/laws/?after=x&kind=y', '/laws/?'], ['/ar/law/12/article/3/', '/law/'], ['/healthz', '/healthz'],
+  ['/ul/uploads/images/1.png', '/ul/'], ['/en', '/'], ['/%D8%A7/', '/other/'], ['/search/?q=secret', '/search/?'],
+]) {
+  test(`route of ${path} is ${route}`, () => {
+    assert.equal(requestRoute(new URL('https://example.com' + path)), route);
   });
 }
 test('server errors are always sent', async t => {
