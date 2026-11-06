@@ -426,15 +426,10 @@ func tfColumns(phrases []ftsPhrase, vec, text string, args *[]any) string {
 // statsCache keeps corpus figures and per-phrase row counts for a while:
 // the corpus changes once a night.
 type statsCache struct {
-	mu    sync.Mutex
-	ttl   time.Duration
-	stats map[string]cachedStats
-	df    map[string]cachedDF
-}
-
-type cachedStats struct {
-	v  corpusStats
-	at time.Time
+	mu      sync.Mutex
+	ttl     time.Duration
+	corpora map[string]*fresh[corpusStats]
+	df      map[string]cachedDF
 }
 
 type cachedDF struct {
@@ -443,24 +438,20 @@ type cachedDF struct {
 }
 
 func newStatsCache(ttl time.Duration) *statsCache {
-	return &statsCache{ttl: ttl, stats: map[string]cachedStats{}, df: map[string]cachedDF{}}
+	return &statsCache{ttl: ttl, corpora: map[string]*fresh[corpusStats]{}, df: map[string]cachedDF{}}
 }
 
+// corpus is a corpus's statistics (rows, average length), read once and
+// reloaded in the background (fresh.go).
 func (c *statsCache) corpus(ctx context.Context, key string, load func(context.Context) (corpusStats, error)) (corpusStats, error) {
 	c.mu.Lock()
-	if v, ok := c.stats[key]; ok && time.Since(v.at) < c.ttl {
-		c.mu.Unlock()
-		return v.v, nil
+	f, ok := c.corpora[key]
+	if !ok {
+		f = &fresh[corpusStats]{}
+		c.corpora[key] = f
 	}
 	c.mu.Unlock()
-	v, err := load(ctx)
-	if err != nil {
-		return v, err
-	}
-	c.mu.Lock()
-	c.stats[key] = cachedStats{v, time.Now()}
-	c.mu.Unlock()
-	return v, nil
+	return f.get(ctx, load)
 }
 
 func (c *statsCache) rowsWith(ctx context.Context, key string, load func(context.Context) (float64, error)) (float64, error) {
