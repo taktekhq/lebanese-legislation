@@ -17,27 +17,6 @@ The MCP server, published as `ghcr.io/taktekhq/lebanese-legislation-mcp`. It is 
 
 Results are copied from the source texts, never written by a model. Search by meaning needs your own `GEMINI_API_KEY`.
 
-## 2.0.0: cursor paging
-
-Since 2.0.0 (6 Nov 2026) the four tools that answer a page at a time (`get_law_texts`, `get_links`, `list_legislation`, `list_gazette_issues`) page with a cursor. An answer with more after it carries `next_cursor`; pass it unchanged as `cursor`, with the same other arguments, for the next page. The last page has no `next_cursor`. `total` is still the whole count. `offset` and `next_offset` are gone, and a call that passes `offset` gets a tool error saying to use `cursor`.
-
-Before (1.x):
-
-```json
-{"name": "list_legislation", "arguments": {"since": "2025", "limit": 50, "offset": 50}}
--> {"total": 812, "offset": 50, "next_offset": 100, "laws": [...]}
-```
-
-After (2.0.0):
-
-```json
-{"name": "list_legislation", "arguments": {"since": "2025", "limit": 50}}
--> {"total": 812, "next_cursor": "djF8MjAyNS0xMS0wNHwyMDAwMjAwODkx", "laws": [...]}
-{"name": "list_legislation", "arguments": {"since": "2025", "limit": 50, "cursor": "djF8MjAyNS0xMS0wNHwyMDAwMjAwODkx"}}
-```
-
-Why: an offset made Postgres read and throw away every row before the page (a deep page of laws took 0.85 s, and 3 to 9 s under a crawl). A cursor is a condition on the sort key that an index answers in under a millisecond at any depth, and a walk neither repeats nor skips a text while new ones are added nightly. It is also how MCP itself pages. To jump to a period, use `since` and `until`; to read one article, use `get_article`.
-
 Run it from the repository root against a restored database:
 
 ```sh
@@ -48,6 +27,27 @@ It listens on `127.0.0.1:8080` (`LISTEN_ADDR` changes it). In Compose it is on h
 
 - The hosted server at https://lebaneselegislation.com/mcp is this code inside the `-all` image on Cloudflare Containers: see [workers/static-site/container](../workers/static-site/container/README.md).
 - [`server.json`](../server.json) at the repository root is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry for the hosted server, and [`.mcp.json`](../.mcp.json) the client configuration.
+
+## 2.0.0: cursor paging
+
+Since 2.0.0 (6 Nov 2026) the four tools that answer a page at a time (`get_law_texts`, `get_links`, `list_legislation`, `list_gazette_issues`) page with a cursor. An answer with more after it carries `next_cursor`; pass it unchanged as `cursor`, with the same other arguments, for the next page. The last page has no `next_cursor`. `total` is still the whole count. `offset` and `next_offset` are gone, and a call that passes `offset` gets a tool error saying to use `cursor`.
+
+Before (1.x):
+
+```text
+{"name": "list_legislation", "arguments": {"since": "2025", "limit": 50, "offset": 50}}
+-> {"since": "2025", "order": "newest", "total": 2575, "offset": 50, "next_offset": 100, "laws": [...]}
+```
+
+After (2.0.0):
+
+```text
+{"name": "list_legislation", "arguments": {"since": "2025", "limit": 50}}
+-> {"since": "2025", "order": "newest", "total": 2575, "next_cursor": "djF8MjAyNi0wNS0yOHwzMzU4MDU", "laws": [...]}
+{"name": "list_legislation", "arguments": {"since": "2025", "limit": 50, "cursor": "djF8MjAyNi0wNS0yOHwzMzU4MDU"}}
+```
+
+Why: an offset made Postgres read and throw away every row before the page (a deep page of laws took 0.85 s, and 3 to 9 s under a crawl). A cursor is a condition on the sort key: for the two lists an index answers it in about 0.2 ms at any depth, and a walk neither repeats nor skips a text while new ones are added nightly. It is also how MCP itself pages. To jump to a period, use `since` and `until`; to read one article, use `get_article`.
 
 ## Code and datasets
 

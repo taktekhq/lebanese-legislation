@@ -2,7 +2,9 @@ package mcpserver
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -363,5 +365,53 @@ func TestEmptyCursorIsTheFirstPage(t *testing.T) {
 		if got := mustMarshal(call(t, s, "list_gazette_issues", map[string]any{"limit": 2, "cursor": c}).result); got != want {
 			t.Errorf("cursor %#v: %s, want %s", c, got, want)
 		}
+	}
+}
+
+// Agents learn the change from the answers they already read: initialize
+// says 2.0.0 and how pages work, tools/list has cursor and no offset, and
+// the MCP Registry entry has the same version.
+func TestCursorContractIsAdvertised(t *testing.T) {
+	s := noDBServer(Config{})
+	r := rpc(t, s, map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{}})["result"].(map[string]any)
+	if v := r["serverInfo"].(map[string]any)["version"]; v != "2.0.0" || ServerVersion != "2.0.0" {
+		t.Errorf("version %v", v)
+	}
+	if in := r["instructions"].(string); !strings.Contains(in, "next_cursor as cursor") || !strings.Contains(in, "offset was removed in version 2.0.0") {
+		t.Errorf("instructions: %s", in)
+	}
+	if strings.Contains(string(toolsJSON), "offset") {
+		t.Error("tools.json still mentions offset")
+	}
+	var defs []struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		InputSchema struct {
+			Properties map[string]map[string]any `json:"properties"`
+		} `json:"inputSchema"`
+	}
+	if err := json.Unmarshal(toolsJSON, &defs); err != nil {
+		t.Fatal(err)
+	}
+	paged := map[string]bool{"get_law_texts": true, "get_links": true, "list_legislation": true, "list_gazette_issues": true}
+	for _, d := range defs {
+		c, has := d.InputSchema.Properties["cursor"]
+		if has != paged[d.Name] {
+			t.Errorf("%s: cursor %v", d.Name, has)
+			continue
+		}
+		if has && (c["type"] != "string" || c["description"] != "next_cursor of the previous answer; omit for the first page" || !strings.Contains(d.Description, "next_cursor")) {
+			t.Errorf("%s: cursor %v, description %q", d.Name, c, d.Description)
+		}
+	}
+	b, err := os.ReadFile("../../server.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var reg struct {
+		Version string `json:"version"`
+	}
+	if err := json.Unmarshal(b, &reg); err != nil || reg.Version != ServerVersion {
+		t.Errorf("server.json version %q, initialize says %q (%v)", reg.Version, ServerVersion, err)
 	}
 }

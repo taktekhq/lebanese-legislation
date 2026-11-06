@@ -64,7 +64,7 @@ const instructions = "Lebanese Legislation: every law, article, court ruling and
 
 // pagingGuidance tells agents how pages work since 2.0.0 (internal/mcpserver/paging.go).
 const pagingGuidance = "Long lists come a page at a time: for the next page pass the answer's next_cursor as cursor, " +
-	"unchanged; next_cursor is absent on the last page. offset was removed in version 2.0.0. "
+	"unchanged, with the same other arguments; next_cursor is absent on the last page. offset was removed in version 2.0.0. "
 
 func isKnownTool(name string) bool {
 	for _, n := range toolNames {
