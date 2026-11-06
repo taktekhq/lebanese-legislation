@@ -13,6 +13,10 @@ CREATE FUNCTION ar_digits(t text) RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 RETURN translate(t, '٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹', '01234567890123456789');
 
+CREATE FUNCTION fr_fold(t text) RETURNS text
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
+RETURN replace(replace(translate(lower(t), 'àâäáãåçéèêëíìîïñóòôöõúùûüýÿ', 'aaaaaaceeeeiiiinooooouuuuyy'), 'œ', 'oe'), 'æ', 'ae');
+
 
 CREATE TABLE legislation_kind (
   name_ar    text PRIMARY KEY,            
@@ -139,7 +143,10 @@ CREATE TABLE legislation_article (
   source_id      text,                    
   search_exact   tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(text_ar))) STORED,
   search_stem    tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(text_ar))) STORED,
-  search_fr      tsvector GENERATED ALWAYS AS (to_tsvector('french', coalesce(text_fr, ''))) STORED,
+  search_fr      tsvector GENERATED ALWAYS AS (to_tsvector('french', fr_fold(coalesce(text_fr, '')))) STORED,
+  -- the text's length, for ranking search results by it (BM25); a search reads it
+  -- without reading the text (internal/mcpserver/search_pg.go)
+  text_len       int GENERATED ALWAYS AS (length(coalesce(text_ar, ''))) STORED,
   PRIMARY KEY (law_id, position)
 );
 
@@ -165,7 +172,8 @@ CREATE TABLE ruling (
   members     text[],                     
   text_ar     text,                       
   search_exact tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(title || ' ' || coalesce(text_ar, '')))) STORED,
-  search_stem  tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(title || ' ' || coalesce(text_ar, '')))) STORED
+  search_stem  tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(title || ' ' || coalesce(text_ar, '')))) STORED,
+  text_len     int GENERATED ALWAYS AS (length(title || ' ' || coalesce(text_ar, ''))) STORED -- for ranking (search_pg.go)
 );
 
 CREATE TABLE ruling_file (

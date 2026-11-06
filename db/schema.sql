@@ -39,6 +39,12 @@ CREATE FUNCTION ar_digits(t text) RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 RETURN translate(t, '٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹', '01234567890123456789');
 
+-- French without accents, for search only: «ecrit» finds «écrit». Applied
+-- inside the French vector and to the query of the French search.
+CREATE FUNCTION fr_fold(t text) RETURNS text
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
+RETURN replace(replace(translate(lower(t), 'àâäáãåçéèêëíìîïñóòôöõúùûüýÿ', 'aaaaaaceeeeiiiinooooouuuuyy'), 'œ', 'oe'), 'æ', 'ae');
+
 -- ---------------------------------------------------------------------------
 -- Vocabularies: the Centre's own lists, with English and French names added
 -- ---------------------------------------------------------------------------
@@ -204,7 +210,10 @@ CREATE TABLE legislation_article (
   -- exact words over the fully folded text, stems over the lightly folded one.
   search_exact   tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(text_ar))) STORED,
   search_stem    tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(text_ar))) STORED,
-  search_fr      tsvector GENERATED ALWAYS AS (to_tsvector('french', coalesce(text_fr, ''))) STORED,
+  search_fr      tsvector GENERATED ALWAYS AS (to_tsvector('french', fr_fold(coalesce(text_fr, '')))) STORED,
+  -- the text's length, for ranking search results by it (BM25); a search reads it
+  -- without reading the text (internal/mcpserver/search_pg.go)
+  text_len       int GENERATED ALWAYS AS (length(coalesce(text_ar, ''))) STORED,
   PRIMARY KEY (law_id, position)
 );
 
@@ -235,7 +244,8 @@ CREATE TABLE ruling (
   members     text[],                     -- the panel, in printed order
   text_ar     text,                       -- NULL when the Centre holds only the judgment's file
   search_exact tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(title || ' ' || coalesce(text_ar, '')))) STORED,
-  search_stem  tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(title || ' ' || coalesce(text_ar, '')))) STORED
+  search_stem  tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(title || ' ' || coalesce(text_ar, '')))) STORED,
+  text_len     int GENERATED ALWAYS AS (length(title || ' ' || coalesce(text_ar, ''))) STORED -- for ranking (search_pg.go)
 );
 
 -- The full judgment behind a ruling page («نص الحكم كاملا»): a scanned PDF the

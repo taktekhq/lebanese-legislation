@@ -1,5 +1,14 @@
 # Changes
 
+## 7 November 2026
+
+- The MCP server's `search_legislation` searches in PostgreSQL alone, one query per kind of text. Each word is looked up in a GIN index and weighted by how rare it is, from `search_term`, a materialized view the build makes with the database (how many texts hold each word, each index's size and average text length). Texts holding every word come first, then those missing only the commonest words, scored by BM25. It replaces an FTS5 port that loaded corpora into the server's memory and, when no text held every word, retried up to a dozen searches in a row. On a copy of the data, 30 real questions: median 71 to 45 ms, slowest 1,544 to 367 ms, all 30 together 5.1 to 1.8 s.
+- A search that finds texts holding only some of the words says `partial_match: true`. Each word also matches its stem and its form without a leading و or ف ("والخامسة" finds "الخامسة"), in the same query; `searched_instead` is now only for a different reading of the question (a translation, a citation, another spelling of a name).
+- French search ignores accents: `search_fr` is built from `fr_fold(text_fr)`, so "ecrit" finds "écrit", on the website and the API too.
+- New generated columns `legislation_article.text_len` and `ruling.text_len` give BM25 each text's length without reading it. Generated columns and `search_term` stay out of `data/` and the Hugging Face dataset.
+- Calculated current amounts are no longer searched by word; `get_article` and `get_law_texts` still return them.
+- The container's PostgreSQL runs with `jit=off`: compiling plans cost more than the searches saved.
+
 ## 6 November 2026
 
 - No OFFSET anywhere. Every list pages with a cursor: the sort key of the last row shown, read back as a condition that an index answers (`internal/cursor`, the "Lists" indexes in `db/indexes.sql`). A page costs about the same at any depth: 0.1 to 0.7 ms on a copy of the data, where page 2,000 of `/laws/` by OFFSET read 80,000 laws (835 ms, and 3 to 9 s on the container under a crawl).

@@ -18,14 +18,20 @@ CREATE OR REPLACE FUNCTION ar_digits(t text) RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 RETURN translate(t, '٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹', '01234567890123456789');
 
+CREATE OR REPLACE FUNCTION fr_fold(t text) RETURNS text
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
+RETURN replace(replace(translate(lower(t), 'àâäáãåçéèêëíìîïñóòôöõúùûüýÿ', 'aaaaaaceeeeiiiinooooouuuuyy'), 'œ', 'oe'), 'æ', 'ae');
+
 ALTER TABLE legislation_article
   ADD COLUMN IF NOT EXISTS search_exact tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(text_ar))) STORED,
   ADD COLUMN IF NOT EXISTS search_stem  tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(text_ar))) STORED,
-  ADD COLUMN IF NOT EXISTS search_fr    tsvector GENERATED ALWAYS AS (to_tsvector('french', coalesce(text_fr, ''))) STORED;
+  ADD COLUMN IF NOT EXISTS search_fr    tsvector GENERATED ALWAYS AS (to_tsvector('french', fr_fold(coalesce(text_fr, '')))) STORED,
+  ADD COLUMN IF NOT EXISTS text_len     int GENERATED ALWAYS AS (length(coalesce(text_ar, ''))) STORED;
 
 ALTER TABLE ruling
   ADD COLUMN IF NOT EXISTS search_exact tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(title || ' ' || coalesce(text_ar, '')))) STORED,
-  ADD COLUMN IF NOT EXISTS search_stem  tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(title || ' ' || coalesce(text_ar, '')))) STORED;
+  ADD COLUMN IF NOT EXISTS search_stem  tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(title || ' ' || coalesce(text_ar, '')))) STORED,
+  ADD COLUMN IF NOT EXISTS text_len     int GENERATED ALWAYS AS (length(title || ' ' || coalesce(text_ar, ''))) STORED;
 
 ALTER TABLE ruling_page
   ADD COLUMN IF NOT EXISTS search_stem tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(ar_digits(text_ar)))) STORED;

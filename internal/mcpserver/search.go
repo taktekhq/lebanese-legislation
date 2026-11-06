@@ -2,13 +2,12 @@ package mcpserver
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
+	"sync"
 )
 
 // ---------------------------------------------------------------- search_legislation
@@ -38,59 +37,75 @@ func yearInt(y int) yearVal {
 // positive is the Worker's `year && year > 0`.
 func (y yearVal) positive() bool { return y.truthy && y.f > 0 }
 
-// found is one pass of the four searches, in the Worker's field order.
+// found is the four searches, in the Worker's field order.
 type found struct {
 	o     obj
 	total int
+	full  int // results that hold every word of the question
 }
 
-// searchOnce runs one pass of the four searches. num narrows laws by their
-// own number; with lawsOnly (a number or a year in a rescued question names
-// a text, not an article or a ruling) only the laws are searched. forms
-// matches each word in its usual forms (fts5Forms) instead of as typed: a
-// late fallback, as short stems ("بيع", "عقد") match more than the
-// question meant.
-func (s *Server) searchOnce(ctx context.Context, q, kind string, year yearVal, limit int, num string, lawsOnly, forms bool) (found, error) {
-	var f found
+// searchAll runs the four searches at once, each on its own connection, and
+// each one query (search_pg.go): a question that no text matches word for
+// word still finds the texts holding its rarest words, with no second pass.
+// num narrows laws by their own number; with lawsOnly (a number or a year
+// names a text, not an article or a ruling) only the laws are searched.
+func (s *Server) searchAll(ctx context.Context, q, kind string, year yearVal, limit int, num string, lawsOnly bool) (found, error) {
 	want := func(k string) bool { return kind == "" || kind == k }
+	type part struct {
+		set   func(*obj)
+		total int
+		full  int
+		err   error
+	}
+	var jobs []func() part
 	if want("laws") {
-		rows, err := s.findLaws(ctx, q, year, limit, num, forms)
-		if err != nil {
-			return f, err
-		}
-		f.o.set("laws", rows)
-		f.o.set("law_count", len(rows))
-		f.total += len(rows)
+		jobs = append(jobs, func() part {
+			rows, full, err := s.findLaws(ctx, q, year, limit, num)
+			return part{func(o *obj) { o.set("laws", rows); o.set("law_count", len(rows)) }, len(rows), full, err}
+		})
 	}
 	if want("articles") && !lawsOnly {
-		rows, notInCode, err := s.findArticles(ctx, q, limit, forms)
-		if err != nil {
-			return f, err
-		}
-		f.o.set("articles", rows)
-		f.o.set("article_count", len(rows))
-		if notInCode != "" && len(rows) > 0 {
-			f.o.set("articles_not_in_code", notInCode)
-		}
-		f.total += len(rows)
+		jobs = append(jobs, func() part {
+			rows, notInCode, full, err := s.findArticles(ctx, q, limit)
+			return part{func(o *obj) {
+				o.set("articles", rows)
+				o.set("article_count", len(rows))
+				if notInCode != "" && len(rows) > 0 {
+					o.set("articles_not_in_code", notInCode)
+				}
+			}, len(rows), full, err}
+		})
 	}
 	if want("rulings") && !lawsOnly {
-		rows, err := s.findRulings(ctx, q, limit, forms)
-		if err != nil {
-			return f, err
-		}
-		f.o.set("rulings", rows)
-		f.o.set("ruling_count", len(rows))
-		f.total += len(rows)
+		jobs = append(jobs, func() part {
+			rows, full, err := s.findRulings(ctx, q, limit)
+			return part{func(o *obj) { o.set("rulings", rows); o.set("ruling_count", len(rows)) }, len(rows), full, err}
+		})
 	}
 	if want("gazette") && !lawsOnly {
-		rows, count, err := s.findGazette(ctx, q, limit, year)
-		if err != nil {
-			return f, err
+		jobs = append(jobs, func() part {
+			rows, count, err := s.findGazette(ctx, q, limit, year)
+			return part{func(o *obj) { o.set("gazette", rows); o.set("gazette_count", count) }, count, count, err}
+		})
+	}
+	parts := make([]part, len(jobs))
+	var wg sync.WaitGroup
+	for i, job := range jobs {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			parts[i] = job()
+		}()
+	}
+	wg.Wait()
+	var f found
+	for _, p := range parts { // in the jobs' order, which is the Worker's field order
+		if p.err != nil {
+			return f, p.err
 		}
-		f.o.set("gazette", rows)
-		f.o.set("gazette_count", count)
-		f.total += count
+		p.set(&f.o)
+		f.total += p.total
+		f.full += p.full
 	}
 	return f, nil
 }
@@ -120,27 +135,32 @@ func (s *Server) searchLegislation(ctx context.Context, a args) (toolResult, err
 	year := yearFrom(a["year"])
 
 	out := obj{{"q", q}}
-	// The fallbacks below stop starting new searches past this point, so the
-	// call stays inside its budget.
-	deadline := time.Now().Add(2500 * time.Millisecond)
-	f, err := s.searchOnce(ctx, q, kind, year, limit, "", false, false)
+	f, err := s.searchAll(ctx, q, kind, year, limit, "", false)
 	if err != nil {
 		return toolResult{}, err
 	}
-	if f.total == 0 && kind != "gazette" {
-		// Nothing matched: read the question again, as the website does. A
-		// year given as a filter stays one.
+	if f.full == 0 && kind != "gazette" {
+		// No text holds every word as written. A citation ("law 44 of 2015")
+		// or an English question the glossary turns into Arabic words reads
+		// differently: one more ranked pass with that reading, if it finds
+		// texts holding all its words. When nothing at all was found, the
+		// other readings too: a Latin name in another spelling, the first
+		// word (often the kind of text) set aside. Each is one pass, and
+		// they stop at the first that finds texts holding all its words.
 		for _, alt := range rescueReadings(q) {
+			if f.total > 0 && alt.kind != "translated" && alt.num == "" && alt.year == 0 {
+				continue
+			}
 			named := alt.num != "" || alt.year != 0
 			y := year
 			if alt.year != 0 {
 				y = yearInt(alt.year)
 			}
-			r, err := s.searchOnce(ctx, alt.query, kind, y, limit, alt.num, named && (kind == "" || kind == "laws"), false)
+			r, err := s.searchAll(ctx, alt.query, kind, y, limit, alt.num, named && (kind == "" || kind == "laws"))
 			if err != nil {
 				return toolResult{}, err
 			}
-			if r.total > 0 {
+			if r.full > 0 {
 				f = r
 				parts := []string{}
 				for _, p := range []string{alt.query, alt.num, yearStr(alt.year)} {
@@ -154,58 +174,9 @@ func (s *Server) searchLegislation(ctx context.Context, a args) (toolResult, err
 			}
 		}
 	}
-	if f.total == 0 && kind != "gazette" && hasArabic(q) {
-		// Every word in its usual forms: "تبلغه الموعدين تغيبه", "مرور الزمن الصورية".
-		r, err := s.searchOnce(ctx, q, kind, year, limit, "", false, true)
-		if err != nil {
-			return toolResult{}, err
-		}
-		if r.total > 0 {
-			f = r
-			out.set("searched_instead", q+" (each word in any of its forms)")
-			out.set("searched_instead_kind", "adjusted")
-		}
-	}
-	if f.total == 0 && kind != "gazette" && hasArabic(q) && time.Now().Before(deadline) {
-		// Still nothing: no text holds every word. Leave out one word, trying
-		// the one that tells least first (dropOrder), and keep the first
-		// reading that finds anything; then the same with the commonest word
-		// gone, while two words are left.
-		var words []string
-		for _, w := range jsFields(q) {
-			if !arStop[arNorm(w)] {
-				words = append(words, w)
-			}
-		}
-	rounds:
-		for round := 0; round < 2 && len(words) > 1; round++ {
-			order, err := s.dropOrder(ctx, words, kind)
-			if err != nil {
-				return toolResult{}, err
-			}
-			for _, i := range order {
-				if time.Now().After(deadline) {
-					break rounds
-				}
-				left := without(words, i)
-				// one kind word left alone ("قانون") answers nothing
-				if len(left) == 1 && kindWords[arNorm(left[0])] {
-					continue
-				}
-				rest := strings.Join(left, " ")
-				r, err := s.searchOnce(ctx, rest, kind, year, limit, "", false, true)
-				if err != nil {
-					return toolResult{}, err
-				}
-				if r.total > 0 {
-					f = r
-					out.set("searched_instead", rest)
-					out.set("searched_instead_kind", "adjusted")
-					break rounds
-				}
-			}
-			words = without(words, order[0])
-		}
+	if f.full == 0 && f.total > 0 {
+		// tell the agent these hold only some of the words, rarest first
+		out.set("partial_match", true)
 	}
 	out.merge(f.o)
 	return ok(out), nil
@@ -216,61 +187,6 @@ func yearStr(y int) string {
 		return ""
 	}
 	return strconv.Itoa(y)
-}
-
-func without(words []string, i int) []string {
-	out := make([]string, 0, len(words)-1)
-	for j, w := range words {
-		if j != i {
-			out = append(out, w)
-		}
-	}
-	return out
-}
-
-var kindWords = setOf("قانون", "القانون", "مرسوم", "المرسوم", "قرار", "القرار", "نظام", "النظام", "قوانين", "القوانين")
-
-// dropOrder ranks the words by how little they tell, as the website's
-// dropOne does: a word found in no text of the kind searched (articles when
-// no kind is given) first, then the one found in the most, counted in its
-// usual forms.
-func (s *Server) dropOrder(ctx context.Context, words []string, kind string) ([]int, error) {
-	counts := make([]float64, len(words))
-	for i, w := range words {
-		counts[i] = math.Inf(1)
-		m := fts5Forms(w)
-		if m == "" {
-			continue
-		}
-		var n int
-		var err error
-		switch kind {
-		case "laws":
-			n, err = s.countLawTitles(ctx, m, 20000)
-		case "rulings":
-			n, err = s.countRulings(ctx, m, 20000)
-		default:
-			n, err = s.countArticles(ctx, m, 20000)
-		}
-		if err != nil {
-			return nil, err
-		}
-		if n > 0 {
-			counts[i] = float64(n)
-		}
-	}
-	order := make([]int, len(words))
-	for i := range order {
-		order[i] = i
-	}
-	sort.SliceStable(order, func(x, y int) bool {
-		a, b := order[x], order[y]
-		if counts[a] == counts[b] {
-			return a < b
-		}
-		return counts[a] > counts[b]
-	})
-	return order, nil
 }
 
 // latinName folds a Latin-script query for matching code names: lower case,
@@ -337,26 +253,38 @@ func rankCodes(q string, codes []lawRow) []lawRow {
 
 var lawIDRe = regexp.MustCompile(`^\d{1,10}$`)
 
-func (s *Server) findLaws(ctx context.Context, q string, year yearVal, limit int, num string, forms bool) ([]any, error) {
+// findLaws are the laws a question names: a pinned text, a law's id, a code
+// by its English or French name, then the titles that hold its words. full
+// counts the title matches that hold every word.
+func (s *Server) findLaws(ctx context.Context, q string, year yearVal, limit int, num string) (out []any, full int, err error) {
 	var foundRows []lawRow
 	// A question that names one text ("cybercrime" is Law 81 of 2018) has it first (pins in gloss.json).
 	if num == "" {
 		if pin := pinnedLaw(q); pin != 0 {
 			l, err := s.loadLaw(ctx, int64(pin))
 			if err != nil {
-				return nil, err
+				return nil, 0, err
 			}
 			if l != nil {
 				foundRows = append(foundRows, *l)
 			}
 		}
 	}
+	// A citation ("قانون رقم 44 تاريخ 2015", "law 81/2018"): the text with that
+	// number, of that year, first.
+	if cn, cy, _ := splitNumbers(q); num == "" && cn != "" && cy != 0 {
+		rows, _, err := s.rankedLaws(ctx, "", false, yearInt(cy), cn, limit)
+		if err != nil {
+			return nil, 0, err
+		}
+		foundRows = append(foundRows, rows...)
+	}
 	// A law's id, as get_law and the site's addresses use it.
 	if num == "" && lawIDRe.MatchString(q) {
 		id, _ := strconv.ParseInt(q, 10, 64)
 		l, err := s.loadLaw(ctx, id)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		if l != nil {
 			foundRows = append(foundRows, *l)
@@ -367,11 +295,11 @@ func (s *Server) findLaws(ctx context.Context, q string, year yearVal, limit int
 	if num == "" && hasLatin(q) {
 		rows, err := s.db.Query(ctx, `SELECT `+lawCols+` FROM `+lawFrom+` WHERE c.slug IS NOT NULL ORDER BY l.id`)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		codes, err := scanLaws(rows, nil)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		foundRows = append(foundRows, rankCodes(q, codes)...)
 	}
@@ -390,29 +318,24 @@ func (s *Server) findLaws(ctx context.Context, q string, year yearVal, limit int
 	if jsTrim(less) == "" {
 		titleQ = q
 	}
-	match := fts5MatchAll(titleQ)
-	if forms {
-		match = fts5Forms(titleQ)
+	// The Arabic titles (official), then the unofficial English ones, each
+	// ranked in one query (search_pg.go).
+	rows, full, err := s.rankedLaws(ctx, titleQ, false, year, num, limit)
+	if err != nil {
+		return nil, 0, err
 	}
-	if match != "" || num != "" {
-		rows, err := s.lawTitleSearch(ctx, match, year, num, limit)
+	foundRows = append(foundRows, rows...)
+	fullTotal := full
+	if hasLatin(q) && num == "" {
+		rows, full, err := s.rankedLaws(ctx, titleQ, true, year, "", limit)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		foundRows = append(foundRows, rows...)
-	}
-	// The unofficial English titles, after every Arabic match (Arabic is official).
-	if hasLatin(q) && num == "" {
-		if en := fts5English(q); en != "" {
-			rows, err := s.englishTitleSearch(ctx, en, year, limit)
-			if err != nil {
-				return nil, err
-			}
-			foundRows = append(foundRows, rows...)
-		}
+		fullTotal += full
 	}
 	seen := map[int]bool{}
-	out := []any{}
+	out = []any{}
 	for i := range foundRows {
 		l := &foundRows[i]
 		if seen[l.ID] {
@@ -427,120 +350,10 @@ func (s *Server) findLaws(ctx context.Context, q string, year yearVal, limit int
 		}
 		out = append(out, lawSummary(l))
 	}
-	return out, nil
+	return out, fullTotal, nil
 }
 
-// lawTitleSearch is the Arabic title search: codes first, then the newest.
-func (s *Server) lawTitleSearch(ctx context.Context, match string, year yearVal, num string, limit int) ([]lawRow, error) {
-	var where []string
-	var params []any
-	if match != "" {
-		q, ok := parseFTS(match).usable()
-		if !ok {
-			return nil, nil
-		}
-		if pf := q.prefilter("ar_norm(l.title)", "ILIKE", &params); pf != "" {
-			where = append(where, pf)
-		}
-		where = append(where, q.where("to_tsvector('simple', ar_norm(l.title))", "l.title", &params))
-	}
-	if year.positive() {
-		params = append(params, year.s+"-%")
-		where = append(where, fmt.Sprintf("to_char(l.issued_on, 'YYYY-MM-DD') LIKE $%d", len(params)))
-	}
-	if num != "" {
-		params = append(params, num)
-		where = append(where, fmt.Sprintf("l.number = $%d", len(params)))
-	}
-	params = append(params, limit)
-	sql := `SELECT ` + lawCols + ` FROM ` + lawFrom + ` WHERE ` + strings.Join(where, " AND ") +
-		fmt.Sprintf(` ORDER BY (c.slug IS NOT NULL) DESC, l.issued_on DESC NULLS LAST, l.id LIMIT $%d`, len(params))
-	rows, err := s.db.Query(ctx, sql, params...)
-	if err != nil {
-		return nil, err
-	}
-	return scanLaws(rows, nil)
-}
-
-func (s *Server) countLawTitles(ctx context.Context, match string, cap int) (int, error) {
-	q, ok := parseFTS(match).usable()
-	if !ok {
-		return 0, nil
-	}
-	var params []any
-	where := []string{}
-	if pf := q.prefilter("ar_norm(l.title)", "ILIKE", &params); pf != "" {
-		where = append(where, pf)
-	}
-	where = append(where, q.where("to_tsvector('simple', ar_norm(l.title))", "l.title", &params))
-	params = append(params, cap)
-	var n int
-	err := s.db.QueryRow(ctx, `SELECT count(*) FROM (SELECT 1 FROM legislation l WHERE `+strings.Join(where, " AND ")+
-		fmt.Sprintf(` LIMIT $%d) x`, len(params)), params...).Scan(&n)
-	return n, err
-}
-
-// fts5French builds a MATCH for the French texts: every word, as a prefix
-// once it is long enough, with a plural "s" dropped ("obligations" finds
-// "obligation" and "obligations").
-func fts5French(q string) string {
-	var out []string
-	for _, w := range nonAlnum.Split(strings.ToLower(stripMarks(q)), -1) {
-		if len(w) <= 1 {
-			continue
-		}
-		if len(w) >= 5 && strings.HasSuffix(w, "s") {
-			w = w[:len(w)-1]
-		}
-		if len(w) >= 4 {
-			out = append(out, fts5Quote(w)+"*")
-		} else {
-			out = append(out, fts5Quote(w))
-		}
-	}
-	return strings.Join(out, " AND ")
-}
-
-var (
-	nonAlnum = regexp.MustCompile(`[^a-z0-9]+`)
-	enStop   = setOf("the", "of", "a", "an", "in", "and", "on", "for", "to", "by", "with", "is", "are")
-)
-
-// fts5English builds a MATCH for the English titles: every content word, as
-// a prefix once it is long enough, with a plural "s" dropped.
-func fts5English(q string) string {
-	var out []string
-	for _, t := range latinTokens(q) {
-		for _, w := range nonAlnum.Split(t, -1) {
-			if len(w) <= 1 || enStop[w] {
-				continue
-			}
-			if len(w) >= 5 && strings.HasSuffix(w, "s") {
-				w = w[:len(w)-1]
-			}
-			if len(w) >= 3 {
-				out = append(out, fts5Quote(w)+"*")
-			} else {
-				out = append(out, fts5Quote(w))
-			}
-		}
-	}
-	return strings.Join(out, " AND ")
-}
-
-// phraseRows is how many rows of a corpus hold each phrase (cached).
-func (s *Server) phraseRows(ctx context.Context, corpus string, phrases []ftsPhrase, count func(context.Context, ftsPhrase) (float64, error)) ([]float64, error) {
-	out := make([]float64, len(phrases))
-	for i, p := range phrases {
-		key := corpus + "\x00" + p.tsquery()
-		n, err := s.stats.rowsWith(ctx, key, func(ctx context.Context) (float64, error) { return count(ctx, p) })
-		if err != nil {
-			return nil, err
-		}
-		out[i] = n
-	}
-	return out, nil
-}
+var nonAlnum = regexp.MustCompile(`[^a-z0-9]+`)
 
 // ---------------------------------------------------------------- reading a question again
 

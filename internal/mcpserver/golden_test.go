@@ -9,7 +9,7 @@ import (
 
 // testdata/golden.json holds the Worker's own answers (its TypeScript
 // functions run under Node) for the pure parts of the server: Arabic
-// normalization, FTS5 expressions, article numbers, the glossary, the
+// normalization, article numbers, the glossary, the
 // rescue readings, the Gazette and date parsers, client kinds, badges and
 // analytics ids. Each Go function must give the same answer for every input.
 
@@ -65,8 +65,6 @@ func TestGoldenStrings(t *testing.T) {
 	g := loadGolden(t)
 	funcs := map[string]func(string) any{
 		"arNorm":        func(s string) any { return arNorm(s) },
-		"fts5MatchAll":  func(s string) any { return fts5MatchAll(s) },
-		"fts5Forms":     func(s string) any { return fts5Forms(s) },
 		"lightStem":     func(s string) any { return lightStem(s) },
 		"numberForms":   func(s string) any { return numberForms(s) },
 		"foldDigits":    func(s string) any { return foldDigits(s) },
@@ -75,8 +73,6 @@ func TestGoldenStrings(t *testing.T) {
 		"nameVariants":  func(s string) any { return orEmpty(nameVariants(s)) },
 		"pinKey":        func(s string) any { return pinKey(s) },
 		"pinnedLaw":     func(s string) any { return pinnedLaw(s) },
-		"fts5French":    func(s string) any { return fts5French(s) },
-		"fts5English":   func(s string) any { return fts5English(s) },
 		"gazetteNumber": func(s string) any { return gazetteNumber(s) },
 		"heading":       func(s string) any { return heading(s) },
 		"snippet":       func(s string) any { return snippet(s) },

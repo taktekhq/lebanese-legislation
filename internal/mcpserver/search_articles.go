@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"regexp"
-	"sort"
 	"strings"
 )
 
@@ -46,14 +45,9 @@ type codeName struct {
 	slug  string
 }
 
-// codeList caches the codes' ids, titles and slugs (fresh.go).
-type codeList struct{ f fresh[[]codeName] }
-
+// codes are the codes' ids, titles and slugs (26 rows, read when a question
+// is checked for a code's name).
 func (s *Server) codes(ctx context.Context) ([]codeName, error) {
-	return s.codeCache.f.get(ctx, s.loadCodes)
-}
-
-func (s *Server) loadCodes(ctx context.Context) ([]codeName, error) {
 	rows, err := s.db.Query(ctx, `SELECT l.id, l.title, c.slug FROM `+lawFrom+` WHERE c.slug IS NOT NULL ORDER BY l.id`)
 	if err != nil {
 		return nil, err
@@ -134,7 +128,11 @@ func (s *Server) codeIn(ctx context.Context, q string) (*codeRef, error) {
 	return ref, nil
 }
 
-func (s *Server) findArticles(ctx context.Context, q string, limit int, forms bool) ([]any, string, error) {
+// findArticles are the articles a question asks for: the numbered articles
+// of a code it names, then the articles that hold its words (in that code
+// when it names one), ranked in one query (search_pg.go), then the French
+// texts for a Latin question. full counts the matches holding every word.
+func (s *Server) findArticles(ctx context.Context, q string, limit int) (out []any, notInCode string, full int, err error) {
 	var hits []articleHit
 	add := func(rows []articleHit) {
 		for _, r := range rows {
@@ -160,13 +158,13 @@ func (s *Server) findArticles(ctx context.Context, q string, limit int, forms bo
 	words := q
 	code, err := s.codeIn(ctx, q)
 	if err != nil {
-		return nil, "", err
+		return nil, "", 0, err
 	}
 	if code != nil {
 		if len(code.numbers) > 0 {
 			rows, err := s.articleHits(ctx, `a.law_id = $1 AND a.number = ANY($2) ORDER BY a.position`, code.id, code.numbers)
 			if err != nil {
-				return nil, "", err
+				return nil, "", 0, err
 			}
 			for _, n := range code.numbers {
 				var same []articleHit
@@ -178,54 +176,37 @@ func (s *Server) findArticles(ctx context.Context, q string, limit int, forms bo
 				add(same)
 			}
 		}
-		if code.rest != "" {
-			for _, m := range []string{fts5MatchAll(code.rest), fts5Forms(code.rest)} {
-				if m == "" || len(hits) >= limit {
-					continue
-				}
-				before := len(hits)
-				rows, err := s.articleMatch(ctx, m, limit, code.id)
-				if err != nil {
-					return nil, "", err
-				}
-				add(rows)
-				if len(hits) > before {
-					break
-				}
+		if code.rest != "" && len(hits) < limit {
+			rows, f, err := s.rankedArticles(ctx, code.rest, false, code.id, limit)
+			if err != nil {
+				return nil, "", 0, err
 			}
+			add(rows)
+			full += f
 			words = code.rest
 		}
 		if len(hits) > 0 {
 			out, err := s.articleOut(ctx, hits)
-			return out, "", err
+			return out, "", full, err
 		}
-	}
-	notInCode := ""
-	if code != nil {
 		notInCode = code.title
 	}
-	m := fts5MatchAll(words)
-	if forms {
-		m = fts5Forms(words)
+	rows, f, err := s.rankedArticles(ctx, words, false, 0, limit)
+	if err != nil {
+		return nil, "", 0, err
 	}
-	if m != "" {
-		rows, err := s.articleMatch(ctx, m, limit, 0)
+	add(rows)
+	full += f
+	if hasLatin(q) && len(hits) < limit {
+		rows, f, err := s.rankedArticles(ctx, q, true, 0, limit-len(hits))
 		if err != nil {
-			return nil, "", err
+			return nil, "", 0, err
 		}
 		add(rows)
+		full += f
 	}
-	if hasLatin(q) && len(hits) < limit {
-		if fr := fts5French(q); fr != "" {
-			rows, err := s.frenchMatch(ctx, fr, limit-len(hits))
-			if err != nil {
-				return nil, "", err
-			}
-			add(rows)
-		}
-	}
-	out, err := s.articleOut(ctx, hits)
-	return out, notInCode, err
+	out, err = s.articleOut(ctx, hits)
+	return out, notInCode, full, err
 }
 
 // articleHits reads hits by a condition on a (the article) and l (its law).
@@ -247,133 +228,10 @@ func (s *Server) articleHits(ctx context.Context, where string, params ...any) (
 	return out, rows.Err()
 }
 
-// candidate is an article a MATCH found, with what bm25 needs.
+// candidate is a ranked article (search_pg.go), before it is read in full.
 type candidate struct {
 	lawID    int
 	position int
-	code     bool
-	dl       float64
-	tf       []float64
-}
-
-const articleMatchFrom = `FROM legislation_article a JOIN legislation l ON l.id = a.law_id JOIN legislation_kind k ON k.name_ar = l.kind
-	LEFT JOIN code c ON c.law_id = a.law_id`
-
-func (s *Server) candidates(ctx context.Context, vec, text, where string, params []any, phrases []ftsPhrase) ([]candidate, error) {
-	tfs := tfColumns(phrases, vec, text, &params)
-	rows, err := s.db.Query(ctx, `SELECT a.law_id, a.position, c.law_id IS NOT NULL, `+tfs+` `+articleMatchFrom+` WHERE `+where, params...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var out []candidate
-	for rows.Next() {
-		var c candidate
-		var st []float64
-		if err := rows.Scan(&c.lawID, &c.position, &c.code, &st); err != nil {
-			return nil, err
-		}
-		c.dl, c.tf = st[0], st[1:]
-		out = append(out, c)
-	}
-	return out, rows.Err()
-}
-
-// rank orders candidates as the Worker's queries did: codes first, then the
-// best bm25, ties in the snapshot's row order.
-func rank(cands []candidate, st corpusStats, df []float64, limit int) []candidate {
-	scores := make(map[[2]int]float64, len(cands))
-	for _, c := range cands {
-		scores[[2]int{c.lawID, c.position}] = bm25(st, df, c.tf, c.dl)
-	}
-	sort.SliceStable(cands, func(i, j int) bool {
-		a, b := cands[i], cands[j]
-		if a.code != b.code {
-			return a.code
-		}
-		sa, sb := scores[[2]int{a.lawID, a.position}], scores[[2]int{b.lawID, b.position}]
-		if sa != sb {
-			return sa > sb
-		}
-		if a.lawID != b.lawID {
-			return a.lawID < b.lawID
-		}
-		return a.position < b.position
-	})
-	if len(cands) > limit {
-		cands = cands[:limit]
-	}
-	return cands
-}
-
-// articleMatch runs one MATCH on the Arabic articles, codes first, then the
-// best match (bm25); lawID keeps it to one text.
-func (s *Server) articleMatch(ctx context.Context, match string, limit, lawID int) ([]articleHit, error) {
-	q, ok := parseFTS(match).usable()
-	if !ok {
-		return nil, nil
-	}
-	phrases := q.phrases()
-	var params []any
-	where := q.where("a.search_exact", "a.text_ar", &params)
-	if lawID != 0 {
-		params = append(params, lawID)
-		where += fmt.Sprintf(` AND a.law_id = $%d`, len(params))
-	}
-	// Codes rank first: when they alone fill the page, the others need no score.
-	cands, err := s.candidates(ctx, "a.search_exact", "a.text_ar", where+` AND c.law_id IS NOT NULL`, params, phrases)
-	if err != nil {
-		return nil, err
-	}
-	if len(cands) < limit {
-		more, err := s.candidates(ctx, "a.search_exact", "a.text_ar", where+` AND c.law_id IS NULL`, params, phrases)
-		if err != nil {
-			return nil, err
-		}
-		cands = append(cands, more...)
-	}
-	// The snapshot indexed the calculated current amounts beside the
-	// Civil Procedure articles' text; no Postgres vector holds them.
-	if lawID == 0 || lawID == calculatedLaw {
-		extra, err := s.calculatedIndex(ctx)
-		if err != nil {
-			return nil, err
-		}
-		have := map[int]bool{}
-		for _, c := range cands {
-			if c.lawID == calculatedLaw {
-				have[c.position] = true
-			}
-		}
-		for _, e := range extra {
-			if have[e.position] || !q.matches(e.tokens) {
-				continue
-			}
-			c := candidate{lawID: calculatedLaw, position: e.position, code: e.code, dl: float64(len(e.tokens))}
-			for _, p := range phrases {
-				c.tf = append(c.tf, float64(p.tf(e.tokens)))
-			}
-			cands = append(cands, c)
-		}
-	}
-	if len(cands) == 0 {
-		return nil, nil
-	}
-	st, err := s.stats.corpus(ctx, "articles", s.articleStats)
-	if err != nil {
-		return nil, err
-	}
-	df, err := s.phraseRows(ctx, "articles", phrases, func(ctx context.Context, p ftsPhrase) (float64, error) {
-		var ps []any
-		w := ftsQuery{groups: [][]ftsPhrase{{p}}}.where("a.search_exact", "a.text_ar", &ps)
-		var n float64
-		err := s.db.QueryRow(ctx, `SELECT count(*)::float8 FROM legislation_article a WHERE `+w, ps...).Scan(&n)
-		return n, err
-	})
-	if err != nil {
-		return nil, err
-	}
-	return s.hitsFor(ctx, rank(cands, st, df, limit), "a.text_ar")
 }
 
 // hitsFor reads the hits for ranked candidates, in their order.
@@ -417,79 +275,9 @@ func (s *Server) hitsFor(ctx context.Context, cands []candidate, textCol string)
 	return out, nil
 }
 
-func (s *Server) articleStats(ctx context.Context) (corpusStats, error) {
-	var st corpusStats
-	if err := s.db.QueryRow(ctx, `SELECT count(*)::float8 FROM legislation_article`).Scan(&st.rows); err != nil {
-		return st, err
-	}
-	// The average length from a fixed sample: a full pass reads every article.
-	err := s.db.QueryRow(ctx, `SELECT coalesce(avg((SELECT sum(cardinality(u.positions)) FROM unnest(a.search_exact) u)), 0)::float8
-		FROM legislation_article a TABLESAMPLE SYSTEM (3) REPEATABLE (1)`).Scan(&st.avgLen)
-	return st, err
-}
-
-func (s *Server) countArticles(ctx context.Context, match string, cap int) (int, error) {
-	q, ok := parseFTS(match).usable()
-	if !ok {
-		return 0, nil
-	}
-	var ps []any
-	w := q.where("a.search_exact", "a.text_ar", &ps)
-	ps = append(ps, cap)
-	var n int
-	err := s.db.QueryRow(ctx, fmt.Sprintf(`SELECT count(*) FROM (SELECT 1 FROM legislation_article a WHERE %s LIMIT $%d) x`, w, len(ps)), ps...).Scan(&n)
-	return n, err
-}
-
 // calculatedLaw is the Code of Civil Procedure, the one text with
 // calculated current amounts.
 const calculatedLaw = 244565
-
-type calculatedEntry struct {
-	position int
-	code     bool
-	tokens   []string
-}
-
-type calcIndex struct{ f fresh[[]calculatedEntry] }
-
-// calculatedIndex is, for every article with calculated amounts, the
-// tokens the snapshot indexed: its text and the calculated text. Read once
-// and reloaded in the background (fresh.go): every article search needs it.
-func (s *Server) calculatedIndex(ctx context.Context) ([]calculatedEntry, error) {
-	return s.calcCache.f.get(ctx, s.loadCalculatedIndex)
-}
-
-func (s *Server) loadCalculatedIndex(ctx context.Context) ([]calculatedEntry, error) {
-	rows, err := s.queryArticles(ctx, `a.law_id = $1 ORDER BY a.position`, calculatedLaw)
-	if err != nil {
-		return nil, err
-	}
-	codes, err := s.codes(ctx)
-	if err != nil {
-		return nil, err
-	}
-	isCode := false
-	for _, c := range codes {
-		if c.id == calculatedLaw {
-			isCode = true
-		}
-	}
-	entries := []calculatedEntry{}
-	for _, a := range rows {
-		if a.Calculated == nil {
-			continue
-		}
-		var rec struct {
-			TextAr string `json:"text_ar"`
-		}
-		if err := jsonUnmarshal(*a.Calculated, &rec); err != nil {
-			continue
-		}
-		entries = append(entries, calculatedEntry{a.Position, isCode, ftsTokens(arNorm(a.TextAr) + " " + arNorm(rec.TextAr))})
-	}
-	return entries, nil
-}
 
 func (s *Server) articleOut(ctx context.Context, hits []articleHit) ([]any, error) {
 	out := []any{}
@@ -524,70 +312,15 @@ func snippet(text string) string {
 
 // ---------------------------------------------------------------- rulings and the Gazette
 
-func (s *Server) findRulings(ctx context.Context, q string, limit int, forms bool) ([]any, error) {
-	m := fts5MatchAll(q)
-	if forms {
-		m = fts5Forms(q)
-	}
-	out := []any{}
-	if m == "" {
-		return out, nil
-	}
-	fq, ok := parseFTS(m).usable()
-	if !ok {
-		return out, nil
-	}
-	var params []any
-	w := fq.where("r.search_exact", rulingText, &params)
-	params = append(params, limit)
-	rows, err := s.db.Query(ctx, `SELECT r.id, r.title, r.court, to_char(r.decided_on, 'YYYY-MM-DD'), r.text_ar,
-		EXISTS (SELECT 1 FROM ruling_file rf WHERE rf.ruling_id = r.id)
-		FROM ruling r WHERE `+w+fmt.Sprintf(` ORDER BY r.decided_on DESC NULLS LAST, r.id LIMIT $%d`, len(params)), params...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var id int
-		var title string
-		var court, decided, text *string
-		var file bool
-		if err := rows.Scan(&id, &title, &court, &decided, &text, &file); err != nil {
-			return nil, err
-		}
-		h := obj{{"id", id}, {"title", title}, {"url", fmt.Sprintf("%s/ruling/%d/", Base, id)}}
-		h.nonEmpty("court", court)
-		h.nonEmpty("decided_on", decided)
-		if text != nil && *text != "" {
-			h.set("snippet", snippet(*text))
-		}
-		if file {
-			h.set("pdf_url", pdfURL(id))
-		}
-		out = append(out, h)
-	}
-	return out, rows.Err()
+// findRulings are the rulings whose title or text holds the question's
+// words, ranked in one query (search_pg.go).
+func (s *Server) findRulings(ctx context.Context, q string, limit int) ([]any, int, error) {
+	return s.rankedRulings(ctx, q, limit)
 }
-
-// rulingText is what a ruling's search vector reads: its title and text.
-const rulingText = "(r.title || ' ' || coalesce(r.text_ar, ''))"
 
 // pdfURL is the judgment's scan on the Lebanese University's site.
 func pdfURL(id int) string {
 	return fmt.Sprintf("https://legallaw.ul.edu.lb/RulingFile.aspx?RuliID=%d&type=list", id)
-}
-
-func (s *Server) countRulings(ctx context.Context, match string, cap int) (int, error) {
-	q, ok := parseFTS(match).usable()
-	if !ok {
-		return 0, nil
-	}
-	var ps []any
-	w := q.where("r.search_exact", rulingText, &ps)
-	ps = append(ps, cap)
-	var n int
-	err := s.db.QueryRow(ctx, fmt.Sprintf(`SELECT count(*) FROM (SELECT 1 FROM ruling r WHERE %s LIMIT $%d) x`, w, len(ps)), ps...).Scan(&n)
-	return n, err
 }
 
 var (

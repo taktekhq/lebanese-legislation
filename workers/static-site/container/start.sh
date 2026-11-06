@@ -9,7 +9,7 @@ perl -MIO::Socket::INET -e '$s=IO::Socket::INET->new(LocalPort=>8081,Listen=>5,R
 export LEBLEG_VECTOR_DSN="${LEBLEG_VECTOR_DSN:-host=127.0.0.1 user=lebleg_web dbname=lebleg_search}"
 echo "start: $(date -u +%T) postgres starting"
 ls -ld /var/run /run /var/run/postgresql 2>&1 || true
-gosu postgres postgres -D "$PGDATA" -c listen_addresses=127.0.0.1 -c unix_socket_directories=/tmp -c shared_buffers=1GB -c max_connections=50 -c default_transaction_read_only=on &
+gosu postgres postgres -D "$PGDATA" -c listen_addresses=127.0.0.1 -c unix_socket_directories=/tmp -c shared_buffers=1GB -c max_connections=50 -c default_transaction_read_only=on -c jit=off &
 PG=$!
 # A stop from Cloudflare (deploy, move, sleep) is not a failure: stop both and exit.
 trap 'echo "start: $(date -u +%T) stop signal"; kill -TERM ${WEB:-} $PG 2>/dev/null; wait; exit 0' TERM INT

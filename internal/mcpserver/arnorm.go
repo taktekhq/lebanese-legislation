@@ -32,25 +32,6 @@ func arNorm(s string) string {
 	return b.String()
 }
 
-// fts5Quote wraps a search term the way an FTS5 MATCH expression quotes a
-// phrase, doubling embedded double quotes. The search code builds FTS5
-// expressions exactly as the Worker did and then translates them to
-// Postgres full-text queries (see fts.go), so both sides read a question
-// the same way.
-func fts5Quote(term string) string {
-	return `"` + strings.ReplaceAll(term, `"`, `""`) + `"`
-}
-
-// fts5MatchAll requires every word of q (each normalized and quoted).
-func fts5MatchAll(q string) string {
-	words := jsFields(jsTrim(arNorm(q)))
-	out := make([]string, len(words))
-	for i, w := range words {
-		out[i] = fts5Quote(w)
-	}
-	return strings.Join(out, " AND ")
-}
-
 // arStop holds the little words that no search should be held up by, after arNorm.
 var arStop = setOf("في", "من", "على", "عن", "الى", "او", "ان", "التي", "الذي", "هل", "ما", "لدى", "رقم", "تاريخ", "بتاريخ", "و")
 
@@ -79,8 +60,6 @@ func lightStem(w string) string {
 	return s
 }
 
-var formPrefixes = []string{"", "ال", "وال", "بال", "لل", "و", "ب", "ل", "ف"}
-
 var (
 	edgePunct  = regexp.MustCompile(`^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$`)
 	arabicChar = regexp.MustCompile(`[\x{0600}-\x{06FF}]`)
@@ -88,41 +67,6 @@ var (
 
 // trimEdges drops anything but letters and digits from both ends of a word.
 func trimEdges(w string) string { return edgePunct.ReplaceAllString(w, "") }
-
-// fts5Forms requires every word in one of its usual forms: the stem as a
-// prefix, bare or after an article or a conjunction. The texts write
-// "صورية", "والصورية", "الصوري"; a search for "الصورية سند الضد" found
-// nothing while every word had to be that exact token. Little words are
-// left out; numbers stay exact.
-func fts5Forms(q string) string {
-	var groups []string
-	for _, raw := range jsFields(jsTrim(arNorm(q))) {
-		w := trimEdges(raw)
-		if w == "" || arStop[w] {
-			continue
-		}
-		stem := lightStem(w)
-		if !arabicChar.MatchString(w) || runeLen(stem) < 3 {
-			groups = append(groups, fts5Quote(w))
-			continue
-		}
-		// the word as typed stays a form: "وكاله" is not "و" + "كاله"
-		var forms []string
-		seen := map[string]bool{}
-		add := func(f string) {
-			if !seen[f] {
-				seen[f] = true
-				forms = append(forms, f)
-			}
-		}
-		for _, p := range formPrefixes {
-			add(fts5Quote(p+stem) + "*")
-		}
-		add(fts5Quote(w))
-		groups = append(groups, "("+strings.Join(forms, " OR ")+")")
-	}
-	return strings.Join(groups, " AND ")
-}
 
 func setOf(items ...string) map[string]bool {
 	m := make(map[string]bool, len(items))
