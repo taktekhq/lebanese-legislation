@@ -61,7 +61,7 @@
             "$ref": "#/components/parameters/ListLimit"
           },
           {
-            "$ref": "#/components/parameters/Offset"
+            "$ref": "#/components/parameters/Cursor"
           }
         ],
         "responses": {
@@ -259,7 +259,7 @@
             "$ref": "#/components/parameters/ListLimit"
           },
           {
-            "$ref": "#/components/parameters/Offset"
+            "$ref": "#/components/parameters/Cursor"
           }
         ],
         "responses": {
@@ -405,14 +405,7 @@
             }
           },
           {
-            "name": "offset",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 10000,
-              "default": 0
-            }
+            "$ref": "#/components/parameters/Cursor"
           },
           {
             "name": "semantic",
@@ -443,6 +436,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           },
           "429": {
             "$ref": "#/components/responses/TooMany"
@@ -516,13 +512,12 @@
           "default": 50
         }
       },
-      "Offset": {
-        "name": "offset",
+      "Cursor": {
+        "name": "cursor",
         "in": "query",
+        "description": "The next page: the next_cursor of the previous answer, unchanged. Absent on the first page. offset was removed on 6 Nov 2026 and answers 400; to jump to a period use since and until.",
         "schema": {
-          "type": "integer",
-          "minimum": 0,
-          "default": 0
+          "type": "string"
         }
       }
     },
@@ -538,7 +533,7 @@
         }
       },
       "BadRequest": {
-        "description": "A parameter could not be read.",
+        "description": "A parameter could not be read, offset was passed (removed on 6 Nov 2026), or cursor is not one this API made.",
         "content": {
           "application/json": {
             "schema": {
@@ -918,6 +913,10 @@
               "ok",
               "unavailable"
             ]
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass it as cursor for the next page of every kind that has more; absent on the last page. Each kind is ranked and its next page starts after its last row."
           }
         }
       },
@@ -1419,7 +1418,6 @@
           "kind",
           "order",
           "total",
-          "offset",
           "laws"
         ],
         "properties": {
@@ -1451,11 +1449,9 @@
           "total": {
             "type": "integer"
           },
-          "offset": {
-            "type": "integer"
-          },
-          "next_offset": {
-            "type": "integer"
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass it as cursor for the next page; absent on the last page."
           },
           "laws": {
             "type": "array",
@@ -1494,7 +1490,6 @@
           "until",
           "order",
           "total",
-          "offset",
           "issues"
         ],
         "properties": {
@@ -1520,11 +1515,9 @@
           "total": {
             "type": "integer"
           },
-          "offset": {
-            "type": "integer"
-          },
-          "next_offset": {
-            "type": "integer"
+          "next_cursor": {
+            "type": "string",
+            "description": "Pass it as cursor for the next page; absent on the last page."
           },
           "issues": {
             "type": "array",
