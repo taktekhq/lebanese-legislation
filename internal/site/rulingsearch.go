@@ -79,21 +79,24 @@ func (s *Server) searchRulings(ctx context.Context, q string, limit int, after *
 	if limit == 0 {
 		return total, nil, false, nil
 	}
-	// The judgments are ranked only once the summaries run out on a page:
-	// first the summaries alone, then, when they fall short of the page,
-	// both. A page the summaries fill exactly has more after it when the
-	// count found judgments.
+	// The judgments are ranked only once the summaries run out on a page.
+	// The first page knows from the count whether they do; a later one ranks
+	// the summaries alone first, then both when they fall short of the page.
+	// A page the summaries fill exactly has more after it when the count
+	// found judgments.
 	var hits []rulingHit
 	var err error
-	if after == nil || after.tier == 1 {
+	both := judgments && ((after == nil && sum < limit) || (after != nil && after.tier == 0))
+	if !both {
 		if hits, err = s.rulingPage(ctx, q, limit+1, after, false); err != nil {
 			return 0, nil, false, err
 		}
 		if len(hits) == limit {
 			return total, hits, judgments, nil
 		}
+		both = len(hits) < limit && judgments
 	}
-	if len(hits) < limit && judgments {
+	if both {
 		if hits, err = s.rulingPage(ctx, q, limit+1, after, true); err != nil {
 			return 0, nil, false, err
 		}
