@@ -946,7 +946,7 @@ func (s *Server) findArticles(ctx context.Context, res *Results) error {
 	q := articleQuery(res.Q)
 	const artWhere = `(a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1))
 		OR a.search_stem @@ websearch_to_tsquery('arabic', ar_light($1))
-		OR a.search_fr @@ websearch_to_tsquery('french', $1))`
+		OR a.search_fr @@ websearch_to_tsquery('french', fr_fold($1)))`
 	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM (SELECT 1 FROM legislation_article a WHERE `+artWhere+` LIMIT 1000) t`, q).
 		Scan(&res.ArtCount); err != nil {
 		return err

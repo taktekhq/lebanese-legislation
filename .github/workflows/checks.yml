@@ -158,6 +158,8 @@ jobs:
           for schema in web/schema/schema.sql web/schema/graph.sql web/schema/amendments.sql web/schema/official.sql web/schema/indexes.sql web/testdata/synthetic.sql; do
             psql "$DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -q -f "$schema"
           done
+          # search_term was made before the fixture's rows: count them
+          psql "$DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -q -c 'REFRESH MATERIALIZED VIEW search_term'
       - run: go vet ./...
       - name: Remaining Go tests with the fictional database
         # The unit and postgres jobs run these excluded packages.

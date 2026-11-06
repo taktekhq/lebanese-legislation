@@ -7,8 +7,6 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-
-	"github.com/taktekhq/lebanese-legislation/internal/calculatedcurrent"
 )
 
 // The Worker's tool tests, against testdata/fixture.sql (see main_test.go).
@@ -539,8 +537,9 @@ func TestEnglishTitles(t *testing.T) {
 func TestWordFormsAndCodes(t *testing.T) {
 	s := dbServer(t)
 	search := func(a map[string]any) map[string]any { return call(t, s, "search_legislation", a).result }
+	// the word without its "و" is one of its forms, in the same search
 	r := search(map[string]any{"query": "والخامسة", "kind": "articles"})
-	if !strings.Contains(fmt.Sprint(r["searched_instead"]), "any of its forms") || !hasArticle(r, 100, "5") {
+	if r["searched_instead"] != nil || !hasArticle(r, 100, "5") {
 		t.Errorf("another form: %v", r)
 	}
 	if r := search(map[string]any{"query": "والتمييزي", "kind": "rulings"}); !containsInt(ids(r["rulings"]), 9000) {
@@ -575,8 +574,9 @@ func TestWordFormsAndCodes(t *testing.T) {
 	if r := search(map[string]any{"query": "الجرائم المعلوماتية 2018", "kind": "laws", "year": 2018}); !containsInt(lawIDs(r), 500) {
 		t.Errorf("the filter year in titles: %v", r)
 	}
-	if r := search(map[string]any{"query": "اتفاق الجرائم المعلوماتية", "kind": "laws", "year": 2018}); !containsInt(lawIDs(r), 500) || r["searched_instead"] == nil {
-		t.Errorf("rescue with a year: %v", r)
+	// a word no title of 2018 holds: the titles holding the others, in the same search, said to be partial
+	if r := search(map[string]any{"query": "اتفاق الجرائم المعلوماتية", "kind": "laws", "year": 2018}); !containsInt(lawIDs(r), 500) || r["partial_match"] != true || r["searched_instead"] != nil {
+		t.Errorf("a word set aside with a year: %v", r)
 	}
 	if r := search(map[string]any{"query": "قانون المعلوماتيةغائب الجرائم", "kind": "laws", "year": 2018}); !containsInt(lawIDs(r), 500) {
 		t.Errorf("the kind word kept: %v", r)
@@ -601,25 +601,6 @@ func TestCalculatedCurrentDB(t *testing.T) {
 	if !reflect.DeepEqual(list(texts["articles"])[0]["calculated_current"], a["calculated_current"]) {
 		t.Errorf("get_law_texts: %v", texts)
 	}
-	// A word only the calculated text has finds the article, as the
-	// snapshot indexed it.
-	rec := calculatedcurrent.Calculate(calculatedcurrent.Input{LawID: 244565, Number: "11", Source: fmt.Sprint(a["text_ar"]), State: "in_force"})
-	if rec == nil {
-		t.Fatal("no calculation for article 11")
-	}
-	has := setOf(ftsTokens(arNorm(rec.SourceTextAr))...)
-	word := ""
-	for _, tok := range ftsTokens(arNorm(rec.TextAr)) {
-		if !has[tok] && runeLen(tok) > 3 {
-			word = tok
-			break
-		}
-	}
-	r := call(t, s, "search_legislation", map[string]any{"query": word, "kind": "articles"}).result
-	hits := list(r["articles"])
-	if len(hits) != 1 || !reflect.DeepEqual(hits[0]["calculated_current"], a["calculated_current"]) || hits[0]["snippet"] != a["text_ar"] {
-		t.Errorf("search %q: %v", word, r)
-	}
 }
 
 func TestToolsAgainstFixtureAreJSON(t *testing.T) {
@@ -637,19 +618,4 @@ func TestToolsAgainstFixtureAreJSON(t *testing.T) {
 	}
 	_ = context.Background
 	_ = json.Valid
-}
-
-func TestWarm(t *testing.T) {
-	s := dbServer(t)
-	if err := s.Warm(context.Background()); err != nil {
-		t.Fatal(err)
-	}
-	en, _ := s.englishMem.f.peek()
-	fr, _ := s.frenchMem.f.peek()
-	if en == nil || len(en.docs) != 4 || fr == nil || len(fr.docs) != 3 {
-		t.Errorf("warmed: %+v %+v", en, fr)
-	}
-	if _, ok := s.calcCache.f.peek(); !ok {
-		t.Error("the calculated amounts were not warmed")
-	}
 }

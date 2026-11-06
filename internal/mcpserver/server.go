@@ -104,17 +104,12 @@ type Server struct {
 	db      querier
 	cfg     Config
 	client  *http.Client
-	stats   *statsCache
 	results *resultCache
 	limiter *rateLimiter // nil when off
 	refusal *rateLimiter
 	bg      sync.WaitGroup
 
-	codeCache  codeList
-	calcCache  calcIndex
-	englishMem memCache
-	counts     memo.Map // the paged tools' totals (count.go)
-	frenchMem  memCache
+	counts memo.Map // the paged tools' totals (count.go)
 
 	badgeMu    sync.Mutex
 	badgeAt    time.Time
@@ -132,7 +127,7 @@ type Server struct {
 func New(pool *pgxpool.Pool, cfg Config) *Server { return newServer(pool, cfg) }
 
 func newServer(db querier, cfg Config) *Server {
-	s := &Server{db: db, cfg: cfg, client: cfg.HTTPClient, stats: newStatsCache(6 * time.Hour), results: newResultCache(cacheTTL, 2000)}
+	s := &Server{db: db, cfg: cfg, client: cfg.HTTPClient, results: newResultCache(cacheTTL, 2000)}
 	if s.client == nil {
 		s.client = &http.Client{Timeout: 10 * time.Second}
 	}

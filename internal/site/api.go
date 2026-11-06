@@ -657,7 +657,7 @@ func (s *Server) apiFindLawByIDOrCode(ctx context.Context, q string) ([]LawRow, 
 func (s *Server) apiFindArticles(ctx context.Context, q string, limit int, pos *searchPos, out *apiSearchResult) error {
 	const artWhere = `(a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1))
 		OR a.search_stem @@ websearch_to_tsquery('arabic', ar_light($1))
-		OR a.search_fr @@ websearch_to_tsquery('french', $1))`
+		OR a.search_fr @@ websearch_to_tsquery('french', fr_fold($1)))`
 	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM (SELECT 1 FROM legislation_article a WHERE `+artWhere+` LIMIT 1000) t`, q).
 		Scan(&out.ArtCount); err != nil {
 		return err

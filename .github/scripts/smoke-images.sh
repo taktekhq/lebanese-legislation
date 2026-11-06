@@ -21,6 +21,8 @@ for _ in $(seq 1 60); do docker exec "$pg" pg_isready -h 127.0.0.1 -U postgres -
 for sql in /schema/schema.sql /schema/graph.sql /schema/amendments.sql /schema/official.sql /schema/indexes.sql /testdata/synthetic.sql; do
   docker exec "$pg" psql -q -v ON_ERROR_STOP=1 -U postgres -d legislation -f "$sql" >/dev/null
 done
+# search_term was made before the fixture's rows: count them
+docker exec "$pg" psql -q -v ON_ERROR_STOP=1 -U postgres -d legislation -c 'REFRESH MATERIALIZED VIEW search_term' >/dev/null
 dsn="host=$pg user=postgres dbname=legislation sslmode=disable"
 
 status() { curl -s -o /dev/null -w '%{http_code}' "$@"; }

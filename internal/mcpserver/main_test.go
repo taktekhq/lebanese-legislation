@@ -66,7 +66,8 @@ func run(m *testing.M) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	for _, sql := range []string{db.Schema, db.AmendmentSchema, db.GraphSchema, string(fixture)} {
+	// the indexes after the fixture, as a build does: search_term counts its words
+	for _, sql := range []string{db.Schema, db.AmendmentSchema, db.GraphSchema, string(fixture), db.Indexes} {
 		if _, err := pool.Exec(ctx, sql); err != nil {
 			return 0, err
 		}
