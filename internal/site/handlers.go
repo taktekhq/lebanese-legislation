@@ -363,10 +363,20 @@ func (s *Server) laws(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// /laws/ is browsed by year (the years' lists are paged by path); its own
-	// pages stay ?page=, which robots.txt blocks: 2,500 deep pages cost seconds each
+	// pages stay ?page=, which robots.txt blocks, but crawlers that ignore it
+	// ask for all 2,500 of them.
+	//
+	// The page's ids are picked first and only those 40 rows are read in full.
+	// With the whole row in one query, Postgres worked out lawRowCols (an
+	// article count and a code name per law) for every row the OFFSET skips:
+	// page 2,000 counted the articles of 80,040 laws and sorted 20 MB on disk,
+	// 835 ms on the XPS and 3 to 9 s on the container under a crawl (6 Nov
+	// 2026). Picking the ids first takes 62 ms. Every join is one row per law,
+	// so the rows and their order are the same.
 	page := min(pageNo(q), max(1, (total+perPage-1)/perPage))
-	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind`+cond+
-		fmt.Sprintf(" ORDER BY l.issued_on DESC NULLS LAST, l.id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage), args...)
+	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM (SELECT l.id FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind`+cond+
+		fmt.Sprintf(" ORDER BY l.issued_on DESC NULLS LAST, l.id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage)+
+		`) p JOIN legislation l ON l.id = p.id JOIN legislation_kind k ON k.name_ar = l.kind ORDER BY l.issued_on DESC NULLS LAST, l.id DESC`, args...)
 	if err != nil {
 		s.fail(w, r, err)
 		return
