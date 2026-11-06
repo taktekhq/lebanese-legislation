@@ -32,13 +32,20 @@ func run(ctx context.Context, args []string, out io.Writer) error {
 	schemaOnly := fs.Bool("schema-only", false, "Create pgvector extension, table and indexes, then exit")
 	opts := semantic.SyncOptions{}
 	fs.IntVar(&opts.Limit, "limit", 0, "Maximum canonical documents; zero indexes all")
-	fs.IntVar(&opts.Offset, "offset", 0, "Skip this many canonical documents in deterministic order")
+	after := fs.String("after", "", "Resume after this document, kind/id/part/lang in corpus order (there is no -offset: a count shifts when the corpus changes)")
 	fs.IntVar(&opts.BatchSize, "batch", 100, "Embedding texts per request (1..100)")
 	fs.IntVar(&opts.GroupSize, "group", 100, "Documents per worker group (1..1000); larger groups fill API batches more efficiently")
 	fs.IntVar(&opts.Workers, "workers", 1, "Concurrent document workers (1..32)")
 	fs.DurationVar(&opts.Rate, "rate", 0, "Minimum interval between batch starts across workers, for example 1s")
 	if err := fs.Parse(args); err != nil {
 		return err
+	}
+	if *after != "" {
+		k, err := semantic.ParseDocKey(*after)
+		if err != nil {
+			return err
+		}
+		opts.After = k
 	}
 	if *corpusDSN == "" {
 		*corpusDSN = os.Getenv("DATABASE_URL")
@@ -49,7 +56,7 @@ func run(ctx context.Context, args []string, out io.Writer) error {
 	if fs.NArg() != 0 {
 		return errors.New("unexpected positional arguments")
 	}
-	if *progress < 0 || opts.GroupSize < 1 || opts.GroupSize > 1000 || opts.Limit < 0 || opts.Offset < 0 || opts.BatchSize < 1 || opts.BatchSize > 100 || opts.Workers < 1 || opts.Workers > 32 || opts.Rate < 0 {
+	if *progress < 0 || opts.GroupSize < 1 || opts.GroupSize > 1000 || opts.Limit < 0 || opts.BatchSize < 1 || opts.BatchSize > 100 || opts.Workers < 1 || opts.Workers > 32 || opts.Rate < 0 {
 		return errors.New("invalid index bounds, batch size, group size, workers or rate")
 	}
 	if !*dryRun && *indexDSN == "" {

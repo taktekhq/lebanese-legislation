@@ -7,6 +7,7 @@ import (
 	"html"
 	"html/template"
 	"net/http"
+	"net/url"
 	"slices"
 	"strconv"
 	"strings"
@@ -65,7 +66,7 @@ func mark(s string) template.HTML {
 type docKind struct {
 	key, list, table, title, eyebrow, h1, noun, many, desc string
 	listSQL                                                string // type, id, title, kicker, date, snippet
-	orderBy                                                string
+	dateCol                                                string // the list's sort date, newest first; "" sorts by id alone
 }
 
 var docKinds = map[string]docKind{
@@ -73,31 +74,35 @@ var docKinds = map[string]docKind{
 		title: "Legal opinions", eyebrow: "Legal opinions · الآراء الاستشارية", h1: "Advisory opinions.",
 		desc:    "Advisory opinions on Lebanese law, with their full text. Free.",
 		listSQL: `SELECT 'opinion', id, coalesce(subject, 'رأي استشاري رقم ' || coalesce(number, '') || '/' || coalesce(year::text, '')), coalesce(requester, ''), issued_on, NULL FROM opinion`,
-		orderBy: "issued_on DESC NULLS LAST, id DESC"},
+		dateCol: "issued_on"},
 	"agreement": {key: "agreement", list: "agreements", table: "agreement", noun: "agreement", many: "agreements",
 		title: "Agreements", eyebrow: "Agreements · الاتفاقيات", h1: "Treaties and agreements.",
 		desc:    "Lebanon's bilateral and international agreements, with the text that ratified them. Free.",
 		listSQL: `SELECT 'agreement', id, title, coalesce(CASE scope WHEN 'bilateral' THEN 'Bilateral' WHEN 'international' THEN 'International' END, ''), signed_on, NULL FROM agreement`,
-		orderBy: "signed_on DESC NULLS LAST, id DESC"},
+		dateCol: "signed_on"},
 	"doctrine": {key: "doctrine", list: "doctrine", table: "doctrine_article", noun: "article", many: "articles",
 		title: "Doctrine", eyebrow: "Doctrine · المقالات", h1: "Articles and commentary.",
 		desc:    "Articles from Lebanese legal periodicals, with their abstracts. Free.",
 		listSQL: `SELECT 'doctrine', id, title, coalesce(array_to_string(authors, '، '), ''), NULL::date, NULL FROM doctrine_article`,
-		orderBy: "id DESC"},
+		dateCol: ""},
 	"research": {key: "research", list: "research", table: "research", noun: "study", many: "studies",
 		title: "Research", eyebrow: "Research · الأبحاث والدراسات", h1: "Studies.",
 		desc:    "Legal studies published by the Lebanese University's Centre for Legal Informatics. Free.",
 		listSQL: `SELECT 'research', id, title, coalesce(author, ''), published_on, NULL FROM research`,
-		orderBy: "published_on DESC NULLS LAST, id DESC"},
+		dateCol: "published_on"},
 }
 
 func (s *Server) docList(k docKind) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		pg, done := s.cursorPaging(w, r, k.dateCol != "")
+		if done {
+			return
+		}
 		ctx, cancel := s.ctx(r)
 		defer cancel()
 		q := r.URL.Query()
-		var total int
-		if err := s.db.QueryRow(ctx, "SELECT count(*) FROM "+k.table).Scan(&total); err != nil {
+		total, err := s.countRows(ctx, "SELECT count(*) FROM "+k.table)
+		if err != nil {
 			s.fail(w, r, err)
 			return
 		}
@@ -105,11 +110,13 @@ func (s *Server) docList(k docKind) http.HandlerFunc {
 		if s.isStatic {
 			size = max(total, 1) // one page: a static copy has no pager to follow
 		}
-		page, pages, listBase, done := s.listPaging(w, r, "/"+k.list+"/", q, total, size)
-		if done {
-			return
+		key := ""
+		if k.dateCol != "" {
+			key = dateKey(k.dateCol)
 		}
-		rows, err := s.db.Query(ctx, k.listSQL+" ORDER BY "+k.orderBy+fmt.Sprintf(" LIMIT %d OFFSET %d", size, (page-1)*size))
+		var args []any
+		page := pg.where(key, "id", &args)
+		rows, err := s.db.Query(ctx, k.listSQL+and(page)+pg.order(key, "id")+fmt.Sprintf(" LIMIT %d", size+1), args...)
 		if err != nil {
 			s.fail(w, r, err)
 			return
@@ -119,18 +126,39 @@ func (s *Server) docList(k docKind) http.HandlerFunc {
 			s.fail(w, r, err)
 			return
 		}
+		list, olderOK, newerOK, top := settle(pg, list, size)
+		if top {
+			s.toFirstPage(w, r)
+			return
+		}
+		older, newer := docPageLinks(q, list, k.dateCol != "", olderOK, newerOK)
 		s.render(w, r, "list", 200, Page{
-			Title:   s.brandTitle(r, s.trOr(r, k.title, k.key+".list_title")) + s.pageSuffix(r, page),
+			Title:   s.brandTitle(r, s.trOr(r, k.title, k.key+".list_title")),
 			Desc:    s.trOr(r, k.desc, k.key+".desc"),
-			Path:    pagePath("/"+k.list+"/", page),
+			Path:    "/" + k.list + "/",
 			NoIndex: r.URL.RawQuery != "",
 			Data: map[string]any{"Kind": map[string]string{
 				"Eyebrow": s.trOr(r, k.eyebrow, k.key+".eyebrow"),
 				"H1":      s.trOr(r, k.h1, k.key+".h1"),
 				"Noun":    s.trOr(r, k.noun, k.key+".noun"),
 				"Many":    s.trOr(r, k.many, k.key+".many")},
-				"List": List{Q: q, Total: total, Page: page, Pages: pages, Rows: list, Base: listBase}}})
+				"List": List{Q: q, Total: total, Older: older, Newer: newer, Rows: list}}})
 	}
+}
+
+// docPageLinks are the pager of a list of documents, sorted by date then id
+// (byDate) or by id alone.
+func docPageLinks(q url.Values, list []DocRow, byDate, older, newer bool) (template.URL, template.URL) {
+	if len(list) == 0 {
+		return "", ""
+	}
+	tok := func(d DocRow) string {
+		if byDate {
+			return dateTok(d.Date, d.ID)
+		}
+		return idTok(d.ID)
+	}
+	return pageLinks(q, tok(list[0]), tok(list[len(list)-1]), older, newer)
 }
 
 // Doc is a single document page: facts, then text.
@@ -281,6 +309,10 @@ func (s *Server) doc(k docKind) http.HandlerFunc {
 // ---------------------------------------------------------------- rulings
 
 func (s *Server) rulings(w http.ResponseWriter, r *http.Request) {
+	pg, done := s.cursorPaging(w, r, true)
+	if done {
+		return
+	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
 	q := r.URL.Query()
@@ -294,21 +326,19 @@ func (s *Server) rulings(w http.ResponseWriter, r *http.Request) {
 		args = append(args, v)
 		where = append(where, fmt.Sprintf("year >= $%d AND year < $%d + 10", len(args), len(args)))
 	}
-	cond := ""
-	if len(where) > 0 {
-		cond = " WHERE " + strings.Join(where, " AND ")
-	}
-	var total int
-	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM ruling"+cond, args...).Scan(&total); err != nil {
+	cond := strings.Join(where, " AND ")
+	total, err := s.countRows(ctx, "SELECT count(*) FROM ruling"+and(cond), args...)
+	if err != nil {
 		s.fail(w, r, err)
 		return
 	}
-	page := min(pageNo(q), max(1, (total+perPage-1)/perPage)) // ?page=, as /laws/ (handlers.go)
-	// ids first, then the page's rows, as /laws/ (handlers.go): left(text_ar)
-	// for every skipped ruling read each whole text, 286 ms at page 750 against 18
+	// the page's ids from the index on the sort key (keyset.go), then those
+	// rows: left(text_ar) reads each ruling's whole text
+	key := dateKey("decided_on")
+	page := pg.where(key, "id", &args)
 	rows, err := s.db.Query(ctx, `SELECT 'ruling', r.id, r.title, coalesce(r.president, ''), r.decided_on, left(r.text_ar, 220)
-		FROM (SELECT id FROM ruling`+cond+fmt.Sprintf(" ORDER BY decided_on DESC NULLS LAST, id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage)+
-		`) p JOIN ruling r ON r.id = p.id ORDER BY r.decided_on DESC NULLS LAST, r.id DESC`, args...)
+		FROM (SELECT id FROM ruling`+and(cond, page)+pg.order(key, "id")+fmt.Sprintf(" LIMIT %d", perPage+1)+
+		`) p JOIN ruling r ON r.id = p.id`+pg.order(dateKey("r.decided_on"), "r.id"), args...)
 	if err != nil {
 		s.fail(w, r, err)
 		return
@@ -318,6 +348,12 @@ func (s *Server) rulings(w http.ResponseWriter, r *http.Request) {
 		s.fail(w, r, err)
 		return
 	}
+	list, olderOK, newerOK, top := settle(pg, list, perPage)
+	if top {
+		s.toFirstPage(w, r)
+		return
+	}
+	older, newer := docPageLinks(q, list, true, olderOK, newerOK)
 	courts, err := s.chips(ctx, `SELECT r.court, r.court || coalesce(' · ' || c.name_en, ''), count(*) FROM ruling r
 		JOIN court c ON c.name_ar = r.court GROUP BY 1, 2 ORDER BY 3 DESC`)
 	if err != nil {
@@ -338,7 +374,7 @@ func (s *Server) rulings(w http.ResponseWriter, r *http.Request) {
 			"Eyebrow": s.trOr(r, "Court rulings · الأحكام", "rulings.eyebrow"),
 			"H1":      s.trOr(r, "Rulings of the Lebanese&nbsp;courts.", "rulings.h1"),
 			"Noun":    s.trOr(r, "ruling", "rulings.noun"), "Many": s.trOr(r, "rulings", "rulings.many"), "Years": "/rulings/years/"},
-			"List": List{Q: q, Total: total, Page: page, Pages: (total + perPage - 1) / perPage, Rows: list, Updated: s.updated(r, "rulings"),
+			"List": List{Q: q, Total: total, Older: older, Newer: newer, Rows: list, Updated: s.updated(r, "rulings"),
 				Params:   []string{"court", "decade"},
 				Selected: map[string]string{"court": q.Get("court"), "decade": q.Get("decade")},
 				Filters: [][]Chip{prepend(Chip{Label: s.trOr(r, "All courts", "chip.all_courts")}, courts),
@@ -441,26 +477,32 @@ func rulingLD(d Doc, path string, on *time.Time, court *string, year *int) map[s
 // ---------------------------------------------------------------- gazette
 
 func (s *Server) gazettes(w http.ResponseWriter, r *http.Request) {
+	pg, done := s.cursorPaging(w, r, true)
+	if done {
+		return
+	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
 	q := r.URL.Query()
+	key := dateKey("published_on")
 	var args []any
 	cond := ""
 	if v, err := strconv.Atoi(q.Get("year")); err == nil && v > 1800 && v < 2100 {
+		// the year as a range on the sort key, which the list's index answers
 		args = append(args, v)
-		cond = " WHERE extract(year FROM published_on) = $1"
+		cond = key + " >= make_date($1, 1, 1) AND " + key + " < make_date($1 + 1, 1, 1)"
 	}
-	var total int
-	if err := s.db.QueryRow(ctx, "SELECT count(*) FROM gazette_issue"+cond, args...).Scan(&total); err != nil {
+	total, err := s.countRows(ctx, "SELECT count(*) FROM gazette_issue"+and(cond), args...)
+	if err != nil {
 		s.fail(w, r, err)
 		return
 	}
-	page := min(pageNo(q), max(1, (total+perPage-1)/perPage)) // ?page=, as /laws/ (handlers.go)
-	// ids first, then the page's rows, as /laws/ (handlers.go)
+	// the page's ids from the index on the sort key (keyset.go), then those rows
+	page := pg.where(key, "id", &args)
 	rows, err := s.db.Query(ctx, `SELECT 'gazette', g.id, 'الجريدة الرسمية، العدد ' || coalesce(g.number, '؟'),
 		(SELECT count(*) FROM gazette_entry e WHERE e.issue_id = g.id)::text || ' texts', g.published_on, NULL
-		FROM (SELECT id FROM gazette_issue`+cond+fmt.Sprintf(" ORDER BY published_on DESC NULLS LAST, id DESC LIMIT %d OFFSET %d", perPage, (page-1)*perPage)+
-		`) p JOIN gazette_issue g ON g.id = p.id ORDER BY g.published_on DESC NULLS LAST, g.id DESC`, args...)
+		FROM (SELECT id FROM gazette_issue`+and(cond, page)+pg.order(key, "id")+fmt.Sprintf(" LIMIT %d", perPage+1)+
+		`) p JOIN gazette_issue g ON g.id = p.id`+pg.order(dateKey("g.published_on"), "g.id"), args...)
 	if err != nil {
 		s.fail(w, r, err)
 		return
@@ -470,6 +512,12 @@ func (s *Server) gazettes(w http.ResponseWriter, r *http.Request) {
 		s.fail(w, r, err)
 		return
 	}
+	list, olderOK, newerOK, top := settle(pg, list, perPage)
+	if top {
+		s.toFirstPage(w, r)
+		return
+	}
+	older, newer := docPageLinks(q, list, true, olderOK, newerOK)
 	years, err := s.chips(ctx, `SELECT y::text, y::text, n FROM (SELECT extract(year FROM published_on)::int y, count(*)::int n
 		FROM gazette_issue WHERE published_on IS NOT NULL GROUP BY 1) t ORDER BY y DESC LIMIT 40`)
 	if err != nil {
@@ -486,7 +534,7 @@ func (s *Server) gazettes(w http.ResponseWriter, r *http.Request) {
 			"Eyebrow": s.trOr(r, "Official Gazette · الجريدة الرسمية", "gazette.eyebrow"),
 			"H1":      s.trOr(r, "Every issue of the Official&nbsp;Gazette.", "gazette.h1"),
 			"Noun":    s.trOr(r, "issue", "gazette.noun"), "Many": s.trOr(r, "issues", "gazette.many"), "Years": "/gazette/years/"},
-			"List": List{Q: q, Total: total, Page: page, Pages: (total + perPage - 1) / perPage, Rows: list, Updated: s.updated(r, "gazette"),
+			"List": List{Q: q, Total: total, Older: older, Newer: newer, Rows: list, Updated: s.updated(r, "gazette"),
 				Params: []string{"year"}, Selected: map[string]string{"year": q.Get("year")},
 				Filters: [][]Chip{prepend(Chip{Label: s.trOr(r, "Every year", "chip.every_year")}, years)}}}})
 }
@@ -931,7 +979,7 @@ func (s *Server) findArticles(ctx context.Context, res *Results) error {
 }
 
 func (s *Server) findRulings(ctx context.Context, res *Results) error {
-	n, hits, err := s.searchRulings(ctx, res.Q, 10, 0)
+	n, hits, _, err := s.searchRulings(ctx, res.Q, 10, nil)
 	if err != nil {
 		return err
 	}

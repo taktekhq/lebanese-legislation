@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/taktekhq/lebanese-legislation/internal/memo"
 )
 
 //go:embed templates/*.html
@@ -40,6 +41,7 @@ type Server struct {
 	vector        vectorSearcher
 	meaning       *meaningSearch // explicitly requested natural language interpretation
 	scache        searchCache    // answers to recent searches
+	counts        memo.Map       // lists' totals and filter chips (countcache.go)
 	db            *pgxpool.Pool
 	pages         map[string]*template.Template // English, at the plain paths
 	pagesAr       map[string]*template.Template // Arabic, at the root and /ar/...; s.pages is English (/en/...); pagesAr is nil when isStatic
@@ -468,11 +470,11 @@ func plural(n int, one, many string) string {
 }
 
 // query rebuilds a list page's query string with one parameter changed
-// ("" removes it); the page number always resets unless it is the one set.
+// ("" removes it); a filter always starts the list from its first page.
 func query(q url.Values, key, value string) template.URL {
 	c := url.Values{}
 	for k, v := range q {
-		if k != "page" {
+		if k != "page" && k != "after" && k != "before" {
 			c[k] = v
 		}
 	}

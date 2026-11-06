@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/taktekhq/lebanese-legislation/internal/cursor"
 )
 
 // Tool implementations, one per MCP tool (tools.json holds the schemas
@@ -319,9 +321,16 @@ func cmpInt(a, b int) int {
 // ---------------------------------------------------------------- get_law_texts
 
 func (s *Server) getLawTexts(ctx context.Context, a args) (toolResult, error) {
+	if msg := offsetGone(a, "For one article use get_article."); msg != "" {
+		return fail(msg), nil
+	}
 	id, shown, bad := idArg(a["law_id"])
 	if bad {
 		return fail("law_id must be a positive integer"), nil
+	}
+	from, after, msg := readCursor(a["cursor"], positionCursor)
+	if msg != "" {
+		return fail(msg), nil
 	}
 	l, err := s.loadLaw(ctx, id)
 	if err != nil {
@@ -330,15 +339,25 @@ func (s *Server) getLawTexts(ctx context.Context, a args) (toolResult, error) {
 	if l == nil {
 		return fail("law " + shown + " not found"), nil
 	}
-	offset := clampInt(a["offset"], 0, 0, 1_000_000)
 	limit := clampInt(a["limit"], 50, 1, 200)
-	var total int
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM legislation_article WHERE law_id = $1`, id).Scan(&total); err != nil {
-		return toolResult{}, err
-	}
-	rows, err := s.queryArticles(ctx, `a.law_id = $1 ORDER BY a.position LIMIT $2 OFFSET $3`, id, limit, offset)
+	total, err := s.count(ctx, `SELECT count(*) FROM legislation_article WHERE law_id = $1`, id)
 	if err != nil {
 		return toolResult{}, err
+	}
+	// The primary key (law_id, position) answers the page at any depth; one
+	// row more than the page says whether there is a next one.
+	where, params := `a.law_id = $1 ORDER BY a.position LIMIT $2`, []any{id, limit + 1}
+	if after {
+		where, params = `a.law_id = $1 AND a.position > $3 ORDER BY a.position LIMIT $2`, append(params, from)
+	}
+	rows, err := s.queryArticles(ctx, where, params...)
+	if err != nil {
+		return toolResult{}, err
+	}
+	next := ""
+	if len(rows) > limit {
+		rows = rows[:limit]
+		next = cursor.Int(int64(rows[limit-1].Position))
 	}
 	errs, err := s.centreErrors(ctx, id, nil)
 	if err != nil {
@@ -363,10 +382,9 @@ func (s *Server) getLawTexts(ctx context.Context, a args) (toolResult, error) {
 		o.set("url", articleURL(int(id), r.Number, l.Kind))
 		articles = append(articles, o)
 	}
-	next := offset + len(rows)
-	out := obj{{"law", lawSummary(l)}, {"total", total}, {"offset", offset}}
-	if next < total {
-		out.set("next_offset", next)
+	out := obj{{"law", lawSummary(l)}, {"total", total}}
+	if next != "" {
+		out.set("next_cursor", next)
 	}
 	out.set("articles", articles)
 	return ok(out), nil
@@ -705,6 +723,9 @@ func enumArg(v any, def string, allowed ...string) (string, bool) {
 }
 
 func (s *Server) getLinks(ctx context.Context, a args) (toolResult, error) {
+	if msg := offsetGone(a, "To narrow the links use relation."); msg != "" {
+		return fail(msg), nil
+	}
 	raw, err := strArg(a["key"])
 	if err != nil {
 		return toolResult{}, err
@@ -732,7 +753,10 @@ func (s *Server) getLinks(ctx context.Context, a args) (toolResult, error) {
 		return fail(`scope must be "all" or "law"`), nil
 	}
 	limit := clampInt(a["limit"], 50, 1, 200)
-	offset := clampInt(a["offset"], 0, 0, 1_000_000)
+	from, after, msg := readCursor(a["cursor"], linkCursor)
+	if msg != "" {
+		return fail(msg), nil
+	}
 
 	// A law key with scope "all" takes in the edges of its articles too.
 	params := []any{key}
@@ -757,32 +781,50 @@ func (s *Server) getLinks(ctx context.Context, a args) (toolResult, error) {
 		params = append(params, jsString(a["relation"]))
 		cond += fmt.Sprintf(" AND ge.relation = $%d", len(params))
 	}
-	dir := "DESC"
-	if order == "oldest" {
-		dir = "ASC"
-	}
 	const date = "coalesce(l.gazette_date, l.issued_on)"
-	var count int
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM graph_edge ge WHERE `+cond, params...).Scan(&count); err != nil {
+	count, err := s.count(ctx, `SELECT count(*) FROM graph_edge ge WHERE `+cond, params...)
+	if err != nil {
 		return fail(fmt.Sprintf("could not read the links of %s: %s; try a smaller limit", key, jsSlice(err.Error(), 200))), nil
 	}
-	params = append(params, limit, offset)
+	// The order is the texts with a date first, by date, then by edge id,
+	// newest or oldest. It is written as one key whose parts all run the same
+	// way, so the next page is one row comparison with the last edge shown:
+	// newest is (dated, date, id) descending, oldest (undated, date, id)
+	// ascending, with no date read as cursor.NoDate.
+	first, dir, cmp := date+" IS NOT NULL", "DESC", "<"
+	if order == "oldest" {
+		first, dir, cmp = date+" IS NULL", "ASC", ">"
+	}
+	sortKey := fmt.Sprintf("(%s), coalesce(%s, date '%s'), ge.id", first, date, cursor.NoDate)
+	if after {
+		params = append(params, from.dated != (order == "oldest"), from.date, from.id)
+		cond += fmt.Sprintf(" AND (%s) %s ($%d::boolean, $%d::date, $%d::integer)", sortKey, cmp, len(params)-2, len(params)-1, len(params))
+	}
+	params = append(params, limit+1)
 	rows, err := s.db.Query(ctx, `SELECT ge.relation, ge.source, ge.status, ge.from_key, ge.to_key, ge.to_cite, ge.part, ge.quote,
-		to_char(`+date+`, 'YYYY-MM-DD')
+		to_char(`+date+`, 'YYYY-MM-DD'), ge.id
 		FROM graph_edge ge LEFT JOIN (legislation l JOIN legislation_kind k ON k.name_ar = l.kind) ON ge.from_type = 'legislation' AND l.id = ge.from_id
 		WHERE `+cond+fmt.Sprintf(`
-		ORDER BY (%s IS NULL), %s %s, ge.id %s LIMIT $%d OFFSET $%d`, date, date, dir, dir, len(params)-1, len(params)), params...)
+		ORDER BY (%s) %s, coalesce(%s, date '%s') %s, ge.id %s LIMIT $%d`, first, dir, date, cursor.NoDate, dir, dir, len(params)), params...)
 	if err != nil {
 		return fail(fmt.Sprintf("could not read the links of %s: %s; try a smaller limit", key, jsSlice(err.Error(), 200))), nil
 	}
 	defer rows.Close()
 	links := []any{}
+	var last linkKey
+	next := ""
 	for rows.Next() {
 		var rel, source, status, fromKey string
 		var toKey, toCite, part, quote, d *string
-		if err := rows.Scan(&rel, &source, &status, &fromKey, &toKey, &toCite, &part, &quote, &d); err != nil {
+		var id int64
+		if err := rows.Scan(&rel, &source, &status, &fromKey, &toKey, &toCite, &part, &quote, &d, &id); err != nil {
 			return toolResult{}, err
 		}
+		if len(links) == limit {
+			next = last.token()
+			break
+		}
+		last = linkKey{d != nil, strOr(d, cursor.NoDate), id}
 		o := obj{{"relation", rel}, {"source", source}, {"status", status}, {"from_key", fromKey}}
 		o.str("to_key", toKey)
 		o.str("to_cite", toCite)
@@ -802,16 +844,14 @@ func (s *Server) getLinks(ctx context.Context, a args) (toolResult, error) {
 	if err := rows.Err(); err != nil {
 		return toolResult{}, err
 	}
-	next := offset + len(links)
 	out := obj{{"key", key}, {"direction", direction}}
 	if isLaw {
 		out.set("scope", scope)
 	}
 	out.set("order", order)
 	out.set("total", count)
-	out.set("offset", offset)
-	if next < count {
-		out.set("next_offset", next)
+	if next != "" {
+		out.set("next_cursor", next)
 	}
 	out.set("links", links)
 	return ok(out), nil
@@ -906,13 +946,38 @@ func listRange(a args) (listRangeVal, string) {
 
 const listMax = 100
 
+// kindNames is the Arabic names of the kinds kind names: the kind itself, or
+// the kinds whose English name it is (two are "Constitution").
+func (s *Server) kindNames(ctx context.Context, kind string) ([]string, error) {
+	rows, err := s.db.Query(ctx, `SELECT name_ar FROM legislation_kind WHERE name_ar = $1 OR lower(name_en) = lower($1) ORDER BY name_ar`, kind)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var names []string
+	for rows.Next() {
+		var n string
+		if err := rows.Scan(&n); err != nil {
+			return nil, err
+		}
+		names = append(names, n)
+	}
+	return names, rows.Err()
+}
+
 func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error) {
+	if msg := offsetGone(a, "To jump to a period use since and until; for one text use get_law."); msg != "" {
+		return fail(msg), nil
+	}
 	r, msg := listRange(a)
 	if msg != "" {
 		return fail(msg), nil
 	}
 	limit := clampInt(a["limit"], 50, 1, listMax)
-	offset := clampInt(a["offset"], 0, 0, 1_000_000)
+	from, after, msg := readCursor(a["cursor"], dateIDCursor)
+	if msg != "" {
+		return fail(msg), nil
+	}
 	kind := ""
 	if k, isStr := a["kind"].(string); isStr {
 		kind = jsTrim(k)
@@ -928,27 +993,51 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 		where = append(where, fmt.Sprintf("%s <= $%d::date", lawDate, len(params)))
 	}
 	if kind != "" {
-		params = append(params, kind)
-		where = append(where, fmt.Sprintf("(l.kind = $%d OR lower(k.name_en) = lower($%d))", len(params), len(params)))
+		// The kind's Arabic names are read first, so the filter is l.kind
+		// itself and legislation_pub_kind answers the page in order. Matched
+		// through a join on legislation_kind (or an IN subquery) the planner
+		// cannot tell a rare kind from a common one and scanned every dated
+		// text for it: 50 to 100 ms for a kind of one text.
+		names, err := s.kindNames(ctx, kind)
+		if err != nil {
+			return toolResult{}, err
+		}
+		if len(names) > 1 {
+			params = append(params, names)
+			where = append(where, fmt.Sprintf("l.kind = ANY($%d::text[])", len(params)))
+		} else {
+			name := kind // no kind has that name, and no text has it as its kind
+			if len(names) == 1 {
+				name = names[0]
+			}
+			params = append(params, name)
+			where = append(where, fmt.Sprintf("l.kind = $%d", len(params)))
+		}
 	}
 	w := strings.Join(where, " AND ")
-	dir := "DESC"
+	dir, cmp := "DESC", "<"
 	if r.order == "oldest" {
-		dir = "ASC"
+		dir, cmp = "ASC", ">"
 	}
-	var total int
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM `+lawFrom+` WHERE `+w, params...).Scan(&total); err != nil {
+	// lawJoins is one row per law and every law has its kind (a foreign key),
+	// so legislation alone counts the same rows.
+	total, err := s.count(ctx, `SELECT count(*) FROM legislation l WHERE `+w, params...)
+	if err != nil {
 		return toolResult{}, err
 	}
-	params = append(params, limit, offset)
-	// The page's ids are picked first and only those rows are read in full:
-	// in one query Postgres worked out lawCols (two subqueries and four joins)
-	// for every row the offset skips. Every join is one row per law, so the
+	if after {
+		params = append(params, from.date, from.id)
+		w += fmt.Sprintf(" AND (%s, l.id) %s ($%d::date, $%d::integer)", lawDate, cmp, len(params)-1, len(params))
+	}
+	params = append(params, limit+1)
+	// The page's ids are picked first, from legislation_pub_date or
+	// legislation_pub_kind, and only those rows are read in full: lawCols is
+	// two subqueries and four joins. Every join is one row per law, so the
 	// rows and their order are the same (internal/site/handlers.go, laws).
 	order := fmt.Sprintf(` ORDER BY %s %s, l.id %s`, lawDate, dir, dir)
 	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, to_char(`+lawDate+`, 'YYYY-MM-DD')
-		FROM (SELECT l.id FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind WHERE `+w+order+
-		fmt.Sprintf(` LIMIT $%d OFFSET $%d`, len(params)-1, len(params))+`) p JOIN legislation l ON l.id = p.id `+lawJoins+order, params...)
+		FROM (SELECT l.id FROM legislation l WHERE `+w+order+fmt.Sprintf(` LIMIT $%d`, len(params))+
+		`) p JOIN legislation l ON l.id = p.id `+lawJoins+order, params...)
 	if err != nil {
 		return toolResult{}, err
 	}
@@ -959,6 +1048,11 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 	})
 	if err != nil {
 		return toolResult{}, err
+	}
+	next := ""
+	if len(laws) > limit {
+		laws = laws[:limit]
+		next = cursor.DateID(dates[limit-1], int64(laws[limit-1].ID))
 	}
 	list := []any{}
 	for i := range laws {
@@ -972,7 +1066,6 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 		o.set("date", dates[i])
 		list = append(list, o)
 	}
-	next := offset + len(laws)
 	out := obj{}
 	out.str("since", r.since)
 	out.str("until", r.until)
@@ -981,21 +1074,26 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 	}
 	out.set("order", r.order)
 	out.set("total", total)
-	out.set("offset", offset)
-	if next < total {
-		out.set("next_offset", next)
+	if next != "" {
+		out.set("next_cursor", next)
 	}
 	out.set("laws", list)
 	return ok(out), nil
 }
 
 func (s *Server) listGazetteIssues(ctx context.Context, a args) (toolResult, error) {
+	if msg := offsetGone(a, "To jump to a period use since and until; for one issue use get_gazette_issue."); msg != "" {
+		return fail(msg), nil
+	}
 	r, msg := listRange(a)
 	if msg != "" {
 		return fail(msg), nil
 	}
 	limit := clampInt(a["limit"], 50, 1, listMax)
-	offset := clampInt(a["offset"], 0, 0, 1_000_000)
+	from, after, msg := readCursor(a["cursor"], dateIDCursor)
+	if msg != "" {
+		return fail(msg), nil
+	}
 	where := []string{"g.published_on IS NOT NULL"}
 	var params []any
 	if r.lo != "" {
@@ -1007,26 +1105,32 @@ func (s *Server) listGazetteIssues(ctx context.Context, a args) (toolResult, err
 		where = append(where, fmt.Sprintf("g.published_on <= $%d::date", len(params)))
 	}
 	w := strings.Join(where, " AND ")
-	dir := "DESC"
+	dir, cmp := "DESC", "<"
 	if r.order == "oldest" {
-		dir = "ASC"
+		dir, cmp = "ASC", ">"
 	}
-	var total int
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM gazette_issue g WHERE `+w, params...).Scan(&total); err != nil {
+	total, err := s.count(ctx, `SELECT count(*) FROM gazette_issue g WHERE `+w, params...)
+	if err != nil {
 		return toolResult{}, err
 	}
-	params = append(params, limit, offset)
-	// ids first, then the page's rows, as listLegislation
+	if after {
+		params = append(params, from.date, from.id)
+		w += fmt.Sprintf(" AND (g.published_on, g.id) %s ($%d::date, $%d::integer)", cmp, len(params)-1, len(params))
+	}
+	params = append(params, limit+1)
+	// ids first, from gazette_pub_date, then the page's rows, as listLegislation
 	order := fmt.Sprintf(` ORDER BY g.published_on %s, g.id %s`, dir, dir)
 	rows, err := s.db.Query(ctx, `SELECT g.id, g.number, to_char(g.published_on, 'YYYY-MM-DD'),
 		(SELECT count(*) FROM gazette_entry e WHERE e.issue_id = g.id)::int
-		FROM (SELECT g.id FROM gazette_issue g WHERE `+w+order+fmt.Sprintf(` LIMIT $%d OFFSET $%d`, len(params)-1, len(params))+
+		FROM (SELECT g.id FROM gazette_issue g WHERE `+w+order+fmt.Sprintf(` LIMIT $%d`, len(params))+
 		`) p JOIN gazette_issue g ON g.id = p.id`+order, params...)
 	if err != nil {
 		return toolResult{}, err
 	}
 	defer rows.Close()
 	issues := []any{}
+	var last dateID
+	next := ""
 	for rows.Next() {
 		var id, count int
 		var number *string
@@ -1034,6 +1138,11 @@ func (s *Server) listGazetteIssues(ctx context.Context, a args) (toolResult, err
 		if err := rows.Scan(&id, &number, &published, &count); err != nil {
 			return toolResult{}, err
 		}
+		if len(issues) == limit {
+			next = cursor.DateID(last.date, last.id)
+			break
+		}
+		last = dateID{published, int64(id)}
 		o := obj{{"id", id}}
 		o.str("number", number)
 		o.set("published_on", published)
@@ -1049,15 +1158,13 @@ func (s *Server) listGazetteIssues(ctx context.Context, a args) (toolResult, err
 	if err := rows.Err(); err != nil {
 		return toolResult{}, err
 	}
-	next := offset + len(issues)
 	out := obj{}
 	out.str("since", r.since)
 	out.str("until", r.until)
 	out.set("order", r.order)
 	out.set("total", total)
-	out.set("offset", offset)
-	if next < total {
-		out.set("next_offset", next)
+	if next != "" {
+		out.set("next_cursor", next)
 	}
 	out.set("issues", issues)
 	return ok(out), nil

@@ -42,3 +42,37 @@ CREATE INDEX IF NOT EXISTS graph_edge_from_id ON graph_edge (from_type, from_id)
 -- The full judgments' machine readings: a ruling found by words only its
 -- judgment holds (docs/DATABASE.md, "Search").
 CREATE INDEX ruling_page_stem ON ruling_page USING gin (search_stem);
+
+-- ---------------------------------------------------------------------------
+-- Lists. Every list on the site, the API and the MCP server pages with a
+-- cursor (internal/cursor): the next page is a WHERE on the sort key, which
+-- one of these answers in about a millisecond at any depth. There is no
+-- OFFSET anywhere: page 2,000 of /laws/ by OFFSET read 80,000 laws, 835 ms on
+-- the XPS and 3 to 9 s on the container under a crawl (6 Nov 2026).
+--
+-- A list sorted newest first with the undated last sorts on
+-- coalesce(date, '0001-01-01'), then id, both descending: one key that an
+-- index scanned backwards answers, and a cursor compares as a row.
+-- ---------------------------------------------------------------------------
+
+-- /laws/, its filters and the year lists: by issue date
+CREATE INDEX legislation_list_date   ON legislation ((coalesce(issued_on, date '0001-01-01')), id);
+CREATE INDEX legislation_list_kind   ON legislation (kind, (coalesce(issued_on, date '0001-01-01')), id);
+CREATE INDEX legislation_list_status ON legislation (status, (coalesce(issued_on, date '0001-01-01')), id);
+-- /api/v1/laws/ and the MCP list_legislation: by publication date (the
+-- Gazette's, else the issue date); both leave out the undated
+CREATE INDEX legislation_pub_date ON legislation ((coalesce(gazette_date, issued_on)), id);
+CREATE INDEX legislation_pub_kind ON legislation (kind, (coalesce(gazette_date, issued_on)), id);
+
+CREATE INDEX ruling_list_date  ON ruling ((coalesce(decided_on, date '0001-01-01')), id);
+CREATE INDEX ruling_list_court ON ruling (court, (coalesce(decided_on, date '0001-01-01')), id);
+CREATE INDEX ruling_list_year  ON ruling ((coalesce(year, 0)), (coalesce(decided_on, date '0001-01-01')), id);
+
+CREATE INDEX gazette_list_date ON gazette_issue ((coalesce(published_on, date '0001-01-01')), id);
+CREATE INDEX gazette_pub_date  ON gazette_issue (published_on, id);
+
+CREATE INDEX opinion_list_date   ON opinion ((coalesce(issued_on, date '0001-01-01')), id);
+CREATE INDEX agreement_list_date ON agreement ((coalesce(signed_on, date '0001-01-01')), id);
+CREATE INDEX research_list_date  ON research ((coalesce(published_on, date '0001-01-01')), id);
+-- doctrine_article lists by id (its primary key); a law's articles by
+-- position (legislation_article's primary key, law_id and position)

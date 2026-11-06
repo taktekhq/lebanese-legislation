@@ -67,7 +67,7 @@ func langCases(t *testing.T, s *Server) []langCase {
 	ctx := t.Context()
 	cases := []langCase{
 		{"home", "/", true, false}, {"laws list", "/laws/", true, false}, {"codes", "/codes/", true, false},
-		{"rulings list", "/rulings/", true, true}, {"opinions page 2", "/opinions/page/2/", true, false},
+		{"rulings list", "/rulings/", true, true}, {"opinions", "/opinions/", true, false},
 		{"year list", "/laws/year/2005/", true, false}, {"data", "/data/", true, false}, {"about", "/about/", true, false},
 		{"search", "/search/?q=tax", true, true},
 	}

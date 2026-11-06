@@ -59,8 +59,8 @@ func TestAPIListLaws(t *testing.T) {
 	if resp := getJSON(t, s, "/api/v1/laws/?since=2025-01&limit=10", &all); resp.StatusCode != 200 {
 		t.Fatalf("status %d", resp.StatusCode)
 	}
-	if all.Order != "newest" || all.Total == 0 || len(all.Laws) != 10 || all.NextOffset == nil || *all.NextOffset != 10 {
-		t.Fatalf("shape: order %q total %d laws %d next %v", all.Order, all.Total, len(all.Laws), all.NextOffset)
+	if all.Order != "newest" || all.Total == 0 || len(all.Laws) != 10 || all.NextCursor == "" {
+		t.Fatalf("shape: order %q total %d laws %d next %q", all.Order, all.Total, len(all.Laws), all.NextCursor)
 	}
 	if all.Since == nil || *all.Since != "2025-01" || all.Until != nil {
 		t.Errorf("since/until echo: %v %v", all.Since, all.Until)
@@ -77,8 +77,8 @@ func TestAPIListLaws(t *testing.T) {
 	}
 	// the next page continues where this one stopped, with no overlap
 	var next apiLawList
-	getJSON(t, s, "/api/v1/laws/?since=2025-01&limit=10&offset=10", &next)
-	if next.Total != all.Total || len(next.Laws) != 10 || next.Laws[0].ID == all.Laws[9].ID {
+	getJSON(t, s, "/api/v1/laws/?since=2025-01&limit=10&cursor="+all.NextCursor, &next)
+	if next.Total != all.Total || len(next.Laws) != 10 || next.Laws[0].ID == all.Laws[9].ID || *next.Laws[0].Date > *all.Laws[9].Date {
 		t.Errorf("page 2: total %d (want %d), %d laws", next.Total, all.Total, len(next.Laws))
 	}
 	// oldest first, bounded both sides, inclusive
@@ -92,11 +92,19 @@ func TestAPIListLaws(t *testing.T) {
 			t.Errorf("law %d date %v outside the day", l.ID, l.Date)
 		}
 	}
-	// the last page has no next_offset
-	var last apiLawList
-	getJSON(t, s, "/api/v1/laws/?since=2025-05-16&until=2025-05-16&limit=100&offset="+itoa(old.Total-1), &last)
-	if len(last.Laws) != 1 || last.NextOffset != nil {
-		t.Errorf("last page: %d laws, next %v", len(last.Laws), last.NextOffset)
+	// the last page has no next_cursor; one short of the total leaves one law
+	var whole, short, last apiLawList
+	day := "/api/v1/laws/?since=2025-05-16&until=2025-05-16&order=oldest&limit="
+	getJSON(t, s, day+itoa(old.Total), &whole)
+	getJSON(t, s, day+itoa(old.Total-1), &short)
+	if old.Total > 1 && old.Total <= 100 {
+		if len(whole.Laws) != old.Total || whole.NextCursor != "" || short.NextCursor == "" {
+			t.Errorf("one day: %d laws next %q, short page next %q", len(whole.Laws), whole.NextCursor, short.NextCursor)
+		}
+		getJSON(t, s, day+itoa(old.Total-1)+"&cursor="+short.NextCursor, &last)
+		if len(last.Laws) != 1 || last.NextCursor != "" || last.Laws[0].ID != whole.Laws[old.Total-1].ID {
+			t.Errorf("last page: %d laws, next %q", len(last.Laws), last.NextCursor)
+		}
 	}
 	// scanned texts are included, with their Gazette issue
 	var scans apiLawList
@@ -168,8 +176,8 @@ func TestAPIListGazette(t *testing.T) {
 	}
 	var asc apiIssueList
 	getJSON(t, s, "/api/v1/gazette/?order=oldest&limit=3", &asc)
-	if len(asc.Issues) != 3 || asc.NextOffset == nil || *asc.NextOffset != 3 {
-		t.Errorf("oldest: %d issues next %v", len(asc.Issues), asc.NextOffset)
+	if len(asc.Issues) != 3 || asc.NextCursor == "" {
+		t.Errorf("oldest: %d issues next %q", len(asc.Issues), asc.NextCursor)
 	}
 	// a scan issue's own page: texts, and the API detail says no source link
 	var one apiGazetteDetail

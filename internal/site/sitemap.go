@@ -430,24 +430,12 @@ func (s *Server) buildSmallSitemap(ctx context.Context, name string, arabic bool
 		}
 		for _, y := range ys {
 			base := fmt.Sprintf("/%s/year/%d/", k, y.Year)
-			urls = append(urls, SitemapURL{base, mods[base]})
-			for n := 2; n <= (y.Count+yearPageSize-1)/yearPageSize; n++ {
-				urls = append(urls, SitemapURL{Path: pagePath(base, n)})
-			}
+			urls = append(urls, SitemapURL{base, mods[base]}) // later pages are cursor pages (keyset.go)
 		}
 	}
-	// the lists of opinions, agreements, doctrine and research: later pages are
-	// the only way to their documents
-	for _, k := range []string{"opinion", "agreement", "doctrine", "research"} {
-		kind := docKinds[k]
-		var total int
-		if err := s.db.QueryRow(ctx, "SELECT count(*) FROM "+kind.table).Scan(&total); err != nil {
-			return nil, err
-		}
-		for n := 2; n <= (total+perPage-1)/perPage; n++ {
-			urls = append(urls, SitemapURL{Path: pagePath("/"+kind.list+"/", n)})
-		}
-	}
+	// the lists of opinions, agreements, doctrine and research have only their
+	// first page here: later pages are cursor pages (keyset.go), and every
+	// document is in the documents sitemaps
 	return urls, nil
 }
 

@@ -27,3 +27,16 @@ CREATE INDEX IF NOT EXISTS graph_edge_to_law ON graph_edge (to_law_id);
 CREATE INDEX IF NOT EXISTS graph_edge_from_id ON graph_edge (from_type, from_id);
 
 CREATE INDEX ruling_page_stem ON ruling_page USING gin (search_stem);
+CREATE INDEX legislation_list_date   ON legislation ((coalesce(issued_on, date '0001-01-01')), id);
+CREATE INDEX legislation_list_kind   ON legislation (kind, (coalesce(issued_on, date '0001-01-01')), id);
+CREATE INDEX legislation_list_status ON legislation (status, (coalesce(issued_on, date '0001-01-01')), id);
+CREATE INDEX legislation_pub_date ON legislation ((coalesce(gazette_date, issued_on)), id);
+CREATE INDEX legislation_pub_kind ON legislation (kind, (coalesce(gazette_date, issued_on)), id);
+CREATE INDEX ruling_list_date  ON ruling ((coalesce(decided_on, date '0001-01-01')), id);
+CREATE INDEX ruling_list_court ON ruling (court, (coalesce(decided_on, date '0001-01-01')), id);
+CREATE INDEX ruling_list_year  ON ruling ((coalesce(year, 0)), (coalesce(decided_on, date '0001-01-01')), id);
+CREATE INDEX gazette_list_date ON gazette_issue ((coalesce(published_on, date '0001-01-01')), id);
+CREATE INDEX gazette_pub_date  ON gazette_issue (published_on, id);
+CREATE INDEX opinion_list_date   ON opinion ((coalesce(issued_on, date '0001-01-01')), id);
+CREATE INDEX agreement_list_date ON agreement ((coalesce(signed_on, date '0001-01-01')), id);
+CREATE INDEX research_list_date  ON research ((coalesce(published_on, date '0001-01-01')), id);

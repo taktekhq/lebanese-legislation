@@ -24,11 +24,29 @@ function requestKind(url) {
   return "page";
 }
 
+// requestRoute names which part of the origin a request used, so each can be
+// timed apart: the API endpoint (/api/v1/search/), else the address's first
+// word (/laws/, /law/, /ul/), with "?" when it carries a query. Never an id or
+// a query's value: the event stays anonymous.
+export function requestRoute(url) {
+  const path = url.pathname.replace(/^\/(en|ar)(?=\/|$)/, "");
+  const seg = path.split("/").filter(Boolean);
+  const word = s => (/^[a-z][a-z0-9_.-]{0,30}$/i.test(s) ? s : "other");
+  let route;
+  if (seg[0] === "api" && seg[1] === "v1") {
+    route = "/api/v1/" + (seg[2] ? word(seg[2]) + "/" : "");
+  } else {
+    route = seg[0] ? "/" + word(seg[0]) + (seg.length > 1 || path.endsWith("/") ? "/" : "") : "/";
+  }
+  return url.search.length > 1 ? route + "?" : route;
+}
+
 function originEvent(request, env, ctx, side, status, duration_ms, cache) {
   // Telemetry is best effort, including synchronous scheduling failures.
   try {
     if (!env.POSTHOG_KEY || !ctx?.waitUntil) return;
-    const kind = requestKind(new URL(request.url));
+    const url = new URL(request.url);
+    const kind = requestKind(url);
     const sample_rate = status >= 500 || duration_ms >= 2000 || kind === "mcp" || kind === "answer" ? 1 : 0.1;
     if (sample_rate !== 1 && Math.random() >= sample_rate) return;
     ctx.waitUntil(Promise.resolve().then(() => fetch("https://eu.i.posthog.com/i/v0/e/", {
@@ -36,7 +54,7 @@ function originEvent(request, env, ctx, side, status, duration_ms, cache) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         api_key: env.POSTHOG_KEY, event: "origin_request", distinct_id: "lebleg-origin",
-        properties: { kind, status, duration_ms, side, cache, colo: request.cf?.colo,
+        properties: { kind, route: requestRoute(url), status, duration_ms, side, cache, colo: request.cf?.colo,
           method: request.method, $lib: "lebleg-static-site-worker", sample_rate },
       }),
     })).catch(() => {}));

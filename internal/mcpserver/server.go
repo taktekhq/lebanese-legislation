@@ -24,12 +24,13 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/taktekhq/lebanese-legislation/internal/memo"
 )
 
 const (
 	// ServerName and ServerVersion are what initialize reports.
 	ServerName    = "lebaneselegislation"
-	ServerVersion = "1.2.0"
+	ServerVersion = "2.0.0"
 
 	maxBody         = 64 * 1024        // request body cap
 	callTimeout     = 5 * time.Second  // per tools/call budget
@@ -112,6 +113,7 @@ type Server struct {
 	codeCache  codeList
 	calcCache  calcIndex
 	englishMem memCache
+	counts     memo.Map // the paged tools' totals (count.go)
 	frenchMem  memCache
 
 	badgeMu    sync.Mutex

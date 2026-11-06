@@ -29,6 +29,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/taktekhq/lebanese-legislation/internal/cursor"
 )
 
 const (
@@ -367,10 +369,10 @@ var toolDefs = []map[string]any{
 			"type": "object",
 			"properties": map[string]any{
 				"id": map[string]any{"type": "integer", "description": "the law's numeric id, from search_legislation or its URL"},
-				"articles_offset": map[string]any{"type": "integer", "minimum": 0, "default": 0,
-					"description": "skip this many articles in the outline (long codes have over 1,000)"},
+				"articles_cursor": map[string]any{"type": "string",
+					"description": "the articles_next_cursor of the previous answer, for the next page of the outline (long codes have over 1,000 articles)"},
 				"articles_limit": map[string]any{"type": "integer", "minimum": 1,
-					"description": "return at most this many articles; omit for the full outline"},
+					"description": "return at most this many articles, with articles_next_cursor when more follow; omit for the full outline"},
 			},
 			"required": []string{"id"},
 		},
@@ -476,24 +478,24 @@ func (s *Server) toolSearch(ctx context.Context, raw json.RawMessage) (any, bool
 	var err error
 	switch a.Kind {
 	case "laws":
-		err = s.apiFindLaws(ctx, q, a.Year, limit, 0, &out)
+		err = s.apiFindLaws(ctx, q, a.Year, limit, nil, &out)
 	case "articles":
-		err = s.apiFindArticles(ctx, q, limit, 0, &out)
+		err = s.apiFindArticles(ctx, q, limit, nil, &out)
 	case "rulings":
-		err = s.apiFindRulings(ctx, q, limit, 0, &out)
+		err = s.apiFindRulings(ctx, q, limit, nil, &out)
 	case "gazette":
-		err = s.apiFindGazette(ctx, q, limit, 0, &out)
+		err = s.apiFindGazette(ctx, q, limit, nil, &out)
 	case "":
-		err = s.apiFindAll(ctx, q, a.Year, limit, 0, &out)
+		err = s.apiFindAll(ctx, q, a.Year, limit, nil, &out)
 	default:
 		return toolErr(`kind must be one of "laws", "articles", "rulings", "gazette", or omitted`), true, nil
 	}
 	if err != nil {
 		return nil, false, err
 	}
-	s.apiRescue(ctx, q, a.Kind, a.Year, 0, limit, &out)
+	s.apiRescue(ctx, q, a.Kind, a.Year, true, limit, &out)
 	if a.Kind == "" || a.Kind == "laws" {
-		s.apiFindLawsEn(ctx, q, a.Year, limit, 0, &out)
+		s.apiFindLawsEn(ctx, q, a.Year, limit, &out)
 	}
 	if a.Semantic {
 		s.addRelated(ctx, q, a.Select, &out)
@@ -514,15 +516,27 @@ func unmarshalID(raw json.RawMessage) (int, bool) {
 	return a.ID, true
 }
 
-// pageLawArticles keeps one page of a law's article outline: skip offset,
-// then at most limit (0: all the rest).
-func pageLawArticles(out *apiLawDetail, offset, limit int) {
-	if offset > 0 {
-		out.Articles = out.Articles[min(offset, len(out.Articles)):]
-	}
+// pageLawArticles keeps one page of a law's article outline: from the
+// article at place from (0: the first), at most limit (0: all the rest). It
+// returns the place of the next article, or -1 when the page ends the
+// outline. A place, not legislation_article.position: the articles only an
+// amendment carries sit in the outline with no position of their own.
+func pageLawArticles(out *apiLawDetail, from, limit int) int {
+	out.Articles = out.Articles[min(from, len(out.Articles)):]
 	if limit > 0 && len(out.Articles) > limit {
 		out.Articles = out.Articles[:limit]
+		return from + limit
 	}
+	return -1
+}
+
+// articlesOffsetRemoved is get_law's answer to the old way of paging.
+const articlesOffsetRemoved = "articles_offset was removed on 6 Nov 2026: pass articles_cursor, the articles_next_cursor of the previous answer"
+
+// mcpLawDetail is get_law's result: the law, and where its outline goes on.
+type mcpLawDetail struct {
+	apiLawDetail
+	ArticlesNextCursor string `json:"articles_next_cursor,omitempty"`
 }
 
 func (s *Server) toolGetLaw(ctx context.Context, raw json.RawMessage) (any, bool, error) {
@@ -531,11 +545,23 @@ func (s *Server) toolGetLaw(ctx context.Context, raw json.RawMessage) (any, bool
 		return toolErr("id must be a positive integer"), true, nil
 	}
 	var page struct {
-		Offset int `json:"articles_offset"`
-		Limit  int `json:"articles_limit"`
+		Offset *json.RawMessage `json:"articles_offset"`
+		Cursor string           `json:"articles_cursor"`
+		Limit  int              `json:"articles_limit"`
 	}
-	if json.Unmarshal(raw, &page) != nil || page.Offset < 0 || page.Limit < 0 {
-		return toolErr("articles_offset and articles_limit must be non-negative integers"), true, nil
+	if json.Unmarshal(raw, &page) != nil || page.Limit < 0 {
+		return toolErr("articles_cursor must be a string and articles_limit a non-negative integer"), true, nil
+	}
+	if page.Offset != nil {
+		return toolErr(articlesOffsetRemoved), true, nil
+	}
+	from := 0
+	if page.Cursor != "" {
+		n, ok := cursor.ParseInt(page.Cursor)
+		if !ok || n < 0 || n > 1<<20 {
+			return toolErr("articles_cursor is not one this server made; pass articles_next_cursor unchanged"), true, nil
+		}
+		from = int(n)
 	}
 	_, out, err := s.lawDetail(ctx, id)
 	if err != nil {
@@ -544,8 +570,11 @@ func (s *Server) toolGetLaw(ctx context.Context, raw json.RawMessage) (any, bool
 		}
 		return nil, false, err
 	}
-	pageLawArticles(&out, page.Offset, page.Limit)
-	return withAdvice(out), false, nil
+	res := mcpLawDetail{apiLawDetail: out}
+	if next := pageLawArticles(&res.apiLawDetail, from, page.Limit); next >= 0 {
+		res.ArticlesNextCursor = cursor.Int(int64(next))
+	}
+	return withAdvice(res), false, nil
 }
 
 func (s *Server) toolGetArticle(ctx context.Context, raw json.RawMessage) (any, bool, error) {

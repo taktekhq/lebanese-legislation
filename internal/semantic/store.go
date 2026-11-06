@@ -226,7 +226,7 @@ func vectorText(v []float32) string {
 type SyncOptions struct {
 	Progress  func(Stats)   // Serialized callback after each completed document group.
 	Limit     int           // Maximum canonical documents, zero means all.
-	Offset    int           // Deterministic corpus document offset.
+	After     DocKey        // Resume after this document (corpus order); zero starts at the first.
 	BatchSize int           // Texts in each embedding call, default 100, maximum 100.
 	GroupSize int           // Documents queued per worker group, default 100, maximum 1000.
 	Workers   int           // Concurrent document workers, default 1, maximum 32.
@@ -240,7 +240,7 @@ func (s *Store) Sync(ctx context.Context, corpus *pgxpool.Pool, opts SyncOptions
 	if corpus == nil || s.db == nil || s.embedder == nil {
 		return total, errors.New("semantic sync unavailable")
 	}
-	if opts.Limit < 0 || opts.Offset < 0 || opts.Rate < 0 || opts.GroupSize < 0 || opts.GroupSize > 1000 {
+	if opts.Limit < 0 || opts.Rate < 0 || opts.GroupSize < 0 || opts.GroupSize > 1000 {
 		return total, errors.New("invalid sync bounds")
 	}
 	if opts.BatchSize <= 0 {
@@ -328,7 +328,7 @@ func (s *Store) Sync(ctx context.Context, corpus *pgxpool.Pool, opts SyncOptions
 			return ctx.Err()
 		}
 	}
-	walkErr := walkCorpus(ctx, corpus, opts.Offset, opts.Limit, func(d Document) error {
+	walkErr := walkCorpus(ctx, corpus, opts.After, opts.Limit, func(d Document) error {
 		group = append(group, d)
 		if len(group) >= opts.GroupSize {
 			return send()
@@ -344,7 +344,7 @@ func (s *Store) Sync(ctx context.Context, corpus *pgxpool.Pool, opts SyncOptions
 	if firstErr != nil {
 		return total, firstErr
 	}
-	if walkErr == nil && opts.Offset == 0 && opts.Limit == 0 {
+	if walkErr == nil && opts.After == (DocKey{}) && opts.Limit == 0 {
 		// Never prune after an interrupted traversal or a bounded/paginated run.
 		tx, err := s.db.Begin(ctx)
 		if err != nil {
@@ -479,10 +479,10 @@ func (s *Store) syncDocuments(ctx context.Context, docs []Document, batchSize in
 // Count streams the same eligible corpus without calling the embedding service.
 func Count(ctx context.Context, corpus *pgxpool.Pool, opts SyncOptions) (Stats, error) {
 	var stats Stats
-	if opts.Limit < 0 || opts.Offset < 0 {
+	if opts.Limit < 0 {
 		return stats, errors.New("invalid count bounds")
 	}
-	err := walkCorpus(ctx, corpus, opts.Offset, opts.Limit, func(d Document) error { stats.Documents++; stats.Chunks += len(Chunks(d)); return nil })
+	err := walkCorpus(ctx, corpus, opts.After, opts.Limit, func(d Document) error { stats.Documents++; stats.Chunks += len(Chunks(d)); return nil })
 	return stats, err
 }
 

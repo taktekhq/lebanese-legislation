@@ -28,7 +28,11 @@
 <div class="scroller filters" role="group" aria-label="{{t "aria.filter"}}">{{range $chips}}<a class="chip" href="{{query $l.Q $param .Value}}"{{if eq .Value $sel}} aria-current="true"{{end}}><span dir="auto">{{.Label}}</span>{{if .Count}} <b>{{num .Count}}</b>{{end}}</a>{{end}}</div>
 {{end}}{{end}}
 
-{{define "pager"}}{{if gt .Pages 1}}<nav class="pager" aria-label="{{t "aria.pages"}}">
+{{define "pager"}}{{if or .Older .Newer}}<nav class="pager" aria-label="{{t "aria.pages"}}">
+  {{if .Newer}}<a class="btn btn--ghost btn--sm" rel="prev" href="{{.Newer}}">{{backArrow}} {{t "pager.newer"}}</a>{{end}}
+  {{if .Older}}<a class="btn btn--ghost btn--sm" rel="next" href="{{.Older}}">{{t "pager.older"}} {{fwdArrow}}</a>{{end}}
+</nav>{{end}}{{end}}
+{{define "numpager"}}{{if gt .Pages 1}}<nav class="pager" aria-label="{{t "aria.pages"}}">
   {{if gt .Page 1}}<a class="btn btn--ghost btn--sm" rel="prev" href="{{if .Base}}{{u (.Path (add .Page -1))}}{{else}}{{.Query (add .Page -1)}}{{end}}">{{backArrow}} {{t "pager.previous"}}</a>{{end}}
   <ul class="pager__nums">{{$l := .}}{{range pageNums .Page .Pages}}{{if eq . 0}}<li class="pager__gap" aria-hidden="true">&hellip;</li>{{else}}<li><a class="chip" href="{{if $l.Base}}{{u ($l.Path .)}}{{else}}{{$l.Query .}}{{end}}"{{if eq . $l.Page}} aria-current="page"{{end}}>{{num .}}</a></li>{{end}}{{end}}</ul>
   {{if lt .Page .Pages}}<a class="btn btn--ghost btn--sm" rel="next" href="{{if .Base}}{{u (.Path (add .Page 1))}}{{else}}{{.Query (add .Page 1)}}{{end}}">{{t "pager.next"}} {{fwdArrow}}</a>{{end}}

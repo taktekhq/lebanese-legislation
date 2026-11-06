@@ -97,7 +97,7 @@
  {
   "name": "get_law_texts",
   "title": "Get a law's article texts",
-  "description": "When calculated_current is present, use its text_ar for current monetary amounts and cite its authority.url. Identify this as calculated under the authority, never as verbatim published wording. The article text_ar and source fields remain published wording. Get the verbatim texts of a law's articles in order, a page at a time: for each article its number, section_id, note, and the same text fields as get_article (text_ar in force today, text_fr, centre_text_ar when an amendment replaced the wording, version, repealed). Follow next_offset until it is absent to read the whole law. Amendment history stays in get_article. Not legal advice.",
+  "description": "When calculated_current is present, use its text_ar for current monetary amounts and cite its authority.url. Identify this as calculated under the authority, never as verbatim published wording. The article text_ar and source fields remain published wording. Get the verbatim texts of a law's articles in order, a page at a time: for each article its number, section_id, note, and the same text fields as get_article (text_ar in force today, text_fr, centre_text_ar when an amendment replaced the wording, version, repealed). To read the whole law, pass each answer's next_cursor as cursor until next_cursor is absent. Amendment history stays in get_article. Not legal advice.",
   "inputSchema": {
    "type": "object",
    "properties": {
@@ -105,11 +105,9 @@
      "type": "integer",
      "description": "the law's numeric id"
     },
-    "offset": {
-     "type": "integer",
-     "minimum": 0,
-     "default": 0,
-     "description": "how many articles to skip (next_offset of the previous page)"
+    "cursor": {
+     "type": "string",
+     "description": "next_cursor of the previous answer; omit for the first page"
     },
     "limit": {
      "type": "integer",
@@ -179,7 +177,7 @@
  {
   "name": "get_links",
   "title": "Get citations and amendments",
-  "description": "Get the graph edges into or out of one item: a law, an article, a ruling, an opinion, a research study or a Gazette issue. Use this to walk citations and amendments directly, instead of only what get_law and get_article attach automatically. For a law key (\"law/<id>\") the default scope \"all\" includes the edges of its articles too (each link keeps its real to_key, e.g. \"law/244611/art/37\"); scope \"law\" is the law itself only. Newest first by the date of the text each edge comes from; page with offset and next_offset, total is the number of edges. Not legal advice.",
+  "description": "Get the graph edges into or out of one item: a law, an article, a ruling, an opinion, a research study or a Gazette issue. Use this to walk citations and amendments directly, instead of only what get_law and get_article attach automatically. For a law key (\"law/<id>\") the default scope \"all\" includes the edges of its articles too (each link keeps its real to_key, e.g. \"law/244611/art/37\"); scope \"law\" is the law itself only. Newest first by the date of the text each edge comes from. For the next page pass next_cursor as cursor (it is absent on the last page); total is the number of edges. Not legal advice.",
   "inputSchema": {
    "type": "object",
    "properties": {
@@ -217,11 +215,9 @@
      "default": "newest",
      "description": "by the date of the text the edge comes from (Gazette date, else issue date)"
     },
-    "offset": {
-     "type": "integer",
-     "minimum": 0,
-     "default": 0,
-     "description": "how many edges to skip (next_offset of the previous page)"
+    "cursor": {
+     "type": "string",
+     "description": "next_cursor of the previous answer; omit for the first page"
     },
     "limit": {
      "type": "integer",
@@ -245,7 +241,7 @@
  {
   "name": "list_legislation",
   "title": "List legislation by date",
-  "description": "List laws, decrees and decisions by date, newest first: for \"everything published since January 2025\" call with since \"2025-01\". The date is the publication date: the Official Gazette date, else the issue date (each entry's date, with gazette_number, gazette_date and gazette_issue_id). Recent texts come from machine readings of Gazette scans (ids from 2000000000, unofficial) because the Lebanese University's Centre lags about a year, so a recent period lists mostly those. since and until accept YYYY, YYYY-MM or YYYY-MM-DD, inclusive. kind narrows to one kind, in Arabic (\"قانون\", \"مرسوم\") or English (\"Law\", \"Decree\"). Page with offset and next_offset; total is the whole count. Not legal advice.",
+  "description": "List laws, decrees and decisions by date, newest first: for \"everything published since January 2025\" call with since \"2025-01\". The date is the publication date: the Official Gazette date, else the issue date (each entry's date, with gazette_number, gazette_date and gazette_issue_id). Recent texts come from machine readings of Gazette scans (ids from 2000000000, unofficial) because the Lebanese University's Centre lags about a year, so a recent period lists mostly those. since and until accept YYYY, YYYY-MM or YYYY-MM-DD, inclusive. kind narrows to one kind, in Arabic (\"قانون\", \"مرسوم\") or English (\"Law\", \"Decree\"). For the next page pass next_cursor as cursor (it is absent on the last page); total is the whole count. Not legal advice.",
   "inputSchema": {
    "type": "object",
    "properties": {
@@ -270,11 +266,9 @@
      "default": "newest",
      "description": "by publication date"
     },
-    "offset": {
-     "type": "integer",
-     "minimum": 0,
-     "default": 0,
-     "description": "how many texts to skip (next_offset of the previous page)"
+    "cursor": {
+     "type": "string",
+     "description": "next_cursor of the previous answer; omit for the first page"
     },
     "limit": {
      "type": "integer",
@@ -295,7 +289,7 @@
  {
   "name": "list_gazette_issues",
   "title": "List Official Gazette issues",
-  "description": "List Official Gazette issues by publication date, newest first, with the number of texts each carries (text_count) and where the issue comes from: source \"centre\" (the Lebanese University's Centre, whose issues stop about a year back) or \"scans\" (issues seen in Gazette scans, ids from 2000000000, which cover recent months). since and until accept YYYY, YYYY-MM or YYYY-MM-DD, inclusive; \"everything since January 2025\" is since \"2025-01\". Page with offset and next_offset. get_gazette_issue reads one issue's texts. Not legal advice.",
+  "description": "List Official Gazette issues by publication date, newest first, with the number of texts each carries (text_count) and where the issue comes from: source \"centre\" (the Lebanese University's Centre, whose issues stop about a year back) or \"scans\" (issues seen in Gazette scans, ids from 2000000000, which cover recent months). since and until accept YYYY, YYYY-MM or YYYY-MM-DD, inclusive; \"everything since January 2025\" is since \"2025-01\". For the next page pass next_cursor as cursor (it is absent on the last page). get_gazette_issue reads one issue's texts. Not legal advice.",
   "inputSchema": {
    "type": "object",
    "properties": {
@@ -316,11 +310,9 @@
      "default": "newest",
      "description": "by publication date"
     },
-    "offset": {
-     "type": "integer",
-     "minimum": 0,
-     "default": 0,
-     "description": "how many issues to skip (next_offset of the previous page)"
+    "cursor": {
+     "type": "string",
+     "description": "next_cursor of the previous answer; omit for the first page"
     },
     "limit": {
      "type": "integer",

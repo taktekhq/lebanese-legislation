@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/taktekhq/lebanese-legislation/internal/cursor"
 )
 
 // Browsing by year: how Lebanese texts are cited ("Law 44/2015") and the way
@@ -103,24 +104,29 @@ func (s *Server) lawsYear(w http.ResponseWriter, r *http.Request) {
 		s.notFound(w, r)
 		return
 	}
+	pg, done := s.cursorPaging(w, r, true)
+	if done {
+		return
+	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-	cond, args := "l.issued_on IS NULL", []any{}
+	// the year as a range on the sort key, which the list's index answers;
+	// the undated sort as 0001-01-01 (keyset.go)
+	key := dateKey("l.issued_on")
+	cond, args := key+" = date '"+cursor.NoDate+"'", []any{}
 	if y > 0 {
-		cond, args = "l.issued_on >= make_date($1, 1, 1) AND l.issued_on < make_date($1 + 1, 1, 1)", []any{y}
+		cond, args = key+" >= make_date($1, 1, 1) AND "+key+" < make_date($1 + 1, 1, 1)", []any{y}
 	}
-	var total int
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM legislation l WHERE `+cond, args...).Scan(&total); err != nil {
+	total, err := s.countRows(ctx, `SELECT count(*) FROM legislation l WHERE `+cond, args...)
+	if err != nil {
 		s.fail(w, r, err)
 		return
 	}
 	base := fmt.Sprintf("/laws/year/%d/", y)
-	page, pages, listBase, done := s.listPaging(w, r, base, r.URL.Query(), total, s.yearSize())
-	if done {
-		return
-	}
-	rows, err := s.db.Query(ctx, fmt.Sprintf(`SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind
-		WHERE `+cond+` ORDER BY l.issued_on DESC NULLS LAST, l.id DESC LIMIT %d OFFSET %d`, s.yearSize(), (page-1)*s.yearSize()), args...)
+	pageArgs := append([]any{}, args...)
+	page := pg.where(key, "l.id", &pageArgs)
+	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM (SELECT l.id FROM legislation l`+and(cond, page)+pg.order(key, "l.id")+
+		fmt.Sprintf(" LIMIT %d", s.yearSize()+1)+`) p JOIN legislation l ON l.id = p.id JOIN legislation_kind k ON k.name_ar = l.kind`+pg.order(key, "l.id"), pageArgs...)
 	if err != nil {
 		s.fail(w, r, err)
 		return
@@ -130,6 +136,12 @@ func (s *Server) lawsYear(w http.ResponseWriter, r *http.Request) {
 		s.fail(w, r, err)
 		return
 	}
+	list, olderOK, newerOK, top := settle(pg, list, s.yearSize())
+	if top {
+		s.toFirstPage(w, r)
+		return
+	}
+	older, newer := lawPageLinks(r.URL.Query(), list, olderOK, newerOK)
 	label := yearLabel(y)
 	if label == "no recorded date" {
 		label = s.trOr(r, label, "years.no_recorded_date")
@@ -144,11 +156,11 @@ func (s *Server) lawsYear(w http.ResponseWriter, r *http.Request) {
 		subhubs = s.kindYearChips(r, y, counts)
 	}
 	s.render(w, r, "laws", 200, Page{
-		Title: s.brandTitle(r, s.trOr(r, "Lebanese legislation of "+label, "years.laws_of_title", label)) + s.pageSuffix(r, page),
-		Path:  pagePath(base, page),
+		Title: s.brandTitle(r, s.trOr(r, "Lebanese legislation of "+label, "years.laws_of_title", label)),
+		Path:  base, NoIndex: !pg.first(),
 		Desc: s.trOr(r, fmt.Sprintf("The %s Lebanese laws, decrees and decisions issued in %s. Free.", thousands(total), label),
 			"years.laws_of_desc", thousands(total), label),
-		Data: List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase, Subhubs: subhubs, Back: "/laws/years/",
+		Data: List{Total: total, Older: older, Newer: newer, Rows: list, Subhubs: subhubs, Back: "/laws/years/",
 			Updated: s.pageUpdated(r, s.latestChange(ctx, cond, args...), nil), BackLabel: s.trOr(r, "All years", "years.all_years"),
 			Eyebrow: s.trOr(r, "Legislation · "+label, "years.legislation_of", label), Heading: s.trOr(r, "Texts of "+label+".", "years.texts_of", label)}})
 }
@@ -170,32 +182,42 @@ func (s *Server) docYear(kind string) http.HandlerFunc {
 			s.notFound(w, r)
 			return
 		}
+		pg, done := s.cursorPaging(w, r, true)
+		if done {
+			return
+		}
 		ctx, cancel := s.ctx(r)
 		defer cancel()
-		var sql, countSQL string
+		// each list's rows by its index (db/indexes.sql, "Lists"), then the
+		// page by its cursor (keyset.go)
+		var table, cond, key, sql string
 		switch kind {
 		case "rulings":
-			countSQL = `SELECT count(*) FROM ruling WHERE coalesce(year, 0) = $1`
-			sql = `SELECT 'ruling', id, title, coalesce(court, ''), decided_on, left(text_ar, 220) FROM ruling
-				WHERE coalesce(year, 0) = $1 ORDER BY decided_on DESC NULLS LAST, id DESC`
+			table, key, cond = "ruling", dateKey("decided_on"), "coalesce(year, 0) = $1"
+			sql = `SELECT 'ruling', r.id, r.title, coalesce(r.court, ''), r.decided_on, left(r.text_ar, 220) FROM ruling r JOIN (%s) p ON p.id = r.id`
 		case "gazette":
-			countSQL = `SELECT count(*) FROM gazette_issue WHERE coalesce(extract(year FROM published_on)::int, 0) = $1`
+			table, key = "gazette_issue", dateKey("published_on")
+			cond = key + " >= make_date($1, 1, 1) AND " + key + " < make_date($1 + 1, 1, 1)"
+			if y == 0 {
+				cond = "published_on IS NULL"
+			}
 			sql = `SELECT 'gazette', g.id, 'الجريدة الرسمية، العدد ' || coalesce(g.number, '؟'),
 				(SELECT count(*) FROM gazette_entry e WHERE e.issue_id = g.id)::text || ' texts', g.published_on, NULL
-				FROM gazette_issue g WHERE coalesce(extract(year FROM g.published_on)::int, 0) = $1
-				ORDER BY g.published_on DESC NULLS LAST, g.id DESC`
+				FROM gazette_issue g JOIN (%s) p ON p.id = g.id`
 		}
-		var total int
-		if err := s.db.QueryRow(ctx, countSQL, y).Scan(&total); err != nil {
+		args := []any{y}
+		if y == 0 && kind == "gazette" {
+			args = nil
+		}
+		total, err := s.countRows(ctx, "SELECT count(*) FROM "+table+and(cond), args...)
+		if err != nil {
 			s.fail(w, r, err)
 			return
 		}
 		base := fmt.Sprintf("/%s/year/%d/", kind, y)
-		page, pages, listBase, done := s.listPaging(w, r, base, r.URL.Query(), total, s.yearSize())
-		if done {
-			return
-		}
-		rows, err := s.db.Query(ctx, fmt.Sprintf("%s LIMIT %d OFFSET %d", sql, s.yearSize(), (page-1)*s.yearSize()), y)
+		page := pg.where(key, "id", &args)
+		ids := "SELECT id, " + key + " AS key FROM " + table + and(cond, page) + pg.order(key, "id") + fmt.Sprintf(" LIMIT %d", s.yearSize()+1)
+		rows, err := s.db.Query(ctx, fmt.Sprintf(sql, ids)+pg.order("p.key", "p.id"), args...)
 		if err != nil {
 			s.fail(w, r, err)
 			return
@@ -205,6 +227,12 @@ func (s *Server) docYear(kind string) http.HandlerFunc {
 			s.fail(w, r, err)
 			return
 		}
+		list, olderOK, newerOK, top := settle(pg, list, s.yearSize())
+		if top {
+			s.toFirstPage(w, r)
+			return
+		}
+		older, newer := docPageLinks(r.URL.Query(), list, true, olderOK, newerOK)
 		label := yearLabel(y)
 		if label == "no recorded date" {
 			label = s.trOr(r, label, "years.no_recorded_date")
@@ -212,13 +240,13 @@ func (s *Server) docYear(kind string) http.HandlerFunc {
 		eyebrow := s.trOr(r, k.eyebrow, "years.index."+k.key+".eyebrow")
 		many := s.trOr(r, k.many, k.key+".many")
 		noun := s.trOr(r, k.noun, k.key+".noun")
-		s.render(w, r, "list", 200, Page{Title: s.brandTitle(r, stripNbsp(eyebrow)+" "+label) + s.pageSuffix(r, page),
-			Path: pagePath(base, page), NoIndex: kind == "rulings" && rulingsHidden,
+		s.render(w, r, "list", 200, Page{Title: s.brandTitle(r, stripNbsp(eyebrow)+" "+label),
+			Path: base, NoIndex: (kind == "rulings" && rulingsHidden) || !pg.first(),
 			Desc: s.trOr(r, fmt.Sprintf("The %s %s of %s. Free.", thousands(total), k.many, label),
 				"years.docs_of_desc", thousands(total), many, label),
 			Data: map[string]any{"Kind": map[string]string{"Eyebrow": eyebrow + " · " + label, "H1": label + ".",
 				"Noun": noun, "Many": many, "Back": "/" + kind + "/years/", "BackLabel": s.trOr(r, "All years", "years.all_years")},
-				"List": List{Total: total, Page: page, Pages: pages, Rows: list, Base: listBase}}})
+				"List": List{Total: total, Older: older, Newer: newer, Rows: list}}})
 	}
 }
 

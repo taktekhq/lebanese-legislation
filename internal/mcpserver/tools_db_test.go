@@ -171,16 +171,17 @@ func TestGetLawTexts(t *testing.T) {
 	s := dbServer(t)
 	first := call(t, s, "get_law_texts", map[string]any{"law_id": 400, "limit": 2}).result
 	arts := list(first["articles"])
-	if num(first["total"]) != 3 || num(first["next_offset"]) != 2 || len(arts) != 2 || arts[0]["number"] != "6" || arts[1]["number"] != "7" {
+	next, _ := first["next_cursor"].(string)
+	if num(first["total"]) != 3 || next == "" || first["offset"] != nil || len(arts) != 2 || arts[0]["number"] != "6" || arts[1]["number"] != "7" {
 		t.Fatalf("first page: %v", first)
 	}
 	if arts[0]["text_ar"] != "نص المادة السادسة الجديد" || arts[0]["centre_text_ar"] != "نص المادة السادسة القديم" || num(arts[0]["section_id"]) != 41 ||
 		!strings.Contains(fmt.Sprint(arts[0]["centre_error"]), "repeats article 5") || arts[1]["centre_error"] != nil || arts[1]["text_ar"] != nil || arts[1]["repealed"] != true {
 		t.Errorf("first page texts: %v", arts)
 	}
-	second := call(t, s, "get_law_texts", map[string]any{"law_id": 400, "offset": 2, "limit": 2}).result
+	second := call(t, s, "get_law_texts", map[string]any{"law_id": 400, "cursor": next, "limit": 2}).result
 	arts = list(second["articles"])
-	if len(arts) != 1 || arts[0]["number"] != "7-1" || arts[0]["text_fr"] != "Le contrat est conclu par écrit." || second["next_offset"] != nil {
+	if len(arts) != 1 || arts[0]["number"] != "7-1" || arts[0]["text_fr"] != "Le contrat est conclu par écrit." || second["next_cursor"] != nil || num(second["total"]) != 3 {
 		t.Errorf("second page: %v", second)
 	}
 	if !call(t, s, "get_law_texts", map[string]any{"law_id": 999999}).isError {
@@ -273,7 +274,7 @@ func TestGetLinks(t *testing.T) {
 		return strings.Join(ks, " ")
 	}
 	r = call(t, s, "get_links", map[string]any{"key": "law/430", "direction": "to"}).result
-	if r["scope"] != "all" || r["order"] != "newest" || num(r["total"]) != 4 || r["next_offset"] != nil ||
+	if r["scope"] != "all" || r["order"] != "newest" || num(r["total"]) != 4 || r["next_cursor"] != nil ||
 		toKeys(r) != "law/430/art/37 law/430/art/99 law/430 law/430/art/5" || list(r["links"])[0]["date"] != "2026-09-10" {
 		t.Errorf("a law's links: %v", r)
 	}
@@ -282,11 +283,11 @@ func TestGetLinks(t *testing.T) {
 		t.Errorf("scope law: %v", r)
 	}
 	first := call(t, s, "get_links", map[string]any{"key": "law/430", "order": "oldest", "limit": 2}).result
-	if toKeys(first) != "law/430 law/430/art/99" || num(first["next_offset"]) != 2 {
+	if toKeys(first) != "law/430 law/430/art/99" || first["next_cursor"] == nil {
 		t.Errorf("oldest first: %v", first)
 	}
-	second := call(t, s, "get_links", map[string]any{"key": "law/430", "order": "oldest", "limit": 2, "offset": 2}).result
-	if toKeys(second) != "law/430/art/37 law/430/art/5" || second["next_offset"] != nil {
+	second := call(t, s, "get_links", map[string]any{"key": "law/430", "order": "oldest", "limit": 2, "cursor": first["next_cursor"]}).result
+	if toKeys(second) != "law/430/art/37 law/430/art/5" || second["next_cursor"] != nil {
 		t.Errorf("second page: %v", second)
 	}
 	r = call(t, s, "get_links", map[string]any{"key": "law/333455", "direction": "from", "relation": "insert"}).result
@@ -373,8 +374,8 @@ func TestListLegislation(t *testing.T) {
 		t.Errorf("oldest: %v", got)
 	}
 	p1 := call(t, s, "list_legislation", map[string]any{"since": "2025", "limit": 2}).result
-	p2 := call(t, s, "list_legislation", map[string]any{"since": "2025", "limit": 2, "offset": 2}).result
-	if num(p1["next_offset"]) != 2 || fmt.Sprint(lawIDs(p2)) != "[333455]" || p2["next_offset"] != nil {
+	p2 := call(t, s, "list_legislation", map[string]any{"since": "2025", "limit": 2, "cursor": p1["next_cursor"]}).result
+	if fmt.Sprint(lawIDs(p1)) != "[2000200347 2000200346]" || p1["next_cursor"] == nil || fmt.Sprint(lawIDs(p2)) != "[333455]" || p2["next_cursor"] != nil || num(p2["total"]) != 3 {
 		t.Errorf("pages: %v %v", p1, p2)
 	}
 	if containsInt(lawIDs(call(t, s, "list_legislation", map[string]any{"limit": 100}).result), 600600) {
@@ -405,8 +406,8 @@ func TestListGazetteIssues(t *testing.T) {
 		t.Errorf("range: %v", got)
 	}
 	p := call(t, s, "list_gazette_issues", map[string]any{"order": "oldest", "limit": 2}).result
-	q := call(t, s, "list_gazette_issues", map[string]any{"order": "oldest", "limit": 2, "offset": 2}).result
-	if fmt.Sprint(ids(p["issues"])) != "[500 600]" || num(p["next_offset"]) != 2 || fmt.Sprint(ids(q["issues"])) != "[601 2002026036]" || q["next_offset"] != nil {
+	q := call(t, s, "list_gazette_issues", map[string]any{"order": "oldest", "limit": 2, "cursor": p["next_cursor"]}).result
+	if fmt.Sprint(ids(p["issues"])) != "[500 600]" || p["next_cursor"] == nil || fmt.Sprint(ids(q["issues"])) != "[601 2002026036]" || q["next_cursor"] != nil {
 		t.Errorf("pages: %v %v", p, q)
 	}
 	for _, a := range []map[string]any{{"since": "2025/01"}, {"until": "x"}} {

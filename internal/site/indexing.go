@@ -100,10 +100,12 @@ func (s *Server) weakText(ctx context.Context, r *http.Request, p *Page, id int)
 
 // ---------------------------------------------------------------- pagination
 
-// A list page is /opinions/ then /opinions/page/2/, and a year's list is
-// /laws/year/2020/ then /laws/year/2020/page/2/: paths a crawler follows
-// and indexes, where "?page=2" is blocked by robots.txt (Disallow: /*?).
-// Lists with a filter keep "?page=" and stay noindex.
+// Lists page with a cursor (keyset.go): the first page is a path a crawler
+// indexes (/opinions/, /laws/year/2020/), the later ones are ?after= and
+// ?before=, noindex and blocked by robots.txt (Disallow: /*?), and every
+// document they list is in a sitemap. The old numbered addresses move to the
+// list's first page. Only a code's article hub keeps numbered pages
+// (/codes/x/page/2/): page n is a range of article positions (hubs.go).
 
 // yearPageSize is how many texts a year's list shows: about 150 KB and 4,000
 // DOM nodes a page, where the whole of a year had 1.5 MB and 31,000.

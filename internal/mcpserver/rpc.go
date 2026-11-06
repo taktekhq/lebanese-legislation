@@ -60,7 +60,11 @@ const calculatedCurrentGuidance = "When calculated_current is present, use its t
 
 const instructions = "Lebanese Legislation: every law, article, court ruling and Official Gazette issue published by the " +
 	"Lebanese University's Centre for Research and Studies in Legal Informatics. Published source text is copied " +
-	"verbatim from that database; nothing here is written or rewritten by a model. " + calculatedCurrentGuidance + NotLegalAdvice
+	"verbatim from that database; nothing here is written or rewritten by a model. " + calculatedCurrentGuidance + pagingGuidance + NotLegalAdvice
+
+// pagingGuidance tells agents how pages work since 2.0.0 (internal/mcpserver/paging.go).
+const pagingGuidance = "Long lists come a page at a time: for the next page pass the answer's next_cursor as cursor, " +
+	"unchanged, with the same other arguments; next_cursor is absent on the last page. offset was removed in version 2.0.0. "
 
 func isKnownTool(name string) bool {
 	for _, n := range toolNames {

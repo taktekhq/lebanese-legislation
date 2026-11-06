@@ -65,6 +65,11 @@ func TestChangedRowsToPaths(t *testing.T) {
 	if slices.Contains(p.Paths, "/text/4/") {
 		t.Error("rendered unrelated text")
 	}
+	for _, path := range p.Paths { // lists store their first page only (internal/site, keyset.go)
+		if strings.Contains(path, "/page/") && !strings.Contains(path, "/codes/") {
+			t.Errorf("planned a numbered list page %s", path)
+		}
+	}
 	if len(p.Paths) != 90 {
 		t.Fatalf("nightly fixture: got %d paths, want 90", len(p.Paths))
 	}
