@@ -644,7 +644,12 @@ func TestWarm(t *testing.T) {
 	if err := s.Warm(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	if s.englishMem.corpus == nil || len(s.englishMem.corpus.docs) != 4 || s.frenchMem.corpus == nil || len(s.frenchMem.corpus.docs) != 3 {
-		t.Errorf("warmed: %+v %+v", s.englishMem.corpus, s.frenchMem.corpus)
+	en, _ := s.englishMem.f.peek()
+	fr, _ := s.frenchMem.f.peek()
+	if en == nil || len(en.docs) != 4 || fr == nil || len(fr.docs) != 3 {
+		t.Errorf("warmed: %+v %+v", en, fr)
+	}
+	if _, ok := s.calcCache.f.peek(); !ok {
+		t.Error("the calculated amounts were not warmed")
 	}
 }

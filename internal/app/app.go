@@ -175,6 +175,20 @@ func run(ctx context.Context, cfg config) error {
 	if os.Getenv("MCP_SHARED_SERVER") == "1" {
 		mcp := mcpserver.New(pool, mcpserver.ConfigFromEnv(nil))
 		defer mcp.Flush()
+		// Read ahead what searches need (codes, English titles, French texts,
+		// statistics, calculated amounts) while the server starts listening:
+		// nothing called Warm before 6 Nov 2026, so the first searches after
+		// every deploy read them, seconds each on the container.
+		go func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+			defer cancel()
+			started := time.Now()
+			if err := mcp.Warm(ctx); err != nil {
+				log.Printf("mcp warm-up: %v", err)
+				return
+			}
+			log.Printf("mcp warm-up done in %s", time.Since(started).Round(time.Millisecond))
+		}()
 		handler = withMCP(handler, mcp)
 	}
 	if cfg.noindex {

@@ -4,8 +4,6 @@ import (
 	"context"
 	"sort"
 	"strings"
-	"sync"
-	"time"
 )
 
 // The unofficial English titles (about 100,000 short lines) and the French
@@ -93,26 +91,12 @@ func containsID(ids []uint32, id uint32) bool {
 	return i < len(ids) && ids[i] == id
 }
 
-type memCache struct {
-	mu     sync.Mutex
-	at     time.Time
-	corpus *memCorpus
-}
-
-const memTTL = 6 * time.Hour
+// memCache is an in-memory table, read once and reloaded in the background
+// (fresh.go).
+type memCache struct{ f fresh[*memCorpus] }
 
 func (c *memCache) get(ctx context.Context, load func(context.Context) (*memCorpus, error)) (*memCorpus, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if c.corpus != nil && time.Since(c.at) < memTTL {
-		return c.corpus, nil
-	}
-	m, err := load(ctx)
-	if err != nil {
-		return nil, err
-	}
-	c.corpus, c.at = m, time.Now()
-	return m, nil
+	return c.f.get(ctx, load)
 }
 
 func (s *Server) loadMem(ctx context.Context, sql string) (*memCorpus, error) {

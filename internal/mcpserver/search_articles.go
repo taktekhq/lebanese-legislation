@@ -6,8 +6,6 @@ import (
 	"regexp"
 	"sort"
 	"strings"
-	"sync"
-	"time"
 )
 
 // articleHit is one article a search found: the law (lawCols), the
@@ -48,19 +46,14 @@ type codeName struct {
 	slug  string
 }
 
-// codeList caches the codes' ids, titles and slugs.
-type codeList struct {
-	mu    sync.Mutex
-	at    time.Time
-	codes []codeName
-}
+// codeList caches the codes' ids, titles and slugs (fresh.go).
+type codeList struct{ f fresh[[]codeName] }
 
 func (s *Server) codes(ctx context.Context) ([]codeName, error) {
-	s.codeCache.mu.Lock()
-	defer s.codeCache.mu.Unlock()
-	if s.codeCache.codes != nil && time.Since(s.codeCache.at) < time.Hour {
-		return s.codeCache.codes, nil
-	}
+	return s.codeCache.f.get(ctx, s.loadCodes)
+}
+
+func (s *Server) loadCodes(ctx context.Context) ([]codeName, error) {
 	rows, err := s.db.Query(ctx, `SELECT l.id, l.title, c.slug FROM `+lawFrom+` WHERE c.slug IS NOT NULL ORDER BY l.id`)
 	if err != nil {
 		return nil, err
@@ -77,7 +70,6 @@ func (s *Server) codes(ctx context.Context) ([]codeName, error) {
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	s.codeCache.codes, s.codeCache.at = codes, time.Now()
 	return codes, nil
 }
 
@@ -459,20 +451,16 @@ type calculatedEntry struct {
 	tokens   []string
 }
 
-type calcIndex struct {
-	mu      sync.Mutex
-	at      time.Time
-	entries []calculatedEntry
-}
+type calcIndex struct{ f fresh[[]calculatedEntry] }
 
 // calculatedIndex is, for every article with calculated amounts, the
-// tokens the snapshot indexed: its text and the calculated text.
+// tokens the snapshot indexed: its text and the calculated text. Read once
+// and reloaded in the background (fresh.go): every article search needs it.
 func (s *Server) calculatedIndex(ctx context.Context) ([]calculatedEntry, error) {
-	s.calcCache.mu.Lock()
-	defer s.calcCache.mu.Unlock()
-	if s.calcCache.entries != nil && time.Since(s.calcCache.at) < 10*time.Minute {
-		return s.calcCache.entries, nil
-	}
+	return s.calcCache.f.get(ctx, s.loadCalculatedIndex)
+}
+
+func (s *Server) loadCalculatedIndex(ctx context.Context) ([]calculatedEntry, error) {
 	rows, err := s.queryArticles(ctx, `a.law_id = $1 ORDER BY a.position`, calculatedLaw)
 	if err != nil {
 		return nil, err
@@ -500,7 +488,6 @@ func (s *Server) calculatedIndex(ctx context.Context) ([]calculatedEntry, error)
 		}
 		entries = append(entries, calculatedEntry{a.Position, isCode, ftsTokens(arNorm(a.TextAr) + " " + arNorm(rec.TextAr))})
 	}
-	s.calcCache.entries, s.calcCache.at = entries, time.Now()
 	return entries, nil
 }
 
