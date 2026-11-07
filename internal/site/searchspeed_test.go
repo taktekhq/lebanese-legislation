@@ -48,17 +48,3 @@ func TestSearchCache(t *testing.T) {
 		t.Errorf("cache grew to %d", len(c.m))
 	}
 }
-
-func TestArticleSource(t *testing.T) {
-	if got := articleSource("قانون العمل", "W"); got != "legislation_article a" {
-		t.Errorf("words: %q", got)
-	}
-	for _, q := range []string{"2", "28 1930"} {
-		if got := articleSource(q, "W"); !strings.Contains(got, "WHERE W LIMIT 3000") {
-			t.Errorf("articleSource(%q) = %q", q, got)
-		}
-	}
-	if onlyDigits("") || onlyDigits(" ") || onlyDigits("2a") {
-		t.Error("onlyDigits accepts non-numbers")
-	}
-}

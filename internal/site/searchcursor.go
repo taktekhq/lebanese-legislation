@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/taktekhq/lebanese-legislation/internal/cursor"
+	"github.com/taktekhq/lebanese-legislation/internal/wordsearch"
 )
 
 // Paging /api/v1/search/. Each part of a search (laws, articles, rulings,
@@ -47,17 +48,18 @@ const (
 )
 
 // searchPart is how a part's key is written: each field i (an integer), r
-// (a real, float4), f (a double, float8) or d (a date). The last field is an
-// id or a position, never 0 in a row, so 0 there means the phase's start.
+// (a real, float4), f (a double, float8), d (a date) or k (a rank of
+// internal/wordsearch, wordsearch.Key). The last field is an id or a rank,
+// never 0 in a row, so 0 there means the phase's start.
 var searchParts = [4]struct {
 	name   string
 	fields string
 	phases int
 }{
-	{"laws", "irdi", lawsEnglishOnly}, // is_code, similarity, issue date, id; the English titles leave the similarity 0
-	{"articles", "fiii", phaseRanked}, // score, is_code, law id, position
-	{"rulings", "iirdi", phaseRanked}, // tier, phrase, rank, date, id
-	{"gazette", "di", phaseRanked},    // publication date, id
+	{"laws", "k", lawsEnglishOnly},     // the rank (internal/wordsearch), in the Arabic or the English titles
+	{"articles", "k", phaseRanked},     // the rank
+	{"rulings", "k", rulingsJudgments}, // the rank, in the titles and summaries, then in the judgments
+	{"gazette", "di", phaseRanked},     // publication date, id
 }
 
 // searchPos is where one part of a search stands: its phase, and the key of
@@ -134,6 +136,10 @@ func keyFieldOK(kind byte, s string) bool {
 		_, err = strconv.ParseFloat(s, 64)
 	case 'd':
 		_, err = time.Parse("2006-01-02", s)
+	case 'k':
+		if _, ok := wordsearch.ParseKey(s); !ok && s != "0" {
+			return false
+		}
 	}
 	return err == nil
 }

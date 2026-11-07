@@ -1,7 +1,6 @@
 package site
 
 import (
-	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -16,19 +15,6 @@ func shortNumber(wd string) (int, bool) {
 	}
 	n, err := strconv.Atoi(wd)
 	return n, err == nil && n >= 0
-}
-
-// articleCandidates bounds how many matching articles are ranked when the
-// query is only a number: "2" matched 103,163 articles and ranking them all
-// took 2.2 s. Word queries match far fewer and are ranked in full.
-const articleCandidates = 3000
-
-// articleSource is the FROM clause of the article search for q; artWhere uses $1.
-func articleSource(q, artWhere string) string {
-	if !onlyDigits(q) {
-		return "legislation_article a"
-	}
-	return fmt.Sprintf("(SELECT * FROM legislation_article a WHERE %s LIMIT %d) a", artWhere, articleCandidates)
 }
 
 func onlyDigits(q string) bool {

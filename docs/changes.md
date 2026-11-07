@@ -8,6 +8,12 @@
 - New generated columns `legislation_article.text_len` and `ruling.text_len` give BM25 each text's length without reading it. Generated columns and `search_term` stay out of `data/` and the Hugging Face dataset.
 - Calculated current amounts are no longer searched by word; `get_article` and `get_law_texts` still return them.
 - The container's PostgreSQL runs with `jit=off`: compiling plans cost more than the searches saved.
+- The website's search page, `/api/v1/search/` and the MCP server search with one engine, `internal/wordsearch`. The old website search ranked every match with `ts_rank` and `similarity` before it kept ten (2.5 to 4 s on the container for a common word, and the "search p95 over 2 s" alert). On a copy of the data, 30 real questions: the search page median 401 to 296 ms, slowest 4,835 to 624 ms; the API slowest 1,244 to 416 ms; the MCP median 49 to 34 ms, slowest 741 to 168 ms.
+- Titles match the word as written, without a leading article (`ar_strip`: «للبيانات» is «البيانات»), or as the start of a word («اللبناني» in «اللبنانية»), never by stem: «الغابات» and «الغابون» (Gabon) stem alike. Each title is scored by the forms it holds; a synonym or the text's kind counts less than the word written in the title, and the newest text comes first among equals. New generated columns `legislation.title_exact`, `legislation.title_base` and `legislation_title_en.search_en`; the Arabic title stem index is gone.
+- Kind words, text numbers, years and synonyms in a title search are conditions of the same query (`wordsearch.Term`), and the close titles (all but one word) come from it too. The search page's rescue keeps the translation, number and year, and spelling readings; setting the commonest words aside is part of the search.
+- Articles holding only some of the words are listed only when none holds every word. Rulings found by their judgment's machine reading (`ruling_page`) still come after those found by title or summary, now ranked the same way; `ruling_page.text_len` is new.
+- `/api/v1/search/` cursors carry the engine's rank; cursors made before this change answer 400. English titles that the Arabic titles also found are counted once.
+- A push that changes `data/` no longer builds the all-in-one image in the checks workflow: `data.yml` builds it from the new database. Built twice, the first image held the old database and its deploy stalled in the warm checks.
 
 ## 6 November 2026
 

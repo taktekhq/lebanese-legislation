@@ -131,7 +131,7 @@ func TestAPILawAndArticle(t *testing.T) {
 
 	art := law.Articles[0]
 	var article apiArticleDetail
-	resp = getJSON(t, s, "/api/v1/law/"+strconv.Itoa(hit.Law.ID)+"/article/"+art.Number+"/", &article)
+	resp = getJSON(t, s, "/api/v1/law/"+strconv.Itoa(hit.Law.ID)+"/article/"+url.PathEscape(art.Number)+"/", &article)
 	if resp.StatusCode != 200 {
 		t.Fatalf("article %s: status %d", art.Number, resp.StatusCode)
 	}
