@@ -1,6 +1,7 @@
 package site
 
 import (
+	"fmt"
 	"html/template"
 
 	"github.com/taktekhq/lebanese-legislation/internal/site/i18n"
@@ -15,6 +16,27 @@ var (
 	arBundle = i18n.New("ar")
 )
 
+// escArgs makes the arguments of a UI string safe to format into HTML. The
+// string itself is trusted markup, its arguments are not: a template.HTML
+// argument (safe "...", a nested t) stays as it is, a string or Stringer is
+// HTML-escaped, and anything else (a number for %d) passes unchanged.
+func escArgs(args []any) []any {
+	out := make([]any, len(args))
+	for i, a := range args {
+		switch v := a.(type) {
+		case template.HTML:
+			out[i] = string(v)
+		case string:
+			out[i] = template.HTMLEscapeString(v)
+		case fmt.Stringer:
+			out[i] = template.HTMLEscapeString(v.String())
+		default:
+			out[i] = a
+		}
+	}
+	return out
+}
+
 // arabicFuncs are the template funcs re-bound on the Arabic clone of every
 // page: UI strings
 // come from ar.json, and the handful of language-direction details (the
@@ -22,7 +44,7 @@ var (
 // numeral-noun agreement) flip for right-to-left.
 func arabicFuncs() template.FuncMap {
 	return template.FuncMap{
-		"t": func(key string, args ...any) template.HTML { return template.HTML(arBundle.T(key, args...)) },
+		"t": func(key string, args ...any) template.HTML { return template.HTML(arBundle.T(key, escArgs(args)...)) },
 		// Arabic is the root: links need no prefix, so u, lawURL and artURL
 		// stay the shared ones (site.go), also on a page served under /ar/.
 		"uilang": func() string { return "ar" },

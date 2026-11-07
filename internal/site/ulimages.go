@@ -2,7 +2,9 @@ package site
 
 import (
 	"io"
+	"mime"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -29,9 +31,18 @@ func imageURL(u string) string {
 	return u
 }
 
+// ulImageName is the shape of a picture name at UL: path segments of
+// letters (Arabic too), digits, "_", "-", "(", ")" and dots, none starting
+// with a dot. Escapes ("%"), backslashes and ".." never pass.
+var ulImageName = regexp.MustCompile(`^[\p{L}\p{N}_()-][\p{L}\p{N}._()-]*(/[\p{L}\p{N}_()-][\p{L}\p{N}._()-]*)*$`)
+
+// ulImageTypes are the picture types relayed: raster images only, never
+// anything a browser could run (SVG) or render as a page.
+var ulImageTypes = map[string]bool{"image/png": true, "image/jpeg": true, "image/gif": true, "image/webp": true, "image/bmp": true, "image/x-ms-bmp": true}
+
 func (s *Server) ulImage(w http.ResponseWriter, r *http.Request) {
 	name := r.PathValue("name")
-	if name == "" || strings.Contains(name, "..") || strings.ContainsAny(name, "?#\\") {
+	if !ulImageName.MatchString(name) || strings.Contains(name, "..") {
 		http.NotFound(w, r)
 		return
 	}
@@ -41,8 +52,8 @@ func (s *Server) ulImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer resp.Body.Close()
-	ct := resp.Header.Get("Content-Type")
-	if resp.StatusCode != http.StatusOK || !strings.HasPrefix(ct, "image/") {
+	ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+	if resp.StatusCode != http.StatusOK || err != nil || !ulImageTypes[ct] {
 		http.NotFound(w, r)
 		return
 	}

@@ -45,7 +45,10 @@ func (s *Server) withLang(next http.Handler) http.Handler {
 			}
 			r2 := r.Clone(context.WithValue(r.Context(), langCtxKey, lang))
 			r2.URL.Path = strings.TrimPrefix(p, prefix)
-			if raw := r.URL.RawPath; raw != "" {
+			// the raw path loses the same prefix; when it spells it another
+			// way ("/en%2F..."), it is dropped and rebuilt from the path
+			r2.URL.RawPath = ""
+			if raw := r.URL.RawPath; strings.HasPrefix(raw, prefix+"/") {
 				r2.URL.RawPath = strings.TrimPrefix(raw, prefix)
 			}
 			if lang == "ar" { // a POST under /ar/: redirects it issues go to the root pages

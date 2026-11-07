@@ -70,7 +70,7 @@
   {{if or .Preamble .ExplanatoryNote}}
   <div class="longtext" lang="ar" dir="rtl" style="padding-top:0">{{with .Preamble}}{{range paras .}}<p>{{marks .}}</p>{{end}}{{end}}{{with .ExplanatoryNote}}{{range paras .}}<p>{{marks .}}</p>{{end}}{{end}}</div>
   {{else}}
-  <p class="nottext"><b>{{t "law.text_coming"}}</b> {{if .Source}}{{t "law.text_coming_body" (safe (printf "<a class=\"link\" href=\"%s\" rel=\"noopener\">%s</a>" .Source (t "law.text_coming_link")))}}{{else}}{{t "law.text_coming_body" (t "law.text_coming_link")}}{{end}}</p>
+  <p class="nottext"><b>{{t "law.text_coming"}}</b> {{if .Source}}{{t "law.text_coming_body" (extLink .Source (t "law.text_coming_link"))}}{{else}}{{t "law.text_coming_body" (t "law.text_coming_link")}}{{end}}</p>
   {{end}}
 </section>
 {{end}}

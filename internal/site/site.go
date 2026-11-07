@@ -377,6 +377,7 @@ var baseFuncs = template.FuncMap{
 	"heading":  Heading,
 	"deref":    func(n *int) int { return *n },
 	"safe":     func(s string) template.HTML { return template.HTML(s) },
+	"extLink":  extLink,
 	// pathq escapes text for a mailto: subject or body (%20, not +)
 	"pathq": func(s string) string { return strings.ReplaceAll(url.QueryEscape(cut(s, 300)), "+", "%20") },
 	// dict2 hands the shared article block its law, article and whether it
@@ -390,7 +391,7 @@ var baseFuncs = template.FuncMap{
 	// the live site the English set is rebound with englishFuncs to prefix
 	// internal URLs with /en, and the Arabic set with arabicFuncs (root URLs,
 	// strings from ar.json, the direction-dependent details flipped).
-	"t":           func(key string, args ...any) template.HTML { return template.HTML(enBundle.T(key, args...)) },
+	"t":           func(key string, args ...any) template.HTML { return template.HTML(enBundle.T(key, escArgs(args)...)) },
 	"u":           func(p string) string { return p },
 	"uilang":      func() string { return "en" },
 	"dir":         func() string { return "ltr" },
@@ -424,6 +425,15 @@ func paras(s *string) []string {
 		}
 	}
 	return out
+}
+
+// extLink is an outside link around trusted text, for a UI string to hold:
+// the address is escaped, and one that is not http or https is left out.
+func extLink(href string, text template.HTML) template.HTML {
+	if !strings.HasPrefix(href, "https://") && !strings.HasPrefix(href, "http://") {
+		return text
+	}
+	return template.HTML(`<a class="link" href="`+template.HTMLEscapeString(href)+`" rel="noopener">`) + text + "</a>"
 }
 
 func dmy(t *time.Time) string {
