@@ -65,17 +65,9 @@ func (m *meaningSearch) selectEvidence(ctx context.Context, q string, p []nlsear
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	m.mu.Lock()
-	day := beirutDay(time.Now())
-	if m.day != day {
-		m.day, m.used = day, 0
+	if err := m.take(ctx, 1); err != nil {
+		return nil, err
 	}
-	if m.used >= m.limit {
-		m.mu.Unlock()
-		return nil, errors.New("daily API allowance reached")
-	}
-	m.used++
-	m.mu.Unlock()
 	qs, err := selector.Select(ctx, q, p)
 	if err != nil {
 		return nil, err

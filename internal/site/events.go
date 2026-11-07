@@ -12,6 +12,7 @@ package site
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"log"
@@ -26,14 +27,24 @@ import (
 	"time"
 )
 
-const eventsKeep = 90 * 24 * time.Hour
+const (
+	eventsKeep = 90 * 24 * time.Hour
+	// A day's file stops growing at eventsDayBytes: later lines that day are
+	// dropped and counted. A busy day of people and crawlers is well under.
+	eventsDayBytes = 64 << 20
+	// eventsQueryRunes is as much of a search as a line keeps.
+	eventsQueryRunes = 200
+)
 
 // Events appends usage lines to the day's file. A nil *Events records nothing.
 type Events struct {
-	dir string
-	mu  sync.Mutex
-	day string
-	f   *os.File
+	dir      string
+	mu       sync.Mutex
+	day      string
+	f        *os.File
+	maxBytes int64 // per day file; 0 is eventsDayBytes
+	written  int64 // bytes in today's file
+	dropped  int   // lines dropped today for the cap
 }
 
 // OpenEvents records into dir, creating it.
@@ -41,7 +52,14 @@ func OpenEvents(dir string) (*Events, error) {
 	if err := os.MkdirAll(filepath.Join(dir, "events"), 0o750); err != nil {
 		return nil, err
 	}
-	return &Events{dir: dir}, nil
+	return &Events{dir: dir, maxBytes: eventsDayBytes}, nil
+}
+
+// Dropped is how many lines today's cap has dropped so far.
+func (e *Events) Dropped() int {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	return e.dropped
 }
 
 // Log writes one event. ev gets "t" (UTC, seconds) added.
@@ -51,6 +69,9 @@ func (e *Events) Log(ev map[string]any) {
 	}
 	now := time.Now().UTC()
 	ev["t"] = now.Format(time.RFC3339)
+	if q, ok := ev["q"].(string); ok {
+		ev["q"] = cut(q, eventsQueryRunes)
+	}
 	b, err := json.Marshal(ev)
 	if err != nil {
 		return
@@ -62,16 +83,34 @@ func (e *Events) Log(ev map[string]any) {
 		if e.f != nil {
 			e.f.Close()
 		}
+		if e.dropped > 0 {
+			log.Printf("events: %s dropped %d lines over the day's cap", e.day, e.dropped)
+		}
 		e.f, err = os.OpenFile(filepath.Join(e.dir, "events", day+".jsonl"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o640)
 		if err != nil {
 			log.Printf("events: %v", err)
 			e.f = nil
 			return
 		}
-		e.day = day
+		e.day, e.written, e.dropped = day, 0, 0
+		if fi, err := e.f.Stat(); err == nil {
+			e.written = fi.Size() // a restart carries on with the day's file
+		}
 		go e.prune(now)
 	}
-	e.f.Write(append(b, '\n'))
+	limit := e.maxBytes
+	if limit <= 0 {
+		limit = eventsDayBytes
+	}
+	if e.written+int64(len(b))+1 > limit {
+		if e.dropped == 0 {
+			log.Printf("events: %s reached its %d byte cap; dropping lines until tomorrow", day, limit)
+		}
+		e.dropped++
+		return
+	}
+	n, _ := e.f.Write(append(b, '\n'))
+	e.written += int64(n)
 }
 
 func (e *Events) prune(now time.Time) {
@@ -139,29 +178,55 @@ type DayStats struct {
 	AIPageViews    int     `json:"ai_page_views"`
 }
 
+// eachLine calls fn with every line of one day's file (none when there is
+// no file). Read line by line: a day of the record reached 270 MB on 22 Oct
+// 2026 (crawlers), and reading it whole (twice, as bytes and as a string)
+// took the app past its 512 MB and got it killed, on every cold sitemap build.
+func eachLine(dir, day string, fn func([]byte)) error {
+	f, err := os.Open(filepath.Join(dir, "events", day+".jsonl"))
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	lines := bufio.NewScanner(f)
+	lines.Buffer(make([]byte, 64*1024), 4<<20)
+	for lines.Scan() {
+		if line := lines.Bytes(); len(line) > 0 {
+			fn(line)
+		}
+	}
+	return lines.Err()
+}
+
+// lawReads counts one day's reads by people, per law, and nothing else: the
+// sitemap's most read texts need no searches, so it never holds them.
+func lawReads(dir, day string) (map[string]int, error) {
+	laws := map[string]int{}
+	err := eachLine(dir, day, func(line []byte) {
+		if !bytes.Contains(line, []byte(`"k":"read"`)) {
+			return
+		}
+		var ev struct {
+			K   string `json:"k"`
+			Bot bool   `json:"bot"`
+			Law string `json:"law"`
+		}
+		if json.Unmarshal(line, &ev) == nil && ev.K == "read" && !ev.Bot && ev.Law != "" {
+			laws[ev.Law]++
+		}
+	})
+	return laws, err
+}
+
 // UsageStats adds up one day (YYYY-MM-DD, UTC) of the events kept in dir.
 func UsageStats(dir, day string) (*DayStats, error) {
 	st := &DayStats{Day: day}
-	// Read line by line: a day of the record reached 270 MB on 22 Oct 2026
-	// (crawlers), and reading it whole (twice, as bytes and as a string) took
-	// the app past its 512 MB and got it killed, on every cold sitemap build.
-	f, err := os.Open(filepath.Join(dir, "events", day+".jsonl"))
-	if err != nil && !os.IsNotExist(err) {
-		return nil, err
-	}
 	queries, zero, laws, kinds, codes := map[string]int{}, map[string]int{}, map[string]int{}, map[string]int{}, map[string]int{}
 	titles := map[string]string{}
-	var lines *bufio.Scanner
-	if f != nil {
-		defer f.Close()
-		lines = bufio.NewScanner(f)
-		lines.Buffer(make([]byte, 64*1024), 4<<20)
-	}
-	for lines != nil && lines.Scan() {
-		line := lines.Bytes()
-		if len(line) == 0 {
-			continue
-		}
+	err := eachLine(dir, day, func(line []byte) {
 		var ev struct {
 			K       string `json:"k"`
 			Bot     bool   `json:"bot"`
@@ -175,13 +240,13 @@ func UsageStats(dir, day string) (*DayStats, error) {
 			Path    string `json:"path"`
 		}
 		if json.Unmarshal(line, &ev) != nil {
-			continue
+			return
 		}
 		switch ev.K {
 		case "search":
 			if ev.Bot {
 				st.SearchesBots++
-				continue
+				return
 			}
 			st.Searches++
 			queries[ev.Q]++
@@ -192,7 +257,7 @@ func UsageStats(dir, day string) (*DayStats, error) {
 		case "read":
 			if ev.Bot {
 				st.ReadsBots++
-				continue
+				return
 			}
 			st.Reads++
 			if ev.Article != "" {
@@ -211,9 +276,9 @@ func UsageStats(dir, day string) (*DayStats, error) {
 				st.AIPageViews++
 			}
 		}
-	}
-	if lines != nil && lines.Err() != nil {
-		return nil, lines.Err()
+	})
+	if err != nil {
+		return nil, err
 	}
 	st.UniqueQueries = len(queries)
 	if st.Searches > 0 {

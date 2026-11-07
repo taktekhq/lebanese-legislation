@@ -90,3 +90,70 @@ func TestEventsAndStats(t *testing.T) {
 		t.Errorf("reads: %+v", st)
 	}
 }
+
+// A search is kept to eventsQueryRunes, and a day's file stops at its byte
+// cap: later lines are dropped and counted, and a reopen keeps the count.
+func TestEventsAreBounded(t *testing.T) {
+	dir := t.TempDir()
+	ev, err := OpenEvents(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ev.maxBytes = 4096
+	long := strings.Repeat("<", 500)
+	for range 100 {
+		ev.Log(map[string]any{"k": "search", "q": long, "bot": false})
+	}
+	day := time.Now().UTC().Format("2006-01-02")
+	path := filepath.Join(dir, "events", day+".jsonl")
+	fi, err := os.Stat(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fi.Size() > 4096 || fi.Size() == 0 {
+		t.Fatalf("day file is %d bytes, cap 4096", fi.Size())
+	}
+	if ev.Dropped() == 0 {
+		t.Fatal("no drops counted")
+	}
+	st, err := UsageStats(dir, day)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if st.Searches == 0 || st.Searches+ev.Dropped() != 100 {
+		t.Fatalf("searches %d + dropped %d != 100", st.Searches, ev.Dropped())
+	}
+	if q := st.TopQueries[0].Key; len([]rune(q)) > eventsQueryRunes+1 {
+		t.Fatalf("query kept at %d runes", len([]rune(q)))
+	}
+	// After a restart the day's file is not reset to empty room.
+	again, _ := OpenEvents(dir)
+	again.maxBytes = 4096
+	again.Log(map[string]any{"k": "search", "q": long})
+	if again.Dropped() != 1 {
+		t.Fatal("reopen ignored the day's bytes")
+	}
+}
+
+// The sitemap's most read texts come from reads alone, people only.
+func TestLawReadsReadsOnlyReads(t *testing.T) {
+	dir := t.TempDir()
+	ev, err := OpenEvents(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ev.Log(map[string]any{"k": "read", "law": "7", "bot": false})
+	ev.Log(map[string]any{"k": "read", "law": "7", "bot": false})
+	ev.Log(map[string]any{"k": "read", "law": "9", "bot": true})
+	ev.Log(map[string]any{"k": "search", "q": `x","k":"read","law":"8`, "bot": false})
+	got, err := lawReads(dir, time.Now().UTC().Format("2006-01-02"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || got["7"] != 2 {
+		t.Fatalf("got %v", got)
+	}
+	if got, err := lawReads(dir, "1999-01-01"); err != nil || len(got) != 0 {
+		t.Fatalf("missing day: %v %v", got, err)
+	}
+}

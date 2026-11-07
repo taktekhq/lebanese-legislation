@@ -150,6 +150,12 @@ func run(ctx context.Context, cfg config) error {
 		return err
 	}
 	defer closeVectors()
+	// One IP's daily share of the AI allowance, in units, on every path.
+	ipUnits, err := envInt("LEBLEG_SEARCH_IP_DAILY_UNITS", site.DefaultIPDailyUnits, 1, 10000)
+	if err != nil {
+		return err
+	}
+	h.SetMeaningIPDaily(ipUnits)
 	perMinute, err := envInt("RATE_LIMIT_PER_MINUTE", 60, 0, 100000)
 	if err != nil {
 		return err
