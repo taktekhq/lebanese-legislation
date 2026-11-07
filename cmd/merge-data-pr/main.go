@@ -159,11 +159,7 @@ func run(ctx context.Context, gh *github, o options, reviewer func(base, head st
 	if err != nil {
 		return err
 	}
-	for _, f := range files {
-		if !strings.HasPrefix(f, "data/") && !strings.HasPrefix(f, "db/model/") {
-			reasons = append(reasons, "changes "+f+", outside data/ and db/model/")
-		}
-	}
+	reasons = append(reasons, outsideData(files)...)
 	head := pr.Head.SHA
 	if len(reasons) == 0 {
 		var why []string
@@ -188,11 +184,26 @@ func run(ctx context.Context, gh *github, o options, reviewer func(base, head st
 		if err != nil {
 			return err
 		}
-		r, err := reviewer(strings.TrimSpace(base), head)
+		base = strings.TrimSpace(base)
+		// The files list above was for the head at the start. The head merged
+		// is the one waitChecks returned, so check its own paths here, from
+		// git: this also covers lists longer than the files API returns.
+		changed, err := gitOut(o.dir, "diff", "--name-only", "--no-renames", "-z", base, head)
 		if err != nil {
 			return err
 		}
-		reasons, summary = r.reasons, r.summary
+		if why := outsideData(strings.FieldsFunc(changed, func(r rune) bool { return r == 0 })); len(why) > 0 {
+			if head != pr.Head.SHA {
+				why = append(why, fmt.Sprintf("the head moved from %.12s to %.12s while checks ran", pr.Head.SHA, head))
+			}
+			reasons = why
+		} else {
+			r, err := reviewer(base, head)
+			if err != nil {
+				return err
+			}
+			reasons, summary = r.reasons, r.summary
+		}
 	}
 	for _, s := range summary {
 		fmt.Println("  " + s)
@@ -225,6 +236,17 @@ func run(ctx context.Context, gh *github, o options, reviewer func(base, head st
 	}
 	fmt.Printf("merged PR #%d\n", pr.Number)
 	return nil
+}
+
+// outsideData gives a reason for each path outside data/ and db/model/.
+func outsideData(files []string) []string {
+	var why []string
+	for _, f := range files {
+		if !strings.HasPrefix(f, "data/") && !strings.HasPrefix(f, "db/model/") {
+			why = append(why, "changes "+f+", outside data/ and db/model/")
+		}
+	}
+	return why
 }
 
 // waitChecks waits until every check on the pull request's head has finished,
@@ -281,7 +303,14 @@ func judgeChecks(runs []checkRun, require []string) (pending, why []string) {
 		}
 	}
 	for _, name := range require {
-		rs := byName[name]
+		// A required check counts only when GitHub Actions ran it: any app
+		// with checks permission can post a run under the same name.
+		var rs []checkRun
+		for _, r := range byName[name] {
+			if r.App.Slug == actionsApp {
+				rs = append(rs, r)
+			}
+		}
 		if len(rs) == 0 {
 			pending = append(pending, name)
 			continue
@@ -501,7 +530,13 @@ type checkRun struct {
 	Name       string `json:"name"`
 	Status     string `json:"status"`
 	Conclusion string `json:"conclusion"`
+	App        struct {
+		Slug string `json:"slug"`
+	} `json:"app"`
 }
+
+// actionsApp is the slug of the GitHub Actions app on check runs.
+const actionsApp = "github-actions"
 
 func (g *github) do(ctx context.Context, method, path string, in, out any) error {
 	var body io.Reader

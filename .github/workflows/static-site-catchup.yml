@@ -26,6 +26,14 @@ permissions:
 
 jobs:
   check:
+    # Woken only by static-site runs of this repository. static-site has no
+    # pull request trigger, so its runs come from push, workflow_run, schedule
+    # or workflow_dispatch; a pull request run is refused all the same.
+    if: >-
+      github.event_name != 'workflow_run' || (
+        github.event.workflow_run.head_repository.full_name == github.repository &&
+        github.event.workflow_run.event != 'pull_request' &&
+        github.event.workflow_run.event != 'pull_request_target')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

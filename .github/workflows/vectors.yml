@@ -184,6 +184,9 @@ jobs:
       group: vectors-vectorize-${{ github.ref }}
       cancel-in-progress: false
     needs: build
+    # Writes production Vectorize and R2: main only. On another branch it skips
+    # and so does publish, which uploads nothing off main anyway.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 300
     env:
