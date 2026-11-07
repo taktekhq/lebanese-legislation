@@ -57,6 +57,18 @@ func (c *dailyCounter) take(key string, limit int) (int, bool) {
 	return c.n[key], true
 }
 
+// add counts n more for key unless that would pass limit (0: no limit).
+func (c *dailyCounter) add(key string, n, limit int) bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.roll(time.Now())
+	if limit > 0 && c.n[key]+n > limit {
+		return false
+	}
+	c.n[key] += n
+	return true
+}
+
 // count reads key's count for today without adding to it.
 func (c *dailyCounter) count(key string) int {
 	c.mu.Lock()

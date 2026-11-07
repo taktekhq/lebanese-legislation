@@ -197,6 +197,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer release()
+	r = r.WithContext(withSpender(r.Context(), clientIP(r)))
 	s.handler.ServeHTTP(w, r)
 	if d := time.Since(start); d > 800*time.Millisecond {
 		log.Printf("slow %s %s", r.URL.RequestURI(), d.Round(time.Millisecond))

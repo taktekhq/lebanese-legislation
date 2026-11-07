@@ -68,20 +68,6 @@ const (
 	deepWeight  = 12
 )
 
-// spend takes n calls from today's site-wide allowance.
-func (m *meaningSearch) spend(n int) error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if day := beirutDay(time.Now()); m.day != day {
-		m.day, m.used = day, 0
-	}
-	if m.used+n > m.limit {
-		return errors.New("daily API allowance reached")
-	}
-	m.used += n
-	return nil
-}
-
 // composeAnswer is ComposeWith with a content-keyed cache, the shared call
 // budget and the shared concurrency slots.
 func (m *meaningSearch) composeAnswer(ctx context.Context, q string, p []nlsearch.Passage, mode nlsearch.Mode) ([]nlsearch.Para, error) {
@@ -113,7 +99,7 @@ func (m *meaningSearch) composeAnswer(ctx context.Context, q string, p []nlsearc
 	if mode.Name == nlsearch.Deep.Name {
 		weight = deepWeight
 	}
-	if err := m.spend(weight); err != nil {
+	if err := m.take(ctx, weight); err != nil {
 		return nil, err
 	}
 	paras, err := composer.ComposeWith(ctx, q, p, mode)
@@ -137,7 +123,7 @@ func (m *meaningSearch) expand(ctx context.Context, q string, searched, titles [
 	if !ok {
 		return nil, errors.New("deep answers unavailable")
 	}
-	if err := m.spend(1); err != nil {
+	if err := m.take(ctx, 1); err != nil {
 		return nil, err
 	}
 	p, err := composer.Expand(ctx, q, searched, titles)
@@ -224,6 +210,13 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 	}
 	if !s.meaning.budgetFor(need) {
 		view.SiteFull = true
+		render()
+		return
+	}
+	// Every path that spends the allowance counts toward one daily share per
+	// IP, weighted by what it spent; take enforces it, this says so early.
+	if !s.meaning.ipHas(ip, need) {
+		view.Limited = true
 		render()
 		return
 	}
