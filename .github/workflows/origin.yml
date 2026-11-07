@@ -53,6 +53,27 @@ jobs:
             core.setOutput('deploy', 'true');
             return;
           }
+          // A commit that also changes data/ needs the database the data
+          // build makes (new tables, views, columns). When checks finish
+          // first, deploying now stages code against the old database: its
+          // warm-up 500s until the data run's own deploy replaces it (7 Nov,
+          // PR #176: 24 minutes of errors and an alert). Leave the commit to
+          // the deploy that the data run starts when it finishes.
+          const run = context.payload.workflow_run;
+          if (run.name === 'checks') {
+            const { data } = await github.rest.actions.listWorkflowRuns({
+              ...context.repo,
+              workflow_id: 'data.yml',
+              head_sha: run.head_sha,
+              per_page: 20,
+            });
+            const pending = data.workflow_runs.filter(r => r.status !== 'completed');
+            if (pending.length) {
+              core.notice(`data run ${pending[0].id} for ${run.head_sha} is ${pending[0].status}; its completion deploys this commit`);
+              core.setOutput('deploy', 'false');
+              return;
+            }
+          }
           const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
             ...context.repo,
             run_id: context.payload.workflow_run.id,
