@@ -38,6 +38,7 @@ var moveRules = []moveRule{
 // finalPath is where an old escaped path ends up once every move has run:
 // the rules are applied until none changes it.
 func (s *Server) finalPath(ctx context.Context, p string) string {
+	p = oneLeadingSlash(p)
 	for range 2 * len(moveRules) { // each rule moves a path at most once; the bound only guards a bug
 		moved := false
 		for _, r := range moveRules {
@@ -74,8 +75,17 @@ func (s *Server) oneHop(next http.Handler) http.Handler {
 	})
 }
 
-// movedTo sends a 301 to the escaped path to, keeping the query.
+// oneLeadingSlash makes p start with exactly one slash. A path that starts
+// with "//" or "/\\" is read by browsers as another host, so no redirect may
+// answer one: "//host/x" is the path "/host/x" here.
+func oneLeadingSlash(p string) string {
+	return "/" + strings.TrimLeft(p, "/\\")
+}
+
+// movedTo sends a 301 to the escaped path to, keeping the query. The path
+// always stays on this site.
 func movedTo(w http.ResponseWriter, r *http.Request, to string) {
+	to = oneLeadingSlash(to)
 	if r.URL.RawQuery != "" {
 		to += "?" + r.URL.RawQuery
 	}
@@ -96,7 +106,7 @@ func (s *Server) moveArPrefix(_ context.Context, p string) (string, bool) {
 // path: either nothing does (the catch-all) or the mux would only send it
 // on to the slashed route, with a 307 of its own.
 func (s *Server) moveTrailingSlash(_ context.Context, p string) (string, bool) {
-	if strings.HasSuffix(p, "/") || strings.Contains(p[strings.LastIndex(p, "/"):], ".") || s.mux == nil {
+	if !strings.HasPrefix(p, "/") || strings.HasSuffix(p, "/") || strings.Contains(p[strings.LastIndex(p, "/"):], ".") || s.mux == nil {
 		return p, false
 	}
 	pattern := func(p string) string {
