@@ -57,7 +57,13 @@ permissions:
 
 jobs:
   plan:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # A data run deploys only when it was a push (or a manual run) on this repository's main.
+    # Every later job needs the plan's outputs, so they skip with it.
+    if: >-
+      github.event_name != 'workflow_run' || (
+        github.event.workflow_run.conclusion == 'success' &&
+        (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch') &&
+        github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     outputs:
       commit: ${{ steps.commit.outputs.sha }}

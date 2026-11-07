@@ -41,7 +41,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          # The caller's own commit. No caller runs on workflow_run, and a
+          # triggering run's head is never built here.
+          ref: ${{ github.sha }}
       - name: Free runner disk
         if: inputs.free_disk
         run: |

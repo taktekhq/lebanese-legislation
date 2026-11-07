@@ -137,7 +137,11 @@ func TestReviewData(t *testing.T) {
 }
 
 func TestJudgeChecks(t *testing.T) {
-	done := func(name, c string) checkRun { return checkRun{Name: name, Status: "completed", Conclusion: c} }
+	done := func(name, c string) checkRun {
+		r := checkRun{Name: name, Status: "completed", Conclusion: c}
+		r.App.Slug = actionsApp
+		return r
+	}
 	pending, why := judgeChecks([]checkRun{done("unit", "success"), {Name: "build", Status: "in_progress"}}, []string{"build", "ci-ok"})
 	if strings.Join(pending, ",") != "build,ci-ok" || len(why) != 0 {
 		t.Fatalf("pending %v why %v", pending, why)
@@ -149,6 +153,13 @@ func TestJudgeChecks(t *testing.T) {
 	_, why = judgeChecks([]checkRun{done("build", "failure"), done("ci-ok", "success")}, []string{"build", "ci-ok"})
 	if strings.Join(why, "|") != "check build: failure|required check build did not succeed" {
 		t.Fatalf("why %v", why)
+	}
+	// A required name posted by another app does not count.
+	other := checkRun{Name: "build", Status: "completed", Conclusion: "success"}
+	other.App.Slug = "some-app"
+	pending, why = judgeChecks([]checkRun{other, done("ci-ok", "success")}, []string{"build", "ci-ok"})
+	if strings.Join(pending, ",") != "build" || len(why) != 0 {
+		t.Fatalf("pending %v why %v", pending, why)
 	}
 }
 
@@ -186,7 +197,7 @@ func (f *fakeGitHub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if f.looks > 1 {
 			status = "completed"
 		}
-		fmt.Fprintf(w, `{"check_runs":[{"name":"build","status":%q,"conclusion":"success"},{"name":"ci-ok","status":"completed","conclusion":"success"}]}`, status)
+		fmt.Fprintf(w, `{"check_runs":[{"name":"build","status":%q,"conclusion":"success","app":{"slug":"github-actions"}},{"name":"ci-ok","status":"completed","conclusion":"success","app":{"slug":"github-actions"}}]}`, status)
 	case r.Method == "POST" && r.URL.Path == "/repos/o/r/issues/7/comments":
 		var c struct{ Body string }
 		json.NewDecoder(r.Body).Decode(&c)
@@ -286,5 +297,71 @@ func TestRunRefusesCodeAndFailedReviews(t *testing.T) {
 	}
 	if f.merged != "" || len(f.comments) != 1 || !strings.Contains(f.comments[0], "Not merged") {
 		t.Fatalf("merged %q comments %q", f.merged, f.comments)
+	}
+}
+
+// The head moves while checks run, to a commit that also changes a workflow.
+// The files API still lists only the first head's data change. run must check
+// the merged head's own paths and refuse it.
+func TestRunRefusesAHeadThatMovedOutsideData(t *testing.T) {
+	src, _, commit := dataRepo(t)
+	if _, err := gitOut(src, "branch", "-M", "main"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := gitOut(src, "checkout", "-q", "-b", "data/nightly"); err != nil {
+		t.Fatal(err)
+	}
+	head1 := commit(map[string]string{"data/stats.json": `{"legislation": 200, "ruling": 2, "page_state": 200, "noindex_page": 1}`})
+	if err := os.MkdirAll(filepath.Join(src, ".github/workflows"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	head2 := commit(map[string]string{".github/workflows/extra.yml": "name: extra\n"})
+	dir := t.TempDir()
+	if out, err := exec.Command("git", "clone", "-q", src, dir).CombinedOutput(); err != nil {
+		t.Fatalf("%v %s", err, out)
+	}
+	var mu sync.Mutex
+	merged, comments := "", 0
+	pr := func(h string) string {
+		return fmt.Sprintf(`{"number":9,"title":"d","state":"open","head":{"sha":%q}}`, h)
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		defer mu.Unlock()
+		switch {
+		case r.Method == "GET" && r.URL.Path == "/repos/o/r/pulls":
+			fmt.Fprint(w, "["+pr(head1)+"]")
+		case r.Method == "GET" && r.URL.Path == "/repos/o/r/pulls/9/files":
+			fmt.Fprint(w, `[{"filename":"data/stats.json"}]`)
+		case r.Method == "GET" && r.URL.Path == "/repos/o/r/pulls/9":
+			fmt.Fprint(w, pr(head2))
+		case r.Method == "GET" && strings.HasSuffix(r.URL.Path, "/check-runs"):
+			fmt.Fprint(w, `{"check_runs":[{"name":"build","status":"completed","conclusion":"success","app":{"slug":"github-actions"}},{"name":"ci-ok","status":"completed","conclusion":"success","app":{"slug":"github-actions"}}]}`)
+		case r.Method == "POST" && r.URL.Path == "/repos/o/r/issues/9/comments":
+			comments++
+			w.WriteHeader(201)
+			fmt.Fprint(w, "{}")
+		case r.Method == "PUT":
+			var m struct{ SHA string }
+			json.NewDecoder(r.Body).Decode(&m)
+			merged = m.SHA
+			fmt.Fprint(w, `{"merged":true}`)
+		default:
+			http.Error(w, r.URL.String(), 404)
+		}
+	}))
+	defer srv.Close()
+	gh := &github{api: srv.URL, repo: "o/r", token: "t", http: srv.Client()}
+	o := testOptions(dir)
+	o.branch, o.base, o.require, o.wait, o.poll = "data/nightly", "main", []string{"build", "ci-ok"}, time.Minute, time.Millisecond
+	err := run(context.Background(), gh, o, func(string, string) (review, error) {
+		t.Fatal("reviewed data of a head that changes a workflow")
+		return review{}, nil
+	})
+	if err == nil || !strings.Contains(err.Error(), "changes .github/workflows/extra.yml") || !strings.Contains(err.Error(), "head moved") {
+		t.Fatalf("err %v", err)
+	}
+	if merged != "" || comments != 1 {
+		t.Fatalf("merged %q comments %d", merged, comments)
 	}
 }
