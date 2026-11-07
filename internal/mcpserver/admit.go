@@ -12,7 +12,7 @@ import (
 // the whole pool: like the site's own /mcp and /api/v1, a call waits up to
 // callWait for room and is otherwise answered 503.
 const (
-	defaultCallUnits = 4               // in line with the site's 4 DB slots
+	defaultCallUnits = 6               // one search over every kind and two other calls; 2 of the 8 pool connections stay for pages
 	callWait         = 2 * time.Second // how long a call queues for room
 	searchFanOut     = 4               // searchAll's parallel searches, one per kind
 	rpcServerBusy    = -32000          // JSON-RPC server error: overloaded

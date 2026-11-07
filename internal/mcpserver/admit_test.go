@@ -98,6 +98,9 @@ func TestOneKindSearchWeighsOne(t *testing.T) {
 }
 
 func TestCallCapOffWhenNegative(t *testing.T) {
+	if s := newServer(&heldDB{}, Config{}); s.callUnits != 6 {
+		t.Fatalf("default cap %d, want 6", s.callUnits)
+	}
 	if s := newServer(&heldDB{}, Config{CallUnits: -1}); s.calls != nil {
 		t.Fatal("cap on")
 	}

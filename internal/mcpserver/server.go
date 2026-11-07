@@ -64,7 +64,7 @@ type Config struct {
 	RateLimitPerMinute int
 
 	// CallUnits caps the database work of tools/call in flight across all
-	// clients, in queries (4 when 0, off when negative). A search over every
+	// clients, in queries (6 when 0, off when negative). A search over every
 	// kind counts 4. A call that finds no room within 2 s gets a 503.
 	CallUnits int
 
