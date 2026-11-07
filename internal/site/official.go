@@ -258,6 +258,12 @@ func (s *Server) officialFiles(w http.ResponseWriter, r *http.Request) {
 		s.notFound(w, r)
 		return
 	}
+	// only a regular file: never a directory listing or a link out of the folder
+	file := filepath.Join(OfficialDir, strconv.Itoa(id), name)
+	if fi, err := os.Lstat(file); err != nil || !fi.Mode().IsRegular() {
+		s.notFound(w, r)
+		return
+	}
 	w.Header().Set("Cache-Control", "public, max-age=86400")
-	http.ServeFile(w, r, filepath.Join(OfficialDir, strconv.Itoa(id), name))
+	http.ServeFile(w, r, file)
 }

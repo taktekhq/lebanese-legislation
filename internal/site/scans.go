@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -22,11 +23,22 @@ func (s *Server) scanRedirect(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := s.ctx(r)
 	defer cancel()
 	var sourceURL string
-	if err := s.db.QueryRow(ctx, `SELECT source_url FROM legislation_scan WHERE law_id = $1`, id).Scan(&sourceURL); err != nil {
+	if err := s.db.QueryRow(ctx, `SELECT source_url FROM legislation_scan WHERE law_id = $1`, id).Scan(&sourceURL); err != nil || !scanSourceURL(sourceURL) {
 		s.notFound(w, r)
 		return
 	}
 	http.Redirect(w, r, sourceURL, http.StatusMovedPermanently)
+}
+
+// scanSources are the archives scans come from (internal/build/scans.go
+// loads their source_url as the bundle gives it).
+var scanSources = map[string]bool{"saderlex.com": true, "www.saderlex.com": true}
+
+// scanSourceURL says whether u is an HTTPS address at a scan archive, the
+// only place a scan's old file URLs may send a reader.
+func scanSourceURL(u string) bool {
+	p, err := url.Parse(u)
+	return err == nil && p.Scheme == "https" && p.User == nil && p.Port() == "" && scanSources[strings.ToLower(p.Hostname())]
 }
 
 // aliasRedirect sends the old address of a scanned text, which the Centre
