@@ -155,7 +155,7 @@ func (s *Server) addEnglishTitles(ctx context.Context, res *Results) {
 		seen[l.ID] = true
 	}
 	res.LawCount = max(res.LawCount, n, len(res.Laws))
-	if len(englishTitlePats(res.Q)) > 0 {
+	if !hasArabic(res.Q) && len(latinTokens(res.Q)) > 0 {
 		for i := range res.Laws {
 			res.Laws[i].TitleEn = s.titles.get(ctx, s, res.Laws[i].ID)
 		}

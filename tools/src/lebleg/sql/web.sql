@@ -18,6 +18,10 @@ CREATE OR REPLACE FUNCTION ar_digits(t text) RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 RETURN translate(t, '٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹', '01234567890123456789');
 
+CREATE OR REPLACE FUNCTION ar_strip(t text) RETURNS text
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
+RETURN regexp_replace(t, '(^|[^[:alnum:]])(وال|بال|كال|فال|لل|ال)([[:alnum:]]{2})', '\1\3', 'g');
+
 CREATE OR REPLACE FUNCTION fr_fold(t text) RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 RETURN replace(replace(translate(lower(t), 'àâäáãåçéèêëíìîïñóòôöõúùûüýÿ', 'aaaaaaceeeeiiiinooooouuuuyy'), 'œ', 'oe'), 'æ', 'ae');
@@ -28,13 +32,18 @@ ALTER TABLE legislation_article
   ADD COLUMN IF NOT EXISTS search_fr    tsvector GENERATED ALWAYS AS (to_tsvector('french', fr_fold(coalesce(text_fr, '')))) STORED,
   ADD COLUMN IF NOT EXISTS text_len     int GENERATED ALWAYS AS (length(coalesce(text_ar, ''))) STORED;
 
+ALTER TABLE legislation
+  ADD COLUMN IF NOT EXISTS title_exact tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(title))) STORED,
+  ADD COLUMN IF NOT EXISTS title_base  tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_strip(ar_norm(title)))) STORED;
+
 ALTER TABLE ruling
   ADD COLUMN IF NOT EXISTS search_exact tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(title || ' ' || coalesce(text_ar, '')))) STORED,
   ADD COLUMN IF NOT EXISTS search_stem  tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(title || ' ' || coalesce(text_ar, '')))) STORED,
   ADD COLUMN IF NOT EXISTS text_len     int GENERATED ALWAYS AS (length(title || ' ' || coalesce(text_ar, ''))) STORED;
 
 ALTER TABLE ruling_page
-  ADD COLUMN IF NOT EXISTS search_stem tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(ar_digits(text_ar)))) STORED;
+  ADD COLUMN IF NOT EXISTS search_stem tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(ar_digits(text_ar)))) STORED,
+  ADD COLUMN IF NOT EXISTS text_len    int GENERATED ALWAYS AS (length(text_ar)) STORED;
 
 -- Not in the public dump, so these stay empty: no council rulings, every page
 -- indexable, no change dates, no official gazette texts.

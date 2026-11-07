@@ -39,6 +39,13 @@ CREATE FUNCTION ar_digits(t text) RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 RETURN translate(t, '٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹', '01234567890123456789');
 
+-- Title words without a leading article, for search only: «للبيانات»,
+-- «البيانات» and «بالبيانات» are all «بيانات». Endings stay, unlike a stem
+-- («الغابات» and «الغابون», Gabon, stay apart). Applied after ar_norm.
+CREATE FUNCTION ar_strip(t text) RETURNS text
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
+RETURN regexp_replace(t, '(^|[^[:alnum:]])(وال|بال|كال|فال|لل|ال)([[:alnum:]]{2})', '\1\3', 'g');
+
 -- French without accents, for search only: «ecrit» finds «écrit». Applied
 -- inside the French vector and to the query of the French search.
 CREATE FUNCTION fr_fold(t text) RETURNS text
@@ -94,7 +101,10 @@ CREATE TABLE legislation (
   gazette_pages     text,
   preamble          text,                 -- the "based on / whereas" recitals
   explanatory_note  text,                 -- الأسباب الموجبة and similar
-  closing           text                  -- promulgation clause, place, date, signatures
+  closing           text,                 -- promulgation clause, place, date, signatures
+  -- the title's words for search (internal/wordsearch), made with the data
+  title_exact       tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(title))) STORED,
+  title_base        tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_strip(ar_norm(title)))) STORED
 );
 
 -- A gazette issue's table of contents: which texts it published, on which page.
@@ -140,7 +150,8 @@ CREATE TABLE date_correction (
 CREATE TABLE legislation_title_en (
   law_id    integer PRIMARY KEY REFERENCES legislation (id),
   title_en  text NOT NULL,
-  model     text NOT NULL                 -- which model wrote it
+  model     text NOT NULL,                -- which model wrote it
+  search_en tsvector GENERATED ALWAYS AS (to_tsvector('english', title_en)) STORED -- for search (internal/wordsearch)
 );
 
 -- Errors in the Centre's own text of an article (db/centre_errors.tsv),
@@ -212,7 +223,7 @@ CREATE TABLE legislation_article (
   search_stem    tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(text_ar))) STORED,
   search_fr      tsvector GENERATED ALWAYS AS (to_tsvector('french', fr_fold(coalesce(text_fr, '')))) STORED,
   -- the text's length, for ranking search results by it (BM25); a search reads it
-  -- without reading the text (internal/mcpserver/search_pg.go)
+  -- without reading the text (internal/wordsearch)
   text_len       int GENERATED ALWAYS AS (length(coalesce(text_ar, ''))) STORED,
   PRIMARY KEY (law_id, position)
 );
@@ -245,7 +256,7 @@ CREATE TABLE ruling (
   text_ar     text,                       -- NULL when the Centre holds only the judgment's file
   search_exact tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(title || ' ' || coalesce(text_ar, '')))) STORED,
   search_stem  tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(title || ' ' || coalesce(text_ar, '')))) STORED,
-  text_len     int GENERATED ALWAYS AS (length(title || ' ' || coalesce(text_ar, ''))) STORED -- for ranking (search_pg.go)
+  text_len     int GENERATED ALWAYS AS (length(title || ' ' || coalesce(text_ar, ''))) STORED -- for ranking (internal/wordsearch)
 );
 
 -- The full judgment behind a ruling page («نص الحكم كاملا»): a scanned PDF the
@@ -272,6 +283,7 @@ CREATE TABLE ruling_page (
   read_at     timestamptz NOT NULL,
   low_confidence boolean NOT NULL DEFAULT false, -- hard to read (mostly handwriting): expect errors
   search_stem tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(ar_digits(text_ar)))) STORED,
+  text_len    int GENERATED ALWAYS AS (length(text_ar)) STORED, -- for ranking (internal/wordsearch)
   PRIMARY KEY (ruling_id, n)
 );
 

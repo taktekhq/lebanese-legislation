@@ -40,26 +40,30 @@ CREATE INDEX gazette_pub_date  ON gazette_issue (published_on, id);
 CREATE INDEX opinion_list_date   ON opinion ((coalesce(issued_on, date '0001-01-01')), id);
 CREATE INDEX agreement_list_date ON agreement ((coalesce(signed_on, date '0001-01-01')), id);
 CREATE INDEX research_list_date  ON research ((coalesce(published_on, date '0001-01-01')), id);
-CREATE INDEX legislation_title_exact  ON legislation USING gin (to_tsvector('simple', ar_norm(title)));
-CREATE INDEX legislation_title_stem   ON legislation USING gin (to_tsvector('arabic', ar_light(title)));
-CREATE INDEX legislation_title_en_fts ON legislation_title_en USING gin (to_tsvector('english', title_en));
+CREATE INDEX legislation_title_exact  ON legislation USING gin (title_exact);
+CREATE INDEX legislation_title_base   ON legislation USING gin (title_base);
+CREATE INDEX legislation_title_en_fts ON legislation_title_en USING gin (search_en);
 CREATE MATERIALIZED VIEW search_term AS
             SELECT 'article_exact'::text AS corpus, t AS term, count(*)::int AS docs FROM legislation_article, unnest(tsvector_to_array(search_exact)) t GROUP BY t
   UNION ALL SELECT 'article_stem', t, count(*)::int FROM legislation_article, unnest(tsvector_to_array(search_stem)) t GROUP BY t
   UNION ALL SELECT 'article_fr', t, count(*)::int FROM legislation_article, unnest(tsvector_to_array(search_fr)) t GROUP BY t
   UNION ALL SELECT 'ruling_exact', t, count(*)::int FROM ruling, unnest(tsvector_to_array(search_exact)) t GROUP BY t
   UNION ALL SELECT 'ruling_stem', t, count(*)::int FROM ruling, unnest(tsvector_to_array(search_stem)) t GROUP BY t
-  UNION ALL SELECT 'law_title', t, count(*)::int FROM legislation, unnest(tsvector_to_array(to_tsvector('simple', ar_norm(title)))) t GROUP BY t
-  UNION ALL SELECT 'law_title_stem', t, count(*)::int FROM legislation, unnest(tsvector_to_array(to_tsvector('arabic', ar_light(title)))) t GROUP BY t
-  UNION ALL SELECT 'law_title_en', t, count(*)::int FROM legislation_title_en, unnest(tsvector_to_array(to_tsvector('english', title_en))) t GROUP BY t
+  UNION ALL SELECT 'law_title', t, count(*)::int FROM legislation, unnest(tsvector_to_array(title_exact)) t GROUP BY t
+  UNION ALL SELECT 'law_title_base', t, count(*)::int FROM legislation, unnest(tsvector_to_array(title_base)) t GROUP BY t
+  UNION ALL SELECT 'law_title_en', t, count(*)::int FROM legislation_title_en, unnest(tsvector_to_array(search_en)) t GROUP BY t
+  UNION ALL SELECT 'judgment_stem', t, count(*)::int FROM ruling_page, unnest(tsvector_to_array(search_stem)) t GROUP BY t
   UNION ALL SELECT c, '', n FROM (SELECT count(*)::int AS n FROM legislation_article) a, unnest(ARRAY['article_exact', 'article_stem']) c
   UNION ALL SELECT 'article_fr', '', count(*)::int FROM legislation_article WHERE text_fr ~ '\S'
   UNION ALL SELECT c, '', n FROM (SELECT count(*)::int AS n FROM ruling) r, unnest(ARRAY['ruling_exact', 'ruling_stem']) c
-  UNION ALL SELECT c, '', n FROM (SELECT count(*)::int AS n FROM legislation) l, unnest(ARRAY['law_title', 'law_title_stem']) c
+  UNION ALL SELECT c, '', n FROM (SELECT count(*)::int AS n FROM legislation) l, unnest(ARRAY['law_title', 'law_title_base']) c
   UNION ALL SELECT 'law_title_en', '', count(*)::int FROM legislation_title_en
+  UNION ALL SELECT 'judgment_stem', '', count(*)::int FROM ruling_page
   UNION ALL SELECT c, '#len', n FROM (SELECT avg(text_len)::int AS n FROM legislation_article) a, unnest(ARRAY['article_exact', 'article_stem']) c
   UNION ALL SELECT 'article_fr', '#len', avg(length(text_fr))::int FROM legislation_article WHERE text_fr ~ '\S'
   UNION ALL SELECT c, '#len', n FROM (SELECT avg(text_len)::int AS n FROM ruling) r, unnest(ARRAY['ruling_exact', 'ruling_stem']) c
-  UNION ALL SELECT c, '#len', n FROM (SELECT avg(length(title))::int AS n FROM legislation) l, unnest(ARRAY['law_title', 'law_title_stem']) c
-  UNION ALL SELECT 'law_title_en', '#len', avg(length(title_en))::int FROM legislation_title_en;
+  UNION ALL SELECT c, '#len', n FROM (SELECT avg(length(title))::int AS n FROM legislation) l, unnest(ARRAY['law_title', 'law_title_base']) c
+  UNION ALL SELECT 'law_title_en', '#len', avg(length(title_en))::int FROM legislation_title_en
+  UNION ALL SELECT 'judgment_stem', '#len', avg(text_len)::int FROM ruling_page;
 CREATE UNIQUE INDEX search_term_key ON search_term (corpus, term);
+CREATE INDEX search_term_prefix ON search_term (corpus, term text_pattern_ops);

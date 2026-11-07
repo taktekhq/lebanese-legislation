@@ -13,6 +13,10 @@ CREATE FUNCTION ar_digits(t text) RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 RETURN translate(t, '٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹', '01234567890123456789');
 
+CREATE FUNCTION ar_strip(t text) RETURNS text
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
+RETURN regexp_replace(t, '(^|[^[:alnum:]])(وال|بال|كال|فال|لل|ال)([[:alnum:]]{2})', '\1\3', 'g');
+
 CREATE FUNCTION fr_fold(t text) RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 RETURN replace(replace(translate(lower(t), 'àâäáãåçéèêëíìîïñóòôöõúùûüýÿ', 'aaaaaaceeeeiiiinooooouuuuyy'), 'œ', 'oe'), 'æ', 'ae');
@@ -55,7 +59,9 @@ CREATE TABLE legislation (
   gazette_pages     text,
   preamble          text,                 
   explanatory_note  text,                 
-  closing           text                  
+  closing           text,
+  title_exact       tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(title))) STORED,
+  title_base        tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_strip(ar_norm(title)))) STORED
 );
 
 CREATE TABLE gazette_entry (
@@ -88,7 +94,8 @@ CREATE TABLE date_correction (
 CREATE TABLE legislation_title_en (
   law_id    integer PRIMARY KEY REFERENCES legislation (id),
   title_en  text NOT NULL,
-  model     text NOT NULL                 
+  model     text NOT NULL,
+  search_en tsvector GENERATED ALWAYS AS (to_tsvector('english', title_en)) STORED
 );
 
 CREATE TABLE centre_error (
@@ -145,7 +152,7 @@ CREATE TABLE legislation_article (
   search_stem    tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(text_ar))) STORED,
   search_fr      tsvector GENERATED ALWAYS AS (to_tsvector('french', fr_fold(coalesce(text_fr, '')))) STORED,
   -- the text's length, for ranking search results by it (BM25); a search reads it
-  -- without reading the text (internal/mcpserver/search_pg.go)
+  -- without reading the text (internal/wordsearch)
   text_len       int GENERATED ALWAYS AS (length(coalesce(text_ar, ''))) STORED,
   PRIMARY KEY (law_id, position)
 );
@@ -173,7 +180,7 @@ CREATE TABLE ruling (
   text_ar     text,                       
   search_exact tsvector GENERATED ALWAYS AS (to_tsvector('simple', ar_norm(title || ' ' || coalesce(text_ar, '')))) STORED,
   search_stem  tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(title || ' ' || coalesce(text_ar, '')))) STORED,
-  text_len     int GENERATED ALWAYS AS (length(title || ' ' || coalesce(text_ar, ''))) STORED -- for ranking (search_pg.go)
+  text_len     int GENERATED ALWAYS AS (length(title || ' ' || coalesce(text_ar, ''))) STORED -- for ranking (internal/wordsearch)
 );
 
 CREATE TABLE ruling_file (
@@ -192,6 +199,7 @@ CREATE TABLE ruling_page (
   read_at     timestamptz NOT NULL,
   low_confidence boolean NOT NULL DEFAULT false, 
   search_stem tsvector GENERATED ALWAYS AS (to_tsvector('arabic', ar_light(ar_digits(text_ar)))) STORED,
+  text_len    int GENERATED ALWAYS AS (length(text_ar)) STORED, -- for ranking (internal/wordsearch)
   PRIMARY KEY (ruling_id, n)
 );
 

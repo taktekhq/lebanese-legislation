@@ -1,6 +1,7 @@
 package site
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -629,7 +630,6 @@ type Results struct {
 	MissingRuling      bool     // ... and it named a ruling
 	AskAI              bool     // the search reads as a question: the page asks for an AI answer (IsQuestion)
 
-	rank string // the words titles are ranked against, when not Q (closeTitles)
 }
 
 func (s *Server) search(w http.ResponseWriter, r *http.Request) {
@@ -839,56 +839,48 @@ func (s *Server) findLawsBase(ctx context.Context, res *Results) error {
 			return err
 		}
 	}
-	// Titles: every word of the query, spelling folded, anywhere in the title.
-	conds, args := titleConds(strings.Fields(q), 1)
-	if n, err := strconv.Atoi(res.Num); err == nil {
-		args = append(args, n)
-		conds = append(conds, fmt.Sprintf("l.number_int = $%d", len(args)))
+	// Titles holding every term of the query (titleTerms: spelling folded,
+	// numbers, years, kind words, synonyms), ranked by internal/wordsearch.
+	pg, hits, err := s.rankedLaws(ctx, q, res.Year, res.Num, 0, 30, nil)
+	if err != nil {
+		return err
 	}
-	if res.Year != 0 {
-		args = append(args, res.Year)
-		conds = append(conds, fmt.Sprintf("l.issued_on >= make_date($%[1]d, 1, 1) AND l.issued_on < make_date($%[1]d + 1, 1, 1)", len(args)))
-	}
-	if len(conds) > 0 {
-		cond := strings.Join(conds, " AND ")
-		if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l WHERE "+cond, args...).Scan(&res.LawCount); err != nil {
-			return err
-		}
-		// A number in the query is first the text's own number: "337" is the
-		// notaries' law 337/1994, not customs tariff amendment no. 337. A bare
-		// number ranks laws before decrees and decisions, and a text of some
-		// length before a one-article ratification. Then codes, then the
-		// closest title, and the closest text in force is lifted to the top
-		// (inForceFirst).
-		// IS TRUE: a text with no number has a NULL number_int, which DESC
-		// would put first.
-		order := ""
-		nums := queryNumbers(q)
-		if len(nums) > 0 {
-			args = append(args, nums)
-			order = fmt.Sprintf("(l.number_int = ANY($%d)) IS TRUE DESC, ", len(args))
-			if onlyDigits(q) {
-				args = append(args, kindGroups["law"])
-				order += fmt.Sprintf("(l.kind = ANY($%d)) DESC, (SELECT count(*) FROM (SELECT 1 FROM legislation_article a WHERE a.law_id = l.id LIMIT 10) a) DESC, ", len(args))
+	res.LawCount = pg.Full
+	laws := lawRowsOf(hits)
+	// A number in the query is first the text's own number: "337" is the
+	// notaries' law 337/1994, not customs tariff amendment no. 337. A bare
+	// number ranks laws before decrees and decisions, and a text of some
+	// length before a one-article ratification. Then the ranking, and the
+	// closest text in force is lifted to the top (inForceFirst).
+	nums := queryNumbers(q)
+	if len(nums) > 0 {
+		digits := onlyDigits(q)
+		rank := func(l LawRow) (int, int, int) {
+			n := 0
+			if l.Number != nil {
+				n, _ = strconv.Atoi(strings.TrimLeft(*l.Number, " "))
 			}
+			own, law := 0, 0
+			if slices.Contains(nums, n) {
+				own = 1
+			}
+			if digits && slices.Contains(kindGroups["law"], l.Kind) {
+				law = 1
+			}
+			arts := 0
+			if digits {
+				arts = min(l.Articles, 10)
+			}
+			return own, law, arts
 		}
-		rank := q
-		if res.rank != "" {
-			rank = res.rank
-		}
-		args = append(args, rank)
-		rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind
-			WHERE `+cond+fmt.Sprintf(` ORDER BY %s(EXISTS (SELECT 1 FROM code c WHERE c.law_id = l.id)) DESC,
-			similarity(ar_norm(l.title), ar_norm($%d)) DESC, l.issued_on DESC NULLS LAST LIMIT 30`, order, len(args)), args...)
-		if err != nil {
-			return err
-		}
-		if res.Laws, err = scanLawRows(rows); err != nil {
-			return err
-		}
-		res.Laws = inForceFirst(res.Laws, nums, onlyDigits(q))
-		res.Laws = res.Laws[:min(10, len(res.Laws))]
+		slices.SortStableFunc(laws, func(a, b LawRow) int {
+			a1, a2, a3 := rank(a)
+			b1, b2, b3 := rank(b)
+			return cmp.Or(b1-a1, b2-a2, b3-a3)
+		})
 	}
+	laws = inForceFirst(laws, nums, onlyDigits(q))
+	res.Laws = laws[:min(10, len(laws))]
 	return nil
 }
 
@@ -941,45 +933,21 @@ func (s *Server) exactTitle(ctx context.Context, q string) *LawRow {
 	return &laws[0]
 }
 
-// findArticles ranks exact phrase, then exact words, then stems; codes first on ties.
+// findArticles lists the articles holding the query's words (rankedArticles).
 func (s *Server) findArticles(ctx context.Context, res *Results) error {
-	q := articleQuery(res.Q)
-	const artWhere = `(a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1))
-		OR a.search_stem @@ websearch_to_tsquery('arabic', ar_light($1))
-		OR a.search_fr @@ websearch_to_tsquery('french', fr_fold($1)))`
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM (SELECT 1 FROM legislation_article a WHERE `+artWhere+` LIMIT 1000) t`, q).
-		Scan(&res.ArtCount); err != nil {
-		return err
-	}
-	rows, err := s.db.Query(ctx, `WITH hits AS (
-		SELECT a.law_id, a.number, a.text_ar,
-		       (a.search_exact @@ phraseto_tsquery('simple', ar_norm($1)))::int * 4
-		     + (a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1)))::int * 2
-		     + ts_rank(a.search_stem, websearch_to_tsquery('arabic', ar_light($1)))
-		     + (EXISTS (SELECT 1 FROM code c WHERE c.law_id = a.law_id))::int AS score,
-		       (EXISTS (SELECT 1 FROM code c WHERE c.law_id = a.law_id))::int AS is_code
-		FROM `+articleSource(q, artWhere)+` WHERE `+artWhere+`
-		ORDER BY score DESC, is_code DESC LIMIT 15)
-		SELECT `+lawRowCols+`, h.number, ts_headline('arabic', h.text_ar, websearch_to_tsquery('arabic', ar_light($1)),
-		       '`+headlineMarks+`, MaxWords=40, MinWords=18, ShortWord=2')
-		FROM hits h JOIN legislation l ON l.id = h.law_id JOIN legislation_kind k ON k.name_ar = l.kind
-		ORDER BY h.score DESC, h.is_code DESC`, q)
+	pg, hits, err := s.rankedArticles(ctx, articleQuery(res.Q), 15, nil, true)
 	if err != nil {
 		return err
 	}
-	res.Articles, err = pgx.CollectRows(rows, func(row pgx.CollectableRow) (LawRow, error) {
-		var x LawRow
-		err := row.Scan(&x.ID, &x.Kind, &x.KindEn, &x.Number, &x.IssuedOn, &x.Title, &x.Status, &x.Articles, &x.Code, &x.Article, &x.Snippet)
-		return x, err
-	})
-	if err != nil {
-		return err
+	res.ArtCount = pg.Total
+	for _, h := range hits {
+		res.Articles = append(res.Articles, h.LawRow)
 	}
 	return nil
 }
 
 func (s *Server) findRulings(ctx context.Context, res *Results) error {
-	n, hits, _, err := s.searchRulings(ctx, res.Q, 10, nil)
+	hits, n, _, err := s.rulingsPage(ctx, res.Q, 10, nil)
 	if err != nil {
 		return err
 	}

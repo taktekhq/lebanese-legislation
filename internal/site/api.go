@@ -17,7 +17,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"slices"
@@ -30,6 +29,7 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/calculatedcurrent"
 	"github.com/taktekhq/lebanese-legislation/internal/cursor"
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
+	"github.com/taktekhq/lebanese-legislation/internal/wordsearch"
 )
 
 const apiCacheControl = "public, max-age=60, stale-while-revalidate=300"
@@ -426,34 +426,6 @@ func (s *Server) apiFindAll(ctx context.Context, q string, year, limit int, cur 
 	return err
 }
 
-// rankedLaw is a law found by the words of its title, with its rank: a
-// code first, then the closest title, the newest, the highest id.
-type rankedLaw struct {
-	LawRow
-	code int
-	sim  float32
-	on   time.Time
-}
-
-func (l rankedLaw) key() []string {
-	return []string{keyInt(l.code), keyReal(l.sim), keyDate(&l.on), keyInt(l.ID)}
-}
-
-// lawTitleWhere is the condition the Arabic title search ranks: every word of
-// q in the title (titleConds), and the year; empty when no word is left to
-// search. Its arguments are numbered from start.
-func lawTitleWhere(q string, year, start int) (string, []any) {
-	conds, args := titleConds(strings.Fields(q), start)
-	if len(conds) == 0 {
-		return "", nil
-	}
-	if year > 0 {
-		args = append(args, year)
-		conds = append(conds, "extract(year from l.issued_on)::int = $"+strconv.Itoa(start+len(args)-1))
-	}
-	return strings.Join(conds, " AND "), args
-}
-
 // apiFindLaws mirrors findLaws in docs.go: every word of q, spelling folded,
 // anywhere in the title. year, when > 0, narrows to laws issued that year
 // (the MCP search_legislation tool's year filter; the HTTP API takes it as
@@ -469,18 +441,22 @@ func (s *Server) apiFindLaws(ctx context.Context, q string, year, limit int, pos
 		return err
 	}
 	next := searchPos{phase: lawsEnglishOnly}
-	var ranked []rankedLaw
-	fetched := limit + 1
-	cond, args := lawTitleWhere(q, year, 1)
-	if titles && cond != "" {
+	var ranked []lawHit
+	var pg wordsearch.Page
+	titled := titles && len(titleTerms(strings.Fields(q))) > 0
+	if titled {
 		next.phase = lawsEnglish
-		if err := s.db.QueryRow(ctx, "SELECT count(*) FROM legislation l WHERE "+cond, args...).Scan(&out.LawCount); err != nil {
+		n := 1 // to count
+		if first || pos.phase == phaseRanked {
+			n = limit + len(looked) + 1 // the looked-up texts may be among them
+		}
+		var err error
+		if pg, ranked, err = s.rankedLaws(ctx, q, year, "", 0, n, keyOf(pos)); err != nil {
 			return err
 		}
-		if first || pos.phase == phaseRanked {
-			if ranked, err = s.rankLawTitles(ctx, q, cond, args, fetched, pos); err != nil {
-				return err
-			}
+		out.LawCount = pg.Full
+		if !(first || pos.phase == phaseRanked) {
+			ranked = nil
 		}
 	}
 	// A question that names one text ("cybercrime") has it first.
@@ -488,11 +464,8 @@ func (s *Server) apiFindLaws(ctx context.Context, q string, year, limit int, pos
 		var found bool // already counted: looked up, or among the titles
 		if slices.ContainsFunc(looked, func(l LawRow) bool { return l.ID == pin.ID }) {
 			found = true
-		} else if titles && cond != "" {
-			if err := s.db.QueryRow(ctx, "SELECT EXISTS (SELECT 1 FROM legislation l WHERE l.id = $"+strconv.Itoa(len(args)+1)+" AND "+cond+")",
-				append(args, pin.ID)...).Scan(&found); err != nil {
-				return err
-			}
+		} else if titled {
+			found = slices.ContainsFunc(ranked, func(l lawHit) bool { return l.ID == pin.ID })
 		}
 		looked, _ = withPin(looked, pin, 0)
 		if !found {
@@ -513,12 +486,12 @@ func (s *Server) apiFindLaws(ctx context.Context, q string, year, limit int, pos
 		return nil
 	}
 	if next.phase == lawsEnglish {
-		last, more := fill(len(out.Laws), limit, ranked, fetched, func(l rankedLaw) bool { return seen[l.ID] }, func(l rankedLaw) {
+		last, more := fill(len(out.Laws), limit, ranked, len(ranked)+1, func(l lawHit) bool { return seen[l.ID] }, func(l lawHit) {
 			out.Laws = append(out.Laws, s.lawSum(ctx, l.LawRow, s.source(ctx, "law", l.ID)))
 			seen[l.ID] = true
 		})
-		if more {
-			next = after(pos, phaseRanked, last, func(i int) []string { return ranked[i].key() })
+		if more || (last >= 0 && last == len(ranked)-1 && pg.More) {
+			next = after(pos, phaseRanked, last, func(i int) []string { return keyField(ranked[i].key) })
 		}
 	}
 	out.next[partLaws] = next
@@ -554,36 +527,6 @@ func (s *Server) apiLookUpLaws(ctx context.Context, q string, year, limit int, o
 	}
 	out.LawCount = len(found)
 	return found[:min(limit, len(found))], len(found) == 0 || (!isDigits(q) && hasArabic(q)), nil
-}
-
-// rankLawTitles ranks the laws matching cond (lawTitleWhere, its arguments
-// args): codes first, then the title closest to q, the newest, the highest
-// id; the first n after pos's key.
-func (s *Server) rankLawTitles(ctx context.Context, q, cond string, args []any, n int, pos *searchPos) ([]rankedLaw, error) {
-	args = append(args, q)
-	sim := "$" + strconv.Itoa(len(args))
-	keyset := ""
-	if pos != nil && pos.key != nil {
-		k := pos.key
-		args = append(args, argInt(k[0]), argReal(k[1]), argDate(k[2]), argInt(k[3]))
-		keyset = fmt.Sprintf(" WHERE (t.is_code, t.sim, t.d, t.id) < ($%d::int, $%d::real, $%d::date, $%d::int)",
-			len(args)-3, len(args)-2, len(args)-1, len(args))
-	}
-	rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+`, p.is_code, p.sim, p.d FROM (
-		SELECT t.* FROM (SELECT l.id, (EXISTS (SELECT 1 FROM code c WHERE c.law_id = l.id))::int AS is_code,
-			similarity(ar_norm(l.title), ar_norm(`+sim+`)) AS sim, coalesce(l.issued_on, date '0001-01-01') AS d
-			FROM legislation l WHERE `+cond+`) t`+keyset+`
-		ORDER BY t.is_code DESC, t.sim DESC, t.d DESC, t.id DESC LIMIT `+strconv.Itoa(n)+`) p
-		JOIN legislation l ON l.id = p.id JOIN legislation_kind k ON k.name_ar = l.kind
-		ORDER BY p.is_code DESC, p.sim DESC, p.d DESC, p.id DESC`, args...)
-	if err != nil {
-		return nil, err
-	}
-	return pgx.CollectRows(rows, func(row pgx.CollectableRow) (rankedLaw, error) {
-		var l rankedLaw
-		err := row.Scan(append(lawRowDest(&l.LawRow), &l.code, &l.sim, &l.on)...)
-		return l, err
-	})
 }
 
 func isDigits(s string) bool {
@@ -655,13 +598,6 @@ func (s *Server) apiFindLawByIDOrCode(ctx context.Context, q string) ([]LawRow, 
 // code's article first on a tie, then law id and position, all highest
 // first.
 func (s *Server) apiFindArticles(ctx context.Context, q string, limit int, pos *searchPos, out *apiSearchResult) error {
-	const artWhere = `(a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1))
-		OR a.search_stem @@ websearch_to_tsquery('arabic', ar_light($1))
-		OR a.search_fr @@ websearch_to_tsquery('french', fr_fold($1)))`
-	if err := s.db.QueryRow(ctx, `SELECT count(*) FROM (SELECT 1 FROM legislation_article a WHERE `+artWhere+` LIMIT 1000) t`, q).
-		Scan(&out.ArtCount); err != nil {
-		return err
-	}
 	// An article the query cites, and articles whose calculated amount
 	// matches it, come first on the first page, once each; every page leaves
 	// them out of its ranked articles.
@@ -685,99 +621,44 @@ func (s *Server) apiFindArticles(ctx context.Context, q string, limit int, pos *
 	if pos != nil && pos.phase == phaseDone {
 		return nil
 	}
-	fetched := limit + 1
-	args := []any{q, fetched}
-	keyset := ""
-	if pos != nil && pos.key != nil {
-		k := pos.key
-		args = append(args, argDouble(k[0]), argInt(k[1]), argInt(k[2]), argInt(k[3]))
-		keyset = ` WHERE (h.score, h.is_code, h.law_id, h.position) < ($3::float8, $4::int, $5::int, $6::int)`
-	}
-	rows, err := s.db.Query(ctx, `WITH hits AS (
-		SELECT * FROM (SELECT a.law_id, a.position, a.number, a.text_ar,
-		       (a.search_exact @@ phraseto_tsquery('simple', ar_norm($1)))::int * 4
-		     + (a.search_exact @@ websearch_to_tsquery('simple', ar_norm($1)))::int * 2
-		     + ts_rank(a.search_stem, websearch_to_tsquery('arabic', ar_light($1)))
-		     + (EXISTS (SELECT 1 FROM code c WHERE c.law_id = a.law_id))::int AS score,
-		       (EXISTS (SELECT 1 FROM code c WHERE c.law_id = a.law_id))::int AS is_code
-		FROM `+articleSource(q, artWhere)+` WHERE `+artWhere+`) h`+keyset+`
-		ORDER BY h.score DESC, h.is_code DESC, h.law_id DESC, h.position DESC LIMIT $2)
-		SELECT `+lawRowCols+`, h.number, ts_headline('arabic', h.text_ar, websearch_to_tsquery('arabic', ar_light($1)),
-		       '`+headlineMarks+`, MaxWords=40, MinWords=18, ShortWord=2'), h.score, h.is_code, h.position
-		FROM hits h JOIN legislation l ON l.id = h.law_id JOIN legislation_kind k ON k.name_ar = l.kind
-		ORDER BY h.score DESC, h.is_code DESC, h.law_id DESC, h.position DESC`, args...)
+	pg, hits, err := s.rankedArticles(ctx, q, limit+len(seen), keyOf(pos), false)
 	if err != nil {
 		return err
 	}
-	type hitRow struct {
-		x     LawRow
-		art   string
-		hl    string
-		score float64
-		code  int
-		pos   int
-	}
-	rs, err := pgx.CollectRows(rows, func(r pgx.CollectableRow) (hitRow, error) {
-		var out hitRow
-		err := r.Scan(&out.x.ID, &out.x.Kind, &out.x.KindEn, &out.x.Number, &out.x.IssuedOn, &out.x.Title, &out.x.Status,
-			&out.x.Articles, &out.x.Code, &out.art, &out.hl, &out.score, &out.code, &out.pos)
-		return out, err
-	})
-	if err != nil {
-		return err
-	}
+	out.ArtCount += pg.Total
 	calculated := s.apiHitCalculator(ctx)
-	last, more := fill(len(out.Articles), limit, rs, fetched, func(r hitRow) bool { return seen[strconv.Itoa(r.x.ID)+"/"+r.art] }, func(r hitRow) {
+	last, more := fill(len(out.Articles), limit, hits, len(hits)+1, func(h articleHit) bool { return seen[strconv.Itoa(h.ID)+"/"+h.Article] }, func(h articleHit) {
 		out.Articles = append(out.Articles, apiArticleHit{
-			Law:               s.lawSum(ctx, r.x, s.source(ctx, "law", r.x.ID)),
-			Number:            r.art,
-			CalculatedCurrent: calculated(r.x.ID, r.art),
-			Snippet:           stripMarks(r.hl),
-			URL:               Base + artPath(r.x.ID, r.art),
+			Law:               s.lawSum(ctx, h.LawRow, s.source(ctx, "law", h.ID)),
+			Number:            h.Article,
+			CalculatedCurrent: calculated(h.ID, h.Article),
+			Snippet:           stripMarks(h.Snippet),
+			URL:               Base + artPath(h.ID, h.Article),
 		})
 	})
-	if more {
-		out.next[partArticles] = after(pos, phaseRanked, last, func(i int) []string {
-			return []string{keyDouble(rs[i].score), keyInt(rs[i].code), keyInt(rs[i].x.ID), keyInt(rs[i].pos)}
-		})
+	if more || (last >= 0 && last == len(hits)-1 && pg.More) {
+		out.next[partArticles] = after(pos, phaseRanked, last, func(i int) []string { return keyField(hits[i].key) })
 	}
 	return nil
 }
 
 func (s *Server) apiFindRulings(ctx context.Context, q string, limit int, pos *searchPos, out *apiSearchResult) error {
-	var from *rulingKey
 	if pos != nil && pos.phase == phaseDone {
 		limit = 0 // count only
-	} else if pos != nil && pos.key != nil {
-		k := pos.key
-		from = &rulingKey{tier: argInt(k[0]), ph: argInt(k[1]), rk: argReal(k[2]), on: argDate(k[3]), id: argInt(k[4])}
 	}
-	n, hits, more, err := s.searchRulings(ctx, q, limit, from)
+	hits, n, next, err := s.rulingsPage(ctx, q, max(limit, 1), pos)
 	if err != nil {
 		return err
 	}
 	out.RulCount = n
-	if more {
-		out.next[partRulings] = searchPos{phase: phaseRanked, key: hits[len(hits)-1].key.fields()}
+	if limit == 0 {
+		return nil
 	}
-	ids := make([]int, len(hits))
-	for i, r := range hits {
-		ids[i] = r.ID
-	}
-	withFile := map[int]bool{}
-	if rows, err := s.db.Query(ctx, `SELECT ruling_id FROM ruling_file WHERE ruling_id = ANY($1)`, ids); err == nil {
-		for rows.Next() {
-			var id int
-			if rows.Scan(&id) == nil {
-				withFile[id] = true
-			}
-		}
-		rows.Close()
-	}
+	out.next[partRulings] = next
 	for _, r := range hits {
 		h := apiRulingHit{ID: r.ID, Title: r.Title, Court: r.Court, Snippet: stripMarks(r.Snippet),
 			URL: Base + "/ruling/" + strconv.Itoa(r.ID) + "/", JudgmentPage: r.Page, UpdatedAt: s.listedChange(ctx, "ruling", r.ID)}
-		if withFile[r.ID] {
+		if r.HasFile {
 			h.PDFURL = ULRulingPDF(r.ID)
 		}
 		if r.On != nil {

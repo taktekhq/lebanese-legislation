@@ -24,15 +24,19 @@ import (
 
 	"github.com/taktekhq/lebanese-legislation/db"
 	"github.com/taktekhq/lebanese-legislation/internal/cursor"
+	"github.com/taktekhq/lebanese-legislation/internal/wordsearch"
 )
 
 // ---------------------------------------------------------------- the contract, no database
 
 func TestSearchCursorRoundTrip(t *testing.T) {
 	var next [4]searchPos
-	next[partLaws] = searchPos{phase: lawsEnglish, key: []string{"1", "0", "2017-02-10", "2000200594"}}
-	next[partArticles] = searchPos{phase: phaseRanked, key: []string{keyDouble(6.060792922973633e-05), "1", "2000200594", "1107"}}
-	next[partRulings] = searchPos{phase: phaseRanked, key: []string{"0", "1", keyReal(6.0759614e-05), cursor.NoDate, "2000157573"}}
+	lawKey := wordsearch.Key{Units: 2, Code: true, Score: 6.06e-05, ID: 2000200594}
+	artKey := wordsearch.Key{Units: 1, Titled: true, Score: 6.060792922973633e-05, ID: 2000200594, Position: 1107}
+	rulKey := wordsearch.Key{Units: 1, Score: 6.0759614e-05, ID: 2000157573, Position: 3}
+	next[partLaws] = searchPos{phase: lawsEnglish, key: keyField(lawKey)}
+	next[partArticles] = searchPos{phase: phaseRanked, key: keyField(artKey)}
+	next[partRulings] = searchPos{phase: rulingsJudgments, key: keyField(rulKey)}
 	next[partGazette] = searchPos{phase: phaseDone}
 	tok := encodeSearchCursor("", next)
 	if len(tok) > 300 {
@@ -48,8 +52,8 @@ func TestSearchCursorRoundTrip(t *testing.T) {
 			t.Errorf("part %d: %+v, want %+v", p, *got, next[p])
 		}
 	}
-	if argReal(c.pos(partRulings).key[2]) != float32(6.0759614e-05) || argDouble(c.pos(partArticles).key[0]) != 6.060792922973633e-05 {
-		t.Error("a rank does not read back to the same float")
+	if k := keyOf(c.pos(partArticles)); k == nil || *k != artKey {
+		t.Errorf("a rank does not read back to the same key: %+v", k)
 	}
 	// one part: its own fields only; a part from its phase's start has no key
 	one := encodeSearchCursor("rulings", [4]searchPos{partRulings: {phase: phaseRanked}})
@@ -60,15 +64,16 @@ func TestSearchCursorRoundTrip(t *testing.T) {
 		t.Error("a search with every part done has a next_cursor")
 	}
 	for _, bad := range []struct{ tok, typ string }{
-		{one, ""},     // made for one part, read for four
-		{one, "laws"}, // another part's fields
-		{"x", "laws"}, // not a token
-		{cursor.Encode("4", "0", "0", cursor.NoDate, "0"), "laws"},             // no phase 4
-		{cursor.Encode("2", "0", "0", cursor.NoDate, "0"), "gazette"},          // gazette has 3 fields
-		{cursor.Encode("1", "x", cursor.NoDate), "gazette"},                    // a date that is not one
-		{cursor.Encode("1", "2020-01-01", "1.5"), "gazette"},                   // an id that is not an integer
-		{cursor.Encode("1", "1", "nan?", cursor.NoDate, "3"), "laws"},          // a rank that is not a number
-		{cursor.Encode("1", "1", "0.5", cursor.NoDate, "99999999999"), "laws"}, // past int32
+		{one, ""},                         // made for one part, read for four
+		{"x", "laws"},                     // not a token
+		{cursor.Encode("4", "0"), "laws"}, // no phase 4
+		{cursor.Encode("2", "0", "0", cursor.NoDate, "0"), "gazette"}, // gazette has 3 fields
+		{cursor.Encode("1", "x", cursor.NoDate), "gazette"},           // a date that is not one
+		{cursor.Encode("1", "2020-01-01", "1.5"), "gazette"},          // an id that is not an integer
+		{cursor.Encode("1", "1~0~0~nan?~0~3~0"), "laws"},              // a rank that is not a number
+		{cursor.Encode("1", "1~0~0~NaN~0~3~0"), "laws"},               // nor NaN
+		{cursor.Encode("1", "1~0~0~0.5~0~99999999999~0"), "laws"},     // past int32
+		{cursor.Encode("1", "1~2~0~0.5~0~3~0"), "articles"},           // a flag that is not 0 or 1
 	} {
 		if _, ok := decodeSearchCursor(bad.tok, bad.typ); ok {
 			t.Errorf("accepted %q for type %q", bad.tok, bad.typ)
@@ -549,8 +554,8 @@ func TestCursorWalkFixture(t *testing.T) {
 	}
 	// "pilot": the English titles leave out the 15 the Arabic titles found
 	out := unpagedSearch(t, s, "pilot", "laws")
-	if len(out.Laws) != 120 || out.LawCount != 135 {
-		t.Errorf("pilot: %d laws listed (want 120), law_count %d (want 60 + 75)", len(out.Laws), out.LawCount)
+	if len(out.Laws) != 120 || out.LawCount != 120 {
+		t.Errorf("pilot: %d laws listed (want 120), law_count %d (want 60 + 60, each counted once)", len(out.Laws), out.LawCount)
 	}
 	// a page boundary inside the undated issues: page 17 of 7 ends on the 5th
 	pages := walk(t, s, "/api/v1/gazette/?limit=7", func(p apiIssueList) string { return p.NextCursor })

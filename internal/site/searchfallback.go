@@ -15,8 +15,12 @@ import (
 //	translated  Latin words to Arabic: the glossary (gloss.go), then names and
 //	            Arabizi read letter by letter against the title words (translit.go)
 //	adjusted    a number or a year in the question narrows the texts
-//	            ("513 هيئة إدارة السير", "... 2024"), a typo is mended
-//	            ("الاستلذ"), or the commonest words are set aside
+//	            ("513 هيئة إدارة السير", "... 2024"), or a typo is mended
+//	            ("الاستلذ")
+//
+// Setting the commonest words aside is no longer a reading of its own: the
+// search does it in the same query (internal/wordsearch), and the titles
+// that hold all but one word are the close titles.
 
 var (
 	searchYear = regexp.MustCompile(`^(?:19|20)\d\d$`)
@@ -89,16 +93,6 @@ func (s *Server) rescue(ctx context.Context, q string) (Results, string, error) 
 	if res, how, ok, err := try(words, num, year, kind, "read"); err != nil || ok {
 		return res, how, err
 	}
-	// A year with fewer words: the commonest words go first, the year stays.
-	if year != 0 && num == "" {
-		rest := words
-		for i := 0; i < 2 && len(rest) > 1; i++ {
-			rest = dropOne(v, rest)
-			if res, how, ok, err := try(rest, "", year, "adjusted", "year"); err != nil || ok {
-				return res, how, err
-			}
-		}
-	}
 	// Without the number and the year ("513" may be an article, not a decree).
 	if num != "" || year != 0 {
 		if res, how, ok, err := try(words, "", 0, "adjusted", "words"); err != nil || ok {
@@ -119,17 +113,6 @@ func (s *Server) rescue(ctx context.Context, q string) (Results, string, error) 
 	}
 	if changed {
 		if res, how, ok, err := try(fixed, "", 0, "adjusted", "spell"); err != nil || ok {
-			return res, how, err
-		}
-	}
-	// Set words aside, one at a time, so the rest still answers.
-	rest := fixed
-	for i := 0; i < 3 && len(rest) > 1; i++ {
-		rest = dropOne(v, rest)
-		if len(rest) == 1 && wordWeight(v, rest[0]) > 500 { // one commonplace word ("قانون") answers nothing
-			break
-		}
-		if res, how, ok, err := try(rest, "", 0, "adjusted", "relax"); err != nil || ok {
 			return res, how, err
 		}
 	}
@@ -173,41 +156,37 @@ func wordWeight(v *vocab, w string) int {
 	return v.freq[strings.TrimPrefix(w, "ال")]
 }
 
-// closeTitles are the titles that hold all but one of the query's words, for
-// a search whose words no title holds together but some articles do: "قانون
-// الغابات اللبناني" listed 56 articles and not the forest law, whose title has
-// no «اللبناني» (22 Oct 2026). Kind words stay; the word that tells least goes
-// (dropOne). Titles still rank against the whole query. One word left alone
-// is not enough ("عدم الصفة" is not every title with «الصفة»), unless a kind
-// word came with it; two dropped words drifted ("المرأة اللبنانية المقترنة
-// بأجنبي" became any title on Lebanese women).
+// closeTitles are the titles that hold all but one of the query's terms,
+// for a search whose words no title holds together but some articles do:
+// "قانون الغابات اللبناني" listed 56 articles and not the forest law, whose
+// title has no «اللبناني» (22 Oct 2026). The term that tells least goes (the
+// commonest, or one no title holds: internal/wordsearch keeps the rarest).
+// One word left alone is not enough ("عدم الصفة" is not every title with
+// «الصفة»), unless a kind word came with it; two dropped words drifted
+// ("المرأة اللبنانية المقترنة بأجنبي" became any title on Lebanese women).
 func (s *Server) closeTitles(ctx context.Context, q string) []LawRow {
-	v := s.vocab.Load()
-	if v == nil || !hasArabic(q) {
+	if !hasArabic(q) {
 		return nil
 	}
-	var kinds, words []string
+	var kinds, words int
 	for _, w := range strings.Fields(q) {
 		switch {
 		case titleStop[w]:
 		case titleKinds[w] != "":
-			kinds = append(kinds, w)
+			kinds++
 		default:
-			words = append(words, w)
+			words++
 		}
 	}
-	if len(words) < 2 {
+	if words < 2 || (words == 2 && kinds == 0) {
 		return nil
 	}
-	words = dropOne(v, words)
-	if len(words) == 1 && (len(kinds) == 0 || wordWeight(v, words[0]) > 500) {
+	terms := titleTerms(strings.Fields(q))
+	_, hits, err := s.rankedLaws(ctx, q, 0, "", len(terms)-1, 5, nil)
+	if err != nil {
 		return nil
 	}
-	alt := Results{Q: strings.Join(append(append([]string{}, kinds...), words...), " "), rank: q}
-	if err := s.findLaws(ctx, &alt); err != nil || alt.LawCount == 0 {
-		return nil
-	}
-	return alt.Laws[:min(5, len(alt.Laws))]
+	return lawRowsOf(hits)
 }
 
 // queryNumbers are the numbers in a query that may be a text's number: not a
