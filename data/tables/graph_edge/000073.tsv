@@ -2811,6 +2811,10 @@
 367813	law/180047	law/176436	repeals	centre	linked	legislation	180047	\N	176436	\N	\N	\N	the Centre's link	\N	\N
 367814	law/209556	law/175613	repeals	centre	linked	legislation	209556	\N	175613	\N	\N	\N	the Centre's link	\N	\N
 367815	law/209814	law/174974	repeals	centre	linked	legislation	209814	\N	174974	\N	\N	\N	the Centre's link	\N	\N
-367820	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16-ل.ر/art/27	\N	this text	المادة 27 من القرار عدد 16- ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
-367821	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16ل.ر/art/4	الفقرة 3 من دفتر الشروط الملحق	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
-367822	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16ل.ر	الباب الثاني	this text	للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
+367823	law/196076	law/172086	repeals	centre	linked	legislation	196076	\N	172086	\N	\N	\N	the Centre's link	\N	\N
+367824	law/255133	law/172502	repeals	centre	linked	legislation	255133	\N	172502	\N	\N	\N	the Centre's link	\N	\N
+367825	law/336529	law/171662	repeals	centre	linked	legislation	336529	\N	171662	\N	\N	\N	the Centre's link	\N	\N
+367826	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المادة 27 من القرار عدد 16 -ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
+367827	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16/art/4	الفقرة 3	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
+367828	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16	الباب الثاني	this text	للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
+367829	law/329374/art/1	law/244369	insert	model	linked	legislation	329374	1	244369	\N	lb/law/1994-08-01/367	الباب الأول	number and date	يعدّل قانون مزاولة مهنة الصيدلة (رقم 367 تاريخ 1/8/1994) بإضافة فصل جديد الى الباب الأول منه	agy:gemini-4-argon-medium
