@@ -25,6 +25,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/taktekhq/lebanese-legislation/internal/memo"
+	"golang.org/x/sync/semaphore"
 )
 
 const (
@@ -62,6 +63,11 @@ type Config struct {
 	// negative). Refusals are logged to PostHog about once per IP per minute.
 	RateLimitPerMinute int
 
+	// CallUnits caps the database work of tools/call in flight across all
+	// clients, in queries (4 when 0, off when negative). A search over every
+	// kind counts 4. A call that finds no room within 2 s gets a 503.
+	CallUnits int
+
 	// HuggingFaceAPI is the Hugging Face API base (https://huggingface.co/api
 	// when empty), for the "last updated" badge and SendHFStats.
 	HuggingFaceAPI string
@@ -79,7 +85,7 @@ type Config struct {
 // ConfigFromEnv reads the Worker's variable names: GA_MCP_MEASUREMENT_ID,
 // GA_MCP_API_SECRET, GA_HF_MEASUREMENT_ID, GA_HF_API_SECRET, POSTHOG_KEY,
 // POSTHOG_HOST, POSTHOG_ID_SALT, plus MCP_RATE_LIMIT (requests per IP per
-// minute, negative for none). getenv is os.Getenv when nil.
+// minute, negative for none) and MCP_CALL_UNITS (CallUnits). getenv is os.Getenv when nil.
 func ConfigFromEnv(getenv func(string) string) Config {
 	if getenv == nil {
 		getenv = os.Getenv
@@ -96,6 +102,9 @@ func ConfigFromEnv(getenv func(string) string) Config {
 	if v, err := strconv.Atoi(getenv("MCP_RATE_LIMIT")); err == nil {
 		c.RateLimitPerMinute = v
 	}
+	if v, err := strconv.Atoi(getenv("MCP_CALL_UNITS")); err == nil {
+		c.CallUnits = v
+	}
 	return c
 }
 
@@ -107,6 +116,8 @@ type Server struct {
 	results *resultCache
 	limiter *rateLimiter // nil when off
 	refusal *rateLimiter
+	calls     *semaphore.Weighted // tools/call DB work in flight; nil when off
+	callUnits int
 	bg      sync.WaitGroup
 
 	counts memo.Map // the paged tools' totals (count.go)
@@ -131,6 +142,7 @@ func newServer(db querier, cfg Config) *Server {
 	if s.client == nil {
 		s.client = &http.Client{Timeout: 10 * time.Second}
 	}
+	s.calls, s.callUnits = newCallSem(cfg.CallUnits)
 	if cfg.RateLimitPerMinute >= 0 {
 		n := cfg.RateLimitPerMinute
 		if n == 0 {
@@ -191,12 +203,10 @@ func writeJSON(w http.ResponseWriter, status int, body any, extra map[string]str
 }
 
 // rateLimitIP is the key the per-IP limit counts by: Cloudflare's client
-// address, else X-Forwarded-For, else the connection's address.
+// address, else the connection's address. X-Forwarded-For is not used: a
+// client sets it freely, so a new value each time would be a new bucket.
 func rateLimitIP(r *http.Request) string {
 	if v := r.Header.Get("CF-Connecting-IP"); v != "" {
-		return v
-	}
-	if v := r.Header.Get("X-Forwarded-For"); v != "" {
 		return v
 	}
 	return remoteHost(r)
@@ -287,6 +297,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		setCORS(w.Header())
 		w.WriteHeader(http.StatusAccepted)
 		return
+	}
+
+	if req.methodName() == "tools/call" {
+		release, ok := s.admitCall(r.Context(), objectParams(req.params))
+		if !ok {
+			s.logf("mcp tools/call: busy, refused %s", ip)
+			writeJSON(w, http.StatusServiceUnavailable, rpcError(req.id, rpcServerBusy, "the server is busy, try again shortly"), map[string]string{"Retry-After": "2"})
+			return
+		}
+		defer release()
 	}
 
 	var events []gaEvent
