@@ -14,7 +14,7 @@ export class OriginGreen extends DurableObject {}
 
 import { route, keyFor, resolve, indexRedirectData } from "./route.js";
 import { SECURITY_HEADERS, EMBEDDABLE } from "./headers.js";
-import { originFetch } from "./origin.js";
+import { originFetch, isTestRequest } from "./origin.js";
 import { isParts, parseParts, prepareFrame, assemble, indexPointer } from "./layout.js";
 
 // The export generation (the workflow run that last finished uploading) is
@@ -160,7 +160,7 @@ export default {
     if (!mcpPath && request.method !== "GET" && request.method !== "HEAD" && !(request.method === "POST" && postAllowed)) {
       return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: postAllowed ? "GET, HEAD, POST" : "GET, HEAD" } });
     }
-    if (env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY) {
+    if (isTestRequest(request, env)) {
       return originFetch(request, env, ctx);
     }
     try {
