@@ -100,7 +100,7 @@ func main() {
 	var mu sync.Mutex
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	agy := &judge.Agy{Bin: *bin, Model: *model, Dir: os.TempDir(), Timeout: *timeout}
+	agy := &judge.Agy{Bin: *bin, Model: *model, Timeout: *timeout}
 	jobs := make(chan []article)
 	var wg sync.WaitGroup
 	var nDone, nFail int

@@ -23,6 +23,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/taktekhq/lebanese-legislation/internal/agentcli"
 )
 
 // PromptVersion changes whenever the prompt does, so readings can be redone.
@@ -294,6 +296,23 @@ func (r *Reader) chunk(ctx context.Context, dir string, imgs []string, first, to
 	return got, nil
 }
 
+// command builds one agy run over the page images in dir. The pages come
+// from a third-party site, so agy runs in dir, a private folder holding only
+// those images, with a minimal environment (agentcli.Env), and with
+// permissions that let it read dir and nothing else: commands, writes, the
+// web and MCP tools are denied, and any other tool needs a grant that
+// headless -p mode cannot give.
+func (r *Reader) command(ctx context.Context, dir, prompt string) *exec.Cmd {
+	if abs, err := filepath.Abs(dir); err == nil {
+		dir = abs
+	}
+	cmd := exec.CommandContext(ctx, r.Agy, "-p", prompt, "--model", r.Model, "--print-timeout", "0",
+		"--output-format", "json", "--disable-slash-commands", "--settings", agentcli.AgySettings(dir))
+	cmd.Dir = dir
+	cmd.Env = agentcli.Env(os.Environ())
+	return cmd
+}
+
 func (r *Reader) call(ctx context.Context, dir string, imgs []string, first, total int) (map[int]string, error) {
 	names := make([]string, len(imgs))
 	for i, p := range imgs {
@@ -303,10 +322,7 @@ func (r *Reader) call(ctx context.Context, dir string, imgs []string, first, tot
 	var last error
 	for try := 0; try < 2; try++ {
 		cctx, cancel := context.WithTimeout(ctx, r.Timeout)
-		cmd := exec.CommandContext(cctx, r.Agy, "-p", prompt, "--model", r.Model, "--print-timeout", "0",
-			"--dangerously-skip-permissions", "--output-format", "json")
-		cmd.Dir = dir
-		out, err := cmd.Output()
+		out, err := r.command(cctx, dir, prompt).Output()
 		cancel()
 		var ans struct {
 			Status   string `json:"status"`

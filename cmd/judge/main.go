@@ -71,9 +71,9 @@ func main() {
 	}
 	var g judge.Asker
 	if *claude != "" {
-		g = &judge.Claude{Bin: *claude, Model: *model, Dir: os.TempDir(), Remote: *claudeRemote, Timeout: 5 * time.Minute}
+		g = &judge.Claude{Bin: *claude, Model: *model, Remote: *claudeRemote, Timeout: 5 * time.Minute}
 	} else if *agy != "" {
-		g = &judge.Agy{Bin: *agy, Model: *model, Dir: os.TempDir(), Remote: *agyRemote, Timeout: 5 * time.Minute}
+		g = &judge.Agy{Bin: *agy, Model: *model, Remote: *agyRemote, Timeout: 5 * time.Minute}
 	} else {
 		key := os.Getenv("GEMINI_API_KEY")
 		if key == "" {
