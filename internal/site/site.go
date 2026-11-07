@@ -433,7 +433,7 @@ func extLink(href string, text template.HTML) template.HTML {
 	if !strings.HasPrefix(href, "https://") && !strings.HasPrefix(href, "http://") {
 		return text
 	}
-	return template.HTML(`<a class="link" href="` + template.HTMLEscapeString(href) + `" rel="noopener">`) + text + "</a>"
+	return template.HTML(`<a class="link" href="`+template.HTMLEscapeString(href)+`" rel="noopener">`) + text + "</a>"
 }
 
 func dmy(t *time.Time) string {
