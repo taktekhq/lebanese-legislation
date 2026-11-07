@@ -218,6 +218,7 @@ jobs:
     needs: ci-ok
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 100
     permissions:
       actions: read
     outputs:
@@ -230,7 +231,30 @@ jobs:
             const runs = await github.rest.actions.listWorkflowRuns({
               ...context.repo, workflow_id: 'data.yml', head_sha: context.sha, event: 'push', per_page: 1,
             });
-            core.setOutput('exists', runs.data.total_count > 0 ? 'true' : 'false');
+            if (runs.data.total_count > 0) {
+              core.setOutput('exists', 'true');
+              return;
+            }
+            // No data run for this commit, but an earlier commit's data run may
+            // still be building the database this code needs. Building now uses
+            // the old `latest` db image, and its deploy warm-up 500s for 30
+            // minutes (7 Nov: 52df4ac, a CI-only commit, merged 3 minutes after
+            // #177's schema change). Wait for every data run on main to finish.
+            const deadline = Date.now() + 90 * 60 * 1000;
+            for (;;) {
+              const all = await github.rest.actions.listWorkflowRuns({
+                ...context.repo, workflow_id: 'data.yml', branch: 'main', event: 'push', per_page: 20,
+              });
+              const pending = all.data.workflow_runs.filter(r => r.status !== 'completed');
+              if (!pending.length) break;
+              if (Date.now() > deadline) {
+                core.setFailed(`data run ${pending[0].id} still ${pending[0].status} after 90 minutes`);
+                return;
+              }
+              core.info(`waiting for data run ${pending[0].id} (${pending[0].head_sha.slice(0, 7)}, ${pending[0].status})`);
+              await new Promise(r => setTimeout(r, 30000));
+            }
+            core.setOutput('exists', 'false');
   all:
     needs: [ci-ok, data-run]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.data-run.outputs.exists != 'true'
