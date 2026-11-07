@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/taktekhq/lebanese-legislation/internal/agentcli"
 )
 
 // Claude asks a Claude model through the Claude Code CLI (`claude -p`), on a
@@ -16,15 +18,17 @@ import (
 type Claude struct {
 	Bin     string // path to claude
 	Model   string // alias or full name, e.g. "sonnet"
-	Dir     string // where claude runs
+	Dir     string // parent of the private empty folder each local call runs in ("" is the system temp folder)
 	Remote  string // run claude on this ssh host instead; the prompt goes over stdin
 	Timeout time.Duration
 }
 
 // claudeFlags follow the prompt, which must come right after -p: a variadic
-// flag placed before it would swallow the prompt. No tools, no MCP servers.
+// flag placed before it would swallow the prompt. No tools, no MCP servers,
+// and no settings files (an empty --setting-sources loads none of user,
+// project or local, so no hooks or CLAUDE.md from the run folder or above).
 func claudeFlags(model string) []string {
-	return []string{"--model", model, "--output-format", "text", "--setting-sources", "project", "--strict-mcp-config", "--tools", ""}
+	return []string{"--model", model, "--output-format", "text", "--setting-sources", "", "--strict-mcp-config", "--tools", ""}
 }
 
 // shellQuote single-quotes s for a remote shell.
@@ -33,13 +37,15 @@ func shellQuote(s string) string {
 }
 
 // command builds the process to run for one prompt. Locally the prompt is an
-// argument; over ssh it goes on stdin and the remote shell reads it back with
-// $(cat), which keeps it clear of quoting.
-func (c *Claude) command(ctx context.Context, full string) *exec.Cmd {
+// argument and claude runs in dir, a private empty folder; over ssh it goes
+// on stdin and the remote shell reads it back with $(cat), which keeps it
+// clear of quoting, and claude runs in a new mktemp -d folder there, never a
+// shared one like /tmp.
+func (c *Claude) command(ctx context.Context, full, dir string) *exec.Cmd {
 	flags := claudeFlags(c.Model)
 	if c.Remote == "" {
 		cmd := exec.CommandContext(ctx, c.Bin, append([]string{"-p", full}, flags...)...)
-		cmd.Dir = c.Dir
+		cmd.Dir = dir
 		return cmd
 	}
 	q := make([]string, len(flags))
@@ -47,7 +53,7 @@ func (c *Claude) command(ctx context.Context, full string) *exec.Cmd {
 		q[i] = shellQuote(f)
 	}
 	cmd := exec.CommandContext(ctx, "ssh", "-o", "BatchMode=yes", c.Remote,
-		"cd /tmp && "+shellQuote(c.Bin)+` -p "$(cat)" `+strings.Join(q, " "))
+		agentcli.RemoteCd+shellQuote(c.Bin)+` -p "$(cat)" `+strings.Join(q, " "))
 	cmd.Stdin = strings.NewReader(full)
 	return cmd
 }
@@ -71,12 +77,17 @@ func (c *Claude) Ask(ctx context.Context, system, prompt string, schema map[stri
 func (c *Claude) Raw(ctx context.Context, full string, out any) (string, error) {
 	var last error
 	for attempt := 0; attempt < 3; attempt++ {
+		dir, err := runDir(c.Remote, c.Dir, "judge-claude-")
+		if err != nil {
+			return "", err
+		}
 		cctx, cancel := context.WithTimeout(ctx, c.Timeout)
-		cmd := c.command(cctx, full)
+		cmd := c.command(cctx, full, dir)
 		var stderr strings.Builder
 		cmd.Stderr = &stderr
 		raw, err := cmd.Output()
 		cancel()
+		removeDir(dir)
 		if err != nil {
 			// A limit message comes on stdout with exit 1; keep both so the log shows it.
 			last = fmt.Errorf("claude: %v: %s %s", err, strings.TrimSpace(stderr.String()), strings.TrimSpace(string(raw)))

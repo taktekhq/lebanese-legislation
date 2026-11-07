@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -326,14 +327,52 @@ func (c *ClaudeReader) one(ctx context.Context, id int) (int, error) {
 	return read, nil
 }
 
+// claudeReadCommand builds one claude -p run over the page images in dir, a
+// private folder holding copies of only the pages asked for: the pages come
+// from a third-party site. It reads no settings files (no hooks or
+// CLAUDE.md), no MCP servers, and only Read is allowed without asking.
+func claudeReadCommand(ctx context.Context, bin, model, prompt, dir string) *exec.Cmd {
+	cmd := exec.CommandContext(ctx, bin, "-p", prompt, "--model", model, "--allowedTools", "Read",
+		"--strict-mcp-config", "--setting-sources", "", "--output-format", "json")
+	cmd.Dir = dir
+	return cmd
+}
+
+// linkOrCopy puts a copy of src at dst: a hard link when both are on one
+// file system, else a copy.
+func linkOrCopy(src, dst string) error {
+	if err := os.Link(src, dst); err == nil {
+		return nil
+	}
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	out, err := os.OpenFile(dst, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
+	if err != nil {
+		return err
+	}
+	if _, err := io.Copy(out, in); err != nil {
+		out.Close()
+		return err
+	}
+	return out.Close()
+}
+
 // call runs one claude -p on some pages of a ruling and splits its answer by
 // page. An answer with the model's own talk in it is asked for once more,
 // then dropped.
 func (c *ClaudeReader) call(ctx context.Context, id int, model string, pages []int) (map[int]string, error) {
+	work, err := os.MkdirTemp("", fmt.Sprintf("claude-ruling-%d-", id))
+	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(work)
 	files := make([]string, len(pages))
 	for i, n := range pages {
-		files[i] = PageImage(c.Cache, id, n)
-		if _, err := os.Stat(files[i]); err != nil {
+		files[i] = filepath.Join(work, fmt.Sprintf("p-%d.jpg", n))
+		if err := linkOrCopy(PageImage(c.Cache, id, n), files[i]); err != nil {
 			return nil, err
 		}
 	}
@@ -341,10 +380,7 @@ func (c *ClaudeReader) call(ctx context.Context, id int, model string, pages []i
 	chatter := 0
 	for try := 0; try < 3; try++ {
 		cctx, cancel := context.WithTimeout(ctx, c.Timeout)
-		cmd := exec.CommandContext(cctx, c.Bin, "-p", prompt, "--model", model, "--allowedTools", "Read",
-			"--strict-mcp-config", "--output-format", "json")
-		cmd.Dir = filepath.Join(c.Cache, strconv.Itoa(id))
-		out, err := cmd.Output()
+		out, err := claudeReadCommand(cctx, c.Bin, model, prompt, work).Output()
 		cancel()
 		var ans struct {
 			Result  string `json:"result"`
