@@ -1,4 +1,21 @@
 import { SECURITY_HEADERS } from "./headers.js";
+import { phRelay } from "./phrelay.js";
+
+// sameSecret compares a header with a secret in time that does not depend on
+// where they first differ.
+export function sameSecret(given, secret) {
+  if (!secret || typeof given !== "string") return false;
+  const enc = new TextEncoder();
+  const a = enc.encode(given), b = enc.encode(secret);
+  let diff = a.length ^ b.length;
+  for (let i = 0; i < b.length; i++) diff |= (a[i] ?? 0) ^ b[i];
+  return diff === 0;
+}
+
+// isTestRequest says whether a request carries the secret test header.
+export function isTestRequest(request, env) {
+  return sameSecret(request.headers.get("x-origin-test"), env.ORIGIN_TEST_KEY);
+}
 
 const liveSides = new WeakMap();
 async function liveSide(env) {
@@ -49,7 +66,7 @@ function originEvent(request, env, ctx, side, status, duration_ms, cache) {
     // idle side) are not visitors. On 6 Nov 2026 a warm-up probe of a cold
     // container, 2.6 s, was the only slow API request of the hour and fired
     // the API p95 alert.
-    if (env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY) return;
+    if (isTestRequest(request, env)) return;
     const url = new URL(request.url);
     const kind = requestKind(url);
     const sample_rate = status >= 500 || duration_ms >= 2000 || kind === "mcp" || kind === "answer" ? 1 : 0.1;
@@ -68,11 +85,7 @@ function originEvent(request, env, ctx, side, status, duration_ms, cache) {
 
 export async function originFetch(request, env, ctx) {
   const url = new URL(request.url);
-  if (url.pathname.startsWith("/ph/")) {
-    const host = url.pathname.startsWith("/ph/static/")
-      ? "https://eu-assets.i.posthog.com" : "https://eu.i.posthog.com";
-    return fetch(new Request(host + url.pathname.slice(3) + url.search, request));
-  }
+  if (url.pathname.startsWith("/ph/")) return phRelay(request, SECURITY_HEADERS);
 
   const ruling = /^\/ruling-files\/([1-9][0-9]{0,8})\.pdf$/.exec(url.pathname);
   if (ruling) {
@@ -94,7 +107,7 @@ export async function originFetch(request, env, ctx) {
 
   // A request with the secret test header can select the idle container
   // so it can be checked before traffic moves to it.
-  const testing = env.ORIGIN_TEST_KEY && request.headers.get("x-origin-test") === env.ORIGIN_TEST_KEY;
+  const testing = isTestRequest(request, env);
   const admin = url.pathname === "/_origin/log" || url.pathname === "/_origin/restart";
   const selected = testing ? (admin ? url.searchParams.get("side") : request.headers.get("x-origin-side")) : null;
   if (selected !== null && selected !== "blue" && selected !== "green") {
