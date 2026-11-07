@@ -110,15 +110,15 @@ func ConfigFromEnv(getenv func(string) string) Config {
 
 // Server is the MCP endpoint and the badges, as an http.Handler.
 type Server struct {
-	db      querier
-	cfg     Config
-	client  *http.Client
-	results *resultCache
-	limiter *rateLimiter // nil when off
-	refusal *rateLimiter
+	db        querier
+	cfg       Config
+	client    *http.Client
+	results   *resultCache
+	limiter   *rateLimiter // nil when off
+	refusal   *rateLimiter
 	calls     *semaphore.Weighted // tools/call DB work in flight; nil when off
 	callUnits int
-	bg      sync.WaitGroup
+	bg        sync.WaitGroup
 
 	counts memo.Map // the paged tools' totals (count.go)
 

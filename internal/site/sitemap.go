@@ -548,11 +548,11 @@ func (s *Server) mostRead(ctx context.Context, n int) ([]int, error) {
 	if s.ev != nil {
 		reads := map[string]int{}
 		for d := 0; d < 14; d++ {
-			st, err := UsageStats(s.ev.dir, time.Now().UTC().AddDate(0, 0, -d).Format("2006-01-02"))
+			day, err := lawReads(s.ev.dir, time.Now().UTC().AddDate(0, 0, -d).Format("2006-01-02"))
 			if err != nil {
 				continue
 			}
-			for _, c := range st.TopLaws {
+			for _, c := range top(day, nil, 15) { // each day's top texts, as the day's stats list them
 				reads[c.Key] += c.N
 			}
 		}
