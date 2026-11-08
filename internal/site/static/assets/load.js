@@ -31,7 +31,7 @@
     ["pointerdown", "keydown", "scroll", "touchstart", "mousemove"].forEach(function (e) {
       window.removeEventListener(e, start, { passive: true });
     });
-    add("https://www.googletagmanager.com/gtag/js?id=G-RDYRK422NP", true);
+    add("/gtag/js?id=G-RDYRK422NP", true);
     if (ph) add(ph);
   }
 
