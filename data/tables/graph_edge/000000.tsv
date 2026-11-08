@@ -3315,7 +3315,7 @@
 3315	law/167784/art/8	\N	general_repeal	model	general	legislation	167784	8	\N	\N	lb/unknown	\N	names no text	تلغى جميع النصوص المخالفة لهذا النظام	gemini-3.8-flash
 3316	law/167784/art/8	\N	repeal	model	unresolved	legislation	167784	8	\N	\N	lb/decision/1972-09-06/1185/ق	\N	several texts with that number	القرار رقم 1185/ق الصادر بتاريخ 6/9/72 نظام الاجراء في وزارة الموارد المائية والكهربائية	gemini-3.8-flash
 3317	law/167787/art/1	law/200048/art/2	amend	model	linked	legislation	167787	1	200048	2	lb/decree/1997-11-12/11291/art/2	لجهة قيمة العائدات السنوية المتوجبة	number and date	تعدل المادة الثانية من المرسوم رقم 11291 تاريخ 12/11/1997	gemini-3.8-flash
-3318	law/167789/art/1	law/171538/art/2	replace	model	linked	legislation	167789	1	171538	2	lb/decree/1985-04-24/2469/art/2	\N	number and date	عدلت المادة الثانية من المرسوم رقم 2469 تاريخ 24 نيسان 1985	gemini-3.8-flash
+3318	law/167789/art/1	law/171538/art/2	replace	model	linked	legislation	167789	1	171538	2	lb/decree/1985-04-24/2469/art/2	\N	number and date	عدلت المادة الثانية من المرسوم رقم 2469 تاريخ 24 نيسان 1985	claude:sonnet
 3319	law/167791/art/1	law/168850	replace	model	no_article	legislation	167791	1	168850	7	lb/decree/1995-03-21/6540/art/7	البند /3/	number and date	الغي نص البند /3/ من المادة السابعة من المرسوم رقم 6540 تاريخ 21/3/1995	gemini-3.8-flash
 3320	law/167791/art/1	law/186540	cites	model	linked	legislation	167791	1	186540	\N	lb/decree/1994-08-31/5603	\N	number and date	المرسوم رقم 5603 تاريخ 31/8/1994	gemini-3.8-flash
 3321	law/167791/art/1	law/169864	cites	model	linked	legislation	167791	1	169864	\N	lb/law/1994-03-24/324	\N	number and date	القانون رقم 324 تاريخ 24/3/1994	gemini-3.8-flash

@@ -2814,7 +2814,24 @@
 367823	law/196076	law/172086	repeals	centre	linked	legislation	196076	\N	172086	\N	\N	\N	the Centre's link	\N	\N
 367824	law/255133	law/172502	repeals	centre	linked	legislation	255133	\N	172502	\N	\N	\N	the Centre's link	\N	\N
 367825	law/336529	law/171662	repeals	centre	linked	legislation	336529	\N	171662	\N	\N	\N	the Centre's link	\N	\N
-367826	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المادة 27 من القرار عدد 16 -ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
-367827	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16/art/4	الفقرة 3	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
-367828	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16	الباب الثاني	this text	للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
-367829	law/329374/art/1	law/244369	insert	model	linked	legislation	329374	1	244369	\N	lb/law/1994-08-01/367	الباب الأول	number and date	يعدّل قانون مزاولة مهنة الصيدلة (رقم 367 تاريخ 1/8/1994) بإضافة فصل جديد الى الباب الأول منه	agy:gemini-4-argon-medium
+367826	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المادة 27 من القرار عدد 16- ل.ر الصادر في 30 كانون الثاني سنة 1935	claude:sonnet
+367827	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16/art/4	الفقرة 3	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	claude:sonnet
+367828	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16	الباب الثاني	this text	للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	claude:sonnet
+367830	law/172301	law/168846	repeals	centre	linked	legislation	172301	\N	168846	\N	\N	\N	the Centre's link	\N	\N
+367831	law/172776	law/169249	repeals	centre	linked	legislation	172776	\N	169249	\N	\N	\N	the Centre's link	\N	\N
+367832	law/176787	law/168889	repeals	centre	linked	legislation	176787	\N	168889	\N	\N	\N	the Centre's link	\N	\N
+367833	law/205276	law/168976	repeals	centre	linked	legislation	205276	\N	168976	\N	\N	\N	the Centre's link	\N	\N
+367834	law/222980	law/168777	repeals	centre	linked	legislation	222980	\N	168777	\N	\N	\N	the Centre's link	\N	\N
+367835	law/245403	law/168247	repeals	centre	linked	legislation	245403	\N	168247	\N	\N	\N	the Centre's link	\N	\N
+367836	law/169678/art/10	law/201384	cites	model	linked	legislation	169678	10	201384	\N	lb/decision/2000-12-02/7723	الانموذج 2010	number and date, the text is later than the citing one	القرار الاساسي رقم 7723 تاريخ 2/12/2000	claude:sonnet
+367837	law/169678/art/15	law/169678/art/2	cites	model	linked	legislation	169678	15	169678	2	lb/decision/self/7548/art/2	البندين (3) و(4)	this text	البندين (3) و(4) من «المادة 2» من هذا القرار	claude:sonnet
+367838	law/169678/art/17	law/253113	cites	model	linked	legislation	169678	17	253113	\N	lb/decision/1997-04-24/6574	الأنموذج (BPL--1)	number and date	القرار الأساسي رقم 6574 تاريخ 24/4/1997	claude:sonnet
+367839	law/169678/art/19 مكرر	law/326220	note_amended_by	model	linked	legislation	169678	19 مكرر	326220	\N	lb/decision/2022-05-27/13440	\N	number and date	القرار الوسيط 13440 ت27/5/2022	claude:sonnet
+367840	law/169678/art/19 مكرر	law/169678/art/19 مكرر	cites	model	linked	legislation	169678	19 مكرر	169678	19 مكرر	lb/decision/self/7548/art/19-مكرر	المقطع أولا	this text	المقطع "اولا هذا"	claude:sonnet
+367841	law/169678/art/21 مكرر	law/169678/art/21 مكرر	cites	model	linked	legislation	169678	21 مكرر	169678	21 مكرر	lb/decision/self/7548/art/21-مكرر	المقطع ثانيا	this text	المقطع «ثانياً» هذا	claude:sonnet
+367842	law/169678/art/4 مكرر	law/169678/art/21	cites	model	linked	legislation	169678	4 مكرر	169678	21	lb/decision/self/7548/art/21	المقطع رابعا	this text	الـمقطع «رابعاً» من الـمادة 21 من هذا القرار	claude:sonnet
+367843	law/169678/art/9 مكرر	law/326220	note_amended_by	model	linked	legislation	169678	9 مكرر	326220	\N	lb/decision/2022-05-27/13440	\N	number and date	كما تعدلت بالقرار 13440 ت 27/5/2022	claude:sonnet
+367844	law/169678/art/9 مكرر	law/169678/art/2	cites	model	linked	legislation	169678	9 مكرر	169678	2	lb/decision/self/7548/art/2	البندين (3) و(4)	this text	البندين (3) و(4) من «المادة 2» من هذا القرار	claude:sonnet
+367845	law/169678/art/9 مكرر	law/169678/art/9 مكرر	cites	model	linked	legislation	169678	9 مكرر	169678	9 مكرر	lb/decision/self/7548/art/9-مكرر	\N	this text	المادة التاسعة (مكرر) هذه	claude:sonnet
+367846	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المنصوص عليها في المادة 27	claude:sonnet
+367847	law/329374/art/1	law/329374	other	model	linked	legislation	329374	1	329374	\N	lb/law/self/الصيدله-السريريه	\N	this text	صدّق اقتراح القانون الـمتعلق بالصيدلة السريرية	claude:sonnet
