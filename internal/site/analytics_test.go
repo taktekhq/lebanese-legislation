@@ -78,7 +78,7 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 	}
 
 	load := get("/assets/load.js")
-	if !strings.Contains(load, "https://www.googletagmanager.com/gtag/js?id=G-RDYRK422NP") || !strings.Contains(load, "data-ph") {
+	if !strings.Contains(load, "/gtag/js?id=G-RDYRK422NP") || !strings.Contains(load, "data-ph") {
 		t.Error("assets/load.js must fetch gtag.js and the PostHog script")
 	}
 }

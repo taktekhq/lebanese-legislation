@@ -1,5 +1,6 @@
 import { SECURITY_HEADERS } from "./headers.js";
 import { phRelay } from "./phrelay.js";
+import { gtagRelay } from "./gtagrelay.js";
 
 // sameSecret compares a header with a secret in time that does not depend on
 // where they first differ.
@@ -86,6 +87,7 @@ function originEvent(request, env, ctx, side, status, duration_ms, cache) {
 export async function originFetch(request, env, ctx) {
   const url = new URL(request.url);
   if (url.pathname.startsWith("/ph/")) return phRelay(request, SECURITY_HEADERS);
+  if (url.pathname.startsWith("/gtag/")) return gtagRelay(request, SECURITY_HEADERS);
 
   const ruling = /^\/ruling-files\/([1-9][0-9]{0,8})\.pdf$/.exec(url.pathname);
   if (ruling) {
