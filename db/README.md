@@ -40,6 +40,20 @@ from published layers. It never resets WAL on a user's running database.
 Gazette scans are linked to the original PDFs on SaderLex, not hosted or included in the images.
 `health.sh` checks PostgreSQL and both databases' serving tables.
 
+### -db and -db-prod
+
+`ghcr.io/taktekhq/lebanese-legislation-db` is the public dataset image: the
+database exactly as the published data defines it. Pull it for the data.
+`ghcr.io/taktekhq/lebanese-legislation-db-prod` is `-db` plus read-optimized
+copies that the website, API and MCP server read, built by `prod/Dockerfile`
+from one SQL file, `prod.sql`: `law_card` (the law summary every MCP reply
+carries), `article_card` (each article with its wording in force resolved) and
+`possibly_affected` stored as a table (the view stays as `possibly_affected_v`).
+No new data, and `prod.sql` can rebuild them at any time. The all-in-one image
+`-all`, which runs lebaneselegislation.com, is built from `-db-prod`. Measured
+on 9 Nov 2026 at the live limits (1 CPU, 6 GB), 6 `get_article` calls at once
+went from a p95 of 1,192 ms to 85 ms, with byte-identical replies.
+
 ```sh
 docker build -f db/Dockerfile -t lebanese-legislation-db .
 docker run --rm -p 127.0.0.1:5433:5432 -e POSTGRES_PASSWORD=local lebanese-legislation-db

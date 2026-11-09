@@ -66,8 +66,10 @@ func run(m *testing.M) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	// the indexes after the fixture, as a build does: search_term counts its words
-	for _, sql := range []string{db.Schema, db.AmendmentSchema, db.GraphSchema, string(fixture), db.Indexes} {
+	// the indexes after the fixture, as a build does: search_term counts its
+	// words. Then db/prod.sql, so the tests read the -db-prod shape the
+	// server runs on (TestLayoutsAgree checks the -db shape gives the same).
+	for _, sql := range []string{db.Schema, db.AmendmentSchema, db.GraphSchema, string(fixture), db.Indexes, db.Prod} {
 		if _, err := pool.Exec(ctx, sql); err != nil {
 			return 0, err
 		}

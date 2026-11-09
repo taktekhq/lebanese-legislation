@@ -375,9 +375,11 @@ func page(ctx context.Context, db Querier, s pageSQL, limit int, after *Key, par
 		cond = afterCond(cols, &params)
 	}
 	params = append(params, limit+1)
+	// n is MATERIALIZED: inlined, Postgres counted every candidate again for
+	// each returned row (9 Nov 2026: "العمل", 38,269 articles, 224 to 114 ms).
 	sql := `WITH g AS (` + s.cands + `),
 		r AS (SELECT g.*, ` + code + ` AS code, ` + titled + ` AS titled, (` + tie + `)::int AS tie FROM g ` + s.served + ` WHERE g.units >= ` + least + `),
-		n AS (SELECT count(*) AS total, count(*) FILTER (WHERE units >= ` + strconv.Itoa(s.units) + ` AND ` + strconv.Itoa(s.units) + ` > 0) AS full FROM r)
+		n AS MATERIALIZED (SELECT count(*) AS total, count(*) FILTER (WHERE units >= ` + strconv.Itoa(s.units) + ` AND ` + strconv.Itoa(s.units) + ` > 0) AS full FROM r)
 		SELECT p.id, p.position, p.units, p.code, p.titled, p.score, p.tie, (` + s.phrase + `), n.total, n.full
 		FROM (SELECT ` + id + ` AS id, ` + pos + ` AS position, r.units, r.code, r.titled, r.score, r.tie FROM r
 			WHERE ` + cond + ` ORDER BY ` + order + ` LIMIT $` + strconv.Itoa(len(params)) + `) p

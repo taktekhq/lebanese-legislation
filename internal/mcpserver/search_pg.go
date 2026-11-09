@@ -35,7 +35,7 @@ func (s *Server) rankedLaws(ctx context.Context, q string, en bool, year yearVal
 			full++
 		}
 	}
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+` FROM legislation l `+lawJoins+` WHERE l.id = ANY($1) ORDER BY array_position($1, l.id)`, ids)
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+` FROM legislation l `+s.sql(ctx).lawJoins+` WHERE l.id = ANY($1) ORDER BY array_position($1, l.id)`, ids)
 	if err != nil {
 		return nil, 0, err
 	}

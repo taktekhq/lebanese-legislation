@@ -57,13 +57,14 @@ Stop services with `docker compose down`. This preserves the database volume. Vo
 | --- | --- |
 | Existing `data/*.parquet` on Hugging Face | Portable source tables for analysis and other databases |
 | `ghcr.io/taktekhq/lebanese-legislation-db:latest` | PostgreSQL 18.6, pgvector 0.8.2 and both databases baked from `data/` |
+| `ghcr.io/taktekhq/lebanese-legislation-db-prod:latest` | `-db` plus read-optimized tables computed from it ([`db/prod.sql`](../db/prod.sql)); no new data |
 | `ghcr.io/taktekhq/lebanese-legislation-api:latest` | The REST API (`/api/v1/`) |
 | `ghcr.io/taktekhq/lebanese-legislation-mcp:latest` | The MCP server (`/mcp`) |
-| `ghcr.io/taktekhq/lebanese-legislation-all:latest` | Both databases and the website, API and MCP |
+| `ghcr.io/taktekhq/lebanese-legislation-all:latest` | `-db-prod` and the website, API and MCP |
 
 Older version tags stay published. See [changes](changes.md).
 
-The local database and hosted Cloudflare container share the same baked database image.
+The hosted Cloudflare container runs `-db-prod`: the same baked database as `-db`, plus read-optimized tables computed from it.
 
 The database image is built only from the public tables of [`data/`](../data/) at a pinned commit, the same tables as the Parquet dataset. It does not contain private website tables, user queries, analytics, credentials or website-only explanations. Exported views become snapshot tables. `source_documents` is a derived read model for this immutable snapshot; editing raw tables does not automatically update it or its vectors. Article retrieval follows the exported in-force view at the stated date; the raw tables retain the wider historical corpus.
 

@@ -293,7 +293,7 @@ func (s *Server) findLaws(ctx context.Context, q string, year yearVal, limit int
 	// The codes by their English or French name ("Penal Code", "obligations"),
 	// closest name first.
 	if num == "" && hasLatin(q) {
-		rows, err := s.db.Query(ctx, `SELECT `+lawCols+` FROM `+lawFrom+` WHERE c.slug IS NOT NULL ORDER BY l.id`)
+		rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+` FROM `+s.sql(ctx).lawFrom+` WHERE c.slug IS NOT NULL ORDER BY l.id`)
 		if err != nil {
 			return nil, 0, err
 		}

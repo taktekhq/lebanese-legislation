@@ -708,3 +708,15 @@ func TestConfigFromEnv(t *testing.T) {
 		t.Error("the limit is off")
 	}
 }
+
+// Without a database answer the server reads the computed layout and asks
+// again next time, so a failed check never pins it.
+func TestLayoutFallsBack(t *testing.T) {
+	s := newServer(noDB{}, Config{RateLimitPerMinute: -1})
+	if got := s.sql(context.Background()); got != &computed {
+		t.Errorf("layout %s, want computed", got.name)
+	}
+	if s.layout.Load() != nil {
+		t.Error("a failed check was remembered")
+	}
+}

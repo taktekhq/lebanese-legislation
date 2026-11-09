@@ -269,5 +269,7 @@ jobs:
       dockerfile: workers/static-site/container/Dockerfile
       tags: |
         ghcr.io/taktekhq/lebanese-legislation-all:latest
+      # the -db-prod tag -all is built from
       build_args: |
         DATA_TAG=latest
+      free_disk: true

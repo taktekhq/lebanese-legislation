@@ -62,7 +62,7 @@ func (s *Server) loadStats(ctx context.Context) (badgeStats, error) {
 		return s.badgeStats, nil
 	}
 	var st badgeStats
-	err := s.db.QueryRow(ctx, `SELECT (SELECT count(*) FROM `+lawFrom+`)::int,
+	err := s.db.QueryRow(ctx, `SELECT (SELECT count(*) FROM `+s.sql(ctx).lawFrom+`)::int,
 		(SELECT count(*) FROM legislation_article)::int, (SELECT count(*) FROM ruling)::int`).Scan(&st.legislation, &st.articles, &st.rulings)
 	if err != nil {
 		return st, err

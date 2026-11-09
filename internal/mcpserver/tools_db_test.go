@@ -619,3 +619,73 @@ func TestToolsAgainstFixtureAreJSON(t *testing.T) {
 	_ = context.Background
 	_ = json.Valid
 }
+
+// TestLayoutsAgree: on the -db-prod shape (law_card, article_card) every
+// tool answers byte for byte what it answers when it computes the same
+// columns from the corpus tables, as on the -db image.
+func TestLayoutsAgree(t *testing.T) {
+	s := dbServer(t)
+	if got := s.sql(context.Background()); got != &cards {
+		t.Fatalf("layout %s, want cards: db/prod.sql ran on the fixture", got.name)
+	}
+	plain := newServer(testPool, Config{RateLimitPerMinute: -1})
+	plain.layout.Store(&computed)
+	type toolCall struct {
+		name string
+		args map[string]any
+	}
+	calls := []toolCall{
+		{"search_legislation", map[string]any{"query": "قانون"}},
+		{"search_legislation", map[string]any{"query": "عقد"}},
+		{"list_legislation", map[string]any{}},
+		{"list_legislation", map[string]any{"order": "oldest"}},
+		{"list_gazette_issues", map[string]any{}},
+	}
+	rows, err := testPool.Query(context.Background(), `SELECT id FROM legislation ORDER BY id`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var laws []int64
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			t.Fatal(err)
+		}
+		laws = append(laws, id)
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatal(err)
+	}
+	for _, id := range laws {
+		calls = append(calls,
+			toolCall{"get_law", map[string]any{"id": id}},
+			toolCall{"get_law_texts", map[string]any{"law_id": id}},
+			toolCall{"possibly_affected", map[string]any{"law_id": id}},
+			toolCall{"get_links", map[string]any{"key": fmt.Sprintf("law/%d", id)}})
+	}
+	arts, err := testPool.Query(context.Background(), `SELECT law_id, number FROM legislation_article ORDER BY law_id, position`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for arts.Next() {
+		var id int64
+		var number string
+		if err := arts.Scan(&id, &number); err != nil {
+			t.Fatal(err)
+		}
+		calls = append(calls, toolCall{"get_article", map[string]any{"law_id": id, "number": number}})
+	}
+	if err := arts.Err(); err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range calls {
+		body := map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": c.name, "arguments": c.args}}
+		got, want := post(s, body, nil).Body.String(), post(plain, body, nil).Body.String()
+		if got != want {
+			t.Errorf("%s %v: cards and computed answers differ\ncards:    %.300s\ncomputed: %.300s", c.name, c.args, got, want)
+		}
+	}
+	if len(calls) < 20 {
+		t.Errorf("only %d calls: the fixture should have laws and articles", len(calls))
+	}
+}

@@ -21,6 +21,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -121,6 +122,8 @@ type Server struct {
 	bg        sync.WaitGroup
 
 	counts memo.Map // the paged tools' totals (count.go)
+
+	layout atomic.Pointer[layout] // the database's layout, once known (db.go sql)
 
 	badgeMu    sync.Mutex
 	badgeAt    time.Time

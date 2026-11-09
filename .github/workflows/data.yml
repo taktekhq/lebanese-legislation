@@ -191,8 +191,25 @@ jobs:
       tags: |
         ghcr.io/taktekhq/lebanese-legislation-db:latest
       free_disk: true
-  all:
+  # -db plus the read-optimized tables of db/prod.sql: what -all is built on.
+  db-prod:
     needs: db
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    with:
+      image: db-prod
+      context: .
+      dockerfile: db/prod/Dockerfile
+      tags: |
+        ghcr.io/taktekhq/lebanese-legislation-db-prod:latest
+      build_args: |
+        DATA_TAG=latest
+      free_disk: true
+  all:
+    needs: db-prod
     permissions:
       contents: read
       packages: write
@@ -204,5 +221,7 @@ jobs:
       dockerfile: workers/static-site/container/Dockerfile
       tags: |
         ghcr.io/taktekhq/lebanese-legislation-all:latest
+      # the -db-prod tag -all is built from
       build_args: |
         DATA_TAG=latest
+      free_disk: true

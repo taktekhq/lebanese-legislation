@@ -52,23 +52,74 @@ type lawRow struct {
 	Changed        *time.Time // page_state.changed_at: when the text's page last changed
 }
 
-// lawCols and lawFrom select a lawRow (alias l). The join to
-// legislation_kind is an inner join, as in the snapshot: a text whose kind
-// has no row there is not served.
-const lawCols = `l.id, l.kind, k.name_en, l.number, to_char(l.issued_on, 'YYYY-MM-DD'), l.title, l.status,
+// layout is how a query reads a lawRow (alias l) and an articleRow
+// (alias a). lawCols and lawFrom select a lawRow; lawJoins joins the rest of
+// it onto legislation l (and code c, which some queries filter on). The
+// join to legislation_kind is an inner join, as in the snapshot: a text
+// whose kind has no row there is not served. articleCols and articleFrom
+// select an articleRow's raw columns.
+type layout struct {
+	name                     string
+	lawCols, lawJoins        string
+	lawFrom                  string
+	articleCols, articleFrom string
+}
+
+// computed reads every column from the corpus tables at request time: the
+// -db image, where db/prod.sql has not run.
+var computed = layout{
+	name: "computed",
+	lawCols: `l.id, l.kind, k.name_en, l.number, to_char(l.issued_on, 'YYYY-MM-DD'), l.title, l.status,
 	l.gazette_number, to_char(l.gazette_date, 'YYYY-MM-DD'),
 	(SELECT min(ge.issue_id) FROM gazette_entry ge WHERE ge.law_id = l.id),
 	(SELECT count(*) FROM legislation_article la WHERE la.law_id = l.id)::int,
-	c.slug, c.name_en, c.name_fr, sp.url, nullif(te.title_en, ''), ps.changed_at`
-
-const lawFrom = `legislation l ` + lawJoins
-
-// lawJoins joins the rest of a lawRow onto legislation l.
-const lawJoins = `JOIN legislation_kind k ON k.name_ar = l.kind
+	c.slug, c.name_en, c.name_fr, sp.url, nullif(te.title_en, ''), ps.changed_at`,
+	lawJoins: `JOIN legislation_kind k ON k.name_ar = l.kind
 	LEFT JOIN code c ON c.law_id = l.id
 	LEFT JOIN source_page sp ON sp.doc_type = 'law' AND sp.centre_id = l.id
 	LEFT JOIN legislation_title_en te ON te.law_id = l.id
-	LEFT JOIN page_state ps ON ps.kind = 'law' AND ps.id = l.id`
+	LEFT JOIN page_state ps ON ps.kind = 'law' AND ps.id = l.id`,
+	articleCols: articleColsComputed,
+	articleFrom: articleFromComputed,
+}
+
+// cards reads the same columns from law_card and article_card, which
+// db/prod.sql computes with the expressions above (the -db-prod image).
+// law_card holds only laws whose kind has a legislation_kind row, so the
+// inner join keeps the same rows.
+var cards = layout{
+	name: "cards",
+	lawCols: `lc.id, lc.kind, lc.kind_en, lc.number, lc.issued_on, lc.title, lc.status, lc.gazette_number, lc.gazette_date,
+	lc.gazette_issue_id, lc.article_count, lc.code_slug, lc.code_name_en, lc.code_name_fr, lc.source_url, lc.title_en, lc.changed_at`,
+	lawJoins: `JOIN law_card lc ON lc.id = l.id LEFT JOIN code c ON c.law_id = l.id`,
+	articleCols: `a.law_id, a.position, a.number, a.note, a.text_ar, a.text_fr, a.in_force_from, a.section_id,
+	a.current_text, a.version, a.state, a.pending, a.valid_from, a.annulled`,
+	articleFrom: `article_card a`,
+}
+
+func init() {
+	computed.lawFrom = `legislation l ` + computed.lawJoins
+	cards.lawFrom = `legislation l ` + cards.lawJoins
+}
+
+// sql is the layout this database has: cards when both card tables exist,
+// computed otherwise. It asks the database once; a failed check is not
+// remembered and reads computed (correct on both, only slower).
+func (s *Server) sql(ctx context.Context) *layout {
+	if l := s.layout.Load(); l != nil {
+		return l
+	}
+	var both bool
+	if err := s.db.QueryRow(ctx, `SELECT to_regclass('law_card') IS NOT NULL AND to_regclass('article_card') IS NOT NULL`).Scan(&both); err != nil {
+		return &computed
+	}
+	l := &computed
+	if both {
+		l = &cards
+	}
+	s.layout.CompareAndSwap(nil, l)
+	return s.layout.Load()
+}
 
 // lawDate is the snapshot's coalesce(nullif(gazette_date, ”), issued_on).
 const lawDate = `coalesce(l.gazette_date, l.issued_on)`
@@ -101,7 +152,8 @@ func (s *Server) loadLaw(ctx context.Context, id int64) (*lawRow, error) {
 		return nil, nil // no law has it
 	}
 	var l lawRow
-	err := s.db.QueryRow(ctx, `SELECT `+lawCols+` FROM `+lawFrom+` WHERE l.id = $1`, id).Scan(l.dest()...)
+	L := s.sql(ctx)
+	err := s.db.QueryRow(ctx, `SELECT `+L.lawCols+` FROM `+L.lawFrom+` WHERE l.id = $1`, id).Scan(l.dest()...)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}
