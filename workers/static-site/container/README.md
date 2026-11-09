@@ -10,7 +10,9 @@ the read-optimized tables of `db/prod.sql` (`law_card`, `article_card`,
 `possibly_affected_t`, the rows of the `possibly_affected` view as a table, and
 `law_link`, `get_law`'s lists of amending and amended texts). It adds no data; every extra table is
 computed from `-db`, and the replies are byte for byte the same. The `data`
-workflow builds it after `-db` and before `-all`. `-db` stays the public
+workflow builds it after `-db` and before `-all`; a push that changes only
+`db/prod.sql` or `db/prod/` rebuilds just `-db-prod` and `-all`, from the
+published `-db` of its data (about 11 minutes instead of 60). `-db` stays the public
 dataset image that strangers pull; the MCP server also runs on it, computing
 the same columns at request time (slower under parallel calls).
 
