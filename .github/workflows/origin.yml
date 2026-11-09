@@ -159,7 +159,10 @@ jobs:
     - site-worker
     if: ${{ always() && needs.eligible.outputs.deploy == 'true' && (needs.image.result == 'success' || needs.image.result == 'skipped') && (needs.site-worker.result == 'success' || needs.site-worker.result == 'skipped') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # The stage step waits up to 30 minutes for Cloudflare's rollout (origin-deploy.py
+    # wait_rollout); a 15-minute job cancelled it on 9 Nov (#197) after a 14-minute
+    # rollout earlier that day.
+    timeout-minutes: 40
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
