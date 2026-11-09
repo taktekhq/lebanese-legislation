@@ -620,16 +620,19 @@ func TestToolsAgainstFixtureAreJSON(t *testing.T) {
 	_ = json.Valid
 }
 
-// TestLayoutsAgree: on the -db-prod shape (law_card, article_card) every
-// tool answers byte for byte what it answers when it computes the same
-// columns from the corpus tables, as on the -db image.
+// TestLayoutsAgree: on the -db-prod shape (law_card, article_card,
+// law_link) every tool answers byte for byte what it answers when it
+// computes the same columns from the corpus tables, as on the -db image,
+// and what it answers with the cards but without law_link.
 func TestLayoutsAgree(t *testing.T) {
 	s := dbServer(t)
-	if got := s.sql(context.Background()); got != &cards {
-		t.Fatalf("layout %s, want cards: db/prod.sql ran on the fixture", got.name)
+	if got := s.sql(context.Background()); got != &linked {
+		t.Fatalf("layout %s, want linked: db/prod.sql ran on the fixture", got.name)
 	}
 	plain := newServer(testPool, Config{RateLimitPerMinute: -1})
 	plain.layout.Store(&computed)
+	cardsOnly := newServer(testPool, Config{RateLimitPerMinute: -1})
+	cardsOnly.layout.Store(&cards)
 	type toolCall struct {
 		name string
 		args map[string]any
@@ -682,7 +685,12 @@ func TestLayoutsAgree(t *testing.T) {
 		body := map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": c.name, "arguments": c.args}}
 		got, want := post(s, body, nil).Body.String(), post(plain, body, nil).Body.String()
 		if got != want {
-			t.Errorf("%s %v: cards and computed answers differ\ncards:    %.300s\ncomputed: %.300s", c.name, c.args, got, want)
+			t.Errorf("%s %v: linked and computed answers differ\nlinked:   %.300s\ncomputed: %.300s", c.name, c.args, got, want)
+		}
+		if c.name == "get_law" {
+			if mid := post(cardsOnly, body, nil).Body.String(); mid != want {
+				t.Errorf("%s %v: cards and computed answers differ\ncards:    %.300s\ncomputed: %.300s", c.name, c.args, mid, want)
+			}
 		}
 	}
 	if len(calls) < 20 {
@@ -706,6 +714,58 @@ func TestLayoutNeedsItsVersion(t *testing.T) {
 	}
 	if got := newServer(tx, Config{RateLimitPerMinute: -1}).sql(ctx); got != &computed {
 		t.Errorf("layout %s, want computed for another version", got.name)
+	}
+}
+
+// A law_link from another prod.sql version is not read; the cards still are.
+func TestLinksNeedTheirVersion(t *testing.T) {
+	if testPool == nil {
+		t.Skip("set LEBLEG_TEST_DSN to a disposable Postgres database")
+	}
+	ctx := context.Background()
+	tx, err := testPool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err := tx.Exec(ctx, `COMMENT ON TABLE law_link IS 'lebleg-prod 1'`); err != nil {
+		t.Fatal(err)
+	}
+	if got := newServer(tx, Config{RateLimitPerMinute: -1}).sql(ctx); got != &cards {
+		t.Errorf("layout %s, want cards for another law_link version", got.name)
+	}
+}
+
+// On a -db-prod image from before law_link (prod.sql 1), get_law groups the
+// links from graph_edge and answers the same.
+func TestLinksFallBack(t *testing.T) {
+	prod := dbServer(t)
+	ctx := context.Background()
+	laws := []int64{430, 190374, 333455, 2000200346, 100}
+	body := func(id int64) map[string]any {
+		return map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": "get_law", "arguments": map[string]any{"id": id}}}
+	}
+	want := map[int64]string{}
+	for _, id := range laws {
+		want[id] = post(prod, body(id), nil).Body.String()
+	}
+	tx, err := testPool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err := tx.Exec(ctx, `DROP TABLE law_link`); err != nil {
+		t.Fatal(err)
+	}
+	old := newServer(tx, Config{RateLimitPerMinute: -1})
+	if got := old.sql(ctx); got != &cards {
+		t.Fatalf("layout %s, want cards without law_link", got.name)
+	}
+	for _, id := range laws {
+		got := post(old, body(id), nil).Body.String()
+		if got != want[id] || strings.Contains(got, `"error"`) || !strings.Contains(got, `amended_by`) {
+			t.Errorf("get_law %d: without law_link %.300s\nwith law_link %.300s", id, got, want[id])
+		}
 	}
 }
 
@@ -733,7 +793,7 @@ func TestOldShape(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer tx.Rollback(ctx)
-	if _, err := tx.Exec(ctx, `DROP TABLE law_card, article_card, possibly_affected_t`); err != nil {
+	if _, err := tx.Exec(ctx, `DROP TABLE law_card, article_card, possibly_affected_t, law_link`); err != nil {
 		t.Fatal(err)
 	}
 	old := newServer(tx, Config{RateLimitPerMinute: -1})
