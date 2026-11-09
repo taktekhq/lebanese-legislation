@@ -2814,9 +2814,8 @@
 367823	law/196076	law/172086	repeals	centre	linked	legislation	196076	\N	172086	\N	\N	\N	the Centre's link	\N	\N
 367824	law/255133	law/172502	repeals	centre	linked	legislation	255133	\N	172502	\N	\N	\N	the Centre's link	\N	\N
 367825	law/336529	law/171662	repeals	centre	linked	legislation	336529	\N	171662	\N	\N	\N	the Centre's link	\N	\N
-367826	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المادة 27 من القرار عدد 16- ل.ر الصادر في 30 كانون الثاني سنة 1935	claude:sonnet
-367827	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16/art/4	الفقرة 3	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	claude:sonnet
-367828	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16	الباب الثاني	this text	للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	claude:sonnet
+367826	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	قرار اللجنة المنصوص عليها في المادة 27 من القرار عدد 16 -ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
+367828	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16	الباب الثاني	this text	بغرامات مفروضة على المزارع لمخالفته للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
 367830	law/172301	law/168846	repeals	centre	linked	legislation	172301	\N	168846	\N	\N	\N	the Centre's link	\N	\N
 367831	law/172776	law/169249	repeals	centre	linked	legislation	172776	\N	169249	\N	\N	\N	the Centre's link	\N	\N
 367832	law/176787	law/168889	repeals	centre	linked	legislation	176787	\N	168889	\N	\N	\N	the Centre's link	\N	\N
@@ -2833,5 +2832,20 @@
 367843	law/169678/art/9 مكرر	law/326220	note_amended_by	model	linked	legislation	169678	9 مكرر	326220	\N	lb/decision/2022-05-27/13440	\N	number and date	كما تعدلت بالقرار 13440 ت 27/5/2022	claude:sonnet
 367844	law/169678/art/9 مكرر	law/169678/art/2	cites	model	linked	legislation	169678	9 مكرر	169678	2	lb/decision/self/7548/art/2	البندين (3) و(4)	this text	البندين (3) و(4) من «المادة 2» من هذا القرار	claude:sonnet
 367845	law/169678/art/9 مكرر	law/169678/art/9 مكرر	cites	model	linked	legislation	169678	9 مكرر	169678	9 مكرر	lb/decision/self/7548/art/9-مكرر	\N	this text	المادة التاسعة (مكرر) هذه	claude:sonnet
-367846	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المنصوص عليها في المادة 27	claude:sonnet
-367847	law/329374/art/1	law/329374	other	model	linked	legislation	329374	1	329374	\N	lb/law/self/الصيدله-السريريه	\N	this text	صدّق اقتراح القانون الـمتعلق بالصيدلة السريرية	claude:sonnet
+367846	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	انتهاء مدة الستة اشهر المنصوص عليها في المادة نفسها	agy:gemini-4-argon-medium
+367848	law/209556	law/165942	repeals	centre	linked	legislation	209556	\N	165942	\N	\N	\N	the Centre's link	\N	\N
+367849	law/335707	law/9014	repeals	centre	linked	legislation	335707	\N	9014	\N	\N	\N	the Centre's link	\N	\N
+367850	law/335709	law/8430	repeals	centre	linked	legislation	335709	\N	8430	\N	\N	\N	the Centre's link	\N	\N
+367851	law/166716/art/2	law/166716	cites	model	linked	legislation	166716	2	166716	\N	lb/decision/self/6895	\N	this text	تحضر المعلومات المطلوبة وفق البيان المرفق بهذا التعميم	agy:gemini-4-argon-medium
+367852	law/166716/art/2	law/166716	cites	model	linked	legislation	166716	2	166716	\N	lb/decision/self/6895	\N	this text	ينبه الى وجوب تطابق الارصدة الواردة في بيان هذا التعميم	agy:gemini-4-argon-medium
+367853	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16/art/4	الفقرة 3 من دفتر الشروط الملحق	this text	بموجب الانظمة المنصوص عليها في المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
+367854	law/201023/art/1	law/258033/art/50	amend	model	linked	legislation	201023	1	258033	50	lb/decree/1989-09-15/377/art/50	الفصل الثاني	number and date	عدل رسم تأجير وسائل الاتصالات السلكية واللاسلكية الدولية الواردة في الفصل الثاني من المرسوم رقم 377 تاريخ 15/9/1989 - المادة 50 منه	agy:gemini-4-argon-medium
+367855	law/329374/art/1	law/244369	insert	model	linked	legislation	329374	1	244369	\N	lb/law/1994-08-01/367	الباب الأول	number and date	يعدّل قانون مزاولة مهنة الصيدلة (رقم 367 تاريخ 1/8/1994) بإضافة فصل جديد الى الباب الأول منه	agy:gemini-4-argon-medium
+367856	law/329374/art/1	law/244369/art/1	cites	model	linked	legislation	329374	1	244369	1	lb/law/1994-08-01/367/art/1	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
+367857	law/329374/art/1	law/244369/art/2	cites	model	linked	legislation	329374	1	244369	2	lb/law/1994-08-01/367/art/2	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
+367858	law/329374/art/1	law/244369/art/3	cites	model	linked	legislation	329374	1	244369	3	lb/law/1994-08-01/367/art/3	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
+367859	law/329374/art/1	law/244369/art/4	cites	model	linked	legislation	329374	1	244369	4	lb/law/1994-08-01/367/art/4	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
+367860	law/329374/art/1	law/244369/art/5	cites	model	linked	legislation	329374	1	244369	5	lb/law/1994-08-01/367/art/5	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
+367861	law/329374/art/1	law/244369/art/6	cites	model	linked	legislation	329374	1	244369	6	lb/law/1994-08-01/367/art/6	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
+367862	law/329374/art/1	law/244369/art/7	cites	model	linked	legislation	329374	1	244369	7	lb/law/1994-08-01/367/art/7	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
+367863	law/329374/art/1	law/244369/art/8	cites	model	linked	legislation	329374	1	244369	8	lb/law/1994-08-01/367/art/8	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium

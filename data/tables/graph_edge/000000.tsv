@@ -1777,19 +1777,15 @@
 1777	law/166714/art/2	law/178509/art/5	cites	model	linked	legislation	166714	2	178509	5	lb/decree/1997-05-08/10227/art/5	\N	number and date	المادة 5 من المرسوم 10227 تاريخ 8/5/1997	gemini-3.8-flash
 1778	law/166714/art/4	law/166699	cites	model	linked	legislation	166714	4	166699	\N	lb/decision/1998-01-02/6/98	\N	number and date	القرار رقم 6/98 السابق ذكره	gemini-3.8-flash
 1779	law/166715/art/1	\N	cites	model	unresolved	legislation	166715	1	\N	29	lb/law/1998/قانون-موازنه-1998/art/29	\N	name not found	المادة 29 من قانون موازنة 1998	gemini-3.8-flash
-1780	law/166716/art/2	\N	amend	model	unresolved	legislation	166716	2	\N	\N	lb/unknown/2010	البابين الفرعيين 20910 و20940	no text with that number	النموذج 2010	gemini-3.8-flash
-1781	law/166716/art/2	law/166716	cites	model	linked	legislation	166716	2	166716	\N	lb/decision/self/6895	البيان المرفق	this text	بهذا التعميم	gemini-3.8-flash
-1782	law/166716/art/2	law/166716	cites	model	linked	legislation	166716	2	166716	\N	lb/decision/self/6895	بيان	this text	هذا التعميم	gemini-3.8-flash
-1783	law/166716/art/2	\N	cites	model	unresolved	legislation	166716	2	\N	\N	lb/unknown/2010	باب ودائع القطاع العام	no text with that number	نموذج 2010	gemini-3.8-flash
-1784	law/166716/art/3	law/166716	cites	model	linked	legislation	166716	3	166716	\N	lb/decision/self/6895	\N	this text	هذا القرار	gemini-3.8-flash
-1785	law/166716/art/3	law/244905/art/208	cites	model	linked	legislation	166716	3	244905	208	lb/law/قانون-النقد-والتسليف/art/208	\N	code name	المادة 208 من قانون النقد والتسليف	gemini-3.8-flash
-1786	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1986-08-01/667	\N	several texts with that number	التعميم للمصارف رقم 667 تاريخ 1/8/1986	gemini-3.8-flash
-1787	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1986-11-18/685	\N	several texts with that number	التعميم للمصارف رقم 685 تاريخ 18/11/1986	gemini-3.8-flash
-1788	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1987-11-19/767	\N	several texts with that number	التعميم للمصارف رقم 767 تاريخ 19/11/1987	gemini-3.8-flash
-1789	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1990-01-03/921	\N	several texts with that number	التعميم للمصارف رقم 921 تاريخ 3/1/1990	gemini-3.8-flash
-1790	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1992-09-01/1120	\N	several texts with that number	التعميم للمصارف رقم 1120 تاريخ 1/9/1992	gemini-3.8-flash
-1791	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1994-02-26/1233	\N	several texts with that number	التعميم للمصارف والمؤسسات المالية رقم 1233 تاريخ 26/2/1994	gemini-3.8-flash
-1792	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1994-03-04/1234	\N	several texts with that number	التعميم للمصارف والمؤسسات المالية رقم 1234 تاريخ 4/3/1994	gemini-3.8-flash
+1784	law/166716/art/3	law/166716	cites	model	linked	legislation	166716	3	166716	\N	lb/decision/self/6895	\N	this text	يحال اي مصرف يخالف احكام هذا القرار امام الهيئة المصرفية العليا	agy:gemini-4-argon-medium
+1785	law/166716/art/3	law/244905/art/208	cites	model	linked	legislation	166716	3	244905	208	lb/law/قانون-النقد-والتسليف/art/208	\N	code name	العقوبات الادارية المنصوص عليها في المادة 208 من قانون النقد والتسليف	agy:gemini-4-argon-medium
+1786	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1986-08-01/667	\N	several texts with that number	تلغى التعاميم التالية كافة الصادرة عن مصرف لبنان: التعميم للمصارف رقم 667 تاريخ 1/8/1986	agy:gemini-4-argon-medium
+1787	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1986-11-18/685	\N	several texts with that number	والتعميم للمصارف رقم 685 تاريخ 18/11/1986	agy:gemini-4-argon-medium
+1788	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1987-11-19/767	\N	several texts with that number	والتعميم للمصارف رقم 767 تاريخ 19/11/1987	agy:gemini-4-argon-medium
+1789	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1990-01-03/921	\N	several texts with that number	والتعميم للمصارف رقم 921 تاريخ 3/1/1990	agy:gemini-4-argon-medium
+1790	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1992-09-01/1120	\N	several texts with that number	والتعميم للمصارف رقم 1120 تاريخ 1/9/1992	agy:gemini-4-argon-medium
+1791	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1994-02-26/1233	\N	several texts with that number	والتعميم للمصارف والمؤسسات المالية رقم 1233 تاريخ 26/2/1994	agy:gemini-4-argon-medium
+1792	law/166716/art/4	\N	repeal	model	unresolved	legislation	166716	4	\N	\N	lb/decision/1994-03-04/1234	\N	several texts with that number	والتعميم للمصارف والمؤسسات المالية رقم 1234 تاريخ 4/3/1994	agy:gemini-4-argon-medium
 1793	law/166719/art/1	law/176301	amend	model	linked	legislation	166719	1	176301	\N	lb/unknown/تعريفه-الرسوم-الجمركيه	\N	name	تعدل تعريفة الرسوم الجمركية	gemini-3.8-flash
 1794	law/166723/art/11	\N	repeal	model	unresolved	legislation	166723	11	\N	\N	lb/decision/1974-09-13/139	\N	several texts with that number	التعميم للمصارف رقم 139 تاريخ 13/9/1974	gemini-3.8-flash
 1795	law/166723/art/11	\N	repeal	model	unresolved	legislation	166723	11	\N	\N	lb/decision/1979-02-24/220	\N	several texts with that number	التعميم للمصارف رقم 220 تاريخ 24/2/1979	gemini-3.8-flash
