@@ -299,6 +299,7 @@ func TestClientKind(t *testing.T) {
 		"EveryMCP-Probe/1.0", "FraywickBot/1.0 (+https://fraywick.xyz/docs#bot)", "MCPWatch/0.1.0 longitudinal MCP security research",
 		"reliability-bureau-spike/0.1", "LEGION-tlog/1.0", "TaifoonHarvester/1.0.0", "mcp-rugpull-research/1.0",
 		"histor/0.1.0 (+https://histor.modelmarket.dev/#crawler; read-only: initialize + tools/list", "atpp-scan/1.0",
+		"livecheck/0.1.0 (+https://github.com/taktekhq/livecheck)", "lebleg-db-prod-check/1", "taktekbot-latency-check",
 	} {
 		if k := clientKind(ua, ""); k != "monitor" {
 			t.Errorf("%s: %s", ua, k)
