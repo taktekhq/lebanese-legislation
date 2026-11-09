@@ -136,7 +136,7 @@ func TestGoldenDateBound(t *testing.T) {
 func TestGoldenClientKind(t *testing.T) {
 	for _, r := range rows(t, loadGolden(t)["clientKind"]) {
 		ua, name, want := str(t, r[0]), str(t, r[1]), str(t, r[2])
-		if got := clientKind(ua, name); got != want {
+		if got := clientKind(ua, name, false); got != want {
 			t.Errorf("clientKind(%q, %q) = %q, the Worker gives %q", ua, name, got, want)
 		}
 	}
