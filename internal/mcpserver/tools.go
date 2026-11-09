@@ -172,7 +172,7 @@ func (s *Server) lawLevelLinks(ctx context.Context, lawID int64, direction strin
 	if direction == "from" {
 		join, cond = "ge.to_law_id", "ge.from_id = $1 AND ge.from_type = 'legislation' AND ge.to_law_id <> $1"
 	}
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, ge.relation, ge.to_article FROM graph_edge ge JOIN legislation l ON l.id = `+join+` `+lawJoins+`
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, ge.relation, ge.to_article FROM graph_edge ge JOIN legislation l ON l.id = `+join+` `+s.sql(ctx).lawJoins+`
 		WHERE `+cond+` AND ge.status IN ('linked', 'no_article') AND ge.relation = ANY($2)
 		ORDER BY `+lawDate+` ASC NULLS FIRST, l.id ASC, ge.id ASC`, lawID, changeRelations)
 	if err != nil {
@@ -457,8 +457,8 @@ func (s *Server) getArticle(ctx context.Context, a args) (toolResult, error) {
 // articleChanges: every text that changed this article, oldest first, with
 // the amending article's own words.
 func (s *Server) articleChanges(ctx context.Context, lawID int64, number string) ([]any, error) {
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, ge.relation, ge.from_id, ge.from_article
-		FROM graph_edge ge JOIN legislation l ON l.id = ge.from_id `+lawJoins+`
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, ge.relation, ge.from_id, ge.from_article
+		FROM graph_edge ge JOIN legislation l ON l.id = ge.from_id `+s.sql(ctx).lawJoins+`
 		WHERE ge.to_law_id = $1 AND ge.to_article = $2 AND ge.from_id <> $1
 		  AND ge.status IN ('linked', 'no_article') AND ge.relation = ANY($3)
 		ORDER BY `+lawDate+` ASC NULLS FIRST, ge.id ASC`, lawID, number, changeRelations)
@@ -517,7 +517,7 @@ func (s *Server) articleChanges(ctx context.Context, lawID int64, number string)
 }
 
 func (s *Server) articleAffected(ctx context.Context, lawID int64, number string) ([]any, error) {
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, p.repealing_article FROM possibly_affected p JOIN legislation l ON l.id = p.repealing_law_id `+lawJoins+`
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, p.repealing_article FROM `+s.sql(ctx).affected+` p JOIN legislation l ON l.id = p.repealing_law_id `+s.sql(ctx).lawJoins+`
 		WHERE p.law_id = $1 AND (p.article_number = $2 OR p.article_number IS NULL)
 		ORDER BY `+lawDate+` ASC NULLS FIRST, l.id, p.repealing_article NULLS FIRST`, lawID, number)
 	if err != nil {
@@ -671,7 +671,7 @@ func (s *Server) getGazetteIssue(ctx context.Context, a args) (toolResult, error
 	if err != nil {
 		return toolResult{}, err
 	}
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+` FROM gazette_entry e JOIN legislation l ON l.id = e.law_id `+lawJoins+` WHERE e.issue_id = $1 ORDER BY l.id`, id)
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+` FROM gazette_entry e JOIN legislation l ON l.id = e.law_id `+s.sql(ctx).lawJoins+` WHERE e.issue_id = $1 ORDER BY l.id`, id)
 	if err != nil {
 		return toolResult{}, err
 	}
@@ -1035,9 +1035,9 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 	// two subqueries and four joins. Every join is one row per law, so the
 	// rows and their order are the same (internal/site/handlers.go, laws).
 	order := fmt.Sprintf(` ORDER BY %s %s, l.id %s`, lawDate, dir, dir)
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, to_char(`+lawDate+`, 'YYYY-MM-DD')
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, to_char(`+lawDate+`, 'YYYY-MM-DD')
 		FROM (SELECT l.id FROM legislation l WHERE `+w+order+fmt.Sprintf(` LIMIT $%d`, len(params))+
-		`) p JOIN legislation l ON l.id = p.id `+lawJoins+order, params...)
+		`) p JOIN legislation l ON l.id = p.id `+s.sql(ctx).lawJoins+order, params...)
 	if err != nil {
 		return toolResult{}, err
 	}
@@ -1184,8 +1184,8 @@ func (s *Server) possiblyAffected(ctx context.Context, a args) (toolResult, erro
 	if target == nil {
 		return fail("law " + shown + " not found"), nil
 	}
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, p.repealing_article, p.article_number FROM possibly_affected p
-		JOIN legislation l ON l.id = p.repealing_law_id `+lawJoins+`
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, p.repealing_article, p.article_number FROM `+s.sql(ctx).affected+` p
+		JOIN legislation l ON l.id = p.repealing_law_id `+s.sql(ctx).lawJoins+`
 		WHERE p.law_id = $1 ORDER BY `+lawDate+` ASC NULLS FIRST, l.id, p.repealing_article NULLS FIRST, p.article_number NULLS FIRST`, lawID)
 	if err != nil {
 		return toolResult{}, err

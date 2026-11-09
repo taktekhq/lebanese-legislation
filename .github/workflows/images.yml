@@ -6,7 +6,7 @@ on:
         description: Image to publish
         type: choice
         default: all
-        options: [db, api, mcp, all, vectors]
+        options: [db, db-prod, api, mcp, all, vectors]
 permissions:
   contents: read
   packages: write
@@ -24,6 +24,24 @@ jobs:
       dockerfile: db/Dockerfile
       tags: |
         ghcr.io/taktekhq/lebanese-legislation-db:latest
+      free_disk: true
+  # Runs after a db publish too, so -db-prod never lags -db.
+  db-prod:
+    needs: db
+    if: always() && (inputs.image == 'db-prod' || (inputs.image == 'db' && needs.db.result == 'success'))
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    with:
+      image: db-prod
+      context: .
+      dockerfile: db/prod/Dockerfile
+      tags: |
+        ghcr.io/taktekhq/lebanese-legislation-db-prod:latest
+      build_args: |
+        DATA_TAG=latest
       free_disk: true
   api:
     if: inputs.image == 'api'
@@ -66,8 +84,10 @@ jobs:
       dockerfile: workers/static-site/container/Dockerfile
       tags: |
         ghcr.io/taktekhq/lebanese-legislation-all:latest
+      # the -db-prod tag -all is built from
       build_args: |
         DATA_TAG=latest
+      free_disk: true
   vectors:
     if: inputs.image == 'vectors'
     permissions:

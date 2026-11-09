@@ -11,7 +11,8 @@ ARG TARGETARCH
 ARG GIT_SHA=unknown
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags="-s -w -X github.com/taktekhq/lebanese-legislation/internal/site.BuildID=${GIT_SHA}" -o /server ./web
 
-FROM ghcr.io/taktekhq/lebanese-legislation-db:${DATA_TAG}
+# -db-prod: the -db database plus the read-optimized tables of db/prod.sql.
+FROM ghcr.io/taktekhq/lebanese-legislation-db-prod:${DATA_TAG}
 ARG GIT_SHA=unknown
 LABEL org.opencontainers.image.revision="${GIT_SHA}"
 LABEL org.opencontainers.image.description="Lebanese Legislation in one image: the database, website, JSON API and MCP server. The same image runs lebaneselegislation.com on Cloudflare Containers. Pull :latest."

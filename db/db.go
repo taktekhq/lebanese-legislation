@@ -64,4 +64,8 @@ var (
 	// patterns couldn't settle (judge).
 	//go:embed model/judgements.jsonl
 	Judgements string
+	// Prod adds the read-optimized tables of the -db-prod image (law_card,
+	// article_card, possibly_affected as a table). No new data.
+	//go:embed prod.sql
+	Prod string
 )

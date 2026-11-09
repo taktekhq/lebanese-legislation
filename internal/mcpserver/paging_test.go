@@ -11,6 +11,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
+	"github.com/taktekhq/lebanese-legislation/db"
 	"github.com/taktekhq/lebanese-legislation/internal/cursor"
 )
 
@@ -63,7 +64,17 @@ func walkServer(t *testing.T) (*Server, pgx.Tx) {
 			t.Fatalf("%v: %s", err, sql)
 		}
 	}
+	refreshCards(t, tx)
 	return newServer(tx, Config{RateLimitPerMinute: -1}), tx
+}
+
+// refreshCards reruns db/prod.sql after rows were written, as an image
+// build does after loading the data: law_card and article_card are copies.
+func refreshCards(t *testing.T, tx pgx.Tx) {
+	t.Helper()
+	if _, err := tx.Exec(context.Background(), db.Prod); err != nil {
+		t.Fatalf("db/prod.sql: %v", err)
+	}
 }
 
 // truth runs one unpaged query and returns its first column as strings.
@@ -289,6 +300,7 @@ func TestCursorStableWhileTextsAreAdded(t *testing.T) {
 	if _, err := tx.Exec(context.Background(), `INSERT INTO legislation (id, kind, number, issued_on, title, status) VALUES (950001, 'قانون', '1', '1852-12-31', 'نص جديد', 'in_force')`); err != nil {
 		t.Fatal(err)
 	}
+	refreshCards(t, tx)
 	second := call(t, s, "list_legislation", map[string]any{"since": "1850", "until": "1852", "limit": 10, "cursor": first["next_cursor"]}).result
 	want := truth(t, tx, `SELECT l.id FROM legislation l WHERE coalesce(l.gazette_date, l.issued_on) BETWEEN '1850-01-01' AND '1852-12-31'
 		ORDER BY coalesce(l.gazette_date, l.issued_on) DESC, l.id DESC LIMIT 21`)

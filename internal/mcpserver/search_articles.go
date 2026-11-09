@@ -48,7 +48,7 @@ type codeName struct {
 // codes are the codes' ids, titles and slugs (26 rows, read when a question
 // is checked for a code's name).
 func (s *Server) codes(ctx context.Context) ([]codeName, error) {
-	rows, err := s.db.Query(ctx, `SELECT l.id, l.title, c.slug FROM `+lawFrom+` WHERE c.slug IS NOT NULL ORDER BY l.id`)
+	rows, err := s.db.Query(ctx, `SELECT l.id, l.title, c.slug FROM `+s.sql(ctx).lawFrom+` WHERE c.slug IS NOT NULL ORDER BY l.id`)
 	if err != nil {
 		return nil, err
 	}
@@ -211,7 +211,7 @@ func (s *Server) findArticles(ctx context.Context, q string, limit int) (out []a
 
 // articleHits reads hits by a condition on a (the article) and l (its law).
 func (s *Server) articleHits(ctx context.Context, where string, params ...any) ([]articleHit, error) {
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, a.law_id, a.number, a.text_ar FROM legislation_article a JOIN legislation l ON l.id = a.law_id `+lawJoins+` WHERE `+where, params...)
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, a.law_id, a.number, a.text_ar FROM legislation_article a JOIN legislation l ON l.id = a.law_id `+s.sql(ctx).lawJoins+` WHERE `+where, params...)
 	if err != nil {
 		return nil, err
 	}
@@ -244,8 +244,8 @@ func (s *Server) hitsFor(ctx context.Context, cands []candidate, textCol string)
 	for i, c := range cands {
 		laws[i], pos[i] = int32(c.lawID), int32(c.position)
 	}
-	rows, err := s.db.Query(ctx, `SELECT `+lawCols+`, a.law_id, a.position, a.number, coalesce(`+textCol+`, '')
-		FROM legislation_article a JOIN legislation l ON l.id = a.law_id `+lawJoins+`
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, a.law_id, a.position, a.number, coalesce(`+textCol+`, '')
+		FROM legislation_article a JOIN legislation l ON l.id = a.law_id `+s.sql(ctx).lawJoins+`
 		WHERE (a.law_id, a.position) IN (SELECT * FROM unnest($1::int[], $2::int[]))`, laws, pos)
 	if err != nil {
 		return nil, err

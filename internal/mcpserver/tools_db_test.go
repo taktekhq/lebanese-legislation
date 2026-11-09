@@ -619,3 +619,131 @@ func TestToolsAgainstFixtureAreJSON(t *testing.T) {
 	_ = context.Background
 	_ = json.Valid
 }
+
+// TestLayoutsAgree: on the -db-prod shape (law_card, article_card) every
+// tool answers byte for byte what it answers when it computes the same
+// columns from the corpus tables, as on the -db image.
+func TestLayoutsAgree(t *testing.T) {
+	s := dbServer(t)
+	if got := s.sql(context.Background()); got != &cards {
+		t.Fatalf("layout %s, want cards: db/prod.sql ran on the fixture", got.name)
+	}
+	plain := newServer(testPool, Config{RateLimitPerMinute: -1})
+	plain.layout.Store(&computed)
+	type toolCall struct {
+		name string
+		args map[string]any
+	}
+	calls := []toolCall{
+		{"search_legislation", map[string]any{"query": "قانون"}},
+		{"search_legislation", map[string]any{"query": "عقد"}},
+		{"list_legislation", map[string]any{}},
+		{"list_legislation", map[string]any{"order": "oldest"}},
+		{"list_gazette_issues", map[string]any{}},
+	}
+	rows, err := testPool.Query(context.Background(), `SELECT id FROM legislation ORDER BY id`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var laws []int64
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			t.Fatal(err)
+		}
+		laws = append(laws, id)
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatal(err)
+	}
+	for _, id := range laws {
+		calls = append(calls,
+			toolCall{"get_law", map[string]any{"id": id}},
+			toolCall{"get_law_texts", map[string]any{"law_id": id}},
+			toolCall{"possibly_affected", map[string]any{"law_id": id}},
+			toolCall{"get_links", map[string]any{"key": fmt.Sprintf("law/%d", id)}})
+	}
+	arts, err := testPool.Query(context.Background(), `SELECT law_id, number FROM legislation_article ORDER BY law_id, position`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for arts.Next() {
+		var id int64
+		var number string
+		if err := arts.Scan(&id, &number); err != nil {
+			t.Fatal(err)
+		}
+		calls = append(calls, toolCall{"get_article", map[string]any{"law_id": id, "number": number}})
+	}
+	if err := arts.Err(); err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range calls {
+		body := map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": c.name, "arguments": c.args}}
+		got, want := post(s, body, nil).Body.String(), post(plain, body, nil).Body.String()
+		if got != want {
+			t.Errorf("%s %v: cards and computed answers differ\ncards:    %.300s\ncomputed: %.300s", c.name, c.args, got, want)
+		}
+	}
+	if len(calls) < 20 {
+		t.Errorf("only %d calls: the fixture should have laws and articles", len(calls))
+	}
+}
+
+// Card tables from another prod.sql version (other columns) are not read.
+func TestLayoutNeedsItsVersion(t *testing.T) {
+	if testPool == nil {
+		t.Skip("set LEBLEG_TEST_DSN to a disposable Postgres database")
+	}
+	ctx := context.Background()
+	tx, err := testPool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err := tx.Exec(ctx, `COMMENT ON TABLE article_card IS 'lebleg-prod 0'`); err != nil {
+		t.Fatal(err)
+	}
+	if got := newServer(tx, Config{RateLimitPerMinute: -1}).sql(ctx); got != &computed {
+		t.Errorf("layout %s, want computed for another version", got.name)
+	}
+}
+
+// On the -db shape (no card tables at all) the server computes the columns
+// and answers as on -db-prod.
+func TestOldShape(t *testing.T) {
+	prod := dbServer(t)
+	ctx := context.Background()
+	// search_legislation runs queries in parallel, which one transaction
+	// cannot: TestLayoutsAgree covers it on the computed layout.
+	calls := map[string]map[string]any{
+		"get_law": {"id": 430}, "get_article": {"law_id": 430, "number": "37"},
+		"get_law_texts": {"law_id": 430}, "get_links": {"key": "law/430"}, "list_legislation": {}, "possibly_affected": {"law_id": 430},
+	}
+	body := func(name string) map[string]any {
+		return map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": name, "arguments": calls[name]}}
+	}
+	// the -db-prod answers first: the transaction below locks the dropped tables
+	want := map[string]string{}
+	for name := range calls {
+		want[name] = post(prod, body(name), nil).Body.String()
+	}
+	tx, err := testPool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err := tx.Exec(ctx, `DROP TABLE law_card, article_card, possibly_affected_t`); err != nil {
+		t.Fatal(err)
+	}
+	old := newServer(tx, Config{RateLimitPerMinute: -1})
+	if got := old.sql(ctx); got != &computed {
+		t.Fatalf("layout %s, want computed without the card tables", got.name)
+	}
+	for name := range calls {
+		got := post(old, body(name), nil).Body.String()
+		if got != want[name] || strings.Contains(got, `"error"`) {
+			t.Errorf("%s: -db shape %.300s\n-db-prod shape %.300s", name, got, want[name])
+		}
+	}
+}

@@ -37,10 +37,10 @@ type articleRow struct {
 	Calculated *string
 }
 
-// articleCols and articleFrom select an articleRow's raw columns (alias a).
-// The two lateral reads are article_in_force's latest and worded versions,
+// articleColsComputed and articleFromComputed select an articleRow's raw
+// columns (alias a) in the computed layout. The two lateral reads are article_in_force's latest and worded versions,
 // for this article only: the view itself reads every version first.
-const articleCols = `a.law_id, a.position, a.number, a.note, a.text_ar, a.text_fr, a.in_force_from, a.section_id,
+const articleColsComputed = `a.law_id, a.position, a.number, a.note, a.text_ar, a.text_fr, a.in_force_from, a.section_id,
 	CASE WHEN st.state = 'repealed' OR v.state = 'repealed' THEN NULL ELSE coalesce(w.text_ar, a.text_ar) END,
 	coalesce(w.major || '.' || w.minor, '1.0'), st.state,
 	st.state = 'in_force' AND coalesce(v.state = 'in_force' AND v.text_ar IS NULL AND (w.major IS NULL OR w.major < v.major), false),
@@ -50,7 +50,7 @@ const articleCols = `a.law_id, a.position, a.number, a.note, a.text_ar, a.text_f
 	   AND x.article_number IS NULL AND x.action = 'repeal' AND x.part IS NULL AND x.status = 'applied')
 	 OR EXISTS (SELECT 1 FROM council_ruling cr WHERE cr.law_id = a.law_id AND (cr.number = '' OR cr.number = a.number) AND cr.effect IN ('annulled', 'not_in_force')))`
 
-const articleFrom = `legislation_article a
+const articleFromComputed = `legislation_article a
 	JOIN legislation al ON al.id = a.law_id
 	LEFT JOIN LATERAL (SELECT av.state, av.text_ar, av.major, av.valid_from FROM article_version av
 	  WHERE av.law_id = a.law_id AND av.article_number = a.number ORDER BY av.major DESC, av.minor DESC LIMIT 1) v ON true
@@ -64,7 +64,8 @@ const articleFrom = `legislation_article a
 var scanReadings = strings.NewReplacer("", "⟦", "", " | ", "", "⟧").Replace
 
 func (s *Server) queryArticles(ctx context.Context, where string, args ...any) ([]articleRow, error) {
-	rows, err := s.db.Query(ctx, `SELECT `+articleCols+` FROM `+articleFrom+` WHERE `+where, args...)
+	L := s.sql(ctx)
+	rows, err := s.db.Query(ctx, `SELECT `+L.articleCols+` FROM `+L.articleFrom+` WHERE `+where, args...)
 	if err != nil {
 		return nil, err
 	}
