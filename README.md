@@ -137,6 +137,8 @@ The same image, `ghcr.io/taktekhq/lebanese-legislation-all`, runs in both. It ho
 | API, MCP, search | the Worker passes them to `-all` (Cloudflare Containers, blue/green, `workers/origin`) | `-all` directly |
 | Run it | `origin.yml` deploys it | `docker compose --profile all up all`, then open http://localhost:8080 |
 
+To check that production serves the latest main (pages, API, MCP and the `/healthz` build), run [livecheck](https://github.com/taktekhq/livecheck) in the repository root; it reads [`livecheck.yaml`](livecheck.yaml).
+
 In development every page is rendered on request, which is slower than production but needs nothing besides the image. To get the exact static copy production serves, run `static-export` against the database: see [docs/static-export.md](docs/static-export.md).
 
 ## Run the services locally

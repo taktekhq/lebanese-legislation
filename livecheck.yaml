@@ -1,0 +1,33 @@
+# What production must show. Run `livecheck` here after a deploy (github.com/taktekhq/livecheck).
+# Read-only requests only; the MCP limit is 60 calls a minute per IP, so keep burst small.
+checks:
+  - name: home page
+    url: https://lebaneselegislation.com/
+    contains: "التشريع اللبناني"
+    max_ms: 2000
+
+  - name: law page
+    url: https://lebaneselegislation.com/decree/244565/
+    contains: "قانون اصول المحاكمات المدنية"
+    max_ms: 2000
+
+  - name: search API
+    url: https://lebaneselegislation.com/api/v1/search/?q=%D9%82%D8%A7%D9%86%D9%88%D9%86%20%D8%A7%D9%84%D8%B9%D9%85%D9%84
+    json: {q: "قانون العمل"}
+    contains: '"id":190374'
+    max_ms: 3000
+
+  - name: deployed build is main
+    url: https://lebaneselegislation.com/healthz
+    json: {status: ok, build: "{{git.main}}"}
+    grace: 2h # checks, then origin.yml, deploy every push to main
+
+  - name: MCP get_article
+    url: https://lebaneselegislation.com/mcp
+    method: POST
+    headers: {Content-Type: application/json, Accept: "application/json, text/event-stream"}
+    body: '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_article","arguments":{"law_id":244565,"number":"1"}}}'
+    json: {result: {isError: false}}
+    contains: text_ar
+    burst: 6
+    max_ms: 1500
