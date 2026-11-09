@@ -9,7 +9,9 @@
 // by its length. Texts that hold every word come first; then the ones missing
 // the commonest words, which cost the least (Meilisearch's "frequency"
 // matching strategy). That is one query per kind of text, not a chain of
-// retries, and nothing is loaded into the server's memory.
+// retries. A caller with an Index (the MCP server on the all-in-one image)
+// ranks the same candidates from word lists in memory instead (index.go),
+// with the same answers.
 //
 // It replaced (7 Nov 2026) an FTS5 port in the MCP server that scored every
 // candidate in Go and, when no text held every word, retried up to a dozen
@@ -447,6 +449,12 @@ type source struct {
 // is worth more).
 const bm25K1, bm25B = 1.2, 0.75
 
+// normSQL is BM25's length factor of length (SQL over the source), for a
+// corpus whose average length is avgLen. A score is (W * normSQL)::float8.
+func normSQL(length string, avgLen float64) string {
+	return fmt.Sprintf("%g / (1 + %g * (%g + %g * (%s)::float8 / %g))", bm25K1+1, bm25K1, 1-bm25B, bm25B, length, math.Max(avgLen, 1))
+}
+
 // candidates is SQL for every candidate of a plan: its keys (names), units
 // (how many of the question's words it holds) and score, from the rows of
 // k.from that pass filter. Its parameters are appended to params.
@@ -455,10 +463,7 @@ func candidates(p plan, idx []index, k source, filter string, params *[]any) str
 	if filter != "" {
 		and = " AND " + filter
 	}
-	avg := math.Max(p.avgLen, 1)
-	norm := func(length string) string {
-		return fmt.Sprintf("%g / (1 + %g * (%g + %g * (%s)::float8 / %g))", bm25K1+1, bm25K1, 1-bm25B, bm25B, length, avg)
-	}
+	norm := func(length string) string { return normSQL(length, p.avgLen) }
 	if p.words == 0 { // every word common: the texts holding all of them, the shortest first
 		var qs []string
 		for _, l := range p.common {

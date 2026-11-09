@@ -15,7 +15,12 @@ dataset image that strangers pull; the MCP server also runs on it, computing
 the same columns at request time (slower under parallel calls).
 
 `Dockerfile` builds the Go server and adds it and `start.sh` to `-db-prod` at
-`DATA_TAG`. Build from the repository root with
+`DATA_TAG`, with the MCP search's word lists (`/opt/lebleg/search-index`,
+`MCP_SEARCH_INDEX`): `lebleg-web search-index` writes them from that same
+database in a build stage, and `search_legislation` ranks from them
+(`internal/wordsearch` `Index`, the file mapped read-only) with the same
+answers. Without the file, or with one from another database, the server
+searches with the SQL. Build from the repository root with
 `docker build -f workers/static-site/container/Dockerfile --build-arg DATA_TAG=latest .`.
 The server serves dynamic pages, `/api/v1/`, and the ten-tool
 `internal/mcpserver` handler at `/mcp` over the same canonical database.

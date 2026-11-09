@@ -70,6 +70,13 @@ type Config struct {
 	// kind counts 4. A call that finds no room within 2 s gets a 503.
 	CallUnits int
 
+	// SearchIndex is the file of search_legislation's word lists
+	// (wordsearch.Index; "lebleg-web search-index" writes it, the -all
+	// image has it); "" searches with the GIN indexes alone. The server maps
+	// it read-only in the background and searches without it until it is
+	// ready (about 0.1 s), or for good if it does not match the database.
+	SearchIndex string
+
 	// HuggingFaceAPI is the Hugging Face API base (https://huggingface.co/api
 	// when empty), for the "last updated" badge and SendHFStats.
 	HuggingFaceAPI string
@@ -107,6 +114,7 @@ func ConfigFromEnv(getenv func(string) string) Config {
 	if v, err := strconv.Atoi(getenv("MCP_CALL_UNITS")); err == nil {
 		c.CallUnits = v
 	}
+	c.SearchIndex = getenv("MCP_SEARCH_INDEX")
 	return c
 }
 
@@ -126,6 +134,7 @@ type Server struct {
 
 	layout      atomic.Pointer[layout]           // the database's layout, once known (db.go sql)
 	searchKnown atomic.Pointer[wordsearch.Known] // read once for the searches (search_pg.go known)
+	searchIndex *indexLoad                       // the word lists' load, nil for none (search_pg.go)
 
 	badgeMu    sync.Mutex
 	badgeAt    time.Time
@@ -148,6 +157,9 @@ func newServer(db querier, cfg Config) *Server {
 		s.client = &http.Client{Timeout: 10 * time.Second}
 	}
 	s.calls, s.callUnits = newCallSem(cfg.CallUnits)
+	if cfg.SearchIndex != "" {
+		s.searchIndex = loadIndex(s, cfg.SearchIndex)
+	}
 	if cfg.RateLimitPerMinute >= 0 {
 		n := cfg.RateLimitPerMinute
 		if n == 0 {

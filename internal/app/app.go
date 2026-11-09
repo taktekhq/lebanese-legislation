@@ -30,6 +30,7 @@ import (
 	"github.com/taktekhq/lebanese-legislation/internal/semantic"
 	"github.com/taktekhq/lebanese-legislation/internal/site"
 	"github.com/taktekhq/lebanese-legislation/internal/vectorize"
+	"github.com/taktekhq/lebanese-legislation/internal/wordsearch"
 )
 
 // Defaults for semantic search set up from GEMINI_API_KEY alone.
@@ -51,7 +52,9 @@ type config struct {
 }
 
 // Main runs mode. With the single argument "healthcheck" it asks the running
-// service for /healthz instead (the images have no shell or curl).
+// service for /healthz instead (the images have no shell or curl); with
+// "search-index FILE" it writes the MCP search's word lists to FILE from
+// the database (DATABASE_URL), as the image build does.
 func Main(mode string) {
 	log.SetFlags(0)
 	if m := os.Getenv("APP_MODE"); m != "" {
@@ -61,6 +64,13 @@ func Main(mode string) {
 	if len(args) == 1 && args[0] == "healthcheck" {
 		if err := healthcheck(listenAddr(mode)); err != nil {
 			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(args) == 2 && args[0] == "search-index" {
+		if err := buildSearchIndex(args[1]); err != nil {
+			fmt.Fprintln(os.Stderr, "search-index:", err)
 			os.Exit(1)
 		}
 		return
@@ -469,4 +479,46 @@ func withMCP(next, mcp http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+// buildSearchIndex writes wordsearch.BuildIndex's file to path, through a
+// temporary file, so a failed build leaves none.
+func buildSearchIndex(path string) error {
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		dsn = os.Getenv("LEBLEG_DSN")
+	}
+	if dsn == "" {
+		return errors.New("DATABASE_URL is required")
+	}
+	ctx := context.Background()
+	pool, err := pgxpool.New(ctx, dsn)
+	if err != nil {
+		return err
+	}
+	defer pool.Close()
+	t := time.Now()
+	tmp := path + ".tmp"
+	f, err := os.Create(tmp)
+	if err != nil {
+		return err
+	}
+	if err := wordsearch.BuildIndex(ctx, pool, f); err != nil {
+		f.Close()
+		os.Remove(tmp)
+		return err
+	}
+	if err := f.Close(); err != nil {
+		os.Remove(tmp)
+		return err
+	}
+	if err := os.Rename(tmp, path); err != nil {
+		return err
+	}
+	st, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	log.Printf("search-index: %s, %d bytes, in %v", path, st.Size(), time.Since(t).Round(time.Millisecond))
+	return nil
 }

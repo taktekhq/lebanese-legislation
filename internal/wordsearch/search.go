@@ -97,6 +97,9 @@ type Page struct {
 type Known struct {
 	Codes    []int32 // code.law_id
 	Unserved []int32 // legislation ids whose kind has no legislation_kind row
+	// Index answers the searches from word lists made with the image
+	// (see Index), with the same answers; nil searches with the GIN indexes.
+	Index *Index
 }
 
 // LawQuery asks for laws by the words of their titles.
@@ -117,6 +120,9 @@ type LawQuery struct {
 	// NoCount leaves Page.Total and Page.Full at 0: the caller reads only
 	// the hits, and counting every candidate keeps them all in memory.
 	NoCount bool
+	// NoPhrase: the caller does not read Hit.Phrase. An answer from the
+	// Index then skips the phrase test (one query); the SQL still makes it.
+	NoPhrase bool
 }
 
 // ArticleQuery asks for articles by the words of their text.
@@ -142,6 +148,7 @@ type RulingQuery struct {
 	After    *Key
 	Known    *Known // see Known; nil joins the tables
 	NoCount  bool   // see LawQuery
+	NoPhrase bool   // see LawQuery
 }
 
 // fullOnly says a search keeps only the texts holding every word: a question
@@ -175,6 +182,11 @@ func Laws(ctx context.Context, db Querier, q LawQuery) (Page, error) {
 	p, err := planWords(ctx, db, terms, idx)
 	if err != nil {
 		return Page{}, err
+	}
+	if q.Known != nil && q.Known.Index != nil && q.After == nil && len(q.Except) == 0 {
+		if pg, err := q.Known.Index.laws(ctx, db, q, p, idx); q.Known.Index.exact(err) != errNotExact {
+			return pg, err
+		}
 	}
 	var params []any
 	var where []string
@@ -237,9 +249,19 @@ func Laws(ctx context.Context, db Querier, q LawQuery) (Page, error) {
 // question that a title can hold, at most 20: their articles rank first
 // among the rest ("حماية المستهلك" is the Consumer Protection Law's).
 func TitleLaws(ctx context.Context, db Querier, text string) ([]int32, error) {
+	return titleLaws(ctx, db, text, nil)
+}
+
+// titleLaws is TitleLaws, from known's index when it has one.
+func titleLaws(ctx context.Context, db Querier, text string, known *Known) ([]int32, error) {
 	p, err := planWords(ctx, db, Terms(text), titleIndexes)
 	if err != nil || p.words == 0 {
 		return nil, err
+	}
+	if known != nil && known.Index != nil {
+		if ids, err := known.Index.titleLaws(ctx, p); known.Index.exact(err) != errNotExact {
+			return ids, err
+		}
 	}
 	var params []any
 	cands := candidates(p, titleIndexes, source{from: "legislation l", keys: "l.id AS id", names: "id", length: "length(l.title)"}, "", &params)
@@ -274,7 +296,7 @@ func Articles(ctx context.Context, db Querier, q ArticleQuery) (Page, error) {
 	}
 	var titles []int32
 	if q.Titled && !q.French && q.LawID == 0 {
-		if titles, err = TitleLaws(ctx, db, q.Text); err != nil {
+		if titles, err = titleLaws(ctx, db, q.Text, q.Known); err != nil {
 			return Page{}, err
 		}
 	}
@@ -283,6 +305,24 @@ func Articles(ctx context.Context, db Querier, q ArticleQuery) (Page, error) {
 	if q.LawID != 0 {
 		params = append(params, q.LawID)
 		filter = fmt.Sprintf("a.law_id = $%d", len(params))
+	}
+	if q.Known != nil && q.Known.Index != nil && q.After == nil {
+		fam := "article"
+		if q.French {
+			fam = "article_fr"
+		}
+		ip := idxPage{fam: fam, fallback: q.Fallback, titles: titles, unserved: q.Known.Unserved,
+			noCount: q.NoCount, phrase: idx[0].phrase("$1"), join: "legislation_article a ON a.law_id = u.id AND a.position = u.pos", text: q.Text}
+		if q.LawID != 0 {
+			law := int32(q.LawID)
+			ip.filter = func(docs *Docs, d int32) bool { return docs.ID[d] == law }
+		}
+		if q.Full || fullOnly(q.Text, !q.French) {
+			ip.least = p.units()
+		}
+		if pg, err := q.Known.Index.page(ctx, db, p, idx, ip, q.Limit); q.Known.Index.exact(err) != errNotExact {
+			return pg, err
+		}
 	}
 	src := source{from: "legislation_article a", keys: "a.law_id AS law_id, a.position AS position", names: "law_id, position", length: length}
 	src.unique = q.Known != nil
@@ -318,6 +358,16 @@ func Rulings(ctx context.Context, db Querier, q RulingQuery) (Page, error) {
 	p, err := planWords(ctx, db, Terms(q.Text), rulingIndexes)
 	if err != nil || p.empty() {
 		return Page{}, err
+	}
+	if q.Known != nil && q.Known.Index != nil && q.After == nil {
+		ip := idxPage{fam: "ruling", fallback: q.Fallback, idDesc: true, noCount: q.NoCount, noPhrase: q.NoPhrase,
+			phrase: rulingIndexes[0].phrase("$1"), join: "ruling r ON r.id = u.id", text: q.Text}
+		if q.Full || fullOnly(q.Text, true) {
+			ip.least = p.units()
+		}
+		if pg, err := q.Known.Index.page(ctx, db, p, rulingIndexes, ip, q.Limit); q.Known.Index.exact(err) != errNotExact {
+			return pg, err
+		}
 	}
 	var params []any
 	src := source{from: "ruling r", keys: "r.id AS id", names: "id", length: "r.text_len"}

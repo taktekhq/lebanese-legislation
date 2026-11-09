@@ -4,6 +4,8 @@ import (
 	"context"
 	"sort"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/taktekhq/lebanese-legislation/internal/wordsearch"
 )
@@ -29,6 +31,22 @@ const knownVersion = "lebleg-prod 3"
 // with another mark) the searches join as before (nil); a failed read is
 // not remembered.
 func (s *Server) known(ctx context.Context) *wordsearch.Known {
+	k := s.knownTables(ctx)
+	if k == nil || k.Index != nil || s.searchIndex == nil {
+		return k
+	}
+	idx := s.searchIndex.ready()
+	if idx == nil {
+		return k
+	}
+	withIndex := *k
+	withIndex.Index = idx
+	s.searchKnown.CompareAndSwap(k, &withIndex)
+	return s.searchKnown.Load()
+}
+
+// knownTables is known without the word lists.
+func (s *Server) knownTables(ctx context.Context) *wordsearch.Known {
 	if k := s.searchKnown.Load(); k != nil {
 		if k.Codes == nil {
 			return nil // no search_known in this database
@@ -49,7 +67,75 @@ func (s *Server) known(ctx context.Context) *wordsearch.Known {
 		}
 	}
 	s.searchKnown.CompareAndSwap(nil, k)
-	return s.known(ctx)
+	return s.knownTables(ctx)
+}
+
+// indexLoad is the word lists' load: one per path in a process (the
+// servers of a test or a benchmark share it).
+type indexLoad struct {
+	done chan struct{}
+	idx  *wordsearch.Index
+}
+
+var indexLoads sync.Map // Config.SearchIndex → *indexLoad
+
+// loadIndex starts loading the lists of the file at where for s, once per
+// process. They need the codes (search_known) and the database's
+// fingerprint; a database not up yet is tried again for a minute.
+func loadIndex(s *Server, where string) *indexLoad {
+	l, loaded := indexLoads.LoadOrStore(where, &indexLoad{done: make(chan struct{})})
+	if loaded {
+		return l.(*indexLoad)
+	}
+	load := l.(*indexLoad)
+	go func() {
+		defer close(load.done)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		defer cancel()
+		t := time.Now()
+		var k *wordsearch.Known
+		for i := 0; i < 60; i++ {
+			if k = s.knownTables(ctx); k != nil || s.searchKnown.Load() != nil {
+				break
+			}
+			time.Sleep(time.Second)
+		}
+		if k == nil {
+			s.logf("search index %s: no search_known, searching without it", where)
+			return
+		}
+		idx, err := wordsearch.LoadIndexFile(ctx, s.db, where, k.Codes)
+		if err != nil {
+			s.logf("search index %s: %v; searching without it", where, err)
+			return
+		}
+		load.idx = idx
+		s.logf("search index %s ready in %v", where, time.Since(t).Round(time.Millisecond))
+	}()
+	return load
+}
+
+// ready is the index once loaded, nil until then or if it failed.
+func (l *indexLoad) ready() *wordsearch.Index {
+	select {
+	case <-l.done:
+		return l.idx
+	default:
+		return nil
+	}
+}
+
+// WaitSearchIndex waits until the search index's load ends (a benchmark
+// times the index, not the load); true if the searches use it.
+func (s *Server) WaitSearchIndex(ctx context.Context) bool {
+	if s.searchIndex == nil {
+		return false
+	}
+	select {
+	case <-s.searchIndex.done:
+	case <-ctx.Done():
+	}
+	return s.searchIndex.ready() != nil
 }
 
 // rankedLaws are the laws whose titles (Arabic, or the unofficial English
@@ -61,7 +147,7 @@ func (s *Server) rankedLaws(ctx context.Context, q string, en bool, year yearVal
 		y = int(truncf(year.f))
 	}
 	pg, err := wordsearch.Laws(ctx, s.db, wordsearch.LawQuery{Text: q, English: en, Year: y, Number: num, Limit: limit,
-		Known: s.known(ctx), NoCount: true})
+		Known: s.known(ctx), NoCount: true, NoPhrase: true})
 	if err != nil || len(pg.Hits) == 0 {
 		return nil, 0, err
 	}
@@ -121,7 +207,7 @@ func (s *Server) rankedArticles(ctx context.Context, q string, fr bool, lawID, l
 // rankedRulings are the rulings whose title or text holds the question's
 // words, best first.
 func (s *Server) rankedRulings(ctx context.Context, q string, limit int) (out []any, full int, err error) {
-	pg, err := wordsearch.Rulings(ctx, s.db, wordsearch.RulingQuery{Text: q, Limit: limit, Known: s.known(ctx), NoCount: true})
+	pg, err := wordsearch.Rulings(ctx, s.db, wordsearch.RulingQuery{Text: q, Limit: limit, Known: s.known(ctx), NoCount: true, NoPhrase: true})
 	out = []any{}
 	if err != nil || len(pg.Hits) == 0 {
 		return out, 0, err
