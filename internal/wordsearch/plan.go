@@ -436,6 +436,9 @@ type source struct {
 	// above its start or its stem), not by the bucket's words: for short
 	// texts, where reading each one's vector costs little.
 	perRow bool
+	// unique: each row of from is one text (names is its key), so a single
+	// bucket has no duplicates to sort out
+	unique bool
 }
 
 // BM25's constants. Each word counts once: the index says whether a text
@@ -541,6 +544,12 @@ func candidates(p plan, idx []index, k source, filter string, params *[]any) str
 		ctes = append(ctes, fmt.Sprintf(`%s AS MATERIALIZED (SELECT %s, %d AS units, (%s * %s)::float8 AS score FROM %s WHERE %s%s%s)`,
 			name, k.keys, n, weightOf(p.order[:n]), norm(k.length), k.from, strings.Join(conds, " AND "), and, gate))
 		names = append(names, name)
+	}
+	if len(names) == 1 && k.unique {
+		// one bucket of texts each read once: nothing to merge. It stays a
+		// MATERIALIZED CTE: inlined, Postgres may walk the table in the
+		// ranking's order and test every text's vector (2.5 s for "العمل").
+		return fmt.Sprintf(`WITH %s SELECT * FROM %s`, ctes[0], names[0])
 	}
 	var all []string
 	for _, nm := range names {

@@ -16,6 +16,42 @@ import (
 // the best ones.
 const topRanked = 50
 
+// The searches read only their hits (Hit.Full, never Page.Total), so they
+// ask for no counts (NoCount).
+
+// knownVersion is the mark db/prod.sql puts on search_known.
+const knownVersion = "lebleg-prod 3"
+
+// known is what the searches read once instead of joining it to every
+// candidate (wordsearch.Known): the codes and the laws of a kind the site
+// does not serve (none today), from search_known (db/prod.sql). The
+// database does not change while the server runs. Without the table (or
+// with another mark) the searches join as before (nil); a failed read is
+// not remembered.
+func (s *Server) known(ctx context.Context) *wordsearch.Known {
+	if k := s.searchKnown.Load(); k != nil {
+		if k.Codes == nil {
+			return nil // no search_known in this database
+		}
+		return k
+	}
+	var mark *string
+	if err := s.db.QueryRow(ctx, `SELECT obj_description(to_regclass('search_known'), 'pg_class')`).Scan(&mark); err != nil {
+		return nil
+	}
+	k := &wordsearch.Known{}
+	if mark != nil && *mark == knownVersion {
+		if err := s.db.QueryRow(ctx, `SELECT codes, unserved FROM search_known`).Scan(&k.Codes, &k.Unserved); err != nil {
+			return nil
+		}
+		if k.Codes == nil {
+			k.Codes = []int32{}
+		}
+	}
+	s.searchKnown.CompareAndSwap(nil, k)
+	return s.known(ctx)
+}
+
 // rankedLaws are the laws whose titles (Arabic, or the unofficial English
 // with en) hold the question's words, best first. full is how many of them
 // hold every word.
@@ -24,7 +60,8 @@ func (s *Server) rankedLaws(ctx context.Context, q string, en bool, year yearVal
 	if year.positive() {
 		y = int(truncf(year.f))
 	}
-	pg, err := wordsearch.Laws(ctx, s.db, wordsearch.LawQuery{Text: q, English: en, Year: y, Number: num, Limit: limit})
+	pg, err := wordsearch.Laws(ctx, s.db, wordsearch.LawQuery{Text: q, English: en, Year: y, Number: num, Limit: limit,
+		Known: s.known(ctx), NoCount: true})
 	if err != nil || len(pg.Hits) == 0 {
 		return nil, 0, err
 	}
@@ -47,7 +84,8 @@ func (s *Server) rankedLaws(ctx context.Context, q string, en bool, year yearVal
 // first, with an exact phrase first among the best ones that hold as many
 // words. lawID keeps them to one text; fr searches the French texts.
 func (s *Server) rankedArticles(ctx context.Context, q string, fr bool, lawID, limit int) (hits []articleHit, full int, err error) {
-	pg, err := wordsearch.Articles(ctx, s.db, wordsearch.ArticleQuery{Text: q, French: fr, LawID: lawID, Titled: true, Limit: max(limit, topRanked)})
+	pg, err := wordsearch.Articles(ctx, s.db, wordsearch.ArticleQuery{Text: q, French: fr, LawID: lawID, Titled: true, Limit: max(limit, topRanked),
+		Known: s.known(ctx), NoCount: true})
 	if err != nil || len(pg.Hits) == 0 {
 		return nil, 0, err
 	}
@@ -83,7 +121,7 @@ func (s *Server) rankedArticles(ctx context.Context, q string, fr bool, lawID, l
 // rankedRulings are the rulings whose title or text holds the question's
 // words, best first.
 func (s *Server) rankedRulings(ctx context.Context, q string, limit int) (out []any, full int, err error) {
-	pg, err := wordsearch.Rulings(ctx, s.db, wordsearch.RulingQuery{Text: q, Limit: limit})
+	pg, err := wordsearch.Rulings(ctx, s.db, wordsearch.RulingQuery{Text: q, Limit: limit, Known: s.known(ctx), NoCount: true})
 	out = []any{}
 	if err != nil || len(pg.Hits) == 0 {
 		return out, 0, err
