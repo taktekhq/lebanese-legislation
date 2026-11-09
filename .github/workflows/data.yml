@@ -8,6 +8,16 @@ name: data
 # HF_TOKEN secret (in the huggingface environment) is set; without it, it says
 # so and uploads nothing. Run it on your own machine with act (see docs/ci.md):
 #   act workflow_dispatch -W .github/workflows/data.yml --input publish=true -s HF_TOKEN
+#
+# On main the images follow: -db (data/ baked in), -db-prod (-db plus
+# db/prod.sql) and -all (-db-prod plus the server); origin.yml deploys -all
+# when this run succeeds. The changes job reads what the push changed. A push
+# that changes no data (data/, the data-*.sh scripts, this file), only
+# db/prod.sql or db/prod/, skips build, publish and db: the dataset and -db stay
+# as they are, so nothing goes to Hugging Face, and -db-prod is built from the
+# published -db of this commit's data (.github/scripts/render-db-tag.sh, which
+# leaves db/prod* out). About 11 minutes to -all instead of about 60. Pull
+# requests, manual runs and pushes that change data run every job as before.
 on:
   pull_request:
     paths: ["data/**", "db/prod.sql", "db/prod/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
@@ -23,12 +33,80 @@ on:
 permissions:
   contents: read
 jobs:
+  # data: true when the data changed, or when there is nothing to compare with
+  # (a pull request, a manual run, a new branch); false for a push that changed
+  # none of data/, .github/scripts/data-*.sh and this file.
+  # db: true when a -db build is needed: the data changed, or this commit's -db
+  # tag is not published (db/ changed since the last data push).
+  # db_tag: that tag, the -db that -db-prod is built from.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      data: ${{ steps.diff.outputs.data }}
+      db: ${{ steps.tag.outputs.db }}
+      db_tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Every commit and tree but no file contents outside .github/scripts:
+          # under 1 MB, where a full checkout downloads data/ (1.4 GB).
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: .github/scripts
+      - name: What the push changed
+        id: diff
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          # A commit missing here (a force push) fails at once instead of
+          # fetching objects one by one.
+          GIT_NO_LAZY_FETCH: 1
+        run: |
+          data=true
+          if [ "$EVENT" != push ]; then
+            echo "A $EVENT run: every job runs." | tee -a "$GITHUB_STEP_SUMMARY"
+          elif [ -z "$BEFORE" ] || [[ "$BEFORE" =~ ^0+$ ]]; then
+            echo "No commit before this push: every job runs." | tee -a "$GITHUB_STEP_SUMMARY"
+          elif ! files=$(git diff --name-only --no-renames "$BEFORE" "$GITHUB_SHA"); then
+            echo "Cannot compare with $BEFORE: every job runs." | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            printf '%s\n' "$files"
+            if grep -qE '^(data/|\.github/scripts/data-[^/]*\.sh$|\.github/workflows/data\.yml$)' <<<"$files"; then
+              echo "This push changes the data: every job runs." | tee -a "$GITHUB_STEP_SUMMARY"
+            else
+              data=false
+              echo "This push changes no data ($(wc -l <<<"$files") files): no build, publish or -db." | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+          echo "data=$data" >> "$GITHUB_OUTPUT"
+      - name: The -db of this commit's data
+        id: tag
+        env:
+          DATA: ${{ steps.diff.outputs.data }}
+        run: |
+          tag=$(bash .github/scripts/render-db-tag.sh)
+          image="ghcr.io/$GITHUB_REPOSITORY-db:$tag"
+          db=$DATA
+          if [ "$DATA" = false ]; then
+            if docker manifest inspect "$image" >/dev/null; then
+              echo "-db-prod builds from $image." | tee -a "$GITHUB_STEP_SUMMARY"
+            else
+              echo "$image is not published: building -db first." | tee -a "$GITHUB_STEP_SUMMARY"
+              db=true
+            fi
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "db=$db" >> "$GITHUB_OUTPUT"
   build:
     concurrency:
       group: data-build-${{ github.ref }}
       cancel-in-progress: true
+    needs: changes
     runs-on: ubuntu-24.04
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      needs.changes.outputs.data == 'true' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     timeout-minutes: 90
     env:
       DATABASE_URL: postgresql://postgres:ci@127.0.0.1:5432/lebleg
@@ -132,12 +210,16 @@ jobs:
         # viewer for about 33 minutes. A data push also runs vectors.yml, whose
         # publish waits for this job (.github/scripts/hf-wait-for-data.sh), so
         # this upload carries its vectors: wait for its Vectorize sync (about 16
-        # minutes after the push) and take its vectors-parquet artifact.
+        # minutes after the push) and take its vectors-parquet artifact. A push
+        # starts its workflows within seconds, so no vectors run after 3 minutes
+        # means this push started none (it changed only this workflow or a
+        # data-*.sh script): go on without vectors.
         id: vectors
         if: steps.token.outputs.ok == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          start=$(date +%s)
           for _ in $(seq 60); do
             run=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/vectors.yml/runs?head_sha=$GITHUB_SHA&event=push" --jq '.workflow_runs[0].id // empty')
             if [ -n "$run" ]; then
@@ -146,6 +228,9 @@ jobs:
                 "completed success") echo "run=$run" >> "$GITHUB_OUTPUT"; exit 0 ;;
                 completed*) echo "Vectors run $run ended ($state): publishing without vectors." | tee -a "$GITHUB_STEP_SUMMARY"; exit 0 ;;
               esac
+            elif [ $(( $(date +%s) - start )) -ge 180 ]; then
+              echo "No vectors run for $GITHUB_SHA after 3 minutes: publishing without vectors." | tee -a "$GITHUB_STEP_SUMMARY"
+              exit 0
             fi
             sleep 30
           done
@@ -176,9 +261,14 @@ jobs:
           hf upload "$HF_REPO" "$RUNNER_TEMP/out" . --repo-type dataset \
             --commit-message "Data from $(git rev-parse --short=12 HEAD), $(date -u +%F)"
           echo "Published https://huggingface.co/datasets/$HF_REPO" | tee -a "$GITHUB_STEP_SUMMARY"
+  # After a publish on main. Or alone, when the data did not change but this
+  # commit's -db tag is not published yet.
   db:
-    needs: publish
-    if: github.ref == 'refs/heads/main'
+    needs: [changes, publish]
+    if: >-
+      !cancelled() && github.ref == 'refs/heads/main' &&
+      (needs.publish.result == 'success' ||
+       (needs.changes.outputs.data == 'false' && needs.changes.outputs.db == 'true'))
     permissions:
       contents: read
       packages: write
@@ -192,8 +282,14 @@ jobs:
         ghcr.io/taktekhq/lebanese-legislation-db:latest
       free_disk: true
   # -db plus the read-optimized tables of db/prod.sql: what -all is built on.
+  # After db, or with db skipped because the -db of this commit's data is
+  # published already (a db/prod-only push). The status checks are explicit:
+  # GitHub skips a job whose needs chain holds a skipped job otherwise.
   db-prod:
-    needs: db
+    needs: [changes, db]
+    if: >-
+      !cancelled() && github.ref == 'refs/heads/main' && needs.changes.result == 'success' &&
+      (needs.db.result == 'success' || (needs.db.result == 'skipped' && needs.changes.outputs.db == 'false'))
     permissions:
       contents: read
       packages: write
@@ -205,11 +301,13 @@ jobs:
       dockerfile: db/prod/Dockerfile
       tags: |
         ghcr.io/taktekhq/lebanese-legislation-db-prod:latest
+      # the -db of this commit's data, which db just published or found
       build_args: |
-        DATA_TAG=latest
+        DATA_TAG=${{ needs.changes.outputs.db_tag }}
       free_disk: true
   all:
     needs: db-prod
+    if: ${{ !cancelled() && needs.db-prod.result == 'success' }}
     permissions:
       contents: read
       packages: write

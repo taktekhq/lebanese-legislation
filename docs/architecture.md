@@ -50,7 +50,7 @@ archive IDs found in the comparison are included in the deletion baseline.
 | [images.yml](../.github/workflows/images.yml) | Manual button to publish one selected image through `build-image.yml`. |
 | [origin.yml](../.github/workflows/origin.yml) | Container image with the database and Go website server, deployed to Cloudflare Containers. |
 | [vectors.yml](../.github/workflows/vectors.yml) | `build` then `vectorize` and `publish`: current chunk IDs filter the public Parquet, Hugging Face receives `vectors/vectors.parquet`, and the vectors image syncs `lebleg-chunks`. |
-| [data.yml](../.github/workflows/data.yml) | `data/` to the source-table Parquet files on Hugging Face, then the `-db` and `-all` images. |
+| [data.yml](../.github/workflows/data.yml) | `data/` to the source-table Parquet files on Hugging Face, then the `-db`, `-db-prod` and `-all` images. A `db/prod`-only push builds just `-db-prod` and `-all`. |
 | [hf-card.yml](../.github/workflows/hf-card.yml) | The dataset card, `METHODS.md` and `SCHEMA.md` from `.github/huggingface/` to Hugging Face. |
 
 ## Origin deployment
@@ -111,9 +111,10 @@ holds a workflow-wide lock.
 | Image | Built in workflow | When |
 | --- | --- | --- |
 | `-db` | `data.yml` | After `publish` succeeds on main. Also tagged `data-<hash>` (`.github/scripts/render-db-tag.sh`) for the static render. |
+| `-db-prod` | `data.yml` | After `-db`; on a push that changes only `db/prod.sql` or `db/prod/`, alone, from the published `-db:data-<hash>`. |
 | `-api` | `checks.yml` (`checks`) | After `ci-ok` succeeds on a push to main. |
 | `-mcp` | `checks.yml` (`checks`) | After `ci-ok` succeeds on a push to main. |
-| `-all` | `data.yml`, `checks.yml` | After `-db` succeeds, or after `ci-ok` on a push to main. Always pulls `-db:latest`. |
+| `-all` | `data.yml`, `checks.yml` | After `-db-prod` succeeds, or after `ci-ok` on a push to main. Always pulls `-db-prod:latest`. |
 | `-vectors` | `vectors.yml` | After `publish` succeeds on main. |
 
 `images.yml` has only a manual dispatch with an `image` suffix choice; it builds

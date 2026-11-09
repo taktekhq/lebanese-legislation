@@ -99,9 +99,10 @@ pushes tags and records the digest in its job summary.
 | Image | Built in workflow | When |
 | --- | --- | --- |
 | `-db` | `data.yml` | After `publish` succeeds on main. Also tagged `data-<hash>` for the static render. |
+| `-db-prod` | `data.yml` | After `-db`. A push that changes only `db/prod.sql` or `db/prod/` skips `build`, `publish` and `-db` and builds it from the published `-db:data-<hash>` of its data. |
 | `-api` | `checks.yml` (`checks`) | Push to main after `ci-ok` succeeds. |
 | `-mcp` | `checks.yml` (`checks`) | Push to main after `ci-ok` succeeds. |
-| `-all` | `data.yml`, `checks.yml` | After `-db`, or push to main after `ci-ok`. Pulls `-db:latest`. |
+| `-all` | `data.yml`, `checks.yml` | After `-db-prod`, or push to main after `ci-ok`. Pulls `-db-prod:latest`. |
 | `-vectors` | `vectors.yml` | After `publish` succeeds on main. |
 
 Each image uses its own `images-<name>` job concurrency group, shared across
@@ -117,3 +118,12 @@ It has no push or workflow completion triggers and no changes-selection job.
 and `data` completions on main, checks that `all / image-all` succeeded, then
 deploys `-all:latest` through the existing blue/green stages. Manual dispatch
 still accepts a published tag or an existing Cloudflare registry image.
+
+A data push (a change to `data/`) takes 45 to 60 minutes from merge to `-all`:
+`build`, `publish` (which waits for the push's vectors run so that one Hugging
+Face commit carries both), `-db`, `-db-prod`, `-all`. A push that changes only
+`db/prod.sql` or `db/prod/` changes no data: `data.yml`'s `changes` job sees
+that and runs only `-db-prod` and `-all` (about 11 minutes), with no Hugging
+Face upload. If the `-db` of that commit's data is not published (`db/` changed
+since the last data push), `-db` is built first. Origin then takes about 25
+minutes to switch.
