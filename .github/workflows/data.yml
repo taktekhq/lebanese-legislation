@@ -10,10 +10,10 @@ name: data
 #   act workflow_dispatch -W .github/workflows/data.yml --input publish=true -s HF_TOKEN
 on:
   pull_request:
-    paths: ["data/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
+    paths: ["data/**", "db/prod.sql", "db/prod/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
   push:
     branches: [main]
-    paths: ["data/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
+    paths: ["data/**", "db/prod.sql", "db/prod/**", ".github/workflows/data.yml", ".github/scripts/data-*.sh"]
   workflow_dispatch:
     inputs:
       publish:

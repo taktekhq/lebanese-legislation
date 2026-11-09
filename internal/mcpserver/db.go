@@ -63,6 +63,7 @@ type layout struct {
 	lawCols, lawJoins        string
 	lawFrom                  string
 	articleCols, articleFrom string
+	affected                 string // possibly_affected's rows
 }
 
 // computed reads every column from the corpus tables at request time: the
@@ -81,10 +82,11 @@ var computed = layout{
 	LEFT JOIN page_state ps ON ps.kind = 'law' AND ps.id = l.id`,
 	articleCols: articleColsComputed,
 	articleFrom: articleFromComputed,
+	affected:    "possibly_affected",
 }
 
-// cards reads the same columns from law_card and article_card, which
-// db/prod.sql computes with the expressions above (the -db-prod image).
+// cards reads the same columns from law_card and article_card, and
+// possibly_affected from possibly_affected_t, which db/prod.sql computes with the expressions above (the -db-prod image).
 // law_card holds only laws whose kind has a legislation_kind row, so the
 // inner join keeps the same rows.
 var cards = layout{
@@ -95,6 +97,7 @@ var cards = layout{
 	articleCols: `a.law_id, a.position, a.number, a.note, a.text_ar, a.text_fr, a.in_force_from, a.section_id,
 	a.current_text, a.version, a.state, a.pending, a.valid_from, a.annulled`,
 	articleFrom: `article_card a`,
+	affected:    "possibly_affected_t",
 }
 
 func init() {
@@ -102,15 +105,22 @@ func init() {
 	cards.lawFrom = `legislation l ` + cards.lawJoins
 }
 
-// sql is the layout this database has: cards when both card tables exist,
-// computed otherwise. It asks the database once; a failed check is not
-// remembered and reads computed (correct on both, only slower).
+// prodVersion is the mark db/prod.sql puts on law_card and article_card.
+// The server reads the cards only when both match, so an image built from an older
+// prod.sql (other columns) falls back to computed instead of failing.
+const prodVersion = "lebleg-prod 1"
+
+// sql is the layout this database has: cards when law_card and
+// article_card carry prodVersion, computed otherwise. It asks the database once; a
+// failed check is not remembered and reads computed (correct on both, only
+// slower).
 func (s *Server) sql(ctx context.Context) *layout {
 	if l := s.layout.Load(); l != nil {
 		return l
 	}
 	var both bool
-	if err := s.db.QueryRow(ctx, `SELECT to_regclass('law_card') IS NOT NULL AND to_regclass('article_card') IS NOT NULL`).Scan(&both); err != nil {
+	if err := s.db.QueryRow(ctx, `SELECT coalesce(obj_description(to_regclass('law_card'), 'pg_class') = $1
+		AND obj_description(to_regclass('article_card'), 'pg_class') = $1, false)`, prodVersion).Scan(&both); err != nil {
 		return &computed
 	}
 	l := &computed

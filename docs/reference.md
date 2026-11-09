@@ -57,7 +57,7 @@ Stop services with `docker compose down`. This preserves the database volume. Vo
 | --- | --- |
 | Existing `data/*.parquet` on Hugging Face | Portable source tables for analysis and other databases |
 | `ghcr.io/taktekhq/lebanese-legislation-db:latest` | PostgreSQL 18.6, pgvector 0.8.2 and both databases baked from `data/` |
-| `ghcr.io/taktekhq/lebanese-legislation-db-prod:latest` | `-db` plus read-optimized tables computed from it ([`db/prod.sql`](../db/prod.sql)); no new data |
+| `ghcr.io/taktekhq/lebanese-legislation-db-prod:latest` | `-db` plus read-optimized tables computed from it for the MCP server ([`db/prod.sql`](../db/prod.sql)); no new data |
 | `ghcr.io/taktekhq/lebanese-legislation-api:latest` | The REST API (`/api/v1/`) |
 | `ghcr.io/taktekhq/lebanese-legislation-mcp:latest` | The MCP server (`/mcp`) |
 | `ghcr.io/taktekhq/lebanese-legislation-all:latest` | `-db-prod` and the website, API and MCP |

@@ -25,8 +25,10 @@ jobs:
       tags: |
         ghcr.io/taktekhq/lebanese-legislation-db:latest
       free_disk: true
+  # Runs after a db publish too, so -db-prod never lags -db.
   db-prod:
-    if: inputs.image == 'db-prod'
+    needs: db
+    if: always() && (inputs.image == 'db-prod' || (inputs.image == 'db' && needs.db.result == 'success'))
     permissions:
       contents: read
       packages: write

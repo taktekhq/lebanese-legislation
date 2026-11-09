@@ -4,39 +4,35 @@
 -- database exactly as the published data defines it. It does not change here.
 --
 -- ghcr.io/taktekhq/lebanese-legislation-db-prod is -db plus read-optimized
--- copies that the website, the JSON API and the MCP server read. It adds no
+-- copies for the servers of the all-in-one image (today the MCP server). It adds no
 -- data: every table below is computed from -db by this file, and can be
 -- rebuilt from it at any time. The all-in-one image (-all, what
 -- lebaneselegislation.com runs) is built from -db-prod.
 --
---   possibly_affected  the view of the same name stored as a table, with
---                      indexes. The view is kept as possibly_affected_v.
+--   possibly_affected_t  the rows of the possibly_affected view stored as a
+--                      table, with indexes. The view itself is untouched, so
+--                      db/graph.sql and data/schema.sql still apply.
 --   law_card           one row per law: the law summary every MCP reply
 --                      carries (internal/mcpserver lawCols).
 --   article_card       one row per article, with its wording in force
 --                      resolved (internal/mcpserver articleCols).
 --
--- The MCP server reads law_card and article_card when both exist and falls
--- back to computing the same columns when they do not, so it still runs on
--- -db. The file is idempotent: running it again rebuilds the tables.
+-- The MCP server reads these tables only when law_card and article_card
+-- carry the version mark it expects (internal/mcpserver prodVersion), and
+-- computes the same columns otherwise, so it still runs on -db and never
+-- fails on an image from an older prod.sql. The file is idempotent: running
+-- it again rebuilds the tables. The Parquet export and -db never see it.
 -- Measured 9 Nov 2026: get_article p95 for 6 calls at once went from 1,267 ms
 -- to about 90 ms on one CPU, with byte-identical replies.
 
 SET default_transaction_read_only = off;
 
--- possibly_affected: a self-join of graph_edge on every read as a view
+-- possibly_affected is a view: a self-join of graph_edge on every read
 -- (214 ms of a 232 ms get_article). As a table it is an index lookup.
-DO $$
-BEGIN
-  IF (SELECT relkind FROM pg_class WHERE oid = to_regclass('possibly_affected')) = 'v' THEN
-    DROP VIEW IF EXISTS possibly_affected_v;
-    ALTER VIEW possibly_affected RENAME TO possibly_affected_v;
-  END IF;
-END $$;
-DROP TABLE IF EXISTS possibly_affected;
-CREATE TABLE possibly_affected AS SELECT * FROM possibly_affected_v;
-CREATE INDEX possibly_affected_target ON possibly_affected (law_id, article_number);
-CREATE INDEX possibly_affected_repealing ON possibly_affected (repealing_law_id);
+DROP TABLE IF EXISTS possibly_affected_t;
+CREATE TABLE possibly_affected_t AS SELECT * FROM possibly_affected;
+CREATE INDEX possibly_affected_t_target ON possibly_affected_t (law_id, article_number);
+CREATE INDEX possibly_affected_t_repealing ON possibly_affected_t (repealing_law_id);
 
 CREATE INDEX IF NOT EXISTS prod_article_law_number ON legislation_article (law_id, number);
 CREATE INDEX IF NOT EXISTS prod_graph_edge_to_article ON graph_edge (to_law_id, to_article);
@@ -83,6 +79,11 @@ FROM legislation_article a
 ALTER TABLE article_card ADD PRIMARY KEY (law_id, position);
 CREATE INDEX article_card_number ON article_card (law_id, number);
 
+-- The server reads these tables only when both marks match its own
+-- (internal/mcpserver prodVersion): change both when a column changes.
+COMMENT ON TABLE law_card IS 'lebleg-prod 1';
+COMMENT ON TABLE article_card IS 'lebleg-prod 1';
+
 -- The server roles exist in the image (db/bake.sh); a test database may
 -- have neither.
 DO $$
@@ -90,12 +91,12 @@ DECLARE r text;
 BEGIN
   FOREACH r IN ARRAY ARRAY['lebleg_web', 'lebleg_reader'] LOOP
     IF EXISTS (SELECT FROM pg_roles WHERE rolname = r) THEN
-      EXECUTE format('GRANT SELECT ON possibly_affected, possibly_affected_v, law_card, article_card TO %I', r);
+      EXECUTE format('GRANT SELECT ON possibly_affected_t, law_card, article_card TO %I', r);
     END IF;
   END LOOP;
 END $$;
 
-ANALYZE possibly_affected;
+ANALYZE possibly_affected_t;
 ANALYZE legislation_article;
 ANALYZE graph_edge;
 ANALYZE law_card;

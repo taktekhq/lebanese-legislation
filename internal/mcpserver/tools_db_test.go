@@ -689,3 +689,61 @@ func TestLayoutsAgree(t *testing.T) {
 		t.Errorf("only %d calls: the fixture should have laws and articles", len(calls))
 	}
 }
+
+// Card tables from another prod.sql version (other columns) are not read.
+func TestLayoutNeedsItsVersion(t *testing.T) {
+	if testPool == nil {
+		t.Skip("set LEBLEG_TEST_DSN to a disposable Postgres database")
+	}
+	ctx := context.Background()
+	tx, err := testPool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err := tx.Exec(ctx, `COMMENT ON TABLE article_card IS 'lebleg-prod 0'`); err != nil {
+		t.Fatal(err)
+	}
+	if got := newServer(tx, Config{RateLimitPerMinute: -1}).sql(ctx); got != &computed {
+		t.Errorf("layout %s, want computed for another version", got.name)
+	}
+}
+
+// On the -db shape (no card tables at all) the server computes the columns
+// and answers as on -db-prod.
+func TestOldShape(t *testing.T) {
+	prod := dbServer(t)
+	ctx := context.Background()
+	// search_legislation runs queries in parallel, which one transaction
+	// cannot: TestLayoutsAgree covers it on the computed layout.
+	calls := map[string]map[string]any{
+		"get_law": {"id": 430}, "get_article": {"law_id": 430, "number": "37"},
+		"get_law_texts": {"law_id": 430}, "get_links": {"key": "law/430"}, "list_legislation": {}, "possibly_affected": {"law_id": 430},
+	}
+	body := func(name string) map[string]any {
+		return map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": name, "arguments": calls[name]}}
+	}
+	// the -db-prod answers first: the transaction below locks the dropped tables
+	want := map[string]string{}
+	for name := range calls {
+		want[name] = post(prod, body(name), nil).Body.String()
+	}
+	tx, err := testPool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err := tx.Exec(ctx, `DROP TABLE law_card, article_card, possibly_affected_t`); err != nil {
+		t.Fatal(err)
+	}
+	old := newServer(tx, Config{RateLimitPerMinute: -1})
+	if got := old.sql(ctx); got != &computed {
+		t.Fatalf("layout %s, want computed without the card tables", got.name)
+	}
+	for name := range calls {
+		got := post(old, body(name), nil).Body.String()
+		if got != want[name] || strings.Contains(got, `"error"`) {
+			t.Errorf("%s: -db shape %.300s\n-db-prod shape %.300s", name, got, want[name])
+		}
+	}
+}

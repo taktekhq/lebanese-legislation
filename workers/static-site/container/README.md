@@ -7,7 +7,7 @@ changes to `data/` on main.
 
 `db/prod/Dockerfile` builds `-db-prod` from `-db`: the same database plus
 the read-optimized tables of `db/prod.sql` (`law_card`, `article_card`, and
-`possibly_affected` stored as a table). It adds no data; every extra table is
+`possibly_affected_t`, the rows of the `possibly_affected` view as a table). It adds no data; every extra table is
 computed from `-db`, and the replies are byte for byte the same. The `data`
 workflow builds it after `-db` and before `-all`. `-db` stays the public
 dataset image that strangers pull; the MCP server also runs on it, computing

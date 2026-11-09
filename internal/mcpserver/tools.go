@@ -517,7 +517,7 @@ func (s *Server) articleChanges(ctx context.Context, lawID int64, number string)
 }
 
 func (s *Server) articleAffected(ctx context.Context, lawID int64, number string) ([]any, error) {
-	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, p.repealing_article FROM possibly_affected p JOIN legislation l ON l.id = p.repealing_law_id `+s.sql(ctx).lawJoins+`
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, p.repealing_article FROM `+s.sql(ctx).affected+` p JOIN legislation l ON l.id = p.repealing_law_id `+s.sql(ctx).lawJoins+`
 		WHERE p.law_id = $1 AND (p.article_number = $2 OR p.article_number IS NULL)
 		ORDER BY `+lawDate+` ASC NULLS FIRST, l.id, p.repealing_article NULLS FIRST`, lawID, number)
 	if err != nil {
@@ -1184,7 +1184,7 @@ func (s *Server) possiblyAffected(ctx context.Context, a args) (toolResult, erro
 	if target == nil {
 		return fail("law " + shown + " not found"), nil
 	}
-	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, p.repealing_article, p.article_number FROM possibly_affected p
+	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, p.repealing_article, p.article_number FROM `+s.sql(ctx).affected+` p
 		JOIN legislation l ON l.id = p.repealing_law_id `+s.sql(ctx).lawJoins+`
 		WHERE p.law_id = $1 ORDER BY `+lawDate+` ASC NULLS FIRST, l.id, p.repealing_article NULLS FIRST, p.article_number NULLS FIRST`, lawID)
 	if err != nil {
