@@ -29,6 +29,9 @@
 -- the same columns otherwise, so it still runs on -db and never fails on an
 -- image from an older prod.sql. The file is idempotent: running it again
 -- rebuilds the tables. The Parquet export and -db never see it.
+-- A push that changes only this file (or db/prod/) rebuilds just -db-prod and
+-- -all from the published -db, with no Hugging Face upload (data.yml, job
+-- changes), and goes live in about 35 minutes.
 -- Measured 9 Nov 2026: get_article p95 for 6 calls at once went from 1,267 ms
 -- to about 90 ms on one CPU, with byte-identical replies.
 
