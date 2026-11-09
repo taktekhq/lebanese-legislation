@@ -195,3 +195,33 @@ func TestScorerMatchesPostgres(t *testing.T) {
 		}
 	}
 }
+
+// cutLength finds the length a sort would put at the n-th place.
+func TestCutLength(t *testing.T) {
+	r := rand.New(rand.NewSource(5))
+	for round := 0; round < 300; round++ {
+		lens := make([]int32, 1+r.Intn(3000))
+		top := []int32{3, 50, 2000, 1 << 23}[round%4]
+		for i := range lens {
+			lens[i] = int32(r.Int63n(int64(top)))
+		}
+		var ds []int32
+		for d := range lens {
+			if r.Intn(3) > 0 {
+				ds = append(ds, int32(d))
+			}
+		}
+		if len(ds) == 0 {
+			continue
+		}
+		n := 1 + r.Intn(len(ds))
+		sorted := make([]int32, len(ds))
+		for i, d := range ds {
+			sorted[i] = lens[d]
+		}
+		slices.Sort(sorted)
+		if got := cutLength(lens, ds, n); got != sorted[n-1] {
+			t.Fatalf("%d texts, n %d: %d, want %d", len(ds), n, got, sorted[n-1])
+		}
+	}
+}
