@@ -22,6 +22,8 @@
 --   search_known       one row: the codes' law ids and the laws of a kind
 --                      the site does not serve, which search_legislation
 --                      reads once instead of joining to every candidate.
+--   law_pub_count      running counts of texts by kind and publication day,
+--                      list_legislation's total in two index reads.
 --
 -- Each table carries a version mark: the prod.sql version that last changed
 -- its columns. The MCP server reads a table only when its mark is the one
@@ -143,15 +145,40 @@ SELECT coalesce((SELECT array_agg(law_id ORDER BY law_id) FROM code), '{}')::int
   coalesce((SELECT array_agg(l.id ORDER BY l.id) FROM legislation l
     WHERE NOT EXISTS (SELECT 1 FROM legislation_kind k WHERE k.name_ar = l.kind)), '{}')::int[] AS unserved;
 
+-- law_pub_count: list_legislation's total (internal/mcpserver listTotal)
+-- without counting rows. One row per kind and publication day (the
+-- server's lawDate, coalesce(gazette_date, issued_on)) on which a text of
+-- that kind came out: upto is the number of texts of that kind published on
+-- or before that day. Rows with kind NULL count every kind (legislation.kind
+-- is NOT NULL, so no kind of its own is NULL). The texts of a kind between
+-- since and until are upto at the last day <= until minus upto at the last
+-- day < since: two index reads per kind. Texts without a date are in no row,
+-- as the tool leaves them out. 23,975 rows (2.5 MB), built in 0.1 s; the
+-- count(*) it replaces read all 103,100 dated texts (a 154 MB heap) for any
+-- wide range: 26 to 40 ms warm on one CPU, more when cold.
+DROP TABLE IF EXISTS law_pub_count;
+CREATE TABLE law_pub_count AS
+SELECT kind, day, (sum(n) OVER (PARTITION BY kind ORDER BY day))::int AS upto
+FROM (SELECT l.kind, coalesce(l.gazette_date, l.issued_on) AS day, count(*) AS n
+      FROM legislation l
+      WHERE coalesce(l.gazette_date, l.issued_on) IS NOT NULL
+      GROUP BY GROUPING SETS ((l.kind, coalesce(l.gazette_date, l.issued_on)), (coalesce(l.gazette_date, l.issued_on)))) d;
+CREATE UNIQUE INDEX law_pub_count_kind_day ON law_pub_count (kind, day) INCLUDE (upto) NULLS NOT DISTINCT;
+-- kind IS NULL does not fix the first column for ORDER BY day, as kind = x
+-- does: without this index the every-kind total sorted 7,416 rows (2.5 ms).
+CREATE INDEX law_pub_count_all_day ON law_pub_count (day) INCLUDE (upto) WHERE kind IS NULL;
+
 -- The server reads each table only when its mark is the one it expects
 -- (internal/mcpserver prodVersion for law_card and article_card,
--- linkVersion for law_link, knownVersion for search_known): change a mark
--- and its constant together when the table's columns change. law_link
--- copies law_card's columns, so it changes with law_card.
+-- linkVersion for law_link, knownVersion for search_known, countVersion for
+-- law_pub_count): change a mark and its constant together when the table's
+-- columns change. law_link copies law_card's columns, so it changes with
+-- law_card.
 COMMENT ON TABLE law_card IS 'lebleg-prod 1';
 COMMENT ON TABLE article_card IS 'lebleg-prod 1';
 COMMENT ON TABLE law_link IS 'lebleg-prod 2';
 COMMENT ON TABLE search_known IS 'lebleg-prod 3';
+COMMENT ON TABLE law_pub_count IS 'lebleg-prod 4';
 
 -- The server roles exist in the image (db/bake.sh); a test database may
 -- have neither.
@@ -160,7 +187,7 @@ DECLARE r text;
 BEGIN
   FOREACH r IN ARRAY ARRAY['lebleg_web', 'lebleg_reader'] LOOP
     IF EXISTS (SELECT FROM pg_roles WHERE rolname = r) THEN
-      EXECUTE format('GRANT SELECT ON possibly_affected_t, law_card, article_card, law_link, search_known TO %I', r);
+      EXECUTE format('GRANT SELECT ON possibly_affected_t, law_card, article_card, law_link, search_known, law_pub_count TO %I', r);
     END IF;
   END LOOP;
 END $$;
@@ -171,3 +198,4 @@ ANALYZE graph_edge;
 ANALYZE law_card;
 ANALYZE article_card;
 ANALYZE law_link;
+ANALYZE law_pub_count;
