@@ -720,4 +720,7 @@ func TestLayoutFallsBack(t *testing.T) {
 	if s.layout.Load() != nil {
 		t.Error("a failed check was remembered")
 	}
+	if s.pubCounts(context.Background()) || s.pubCount.Load() != nil {
+		t.Error("law_pub_count: a failed check was read or remembered")
+	}
 }

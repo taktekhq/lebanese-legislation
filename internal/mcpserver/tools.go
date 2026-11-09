@@ -1003,6 +1003,7 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 	}
 	where := []string{lawDate + " IS NOT NULL"}
 	var params []any
+	var kinds []string // the kinds the total counts, nil for every kind
 	if r.lo != "" {
 		params = append(params, r.lo)
 		where = append(where, fmt.Sprintf("%s >= $%d::date", lawDate, len(params)))
@@ -1024,6 +1025,7 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 		if len(names) > 1 {
 			params = append(params, names)
 			where = append(where, fmt.Sprintf("l.kind = ANY($%d::text[])", len(params)))
+			kinds = names
 		} else {
 			name := kind // no kind has that name, and no text has it as its kind
 			if len(names) == 1 {
@@ -1031,6 +1033,7 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 			}
 			params = append(params, name)
 			where = append(where, fmt.Sprintf("l.kind = $%d", len(params)))
+			kinds = []string{name}
 		}
 	}
 	w := strings.Join(where, " AND ")
@@ -1040,7 +1043,7 @@ func (s *Server) listLegislation(ctx context.Context, a args) (toolResult, error
 	}
 	// lawJoins is one row per law and every law has its kind (a foreign key),
 	// so legislation alone counts the same rows.
-	total, err := s.count(ctx, `SELECT count(*) FROM legislation l WHERE `+w, params...)
+	total, err := s.listTotal(ctx, r.lo, r.hi, kinds, w, params)
 	if err != nil {
 		return toolResult{}, err
 	}

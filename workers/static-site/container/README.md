@@ -8,7 +8,8 @@ changes to `data/` on main.
 `db/prod/Dockerfile` builds `-db-prod` from `-db`: the same database plus
 the read-optimized tables of `db/prod.sql` (`law_card`, `article_card`,
 `possibly_affected_t`, the rows of the `possibly_affected` view as a table, and
-`law_link`, `get_law`'s lists of amending and amended texts). It adds no data; every extra table is
+`law_link`, `get_law`'s lists of amending and amended texts, `search_known` and
+`law_pub_count`, `list_legislation`'s running counts). It adds no data; every extra table is
 computed from `-db`, and the replies are byte for byte the same. The `data`
 workflow builds it after `-db` and before `-all`; a push that changes only
 `db/prod.sql` or `db/prod/` rebuilds just `-db-prod` and `-all`, from the

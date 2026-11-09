@@ -135,6 +135,7 @@ type Server struct {
 	layout      atomic.Pointer[layout]           // the database's layout, once known (db.go sql)
 	searchKnown atomic.Pointer[wordsearch.Known] // read once for the searches (search_pg.go known)
 	searchIndex *indexLoad                       // the word lists' load, nil for none (search_pg.go)
+	pubCount    atomic.Pointer[bool]             // law_pub_count is there, once known (count.go pubCounts)
 
 	badgeMu    sync.Mutex
 	badgeAt    time.Time

@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/taktekhq/lebanese-legislation/internal/wordsearch"
 )
@@ -638,6 +639,7 @@ func TestLayoutsAgree(t *testing.T) {
 	plain := newServer(testPool, Config{RateLimitPerMinute: -1})
 	plain.layout.Store(&computed)
 	plain.searchKnown.Store(&wordsearch.Known{}) // none: the searches join as on -db
+	plain.pubCount.Store(new(bool))              // none: list_legislation counts rows as on -db
 	cardsOnly := newServer(testPool, Config{RateLimitPerMinute: -1})
 	cardsOnly.layout.Store(&cards)
 	type toolCall struct {
@@ -659,6 +661,13 @@ func TestLayoutsAgree(t *testing.T) {
 		{"search_legislation", map[string]any{"query": "قانون", "kind": "laws", "year": 2015}},
 		{"list_legislation", map[string]any{}},
 		{"list_legislation", map[string]any{"order": "oldest"}},
+		{"list_legislation", map[string]any{"since": "2025"}},
+		{"list_legislation", map[string]any{"since": "2026-09-10", "until": "2026-09-10"}},
+		{"list_legislation", map[string]any{"until": "1990", "order": "oldest", "limit": 1}},
+		{"list_legislation", map[string]any{"kind": "مرسوم"}},
+		{"list_legislation", map[string]any{"kind": "decree", "since": "2000", "until": "2026-09"}},
+		{"list_legislation", map[string]any{"kind": "Constitution"}},
+		{"list_legislation", map[string]any{"kind": "no such kind", "since": "1900"}},
 		{"list_gazette_issues", map[string]any{}},
 	}
 	rows, err := testPool.Query(context.Background(), `SELECT id FROM legislation ORDER BY id`)
@@ -813,12 +822,15 @@ func TestOldShape(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer tx.Rollback(ctx)
-	if _, err := tx.Exec(ctx, `DROP TABLE law_card, article_card, possibly_affected_t, law_link, search_known`); err != nil {
+	if _, err := tx.Exec(ctx, `DROP TABLE law_card, article_card, possibly_affected_t, law_link, search_known, law_pub_count`); err != nil {
 		t.Fatal(err)
 	}
 	old := newServer(tx, Config{RateLimitPerMinute: -1})
 	if got := old.sql(ctx); got != &computed {
 		t.Fatalf("layout %s, want computed without the card tables", got.name)
+	}
+	if old.pubCounts(ctx) {
+		t.Fatal("law_pub_count read without the table")
 	}
 	if k := old.known(ctx); k != nil {
 		t.Fatalf("known %v without search_known", k)
@@ -851,5 +863,110 @@ func TestKnownNeedsItsVersion(t *testing.T) {
 	}
 	if k := s.known(ctx); k != nil {
 		t.Errorf("known %v on the second read", k)
+	}
+}
+
+// A law_pub_count from another prod.sql version is not read.
+func TestPubCountNeedsItsVersion(t *testing.T) {
+	if testPool == nil {
+		t.Skip("set LEBLEG_TEST_DSN to a disposable Postgres database")
+	}
+	ctx := context.Background()
+	if !newServer(testPool, Config{RateLimitPerMinute: -1}).pubCounts(ctx) {
+		t.Fatal("no law_pub_count: db/prod.sql ran on the fixture")
+	}
+	tx, err := testPool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err := tx.Exec(ctx, `COMMENT ON TABLE law_pub_count IS 'lebleg-prod 3'`); err != nil {
+		t.Fatal(err)
+	}
+	s := newServer(tx, Config{RateLimitPerMinute: -1})
+	if s.pubCounts(ctx) || s.pubCounts(ctx) {
+		t.Error("law_pub_count read with another version")
+	}
+}
+
+// TestListTotalMatchesCount: list_legislation's total from law_pub_count is
+// count(*) of the same rows, and so is the total of a server that counts
+// them: every kind alone, two kinds, every kind named once and with a
+// duplicate, a kind no text has, all kinds; ranges open on either side or
+// both, of one day, from or to the day before or after a day with texts,
+// and outside the data.
+func TestListTotalMatchesCount(t *testing.T) {
+	s, tx := walkServer(t)
+	ctx := context.Background()
+	if !s.pubCounts(ctx) {
+		t.Fatal("no law_pub_count: db/prod.sql ran on the fixture")
+	}
+	counting := newServer(tx, Config{RateLimitPerMinute: -1})
+	counting.pubCount.Store(new(bool))
+	kinds := truth(t, tx, `SELECT DISTINCT kind FROM legislation ORDER BY 1`)
+	if len(kinds) < 3 {
+		t.Fatalf("kinds %v: the fixture should have several", kinds)
+	}
+	sets := [][]string{nil, {"no such kind"}, kinds[:2], kinds, append([]string{kinds[1]}, kinds...)}
+	for _, k := range kinds {
+		sets = append(sets, []string{k})
+	}
+	days := truth(t, tx, `SELECT DISTINCT to_char(coalesce(gazette_date, issued_on), 'YYYY-MM-DD') FROM legislation
+		WHERE coalesce(gazette_date, issued_on) IS NOT NULL ORDER BY 1`)
+	shift := func(d string, n int) string {
+		v, err := time.Parse("2006-01-02", d)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return v.AddDate(0, 0, n).Format("2006-01-02")
+	}
+	mid := days[len(days)/2]
+	bounds := []string{"", "1800-01-01", "2200-12-31", days[0], shift(days[0], -1), days[len(days)-1], shift(days[len(days)-1], 1),
+		mid, shift(mid, -1), shift(mid, 1), days[len(days)/3]}
+	n := 0
+	for _, lo := range bounds {
+		for _, hi := range bounds {
+			if lo != "" && hi != "" && lo > hi {
+				continue
+			}
+			for _, ks := range sets {
+				where := []string{lawDate + " IS NOT NULL"}
+				var params []any
+				if lo != "" {
+					params = append(params, lo)
+					where = append(where, fmt.Sprintf("%s >= $%d::date", lawDate, len(params)))
+				}
+				if hi != "" {
+					params = append(params, hi)
+					where = append(where, fmt.Sprintf("%s <= $%d::date", lawDate, len(params)))
+				}
+				if ks != nil {
+					params = append(params, ks)
+					where = append(where, fmt.Sprintf("l.kind = ANY($%d::text[])", len(params)))
+				}
+				w := strings.Join(where, " AND ")
+				var want int
+				if err := tx.QueryRow(ctx, `SELECT count(*) FROM legislation l WHERE `+w, params...).Scan(&want); err != nil {
+					t.Fatal(err)
+				}
+				got, err := s.listTotal(ctx, lo, hi, ks, w, params)
+				if err != nil {
+					t.Fatal(err)
+				}
+				counted, err := counting.listTotal(ctx, lo, hi, ks, w, params)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if got != want || counted != want {
+					t.Errorf("since %q until %q kinds %v: law_pub_count %d, counted %d, count(*) %d", lo, hi, ks, got, counted, want)
+				}
+				if want > 0 {
+					n++
+				}
+			}
+		}
+	}
+	if n < 100 {
+		t.Errorf("only %d totals above zero: the fixture should have dated texts", n)
 	}
 }
