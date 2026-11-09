@@ -14,8 +14,12 @@ import (
 const (
 	defaultCallUnits = 6               // one search over every kind and two other calls; 2 of the 8 pool connections stay for pages
 	callWait         = 2 * time.Second // how long a call queues for room
-	searchFanOut     = 4               // searchAll's parallel searches, one per kind
-	rpcServerBusy    = -32000          // JSON-RPC server error: overloaded
+	// searchFanOut is the weight of a search over every kind: four ranked
+	// queries, one per kind. They run one after another since 9 Nov 2026,
+	// and the weight stays 4 so that two such searches do not run at once
+	// on the one CPU.
+	searchFanOut  = 4
+	rpcServerBusy = -32000 // JSON-RPC server error: overloaded
 )
 
 // newCallSem is the cap for units (defaultCallUnits when 0, none when

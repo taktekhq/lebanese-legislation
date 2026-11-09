@@ -19,6 +19,9 @@
 --   law_link           get_law's amended_by and amended lists: one row per
 --                      entry, in the order the tool returns them, with the
 --                      other law's law_card columns.
+--   search_known       one row: the codes' law ids and the laws of a kind
+--                      the site does not serve, which search_legislation
+--                      reads once instead of joining to every candidate.
 --
 -- Each table carries a version mark: the prod.sql version that last changed
 -- its columns. The MCP server reads a table only when its mark is the one
@@ -126,14 +129,26 @@ FROM entry en
   LEFT JOIN art a USING (law_id, direction, other_id, relation);
 ALTER TABLE law_link ADD PRIMARY KEY (law_id, direction, ord);
 
+-- search_known: what search_legislation reads once instead of joining it to
+-- every candidate (internal/wordsearch Known): the codes' law ids, and the
+-- laws whose kind has no legislation_kind row (an article of one is not
+-- served; none today). A common word's 38,269 articles were joined to
+-- legislation and legislation_kind on every search.
+DROP TABLE IF EXISTS search_known;
+CREATE TABLE search_known AS
+SELECT coalesce((SELECT array_agg(law_id ORDER BY law_id) FROM code), '{}')::int[] AS codes,
+  coalesce((SELECT array_agg(l.id ORDER BY l.id) FROM legislation l
+    WHERE NOT EXISTS (SELECT 1 FROM legislation_kind k WHERE k.name_ar = l.kind)), '{}')::int[] AS unserved;
+
 -- The server reads each table only when its mark is the one it expects
 -- (internal/mcpserver prodVersion for law_card and article_card,
--- linkVersion for law_link): change a mark and its constant together when
--- the table's columns change. law_link copies law_card's columns, so it
--- changes with law_card.
+-- linkVersion for law_link, knownVersion for search_known): change a mark
+-- and its constant together when the table's columns change. law_link
+-- copies law_card's columns, so it changes with law_card.
 COMMENT ON TABLE law_card IS 'lebleg-prod 1';
 COMMENT ON TABLE article_card IS 'lebleg-prod 1';
 COMMENT ON TABLE law_link IS 'lebleg-prod 2';
+COMMENT ON TABLE search_known IS 'lebleg-prod 3';
 
 -- The server roles exist in the image (db/bake.sh); a test database may
 -- have neither.
@@ -142,7 +157,7 @@ DECLARE r text;
 BEGIN
   FOREACH r IN ARRAY ARRAY['lebleg_web', 'lebleg_reader'] LOOP
     IF EXISTS (SELECT FROM pg_roles WHERE rolname = r) THEN
-      EXECUTE format('GRANT SELECT ON possibly_affected_t, law_card, article_card, law_link TO %I', r);
+      EXECUTE format('GRANT SELECT ON possibly_affected_t, law_card, article_card, law_link, search_known TO %I', r);
     END IF;
   END LOOP;
 END $$;

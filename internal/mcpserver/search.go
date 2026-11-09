@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 // ---------------------------------------------------------------- search_legislation
@@ -44,9 +43,12 @@ type found struct {
 	full  int // results that hold every word of the question
 }
 
-// searchAll runs the four searches at once, each on its own connection, and
-// each one query (search_pg.go): a question that no text matches word for
-// word still finds the texts holding its rarest words, with no second pass.
+// searchAll runs the four searches one after another, each one ranked
+// query (search_pg.go): a question that no text matches word for word
+// still finds the texts holding its rarest words, with no second pass.
+// They ran at once until 9 Nov 2026; on the one CPU the origin has, that
+// saved nothing and cost more: at the live limits (docker --cpus=1) the
+// 30 benchmark questions' p95 was 89 to 93 ms at once, 44 ms in turn.
 // num narrows laws by their own number; with lawsOnly (a number or a year
 // names a text, not an article or a ruling) only the laws are searched.
 func (s *Server) searchAll(ctx context.Context, q, kind string, year yearVal, limit int, num string, lawsOnly bool) (found, error) {
@@ -88,18 +90,9 @@ func (s *Server) searchAll(ctx context.Context, q, kind string, year yearVal, li
 			return part{func(o *obj) { o.set("gazette", rows); o.set("gazette_count", count) }, count, count, err}
 		})
 	}
-	parts := make([]part, len(jobs))
-	var wg sync.WaitGroup
-	for i, job := range jobs {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			parts[i] = job()
-		}()
-	}
-	wg.Wait()
 	var f found
-	for _, p := range parts { // in the jobs' order, which is the Worker's field order
+	for _, job := range jobs { // in the Worker's field order
+		p := job()
 		if p.err != nil {
 			return f, p.err
 		}

@@ -26,6 +26,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/taktekhq/lebanese-legislation/internal/memo"
+	"github.com/taktekhq/lebanese-legislation/internal/wordsearch"
 	"golang.org/x/sync/semaphore"
 )
 
@@ -123,7 +124,8 @@ type Server struct {
 
 	counts memo.Map // the paged tools' totals (count.go)
 
-	layout atomic.Pointer[layout] // the database's layout, once known (db.go sql)
+	layout      atomic.Pointer[layout]           // the database's layout, once known (db.go sql)
+	searchKnown atomic.Pointer[wordsearch.Known] // read once for the searches (search_pg.go known)
 
 	badgeMu    sync.Mutex
 	badgeAt    time.Time

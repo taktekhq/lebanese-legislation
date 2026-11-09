@@ -6,6 +6,8 @@ import (
 	"math"
 	"strconv"
 	"strings"
+
+	"github.com/jackc/pgx/v5"
 )
 
 // Hit is one text found, in rank order.
@@ -85,6 +87,18 @@ type Page struct {
 	More  bool // more hits follow the last
 }
 
+// Known is what a caller has read once from a database that does not
+// change while it runs (the image is read-only), so that a search reads it
+// as a constant instead of joining it to every candidate: the codes' law
+// ids and the laws of a kind the site does not serve. A query with Known
+// also carries each candidate's date with it, and keeps a single bucket
+// without sorting it for duplicates. The replies are the same; a common
+// word's 38,269 articles cost about half as much (9 Nov 2026).
+type Known struct {
+	Codes    []int32 // code.law_id
+	Unserved []int32 // legislation ids whose kind has no legislation_kind row
+}
+
 // LawQuery asks for laws by the words of their titles.
 type LawQuery struct {
 	Text    string
@@ -99,6 +113,10 @@ type LawQuery struct {
 	Number string // only texts with this number; alone, every text with it
 	Limit  int
 	After  *Key
+	Known  *Known // see Known; nil joins the tables
+	// NoCount leaves Page.Total and Page.Full at 0: the caller reads only
+	// the hits, and counting every candidate keeps them all in memory.
+	NoCount bool
 }
 
 // ArticleQuery asks for articles by the words of their text.
@@ -111,6 +129,8 @@ type ArticleQuery struct {
 	Titled   bool // the articles of the texts whose title holds the question first
 	Limit    int
 	After    *Key
+	Known    *Known // see Known; nil joins the tables
+	NoCount  bool   // see LawQuery
 }
 
 // RulingQuery asks for court rulings by the words of their title and text.
@@ -120,6 +140,8 @@ type RulingQuery struct {
 	Fallback bool // the rulings holding some of the words only when none holds every word
 	Limit    int
 	After    *Key
+	Known    *Known // see Known; nil joins the tables
+	NoCount  bool   // see LawQuery
 }
 
 // fullOnly says a search keeps only the texts holding every word: a question
@@ -137,6 +159,14 @@ func Laws(ctx context.Context, db Querier, q LawQuery) (Page, error) {
 	if q.English {
 		idx = titleEnIndexes
 		src = source{from: "legislation_title_en te JOIN legislation l ON l.id = te.law_id", keys: "te.law_id AS id", names: "id", length: "length(te.title_en)", perRow: true}
+	}
+	// With Known, each candidate carries its date (l is the law in both
+	// sources), so the ranking does not join legislation again for it. One
+	// row per law in both (legislation_title_en's key is law_id).
+	lawTie := "coalesce(l.issued_on - date '0001-01-01', 0) AS g_tie"
+	if q.Known != nil {
+		src.keys += ", " + lawTie
+		src.unique = true
 	}
 	terms := q.Terms
 	if terms == nil {
@@ -171,7 +201,11 @@ func Laws(ctx context.Context, db Querier, q LawQuery) (Page, error) {
 	case !p.empty():
 		cands = candidates(p, idx, src, filter, &params)
 	case q.Number != "": // a number alone: "law 44 of 2015"
-		cands = fmt.Sprintf(`SELECT l.id, 0 AS units, 0::float8 AS score FROM legislation l WHERE %s`, filter)
+		cols := "l.id"
+		if q.Known != nil {
+			cols += ", " + lawTie
+		}
+		cands = fmt.Sprintf(`SELECT %s, 0 AS units, 0::float8 AS score FROM legislation l WHERE %s`, cols, filter)
 	default:
 		return Page{}, nil
 	}
@@ -185,13 +219,18 @@ func Laws(ctx context.Context, db Querier, q LawQuery) (Page, error) {
 	if q.Full || fullOnly(q.Text, !q.English) {
 		least = p.units()
 	}
-	return page(ctx, db, pageSQL{
+	ps := pageSQL{
 		cands: cands, units: p.units(), least: least,
 		code:   "EXISTS (SELECT 1 FROM code c WHERE c.law_id = g.id)",
 		served: "JOIN legislation tl ON tl.id = g.id", tie: "coalesce(tl.issued_on - date '0001-01-01', 0)",
 		keys: []string{"id"}, idDesc: true,
-		join: join, phrase: phrase,
-	}, q.Limit, q.After, params)
+		join: join, phrase: phrase, noCount: q.NoCount,
+	}
+	if q.Known != nil {
+		// every candidate is a legislation row (the join only read its date)
+		ps.code, ps.served, ps.tie = q.Known.codeOf("g.id", &params), "", "g.g_tie"
+	}
+	return page(ctx, db, ps, q.Limit, q.After, params)
 }
 
 // TitleLaws are the texts whose Arabic title holds every word of the
@@ -245,22 +284,32 @@ func Articles(ctx context.Context, db Querier, q ArticleQuery) (Page, error) {
 		params = append(params, q.LawID)
 		filter = fmt.Sprintf("a.law_id = $%d", len(params))
 	}
-	cands := candidates(p, idx, source{from: "legislation_article a", keys: "a.law_id AS law_id, a.position AS position", names: "law_id, position", length: length}, filter, &params)
+	src := source{from: "legislation_article a", keys: "a.law_id AS law_id, a.position AS position", names: "law_id, position", length: length}
+	src.unique = q.Known != nil
+	cands := candidates(p, idx, src, filter, &params)
 	params = append(params, titles)
 	titled := fmt.Sprintf("coalesce(g.law_id = ANY($%d::int[]), false)", len(params))
-	params = append(params, q.Text)
-	least := 0
-	if q.Full || fullOnly(q.Text, !q.French) {
-		least = p.units()
-	}
-	return page(ctx, db, pageSQL{
-		cands: cands, units: p.units(), least: least, fallback: q.Fallback,
+	ps := pageSQL{
+		cands: cands, units: p.units(), fallback: q.Fallback,
 		served: "JOIN legislation l ON l.id = g.law_id JOIN legislation_kind k ON k.name_ar = l.kind",
 		code:   "EXISTS (SELECT 1 FROM code c WHERE c.law_id = g.law_id)", titled: titled,
-		keys:   []string{"law_id", "position"},
-		join:   "JOIN legislation_article a ON a.law_id = p.id AND a.position = p.position",
-		phrase: idx[0].phrase(fmt.Sprintf("$%d", len(params))),
-	}, q.Limit, q.After, params)
+		keys:    []string{"law_id", "position"},
+		join:    "JOIN legislation_article a ON a.law_id = p.id AND a.position = p.position",
+		noCount: q.NoCount,
+	}
+	if q.Known != nil {
+		// an article's law is a legislation row (foreign key): only its kind
+		// can leave it out
+		ps.code, ps.served = q.Known.codeOf("g.law_id", &params), ""
+		ps.servedCond = q.Known.servedOf("g.law_id", &params)
+		ps.noSeqScan = p.words == 0
+	}
+	params = append(params, q.Text)
+	ps.phrase = idx[0].phrase(fmt.Sprintf("$%d", len(params)))
+	if q.Full || fullOnly(q.Text, !q.French) {
+		ps.least = p.units()
+	}
+	return page(ctx, db, ps, q.Limit, q.After, params)
 }
 
 // Rulings are the rulings whose title or text holds the question's words,
@@ -271,18 +320,30 @@ func Rulings(ctx context.Context, db Querier, q RulingQuery) (Page, error) {
 		return Page{}, err
 	}
 	var params []any
-	cands := candidates(p, rulingIndexes, source{from: "ruling r", keys: "r.id AS id", names: "id", length: "r.text_len"}, "", &params)
+	src := source{from: "ruling r", keys: "r.id AS id", names: "id", length: "r.text_len"}
+	if q.Known != nil {
+		// each candidate carries its date: no second read of ruling for it
+		src.keys += ", coalesce(r.decided_on - date '0001-01-01', 0) AS g_tie"
+		src.unique = true
+	}
+	cands := candidates(p, rulingIndexes, src, "", &params)
 	params = append(params, q.Text)
 	least := 0
 	if q.Full || fullOnly(q.Text, true) {
 		least = p.units()
 	}
-	return page(ctx, db, pageSQL{
+	ps := pageSQL{
 		cands: cands, units: p.units(), least: least, fallback: q.Fallback,
 		served: "JOIN ruling tr ON tr.id = g.id", tie: "coalesce(tr.decided_on - date '0001-01-01', 0)",
 		keys: []string{"id"}, idDesc: true,
 		join: "JOIN ruling r ON r.id = p.id", phrase: rulingIndexes[0].phrase(fmt.Sprintf("$%d", len(params))),
-	}, q.Limit, q.After, params)
+		noCount: q.NoCount,
+	}
+	if q.Known != nil {
+		ps.served, ps.tie = "", "g.g_tie"
+		ps.noSeqScan = p.words == 0
+	}
+	return page(ctx, db, ps, q.Limit, q.After, params)
 }
 
 // Judgments are the rulings whose scanned judgment, read by machine, holds
@@ -316,18 +377,27 @@ func Judgments(ctx context.Context, db Querier, q RulingQuery) (Page, error) {
 
 // pageSQL is one kind's ranking, for page.
 type pageSQL struct {
-	cands    string   // the candidates (candidates): keys, units, score
-	units    int      // units of a text holding every word
-	least    int      // keep only the texts holding at least this many
-	fallback bool     // the texts holding fewer words than units only when none holds them all
-	served   string   // joins that keep only texts the site serves, over g
-	code     string   // SQL over g: a major code's; "" for none
-	titled   string   // SQL over g: a text whose title holds the question; "" for none
-	tie      string   // SQL over g and served: the newest first among equals; "" for none
-	keys     []string // the candidates' key columns
-	idDesc   bool     // the highest id first among equals
-	join     string   // joins over p for phrase
-	phrase   string   // SQL: the text holds the question as a phrase
+	cands    string // the candidates (candidates): keys, units, score
+	units    int    // units of a text holding every word
+	least    int    // keep only the texts holding at least this many
+	fallback bool   // the texts holding fewer words than units only when none holds them all
+	served   string // joins that keep only texts the site serves, over g
+	// servedCond is SQL over g that keeps only texts the site serves, in
+	// place of served's joins; "" for none
+	servedCond string
+	noCount    bool // no counts: Page.Total and Page.Full stay 0
+	// noSeqScan: every word is common, and Postgres would rather read every
+	// text's vector than the index (30% of the rulings hold "المحكمة"),
+	// which it must first decompress: 165 ms for "المحكمة" against 25 ms
+	// from the index. The query runs with seq scans off.
+	noSeqScan bool
+	code      string   // SQL over g: a major code's; "" for none
+	titled    string   // SQL over g: a text whose title holds the question; "" for none
+	tie       string   // SQL over g and served: the newest first among equals; "" for none
+	keys      []string // the candidates' key columns
+	idDesc    bool     // the highest id first among equals
+	join      string   // joins over p for phrase
+	phrase    string   // SQL: the text holds the question as a phrase
 }
 
 // page reads one page of a ranking: the hits after after, at most limit,
@@ -375,17 +445,41 @@ func page(ctx context.Context, db Querier, s pageSQL, limit int, after *Key, par
 		cond = afterCond(cols, &params)
 	}
 	params = append(params, limit+1)
+	where := "g.units >= " + least
+	if s.servedCond != "" {
+		where += " AND " + s.servedCond
+	}
 	// n is MATERIALIZED: inlined, Postgres counted every candidate again for
 	// each returned row (9 Nov 2026: "العمل", 38,269 articles, 224 to 114 ms).
+	count, counts, crossN := `,
+		n AS MATERIALIZED (SELECT count(*) AS total, count(*) FILTER (WHERE units >= `+strconv.Itoa(s.units)+` AND `+strconv.Itoa(s.units)+` > 0) AS full FROM r)`, "n.total, n.full", " CROSS JOIN n"
+	if s.noCount {
+		count, counts, crossN = "", "0::bigint, 0::bigint", ""
+	}
 	sql := `WITH g AS (` + s.cands + `),
-		r AS (SELECT g.*, ` + code + ` AS code, ` + titled + ` AS titled, (` + tie + `)::int AS tie FROM g ` + s.served + ` WHERE g.units >= ` + least + `),
-		n AS MATERIALIZED (SELECT count(*) AS total, count(*) FILTER (WHERE units >= ` + strconv.Itoa(s.units) + ` AND ` + strconv.Itoa(s.units) + ` > 0) AS full FROM r)
-		SELECT p.id, p.position, p.units, p.code, p.titled, p.score, p.tie, (` + s.phrase + `), n.total, n.full
+		r AS (SELECT g.*, ` + code + ` AS code, ` + titled + ` AS titled, (` + tie + `)::int AS tie FROM g ` + s.served + ` WHERE ` + where + `)` + count + `
+		SELECT p.id, p.position, p.units, p.code, p.titled, p.score, p.tie, (` + s.phrase + `), ` + counts + `
 		FROM (SELECT ` + id + ` AS id, ` + pos + ` AS position, r.units, r.code, r.titled, r.score, r.tie FROM r
 			WHERE ` + cond + ` ORDER BY ` + order + ` LIMIT $` + strconv.Itoa(len(params)) + `) p
-		` + s.join + ` CROSS JOIN n
+		` + s.join + crossN + `
 		ORDER BY p.units DESC, p.code DESC, p.titled DESC, p.score DESC, p.tie DESC, p.id` + idDir + `, p.position`
-	rows, err := db.Query(ctx, sql, params...)
+	q := db
+	if s.noSeqScan {
+		if b, ok := db.(interface {
+			Begin(context.Context) (pgx.Tx, error)
+		}); ok {
+			tx, err := b.Begin(ctx)
+			if err != nil {
+				return Page{}, err
+			}
+			defer tx.Rollback(ctx)
+			if _, err := tx.Exec(ctx, "SET LOCAL enable_seqscan = off"); err != nil {
+				return Page{}, err
+			}
+			q = tx
+		}
+	}
+	rows, err := q.Query(ctx, sql, params...)
 	if err != nil {
 		return Page{}, err
 	}
@@ -444,4 +538,21 @@ func afterCond(cols []keyCol, params *[]any) string {
 		cond = fmt.Sprintf("(%s %s %s OR (%s = %s AND %s))", c.expr, op, arg, c.expr, arg, cond)
 	}
 	return cond
+}
+
+// codeOf is SQL over col that holds for a code's law id; its parameter is
+// appended to params.
+func (k *Known) codeOf(col string, params *[]any) string {
+	*params = append(*params, k.Codes)
+	return fmt.Sprintf("%s = ANY($%d::int[])", col, len(*params))
+}
+
+// servedOf is SQL over col that holds for a law the site serves, "" when
+// it serves them all (the usual case: no condition to test per candidate).
+func (k *Known) servedOf(col string, params *[]any) string {
+	if len(k.Unserved) == 0 {
+		return ""
+	}
+	*params = append(*params, k.Unserved)
+	return fmt.Sprintf("NOT (%s = ANY($%d::int[]))", col, len(*params))
 }

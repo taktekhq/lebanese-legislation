@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/taktekhq/lebanese-legislation/internal/wordsearch"
 )
 
 // The Worker's tool tests, against testdata/fixture.sql (see main_test.go).
@@ -621,16 +623,21 @@ func TestToolsAgainstFixtureAreJSON(t *testing.T) {
 }
 
 // TestLayoutsAgree: on the -db-prod shape (law_card, article_card,
-// law_link) every tool answers byte for byte what it answers when it
-// computes the same columns from the corpus tables, as on the -db image,
-// and what it answers with the cards but without law_link.
+// law_link, search_known) every tool answers byte for byte what it answers
+// when it computes the same columns from the corpus tables and joins them
+// in its searches, as on the -db image, and what it answers with the cards
+// but without law_link.
 func TestLayoutsAgree(t *testing.T) {
 	s := dbServer(t)
 	if got := s.sql(context.Background()); got != &linked {
 		t.Fatalf("layout %s, want linked: db/prod.sql ran on the fixture", got.name)
 	}
+	if k := s.known(context.Background()); k == nil || len(k.Codes) == 0 {
+		t.Fatalf("search_known %v: db/prod.sql ran on the fixture", k)
+	}
 	plain := newServer(testPool, Config{RateLimitPerMinute: -1})
 	plain.layout.Store(&computed)
+	plain.searchKnown.Store(&wordsearch.Known{}) // none: the searches join as on -db
 	cardsOnly := newServer(testPool, Config{RateLimitPerMinute: -1})
 	cardsOnly.layout.Store(&cards)
 	type toolCall struct {
@@ -640,6 +647,16 @@ func TestLayoutsAgree(t *testing.T) {
 	calls := []toolCall{
 		{"search_legislation", map[string]any{"query": "قانون"}},
 		{"search_legislation", map[string]any{"query": "عقد"}},
+		{"search_legislation", map[string]any{"query": "عقد العمل"}},
+		{"search_legislation", map[string]any{"query": "قانون العقوبات المادة 37"}},
+		{"search_legislation", map[string]any{"query": "المحكمة"}},
+		{"search_legislation", map[string]any{"query": "الدستور"}},
+		{"search_legislation", map[string]any{"query": "penal code"}},
+		{"search_legislation", map[string]any{"query": "labour law"}},
+		{"search_legislation", map[string]any{"query": "law 44 of 2015"}},
+		{"search_legislation", map[string]any{"query": "عقد", "kind": "articles", "limit": 20}},
+		{"search_legislation", map[string]any{"query": "عقد", "kind": "rulings"}},
+		{"search_legislation", map[string]any{"query": "قانون", "kind": "laws", "year": 2015}},
 		{"list_legislation", map[string]any{}},
 		{"list_legislation", map[string]any{"order": "oldest"}},
 		{"list_gazette_issues", map[string]any{}},
@@ -686,6 +703,9 @@ func TestLayoutsAgree(t *testing.T) {
 		got, want := post(s, body, nil).Body.String(), post(plain, body, nil).Body.String()
 		if got != want {
 			t.Errorf("%s %v: linked and computed answers differ\nlinked:   %.300s\ncomputed: %.300s", c.name, c.args, got, want)
+		}
+		if strings.Contains(got, `"error"`) {
+			t.Errorf("%s %v: %.300s", c.name, c.args, got)
 		}
 		if c.name == "get_law" {
 			if mid := post(cardsOnly, body, nil).Body.String(); mid != want {
@@ -793,17 +813,43 @@ func TestOldShape(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer tx.Rollback(ctx)
-	if _, err := tx.Exec(ctx, `DROP TABLE law_card, article_card, possibly_affected_t, law_link`); err != nil {
+	if _, err := tx.Exec(ctx, `DROP TABLE law_card, article_card, possibly_affected_t, law_link, search_known`); err != nil {
 		t.Fatal(err)
 	}
 	old := newServer(tx, Config{RateLimitPerMinute: -1})
 	if got := old.sql(ctx); got != &computed {
 		t.Fatalf("layout %s, want computed without the card tables", got.name)
 	}
+	if k := old.known(ctx); k != nil {
+		t.Fatalf("known %v without search_known", k)
+	}
 	for name := range calls {
 		got := post(old, body(name), nil).Body.String()
 		if got != want[name] || strings.Contains(got, `"error"`) {
 			t.Errorf("%s: -db shape %.300s\n-db-prod shape %.300s", name, got, want[name])
 		}
+	}
+}
+
+// A search_known from another prod.sql version is not read.
+func TestKnownNeedsItsVersion(t *testing.T) {
+	if testPool == nil {
+		t.Skip("set LEBLEG_TEST_DSN to a disposable Postgres database")
+	}
+	ctx := context.Background()
+	tx, err := testPool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err := tx.Exec(ctx, `COMMENT ON TABLE search_known IS 'lebleg-prod 2'`); err != nil {
+		t.Fatal(err)
+	}
+	s := newServer(tx, Config{RateLimitPerMinute: -1})
+	if k := s.known(ctx); k != nil {
+		t.Errorf("known %v for another version", k)
+	}
+	if k := s.known(ctx); k != nil {
+		t.Errorf("known %v on the second read", k)
 	}
 }
