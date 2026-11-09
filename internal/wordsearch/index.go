@@ -230,23 +230,29 @@ func (x *Index) candidates(ctx context.Context, p plan, idx []index, q *idxPage,
 			ds = intersect(ds, l)
 		}
 		ds = slices.DeleteFunc(ds, func(d int32) bool { return !keep(d) })
+		if len(ds) > commonCut {
+			// The shortest commonCut: every text up to the length the
+			// commonCut-th has. When more than commonCut are that short, the
+			// texts of that length straddle the cut. Found by counting
+			// lengths, not sorting ("2" is in 102,605 articles: sorting them
+			// took 110 ms before a search the SQL had to answer anyway).
+			l := cutLength(docs.Len, ds, commonCut)
+			n := 0
+			ds = slices.DeleteFunc(ds, func(d int32) bool {
+				if docs.Len[d] > l {
+					return true
+				}
+				n++
+				return false
+			})
+			if n > commonCut {
+				edge = l
+			}
+		}
 		scaled := sc.scaled(p.weight)
 		cs = make([]cand, len(ds))
 		for i, d := range ds {
 			cs[i] = cand{doc: d, units: int32(len(p.common)), score: sc.score(scaled, docs.Len[d])}
-		}
-		if len(cs) > commonCut {
-			sort.SliceStable(cs, func(i, j int) bool { return docs.Len[cs[i].doc] < docs.Len[cs[j].doc] })
-			if l := docs.Len[cs[commonCut-1].doc]; docs.Len[cs[commonCut].doc] != l {
-				cs = cs[:commonCut]
-			} else {
-				edge = l
-				end := commonCut
-				for end < len(cs) && docs.Len[cs[end].doc] == edge {
-					end++
-				}
-				cs = cs[:end]
-			}
 		}
 		return cs, edge, nil
 	}
@@ -344,6 +350,34 @@ func (x *Index) candidates(ctx context.Context, p plan, idx []index, q *idxPage,
 		cs = append(cs, cand{doc: d, units: us[i], score: sc.score(sc.scaled(ws...), docs.Len[d])})
 	}
 	return cs, -1, nil
+}
+
+// cutLength is the smallest length that n of the texts ds are no longer
+// than (n <= len(ds)).
+func cutLength(lens []int32, ds []int32, n int) int32 {
+	hi := int32(0)
+	for _, d := range ds {
+		hi = max(hi, lens[d])
+	}
+	if hi > 1<<22 { // a count per length would be large: sort the lengths
+		ls := make([]int32, len(ds))
+		for i, d := range ds {
+			ls[i] = lens[d]
+		}
+		slices.Sort(ls)
+		return ls[n-1]
+	}
+	count := make([]int32, hi+1)
+	for _, d := range ds {
+		count[max(lens[d], 0)]++
+	}
+	seen := 0
+	for l, c := range count {
+		if seen += int(c); seen >= n {
+			return int32(l)
+		}
+	}
+	return hi
 }
 
 // page is page(candidates(p, idx, ...)) from the index: the same hits in the
@@ -506,7 +540,20 @@ func (x *Index) titleLaws(ctx context.Context, p plan) ([]int32, error) {
 		return nil, err
 	}
 	cs = slices.DeleteFunc(cs, func(c cand) bool { return int(c.units) != p.words })
-	sort.SliceStable(cs, func(i, j int) bool { return cs[i].score > cs[j].score })
+	// the 21 best scores, best first (the 21st only to see a tie at the 20th)
+	var best []cand
+	for _, c := range cs {
+		if len(best) == 21 && c.score <= best[20].score {
+			continue
+		}
+		at := sort.Search(len(best), func(j int) bool { return c.score > best[j].score })
+		if len(best) < 21 {
+			best = append(best, cand{})
+		}
+		copy(best[at+1:], best[at:len(best)-1])
+		best[at] = c
+	}
+	cs = best
 	if len(cs) > 20 {
 		if cs[19].score == cs[20].score {
 			return nil, errNotExact
