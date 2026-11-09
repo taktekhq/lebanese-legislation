@@ -47,8 +47,9 @@ database exactly as the published data defines it. Pull it for the data.
 `ghcr.io/taktekhq/lebanese-legislation-db-prod` is `-db` plus read-optimized
 copies that the MCP server reads, built by `prod/Dockerfile`
 from one SQL file, `prod.sql`: `law_card` (the law summary every MCP reply
-carries), `article_card` (each article with its wording in force resolved) and
-`possibly_affected_t` (the rows of the `possibly_affected` view as a table; the view is untouched).
+carries), `article_card` (each article with its wording in force resolved),
+`possibly_affected_t` (the rows of the `possibly_affected` view as a table; the view is untouched)
+and `law_link` (`get_law`'s amended_by and amended lists, in order).
 No new data, and `prod.sql` can rebuild them at any time. The all-in-one image
 `-all`, which runs lebaneselegislation.com, is built from `-db-prod`. Measured
 on 9 Nov 2026 at the live limits (1 CPU, 6 GB), 6 `get_article` calls at once

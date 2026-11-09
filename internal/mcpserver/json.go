@@ -74,33 +74,127 @@ func (o *obj) nonEmpty(k string, s *string) {
 	}
 }
 
-func (o obj) MarshalJSON() ([]byte, error) {
-	var b bytes.Buffer
-	b.WriteByte('{')
-	for i, e := range o {
-		if i > 0 {
-			b.WriteByte(',')
-		}
-		kb, err := marshal(e.K)
-		if err != nil {
-			return nil, err
-		}
-		b.Write(kb)
-		b.WriteByte(':')
-		vb, err := marshal(e.V)
-		if err != nil {
-			return nil, err
-		}
-		b.Write(vb)
-	}
-	b.WriteByte('}')
-	return b.Bytes(), nil
-}
+func (o obj) MarshalJSON() ([]byte, error) { return appendJSON(nil, o) }
 
 // marshal is json.Marshal without HTML escaping, as JSON.stringify writes
 // "<", ">" and "&" as they are. U+2028 and U+2029, which Go always escapes,
 // are written raw too, so the bytes match the Worker's.
-func marshal(v any) ([]byte, error) {
+func marshal(v any) ([]byte, error) { return appendJSON(nil, v) }
+
+// appendJSON appends what encodeJSON writes for v, in one pass: an obj, a
+// []any or a []string is written element by element, and a plain string,
+// int or bool directly; any other value, and a string that needs more
+// escaping than \" and \\, goes through encodeJSON. Before 9 Nov 2026 each
+// nested obj was encoded on its own and then re-read by the encoder of the
+// level above, so a reply was scanned once per level of nesting: 60% of the
+// CPU of get_law, whose replies reach 280 KB (TestAppendJSONMatchesEncoder
+// holds the bytes to the encoder's).
+func appendJSON(b []byte, v any) ([]byte, error) {
+	var err error
+	switch x := v.(type) {
+	case nil:
+		return append(b, "null"...), nil
+	case string:
+		return appendString(b, x)
+	case bool:
+		return strconv.AppendBool(b, x), nil
+	case int:
+		return strconv.AppendInt(b, int64(x), 10), nil
+	case int64:
+		return strconv.AppendInt(b, x, 10), nil
+	case obj:
+		b = append(b, '{')
+		for i, e := range x {
+			if i > 0 {
+				b = append(b, ',')
+			}
+			if b, err = appendString(b, e.K); err != nil {
+				return nil, err
+			}
+			b = append(b, ':')
+			if b, err = appendJSON(b, e.V); err != nil {
+				return nil, err
+			}
+		}
+		return append(b, '}'), nil
+	case []any:
+		if x == nil {
+			return append(b, "null"...), nil
+		}
+		b = append(b, '[')
+		for i, e := range x {
+			if i > 0 {
+				b = append(b, ',')
+			}
+			if b, err = appendJSON(b, e); err != nil {
+				return nil, err
+			}
+		}
+		return append(b, ']'), nil
+	case []string:
+		if x == nil {
+			return append(b, "null"...), nil
+		}
+		b = append(b, '[')
+		for i, e := range x {
+			if i > 0 {
+				b = append(b, ',')
+			}
+			if b, err = appendString(b, e); err != nil {
+				return nil, err
+			}
+		}
+		return append(b, ']'), nil
+	}
+	return appendEncoded(b, v)
+}
+
+// appendString writes s as a JSON string. Valid UTF-8 without control
+// characters is copied with only " and \ escaped, which is what the encoder
+// does with such a string (U+2028 and U+2029 raw, as marshal writes them);
+// anything else goes through encodeJSON.
+func appendString(b []byte, s string) ([]byte, error) {
+	quotes := 0
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c < 0x20 {
+			return appendEncoded(b, s)
+		}
+		if c == '"' || c == '\\' {
+			quotes++
+		}
+	}
+	if !utf8.ValidString(s) {
+		return appendEncoded(b, s)
+	}
+	b = append(b, '"')
+	if quotes == 0 {
+		b = append(b, s...)
+	} else {
+		start := 0
+		for i := 0; i < len(s); i++ {
+			if c := s[i]; c == '"' || c == '\\' {
+				b = append(b, s[start:i]...)
+				b = append(b, '\\', c)
+				start = i + 1
+			}
+		}
+		b = append(b, s[start:]...)
+	}
+	return append(b, '"'), nil
+}
+
+func appendEncoded(b []byte, v any) ([]byte, error) {
+	out, err := encodeJSON(v)
+	if err != nil {
+		return nil, err
+	}
+	return append(b, out...), nil
+}
+
+// encodeJSON is the encoder appendJSON matches: json.Encoder without HTML
+// escaping, U+2028 and U+2029 written raw.
+func encodeJSON(v any) ([]byte, error) {
 	var b bytes.Buffer
 	enc := json.NewEncoder(&b)
 	enc.SetEscapeHTML(false)

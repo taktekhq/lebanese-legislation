@@ -11,6 +11,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/taktekhq/lebanese-legislation/internal/cursor"
 )
 
@@ -135,11 +136,11 @@ func (s *Server) getLaw(ctx context.Context, a args) (toolResult, error) {
 	if err := rows.Err(); err != nil {
 		return toolResult{}, err
 	}
-	amendedBy, err := s.lawLevelLinks(ctx, id, "to")
+	amendedBy, err := s.lawLevelLinks(ctx, l, "to")
 	if err != nil {
 		return toolResult{}, err
 	}
-	amended, err := s.lawLevelLinks(ctx, id, "from")
+	amended, err := s.lawLevelLinks(ctx, l, "from")
 	if err != nil {
 		return toolResult{}, err
 	}
@@ -163,41 +164,59 @@ func (s *Server) getLaw(ctx context.Context, a args) (toolResult, error) {
 	return ok(o), nil
 }
 
-// lawLevelLinks: the texts that changed this one (direction "to") or that
-// this one changed (direction "from"), oldest first, one entry per relation
+// lawLevelLinks: the texts that changed law self (direction "to") or that
+// it changed (direction "from"), oldest first, one entry per relation
 // and other text. Edges to or from a single article count too: the Labour
 // Code is changed mostly article by article, so articles lists which.
-func (s *Server) lawLevelLinks(ctx context.Context, lawID int64, direction string) ([]any, error) {
-	join, cond := "ge.from_id", "ge.to_law_id = $1 AND ge.from_type = 'legislation' AND ge.from_id <> $1"
-	if direction == "from" {
-		join, cond = "ge.to_law_id", "ge.from_id = $1 AND ge.from_type = 'legislation' AND ge.to_law_id <> $1"
+// law_link (db/prod.sql) holds the entries in this order; without it they
+// are grouped here from the edges.
+func (s *Server) lawLevelLinks(ctx context.Context, self *lawRow, direction string) ([]any, error) {
+	L := s.sql(ctx)
+	lawID := self.ID
+	type extra struct {
+		rel  string
+		art  *string  // one edge's article (from graph_edge)
+		arts []string // the entry's articles (from law_link)
 	}
-	rows, err := s.db.Query(ctx, `SELECT `+s.sql(ctx).lawCols+`, ge.relation, ge.to_article FROM graph_edge ge JOIN legislation l ON l.id = `+join+` `+s.sql(ctx).lawJoins+`
+	var extras []*extra
+	var rows pgx.Rows
+	var err error
+	if L.links {
+		rows, err = s.db.Query(ctx, `SELECT `+L.lawCols+`, lc.relation, lc.articles FROM law_link lc
+			WHERE lc.law_id = $1 AND lc.direction = $2 ORDER BY lc.ord`, lawID, direction)
+	} else {
+		join, cond := "ge.from_id", "ge.to_law_id = $1 AND ge.from_type = 'legislation' AND ge.from_id <> $1"
+		if direction == "from" {
+			join, cond = "ge.to_law_id", "ge.from_id = $1 AND ge.from_type = 'legislation' AND ge.to_law_id <> $1"
+		}
+		rows, err = s.db.Query(ctx, `SELECT `+L.lawCols+`, ge.relation, ge.to_article FROM graph_edge ge JOIN legislation l ON l.id = `+join+` `+L.lawJoins+`
 		WHERE `+cond+` AND ge.status IN ('linked', 'no_article') AND ge.relation = ANY($2)
 		ORDER BY `+lawDate+` ASC NULLS FIRST, l.id ASC, ge.id ASC`, lawID, changeRelations)
+	}
 	if err != nil {
 		return nil, err
 	}
-	type extra struct {
-		rel string
-		art *string
-	}
-	var extras []*extra
 	laws, err := scanLaws(rows, func() []any {
 		e := &extra{}
 		extras = append(extras, e)
+		if L.links {
+			return []any{&e.rel, &e.arts}
+		}
 		return []any{&e.rel, &e.art}
 	})
 	if err != nil {
 		return nil, err
 	}
+	for _, e := range extras {
+		if e.art != nil {
+			e.arts = []string{*e.art}
+		}
+	}
 	// The date of the change is the amending text's: the other law's for
 	// amended_by, this law's for amended.
-	var self *lawRow
+	var dated *lawRow
 	if direction == "from" {
-		if self, err = s.loadLaw(ctx, lawID); err != nil {
-			return nil, err
-		}
+		dated = self
 	}
 	type entry struct {
 		o        obj
@@ -212,8 +231,8 @@ func (s *Server) lawLevelLinks(ctx context.Context, lawID int64, direction strin
 		en, seen := byKey[key]
 		if !seen {
 			d := r
-			if self != nil {
-				d = self
+			if dated != nil {
+				d = dated
 			}
 			o := obj{{"relation", e.rel}, {"verb", verbFor(e.rel)}, {"law", lawSummary(r)}}
 			if d.GazetteDate != nil && *d.GazetteDate != "" {
@@ -225,9 +244,9 @@ func (s *Server) lawLevelLinks(ctx context.Context, lawID int64, direction strin
 			byKey[key] = en
 			order = append(order, key)
 		}
-		if e.art != nil && *e.art != "" {
-			if !contains(en.articles, *e.art) {
-				en.articles = append(en.articles, *e.art)
+		for _, a := range e.arts {
+			if a != "" && !contains(en.articles, a) {
+				en.articles = append(en.articles, a)
 			}
 		}
 	}

@@ -16,12 +16,16 @@
 --                      carries (internal/mcpserver lawCols).
 --   article_card       one row per article, with its wording in force
 --                      resolved (internal/mcpserver articleCols).
+--   law_link           get_law's amended_by and amended lists: one row per
+--                      entry, in the order the tool returns them, with the
+--                      other law's law_card columns.
 --
--- The MCP server reads these tables only when law_card and article_card
--- carry the version mark it expects (internal/mcpserver prodVersion), and
--- computes the same columns otherwise, so it still runs on -db and never
--- fails on an image from an older prod.sql. The file is idempotent: running
--- it again rebuilds the tables. The Parquet export and -db never see it.
+-- Each table carries a version mark: the prod.sql version that last changed
+-- its columns. The MCP server reads a table only when its mark is the one
+-- it expects (internal/mcpserver prodVersion, linkVersion), and computes
+-- the same columns otherwise, so it still runs on -db and never fails on an
+-- image from an older prod.sql. The file is idempotent: running it again
+-- rebuilds the tables. The Parquet export and -db never see it.
 -- Measured 9 Nov 2026: get_article p95 for 6 calls at once went from 1,267 ms
 -- to about 90 ms on one CPU, with byte-identical replies.
 
@@ -79,10 +83,57 @@ FROM legislation_article a
 ALTER TABLE article_card ADD PRIMARY KEY (law_id, position);
 CREATE INDEX article_card_number ON article_card (law_id, number);
 
--- The server reads these tables only when both marks match its own
--- (internal/mcpserver prodVersion): change both when a column changes.
+-- law_link: get_law's law-level links (internal/mcpserver lawLevelLinks).
+-- direction 'to' lists the texts that changed law_id (amended_by), 'from'
+-- the texts law_id changed (amended). One row per relation and other text,
+-- ordered as the tool lists them: by the other text's date (gazette, else
+-- issue; none first), its id, then the entry's first edge. articles holds
+-- the article numbers the entry's edges name, each once, in edge order
+-- (NULL when none; the server sorts them). The other text's columns are
+-- its law_card row, so a text without one (kind not served) is left out,
+-- as the server's join to law_card does. Built in about a second from 30k
+-- edges; the Penal Code's 22,861 incoming edges were read and filtered on
+-- every get_law before.
+DROP TABLE IF EXISTS law_link;
+CREATE TABLE law_link AS
+WITH e AS (
+  SELECT ge.to_law_id AS law_id, 'to' AS direction, ge.from_id AS other_id, ge.relation, ge.to_article, ge.id
+  FROM graph_edge ge
+  WHERE ge.from_type = 'legislation' AND ge.to_law_id IS NOT NULL AND ge.from_id <> ge.to_law_id
+    AND ge.status IN ('linked', 'no_article') AND ge.relation IN ('replace', 'amend', 'repeal', 'insert', 'suspend', 'extend')
+  UNION ALL
+  SELECT ge.from_id, 'from', ge.to_law_id, ge.relation, ge.to_article, ge.id
+  FROM graph_edge ge
+  WHERE ge.from_type = 'legislation' AND ge.to_law_id IS NOT NULL AND ge.from_id <> ge.to_law_id
+    AND ge.status IN ('linked', 'no_article') AND ge.relation IN ('replace', 'amend', 'repeal', 'insert', 'suspend', 'extend')
+), entry AS (
+  SELECT law_id, direction, other_id, relation, min(id) AS first_edge FROM e GROUP BY 1, 2, 3, 4
+), art AS (
+  SELECT law_id, direction, other_id, relation, array_agg(to_article ORDER BY first_edge) AS articles
+  FROM (SELECT law_id, direction, other_id, relation, to_article, min(id) AS first_edge
+        FROM e WHERE to_article <> '' GROUP BY 1, 2, 3, 4, 5) x
+  GROUP BY 1, 2, 3, 4
+)
+SELECT en.law_id, en.direction,
+  row_number() OVER (PARTITION BY en.law_id, en.direction
+    ORDER BY coalesce(l.gazette_date, l.issued_on) ASC NULLS FIRST, en.other_id, en.first_edge)::int AS ord,
+  en.relation, a.articles,
+  lc.id, lc.kind, lc.kind_en, lc.number, lc.issued_on, lc.title, lc.status, lc.gazette_number, lc.gazette_date,
+  lc.gazette_issue_id, lc.article_count, lc.code_slug, lc.code_name_en, lc.code_name_fr, lc.source_url, lc.title_en, lc.changed_at
+FROM entry en
+  JOIN legislation l ON l.id = en.other_id
+  JOIN law_card lc ON lc.id = en.other_id
+  LEFT JOIN art a USING (law_id, direction, other_id, relation);
+ALTER TABLE law_link ADD PRIMARY KEY (law_id, direction, ord);
+
+-- The server reads each table only when its mark is the one it expects
+-- (internal/mcpserver prodVersion for law_card and article_card,
+-- linkVersion for law_link): change a mark and its constant together when
+-- the table's columns change. law_link copies law_card's columns, so it
+-- changes with law_card.
 COMMENT ON TABLE law_card IS 'lebleg-prod 1';
 COMMENT ON TABLE article_card IS 'lebleg-prod 1';
+COMMENT ON TABLE law_link IS 'lebleg-prod 2';
 
 -- The server roles exist in the image (db/bake.sh); a test database may
 -- have neither.
@@ -91,7 +142,7 @@ DECLARE r text;
 BEGIN
   FOREACH r IN ARRAY ARRAY['lebleg_web', 'lebleg_reader'] LOOP
     IF EXISTS (SELECT FROM pg_roles WHERE rolname = r) THEN
-      EXECUTE format('GRANT SELECT ON possibly_affected_t, law_card, article_card TO %I', r);
+      EXECUTE format('GRANT SELECT ON possibly_affected_t, law_card, article_card, law_link TO %I', r);
     END IF;
   END LOOP;
 END $$;
@@ -101,3 +152,4 @@ ANALYZE legislation_article;
 ANALYZE graph_edge;
 ANALYZE law_card;
 ANALYZE article_card;
+ANALYZE law_link;

@@ -64,6 +64,7 @@ type layout struct {
 	lawFrom                  string
 	articleCols, articleFrom string
 	affected                 string // possibly_affected's rows
+	links                    bool   // get_law's links come from law_link
 }
 
 // computed reads every column from the corpus tables at request time: the
@@ -100,31 +101,45 @@ var cards = layout{
 	affected:    "possibly_affected_t",
 }
 
+// linked is cards plus law_link, get_law's amended_by and amended lists
+// precomputed by db/prod.sql in the order lawLevelLinks returns them.
+var linked layout
+
 func init() {
 	computed.lawFrom = `legislation l ` + computed.lawJoins
 	cards.lawFrom = `legislation l ` + cards.lawJoins
+	linked = cards
+	linked.name, linked.links = "linked", true
 }
 
-// prodVersion is the mark db/prod.sql puts on law_card and article_card.
-// The server reads the cards only when both match, so an image built from an older
-// prod.sql (other columns) falls back to computed instead of failing.
-const prodVersion = "lebleg-prod 1"
+// prodVersion is the mark db/prod.sql puts on law_card and article_card,
+// linkVersion the one on law_link. The server reads a table only when its
+// mark matches, so an image built from another prod.sql (other columns)
+// falls back to computing them instead of failing.
+const (
+	prodVersion = "lebleg-prod 1"
+	linkVersion = "lebleg-prod 2"
+)
 
-// sql is the layout this database has: cards when law_card and
-// article_card carry prodVersion, computed otherwise. It asks the database once; a
-// failed check is not remembered and reads computed (correct on both, only
+// sql is the layout this database has: linked when law_card and
+// article_card carry prodVersion and law_link carries linkVersion, cards
+// without that law_link, computed otherwise. It asks the database once; a
+// failed check is not remembered and reads computed (correct on all, only
 // slower).
 func (s *Server) sql(ctx context.Context) *layout {
 	if l := s.layout.Load(); l != nil {
 		return l
 	}
-	var both bool
+	var both, links bool
 	if err := s.db.QueryRow(ctx, `SELECT coalesce(obj_description(to_regclass('law_card'), 'pg_class') = $1
-		AND obj_description(to_regclass('article_card'), 'pg_class') = $1, false)`, prodVersion).Scan(&both); err != nil {
+		AND obj_description(to_regclass('article_card'), 'pg_class') = $1, false),
+		coalesce(obj_description(to_regclass('law_link'), 'pg_class') = $2, false)`, prodVersion, linkVersion).Scan(&both, &links); err != nil {
 		return &computed
 	}
 	l := &computed
-	if both {
+	if both && links {
+		l = &linked
+	} else if both {
 		l = &cards
 	}
 	s.layout.CompareAndSwap(nil, l)
