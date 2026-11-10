@@ -1,5 +1,33 @@
 # Changes
 
+## 9 November 2026
+
+- The hosted MCP server reads answers prepared at build time. `db/prod.sql` runs once on the baked database and makes `-db-prod`, the base of `-all`: `law_card`, `article_card`, `possibly_affected_t`, `law_link`, `search_known` and `law_pub_count`. Each carries a version mark; without it (plain `-db`, an older image) the server computes the same reply with SQL. Real `get_article` calls went from a p95 of 1,060 ms to 131 ms; replies are byte-identical on a 622-call set. `-db` and the Hugging Face dataset do not change. See [performance](performance.md).
+- `get_law` replies are written as JSON in one pass (60% of its Go CPU was encoding). Six calls at once: p95 177 to 185 ms down to 69 to 80 ms at the live limits.
+- `search_legislation` ranks from word lists the `-all` build writes (`lebleg-web search-index`, 87.5 MB, 15 s) and the server maps read-only. CPU per search 13 to 15 ms down to 4 to 6 ms. 21,169 answers compared field by field, none differ. The website's search page and the API keep the SQL path.
+- `list_legislation` totals come from running counts by kind and publication day: two index reads instead of a count of every text.
+- A push that changes only `db/prod.sql` or `db/prod/` builds just `-db-prod` and `-all`, with no Hugging Face commit: live in about half an hour, was about 1.5 hours. The origin `stage` job gets 40 minutes, longer than the 30-minute rollout wait inside it.
+- [`livecheck.yaml`](../livecheck.yaml) says what production must show. Our own checks and deploy probes are tagged as monitors and left out of the MCP response-time insight.
+
+## 7-8 November 2026
+
+- Security fixes after an audit: the `t` template helper escapes its arguments; redirects cannot leave the site; the image relay and the scan redirect accept only expected names and hosts.
+- AI answers: each address has a daily share of the site-wide allowance (`LEBLEG_SEARCH_IP_DAILY_UNITS`, default 150).
+- MCP `tools/call` reserves database units (`MCP_CALL_UNITS`, default 6; a search over every kind takes 4). No room within 2 s: HTTP 503 with `Retry-After: 2`.
+- The `/ph/` analytics relay forwards only the site's own endpoints and project. `gtag.js` is relayed at `/gtag/js`, and `script-src` no longer lists the Tag Manager host.
+- Deploy workflows started by another workflow require a push or manual run of this repository. `merge-data-pr` re-reads the head it merges and refuses paths outside `data/` and `db/model/`.
+- Model CLIs (agy, claude) that read source text run in a new empty folder with a minimal environment and denied tools (`internal/agentcli`).
+- A commit with a data build is deployed once, after that build; a push without one waits for any running data build.
+
+## 5-6 November 2026
+
+- Unofficial English translation of the articles of the popular texts (`data/popular_texts.txt`): 20,679 articles of 306 texts in `data/article_en.jsonl`, shown on `/en/` pages under the Arabic, dropped when the Arabic changes (`cmd/translate-en`).
+- Gazette readings: `data/gazette_annex.jsonl` holds the 389 rows of the violation tables annexed to Law 243/2012 and Social Security Law Articles 49 to 54 as first published in 1963. Law pages show them, and topic guides may cite a row (`annex-<category>-<row>`) or an original wording (`original-<n>`).
+- `cmd/merge-data-pr` reviews and merges the nightly data pull request: only `data/` and `db/model/`, no table losing over 1% of its rows, at most 25 laws or rulings removed, at most 5% of page dates moved. The nightly restores its `data/` folder when it ends and carries model answers from an unmerged night.
+- Hugging Face: one commit per data publish (tables, card and vectors together). The card is laid out like this README and is always taken from main. Badges send `Cross-Origin-Resource-Policy: cross-origin`.
+- MCP 1.2.0: every tool has a title and read-only annotations; `server.json` has icons.
+- AI answer ratings: each thumbs-down reason gets a reply in place. Every page has "Report an error on this page". Editor links show "Editor: name".
+
 ## 7 November 2026
 
 - The MCP server's `search_legislation` searches in PostgreSQL alone, one query per kind of text. Each word is looked up in a GIN index and weighted by how rare it is, from `search_term`, a materialized view the build makes with the database (how many texts hold each word, each index's size and average text length). Texts holding every word come first, then those missing only the commonest words, scored by BM25. It replaces an FTS5 port that loaded corpora into the server's memory and, when no text held every word, retried up to a dozen searches in a row. On a copy of the data, 30 real questions: median 71 to 45 ms, slowest 1,544 to 367 ms, all 30 together 5.1 to 1.8 s.

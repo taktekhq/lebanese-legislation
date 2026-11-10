@@ -28,6 +28,10 @@ It listens on `127.0.0.1:8080` (`LISTEN_ADDR` changes it). In Compose it is on h
 - The hosted server at https://lebaneselegislation.com/mcp is this code inside the `-all` image on Cloudflare Containers: see [workers/static-site/container](../workers/static-site/container/README.md).
 - [`server.json`](../server.json) at the repository root is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry for the hosted server, and [`.mcp.json`](../.mcp.json) the client configuration.
 
+## Speed
+
+On the hosted `-all` image the tools read tables and search word lists prepared at build time (`db/prod.sql`, `lebleg-web search-index`). On a plain `-db` database, as in Compose, the server computes the same replies with SQL: same bytes, slower. See [how the build makes reads fast](../docs/performance.md).
+
 ## 2.0.0: cursor paging
 
 Since 2.0.0 (6 Nov 2026) the four tools that answer a page at a time (`get_law_texts`, `get_links`, `list_legislation`, `list_gazette_issues`) page with a cursor. An answer with more after it carries `next_cursor`; pass it unchanged as `cursor`, with the same other arguments, for the next page. The last page has no `next_cursor`. `total` is still the whole count. `offset` and `next_offset` are gone, and a call that passes `offset` gets a tool error saying to use `cursor`.

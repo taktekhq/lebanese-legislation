@@ -103,7 +103,7 @@ flowchart LR
   A -->|build-db| D[data/<br>tables as text]
   D -->|data workflow| HF[Hugging Face<br>Parquet + vectors]
   D -->|static-site workflow| R2[(Cloudflare R2<br>static pages)]
-  D -->|data workflow| IMG[-db and -all images]
+  D -->|data workflow| IMG[-db, -db-prod and -all images]
   IMG -->|origin workflow| C[Cloudflare Container<br>PostgreSQL + Go server]
   R2 --> W{Worker}
   C --> W
@@ -111,6 +111,8 @@ flowchart LR
 ```
 
 Cloudflare serves the static pages and ruling PDFs from R2 through the Worker in [`workers/static-site`](workers/static-site/). Search, `/api/v1/`, filters, scans and `/mcp` go through `workers/origin` to a blue/green Cloudflare Container running the `-all` image. [static-site.yml](.github/workflows/static-site.yml) renders `data/` with `cmd/static-export`, only the pages that changed: a data change renders the pages its rows touch, a template, string or topic guide change the pages that used it, and a Go change every page. It starts on every push to main that touches the site, and a catch-up check after each deploy reruns a failed one. Changed pages go to IndexNow. [vectors.yml](.github/workflows/vectors.yml) embeds new passages, publishes the vectors and loads Cloudflare Vectorize. See [architecture](docs/architecture.md) and [static export](docs/static-export.md).
+
+**Fast because the work is done at build time.** The served database is read-only, so anything that is the same for every caller is computed once, when the image is built: law and article cards, ordered amendment lists, running counts for list totals, and the word lists search ranks from. On 9 November 2026 real `get_article` calls went from a p95 of 1,060 ms to 131 ms on the same one-CPU container, with byte-identical replies. No cache, no warm-up. See [how the build makes reads fast](docs/performance.md).
 
 AI crawlers are welcome. `robots.txt` lets every named AI crawler (GPTBot, ClaudeBot, PerplexityBot, ShapBot and others) read the pages, search, the API and the MCP server. Every client gets the same limit on dynamic paths: 30 requests per 10 seconds from one address.
 
@@ -162,16 +164,17 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 
 | Image | Holds | Used by |
 | --- | --- | --- |
-| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings | Compose, database users, the static render and the base of `-all` |
+| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings | Compose, database users and the static render |
+| `-db-prod` | `-db` plus read-optimized tables computed from it at build time ([`db/prod.sql`](db/prod.sql)); no new data | The base of `-all` |
 | `-api` | Standalone API server, unchanged Dockerfile and amd64/arm64 support | Compose and API users with a separate database |
 | `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
-| `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
+| `-all` | `-db-prod` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges, and the search word lists | Compose, Cloudflare Containers and self-hosted sites |
 | `-vectors` | `vectorize-sync`, `export-vectors` and DuckDB; downloads the Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
 
 Each image is built by the workflow that produces its inputs: the
 [checks](.github/workflows/checks.yml) workflow publishes `-api`, `-mcp` and
-`-all` after a push to main, [data](.github/workflows/data.yml) publishes `-db`
-and `-all` after a data change, and [vectors](.github/workflows/vectors.yml)
+`-all` after a push to main, [data](.github/workflows/data.yml) publishes `-db`,
+`-db-prod` and `-all` after a data change, and [vectors](.github/workflows/vectors.yml)
 publishes `-vectors`. [images.yml](.github/workflows/images.yml) is a manual
 button to rebuild one. Every image gets a `latest` tag and a UTC date tag, so
 use `:latest` unless you need a fixed copy. Static pages are published directly to R2.
@@ -197,7 +200,7 @@ existing immutable release versions are retained and new versions are added when
 | [`scraper/`](scraper/) | The crawler that reads the Lebanese University's site into the archive, and the scripts that publish the archive. |
 | [`cmd/`](cmd/) | One command per job: build the database, model readings, data checks, export, and local services. [Listed here](cmd/README.md). |
 | [`tools/`](tools/) | Only `tools/src/lebleg/sql/web.sql` now: the serving schema the database image applies for the website, API and MCP. |
-| [`docs/`](docs/) | Architecture, service reference, MCP setup, CI and changes. |
+| [`docs/`](docs/) | Architecture, [performance](docs/performance.md), service reference, MCP setup, CI and changes. |
 | [`workers/`](workers/) | Cloudflare Workers, including the static-site router and its dynamic container. |
 
 `compose.yaml` runs the four images. `compose.build.yaml` builds them from this checkout instead. `compose.local.yaml` selects an already built database image. `server.json` is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry and `.mcp.json` the client configuration for the hosted server.

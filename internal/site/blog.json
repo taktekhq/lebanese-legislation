@@ -1,5 +1,1201 @@
 [
   {
+    "Slug": "answers-prepared-at-build-time",
+    "Milestone": "2026-11-09",
+    "Published": "2026-11-10",
+    "Commit": "e4e4061",
+    "EvidenceKind": "public-commit",
+    "Title": "How we made the MCP server fast: do the work at build time",
+    "TitleAr": "كيف صار خادم MCP سريعاً: ننجز العمل عند بناء الصورة",
+    "Summary": "On 9 November we moved four computations from each request to the image build. Real get_article calls went from a p95 of 1,060 ms to 131 ms.",
+    "SummaryAr": "في 9 تشرين الثاني نقلنا أربع عمليات حسابية من كل طلب إلى بناء الصورة. انخفض المئين 95 لطلبات get_article الحقيقية من 1,060 إلى 131 ميلي ثانية.",
+    "Sections": [
+      {
+        "Heading": "The short answer.",
+        "Body": "The database behind LebaneseLegislation.com is read-only. It is rebuilt from the data files each night and baked into a container image, and nothing writes to it while it serves. So a result that is the same for every caller can be computed once, when the image is built, and read back in a fraction of a millisecond. On 9 November 2026 we moved four such results out of the request and into the build. The server, its one CPU and the answers stayed the same."
+      },
+      {
+        "Heading": "Why it was slow.",
+        "Body": "The MCP server and PostgreSQL share one container with one CPU. On 8 November an AI assistant sent 10 get_article calls within about 60 milliseconds. Six took 3.2 to 3.4 seconds each and four were refused with a 503. One call alone took about 230 ms, and almost all of it went to one question: which general repeal clauses might touch this article? That answer came from a view, a saved query that joined the graph of links between texts to itself on every call. On a copy of the data it took 214 of the 232 ms."
+      },
+      {
+        "Heading": "What the build makes now.",
+        "Body": "One SQL file, db/prod.sql, runs once when the image is built. It writes that view's rows into a table with an index. It writes a card for every law, the summary each reply carries (49 MB), and a card for every article with its wording in force already resolved (340 MB). It writes each law's lists of amending and amended texts, grouped and in order: 37,672 rows, built in 2.5 seconds. And it writes running counts of texts by kind and publication day: 23,975 rows, built in 0.1 seconds. The compressed image grew from 2.149 GB to 2.434 GB."
+      },
+      {
+        "Heading": "A count becomes a subtraction.",
+        "Body": "list_legislation returns how many texts match a kind and a period. Counting them meant reading all 103,112 texts, 26 to 40 ms every time. The build now stores, for each kind and each day, how many texts were published up to that day. A total is one stored number minus another: two index reads, 0.1 to 0.2 ms. On the live server, six such calls at once went from 243 to 290 ms each to 9 to 16 ms."
+      },
+      {
+        "Heading": "It is not a cache.",
+        "Body": "Nothing is loaded into memory when the server starts, nothing is warmed and nothing expires. The tables sit in the database like any other, and PostgreSQL reads them from disk as it needs them. They hold no new data: db/prod.sql can rebuild them from the published tables at any time, and the public dataset image does not carry them. Each table carries a version mark. The server checks the marks once, and if a table is missing or older it computes the answer the old way. So the standalone images still work on the plain database, and an out-of-date image cannot return an error."
+      },
+      {
+        "Heading": "One fix was not in the database.",
+        "Body": "For get_law, 60% of the server's own CPU went to writing JSON. Each level of nesting re-read the bytes of the level below, so a 284 KB reply was scanned once per level. The reply is now written in one pass, and a test checks it against the old encoder on 20,000 random values. With the prepared lists of amending texts, six get_law calls at once went from a p95 of 177 to 185 ms to 69 to 80 ms."
+      },
+      {
+        "Heading": "Same answers, byte for byte.",
+        "Body": "Every change had to pass one test before it merged: 622 calls, replayed against the old server and the new one, must give byte-identical replies. The set holds 322 calls across five tools, 100 more get_law calls and 200 real search questions. The SHA-256 hash of all the replies was the same before and after each change. Speed was measured at the live limits, one CPU and 6 GB of memory, with calls sent alone, six at once and ten at once."
+      },
+      {
+        "Heading": "What people got.",
+        "Body": "In the seven days before the change, real get_article calls had a median of 128 ms, a p95 of 1,060 ms (95 of 100 calls finish within it) and a worst case of 3,242 ms. For the 25 real calls in the first 12 hours after it: 13 ms, 131 ms and 199 ms. They included a burst of 10 calls in one minute, the pattern that had failed the day before. Its slowest call took 199 ms and none was refused."
+      },
+      {
+        "Heading": "What is still slow.",
+        "Body": "The first minute after a deploy. A new container has read nothing from disk yet: six searches sent one second after a switch took 104 to 298 ms, against 17 to 90 ms once warm. Large replies also take time to travel. get_law for a big code returns up to 284 KB, and seen from our test machine the whole call takes 0.4 to 0.9 seconds whatever the server does."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الجواب باختصار.",
+        "Body": "قاعدة البيانات التي يعمل عليها LebaneseLegislation.com للقراءة فقط. تُبنى من جديد من ملفات البيانات كل ليلة وتُحفظ داخل صورة حاوية، ولا يكتب فيها شيء أثناء الخدمة. لذلك يمكن حساب أي نتيجة لا تتغيّر من مستخدم إلى آخر مرة واحدة، عند بناء الصورة، ثم قراءتها في جزء من الميلي ثانية. في 9 تشرين الثاني 2026 نقلنا أربع نتائج من هذا النوع من لحظة الطلب إلى لحظة البناء. بقي الخادم نفسه، بمعالجه الواحد، وبقيت الأجوبة نفسها."
+      },
+      {
+        "Heading": "لماذا كان بطيئاً.",
+        "Body": "يتشارك خادم MCP وPostgreSQL حاوية واحدة بمعالج واحد. في 8 تشرين الثاني أرسل مساعد ذكاء اصطناعي 10 طلبات get_article خلال نحو 60 ميلي ثانية. استغرقت ستة منها بين 3.2 و3.4 ثوانٍ لكل طلب ورُفضت أربعة بالرمز 503. كان الطلب الواحد وحده يستغرق نحو 230 ميلي ثانية، يذهب معظمها إلى سؤال واحد: أي أحكام إلغاء عامة قد تمسّ هذه المادة؟ كان الجواب يأتي من view، أي استعلام محفوظ يربط شبكة الروابط بين النصوص بنفسها عند كل طلب. على نسخة من البيانات استغرق 214 من أصل 232 ميلي ثانية."
+      },
+      {
+        "Heading": "ما يصنعه البناء الآن.",
+        "Body": "ملف SQL واحد، db/prod.sql، يعمل مرة واحدة عند بناء الصورة. يكتب صفوف ذلك الاستعلام في جدول مفهرس. ويكتب بطاقة لكل قانون، هي الخلاصة التي يحملها كل ردّ (49 ميغابايت)، وبطاقة لكل مادة مع صيغتها النافذة محسومة سلفاً (340 ميغابايت). ويكتب لكل قانون قائمتي النصوص التي عدّلته والتي عدّلها، مجمّعة ومرتّبة: 37,672 صفاً تُبنى في 2.5 ثانية. ويكتب أعداداً تراكمية للنصوص بحسب النوع ويوم النشر: 23,975 صفاً تُبنى في 0.1 ثانية. كبرت الصورة المضغوطة من 2.149 إلى 2.434 غيغابايت."
+      },
+      {
+        "Heading": "العدّ يصير عملية طرح.",
+        "Body": "تعيد list_legislation عدد النصوص المطابقة لنوع وفترة. كان عدّها يعني قراءة النصوص الـ103,112 كلها، بين 26 و40 ميلي ثانية في كل مرة. صار البناء يخزّن، لكل نوع ولكل يوم، عدد النصوص المنشورة حتى ذلك اليوم. المجموع هو رقم مخزّن ناقص رقم آخر: قراءتان من الفهرس، بين 0.1 و0.2 ميلي ثانية. على الخادم الحي انخفضت ستة طلبات متزامنة من هذا النوع من 243 إلى 290 ميلي ثانية لكل طلب إلى ما بين 9 و16."
+      },
+      {
+        "Heading": "ليست ذاكرة مؤقتة.",
+        "Body": "لا يُحمَّل شيء في الذاكرة عند تشغيل الخادم، ولا تسخين مسبقاً، ولا شيء تنتهي صلاحيته. الجداول موجودة في قاعدة البيانات كأي جدول آخر، ويقرأها PostgreSQL من القرص عند الحاجة. لا تحمل بيانات جديدة: يستطيع db/prod.sql إعادة بنائها من الجداول المنشورة في أي وقت، وصورة البيانات العامة لا تتضمنها. يحمل كل جدول علامة إصدار. يفحص الخادم العلامات مرة واحدة، وإذا كان جدول ما ناقصاً أو أقدم حسب الجواب بالطريقة السابقة. لذلك ما زالت الصور المستقلة تعمل على قاعدة البيانات العادية، ولا يمكن لصورة قديمة أن تعيد خطأ."
+      },
+      {
+        "Heading": "إصلاح واحد لم يكن في قاعدة البيانات.",
+        "Body": "في get_law كان 60% من وقت معالج الخادم نفسه يذهب إلى كتابة JSON. كان كل مستوى من التداخل يعيد قراءة بايتات المستوى الذي تحته، فيُمسح ردّ حجمه 284 كيلوبايت مرة لكل مستوى. صار الردّ يُكتب في مرور واحد، ويقارنه اختبار بالمرمِّز السابق على 20,000 قيمة عشوائية. ومع القوائم الجاهزة للنصوص المعدِّلة انخفض المئين 95 لستة طلبات get_law متزامنة من ما بين 177 و185 ميلي ثانية إلى ما بين 69 و80."
+      },
+      {
+        "Heading": "الأجوبة نفسها، بايتاً ببايت.",
+        "Body": "كان على كل تغيير أن يجتاز اختباراً واحداً قبل دمجه: 622 طلباً تُعاد على الخادم القديم والخادم الجديد ويجب أن تعطي ردوداً متطابقة بايتاً ببايت. تضم المجموعة 322 طلباً على خمس أدوات، و100 طلب get_law إضافي، و200 سؤال بحث حقيقي. كانت بصمة SHA-256 لكل الردود هي نفسها قبل كل تغيير وبعده. وقيست السرعة ضمن حدود الخادم الحي، معالج واحد و6 غيغابايت من الذاكرة، بطلبات منفردة ثم ستة معاً ثم عشرة معاً."
+      },
+      {
+        "Heading": "ما حصل عليه المستخدمون.",
+        "Body": "في الأيام السبعة السابقة للتغيير كان وسيط طلبات get_article الحقيقية 128 ميلي ثانية، والمئين 95 (الزمن الذي ينتهي ضمنه 95 من كل 100 طلب) 1,060 ميلي ثانية، وأسوأ حالة 3,242. وفي الطلبات الحقيقية الـ25 خلال أول 12 ساعة بعده: 13 و131 و199 ميلي ثانية. شملت دفعة من 10 طلبات في دقيقة واحدة، وهو النمط الذي فشل في اليوم السابق. استغرق أبطأ طلب فيها 199 ميلي ثانية ولم يُرفض أي طلب."
+      },
+      {
+        "Heading": "ما زال بطيئاً.",
+        "Body": "الدقيقة الأولى بعد كل نشر. الحاوية الجديدة لم تقرأ شيئاً من القرص بعد: ستة طلبات بحث أُرسلت بعد ثانية واحدة من التبديل استغرقت بين 104 و298 ميلي ثانية، مقابل 17 إلى 90 بعد أن تسخن. والردود الكبيرة تحتاج وقتاً لتنتقل. يعيد get_law لقانون كبير حتى 284 كيلوبايت، ومن جهاز الاختبار لدينا يستغرق الطلب كله بين 0.4 و0.9 ثانية مهما فعل الخادم."
+      }
+    ],
+    "Action": "Connect your AI assistant",
+    "ActionPath": "/ai/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/188",
+        "Label": "The read-optimized image and its tables",
+        "LabelAr": "الصورة المهيأة للقراءة وجداولها"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/192",
+        "Label": "get_law: prepared lists and one-pass JSON",
+        "LabelAr": "get_law: قوائم جاهزة وكتابة JSON في مرور واحد"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/199",
+        "Label": "list_legislation: totals from running counts",
+        "LabelAr": "list_legislation: المجاميع من أعداد تراكمية"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/blob/main/db/prod.sql",
+        "Label": "db/prod.sql, the file the build runs",
+        "LabelAr": "db/prod.sql، الملف الذي يشغّله البناء"
+      },
+      {
+        "URL": "/blog/search-ranks-from-build-time-word-lists/",
+        "Label": "The search half of the same work",
+        "LabelAr": "الجزء المتعلق بالبحث من العمل نفسه"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/performance.md",
+    "ResourceLabel": "How the build makes reads fast",
+    "ResourceLabelAr": "كيف يجعل البناء القراءة سريعة",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "search-ranks-from-build-time-word-lists",
+    "Milestone": "2026-11-09",
+    "Published": "2026-11-10",
+    "Commit": "d5f6706",
+    "EvidenceKind": "public-commit",
+    "Title": "Search ranks from word lists built with the image",
+    "TitleAr": "البحث يرتّب نتائجه من قوائم كلمات تُبنى مع الصورة",
+    "Summary": "Since 9 November the MCP search ranks from an 87.5 MB file of word lists that the image build writes in 15 seconds. Every answer is identical to the bit.",
+    "SummaryAr": "منذ 9 تشرين الثاني يرتّب بحث MCP نتائجه من ملف قوائم كلمات حجمه 87.5 ميغابايت يكتبه بناء الصورة في 15 ثانية. وكل جواب مطابق حتى آخر بت.",
+    "Sections": [
+      {
+        "Heading": "The short answer.",
+        "Body": "search_legislation finds texts by their words. Until 9 November PostgreSQL collected and scored every candidate text on every search. Now the image build writes, for each word, the list of texts that hold it, and the server ranks from those lists. On one CPU core, six searches at once finish within 54 to 56 ms at the 95th percentile, against 134 to 140 ms before. Every answer is the same."
+      },
+      {
+        "Heading": "First, less work for the same answer.",
+        "Body": "The first step changed no data structure. For a common word such as العمل, found in 38,269 articles, the query joined every candidate to all 103,112 laws to check that the law is served, sorted the candidates for duplicates that could not exist, and counted them all for a total the MCP never reads. Without that work, 30 real questions went from a p95 of 176 to 213 ms to 45 ms. When every word of a question is common, PostgreSQL had also chosen to read every ruling instead of using its index: 165 ms against about 25."
+      },
+      {
+        "Heading": "A file the build writes.",
+        "Body": "PostgreSQL has already split every text into words to build its search indexes. A build stage reads those words back and writes one list per word: the numbers of the texts that hold it, stored as small gaps. Beside the lists it writes what ranking needs for each text: its length, date, year and number. The file is 87.5 MB, 52 MB compressed, and takes 15 seconds to write on one CPU. It is made from the same database the image ships, and the server checks a fingerprint of that database before it uses the file."
+      },
+      {
+        "Heading": "Mapped, not loaded.",
+        "Body": "The server does not read the file into memory. It maps it: the operating system brings in the pages a search touches and can drop them again, as it does for PostgreSQL's own files. Only 12 MB of per-text columns are copied. The server is ready 70 to 110 ms after it starts, and searches the old way until then. A first version decoded everything into memory and held 200 to 225 MB. This one holds 51 to 61 MB, plus mapped pages the system can take back."
+      },
+      {
+        "Heading": "In memory or in the database?",
+        "Body": "We built it both ways. With the same lists stored in a PostgreSQL table and the same ranking code, CPU per search fell from 13 to 15 ms to 7 to 9 ms. Read from the mapped file, it fell to 4 to 6 ms. The table version pays 3 to 5 extra queries per search, and PostgreSQL must unpack and copy each list, which grows with the word. It also cost 432 MB in the database against an 88 MB file, and 133 seconds of build against 15. The database can hold the index. Reading it in the same process is what wins."
+      },
+      {
+        "Heading": "Exact to the bit.",
+        "Body": "A faster search that ranks differently would be a different search. We compared 21,169 answers field by field, with scores compared bit for bit, and none differed. That meant computing each score the way PostgreSQL does, multiplying in exact decimal before dividing in floating point. The obvious formula gave a different result in 692 of 2,000 values. Where the old query's own answer is not fixed, because texts of equal length sit on both sides of a cut-off, the index hands the search back to SQL. That happened for 4.9% of answers."
+      },
+      {
+        "Heading": "A mistake the live check caught.",
+        "Body": "Right after the deploy, one question took 3,154 ms. It is one of the searches the index hands back to SQL, and before handing it back the index had sorted all 102,605 matches for nothing. Counting the matches by length finds the same cut-off without a sort. That fix merged an hour later. We now time the cases that fall back too, not only the fast ones."
+      },
+      {
+        "Heading": "Live numbers.",
+        "Body": "Server time for six searches sent at once to the live site: 19 to 178 ms before, 17 to 90 ms after, once the container is warm. One second after the deploy, on a cold container: 104 to 298 ms, and no call refused. The first minute after the previous search deploy had 88 to 1,050 ms and one refusal."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الجواب باختصار.",
+        "Body": "تجد search_legislation النصوص من كلماتها. حتى 9 تشرين الثاني كان PostgreSQL يجمع كل نص مرشّح ويحسب درجته عند كل بحث. صار بناء الصورة يكتب، لكل كلمة، قائمة النصوص التي تحتويها، ويرتّب الخادم النتائج من هذه القوائم. على نواة معالج واحدة ينتهي ستة طلبات بحث متزامنة ضمن 54 إلى 56 ميلي ثانية عند المئين 95، مقابل 134 إلى 140 سابقاً. وكل جواب هو نفسه."
+      },
+      {
+        "Heading": "أولاً، عمل أقل للجواب نفسه.",
+        "Body": "الخطوة الأولى لم تغيّر أي بنية بيانات. في كلمة شائعة مثل «العمل»، الموجودة في 38,269 مادة، كان الاستعلام يربط كل نص مرشّح بالقوانين الـ103,112 كلها ليتأكد من أن القانون معروض، ويفرز المرشّحين بحثاً عن تكرار لا يمكن أن يوجد، ويعدّهم جميعاً من أجل مجموع لا يقرأه خادم MCP أبداً. من دون هذا العمل انخفض المئين 95 لـ30 سؤالاً حقيقياً من ما بين 176 و213 ميلي ثانية إلى 45. وحين تكون كل كلمات السؤال شائعة كان PostgreSQL يختار أيضاً قراءة كل الأحكام بدلاً من استخدام الفهرس: 165 ميلي ثانية مقابل نحو 25."
+      },
+      {
+        "Heading": "ملف يكتبه البناء.",
+        "Body": "سبق أن قسّم PostgreSQL كل نص إلى كلمات ليبني فهارس البحث. تقرأ مرحلة من البناء هذه الكلمات وتكتب قائمة لكل كلمة: أرقام النصوص التي تحتويها، مخزّنة كفروق صغيرة. وإلى جانب القوائم تكتب ما يحتاجه الترتيب عن كل نص: طوله وتاريخه وسنته ورقمه. حجم الملف 87.5 ميغابايت، و52 مضغوطاً، وتستغرق كتابته 15 ثانية على معالج واحد. يُصنع من قاعدة البيانات نفسها التي تحملها الصورة، ويتحقق الخادم من بصمة تلك القاعدة قبل أن يستخدم الملف."
+      },
+      {
+        "Heading": "ربط بالذاكرة، لا تحميل.",
+        "Body": "لا يقرأ الخادم الملف إلى الذاكرة. بل يربطه بها (mmap): يجلب نظام التشغيل الصفحات التي يلمسها البحث ويستطيع إسقاطها من جديد، كما يفعل مع ملفات PostgreSQL نفسها. لا يُنسخ إلا 12 ميغابايت من أعمدة النصوص. يصبح الخادم جاهزاً بعد 70 إلى 110 ميلي ثانية من تشغيله، ويبحث بالطريقة السابقة حتى ذلك الحين. نسخة أولى كانت تفكّ كل شيء في الذاكرة وتشغل 200 إلى 225 ميغابايت. أما هذه فتشغل 51 إلى 61 ميغابايت، إضافة إلى صفحات مربوطة يستطيع النظام استعادتها."
+      },
+      {
+        "Heading": "في الذاكرة أم في قاعدة البيانات؟",
+        "Body": "بنيناه بالطريقتين. بالقوائم نفسها مخزّنة في جدول PostgreSQL وبشيفرة الترتيب نفسها، انخفض وقت المعالج لكل بحث من ما بين 13 و15 ميلي ثانية إلى ما بين 7 و9. وبقراءتها من الملف المربوط انخفض إلى ما بين 4 و6. نسخة الجدول تدفع 3 إلى 5 استعلامات إضافية لكل بحث، وعلى PostgreSQL أن يفكّ كل قائمة وينسخها، وهي تكبر مع شيوع الكلمة. وكلّفت أيضاً 432 ميغابايت في قاعدة البيانات مقابل ملف من 88 ميغابايت، و133 ثانية من البناء مقابل 15. تستطيع قاعدة البيانات أن تحمل الفهرس. لكن ما يربح هو قراءته داخل العملية نفسها."
+      },
+      {
+        "Heading": "مطابق حتى آخر بت.",
+        "Body": "بحث أسرع يرتّب بشكل مختلف هو بحث آخر. قارنّا 21,169 جواباً حقلاً بحقل، مع مقارنة الدرجات بتاً ببت، ولم يختلف أي منها. اقتضى ذلك حساب كل درجة كما يحسبها PostgreSQL، بالضرب بدقة عشرية تامة قبل القسمة بالفاصلة العائمة. الصيغة البديهية أعطت نتيجة مختلفة في 692 من 2,000 قيمة. وحيث لا يكون جواب الاستعلام القديم نفسه محسوماً، لأن نصوصاً متساوية الطول تقع على جانبي حدّ القطع، يعيد الفهرس البحث إلى SQL. حصل ذلك في 4.9% من الأجوبة."
+      },
+      {
+        "Heading": "خطأ كشفه الفحص الحي.",
+        "Body": "مباشرة بعد النشر استغرق سؤال واحد 3,154 ميلي ثانية. هو من الأسئلة التي يعيدها الفهرس إلى SQL، وقبل إعادته كان الفهرس يفرز المطابقات الـ102,605 كلها بلا فائدة. عدّ المطابقات بحسب الطول يجد حدّ القطع نفسه من دون فرز. دُمج الإصلاح بعد ساعة. وصرنا نقيس زمن الحالات التي تعود إلى SQL أيضاً، لا الحالات السريعة وحدها."
+      },
+      {
+        "Heading": "أرقام من الخادم الحي.",
+        "Body": "زمن الخادم لستة طلبات بحث أُرسلت معاً إلى الموقع الحي: بين 19 و178 ميلي ثانية قبل التغيير، وبين 17 و90 بعده، بعد أن تسخن الحاوية. وبعد ثانية واحدة من النشر، على حاوية باردة: بين 104 و298 ميلي ثانية، ولم يُرفض أي طلب. أما الدقيقة الأولى بعد نشر البحث السابق فشهدت 88 إلى 1,050 ميلي ثانية وطلباً مرفوضاً."
+      }
+    ],
+    "Action": "Connect your AI assistant",
+    "ActionPath": "/ai/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/193",
+        "Label": "Same answers, a third of the work",
+        "LabelAr": "الأجوبة نفسها بثلث العمل"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/194",
+        "Label": "Ranking from word lists, with every measurement",
+        "LabelAr": "الترتيب من قوائم الكلمات، مع كل القياسات"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/195",
+        "Label": "The cut-off found by counting, not sorting",
+        "LabelAr": "إيجاد حدّ القطع بالعدّ لا بالفرز"
+      },
+      {
+        "URL": "/blog/answers-prepared-at-build-time/",
+        "Label": "The same idea for the other tools",
+        "LabelAr": "الفكرة نفسها للأدوات الأخرى"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/performance.md",
+    "ResourceLabel": "How the build makes reads fast",
+    "ResourceLabelAr": "كيف يجعل البناء القراءة سريعة",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "tuning-change-live-in-half-an-hour",
+    "Milestone": "2026-11-09",
+    "Published": "2026-11-10",
+    "Commit": "1eeaee6",
+    "EvidenceKind": "public-commit",
+    "Title": "A tuning change now goes live in 28 minutes, not 90",
+    "TitleAr": "تغيير في تهيئة القراءة يصل إلى الموقع في 28 دقيقة بدلاً من 90",
+    "Summary": "A change to the build-time tables took about 1.5 hours from merge to live. Since 9 November it takes about half an hour and sends nothing to Hugging Face.",
+    "SummaryAr": "كان تغيير في الجداول التي تُبنى مع الصورة يحتاج نحو ساعة ونصف من الدمج إلى الموقع الحي. منذ 9 تشرين الثاني يحتاج نحو نصف ساعة.",
+    "Sections": [
+      {
+        "Heading": "The short answer.",
+        "Body": "A change to db/prod.sql, the file that prepares the read-optimized tables, used to run the whole data chain: rebuild the tables, publish them to Hugging Face, rebuild the database image, then the two images on top of it. Four such changes on 9 November each took about 1.5 hours from merge to live. The chain now looks at what the push changed. The last change of that day was live 28.5 minutes after its merge."
+      },
+      {
+        "Heading": "Where the 90 minutes went.",
+        "Body": "Measured on one run: build 6 minutes, publish 31, the database image 12, and 5 each for the two images above it. Publish spent 30 of its 31 minutes waiting for a vectors run that only a data change starts. It then committed unchanged tables to Hugging Face, which restarts the dataset viewer there for about 33 minutes."
+      },
+      {
+        "Heading": "Build only what changed.",
+        "Body": "A new first job compares the push with the commit before it. If nothing under data/ changed, the build, publish and database image jobs are skipped, and the read-optimized image is built on the database image already published for that data. When in doubt, on a manual run, a missing commit or a failed comparison, it counts the push as a data change and runs everything. Publish now waits 3 minutes for a vectors run to appear, not 30."
+      },
+      {
+        "Heading": "The proof.",
+        "Body": "We merged a one-line comment in db/prod.sql to measure it. The data run took 9 minutes 34 seconds: 7 seconds to compare, 5 minutes 11 seconds for the read-optimized image and 4 minutes 8 seconds for the all-in-one image. Hugging Face received no commit. The site reported the new build 43 minutes 39 seconds after the merge, and about 25 of those minutes were the timeout described next."
+      },
+      {
+        "Heading": "A timeout shorter than the wait inside it.",
+        "Body": "The deploy's stage job waits up to 30 minutes for Cloudflare to roll out the idle side, but the job itself was cancelled after 15. Rollouts that day took 14 minutes 17 seconds, then 6 minutes 7 seconds, then more than 15, and that deploy needed a manual re-run. The job now gets 40 minutes."
+      },
+      {
+        "Heading": "New code never meets the old database.",
+        "Body": "On 7 November one change to code and data started two deploys: one after the 5-minute checks and one after the 40-minute data build. The first staged the new code on the old database, and its warm-up requests got errors for 24 minutes until the second deploy replaced it. The first fix looked for a data build on the same commit. Its own merge, a CI-only commit that landed 3 minutes after a schema change, slipped past it. A deploy now waits for any data build still running. In both cases only our own warm-up probes saw the errors: visitors were served none that day."
+      },
+      {
+        "Heading": "Checks that count as checks.",
+        "Body": "A file in the repository, livecheck.yaml, says what production must show: the home page, a law page, the search API, the deployed build matching the main branch, and six MCP calls at once. Our own checks and deploy probes identify themselves, and the site leaves them out of its response-time charts. Before, their fast calls would have made the numbers look better than what people get, and one slow warm-up probe on a cold container fired an alert at 2,627 ms that no visitor experienced."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الجواب باختصار.",
+        "Body": "كان أي تغيير في db/prod.sql، الملف الذي يجهّز الجداول المهيأة للقراءة، يشغّل سلسلة البيانات كلها: إعادة بناء الجداول، نشرها على Hugging Face، إعادة بناء صورة قاعدة البيانات، ثم الصورتين المبنيتين فوقها. أربعة تغييرات من هذا النوع في 9 تشرين الثاني احتاج كل منها نحو ساعة ونصف من الدمج إلى الموقع الحي. صارت السلسلة تنظر في ما غيّره الدفع. وآخر تغيير في ذلك اليوم صار حياً بعد 28.5 دقيقة من دمجه."
+      },
+      {
+        "Heading": "أين ذهبت الدقائق الـ90.",
+        "Body": "بالقياس على تشغيل واحد: البناء 6 دقائق، النشر 31، صورة قاعدة البيانات 12، و5 لكل من الصورتين فوقها. أمضى النشر 30 من دقائقه الـ31 في انتظار تشغيل للمتجهات لا يبدأ إلا عند تغيّر البيانات. ثم سجّل جداول لم تتغيّر على Hugging Face، وهذا يعيد تشغيل عارض البيانات هناك لنحو 33 دقيقة."
+      },
+      {
+        "Heading": "بناء ما تغيّر فقط.",
+        "Body": "مهمة أولى جديدة تقارن الدفع بالإيداع الذي سبقه. إذا لم يتغيّر شيء تحت data/ تُتخطى مهام البناء والنشر وصورة قاعدة البيانات، وتُبنى الصورة المهيأة للقراءة فوق صورة قاعدة البيانات المنشورة أصلاً لتلك البيانات. وعند الشك، في تشغيل يدوي أو إيداع مفقود أو مقارنة فاشلة، يُعدّ الدفع تغييراً في البيانات ويُشغَّل كل شيء. وصار النشر ينتظر 3 دقائق لظهور تشغيل للمتجهات، لا 30."
+      },
+      {
+        "Heading": "الدليل.",
+        "Body": "دمجنا تعليقاً من سطر واحد في db/prod.sql لنقيس. استغرق تشغيل البيانات 9 دقائق و34 ثانية: 7 ثوانٍ للمقارنة، و5 دقائق و11 ثانية للصورة المهيأة للقراءة، و4 دقائق و8 ثوانٍ للصورة الشاملة. لم يصل أي إيداع إلى Hugging Face. أعلن الموقع عن البناء الجديد بعد 43 دقيقة و39 ثانية من الدمج، ونحو 25 دقيقة منها كانت بسبب المهلة الموصوفة في الفقرة التالية."
+      },
+      {
+        "Heading": "مهلة أقصر من الانتظار الذي بداخلها.",
+        "Body": "تنتظر مهمة التجهيز في النشر حتى 30 دقيقة ليكمل Cloudflare تجهيز الجهة غير المستخدمة، لكن المهمة نفسها كانت تُلغى بعد 15. استغرق التجهيز في ذلك اليوم 14 دقيقة و17 ثانية، ثم 6 دقائق و7 ثوانٍ، ثم أكثر من 15، فاحتاج ذلك النشر إلى إعادة تشغيل يدوية. صارت مهلة المهمة 40 دقيقة."
+      },
+      {
+        "Heading": "الشيفرة الجديدة لا تلتقي بقاعدة البيانات القديمة.",
+        "Body": "في 7 تشرين الثاني أطلق تغيير واحد في الشيفرة والبيانات عمليتَي نشر: واحدة بعد الفحوص التي تستغرق 5 دقائق وأخرى بعد بناء البيانات الذي يستغرق 40. جهّزت الأولى الشيفرة الجديدة على قاعدة البيانات القديمة، فتلقّت طلبات تسخينها أخطاء طوال 24 دقيقة إلى أن حلّت الثانية محلها. الإصلاح الأول كان يبحث عن بناء بيانات على الإيداع نفسه. لكن دمجه هو، وكان إيداعاً يخص CI وحده وصل بعد 3 دقائق من تغيير في المخطط، أفلت منه. صار النشر ينتظر أي بناء بيانات ما زال جارياً. في الحالتين لم يرَ الأخطاء إلا طلبات التسخين التابعة لنا: لم يتلقَّ الزوار أي خطأ في ذلك اليوم."
+      },
+      {
+        "Heading": "فحوص تُحتسب فحوصاً.",
+        "Body": "ملف في المستودع، livecheck.yaml، يحدد ما يجب أن يظهره الموقع الحي: الصفحة الرئيسية، صفحة قانون، واجهة البحث البرمجية، تطابق البناء المنشور مع الفرع الرئيسي، وستة طلبات MCP متزامنة. فحوصنا وطلبات النشر التابعة لنا تعرّف عن نفسها، ويستثنيها الموقع من مخططات زمن الاستجابة. قبل ذلك كانت طلباتها السريعة ستجعل الأرقام تبدو أفضل مما يحصل عليه الناس، وطلب تسخين بطيء واحد على حاوية باردة أطلق تنبيهاً عند 2,627 ميلي ثانية لم يشعر به أي زائر."
+      }
+    ],
+    "Action": "Run it yourself",
+    "ActionPath": "/run-it-yourself/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/196",
+        "Label": "A prod-only push builds two images, with measured times",
+        "LabelAr": "دفع يخص التهيئة وحدها يبني صورتين، مع الأزمنة المقيسة"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/197",
+        "Label": "The one-line proof and its timings",
+        "LabelAr": "دليل السطر الواحد وأزمنته"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/198",
+        "Label": "The stage job gets 40 minutes",
+        "LabelAr": "مهمة التجهيز تحصل على 40 دقيقة"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/180",
+        "Label": "Wait for any running data build",
+        "LabelAr": "انتظار أي بناء بيانات جارٍ"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/190",
+        "Label": "livecheck.yaml: what production must show",
+        "LabelAr": "livecheck.yaml: ما يجب أن يظهره الموقع الحي"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/191",
+        "Label": "Our own checks count as monitors",
+        "LabelAr": "فحوصنا تُحتسب مراقبة"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/ci.md",
+    "ResourceLabel": "How the workflows build and deploy",
+    "ResourceLabelAr": "كيف تبني مسارات العمل وتنشر",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "security-audit-and-fixes",
+    "Milestone": "2026-11-08",
+    "Published": "2026-11-10",
+    "Commit": "3735aaf",
+    "EvidenceKind": "public-commit",
+    "Title": "We audited the site's security and fixed what we found",
+    "TitleAr": "دقّقنا في أمان الموقع وأصلحنا ما وجدناه",
+    "Summary": "On 7 November we audited the site, its Workers and its build pipeline. Six pull requests fixed what we found. No reader needs to do anything.",
+    "SummaryAr": "في 7 تشرين الثاني دقّقنا في الموقع وفي Workers التابعة له وفي مسار البناء. أصلحت ستة طلبات دمج ما وجدناه. لا يحتاج أي قارئ إلى فعل شيء.",
+    "Sections": [
+      {
+        "Heading": "The short answer.",
+        "Body": "The site has no accounts and stores no passwords, so the audit looked at what remains: text a visitor can put on a page, shared limits one visitor can use up, the analytics relay, and the pipeline that builds and deploys the site. Six pull requests fixed what it found, five on 7 November and one on 8 November. This entry lists them."
+      },
+      {
+        "Heading": "Search text is escaped everywhere.",
+        "Body": "The helper that formats interface strings returned its result as trusted HTML, including any text passed into it. A search with no match printed the visitor's own words through it. Text arguments are now escaped before formatting, and only the interface string itself is trusted. A test searches for <b>x</b> in both languages and checks that it comes back as text. 16 pages rendered byte for byte the same before and after."
+      },
+      {
+        "Heading": "Redirects stay on this site.",
+        "Body": "An address built to start with two slashes, or a slash and a backslash, could turn one of our redirects into a link to another host. Redirect targets now collapse those. The redirect from old scan links goes only to HTTPS addresses on the scan archive's host, and the image relay accepts only names shaped like the source's picture names. All 946 image names in the data pass."
+      },
+      {
+        "Heading": "One address cannot spend everyone's AI answers.",
+        "Body": "AI answers draw on a daily allowance shared by all visitors. The per-device limit did not cover every path that spends it: calls to the API could draw the allowance down from one address. Each address now has its own daily share, 150 units by default, about three times what one device's own limit costs. Past it, the answer box shows its limited view. Search itself keeps working."
+      },
+      {
+        "Heading": "The MCP server queues, then refuses.",
+        "Body": "A burst of tool calls could take every database connection and leave none for the website's pages. Tool calls now reserve units before they run: 4 for a search across every kind of text, 1 for anything else, 6 in total. A call that finds no room within 2 seconds gets a 503 with Retry-After: 2, and assistants try again."
+      },
+      {
+        "Heading": "The analytics relay forwards only our own traffic.",
+        "Body": "The site relays its analytics through its own address. The relay forwarded any path and any project token to the analytics provider. It now forwards only the endpoints our pages use, for our project, and answers 404 to anything else. It drops cookies and authorization headers on the way out and Set-Cookie on the way back. The Google tag script is relayed the same way, so the page's content security policy no longer trusts a host that serves any Tag Manager container."
+      },
+      {
+        "Heading": "The pipeline deploys only what was merged.",
+        "Body": "Deploy workflows start when another workflow finishes. They now also require that the earlier run was a push or a manual run in this repository, never a pull request from a fork. The job that merges the nightly data pull request re-reads the exact commit it is about to merge and refuses any file outside data/ and db/model/."
+      },
+      {
+        "Heading": "Models read outside text in an empty folder.",
+        "Body": "The nightly build asks language models to read law text and judgment scans that come from a third-party site. Each such run now starts in a new empty folder with a minimal environment. Shell, file-write and web tools are denied by the tool's own settings, not by a sentence in the prompt."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الجواب باختصار.",
+        "Body": "لا حسابات في الموقع ولا كلمات مرور مخزّنة، فنظر التدقيق في ما يبقى: النص الذي يستطيع الزائر إدخاله في صفحة، الحدود المشتركة التي يستطيع زائر واحد استنفادها، وسيط التحليلات، والمسار الذي يبني الموقع وينشره. أصلحت ستة طلبات دمج ما وجده، خمسة في 7 تشرين الثاني وواحد في 8 منه. وهذا المدخل يعدّدها."
+      },
+      {
+        "Heading": "نص البحث يُحوَّل إلى نص آمن في كل مكان.",
+        "Body": "كانت الدالة التي تنسّق عبارات الواجهة تعيد نتيجتها بوصفها HTML موثوقاً، بما فيها أي نص يُمرَّر إليها. والبحث الذي لا يجد نتيجة كان يطبع كلمات الزائر نفسها عبرها. صارت الوسائط النصية تُحوَّل إلى نص آمن قبل التنسيق، ولا يُعدّ موثوقاً إلا عبارة الواجهة نفسها. يبحث اختبار عن <b>x</b> باللغتين ويتحقق من أنها تعود نصاً. وخرجت 16 صفحة مطابقة بايتاً ببايت قبل التغيير وبعده."
+      },
+      {
+        "Heading": "إعادة التوجيه تبقى داخل الموقع.",
+        "Body": "كان عنوان مصاغ ليبدأ بشرطتين مائلتين، أو بشرطة مائلة وأخرى معكوسة، قادراً على تحويل إحدى إعادات التوجيه لدينا إلى رابط نحو موقع آخر. صارت وجهات إعادة التوجيه تختزل هذه الصيغ. وإعادة التوجيه من روابط الصور الممسوحة القديمة لا تذهب إلا إلى عناوين HTTPS على خادم أرشيف المسح، ووسيط الصور لا يقبل إلا أسماء على هيئة أسماء صور المصدر. أسماء الصور الـ946 في البيانات كلها تجتاز الشرط."
+      },
+      {
+        "Heading": "عنوان واحد لا يستطيع إنفاق أجوبة الجميع.",
+        "Body": "تسحب أجوبة الذكاء الاصطناعي من رصيد يومي مشترك بين كل الزوار. لم يكن الحدّ الخاص بكل جهاز يغطي كل مسار ينفق منه: كانت طلبات إلى واجهة البرمجة تستطيع استنزاف الرصيد من عنوان واحد. صار لكل عنوان حصته اليومية، 150 وحدة افتراضياً، أي نحو ثلاثة أضعاف ما يكلّفه حدّ الجهاز الواحد. وبعد تجاوزها يعرض مربع الجواب صيغته المحدودة. أما البحث نفسه فيستمر."
+      },
+      {
+        "Heading": "خادم MCP ينتظر ثم يرفض.",
+        "Body": "كانت دفعة من طلبات الأدوات قادرة على أخذ كل اتصالات قاعدة البيانات فلا يبقى منها شيء لصفحات الموقع. صارت طلبات الأدوات تحجز وحدات قبل أن تعمل: 4 للبحث في كل أنواع النصوص، و1 لأي طلب آخر، و6 في المجموع. الطلب الذي لا يجد مكاناً خلال ثانيتين يتلقى 503 مع Retry-After: 2، فيعيد المساعد المحاولة."
+      },
+      {
+        "Heading": "وسيط التحليلات لا يمرّر إلا حركة موقعنا.",
+        "Body": "يمرّر الموقع تحليلاته عبر عنوانه نفسه. كان الوسيط يمرّر أي مسار وأي رمز مشروع إلى مزوّد التحليلات. صار يمرّر فقط النقاط التي تستخدمها صفحاتنا، ولمشروعنا، ويردّ بـ404 على أي شيء آخر. ويحذف ملفات تعريف الارتباط وترويسات التفويض في الذهاب وSet-Cookie في العودة. ويُمرَّر سكربت وسم Google بالطريقة نفسها، فلم تعد سياسة أمان المحتوى في الصفحة تثق بخادم يقدّم أي حاوية من Tag Manager."
+      },
+      {
+        "Heading": "مسار النشر لا ينشر إلا ما دُمج.",
+        "Body": "تبدأ مسارات النشر عند انتهاء مسار آخر. صارت تشترط أيضاً أن يكون التشغيل السابق دفعاً أو تشغيلاً يدوياً في هذا المستودع، لا طلب دمج من نسخة متفرعة أبداً. والمهمة التي تدمج طلب دمج البيانات الليلي تعيد قراءة الإيداع نفسه الذي ستدمجه وترفض أي ملف خارج data/ وdb/model/."
+      },
+      {
+        "Heading": "النماذج تقرأ النص الخارجي في مجلد فارغ.",
+        "Body": "يطلب البناء الليلي من نماذج لغوية قراءة نصوص قانونية وصور أحكام ممسوحة تأتي من موقع طرف ثالث. صار كل تشغيل من هذا النوع يبدأ في مجلد جديد فارغ وببيئة دنيا. وأدوات الصدفة وكتابة الملفات والويب ممنوعة بإعدادات الأداة نفسها، لا بجملة في نص التعليمات."
+      }
+    ],
+    "Action": "Read the privacy policy",
+    "ActionPath": "/privacy/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/183",
+        "Label": "Escaping, redirects and narrower relays",
+        "LabelAr": "تحويل النص، إعادة التوجيه وتضييق الوسطاء"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/184",
+        "Label": "Per-address AI units and the MCP cap",
+        "LabelAr": "وحدات الذكاء الاصطناعي لكل عنوان وحدّ MCP"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/182",
+        "Label": "The analytics relay allowlist",
+        "LabelAr": "قائمة المسموح في وسيط التحليلات"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/181",
+        "Label": "Deploy gates and the data pull request",
+        "LabelAr": "شروط النشر وطلب دمج البيانات"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/185",
+        "Label": "Model tools in private folders",
+        "LabelAr": "أدوات النماذج في مجلدات خاصة"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/187",
+        "Label": "The content security policy without the Tag Manager host",
+        "LabelAr": "سياسة أمان المحتوى من دون خادم Tag Manager"
+      }
+    ],
+    "ResourceURL": "",
+    "ResourceLabel": "",
+    "ResourceLabelAr": "",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "one-search-engine-in-postgres",
+    "Milestone": "2026-11-07",
+    "Published": "2026-11-10",
+    "Commit": "4591f28",
+    "EvidenceKind": "public-commit",
+    "Title": "One search engine for the website, the API and MCP",
+    "TitleAr": "محرك بحث واحد للموقع وواجهة البرمجة وخادم MCP",
+    "Summary": "Since 7 November the website, the API and the MCP server share one search, run by PostgreSQL alone. The slowest of 30 real questions: 4,835 ms to 624 ms.",
+    "SummaryAr": "منذ 7 تشرين الثاني يتشارك الموقع وواجهة البرمجة وخادم MCP بحثاً واحداً ينفّذه PostgreSQL وحده. انخفض أبطأ سؤال من 30 سؤالاً حقيقياً من 4,835 إلى 624 ميلي ثانية.",
+    "Sections": [
+      {
+        "Heading": "The short answer.",
+        "Body": "There were two searches: one for the website and the API, and one for the MCP server that kept copies of the texts in the server's memory. Since 7 November there is one, and it runs in PostgreSQL alone. On 30 real questions, on a copy of the data, the search page's median went from 401 to 296 ms and its slowest question from 4,835 to 624 ms."
+      },
+      {
+        "Heading": "Measure each tool, not the endpoint.",
+        "Body": "The MCP endpoint looked fine: a p95 of about 350 ms. That number counted every request, and most are handshakes and tool listings, about 41,000 a week. Per tool the picture was different. Over seven days search_legislation ran 785 times with a median of 230 ms, a p95 of 2.6 seconds and a p99 of 5.0 seconds. 185 calls took over a second and 12 timed out."
+      },
+      {
+        "Heading": "A fix we replaced the same night.",
+        "Body": "The first fix kept the in-memory copies and filled them when the server started. It made the first search faster and left the design alone: every deploy still began cold, and the memory still had to be filled. Less than four hours later it was gone. The rule we took from it: when something is slow because it is computed or loaded while serving, move the work to the build."
+      },
+      {
+        "Heading": "Word counts made by the build.",
+        "Body": "A good ranking weighs rare words more than common ones, so it must know how many texts hold each word. The database build now writes that into search_term, a materialized view, with each index's size and average text length. Each text's length is a stored column. A search reads those numbers and counts nothing. With them, the MCP's 30 real questions went from a median of 71 ms to 45 ms, and the slowest from 1,544 ms to 367 ms."
+      },
+      {
+        "Heading": "Every word first.",
+        "Body": "Texts that hold every word of the question come first. Then come texts missing only the commonest words, and the reply says partial_match: true. Each word also matches its stem and its form without a leading و or ف, in the same query: والخامسة finds الخامسة. Before, a question with no full match was retried up to a dozen times with different readings, one search after another."
+      },
+      {
+        "Heading": "Titles match what is written.",
+        "Body": "Titles no longer match by stem, because الغابات (forests) and الغابون (Gabon) share one. A title matches the word as written, without its leading article, or as the start of a longer word. The word written in the title counts more than a synonym or the kind of text, and the newest text wins a tie."
+      },
+      {
+        "Heading": "French without accents.",
+        "Body": "French search now ignores accents: ecrit finds écrit, on the website, the API and the MCP server. The unaccented form is a column the build writes, not something each search works out."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الجواب باختصار.",
+        "Body": "كان هناك بحثان: واحد للموقع ولواجهة البرمجة، وآخر لخادم MCP يحتفظ بنسخ من النصوص في ذاكرة الخادم. منذ 7 تشرين الثاني صار هناك بحث واحد، ينفَّذ في PostgreSQL وحده. على 30 سؤالاً حقيقياً، وعلى نسخة من البيانات، انخفض وسيط صفحة البحث من 401 إلى 296 ميلي ثانية وأبطأ سؤال فيها من 4,835 إلى 624."
+      },
+      {
+        "Heading": "قياس كل أداة، لا نقطة الاتصال.",
+        "Body": "بدت نقطة اتصال MCP سليمة: المئين 95 نحو 350 ميلي ثانية. لكن هذا الرقم كان يحتسب كل الطلبات، ومعظمها مصافحات وطلبات لائحة الأدوات، نحو 41,000 في الأسبوع. أما لكل أداة فالصورة مختلفة. خلال سبعة أيام نُفّذت search_legislation 785 مرة بوسيط 230 ميلي ثانية، ومئين 95 يبلغ 2.6 ثانية، ومئين 99 يبلغ 5.0 ثوانٍ. تجاوز 185 طلباً الثانية الواحدة وانتهت مهلة 12 طلباً."
+      },
+      {
+        "Heading": "إصلاح استبدلناه في الليلة نفسها.",
+        "Body": "أبقى الإصلاح الأول على النسخ في الذاكرة وملأها عند تشغيل الخادم. جعل البحث الأول أسرع وترك التصميم على حاله: كل نشر كان يبدأ بارداً، والذاكرة كان يجب أن تُملأ في كل مرة. بعد أقل من أربع ساعات أُزيل. والقاعدة التي خرجنا بها: حين يكون شيء ما بطيئاً لأنه يُحسب أو يُحمَّل أثناء الخدمة، ننقل العمل إلى البناء."
+      },
+      {
+        "Heading": "أعداد كلمات يصنعها البناء.",
+        "Body": "الترتيب الجيد يعطي الكلمات النادرة وزناً أكبر من الشائعة، فعليه أن يعرف كم نصاً يحتوي كل كلمة. صار بناء قاعدة البيانات يكتب ذلك في search_term، وهو materialized view، مع حجم كل فهرس ومتوسط طول النص فيه. وطول كل نص عمود مخزّن. يقرأ البحث هذه الأرقام ولا يعدّ شيئاً. بها انخفض وسيط 30 سؤالاً حقيقياً على MCP من 71 إلى 45 ميلي ثانية، والأبطأ من 1,544 إلى 367."
+      },
+      {
+        "Heading": "النصوص التي تحتوي كل الكلمات أولاً.",
+        "Body": "تأتي أولاً النصوص التي تحتوي كل كلمات السؤال. ثم النصوص التي ينقصها أكثر الكلمات شيوعاً فقط، ويقول الردّ partial_match: true. تطابق كل كلمة أيضاً جذعها وصيغتها من دون واو أو فاء في أولها، في الاستعلام نفسه: «والخامسة» تجد «الخامسة». سابقاً كان السؤال الذي لا يجد مطابقة كاملة يُعاد حتى اثنتي عشرة مرة بقراءات مختلفة، بحثاً بعد بحث."
+      },
+      {
+        "Heading": "العناوين تطابق المكتوب.",
+        "Body": "لم تعد العناوين تُطابَق بالجذع، لأن «الغابات» و«الغابون» يتشاركان جذعاً واحداً. يطابق العنوان الكلمة كما كُتبت، من دون أداة التعريف في أولها، أو كبداية لكلمة أطول. والكلمة المكتوبة في العنوان تُحتسب أكثر من مرادفها أو من نوع النص، وعند التعادل يتقدم النص الأحدث."
+      },
+      {
+        "Heading": "الفرنسية من دون حركات.",
+        "Body": "صار البحث بالفرنسية يتجاهل علامات الحروف: ecrit تجد écrit، في الموقع وواجهة البرمجة وخادم MCP. والصيغة الخالية من العلامات عمود يكتبه البناء، لا شيء يحسبه كل بحث."
+      }
+    ],
+    "Action": "Search the library",
+    "ActionPath": "/search/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/176",
+        "Label": "MCP search in PostgreSQL alone",
+        "LabelAr": "بحث MCP في PostgreSQL وحده"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/177",
+        "Label": "One engine for the website, the API and MCP",
+        "LabelAr": "محرك واحد للموقع وواجهة البرمجة وMCP"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/175",
+        "Label": "The warm-up fix it replaced",
+        "LabelAr": "إصلاح التسخين الذي استُبدل"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/changes.md",
+        "Label": "The change log for 7 November",
+        "LabelAr": "سجل التغييرات ليوم 7 تشرين الثاني"
+      }
+    ],
+    "ResourceURL": "",
+    "ResourceLabel": "",
+    "ResourceLabelAr": "",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "cursors-replace-page-numbers",
+    "Milestone": "2026-11-06",
+    "Published": "2026-11-10",
+    "Commit": "78fb698",
+    "EvidenceKind": "public-commit",
+    "Title": "Lists page by cursor now, and MCP 2.0.0 drops offset",
+    "TitleAr": "القوائم تتنقل بمؤشّر، وMCP 2.0.0 يتخلى عن offset",
+    "Summary": "Since 6 November every list on the site, the API and the MCP server pages with a cursor. A call with offset gets an error that says what to send instead.",
+    "SummaryAr": "منذ 6 تشرين الثاني تتنقل كل قائمة في الموقع وواجهة البرمجة وخادم MCP بمؤشّر. والطلب الذي يحمل offset يتلقى خطأ يقول ما يجب إرساله بدلاً منه.",
+    "Sections": [
+      {
+        "Heading": "The short answer.",
+        "Body": "If you call the API or the MCP server with offset, change it: pass the next_cursor of the previous reply as cursor. offset now answers 400 on the API and a tool error on MCP, and both say what to send. On the website, lists show Newer and Older, and page numbers are gone. A page costs the same at any depth: 0.1 to 0.7 ms on a copy of the data."
+      },
+      {
+        "Heading": "A crawler found the slow pages.",
+        "Body": "On 6 November our response-time alert fired at 3,108 ms. A crawler on Alibaba Cloud, with browser user agents and no regard for robots.txt, was walking the list of laws from page 1,035 to page 2,511. Each page took 2 to 9 seconds."
+      },
+      {
+        "Heading": "Why page 2,000 was slow.",
+        "Body": "An offset tells the database to produce every earlier row and throw it away. Page 2,000 of the laws list read 80,000 laws to show one page: 835 ms on our test machine. A first fix the same day picked the page's ids before reading the costly columns, which made deep pages about six times faster. The second removed offset."
+      },
+      {
+        "Heading": "How a cursor works.",
+        "Body": "A cursor holds the sort key of the last row you saw. The next page is the rows after that key, which an index answers directly. We added 13 indexes, one for each list order. The cursor is an opaque token: pass it back unchanged."
+      },
+      {
+        "Heading": "What changes for you.",
+        "Body": "API: /api/v1/laws/, /api/v1/gazette/ and /api/v1/search/ take cursor and return next_cursor while more follows. MCP 2.0.0: get_law_texts, get_links, list_legislation and list_gazette_issues do the same. To jump to a period, use since and until. Old numbered addresses such as ?page=7 redirect to the list's first page, and every document is still in a sitemap. A code's list of articles keeps its numbered pages, which are ranges of article positions."
+      },
+      {
+        "Heading": "Proof: no gaps, no repeats.",
+        "Body": "We walked whole lists by cursor on the real data and compared each walk with one unpaged query: all 103,102 laws in both orders (1,032 pages), 6,848 Gazette issues and 5,421 links between texts. No row was missing and none came twice."
+      },
+      {
+        "Heading": "Tools that say they only read.",
+        "Body": "The same day, MCP 1.2.0 marked all 10 tools as read-only. ChatGPT asks the user to confirm every call to a tool that is not marked that way. The registry entry also got an icon, so directories no longer show a blank square."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الجواب باختصار.",
+        "Body": "إذا كنت تستدعي واجهة البرمجة أو خادم MCP بـoffset فغيّر ذلك: مرّر قيمة next_cursor من الردّ السابق في cursor. صار offset يعيد 400 في واجهة البرمجة وخطأ أداة في MCP، وكلاهما يقول ما يجب إرساله. وفي الموقع تعرض القوائم «الأحدث» و«الأقدم»، واختفت أرقام الصفحات. تكلّف الصفحة الشيء نفسه مهما كان عمقها: بين 0.1 و0.7 ميلي ثانية على نسخة من البيانات."
+      },
+      {
+        "Heading": "برنامج زحف كشف الصفحات البطيئة.",
+        "Body": "في 6 تشرين الثاني انطلق تنبيه زمن الاستجابة لدينا عند 3,108 ميلي ثانية. كان برنامج زحف على Alibaba Cloud، يعرّف عن نفسه كمتصفح ولا يحترم robots.txt، يسير في قائمة القوانين من الصفحة 1,035 إلى الصفحة 2,511. استغرقت كل صفحة بين ثانيتين و9 ثوانٍ."
+      },
+      {
+        "Heading": "لماذا كانت الصفحة 2,000 بطيئة.",
+        "Body": "يطلب offset من قاعدة البيانات أن تنتج كل الصفوف السابقة ثم ترميها. الصفحة 2,000 من قائمة القوانين كانت تقرأ 80,000 قانون لتعرض صفحة واحدة: 835 ميلي ثانية على جهاز الاختبار لدينا. إصلاح أول في اليوم نفسه صار يختار معرّفات الصفحة قبل قراءة الأعمدة المكلفة، فصارت الصفحات العميقة أسرع بنحو ست مرات. والإصلاح الثاني أزال offset."
+      },
+      {
+        "Heading": "كيف يعمل المؤشّر.",
+        "Body": "يحمل المؤشّر مفتاح الترتيب لآخر صف رأيته. الصفحة التالية هي الصفوف التي تلي هذا المفتاح، ويجيب عنها الفهرس مباشرة. أضفنا 13 فهرساً، واحداً لكل ترتيب قائمة. المؤشّر رمز مغلق: أعده كما هو."
+      },
+      {
+        "Heading": "ما الذي يتغيّر عندك.",
+        "Body": "واجهة البرمجة: /api/v1/laws/ و/api/v1/gazette/ و/api/v1/search/ تقبل cursor وتعيد next_cursor ما دام هناك مزيد. MCP 2.0.0: الأدوات get_law_texts وget_links وlist_legislation وlist_gazette_issues تفعل الشيء نفسه. للانتقال إلى فترة معيّنة استخدم since وuntil. العناوين المرقّمة القديمة مثل ?page=7 تُحوَّل إلى الصفحة الأولى من القائمة، وكل وثيقة ما زالت في خريطة موقع. وتحتفظ قائمة مواد القانون بصفحاتها المرقّمة، وهي نطاقات من مواقع المواد."
+      },
+      {
+        "Heading": "الدليل: لا فجوات ولا تكرار.",
+        "Body": "سرنا في قوائم كاملة بالمؤشّر على البيانات الحقيقية وقارنّا كل مسار باستعلام واحد غير مقسّم إلى صفحات: القوانين الـ103,102 كلها بالترتيبين (1,032 صفحة)، و6,848 عدداً من الجريدة الرسمية، و5,421 رابطاً بين النصوص. لم ينقص أي صف ولم يتكرر أي صف."
+      },
+      {
+        "Heading": "أدوات تقول إنها تقرأ فقط.",
+        "Body": "في اليوم نفسه وسم MCP 1.2.0 الأدوات العشر كلها بأنها للقراءة فقط. يطلب ChatGPT من المستخدم تأكيد كل استدعاء لأداة غير موسومة بذلك. وحصل مدخل السجل الرسمي على أيقونة، فلم تعد الأدلّة تعرض مربعاً فارغاً."
+      }
+    ],
+    "Action": "Connect your AI assistant",
+    "ActionPath": "/ai/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/173",
+        "Label": "Cursor paging everywhere and MCP 2.0.0",
+        "LabelAr": "التنقل بالمؤشّر في كل مكان وMCP 2.0.0"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/172",
+        "Label": "The first fix for deep list pages",
+        "LabelAr": "الإصلاح الأول لصفحات القوائم العميقة"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/171",
+        "Label": "MCP 1.2.0: read-only tools and icons",
+        "LabelAr": "MCP 1.2.0: أدوات للقراءة فقط وأيقونات"
+      },
+      {
+        "URL": "/developers/",
+        "Label": "The API page",
+        "LabelAr": "صفحة واجهة البرمجة"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation/blob/main/mcp/README.md",
+    "ResourceLabel": "MCP server reference",
+    "ResourceLabelAr": "مرجع خادم MCP",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "english-translation-most-read-texts",
+    "Milestone": "2026-11-06",
+    "Published": "2026-11-10",
+    "Commit": "b699fa0",
+    "EvidenceKind": "public-commit",
+    "Title": "20,679 articles of the most read texts, now in English",
+    "TitleAr": "20,679 مادة من أكثر النصوص قراءة صارت بالإنكليزية",
+    "Summary": "Since 6 November the English pages of the 306 most read texts show an unofficial machine translation under the official Arabic: 20,679 articles.",
+    "SummaryAr": "منذ 6 تشرين الثاني تعرض الصفحات الإنكليزية لأكثر 306 نصوص قراءة ترجمة آلية غير رسمية تحت النص العربي الرسمي: 20,679 مادة.",
+    "Sections": [
+      {
+        "Heading": "The short answer.",
+        "Body": "Open an article of a widely read text on the English site, for example Article 655 of the Penal Code, and you now read it in English under the official Arabic. The translation is by a machine, it is unofficial and it says so, with its date. It covers 20,679 articles of 306 texts. The Arabic pages are unchanged and never show it."
+      },
+      {
+        "Heading": "Why.",
+        "Body": "The English pages of these texts showed Arabic under an English menu. Only the titles had machine English. A reader who cannot read Arabic could find a law and not read it."
+      },
+      {
+        "Heading": "Which texts.",
+        "Body": "The texts that people read: those with 5 or more page views in the last 60 days, in any language. That was 307 texts on 2 November. Their English pages were already the only machine-English pages open to search engines."
+      },
+      {
+        "Heading": "How it was made.",
+        "Body": "Gemini translated the articles in batches of about 8 articles, run from a timer every two hours until all were done. A batch that failed was split in half and tried again, down to one article. The first 5,386 articles went live on 5 November and the rest on 6 November."
+      },
+      {
+        "Heading": "What keeps it honest.",
+        "Body": "Each translation is tied to a hash of the Arabic it was made from. If the Arabic text changes, its translation is no longer shown until it is made again. It is not shown either when the page displays a newer wording of the article. A check flags every number in the Arabic that is missing from the English. In the first batch it flagged 704 lines, and a sample of 20 were all false alarms, such as the article's own heading."
+      },
+      {
+        "Heading": "What is missing.",
+        "Body": "One article of the 20,680: the model stopped mid-sentence on most tries, so we left it out. The translation is a reading aid. For anything that matters, read the Arabic above it and the source it links."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الجواب باختصار.",
+        "Body": "افتح مادة من نص واسع القراءة في الموقع الإنكليزي، مثل المادة 655 من قانون العقوبات، وستقرأها الآن بالإنكليزية تحت النص العربي الرسمي. الترجمة آلية وغير رسمية، وتقول ذلك عن نفسها مع تاريخها. تغطي 20,679 مادة من 306 نصوص. الصفحات العربية لم تتغيّر ولا تعرضها أبداً."
+      },
+      {
+        "Heading": "لماذا.",
+        "Body": "كانت الصفحات الإنكليزية لهذه النصوص تعرض العربية تحت قائمة إنكليزية. العناوين وحدها كانت مترجمة آلياً. القارئ الذي لا يقرأ العربية كان يجد القانون ولا يستطيع قراءته."
+      },
+      {
+        "Heading": "أي نصوص.",
+        "Body": "النصوص التي يقرأها الناس: تلك التي لها 5 مشاهدات أو أكثر في آخر 60 يوماً، بأي لغة. كانت 307 نصوص في 2 تشرين الثاني. وصفحاتها الإنكليزية كانت أصلاً الصفحات الوحيدة بالإنكليزية الآلية المفتوحة لمحركات البحث."
+      },
+      {
+        "Heading": "كيف صُنعت.",
+        "Body": "ترجم Gemini المواد على دفعات من نحو 8 مواد، تُشغَّل بمؤقّت كل ساعتين إلى أن اكتملت. الدفعة التي تفشل تُقسم نصفين وتُعاد، نزولاً إلى مادة واحدة. نُشرت أول 5,386 مادة في 5 تشرين الثاني والبقية في 6 منه."
+      },
+      {
+        "Heading": "ما الذي يبقيها أمينة.",
+        "Body": "ترتبط كل ترجمة ببصمة النص العربي الذي صُنعت منه. إذا تغيّر النص العربي لا تُعرض ترجمته إلى أن تُصنع من جديد. ولا تُعرض كذلك حين تعرض الصفحة صيغة أحدث للمادة. ويشير فحص إلى كل رقم في العربية غائب عن الإنكليزية. في الدفعة الأولى أشار إلى 704 أسطر، وعيّنة من 20 منها كانت كلها إنذارات خاطئة، مثل عنوان المادة نفسه."
+      },
+      {
+        "Heading": "ما الذي ينقص.",
+        "Body": "مادة واحدة من 20,680: كان النموذج يتوقف في منتصف الجملة في معظم المحاولات، فتركناها. الترجمة وسيلة مساعدة على القراءة. في كل ما يهم، اقرأ العربية فوقها والمصدر الذي تحيل إليه."
+      }
+    ],
+    "Action": "Read the Penal Code in English",
+    "ActionPath": "/decree/244611/",
+    "Sources": [
+      {
+        "URL": "/en/decree/244611/article/655/",
+        "Label": "Penal Code, Article 655, with its translation",
+        "LabelAr": "قانون العقوبات، المادة 655، مع ترجمتها"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/146",
+        "Label": "How translations are loaded and shown",
+        "LabelAr": "كيف تُحمَّل الترجمات وتُعرض"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/152",
+        "Label": "Batch 1: 5,386 articles",
+        "LabelAr": "الدفعة الأولى: 5,386 مادة"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/170",
+        "Label": "Batch 2: 20,679 of 20,680 articles",
+        "LabelAr": "الدفعة الثانية: 20,679 من 20,680 مادة"
+      }
+    ],
+    "ResourceURL": "",
+    "ResourceLabel": "",
+    "ResourceLabelAr": "",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "traffic-law-tables-from-the-gazette",
+    "Milestone": "2026-11-05",
+    "Published": "2026-11-10",
+    "Commit": "240e8f0",
+    "EvidenceKind": "public-commit",
+    "Title": "The traffic law's violation tables, read from the Gazette",
+    "TitleAr": "جداول مخالفات قانون السير، مقروءة من الجريدة الرسمية",
+    "Summary": "Since 5 November the page of Traffic Law 243/2012 shows the 389 rows of its annexed violation tables, read by machine from the Official Gazette.",
+    "SummaryAr": "منذ 5 تشرين الثاني تعرض صفحة قانون السير 243/2012 صفوف جداول المخالفات الملحقة به، وعددها 389، مقروءة آلياً من الجريدة الرسمية.",
+    "Sections": [
+      {
+        "Heading": "The short answer.",
+        "Body": "Law 243 of 2012, the traffic law, sorts violations into categories in tables annexed to it. Its page now has those tables: 389 rows, each with its category, the articles it rests on, the violation, the points and the 2012 fine range. They were read from Official Gazette issue 45 of 25 October 2012, pages 4970 to 4995 and 5001. Each row has its own address, so a guide or an AI assistant can cite the exact row."
+      },
+      {
+        "Heading": "A machine read them, and the page says so.",
+        "Body": "No person reviewed these rows. Where two readings of a row disagreed, in 26 rows, the value shown was decided by Gemini from the page image and the cited articles. The page marks those rows and the data keeps every candidate reading. Six rows are marked as replaced by Article 1 of Law 278 of 2014."
+      },
+      {
+        "Heading": "The fines are the 2012 amounts.",
+        "Body": "The tables give the fine range each category had in 2012, from Article 374. Later laws changed the amounts, and the page carries the same line about Law 324 of 2024, Article 42, that our traffic fines guide gives. Read the tables for the category and the points, and check the amount against the later texts."
+      },
+      {
+        "Heading": "Six articles as first published in 1963.",
+        "Body": "Articles 49 to 54 of the Social Security Law now show a folded block, \"Wording as first published in 1963, read from the Official Gazette's pages\", under the Lebanese University's text. It was read from Gazette issue 78 of 30 September 1963, pages 14 to 17. The University's text stays the text of the page."
+      },
+      {
+        "Heading": "Two guides now use them.",
+        "Body": "The traffic fines guide gives the category and points for speeding, phone use, alcohol, seat belts, traffic lights, driving the wrong way, helmets and child seats, each linked to its row. The end-of-service indemnity guide takes the rules of Articles 50, 51 and 52 from the 1963 wording. Every quote in a guide is checked against the reading it cites."
+      },
+      {
+        "Heading": "A fix the screenshots found.",
+        "Body": "While checking the new tables on a phone we found that every Arabic law page with a side column was 63 pixels wider than a 390-pixel screen. It came from an older form on the page, not from the tables, and it is fixed."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الجواب باختصار.",
+        "Body": "يصنّف القانون 243 لسنة 2012، قانون السير، المخالفات في فئات ضمن جداول ملحقة به. صارت صفحته تحمل هذه الجداول: 389 صفاً، لكل صف فئته، والمواد التي يستند إليها، والمخالفة، والنقاط، ونطاق الغرامة عام 2012. قُرئت من العدد 45 من الجريدة الرسمية الصادر في 25 تشرين الأول 2012، الصفحات 4970 إلى 4995 و5001. ولكل صف عنوانه الخاص، فيستطيع دليل أو مساعد ذكاء اصطناعي أن يحيل إلى الصف بعينه."
+      },
+      {
+        "Heading": "قرأتها آلة، والصفحة تقول ذلك.",
+        "Body": "لم يراجع أي شخص هذه الصفوف. حيث اختلفت قراءتان للصف، في 26 صفاً، حسم Gemini القيمة المعروضة من صورة الصفحة ومن المواد المذكورة. تميّز الصفحة هذه الصفوف، وتحتفظ البيانات بكل قراءة مرشّحة. وستة صفوف موسومة بأن المادة 1 من القانون 278 لسنة 2014 استبدلتها."
+      },
+      {
+        "Heading": "الغرامات هي مبالغ عام 2012.",
+        "Body": "تعطي الجداول نطاق الغرامة الذي كان لكل فئة عام 2012، من المادة 374. غيّرت قوانين لاحقة هذه المبالغ، وتحمل الصفحة السطر نفسه عن المادة 42 من القانون 324 لسنة 2024 الذي يورده دليلنا عن غرامات السير. اقرأ الجداول لمعرفة الفئة والنقاط، وتحقق من المبلغ في النصوص اللاحقة."
+      },
+      {
+        "Heading": "ست مواد كما نُشرت أول مرة عام 1963.",
+        "Body": "صارت المواد 49 إلى 54 من قانون الضمان الاجتماعي تعرض قسماً مطوياً، «النص كما نُشر عام 1963، مقروءاً من صفحات الجريدة الرسمية»، تحت نص الجامعة اللبنانية. قُرئت من العدد 78 من الجريدة الرسمية الصادر في 30 أيلول 1963، الصفحات 14 إلى 17. ويبقى نص الجامعة هو نص الصفحة."
+      },
+      {
+        "Heading": "دليلان يستخدمانها الآن.",
+        "Body": "يعطي دليل غرامات السير الفئة والنقاط لمخالفات السرعة، واستعمال الهاتف، والكحول، وحزام الأمان، وإشارات المرور، والسير بعكس الاتجاه، والخوذة، ومقاعد الأطفال، مع رابط إلى صف كل منها. ويأخذ دليل تعويض نهاية الخدمة قواعد المواد 50 و51 و52 من صيغة 1963. وكل اقتباس في دليل يُتحقق منه مقابل القراءة التي يحيل إليها."
+      },
+      {
+        "Heading": "إصلاح كشفته لقطات الشاشة.",
+        "Body": "أثناء فحص الجداول الجديدة على هاتف وجدنا أن كل صفحة قانون عربية ذات عمود جانبي كانت أعرض بـ63 بكسلاً من شاشة عرضها 390 بكسلاً. كان السبب نموذجاً أقدم في الصفحة لا الجداول، وقد أُصلح."
+      }
+    ],
+    "Action": "Read the traffic fines guide",
+    "ActionPath": "/topic/traffic-fines/",
+    "Sources": [
+      {
+        "URL": "/law/246455/",
+        "Label": "Law 243/2012, with its annexed tables",
+        "LabelAr": "القانون 243/2012، مع جداوله الملحقة"
+      },
+      {
+        "URL": "/topic/traffic-fines/",
+        "Label": "Guide: traffic fines",
+        "LabelAr": "دليل: غرامات السير"
+      },
+      {
+        "URL": "/topic/end-of-service-indemnity/",
+        "Label": "Guide: end-of-service indemnity",
+        "LabelAr": "دليل: تعويض نهاية الخدمة"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/164",
+        "Label": "The change, with every count",
+        "LabelAr": "التغيير، مع كل الأعداد"
+      }
+    ],
+    "ResourceURL": "",
+    "ResourceLabel": "",
+    "ResourceLabelAr": "",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "nightly-update-merges-itself",
+    "Milestone": "2026-11-05",
+    "Published": "2026-11-10",
+    "Commit": "6281281",
+    "EvidenceKind": "public-commit",
+    "Title": "The nightly data update now reviews and merges itself",
+    "TitleAr": "التحديث الليلي للبيانات صار يراجع نفسه ويدمج نفسه",
+    "Summary": "Since 5 November a job reviews each night's data pull request against five rules and merges it. A night that removes too much stays open, with the reasons.",
+    "SummaryAr": "منذ 5 تشرين الثاني تراجع مهمة طلب دمج البيانات لكل ليلة وفق خمس قواعد ثم تدمجه. والليلة التي تحذف أكثر من اللازم تبقى مفتوحة، مع الأسباب.",
+    "Sections": [
+      {
+        "Heading": "The short answer.",
+        "Body": "Every night a script reads the Lebanese University's pages again, rebuilds the data and opens a pull request. A person used to read it and merge it. Now a job does: it waits for the checks, reviews the data and merges. If a rule fails it writes the reasons on the pull request, leaves it open and tells us."
+      },
+      {
+        "Heading": "The five rules.",
+        "Body": "Only files under data/ and db/model/ may change. Every check must finish without failing. No table may lose more than 1% of its rows, with 50 rows always allowed. No more than 25 laws, or 25 rulings, may disappear. No more than 5% of page dates may move."
+      },
+      {
+        "Heading": "Why these rules.",
+        "Body": "Each one comes from a night that went wrong. On 3 November a trial run built from an incomplete copy of the source pages would have removed 93,487 laws. The same run would have reset 164,305 of 165,855 page dates. And in October an outage at the source looked like 3,000 laws withdrawn. Run against that trial data, the review refuses it."
+      },
+      {
+        "Heading": "It merges what it reviewed.",
+        "Body": "The merge names the exact commit that was reviewed, so a later push to the same branch cannot be merged unseen. Right before merging, the job reads that commit's file list again and refuses anything outside data/ and db/model/. On the first night's real pull request it printed what a person had found by hand, two decrees removed and five dates moved, in 0.3 seconds."
+      },
+      {
+        "Heading": "Answers a model gave are not asked twice.",
+        "Body": "The build asks a language model about amendments and citations it has not judged before. On a night whose pull request was still open, those answers lived only on its branch, and the next night asked again: paid again, and possibly answered differently. The nightly now carries them forward for every question the main branch has no answer to."
+      },
+      {
+        "Heading": "The morning it did not run.",
+        "Body": "On 5 November the 06:40 run stopped after 7 seconds. The night before had left its export in the working folder, the same files had since been merged, and git refused to update over them. The script now puts the folder back as it found it when it ends, and a test fails if it does not."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الجواب باختصار.",
+        "Body": "كل ليلة يعيد سكربت قراءة صفحات الجامعة اللبنانية، ويعيد بناء البيانات، ويفتح طلب دمج. كان شخص يقرأه ويدمجه. صارت مهمة تفعل ذلك: تنتظر الفحوص، تراجع البيانات، ثم تدمج. وإذا أخفقت قاعدة كتبت الأسباب على طلب الدمج، وتركته مفتوحاً، وأبلغتنا."
+      },
+      {
+        "Heading": "القواعد الخمس.",
+        "Body": "لا يتغيّر إلا ما تحت data/ وdb/model/. يجب أن ينتهي كل فحص من دون فشل. لا يخسر أي جدول أكثر من 1% من صفوفه، مع السماح دائماً بـ50 صفاً. لا يختفي أكثر من 25 قانوناً، ولا أكثر من 25 حكماً. ولا يتحرك أكثر من 5% من تواريخ الصفحات."
+      },
+      {
+        "Heading": "لماذا هذه القواعد.",
+        "Body": "كل قاعدة تعود إلى ليلة ساءت. في 3 تشرين الثاني كان تشغيل تجريبي مبني من نسخة ناقصة من صفحات المصدر سيحذف 93,487 قانوناً. والتشغيل نفسه كان سيعيد ضبط 164,305 من أصل 165,855 تاريخ صفحة. وفي تشرين الأول بدا انقطاع في موقع المصدر كأنه سحب 3,000 قانون. وعند تشغيل المراجعة على بيانات تلك التجربة، ترفضها."
+      },
+      {
+        "Heading": "تدمج ما راجعته.",
+        "Body": "يسمّي الدمج الإيداع نفسه الذي جرت مراجعته، فلا يمكن دمج دفع لاحق إلى الفرع نفسه من دون أن يُرى. وقبل الدمج مباشرة تعيد المهمة قراءة لائحة ملفات ذلك الإيداع وترفض أي شيء خارج data/ وdb/model/. على طلب الدمج الحقيقي لأول ليلة طبعت ما وجده شخص يدوياً، مرسومين محذوفين وخمسة تواريخ متحركة، في 0.3 ثانية."
+      },
+      {
+        "Heading": "أجوبة النموذج لا تُطلب مرتين.",
+        "Body": "يسأل البناء نموذجاً لغوياً عن التعديلات والإحالات التي لم يحكم فيها من قبل. في ليلة ما زال طلب دمجها مفتوحاً كانت هذه الأجوبة تعيش على فرعها فقط، فتسأل الليلة التالية من جديد: كلفة مرة ثانية، وربما جواب مختلف. صار التحديث الليلي يحملها معه لكل سؤال لا جواب له في الفرع الرئيسي."
+      },
+      {
+        "Heading": "الصباح الذي لم يعمل فيه.",
+        "Body": "في 5 تشرين الثاني توقف تشغيل الساعة 06:40 بعد 7 ثوانٍ. كانت الليلة السابقة قد تركت تصديرها في مجلد العمل، والملفات نفسها دُمجت في هذه الأثناء، فرفض git التحديث فوقها. صار السكربت يعيد المجلد كما وجده عند انتهائه، ويفشل اختبار إذا لم يفعل."
+      }
+    ],
+    "Action": "Run it yourself",
+    "ActionPath": "/run-it-yourself/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/157",
+        "Label": "The review and merge job, with its rules",
+        "LabelAr": "مهمة المراجعة والدمج، مع قواعدها"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/158",
+        "Label": "The nightly restores its working folder",
+        "LabelAr": "التحديث الليلي يعيد مجلد عمله"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/181",
+        "Label": "The merge is bound to the reviewed commit",
+        "LabelAr": "الدمج مربوط بالإيداع الذي روجع"
+      },
+      {
+        "URL": "/blog/nightly-runs-again-one-pr/",
+        "Label": "Earlier: one pull request, updated every night",
+        "LabelAr": "سابقاً: طلب دمج واحد يُحدَّث كل ليلة"
+      }
+    ],
+    "ResourceURL": "https://github.com/taktekhq/lebanese-legislation/blob/main/docs/update-data.md",
+    "ResourceLabel": "How to update the data",
+    "ResourceLabelAr": "كيف تحدّث البيانات",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "hugging-face-one-commit-clearer-card",
+    "Milestone": "2026-11-05",
+    "Published": "2026-11-10",
+    "Commit": "555a8c9",
+    "EvidenceKind": "public-commit",
+    "Title": "Hugging Face: one commit per update and a clearer card",
+    "TitleAr": "Hugging Face: إيداع واحد لكل تحديث وبطاقة أوضح",
+    "Summary": "Since 5 November a data update reaches the Hugging Face dataset as one commit, not three. The dataset card now opens with live counts and a query to run.",
+    "SummaryAr": "منذ 5 تشرين الثاني يصل تحديث البيانات إلى Hugging Face في إيداع واحد لا ثلاثة. وصارت بطاقة مجموعة البيانات تبدأ بأعداد حية واستعلام يمكن تشغيله.",
+    "Sections": [
+      {
+        "Heading": "One commit per update.",
+        "Body": "Each commit to a Hugging Face dataset restarts its viewer, the table preview on the dataset page, for about 33 minutes. One data update made two commits, tables then search vectors, and a card edit made a third. The publish step now waits for the same commit's vectors and uploads tables, card, methods, schema and vectors together."
+      },
+      {
+        "Heading": "A card you can start from.",
+        "Body": "The card now has the same opening as the GitHub README: what the library is, live counts and a screenshot. Then come four ways to start in one minute: the datasets library, a DuckDB query that reads the Parquet files straight from Hugging Face, the MCP server and the API. A table lists the 10 main tables and links the full schema."
+      },
+      {
+        "Heading": "Badges that showed on GitHub and nowhere else.",
+        "Body": "The live count badges were blank on Hugging Face. Our site told browsers its files were for our site only, and Chromium on huggingface.co blocked all five. GitHub had hidden the problem because it fetches images through its own proxy. Badges now say any site may show them. Then they stacked one per line, because the Hub styles a linked image as a block, and one inline style put them back in a row."
+      },
+      {
+        "Heading": "An older run overwrote a newer card.",
+        "Body": "The badge fix published at 13:28 UTC. A data run from a commit merged just before it finished at 13:44 and uploaded the card as that older commit had it. The data publish now takes the card from the main branch at the moment it uploads, so a slow run can no longer bring back an old card."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "إيداع واحد لكل تحديث.",
+        "Body": "كل إيداع في مجموعة بيانات على Hugging Face يعيد تشغيل عارضها، أي معاينة الجداول في صفحة المجموعة، لنحو 33 دقيقة. كان تحديث البيانات الواحد يصنع إيداعين، الجداول ثم متجهات البحث، وتعديل البطاقة يصنع ثالثاً. صارت خطوة النشر تنتظر متجهات الإيداع نفسه وترفع الجداول والبطاقة والمنهجية والمخطط والمتجهات معاً."
+      },
+      {
+        "Heading": "بطاقة تبدأ منها.",
+        "Body": "صار للبطاقة الافتتاح نفسه الذي في ملف README على GitHub: ما هي المكتبة، أعداد حية ولقطة شاشة. ثم أربع طرق للبدء في دقيقة: مكتبة datasets، واستعلام DuckDB يقرأ ملفات Parquet مباشرة من Hugging Face، وخادم MCP، وواجهة البرمجة. ويعدّد جدول الجداول العشرة الرئيسية ويحيل إلى المخطط الكامل."
+      },
+      {
+        "Heading": "شارات ظهرت على GitHub ولم تظهر في أي مكان آخر.",
+        "Body": "كانت شارات الأعداد الحية فارغة على Hugging Face. كان موقعنا يقول للمتصفحات إن ملفاته لموقعنا فقط، فحجب Chromium على huggingface.co الشارات الخمس كلها. وكان GitHub يخفي المشكلة لأنه يجلب الصور عبر وسيطه الخاص. صارت الشارات تقول إن أي موقع يستطيع عرضها. ثم اصطفّت واحدة في كل سطر، لأن المنصة تعرض الصورة داخل رابط ككتلة، فأعادها سطر تنسيق واحد إلى صف واحد."
+      },
+      {
+        "Heading": "تشغيل أقدم كتب فوق بطاقة أحدث.",
+        "Body": "نُشر إصلاح الشارات عند 13:28 بالتوقيت العالمي. ثم انتهى عند 13:44 تشغيل بيانات من إيداع دُمج قبله بقليل، ورفع البطاقة كما كانت في ذلك الإيداع الأقدم. صار نشر البيانات يأخذ البطاقة من الفرع الرئيسي لحظة الرفع، فلا يستطيع تشغيل بطيء أن يعيد بطاقة قديمة."
+      }
+    ],
+    "Action": "Get the data",
+    "ActionPath": "/data/",
+    "Sources": [
+      {
+        "URL": "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
+        "Label": "The dataset on Hugging Face",
+        "LabelAr": "مجموعة البيانات على Hugging Face"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/156",
+        "Label": "One commit per publish",
+        "LabelAr": "إيداع واحد لكل نشر"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/163",
+        "Label": "The card laid out like the README",
+        "LabelAr": "البطاقة بتصميم ملف README"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/162",
+        "Label": "Badges allowed on other sites",
+        "LabelAr": "السماح بعرض الشارات على مواقع أخرى"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/167",
+        "Label": "The card comes from the main branch",
+        "LabelAr": "البطاقة تؤخذ من الفرع الرئيسي"
+      }
+    ],
+    "ResourceURL": "",
+    "ResourceLabel": "",
+    "ResourceLabelAr": "",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "wrong-answer-gets-a-reply",
+    "Milestone": "2026-11-05",
+    "Published": "2026-11-10",
+    "Commit": "af4c12e",
+    "EvidenceKind": "public-commit",
+    "Title": "Tell us an answer was wrong, and it now replies",
+    "TitleAr": "قل لنا إن الجواب خاطئ، وسيردّ عليك الآن",
+    "Summary": "Since 5 November a thumbs down on an AI answer shows the laws it used, their last update, or a deeper answer. Every page has a link to report an error.",
+    "SummaryAr": "منذ 5 تشرين الثاني يُظهر التقييم السلبي لجواب الذكاء الاصطناعي القوانين التي استند إليها أو تاريخ تحديثها أو إجابة معمّقة. وفي كل صفحة رابط للإبلاغ عن خطأ.",
+    "Sections": [
+      {
+        "Heading": "Every AI answer asks if it helped.",
+        "Body": "Since 4 November each AI answer on the search page ends with \"Was this answer helpful?\" and two thumbs. A thumbs down opens three one-tap reasons and an optional note. The rating goes to our analytics and is not stored in the site's database. A line asks you to leave out names and personal details."
+      },
+      {
+        "Heading": "Each reason gets its own reply.",
+        "Body": "Until 5 November every reason got the same thanks. Now \"Wrong law or article\" opens the answer, highlights the laws it used and moves to the first one. \"Out of date\" shows under each source when we last updated it and which text last amended it, the same line the law pages carry. \"Didn't answer my question\" points to the deep answer when you have one left today."
+      },
+      {
+        "Heading": "Report an error on any page.",
+        "Body": "The footer of every page now has \"Report an error on this page\". It opens a short note and sends it with the page's address and language. This is how a reader tells us a text is wrong, cut short or missing, without writing an email."
+      },
+      {
+        "Heading": "Student editors see that their link worked.",
+        "Body": "Students in our paid program open the site through a personal link. The site now shows a small label, \"Editor: \" and their name, at the bottom corner of every page, in English and Arabic. Before, a student could not tell whether a visit counted."
+      },
+      {
+        "Heading": "Smaller things.",
+        "Body": "The contribute page has its own share image in each language, so a link sent to a student shows what the program is and that it pays $10 a week to accepted students. Arabic filter chips are 12% larger: on the laws list at phone width, 27 chips fit and none runs off the screen."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "كل جواب يسأل إن كان مفيداً.",
+        "Body": "منذ 4 تشرين الثاني ينتهي كل جواب للذكاء الاصطناعي في صفحة البحث بسؤال «هل كانت هذه الإجابة مفيدة؟» وإبهامين. يفتح الإبهام إلى الأسفل ثلاثة أسباب تُختار بنقرة واحدة وملاحظة اختيارية. يذهب التقييم إلى تحليلاتنا ولا يُخزَّن في قاعدة بيانات الموقع. ويطلب منك سطر ألا تذكر أسماء أو تفاصيل شخصية."
+      },
+      {
+        "Heading": "لكل سبب ردّه الخاص.",
+        "Body": "حتى 5 تشرين الثاني كان كل سبب يتلقى الشكر نفسه. صار «قانون أو مادة غير صحيحة» يفتح الجواب، ويبرز القوانين التي استند إليها، وينتقل إلى أولها. و«معلومات قديمة» يعرض تحت كل مصدر متى حدّثناه آخر مرة وأي نص عدّله آخر مرة، وهو السطر نفسه الذي تحمله صفحات القوانين. و«لم تُجب عن سؤالي» يدلّ على الإجابة المعمّقة حين يبقى لك واحد اليوم."
+      },
+      {
+        "Heading": "الإبلاغ عن خطأ في أي صفحة.",
+        "Body": "صار في تذييل كل صفحة «أبلغ عن خطأ في هذه الصفحة». يفتح ملاحظة قصيرة ويرسلها مع عنوان الصفحة ولغتها. هكذا يخبرنا القارئ أن نصاً خاطئ أو مبتور أو ناقص، من دون كتابة بريد إلكتروني."
+      },
+      {
+        "Heading": "الطلاب المحررون يرون أن رابطهم نجح.",
+        "Body": "يفتح الطلاب في برنامجنا المدفوع الموقع عبر رابط شخصي. صار الموقع يعرض شارة صغيرة، «المحرّر:» مع الاسم، في الزاوية السفلى من كل صفحة، بالعربية والإنكليزية. قبل ذلك لم يكن الطالب يعرف إن كانت زيارته قد احتُسبت."
+      },
+      {
+        "Heading": "أشياء أصغر.",
+        "Body": "صار لصفحة المساهمة صورة مشاركة خاصة بكل لغة، فالرابط المرسل إلى طالب يُظهر ما هو البرنامج وأنه يدفع 10 دولارات في الأسبوع للطلاب المقبولين. وكبرت أزرار التصفية العربية بـ12%: في قائمة القوانين بعرض الهاتف تتسع 27 زراً ولا يخرج أي منها عن الشاشة."
+      }
+    ],
+    "Action": "Ask a question",
+    "ActionPath": "/search/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/133",
+        "Label": "The rating under every AI answer",
+        "LabelAr": "التقييم تحت كل جواب"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/160",
+        "Label": "A reply for each reason",
+        "LabelAr": "ردّ لكل سبب"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/145",
+        "Label": "Report an error on every page",
+        "LabelAr": "الإبلاغ عن خطأ في كل صفحة"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/168",
+        "Label": "The editor label",
+        "LabelAr": "شارة المحرّر"
+      },
+      {
+        "URL": "/contribute/",
+        "Label": "The student program",
+        "LabelAr": "برنامج الطلاب"
+      }
+    ],
+    "ResourceURL": "",
+    "ResourceLabel": "",
+    "ResourceLabelAr": "",
+    "Updated": "2026-11-10"
+  },
+  {
+    "Slug": "article-pages-describe-themselves",
+    "Milestone": "2026-11-04",
+    "Published": "2026-11-10",
+    "Commit": "2487128",
+    "EvidenceKind": "public-commit",
+    "Title": "Article pages now describe themselves to search engines",
+    "TitleAr": "صفحات المواد صارت تعرّف عن نفسها لمحركات البحث",
+    "Summary": "On 4 November each article page got a description of its own, 92,053 pages that copied another left the sitemaps, and unchanged pages began answering 304.",
+    "SummaryAr": "في 4 تشرين الثاني حصلت كل صفحة مادة على وصف خاص بها، وخرجت من خرائط الموقع 92,053 صفحة مكرّرة، وصارت الصفحات التي لم تتغيّر تردّ بـ304.",
+    "Sections": [
+      {
+        "Heading": "The short answer.",
+        "Body": "Two audits of the site on 3 and 4 November found three things a search engine would trip on. Every article of a law had the same description. Tens of thousands of article pages repeated the page of their own short text. And a crawler that already held a page was sent the whole page again. All three were fixed on 4 November."
+      },
+      {
+        "Heading": "Every article had one description.",
+        "Body": "The description is the text a search engine shows under a page's title. Ours listed facts about the law first and the article's words only if room was left, which never happened. So every article of a text shared one description, apart from its number. An Arabic article page now says which article it is, then its subject, then the article's own words."
+      },
+      {
+        "Heading": "Subjects from the source's own headings.",
+        "Body": "The subject is the chapter heading the Lebanese University's text places above the article, with its numbering removed. Article 655 of the Penal Code reads \"الاحتيال وسائر ضروب الغش\" and Article 547 \"القتل قصدا\". 43,379 of 389,078 articles have one, 11%, mostly in the codes. No model wrote any of it."
+      },
+      {
+        "Heading": "92,053 copies left the sitemaps.",
+        "Body": "A text of one to three articles shows every article whole on its own page, so each of its article pages repeated that page. Those article pages now ask search engines not to index them and are out of the sitemaps: 289,082 article addresses became 197,029. Readers and links still reach them. Texts of four or more articles are unchanged."
+      },
+      {
+        "Heading": "Short descriptions, completed honestly.",
+        "Body": "A site audit flagged 989 list pages whose descriptions were 72 to 97 characters. Descriptions under 110 characters now gain one of the site's own short lines, whole, and only if it fits within 160. None is cut off with an ellipsis any more."
+      },
+      {
+        "Heading": "Unchanged pages answer 304.",
+        "Body": "A crawler that sent back a page's exact version tag still got the full page. A page served from the Worker's cache skipped the comparison, and the comparison was exact while Cloudflare marks a tag as weak when it compresses. Pages now answer 304 Not Modified and carry a Last-Modified date, so a crawler learns in one small request that a page has not changed."
+      },
+      {
+        "Heading": "The home page shows before its script.",
+        "Body": "The title and search box on the home page waited for a script before they appeared. On a phone, Lighthouse measured 5.8 seconds until the largest element showed, 92% of it waiting to render. They now show without the script."
+      }
+    ],
+    "SectionsAr": [
+      {
+        "Heading": "الجواب باختصار.",
+        "Body": "وجد تدقيقان في الموقع في 3 و4 تشرين الثاني ثلاثة أشياء يتعثر بها محرك البحث. كل مواد القانون الواحد كان لها الوصف نفسه. عشرات آلاف صفحات المواد كانت تكرّر صفحة نصّها القصير. وبرنامج الزحف الذي يملك الصفحة أصلاً كانت تُرسل إليه الصفحة كاملة من جديد. أُصلحت الثلاثة في 4 تشرين الثاني."
+      },
+      {
+        "Heading": "كل المواد كان لها وصف واحد.",
+        "Body": "الوصف هو النص الذي يعرضه محرك البحث تحت عنوان الصفحة. كان وصفنا يعدّد معلومات عن القانون أولاً، ثم كلمات المادة إذا بقي مكان فقط، ولم يكن يبقى أبداً. فكانت كل مواد النص تتشارك وصفاً واحداً لا يختلف إلا برقم المادة. صارت صفحة المادة العربية تقول أي مادة هي، ثم موضوعها، ثم كلمات المادة نفسها."
+      },
+      {
+        "Heading": "مواضيع من عناوين المصدر نفسه.",
+        "Body": "الموضوع هو عنوان الفصل الذي يضعه نص الجامعة اللبنانية فوق المادة، من دون ترقيمه. المادة 655 من قانون العقوبات موضوعها «الاحتيال وسائر ضروب الغش» والمادة 547 «القتل قصدا». لـ43,379 مادة من أصل 389,078 موضوع، أي 11%، معظمها في القوانين الأساسية. لم يكتب أي نموذج شيئاً منها."
+      },
+      {
+        "Heading": "92,053 نسخة خرجت من خرائط الموقع.",
+        "Body": "النص المؤلف من مادة إلى ثلاث مواد يعرض كل مادة كاملة في صفحته، فكانت كل صفحة مادة منه تكرّر تلك الصفحة. صارت صفحات المواد هذه تطلب من محركات البحث ألا تفهرسها، وخرجت من خرائط الموقع: 289,082 عنوان مادة صارت 197,029. ما زال القرّاء والروابط يصلون إليها. والنصوص المؤلفة من أربع مواد أو أكثر لم تتغيّر."
+      },
+      {
+        "Heading": "أوصاف قصيرة تُستكمل بأمانة.",
+        "Body": "أشار تدقيق في الموقع إلى 989 صفحة قوائم يتراوح وصفها بين 72 و97 حرفاً. صار الوصف الذي يقل عن 110 أحرف يكتسب أحد أسطر الموقع القصيرة، كاملاً، وفقط إذا بقي ضمن 160 حرفاً. ولم يعد أي وصف يُقطع بثلاث نقاط."
+      },
+      {
+        "Heading": "الصفحات التي لم تتغيّر تردّ بـ304.",
+        "Body": "كان برنامج الزحف الذي يعيد إرسال وسم إصدار الصفحة بعينه يتلقى الصفحة كاملة مع ذلك. الصفحة المقدَّمة من ذاكرة Worker كانت تتخطى المقارنة، والمقارنة كانت حرفية بينما يسم Cloudflare الوسم بأنه ضعيف حين يضغط الصفحة. صارت الصفحات تردّ بـ304 Not Modified وتحمل تاريخ Last-Modified، فيعرف برنامج الزحف بطلب صغير واحد أن الصفحة لم تتغيّر."
+      },
+      {
+        "Heading": "الصفحة الرئيسية تظهر قبل السكربت.",
+        "Body": "كان العنوان ومربع البحث في الصفحة الرئيسية ينتظران سكربتاً قبل أن يظهرا. على الهاتف قاس Lighthouse 5.8 ثوانٍ حتى ظهور أكبر عنصر، 92% منها انتظار للعرض. صارا يظهران من دون السكربت."
+      }
+    ],
+    "Action": "Browse the laws",
+    "ActionPath": "/laws/",
+    "Sources": [
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/135",
+        "Label": "Article descriptions and subjects",
+        "LabelAr": "أوصاف المواد ومواضيعها"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/140",
+        "Label": "Article pages of short texts hidden",
+        "LabelAr": "إخفاء صفحات مواد النصوص القصيرة"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/136",
+        "Label": "Descriptions of at least 110 characters",
+        "LabelAr": "أوصاف من 110 أحرف على الأقل"
+      },
+      {
+        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/143",
+        "Label": "304 Not Modified and Last-Modified",
+        "LabelAr": "304 Not Modified وLast-Modified"
+      },
+      {
+        "URL": "/decree/244611/article/655/",
+        "Label": "Penal Code, Article 655",
+        "LabelAr": "قانون العقوبات، المادة 655"
+      }
+    ],
+    "ResourceURL": "",
+    "ResourceLabel": "",
+    "ResourceLabelAr": "",
+    "Updated": "2026-11-10"
+  },
+  {
     "Slug": "nightly-runs-again-one-pr",
     "Milestone": "2026-11-04",
     "Published": "2026-11-05",
