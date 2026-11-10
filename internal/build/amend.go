@@ -291,7 +291,12 @@ func applyDecisions(changes []*change, ds []amend.Decision, ix *amend.Index,
 			case amend.DecideReject:
 				c.status = "rejected"
 			case amend.DecideApply:
-				c.status, c.method = "applied", "editorial"
+				// A person read the wording as the whole article: a part the
+				// pattern pass named, or an addition it read, was a misreading.
+				if c.action == amend.Insert && c.part == "+" {
+					c.action = amend.Replace
+				}
+				c.status, c.method, c.part = "applied", "editorial", ""
 			case amend.DecideRepeal:
 				if c.law == 0 {
 					c.law, c.resolvedBy, c.reasons = d.Law, "by hand", nil
@@ -432,87 +437,10 @@ func (b *builder) versions(changes []*change) ([][]any, error) {
 		return keys[i].article < keys[j].article
 	})
 	for _, k := range keys {
-		cs := groups[k]
-		sort.SliceStable(cs, func(i, j int) bool {
-			a, b := cs[i], cs[j]
-			if !a.effective.Equal(b.effective) {
-				return a.effective.Before(b.effective)
-			}
-			if a.byLaw != b.byLaw {
-				return a.byLaw < b.byLaw
-			}
-			return a.seq < b.seq
-		})
 		u := centre[k]
-		// A model's checked answer, where the patterns couldn't tell (see
-		// judge): only for the same inputs it was shown. It says
-		// which version stands, never what one says.
-		for _, c := range cs {
-			if shows(u, c) {
-				continue // the Centre's text already shows the change
-			}
-			if v, ok := judged.Verdict(c.byLaw, c.byArticle, c.seq, c.article, c.amending, u, c.part); ok {
-				c.judgedBy, c.judgement = string(v.Model), string(v.State)
-			}
-		}
-		// A new wording that is only a part of the article never stands as
-		// the article: the Centre's text does, and the change is a note.
-		for _, c := range cs {
-			if c.status != "applied" || c.part != "" || c.text == "" || c.action == amend.Repeal || c.method == "editorial" {
-				continue
-			}
-			switch {
-			case inside(u, c.text):
-				c.inside = true
-				c.reasons = append(c.reasons, "the Centre's text has this wording and more")
-			case short(u, c.text):
-				c.status = "partial"
-				c.reasons = append(c.reasons, "new wording under half the article's length: a part of it, or cut short")
-			}
-		}
-		shown := -1 // the latest change the Centre's text already shows
-		later := -1 // the latest change the Centre's text is later than
-		for i, c := range cs {
-			if shows(u, c) || c.judgement == "includes" {
-				shown = i
-			}
-			if c.judgement == "later" {
-				later = i
-			}
-		}
-		// The Centre's text is the state after change "at"; with unknown, it
-		// comes from a later change we haven't identified.
-		at, unknown := shown, false
-		if later > shown {
-			at, unknown = later, true
-		}
-		// Changes after it are newer than the Centre's text, when there is
-		// a reason to think so: it shows an earlier change; a person or the
-		// model said so; the change quotes the wording it replaced and that
-		// is the Centre's; or the amending text appeared after the Centre's
-		// text last changed. Otherwise the Centre's text may as well be the
-		// newer one (amended again by a text we haven't linked): it waits
-		// for review, and meanwhile the article shows the change as a note.
-		if at < len(cs)-1 {
-			kept := cs[:at+1]
-			for _, c := range cs[at+1:] {
-				newer := at >= 0 && c.effective.After(cs[at].effective) || c.method == "editorial" || c.judgement == "predates" ||
-					c.status == "partial" && c.judgement != "unclear" || quotesOld(u, c) || seen.after(c.byLaw, k.law)
-				if newer {
-					c.reasons = append(c.reasons, "not in the Centre's text")
-					if c.status == "review" {
-						c.status = "applied"
-					}
-					kept = append(kept, c)
-				} else {
-					c.status = "review"
-					c.reasons = append(c.reasons, "the Centre's text matches no version: is it older or newer than this change?")
-				}
-			}
-			cs = kept
-			if len(cs) == 0 {
-				continue
-			}
+		cs, at, unknown := place(u, groups[k], k.law, seen, judged)
+		if len(cs) == 0 {
+			continue
 		}
 		vs := buildVersions(u, centreSrc[k], cs, at, unknown)
 		for i, v := range vs {
@@ -539,6 +467,96 @@ func (b *builder) versions(changes []*change) ([][]any, error) {
 	return out, nil
 }
 
+// place puts the Centre's text u of an article among the changes cs made
+// to it. It returns the changes that stand, oldest first, the index of the
+// one after which the Centre's text stands (-1: before them all), and
+// whether a later change we haven't identified made the Centre's text. On
+// the way each change gets its judgement and its final status: a wording
+// that is only a part of the article is marked (inside) or becomes partial.
+func place(u string, cs []*change, law int, seen seenTimes, judged modelout.Judgements) ([]*change, int, bool) {
+	sort.SliceStable(cs, func(i, j int) bool {
+		a, b := cs[i], cs[j]
+		if !a.effective.Equal(b.effective) {
+			return a.effective.Before(b.effective)
+		}
+		if a.byLaw != b.byLaw {
+			return a.byLaw < b.byLaw
+		}
+		return a.seq < b.seq
+	})
+	// A model's checked answer, where the patterns couldn't tell (see
+	// judge): only for the same inputs it was shown. It says
+	// which version stands, never what one says.
+	for _, c := range cs {
+		if shows(u, c) {
+			continue // the Centre's text already shows the change
+		}
+		if v, ok := judged.Verdict(c.byLaw, c.byArticle, c.seq, c.article, c.amending, u, c.part); ok {
+			c.judgedBy, c.judgement = string(v.Model), string(v.State)
+		}
+	}
+	// A new wording that is only a part of the article never stands as
+	// the article: the Centre's text does, and the change is a note.
+	for _, c := range cs {
+		if c.status != "applied" || c.part != "" || c.text == "" || c.action == amend.Repeal || c.method == "editorial" {
+			continue
+		}
+		switch {
+		case inside(u, c.text):
+			c.inside = true
+			c.reasons = append(c.reasons, "the Centre's text has this wording and more")
+		case restated(u, c):
+			// Short, and still the whole article: the amending article
+			// quotes all of the old one after "بدلا من".
+		case short(u, c.text):
+			c.status = "partial"
+			c.reasons = append(c.reasons, "new wording under half the article's length: a part of it, or cut short")
+		}
+	}
+	shown := -1 // the latest change the Centre's text already shows
+	later := -1 // the latest change the Centre's text is later than
+	for i, c := range cs {
+		if shows(u, c) || c.judgement == "includes" {
+			shown = i
+		}
+		if c.judgement == "later" {
+			later = i
+		}
+	}
+	// The Centre's text is the state after change "at"; with unknown, it
+	// comes from a later change we haven't identified.
+	at, unknown := shown, false
+	if later > shown {
+		at, unknown = later, true
+	}
+	// Changes after it are newer than the Centre's text, when there is
+	// a reason to think so: it shows an earlier change; a person or the
+	// model said so; the change quotes the wording it replaced and that
+	// is the Centre's; or the amending text appeared after the Centre's
+	// text last changed. Otherwise the Centre's text may as well be the
+	// newer one (amended again by a text we haven't linked): it waits
+	// for review, and meanwhile the article shows the change as a note.
+	if at < len(cs)-1 {
+		kept := cs[:at+1]
+		for _, c := range cs[at+1:] {
+			newer := at >= 0 && c.effective.After(cs[at].effective) || c.method == "editorial" || c.judgement == "predates" ||
+				c.status == "partial" && c.judgement != "unclear" || quotesOld(u, c) || seen.after(c.byLaw, law)
+			if newer {
+				c.reasons = append(c.reasons, "not in the Centre's text")
+				if c.status == "review" {
+					c.status = "applied"
+				}
+				kept = append(kept, c)
+			} else {
+				c.status = "review"
+				c.reasons = append(c.reasons, "the Centre's text matches no version: is it older or newer than this change?")
+			}
+		}
+		cs = kept
+	}
+	return cs, at, unknown
+}
+
 // quotesOld says whether c quotes the wording it replaced, and the Centre's
 // text u is that wording: then u is older than c.
 func quotesOld(u string, c *change) bool {
@@ -547,6 +565,14 @@ func quotesOld(u string, c *change) bool {
 	}
 	co := core(c.old)
 	return len([]rune(co)) >= 12 && (strings.Contains(core(u), co) || coverage(words(c.old), words(u)) >= 0.9)
+}
+
+// restated says whether c quotes, as the wording it replaced, most of the
+// Centre's text u: then c's new wording replaces the whole article, however
+// short it is (Decree 3125/2018: "تمتد فترة عمل الدعم التقني … لغاية
+// 31/1/2021" for an article of four lines).
+func restated(u string, c *change) bool {
+	return quotesOld(u, c) && !short(u, c.old)
 }
 
 // The initial crawl saw every text by this day; a text first seen after it
