@@ -420,8 +420,8 @@ func (s *Server) buildSmallSitemap(ctx context.Context, name string, arabic bool
 		return urls, nil
 	}
 	// pages: the rest of the interface pages, the year lists and their later pages
-	for _, p := range []string{"/data/", "/ai/", "/run-it-yourself/", "/about/", "/privacy/", "/terms/"} {
-		urls = append(urls, SitemapURL{Path: p})
+	for _, p := range []string{"/data/", "/ai/", "/run-it-yourself/", "/about/", "/sources/", "/legiliban/", "/privacy/", "/terms/"} {
+		urls = append(urls, SitemapURL{Path: p, Mod: infoPageMods[p]}) // sources.go dates its two pages
 	}
 	for _, k := range []string{"laws", "gazette"} { // no rulings: rulingsHidden
 		ys, err := s.Years(ctx, k)

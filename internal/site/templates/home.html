@@ -4,6 +4,7 @@
   <h1>{{t "home.h1"}}</h1>
   <p class="sub">{{t "home.sub"}}</p>
   <div>{{template "search" ""}}</div>
+  <p class="tiny ls-hero__what">{{t "home.what" (num .Stats.Laws) (num .Stats.Rulings) (num .Stats.Gazette)}} <a class="link" href="{{u "/sources/"}}">{{t "home.what_link"}}</a></p>
 </section>
 
 <section class="wrap sec" id="codes">

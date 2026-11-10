@@ -103,6 +103,8 @@ func (s *Server) routes() {
 	m.HandleFunc("GET /run-it-yourself/{$}", s.localPage)
 	m.HandleFunc("GET /data/{$}", s.data)
 	m.HandleFunc("GET /about/{$}", s.about)
+	m.HandleFunc("GET /sources/{$}", s.sources)
+	m.HandleFunc("GET /legiliban/{$}", s.legiliban)
 	m.HandleFunc("GET /contribute/{$}", s.contribute)
 	m.HandleFunc("GET /privacy/{$}", s.privacy)
 	m.HandleFunc("GET /terms/{$}", s.terms)

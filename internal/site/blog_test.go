@@ -229,8 +229,8 @@ func TestBlogSingleVisibleDateAndFooterGroups(t *testing.T) {
 					t.Error("information group must not contain analytics preference controls")
 				}
 				links := blogElements(groups[info], "a")
-				if len(links) != 6 || blogAttribute(links[0], "href") != prefix+"/blog/" || blogAttribute(links[1], "href") != prefix+"/about/" || blogAttribute(links[2], "href") != "https://github.com/taktekhq/lebanese-legislation" || blogAttribute(links[3], "href") != "https://huggingface.co/taktekhq" || blogAttribute(links[4], "href") != prefix+"/privacy/" || blogAttribute(links[5], "href") != prefix+"/terms/" {
-					t.Error("information group needs the localized journal, About, privacy and terms links")
+				if len(links) != 8 || blogAttribute(links[0], "href") != prefix+"/blog/" || blogAttribute(links[1], "href") != prefix+"/about/" || blogAttribute(links[2], "href") != prefix+"/sources/" || blogAttribute(links[3], "href") != prefix+"/legiliban/" || blogAttribute(links[4], "href") != "https://github.com/taktekhq/lebanese-legislation" || blogAttribute(links[5], "href") != "https://huggingface.co/taktekhq" || blogAttribute(links[6], "href") != prefix+"/privacy/" || blogAttribute(links[7], "href") != prefix+"/terms/" {
+					t.Error("information group needs the localized journal, About, sources, Legiliban, privacy and terms links")
 				}
 			})
 		}

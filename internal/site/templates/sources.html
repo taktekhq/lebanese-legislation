@@ -1,0 +1,36 @@
+{{define "content"}}{{with .Data}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <p class="eyebrow" data-reveal>{{t "sources.eyebrow"}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{t "sources.title"}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{t "sources.lead"}}</p>
+  <p class="tiny">{{t "sources.checked"}} <time datetime="{{.ISO}}">{{.Updated}}</time></p>
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <article class="prose">
+    <h2 id="table">{{t "sources.table_h2"}}</h2>
+    <p>{{t "sources.table_p" .Count}}</p>
+  </article>
+  <div class="tablewrap"><table class="ref sources" aria-label="{{t "sources.title"}}">
+    <thead><tr><th scope="col">{{t "sources.col.name"}}</th>{{range .Head}}<th scope="col">{{.}}</th>{{end}}</tr></thead>
+    <tbody>{{range .Rows}}<tr><th scope="row"><b>{{.Name}}</b>{{range .Links}}<br><a class="link" href="{{.URL}}" rel="noopener" dir="ltr">{{.Label}}</a>{{end}}</th>{{range .Cells}}<td>{{.}}</td>{{end}}</tr>
+    {{end}}</tbody>
+  </table></div>
+  <article class="prose">
+    <h2 id="choose">{{t "sources.choose_h2"}}</h2>
+    <ul>
+      <li>{{t "sources.choose_gazette"}}</li>
+      <li>{{t "sources.choose_free"}}</li>
+      <li>{{t "sources.choose_paid"}}</li>
+      <li>{{t "sources.choose_field"}}</li>
+    </ul>
+    <h2 id="legiliban">{{t "sources.legiliban_h2"}}</h2>
+    <p>{{t "sources.legiliban_p"}} <a class="link" href="{{u "/legiliban/"}}">{{t "sources.legiliban_link"}}</a></p>
+    <h2 id="method">{{t "sources.method_h2"}}</h2>
+    <p>{{t "sources.method_p"}} <time datetime="{{.ISO}}">{{.Updated}}</time>.</p>
+    <p>{{t "sources.method_p2"}}</p>
+    <p>{{t "sources.independent_p"}}</p>
+    <p>{{t "about.not_p"}}</p>
+  </article>
+</section>
+{{end}}{{end}}

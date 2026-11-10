@@ -1,0 +1,36 @@
+{{define "content"}}{{with .Data}}
+<section class="wrap page">
+  <a class="back" href="{{u "/"}}"><span aria-hidden="true">{{backArrow}}</span> {{t "back.home"}}</a>
+  <p class="eyebrow" data-reveal>{{t "legiliban.eyebrow"}}</p>
+  <h1 class="page__title" data-reveal style="--d:60ms">{{t "legiliban.title"}}</h1>
+  <p class="lead" data-reveal style="--d:120ms">{{t "legiliban.lead"}}</p>
+  <p class="tiny">{{t "page.updated"}} <time datetime="{{.ISO}}">{{.Updated}}</time></p>
+</section>
+<section class="wrap" style="padding-bottom:var(--section-y)">
+  <article class="prose">
+    <h2 id="what">{{t "legiliban.what_h2"}}</h2>
+    <p>{{t "legiliban.what_p" (safe "<span lang=\"ar\" dir=\"rtl\">مركز الدراسات والأبحاث في المعلوماتية القانونية</span>") (safe "<a class=\"link\" href=\"https://legallaw.ul.edu.lb/\" rel=\"noopener\" dir=\"ltr\">legallaw.ul.edu.lb</a>") (safe "<span dir=\"ltr\">legiliban.ul.edu.lb</span>")}}</p>
+    <h2 id="source">{{t "legiliban.source_h2"}}</h2>
+    <p>{{t "legiliban.source_p" (num .Laws) (num .WithText) (num .Articles) (num .Rulings) (num .Gazette) (num .Opinions) (num .Agreements) (num .Doctrine)}}</p>
+    <p>{{t "legiliban.source_p2"}}</p>
+    <h2 id="adds">{{t "legiliban.adds_h2"}}</h2>
+    <ul>
+      <li>{{t "legiliban.adds_lang"}}</li>
+      <li>{{t "legiliban.adds_article"}}</li>
+      <li><a class="link" href="{{u "/search/"}}">{{t "legiliban.adds_search"}}</a></li>
+      <li>{{t "legiliban.adds_links"}}</li>
+      <li><a class="link" href="{{u "/ai/"}}">{{t "legiliban.adds_api"}}</a></li>
+      <li><a class="link" href="{{u "/ai/"}}">{{t "legiliban.adds_mcp"}}</a></li>
+      <li><a class="link" href="{{datasetURL}}" rel="noopener">{{t "legiliban.adds_download"}}</a></li>
+    </ul>
+    <p>{{t "legiliban.adds_p"}}</p>
+    <h2 id="independent">{{t "legiliban.independent_h2"}}</h2>
+    <p>{{t "legiliban.intention_p"}}</p>
+    <p><strong>{{t "legiliban.independent_p"}}</strong></p>
+    <p>{{t "legiliban.gazette_p"}}</p>
+    <p>{{t "about.not_p"}}</p>
+    <h2 id="elsewhere">{{t "legiliban.elsewhere_h2"}}</h2>
+    <p>{{t "legiliban.elsewhere_p"}} <a class="link" href="{{u "/sources/"}}">{{t "legiliban.elsewhere_link"}}</a></p>
+  </article>
+</section>
+{{end}}{{end}}

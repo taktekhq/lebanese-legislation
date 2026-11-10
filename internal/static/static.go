@@ -114,7 +114,7 @@ func Build(ctx context.Context, pool *pgxpool.Pool, out, base string, workers in
 
 // routes lists every page of the static site.
 func routes(ctx context.Context, pool *pgxpool.Pool, srv *site.Server) ([]string, error) {
-	paths := []string{"/", "/codes/", "/changes/", "/about/", "/ai/", "/developers/", "/data/", "/search/",
+	paths := []string{"/", "/codes/", "/changes/", "/about/", "/sources/", "/legiliban/", "/ai/", "/developers/", "/data/", "/search/",
 		"/laws/", "/rulings/", "/gazette/", "/laws/years/", "/rulings/years/", "/gazette/years/",
 		"/opinions/", "/agreements/", "/doctrine/", "/research/"}
 	for _, k := range []string{"laws", "rulings", "gazette"} {
