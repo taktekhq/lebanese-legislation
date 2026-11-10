@@ -24,7 +24,7 @@ export function hasRealQuery(search) {
 // route says where a request goes: "origin" or "static".
 export function route(method, pathname, search) {
   if (method !== "GET" && method !== "HEAD") return "origin";
-  const bare = pathname.replace(/^\/en(?=\/|$)/, "") || "/";
+  const bare = pathname.replace(/^\/(?:en|fr)(?=\/|$)/, "") || "/";
   if (ORIGIN_PREFIXES.some((p) => bare === p || bare.startsWith(p.endsWith("/") ? p : p + "/") || (p === "/official" && bare.startsWith("/official")))) {
     return "origin";
   }

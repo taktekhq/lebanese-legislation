@@ -1,8 +1,10 @@
-// Package i18n holds the site's user-interface strings in English and
-// Arabic. The English file (en.json) is the source of truth; the Arabic
+// Package i18n holds the site's user-interface strings in English, Arabic
+// and French. The English file (en.json) is the source of truth; the Arabic
 // file (ar.json) is a verbatim translation produced by Gemini (see
-// lebaneselegislation's deploy notes) and is never hand-edited. A string
-// missing from ar.json falls back to English and is reported by the tests.
+// lebaneselegislation's deploy notes) and is never hand-edited. The French
+// file (fr.json) translates the interface only: law texts and titles stay as
+// they are. A string missing from ar.json or fr.json falls back to English
+// and is reported by the tests.
 package i18n
 
 import (
@@ -11,23 +13,30 @@ import (
 	"fmt"
 )
 
-//go:embed en.json ar.json
+//go:embed en.json ar.json fr.json
 var fs embed.FS
 
-// English and Arabic are the two loaded string tables, keyed the same way.
-var English, Arabic map[string]string
+// English, Arabic and French are the loaded string tables, keyed the same way.
+var English, Arabic, French map[string]string
 
 // Missing lists the keys present in English but absent from Arabic, found
 // at load time; the tests fail loudly if this is non-empty so a missing
 // translation is never silently served.
 var Missing []string
 
+// MissingFrench lists the keys present in English but absent from French.
+var MissingFrench []string
+
 func init() {
 	English = load("en.json")
 	Arabic = load("ar.json")
+	French = load("fr.json")
 	for k := range English {
 		if _, ok := Arabic[k]; !ok {
 			Missing = append(Missing, k)
+		}
+		if _, ok := French[k]; !ok {
+			MissingFrench = append(MissingFrench, k)
 		}
 	}
 }
@@ -46,7 +55,7 @@ func load(name string) map[string]string {
 
 // Bundle looks strings up in one language, falling back to English.
 type Bundle struct {
-	Lang  string // "en" or "ar"
+	Lang  string // "en", "ar" or "fr"
 	table map[string]string
 	note  func(key string)
 }
@@ -59,10 +68,13 @@ func (b *Bundle) Noting(note func(key string)) *Bundle {
 	return &c
 }
 
-// New returns the bundle for "en" or "ar" (anything else behaves as "en").
+// New returns the bundle for "en", "ar" or "fr" (anything else behaves as "en").
 func New(lang string) *Bundle {
-	if lang == "ar" {
+	switch lang {
+	case "ar":
 		return &Bundle{Lang: "ar", table: Arabic}
+	case "fr":
+		return &Bundle{Lang: "fr", table: French}
 	}
 	return &Bundle{Lang: "en", table: English}
 }
@@ -142,6 +154,40 @@ func thousandsAr(n int) string {
 	}
 	for i := len(s) - 3; i > 0; i -= 3 {
 		s = s[:i] + "," + s[i:]
+	}
+	if neg {
+		s = "-" + s
+	}
+	return s
+}
+
+// PluralFr renders a count with its French noun for the nouns the site
+// counts (plural.<noun>.one and .many in fr.json), matched by the English
+// singular the templates pass. French uses the singular for 0 and 1, and a
+// narrow no-break space between thousands. An unknown noun keeps its English
+// words.
+func (b *Bundle) PluralFr(n int, enOne, enMany string) string {
+	one, many := enOne, enMany
+	for _, w := range pluralNouns {
+		if w == enOne {
+			one, many = b.T("plural."+w+".one"), b.T("plural."+w+".many")
+		}
+	}
+	if n <= 1 && n >= -1 {
+		return fmt.Sprintf("%d %s", n, one)
+	}
+	return ThousandsFr(n) + " " + many
+}
+
+// ThousandsFr prints n the French way: 12 345, with narrow no-break spaces.
+func ThousandsFr(n int) string {
+	s := fmt.Sprint(n)
+	neg := n < 0
+	if neg {
+		s = s[1:]
+	}
+	for i := len(s) - 3; i > 0; i -= 3 {
+		s = s[:i] + "\u202f" + s[i:]
 	}
 	if neg {
 		s = "-" + s

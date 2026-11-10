@@ -39,7 +39,7 @@ func (s *Server) robots(w http.ResponseWriter, r *http.Request) {
 	// short, so a change (like the noindex preview ending) reaches crawlers
 	// through Cloudflare's cache within minutes, not its default 4 hours
 	w.Header().Set("Cache-Control", "public, max-age=600")
-	rules := "Allow: /\nDisallow: /search/\nDisallow: /en/search/\nDisallow: /api/\nDisallow: /changes/review/\nDisallow: /en/changes/review/\nDisallow: /*?\n"
+	rules := "Allow: /\nDisallow: /search/\nDisallow: /en/search/\nDisallow: /api/\nDisallow: /changes/review/\nDisallow: /en/changes/review/\nDisallow: /fr/search/\nDisallow: /*?\n"
 	var b strings.Builder
 	b.WriteString("# Lebanese Legislation: every Lebanese law, free to read, cite and build on.\n")
 	b.WriteString("# Search engines and AI assistants are welcome; please cite the article's address.\n\n")
@@ -71,7 +71,7 @@ func (s *Server) llms(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(&b, "# Lebanese Legislation\n\n> Every Lebanese law, decree and ruling, free: %s texts (%s with full text, %s articles), %s court rulings, %s Official Gazette issues, opinions, agreements and doctrine, from the Lebanese University's Centre for Research and Studies in Legal Informatics. Arabic, with the French text where it was published.\n\n",
 		thousands(st.Laws), thousands(st.WithText), thousands(st.Articles), thousands(st.Rulings), thousands(st.Gazette))
 	b.WriteString("Cite an article by its address, which never changes: " + Base + "/law/{id}/article/{number}/ . Each page shows the text's kind, number, date, Official Gazette issue and whether it is in force.\n\n")
-	b.WriteString("The site is in Arabic at the root (" + Base + "/). The English interface is under " + Base + "/en/ (for example " + Base + "/en/law/{id}/); the text of a law is the same Arabic text in both.\n\n")
+	b.WriteString("The site is in Arabic at the root (" + Base + "/). The English interface is under " + Base + "/en/ (for example " + Base + "/en/law/{id}/); the text of a law is the same Arabic text in both. A French interface under " + Base + "/fr/ covers the site's own pages (home, lists, About, the database, AI); it links each law to its /en/ page.\n\n")
 	b.WriteString("## The codes\n\n")
 	for _, c := range codes {
 		fmt.Fprintf(&b, "- [%s (%s)](%s%s)\n", c.NameEn, c.Title, Base, lawPath(c.ID))

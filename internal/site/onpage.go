@@ -495,6 +495,12 @@ func (s *Server) updated(r *http.Request, kind string) *Updated {
 // pages, so structured data on /en/ names /en/ URLs (the legislation objects
 // are built with theirs). Other objects pass through.
 func englishLD(in []any) []any {
+	return langLD(in, func(path string) string { return "/en" + path })
+}
+
+// langLD is englishLD for any interface: to gives a root path's address in
+// that interface.
+func langLD(in []any, to func(path string) string) []any {
 	out := make([]any, len(in))
 	for i, o := range in {
 		out[i] = o
@@ -522,8 +528,8 @@ func englishLD(in []any) []any {
 				c[k] = v
 			}
 			for _, k := range []string{"item", "url"} {
-				if u, ok := c[k].(string); ok && strings.HasPrefix(u, Base+"/") && !strings.HasPrefix(u, Base+"/en/") {
-					c[k] = Base + "/en" + strings.TrimPrefix(u, Base)
+				if u, ok := c[k].(string); ok && strings.HasPrefix(u, Base+"/") && !strings.HasPrefix(u, Base+"/en/") && !strings.HasPrefix(u, Base+"/fr/") {
+					c[k] = Base + to(strings.TrimPrefix(u, Base))
 				}
 			}
 			ni = append(ni, c)

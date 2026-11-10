@@ -32,7 +32,7 @@ function visit(url, lang, saved, blocked = false) {
 }
 
 test('only an explicit choice is remembered', () => {
-  for (const saved of [null, '', 'fr', 'EN']) {
+  for (const saved of [null, '', 'de', 'EN']) {
     assert.equal(visit('https://example.com/laws/', 'ar', saved).redirect, null);
   }
   assert.equal(visit('https://example.com/en/laws/', 'en', null).saved, null);
@@ -78,4 +78,29 @@ test('middle-click also remembers the selected language', () => {
   const state = visit('https://example.com/laws/', 'ar', 'ar');
   assert.equal(state.switchTo('en', 'auxclick'), 'https://example.com/en/laws/');
   assert.equal(state.saved, 'en');
+});
+
+test('French is used on the pages that have a French version', () => {
+  assert.equal(visit('https://example.com/about/', 'ar', 'fr').redirect, 'https://example.com/fr/about/');
+  assert.equal(visit('https://example.com/en/laws/?kind=law#list', 'en', 'fr').redirect, 'https://example.com/fr/laws/?kind=law#list');
+  assert.equal(visit('https://example.com/en/', 'en', 'fr').redirect, 'https://example.com/fr/');
+  assert.equal(visit('https://example.com/fr/about/', 'fr', 'fr').redirect, null);
+});
+
+test('a page with no French version stays as it is for a French reader', () => {
+  assert.equal(visit('https://example.com/en/law/12/', 'en', 'fr').redirect, null);
+  assert.equal(visit('https://example.com/law/12/article/3/', 'ar', 'fr').redirect, null);
+  const state = visit('https://example.com/en/law/12/', 'en', 'en');
+  assert.equal(state.switchTo('fr'), '');
+  assert.equal(state.saved, 'fr');
+});
+
+test('leaving French keeps the page', () => {
+  assert.equal(visit('https://example.com/fr/about/', 'fr', 'en').redirect, 'https://example.com/en/about/');
+  assert.equal(visit('https://example.com/fr/', 'fr', 'ar').redirect, 'https://example.com/');
+  const fr = visit('https://example.com/fr/data/#license', 'fr', 'fr');
+  assert.equal(fr.switchTo('ar'), 'https://example.com/data/#license');
+  assert.equal(fr.switchTo('en'), 'https://example.com/en/data/#license');
+  const en = visit('https://example.com/en/data/', 'en', 'en');
+  assert.equal(en.switchTo('fr'), 'https://example.com/fr/data/');
 });

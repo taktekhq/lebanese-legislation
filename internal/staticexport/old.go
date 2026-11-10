@@ -24,7 +24,7 @@ import (
 func OldVariants(m map[string]Entry, d *RedirectData, n int, seed uint64) []string {
 	var pages []string
 	for p, e := range m {
-		if e.Status == 200 && strings.HasPrefix(e.Type, "text/html") && !strings.HasPrefix(p, "/en/") {
+		if e.Status == 200 && strings.HasPrefix(e.Type, "text/html") && !strings.HasPrefix(p, "/en/") && !strings.HasPrefix(p, "/fr/") {
 			pages = append(pages, p)
 		}
 	}

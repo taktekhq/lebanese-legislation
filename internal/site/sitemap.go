@@ -23,6 +23,8 @@ import (
 //   - core.xml and ar-core.xml are small: the list pages, the principal codes,
 //     the most-read texts (Arabic only), the hubs and the blog. Submit these first.
 //   - pages.xml and ar-pages.xml hold the year lists and the other list pages.
+//   - fr-pages.xml holds the /fr/ addresses of the pages that have a French
+//     version (frenchPaths), less the ones hidden in every language.
 //   - ar-laws-N, ar-articles-N, ar-gazette-N, ar-documents-N hold
 //     the Arabic address of every text. laws-N holds the /en/ address of every
 //     text's own page (same rows, same lastmod as its Arabic twin): those are
@@ -251,6 +253,17 @@ func (s *Server) buildIndex(ctx context.Context) (string, error) {
 		}
 		entry("/sitemaps/"+name+".xml", newest)
 	}
+	if fr, err := s.frenchSitemap(ctx); err != nil {
+		return "", err
+	} else {
+		var newest time.Time
+		for _, u := range fr {
+			if u.Mod.After(newest) {
+				newest = u.Mod
+			}
+		}
+		entry("/sitemaps/fr-pages.xml", newest)
+	}
 	entry("/blog-sitemap.xml", blogSitemapRows()[0].Mod)
 	for _, set := range sitemapSets {
 		files, err := s.setShards(ctx, set)
@@ -286,6 +299,15 @@ func (s *Server) sitemap(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
 	defer cancel()
 	name := strings.TrimSuffix(r.PathValue("name"), ".xml")
+	if name == "fr-pages" {
+		urls, err := s.frenchSitemap(ctx)
+		if err != nil {
+			s.sitemapFail(w, r, err)
+			return
+		}
+		xmlOut(w, urlset("/fr", urls))
+		return
+	}
 	arabic := strings.HasPrefix(name, "ar-")
 	name = strings.TrimPrefix(name, "ar-")
 	switch name {
@@ -591,4 +613,31 @@ func xmlOutBytes(w http.ResponseWriter, body []byte) {
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.Header().Set("Cache-Control", sitemapCacheControl)
 	_, _ = w.Write(body)
+}
+
+// frenchSitemap lists the pages that have a French version, as root paths
+// (the file prints them under /fr): every path of frenchPaths the site
+// answers, less search, the rulings lists (rulingsHidden) and the topic index
+// (topicsHidden), which are in no sitemap in any language.
+func (s *Server) frenchSitemap(ctx context.Context) ([]SitemapURL, error) {
+	mods, err := s.listMods(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var urls []SitemapURL
+	for _, p := range FrenchPaths() {
+		switch p {
+		case "/search/", "/rulings/", "/rulings/years/", "/topics/":
+			continue
+		}
+		if s.Route(p) == "GET /" { // no such page on this build
+			continue
+		}
+		mod := mods[p]
+		if m, ok := infoPageMods[p]; ok { // sources.go dates its two pages
+			mod = m
+		}
+		urls = append(urls, SitemapURL{p, mod})
+	}
+	return urls, nil
 }

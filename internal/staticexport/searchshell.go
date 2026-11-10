@@ -23,12 +23,12 @@ func SearchShellFiles() map[string][]byte {
 	return map[string][]byte{"assets/search-shell.js": searchShellJS}
 }
 
-// SearchShell returns a Transform that adds the script to /search/ and
-// /en/search/.
+// SearchShell returns a Transform that adds the script to /search/,
+// /en/search/ and /fr/search/.
 func SearchShell(apiBase string) func(path, contentType string, body []byte) []byte {
 	tag := `<script defer src="/assets/search-shell.js" data-api="` + html.EscapeString(strings.TrimRight(apiBase, "/")) + `"></script>`
 	return func(p, contentType string, body []byte) []byte {
-		if p != "/search/" && p != "/en/search/" || !strings.HasPrefix(contentType, "text/html") {
+		if p != "/search/" && p != "/en/search/" && p != "/fr/search/" || !strings.HasPrefix(contentType, "text/html") {
 			return body
 		}
 		i := bytes.LastIndex(body, []byte("</body>"))

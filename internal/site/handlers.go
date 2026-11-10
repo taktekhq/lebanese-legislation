@@ -230,7 +230,7 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	homeTitle := "Lebanese Legislation · Every Lebanese law, one search away"
-	if s.lang(r) == "ar" {
+	if s.lang(r) != "en" {
 		homeTitle = s.tr(r, "brand.name") + " · " + s.tr(r, "meta.home_tagline")
 	}
 	s.render(w, r, "home", 200, Page{
@@ -391,8 +391,11 @@ func (s *Server) laws(w http.ResponseWriter, r *http.Request) {
 	}
 	older, newer := lawPageLinks(q, list, olderOK, newerOK)
 	kindLabelSQL := "kind || coalesce(' · ' || k.name_en, '')"
-	if s.lang(r) == "ar" { // the Arabic data already names the kind; no English needed too
+	switch s.lang(r) {
+	case "ar": // the Arabic data already names the kind; no English needed too
 		kindLabelSQL = "kind"
+	case "fr": // the kind's French name, where the table has one
+		kindLabelSQL = "kind || coalesce(' · ' || k.name_fr, ' · ' || k.name_en, '')"
 	}
 	kinds, err := s.chips(ctx, `SELECT kind, `+kindLabelSQL+`, count(*) FROM legislation l
 		JOIN legislation_kind k ON k.name_ar = l.kind GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 10`)

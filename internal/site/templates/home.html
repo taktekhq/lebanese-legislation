@@ -13,7 +13,7 @@
     <a class="sec__more" href="{{u "/codes/"}}">{{t "home.codes_more"}} <span class="arrow" aria-hidden="true">{{fwdArrow}}</span></a>
   </div>
   <div class="codes" data-reveal>{{range .Codes}}
-    <a class="code" href="{{lawURL .ID}}" dir="rtl"><b lang="ar">{{.Title}}</b><span>{{if ne (uilang) "ar"}}<bdi>{{.NameEn}}</bdi>{{if .Articles}} &middot; {{end}}{{end}}{{if .Articles}}<bdi>{{plural .Articles "article" "articles"}}</bdi>{{end}}</span></a>{{end}}
+    <a class="code" href="{{lawURL .ID}}" dir="rtl"><b lang="ar">{{.Title}}</b><span>{{if ne (uilang) "ar"}}<bdi>{{if and (eq (uilang) "fr") .NameFr}}{{.NameFr}}{{else}}{{.NameEn}}{{end}}</bdi>{{if .Articles}} &middot; {{end}}{{end}}{{if .Articles}}<bdi>{{plural .Articles "article" "articles"}}</bdi>{{end}}</span></a>{{end}}
   </div>
 </section>
 

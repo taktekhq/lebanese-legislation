@@ -339,7 +339,7 @@ a { color: inherit; text-decoration: none; }
 /* On a phone the Arabic header can't fit the wordmark, the switch and the
    long "Law & AI" label: the button goes (the footer links the page). */
 @media (max-width: 520px) {
-  html[dir="rtl"] .nav__end .btn { display: none; }
+  .nav__end .btn { display: none; } /* two language links stand beside it since the French interface */
 }
 
 @media (max-width: 460px) {

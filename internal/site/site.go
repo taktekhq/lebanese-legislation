@@ -45,6 +45,7 @@ type Server struct {
 	db            *pgxpool.Pool
 	pages         map[string]*template.Template // English, at the plain paths
 	pagesAr       map[string]*template.Template // Arabic, at the root and /ar/...; s.pages is English (/en/...); pagesAr is nil when isStatic
+	pagesFr       map[string]*template.Template // French, under /fr/, for the pages of frenchPaths; nil when isStatic
 	handler       http.Handler                  // mux wrapped in the /ar language middleware
 	mux           *http.ServeMux
 	isStatic      bool // rendering a static copy: see NewStatic
@@ -158,13 +159,18 @@ func newServer(db *pgxpool.Pool, static bool) (*Server, error) {
 		// language-specific funcs (t, u, lawURL, artURL...) bound over the
 		// same parsed templates; see i18n_funcs.go.
 		s.pagesAr = map[string]*template.Template{}
-		enFuncs, arFuncs := englishFuncs(), arabicFuncs()
+		s.pagesFr = map[string]*template.Template{}
+		enFuncs, arFuncs, frFuncs := englishFuncs(), arabicFuncs(), frenchFuncs()
 		for name, t := range s.pages {
 			c, err := t.Clone()
 			if err != nil {
 				return nil, fmt.Errorf("ar clone %s: %w", name, err)
 			}
 			s.pagesAr[name] = c.Funcs(arFuncs)
+			if c, err = t.Clone(); err != nil {
+				return nil, fmt.Errorf("fr clone %s: %w", name, err)
+			}
+			s.pagesFr[name] = c.Funcs(frFuncs)
 			s.pages[name] = t.Funcs(enFuncs)
 		}
 	}
@@ -246,10 +252,12 @@ type Page struct {
 	TwinHidden bool
 	// Set by render: the canonical path with its /en prefix (none for Arabic), whether the
 	// page is one of an en/ar pair, and whether it carries the hreflang links
-	// (a pair where neither side is noindex).
+	// (a pair where neither side is noindex). French says the page also has
+	// a /fr/ version (frenchPaths), named by a third hreflang link.
 	Canon    string
 	Pair     bool
 	Hreflang bool
+	French   bool
 }
 
 func (s *Server) render(w http.ResponseWriter, r *http.Request, name string, code int, p Page) {
@@ -268,12 +276,19 @@ func (s *Server) execute(r *http.Request, name string, p Page) (string, error) {
 	}
 	p.Canon, p.Pair = s.canonical(r, p)
 	p.Hreflang = p.Pair && !p.NoIndex && !p.TwinHidden
+	p.French = p.Hreflang && frenchPaths[p.Path] && r.URL.RawQuery == ""
 	p.Title, p.Desc = finishMeta(s.bundle(r), p.Title, p.Desc)
 	noteDep(r.Context(), "set:"+name)
 	pages := s.pages
-	if s.lang(r) == "ar" && s.pagesAr != nil {
+	switch lang := s.lang(r); {
+	case lang == "ar" && s.pagesAr != nil:
 		pages = s.pagesAr
-	} else if s.pagesAr != nil && p.Pair {
+	case lang == "fr" && s.pagesFr != nil:
+		pages = s.pagesFr
+		if p.Pair {
+			p.LD = langLD(p.LD, frLink)
+		}
+	case s.pagesAr != nil && p.Pair:
 		p.LD = englishLD(p.LD)
 	}
 	var b strings.Builder
@@ -400,6 +415,7 @@ var baseFuncs = template.FuncMap{
 	"altURL":      func(p string) string { return Base + p },         // the Arabic version of this same page
 	"enURL":       func(p string) string { return Base + "/en" + p }, // always the English absolute URL (hreflang)
 	"arURL":       func(p string) string { return Base + p },         // always the Arabic (root) absolute URL (hreflang)
+	"frURL":       func(p string) string { return Base + "/fr" + p }, // the French absolute URL of a page that has one (hreflang)
 	"enPath":      func(p string) string { return "/en" + p },        // the English path of a page, for the link at the top of every Arabic page
 	"linkVerb":    func(k Link) template.HTML { return template.HTML(k.Verb()) },
 	"changeVerb":  func(c *Change) template.HTML { return template.HTML(c.Verb()) },

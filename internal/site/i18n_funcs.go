@@ -14,6 +14,7 @@ import (
 var (
 	enBundle = i18n.New("en")
 	arBundle = i18n.New("ar")
+	frBundle = i18n.New("fr")
 )
 
 // escArgs makes the arguments of a UI string safe to format into HTML. The
@@ -76,5 +77,32 @@ func englishFuncs() template.FuncMap {
 		"lawURL":     func(id int) string { return "/en" + lawPath(id) },
 		"artURL":     func(id int, number string) string { return "/en" + artPath(id, number) },
 		"rulingsURL": func(id int, number string) string { return "/en" + artPath(id, number) + "rulings/" },
+	}
+}
+
+// frenchFuncs are the template funcs bound on the French set of the pages
+// that have a French version (frenchPaths): UI strings come from fr.json,
+// links to those pages stay under /fr, and every other internal link (a
+// text, an article, a ruling, a topic page) goes to its existing /en page,
+// whose content is unchanged.
+func frenchFuncs() template.FuncMap {
+	return template.FuncMap{
+		"t":          func(key string, args ...any) template.HTML { return template.HTML(frBundle.T(key, escArgs(args)...)) },
+		"u":          frLink,
+		"lawURL":     func(id int) string { return "/en" + lawPath(id) },
+		"artURL":     func(id int, number string) string { return "/en" + artPath(id, number) },
+		"rulingsURL": func(id int, number string) string { return "/en" + artPath(id, number) + "rulings/" },
+		"uilang":     func() string { return "fr" },
+		"altURL":     func(p string) string { return Base + p }, // the Arabic version of this same page
+		"linkVerb":   func(k Link) template.HTML { return template.HTML(frBundle.T("verb." + k.VerbKey())) },
+		"changeVerb": func(c *Change) template.HTML { return template.HTML(frBundle.T("cverb." + c.VerbKey())) },
+		"statusText": func(status string) template.HTML {
+			if status == "repealed" {
+				return template.HTML(frBundle.T("status.repealed"))
+			}
+			return template.HTML(frBundle.T("status.in_force"))
+		},
+		"plural": func(n int, one, many string) string { return frBundle.PluralFr(n, one, many) },
+		"num":    i18n.ThousandsFr,
 	}
 }
