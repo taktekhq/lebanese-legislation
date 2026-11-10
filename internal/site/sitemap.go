@@ -633,7 +633,11 @@ func (s *Server) frenchSitemap(ctx context.Context) ([]SitemapURL, error) {
 		if s.Route(p) == "GET /" { // no such page on this build
 			continue
 		}
-		urls = append(urls, SitemapURL{p, mods[p]})
+		mod := mods[p]
+		if m, ok := infoPageMods[p]; ok { // sources.go dates its two pages
+			mod = m
+		}
+		urls = append(urls, SitemapURL{p, mod})
 	}
 	return urls, nil
 }

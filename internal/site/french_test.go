@@ -104,9 +104,6 @@ func TestFrenchPagesRender(t *testing.T) {
 	}
 	served := 0
 	for _, p := range FrenchPaths() {
-		if s.Route(p) == "GET /" {
-			continue // a page of a branch that is not merged yet
-		}
 		served++
 		code, body := get("/fr" + p)
 		if code != 200 {
@@ -140,8 +137,34 @@ func TestFrenchPagesRender(t *testing.T) {
 			}
 		}
 	}
-	if served < 20 {
-		t.Errorf("only %d French pages are served", served)
+	if served != len(frenchPaths) {
+		t.Errorf("%d of the %d French pages are served", served, len(frenchPaths))
+	}
+	// the Legiliban page keeps the independence sentence right after the intention
+	_, leg := get("/fr/legiliban/")
+	i, j := strings.Index(leg, "avec l'intention de le donner à l'Université libanaise"), strings.Index(leg, "Il n'est ni affilié à l'Université libanaise ou au Centre, ni approuvé par eux, ni exploité par eux.")
+	if i < 0 || j < i || strings.Contains(leg[i:j], "<h2") {
+		t.Error("/fr/legiliban/: the independence sentence must follow the intention in the same section")
+	}
+	for _, want := range []string{"Legiliban", `"dateModified":"` + legilibanUpdated.Format("2006-01-02") + `"`, `href="/fr/sources/"`, "Une interface en anglais, en arabe et en français."} {
+		if !strings.Contains(leg, want) {
+			t.Errorf("/fr/legiliban/: missing %q", want)
+		}
+	}
+	_, src := get("/fr/sources/")
+	if n := strings.Count(src, `<th scope="row">`); n != len(sourceRows) || !strings.Contains(src, "Non précisé") || !strings.Contains(src, `"@type":"ItemList"`) || strings.Contains(src, "Not stated") {
+		t.Errorf("/fr/sources/: %d rows, or the table is not in French", n)
+	}
+	for _, p := range []string{"/fr/", "/fr/about/"} {
+		if _, body := get(p); !strings.Contains(body, `href="/fr/sources/"`) || !strings.Contains(body, `href="/fr/legiliban/"`) {
+			t.Errorf("%s: no French links to the sources and Legiliban pages", p)
+		}
+	}
+	if _, home := get("/fr/"); !strings.Contains(home, "est une base de données en ligne gratuite du droit libanais") {
+		t.Error("/fr/: missing the sentence that says what the site is")
+	}
+	if _, en := get("/en/legiliban/"); !strings.Contains(en, "An interface in English, Arabic and French.") || strings.Contains(en, "soon French") {
+		t.Error("/en/legiliban/ must name three interface languages")
 	}
 	// a text's page keeps its two languages and names no French twin
 	if _, body := get("/en/law/1/"); strings.Contains(body, `hreflang="fr" href=`) {
@@ -152,7 +175,8 @@ func TestFrenchPagesRender(t *testing.T) {
 		t.Error("/fr/ must link texts to their /en/ pages")
 	}
 	_, xml := get("/sitemaps/fr-pages.xml")
-	for _, want := range []string{"<loc>" + Base + "/fr/</loc>", "<loc>" + Base + "/fr/about/</loc>", "<loc>" + Base + "/fr/laws/</loc>"} {
+	for _, want := range []string{"<loc>" + Base + "/fr/</loc>", "<loc>" + Base + "/fr/about/</loc>", "<loc>" + Base + "/fr/laws/</loc>",
+		"<loc>" + Base + "/fr/sources/</loc><lastmod>" + sourcesChecked.Format("2006-01-02"), "<loc>" + Base + "/fr/legiliban/</loc><lastmod>" + legilibanUpdated.Format("2006-01-02")} {
 		if !strings.Contains(xml, want) {
 			t.Errorf("fr-pages.xml: missing %s", want)
 		}
