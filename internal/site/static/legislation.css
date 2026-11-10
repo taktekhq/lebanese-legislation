@@ -40,7 +40,7 @@
 
 /* --- A document's head ------------------------------------------------- */
 
-.dochead { padding-top: 84px; }
+.dochead { padding-top: 104px; } /* under the header and the language bar */
 .dochead h1 {
   margin-top: 14px; font-family: var(--font-ar); font-weight: 600;
   font-size: clamp(1.625rem, 3.4vw, 2.375rem); line-height: 1.45; letter-spacing: 0;
@@ -436,8 +436,6 @@ mark.flag { background: #fff2a8; color: inherit; border-bottom: 2px solid #d9a40
 
 /* Use the existing space below the fixed navigation without moving content. */
 #top { position: relative; }
-.lang-note { position: absolute; inset: 62px 0 auto; display: flex; justify-content: flex-end; font-size: 0.75rem; line-height: 20px; pointer-events: none; }
-.lang-note a { pointer-events: auto; }
 
 html[lang="ar"] :lang(ar){letter-spacing:0}
 .page__title:lang(ar),.blog-entry h2:lang(ar),.blog-body h2:lang(ar){line-height:1.35}
@@ -445,14 +443,46 @@ html[lang="ar"] :lang(ar){letter-spacing:0}
 .journal-resource .btn{height:auto;min-block-size:52px;max-inline-size:100%;padding-block:12px;white-space:normal;text-align:center}
 .local-images code{overflow-wrap:anywhere;direction:ltr;unicode-bidi:isolate}
 
-/* The language switch names the two other languages. The pair stays close;
-   the Arabic and French menus, whose words are longer, give up some of the
-   space between entries so the bar still fits one line on a laptop. */
-.nav__langs { display: flex; align-items: center; gap: 2px; }
+/* The language bar: a slim line under the fixed header with the three
+   interface languages, on every page at every width. It is not sticky: it
+   lies in the space every page already leaves under the header and scrolls
+   away with the page. Its spacing and line are the sub navigation's
+   (.subnav in styles.css); its links are the header's plain text links. */
+.langbar { position: absolute; inset-block-start: 60px; inset-inline: 0; z-index: 80; border-bottom: 1px solid var(--line); }
+.langbar__inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  width: 100%; max-width: var(--shell); margin-inline: auto; padding-inline: var(--gutter);
+  font-size: 0.875rem; line-height: 20px; letter-spacing: -0.008em; color: var(--muted);
+}
+.langbar__list { display: flex; align-items: center; gap: clamp(16px, 2vw, 24px); margin: 0; padding: 0; list-style: none; }
+.langbar__link, .langbar__current { display: block; padding-block: 8px; white-space: nowrap; }
+.langbar__link { transition: color 0.2s var(--ease); }
+.langbar__link:hover { color: var(--ink); }
+.langbar__current { color: var(--ink); font-weight: 500; }
+.lang-note { font-size: 0.75rem; white-space: nowrap; }
+/* The bar ends 97px down the page: the pages that began at 84px begin under it. */
+.page { padding-top: 104px; }
+.ls-hero { padding-top: 116px; }
+@media (min-width: 760px) {
+  .page { padding-top: clamp(120px, 13vw, 156px); }
+  .ls-hero { padding-top: clamp(150px, 17vw, 200px); }
+}
+/* On a phone the header holds the wordmark and the "Law & AI" button. The
+   button gives up padding first. The Arabic label is the longest: it also
+   goes down one type size, and under 375px, where it still cannot fit beside
+   the wordmark, the button goes (the footer links the page). The line
+   "Read this page in English" goes under 380px too: the bar's own English
+   link is beside it. */
+@media (max-width: 420px) {
+  .nav__end .btn { padding-inline: 14px; }
+  html[dir="rtl"] .nav__end .btn { padding-inline: 10px; font-size: 0.8125rem; }
+}
+@media (max-width: 379px) { .lang-note { display: none; } }
+@media (max-width: 374px) { html[dir="rtl"] .nav__end .btn { display: none; } }
+/* A Latin menu keeps each entry on one line. */
 html:not([dir="rtl"]) .nav__links a { white-space: nowrap; }
-html[dir="rtl"] .nav__links, html[lang="fr"] .nav__links { gap: 2px; }
-html[dir="rtl"] .nav__end, html[lang="fr"] .nav__end { gap: 12px; }
-@media (max-width: 460px) { .nav__langs { gap: 14px; } }
-/* Below a small laptop those two bars cannot also hold the "Law & AI" button:
-   it goes, as on a phone (the footer links the page). */
-@media (max-width: 1040px) { html[dir="rtl"] .nav__end .btn, html[lang="fr"] .nav__end .btn { display: none; } }
+/* The French and Arabic menus are the widest: on a small laptop their entries stand closer. */
+@media (max-width: 1040px) {
+  html[lang="fr"] .nav__links, html[dir="rtl"] .nav__links { gap: 0; }
+  html[lang="fr"] .nav__links a, html[dir="rtl"] .nav__links a { padding-inline: 6px; }
+}

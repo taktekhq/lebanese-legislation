@@ -916,5 +916,6 @@
   "legiliban.gazette_p": "تبقى الجريدة الرسمية هي النص الرسمي المعتمد.",
   "legiliban.elsewhere_h2": "أماكن أخرى لقراءة القانون اللبناني",
   "legiliban.elsewhere_p": "Legiliban وهذا الموقع هما 2 من أصل 13 مصدراً ندرجها.",
-  "legiliban.elsewhere_link": "انظر أين تقرأ القانون اللبناني عبر الإنترنت."
+  "legiliban.elsewhere_link": "انظر أين تقرأ القانون اللبناني عبر الإنترنت.",
+  "langbar.label": "اللغة"
 }
