@@ -458,7 +458,7 @@ html[lang="ar"] :lang(ar){letter-spacing:0}
 .langbar__link, .langbar__current { display: block; padding-block: 8px; white-space: nowrap; }
 .langbar__link { transition: color 0.2s var(--ease); }
 .langbar__link:hover { color: var(--ink); }
-.langbar__current { color: var(--ink); font-weight: 500; }
+.langbar__current { color: var(--ink); font-weight: 500; text-decoration: underline 2px; text-underline-offset: 6px; } /* not by weight and colour alone */
 .lang-note { font-size: 0.75rem; white-space: nowrap; }
 /* The bar ends 97px down the page: the pages that began at 84px begin under it. */
 .page { padding-top: 104px; }
@@ -469,16 +469,23 @@ html[lang="ar"] :lang(ar){letter-spacing:0}
 }
 /* On a phone the header holds the wordmark and the "Law & AI" button. The
    button gives up padding first. The Arabic label is the longest: it also
-   goes down one type size, and under 375px, where it still cannot fit beside
-   the wordmark, the button goes (the footer links the page). The line
-   "Read this page in English" goes under 380px too: the bar's own English
-   link is beside it. */
+   goes down one type size, then, under 375px, the bar's own gutters and the
+   button's padding shrink, which keeps it down to 360px. Under 360px it
+   cannot fit beside the wordmark and goes (the footer links the page). The
+   line "Read this page in English" shares the language bar's line down to
+   360px; under that it would wrap, and the bar's own English link stands in. */
 @media (max-width: 420px) {
   .nav__end .btn { padding-inline: 14px; }
   html[dir="rtl"] .nav__end .btn { padding-inline: 10px; font-size: 0.8125rem; }
 }
-@media (max-width: 379px) { .lang-note { display: none; } }
-@media (max-width: 374px) { html[dir="rtl"] .nav__end .btn { display: none; } }
+@media (max-width: 374px) {
+  html[dir="rtl"] .nav__inner { padding-inline: 16px; gap: 8px; }
+  html[dir="rtl"] .nav__end .btn { padding-inline: 6px; }
+}
+@media (max-width: 359px) {
+  .lang-note { display: none; }
+  html[dir="rtl"] .nav__end .btn { display: none; }
+}
 /* A Latin menu keeps each entry on one line. */
 html:not([dir="rtl"]) .nav__links a { white-space: nowrap; }
 /* The French and Arabic menus are the widest: on a small laptop their entries stand closer. */
