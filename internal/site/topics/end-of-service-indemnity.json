@@ -223,10 +223,11 @@
   ],
   "en": {
     "title": "How is end-of-service indemnity calculated in Lebanon?",
+    "head_title": "Lebanon end of service indemnity calculation: NSSF, Law 319",
     "question": "How is end-of-service indemnity calculated under Lebanese labour law, and how much notice must be given before dismissal?",
-    "description": "Labour Code: 1 month's wage per year of service, on the last wage, after at least 1 year. Notice is 1 to 4 months by length of service.",
+    "description": "End-of-service indemnity calculation in Lebanon: 1 month's wage per year of service (Labour Code, NSSF scheme). Law 319 of 2023 sets up a pension scheme.",
     "answer": {
-      "text": "Under Article 54 of the Labour Code, a dismissed worker is owed 1 month's wage for each year of service, on the last wage paid before the dismissal or notice (Article 57), after at least 1 year of continuous service (Article 56). No indemnity is due for the faults in Article 74, and either side must give 1 to 4 months' written notice by length of service (Article 50). For workers in the NSSF end-of-service scheme, which employers alone fund, Article 63 of the Social Security Law repeals these Labour Code rules to the extent the scheme applies. In that scheme's 1963 wording, the indemnity is 1 month of the last wage for each year of service, cut to 50% to 85% for a worker who leaves work for good before 20 years.",
+      "text": "In Lebanon, the end-of-service indemnity is calculated under Article 54 of the Labour Code: a dismissed worker is owed 1 month's wage for each year of service, on the last wage paid before the dismissal or notice (Article 57), after at least 1 year of continuous service (Article 56). No indemnity is due for the faults in Article 74, and either side must give 1 to 4 months' written notice by length of service (Article 50). For workers in the NSSF end-of-service scheme, which employers alone fund, Article 63 of the Social Security Law repeals these Labour Code rules to the extent the scheme applies. In that scheme's 1963 wording, the indemnity is 1 month of the last wage for each year of service, cut to 50% to 85% for a worker who leaves work for good before 20 years.",
       "cites": [
         "a1",
         "a3",
@@ -637,10 +638,11 @@
   },
   "ar": {
     "title": "كيف يُحتسب تعويض نهاية الخدمة في لبنان؟",
+    "head_title": "تعويض نهاية الخدمة في لبنان: الحساب، الضمان، القانون 319",
     "question": "كيف يُحتسب تعويض الصرف أو نهاية الخدمة وفق قانون العمل اللبناني، وما مهلة الإنذار الواجبة قبل الصرف؟",
-    "description": "قانون العمل: أجرة شهر عن كل سنة خدمة على أساس الأجر الأخير، بعد سنة خدمة على الأقل. والإنذار من شهر إلى 4 أشهر بحسب مدة الخدمة.",
+    "description": "طريقة حساب تعويض نهاية الخدمة في لبنان: أجرة شهر عن كل سنة خدمة (قانون العمل ونظام الضمان الاجتماعي). والقانون 319 لعام 2023 ينشئ نظام التقاعد.",
     "answer": {
-      "text": "وفق المادة 54 من قانون العمل، يستحق الأجير المصروف أجرة شهر عن كل سنة خدمة على أساس الأجر الأخير المدفوع قبل الصرف أو الإنذار (المادة 57)، بعد خدمة مستمرة سنة على الأقل (المادة 56). ولا يُستحق التعويض في حالات الصرف الواردة في المادة 74، وعلى كل من الطرفين توجيه إنذار خطي من شهر إلى 4 أشهر بحسب مدة الخدمة (المادة 50). أما المضمونون في نظام تعويض نهاية الخدمة في الضمان الاجتماعي، الذي يموّله أرباب العمل وحدهم، فقد ألغت المادة 63 من قانون الضمان الاجتماعي بحقهم أحكام قانون العمل هذه بقدر ما يطبَّق عليهم النظام. وفي النص الأصلي لهذا النظام عام 1963، يعادل التعويض أجر الشهر الأخير عن كل سنة خدمة، ويُخفَّض إلى ما بين 50% و85% للأجير الذي يترك العمل نهائياً قبل 20 سنة.",
+      "text": "يُحتسب تعويض نهاية الخدمة في لبنان وفق المادة 54 من قانون العمل: يستحق الأجير المصروف أجرة شهر عن كل سنة خدمة على أساس الأجر الأخير المدفوع قبل الصرف أو الإنذار (المادة 57)، بعد خدمة مستمرة سنة على الأقل (المادة 56). ولا يُستحق التعويض في حالات الصرف الواردة في المادة 74، وعلى كل من الطرفين توجيه إنذار خطي من شهر إلى 4 أشهر بحسب مدة الخدمة (المادة 50). أما المضمونون في نظام تعويض نهاية الخدمة في الضمان الاجتماعي، الذي يموّله أرباب العمل وحدهم، فقد ألغت المادة 63 من قانون الضمان الاجتماعي بحقهم أحكام قانون العمل هذه بقدر ما يطبَّق عليهم النظام. وفي النص الأصلي لهذا النظام عام 1963، يعادل التعويض أجر الشهر الأخير عن كل سنة خدمة، ويُخفَّض إلى ما بين 50% و85% للأجير الذي يترك العمل نهائياً قبل 20 سنة.",
       "cites": [
         "a1",
         "a3",

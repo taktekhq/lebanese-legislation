@@ -115,10 +115,11 @@
   ],
   "en": {
     "title": "Can a Lebanese mother pass her nationality to her children?",
+    "head_title": "Lebanon nationality law: mothers, children, Decision 15/1925",
     "question": "Can a Lebanese mother pass Lebanese nationality to her children, can a foreign wife or husband become Lebanese, and how is nationality lost or recovered under the nationality law?",
-    "description": "Only a Lebanese father passes nationality by birth (Decision 15 of 1925, Art. 1). A foreign wife becomes Lebanese 1 year after the marriage is registered.",
+    "description": "Lebanon nationality law, checked November 2026: only a Lebanese father passes citizenship by birth (Decision 15 of 1925, Art. 1). Mothers: narrow exceptions.",
     "answer": {
-      "text": "As a rule, no: Article 1 of Decision 15 of 1925, the basic nationality text, makes Lebanese anyone born to a Lebanese father, and none of its articles gives the same right to the child of a Lebanese mother. The exceptions are narrow: a child born in Lebanon who is not proved to have taken a foreign nationality by descent at birth, a child born outside marriage whose filiation to the Lebanese mother is proved first (Article 2), and the minor children of a mother who acquired Lebanese nationality and outlived the father (Article 4). A foreign wife of a Lebanese man, by contrast, becomes Lebanese on request 1 year after the marriage is registered (Article 5, as amended in 1960).",
+      "text": "As a rule, no: under Lebanon's nationality law, a mother does not pass her citizenship to her children. Article 1 of Decision 15 of 1925, the basic nationality text, makes Lebanese anyone born to a Lebanese father, and none of its articles gives the same right to the child of a Lebanese mother. The exceptions are narrow: a child born in Lebanon who is not proved to have taken a foreign nationality by descent at birth, a child born outside marriage whose filiation to the Lebanese mother is proved first (Article 2), and the minor children of a mother who acquired Lebanese nationality and outlived the father (Article 4). A foreign wife of a Lebanese man, by contrast, becomes Lebanese on request 1 year after the marriage is registered (Article 5, as amended in 1960).",
       "cites": [
         "a1",
         "a2",
@@ -337,10 +338,11 @@
   },
   "ar": {
     "title": "هل تستطيع الأم اللبنانية أن تمنح جنسيتها لأولادها؟",
+    "head_title": "الجنسية اللبنانية: منح الأم الجنسية لأولادها، القرار 15/1925",
     "question": "هل تستطيع الأم اللبنانية منح الجنسية اللبنانية لأولادها، وهل يصبح الزوج أو الزوجة الأجنبية لبنانياً، وكيف تفقد الجنسية وتستعاد وفق قانون الجنسية؟",
-    "description": "لا تنتقل الجنسية بالولادة إلا من الأب اللبناني (المادة 1 من القرار 15 لسنة 1925). وتصبح الأجنبية المتزوجة من لبناني لبنانية بعد سنة من تسجيل الزواج.",
+    "description": "قانون الجنسية اللبنانية (مراجعة تشرين الثاني 2026): لا تنتقل الجنسية بالولادة إلا من الأب اللبناني (المادة 1 من القرار 15 لسنة 1925)، واستثناءات الأم ضيقة.",
     "answer": {
-      "text": "كقاعدة عامة لا: فالمادة 1 من القرار 15 لسنة 1925، النص الأساسي في الجنسية، تعتبر لبنانياً كل شخص مولود من أب لبناني، ولا تمنح أي من مواده الحق نفسه لولد الأم اللبنانية. والاستثناءات ضيقة: الولد المولود في لبنان الذي لم يثبت أنه اكتسب بالبنوة عند الولادة تابعية أجنبية، والولد غير الشرعي الذي تثبت بنوته أولاً بالنظر إلى أمه اللبنانية (المادة 2)، والأولاد القاصرون لأم اكتسبت الجنسية اللبنانية وبقيت حية بعد وفاة الأب (المادة 4). أما المرأة الأجنبية التي تقترن بلبناني فتصبح لبنانية بناء على طلبها بعد مرور سنة على تسجيل الزواج (المادة 5 المعدلة سنة 1960).",
+      "text": "كقاعدة عامة لا: في قانون الجنسية اللبنانية لا تمنح الأم جنسيتها لأولادها. فالمادة 1 من القرار 15 لسنة 1925، النص الأساسي في الجنسية، تعتبر لبنانياً كل شخص مولود من أب لبناني، ولا تمنح أي من مواده الحق نفسه لولد الأم اللبنانية. والاستثناءات ضيقة: الولد المولود في لبنان الذي لم يثبت أنه اكتسب بالبنوة عند الولادة تابعية أجنبية، والولد غير الشرعي الذي تثبت بنوته أولاً بالنظر إلى أمه اللبنانية (المادة 2)، والأولاد القاصرون لأم اكتسبت الجنسية اللبنانية وبقيت حية بعد وفاة الأب (المادة 4). أما المرأة الأجنبية التي تقترن بلبناني فتصبح لبنانية بناء على طلبها بعد مرور سنة على تسجيل الزواج (المادة 5 المعدلة سنة 1960).",
       "cites": [
         "a1",
         "a2",

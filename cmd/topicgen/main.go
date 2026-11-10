@@ -48,7 +48,8 @@ var order = []string{"end-of-service-indemnity", "nssf-registration-contribution
 	"cybercrime-electronic-transactions", "company-formation", "income-tax-brackets", "constitution", "code-of-commerce",
 	"official-gazette", "founding-an-association", "weapons-law", "penal-code-articles", "code-of-obligations",
 	"building-violations-encroachment", "pre-emption-right", "general-amnesty-law", "penal-code-forgery-article-459",
-	"traffic-authority-decree-11244", "foreign-ministry-regulations", "notaries-law", "pharmacy-practice-law", "foreign-workers-work-permits"}
+	"traffic-authority-decree-11244", "foreign-ministry-regulations", "notaries-law", "pharmacy-practice-law", "foreign-workers-work-permits",
+	"dismissal-notice-period", "anti-money-laundering-law-44", "pretrial-detention"}
 
 func main() {
 	flag.Usage = func() {
@@ -184,8 +185,8 @@ func assemble(s *Spec, p *rawPage, texts map[string]string, repair bool) (*topic
 			t.Order = i + 1
 		}
 	}
-	t.EN.Title, t.EN.Question = s.TitleEN, s.QuestionEN
-	t.AR.Title, t.AR.Question = s.TitleAR, s.QuestionAR
+	t.EN.Title, t.EN.HeadTitle, t.EN.Question = s.TitleEN, s.HeadTitleEN, s.QuestionEN
+	t.AR.Title, t.AR.HeadTitle, t.AR.Question = s.TitleAR, s.HeadTitleAR, s.QuestionAR
 	stripDashes(t)
 	pruneUnused(t)
 	var st Stats

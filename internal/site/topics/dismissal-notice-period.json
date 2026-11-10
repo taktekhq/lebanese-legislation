@@ -1,0 +1,526 @@
+{
+  "slug": "dismissal-notice-period",
+  "order": 30,
+  "published": "2026-11-10",
+  "updated": "2026-11-10",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 190374,
+      "article": "50",
+      "quote": "يجب على كل من صاحب العمل والعامل ان يعلم الآخر برغبته في فسخ العقد, قبل شهر واحد اذا كان قد مضى على تنفيذ عقد الاستخدام مدة ثلاث سنوات فما دون, وقبل شهرين اذا كان قد مضى اكثر من ثلاث سنوات وأقل من ست سنوات , وقبل ثلاثة اشهر اذا كان قد مضى اكثر من ست سنوات واقل من اثنتي عشرة سنة وقبل اربعة اشهر اذا كان قد مضى اثنتا عشرة سنة فأكثر."
+    },
+    {
+      "id": "a2",
+      "law": 190374,
+      "article": "50",
+      "quote": "ويجب ان يكون الانذار خطيا, وان يبلغ الى صاحب العلاقة, ويحق لهذا الاخير ان يطلب توضيح اسباب الفسخ اذا لم تكن واردة في نص الانذار. يتعرض الطرف الذي يخالف احكام الفقرة السابقة لدفع تعويض الى الطرف الآخر يعادل بدل اجر مدة الانذار المفروضة عليه قانونا."
+    },
+    {
+      "id": "a3",
+      "law": 190374,
+      "article": "50",
+      "quote": "خلافا لاحكام هذه الفقرة, اذا كان العامل معينا تحت التجربة, يحق له كما يحق لصاحب العمل, ان يفسخ عقد العمل دون أي انذار او تعويض خلال الاشهر الثلاثة التي تلي استخدامه."
+    },
+    {
+      "id": "a4",
+      "law": 190374,
+      "article": "74",
+      "quote": "لرب العمل ان يفسخ العقد دون ما تعويض او علم سابق في الحالات التالية:"
+    },
+    {
+      "id": "a5",
+      "law": 190374,
+      "article": "75",
+      "quote": "يحق للاجير ان يترك عمله قبل انتهاء مدة العقد ودون ما علم سابق في الحالات التالية:"
+    },
+    {
+      "id": "a6",
+      "law": 190374,
+      "article": "76",
+      "quote": "اذا ترك الاجير عمله لاحد الاسباب المبينة في المادة السابقة يدفع له تعويضات الصرف المنصوص عليها في هذا القانون."
+    },
+    {
+      "id": "a7",
+      "law": 190374,
+      "article": "52",
+      "quote": "الى المرأة الحامل."
+    },
+    {
+      "id": "a8",
+      "law": 190374,
+      "article": "52",
+      "quote": "الى المرأة المجازة بداعي الولادة."
+    },
+    {
+      "id": "a9",
+      "law": 190374,
+      "article": "52",
+      "quote": "الى كل اجير اثناء الاجازات العادية او خلال الاجازة المرضية."
+    },
+    {
+      "id": "a10",
+      "law": 190374,
+      "article": "51",
+      "quote": "للاجير خلال مدة الانذار ان يتغيب ساعة من ساعات العمل في اليوم ليفتش عن عمل آخر."
+    },
+    {
+      "id": "a11",
+      "law": 190374,
+      "article": "50",
+      "quote": "اذا كان الفسخ صادرا من قبل صاحب العمل يقدر التعويض على اساس نوع عمل العامل, وسنه, ومدة خدمته, ووضعه العائلي والصحي, ومقدار الضرر, ومدى الاساءة في استعمال الحق, على ان لا ينقص التعويض الذي يحكم به عن بدل اجرة شهرين وان لا يزيد عن بدل اجرة اثني عشرة شهرا, وذلك بالاضافة لما قد يستحقه العامل من تعويضات قانونية نتيجة لفصله من الخدمة."
+    },
+    {
+      "id": "a12",
+      "law": 190374,
+      "article": "50",
+      "quote": "واذا كان الفسخ صادرا من قبل العامل لغير الاسباب التي يجيزها القانون وتبين انه سبب ضررا او احراجا لصاحب العمل, يقدر تعويض العطل والضرر بما يعادل اجرة شهر حتى اربعة اشهر حسب مقتضى الحال وذلك بالاضافة الى تعويض الانذار المنصوص عنه في الفقرة ج."
+    },
+    {
+      "id": "a13",
+      "law": 190374,
+      "article": "50",
+      "quote": "على من يتذرع بأن الفسخ حصل نتيجة لاساءة استعمال الحق او لتجاوزه, ان يقيم الدعوى بذلك امام المجلس التحكيمي خلال مهلة شهر من تاريخ ابلاغه الفسخ"
+    },
+    {
+      "id": "a14",
+      "law": 190374,
+      "article": "50",
+      "quote": "يجوز لصاحب العمل انهاء بعض او كل عقود العمل الجارية في المؤسسة اذا اقتضت قوة قاهرة او ظروف اقتصادية او فنية هذا الانهاء, كتقليص حجم المؤسسة او استبدال نظام انتاج بآخر او التوقف نهائيا عن العمل. وعلى صاحب العمل ان يبلغ وزارة العمل والشؤون الاجتماعية رغبته في انهاء تلك العقود قبل شهر من تنفيذه,"
+    },
+    {
+      "id": "a15",
+      "law": 190374,
+      "article": "50",
+      "quote": "اذا تعاقد العامل مع صاحب عمل جديد بعد فسخه العقد دون القيام بواجبات الانذار, وكان صاحب العمل الجديد عالما بالامر, فان هذا الاخير يكون مسؤولا بالتكافل والتضامن عما يحكم به لصاحب العمل الاول."
+    },
+    {
+      "id": "a16",
+      "law": 190374,
+      "article": "53",
+      "quote": "اذا خالف رب العمل الاحكام المتعلقة بالانذار يجب عليه ان يدفع اجرة الايام الداخلة في مدة الانذار او الايام التي لا يجوز له ان يقدم الانذار عليها."
+    },
+    {
+      "id": "a17",
+      "law": 190374,
+      "article": "52",
+      "quote": "على ان رب العمل يصبح بحل من هذه الموانع اذا استخدم الاجير في محل اخر خلال تلك المدات"
+    },
+    {
+      "id": "a18",
+      "law": 190374,
+      "article": "50",
+      "quote": "وعلى المجلس التحكيمي ان يبت بالقضية بمهلة لا تتجاوز الثلاثة اشهر."
+    },
+    {
+      "id": "a19",
+      "law": 190374,
+      "article": "50",
+      "quote": "يعتبر الصرف من قبيل الاساءة او التجاوز في استعمال الحق اذا تم في الحالات التالية:"
+    },
+    {
+      "id": "a20",
+      "law": 190374,
+      "article": "50",
+      "quote": "يتمتع العمال المصروفون من الخدمة تطبيقا للفقرة السابقة, ولمدة سنة تبدأ من تاريخ تركهم العمل بحق اولوية (افضلية) في العودة الى العمل في المؤسسة التي صرفوا منها"
+    }
+  ],
+  "en": {
+    "title": "How much notice is required before dismissal in Lebanon?",
+    "head_title": "Lebanon Labour Code Article 50: dismissal notice periods",
+    "question": "How long is the notice period before dismissal or resignation under Article 50 of the Lebanese Labour Code, and what is owed when no notice is given?",
+    "description": "Lebanon Labour Code Article 50: notice (préavis) before dismissal is 1 month up to 3 years of service, then 2, 3 or 4 months. In writing, or the wage is owed.",
+    "answer": {
+      "text": "In Lebanon, Article 50 of the Labour Code of 1946 sets the notice period before dismissal or resignation by length of service: 1 month for 3 years or less, 2 months for more than 3 and less than 6 years, 3 months for more than 6 and less than 12 years, and 4 months for 12 years or more. Notice must be written and served on the other side. The side that skips it owes the other the wage of the notice period the law required.",
+      "cites": [
+        "a1",
+        "a2"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "How long is the notice, and what is owed without it?",
+        "paras": [
+          {
+            "text": "Either the employer or the worker must give this notice before ending the contract. The bands, as printed in Article 50, do not address a contract that has run exactly 6 years.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "Example: after 4 years the notice is 2 months, and after 12 years or more it is 4 months.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "Notice must be written and served. If it gives no reasons, the other side may ask for them. A side that breaches owes the other the wage of the notice period the law required.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "An employer who breaches the notice rules pays the wages of the days of the notice period, or of the days on which notice may not be served (Article 53). A new employer who hires a worker knowing the worker left without notice is jointly liable for what the first employer is awarded.",
+            "cites": [
+              "a16",
+              "a15"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Notice by length of service",
+          "head": [
+            "Service",
+            "Notice"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "3 years or less",
+                "1 month"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "More than 3 and less than 6 years",
+                "2 months"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "More than 6 and less than 12 years",
+                "3 months"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "12 years or more",
+                "4 months"
+              ],
+              "cites": [
+                "a1"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "When is no notice required?",
+        "paras": [
+          {
+            "text": "During the 3 months after hiring, a worker on probation or the employer may end the contract with no notice or indemnity.",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "The employer may also end the contract with no notice or indemnity in the cases Article 74 lists, such as a false nationality, intentional harm to the employer's material interests, 3 serious breaches of the internal rules in a year despite written warnings, or unexcused absence of more than 15 days a year or more than 7 days in a row.",
+            "cites": [
+              "a4"
+            ]
+          },
+          {
+            "text": "A worker may leave with no notice in the 4 cases Article 75 lists: deception about the terms of work when the contract was made, the employer failing his duties under the Code, an offence against morals on the worker or a family member, or violence against the worker. Article 76 then gives the worker the dismissal indemnities the Code provides.",
+            "cites": [
+              "a5",
+              "a6"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "When may notice not be served, and may the worker look for work during notice?",
+        "paras": [
+          {
+            "text": "Article 52 bars notice to a pregnant woman, a woman on maternity leave, and any worker on ordinary or sick leave.",
+            "cites": [
+              "a7",
+              "a8",
+              "a9"
+            ]
+          },
+          {
+            "text": "The employer is released from these bars if the worker takes a job elsewhere during those periods (Article 52).",
+            "cites": [
+              "a17"
+            ]
+          },
+          {
+            "text": "During notice, the worker may be absent 1 hour of work a day to look for another job (Article 51).",
+            "cites": [
+              "a10"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What is owed for an abusive termination, and how long is there to sue?",
+        "paras": [
+          {
+            "text": "A dismissal is abusive in the cases Article 50 lists, such as a reason that is unacceptable or unrelated to the worker's ability or conduct or to the running of the business, union membership or lawful union activity, a good-faith complaint about the application of the Code, or the use of personal or public freedoms.",
+            "cites": [
+              "a19"
+            ]
+          },
+          {
+            "text": "Abusive termination by the employer costs 2 to 12 months of wages, on top of the worker's legal indemnities.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "A worker who ends the contract for reasons the law does not allow, and causes the employer harm or embarrassment, owes 1 to 4 months of wages on top of the notice indemnity.",
+            "cites": [
+              "a12"
+            ]
+          },
+          {
+            "text": "The claim goes to the arbitral council within 1 month of being told of the termination, and the council must decide within 3 months.",
+            "cites": [
+              "a13",
+              "a18"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What notice does an employer give the Ministry before ending contracts for economic or technical reasons?",
+        "paras": [
+          {
+            "text": "For force majeure or economic or technical reasons, the employer must tell the Ministry of Labour and Social Affairs 1 month before ending the contracts.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "Workers dismissed this way have, for 1 year from leaving, priority to return to the business if work there goes back to normal and they can be employed in its new jobs.",
+            "cites": [
+              "a20"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What this page does not cover",
+        "paras": [
+          {
+            "text": "The amount of the dismissal or end-of-service indemnity is on another page of this site, the end-of-service indemnity topic.",
+            "note": true
+          },
+          {
+            "text": "Fixed-term contracts and the special procedure for dismissing elected union council members (Article 50, paragraph e) are not covered. This page does not say how courts apply these rules. We hold this law in Arabic only, with no French text.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "ما مهلة الإنذار قبل الصرف من العمل في لبنان؟",
+    "head_title": "المادة 50 من قانون العمل اللبناني: مهلة الإنذار قبل الصرف",
+    "question": "ما مدة الإنذار الواجب قبل الصرف أو الاستقالة وفق المادة 50 من قانون العمل اللبناني، وما الذي يترتب على عدم توجيهه؟",
+    "description": "المادة 50 من قانون العمل اللبناني: مهلة الإنذار قبل الصرف شهر حتى 3 سنوات خدمة، ثم شهران أو 3 أو 4 أشهر. يكون الإنذار خطياً، وإلا استُحق بدل أجر مدته.",
+    "answer": {
+      "text": "في لبنان، تحدد المادة 50 من قانون العمل لعام 1946 مهلة الإنذار قبل الصرف أو الاستقالة بحسب مدة الخدمة: شهر واحد لمن خدمته 3 سنوات فما دون، وشهران لأكثر من 3 سنوات وأقل من 6، و3 أشهر لأكثر من 6 سنوات وأقل من 12، و4 أشهر لمن خدمته 12 سنة فأكثر. يجب أن يكون الإنذار خطياً وأن يبلَّغ إلى صاحب العلاقة. ويدفع الطرف الذي لا يوجهه للطرف الآخر بدل أجر مدة الإنذار التي فرضها القانون عليه.",
+      "cites": [
+        "a1",
+        "a2"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "ما مدة الإنذار، وما الذي يترتب على عدم توجيهه؟",
+        "paras": [
+          {
+            "text": "يوجه كل من صاحب العمل والعامل هذا الإنذار إلى الآخر قبل فسخ العقد. والفئات كما وردت في المادة 50 لا تتناول العقد الذي مضى على تنفيذه 6 سنوات بالتحديد.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "مثال: بعد 4 سنوات تكون مهلة الإنذار شهرين، وبعد 12 سنة فأكثر تكون 4 أشهر.",
+            "cites": [
+              "a1"
+            ]
+          },
+          {
+            "text": "يجب أن يكون الإنذار خطياً وأن يبلَّغ إلى صاحب العلاقة. وإن لم يذكر الأسباب جاز للطرف الآخر أن يطلب توضيحها. ويدفع الطرف المخالف للآخر بدل أجر مدة الإنذار المفروضة عليه قانوناً.",
+            "cites": [
+              "a2"
+            ]
+          },
+          {
+            "text": "على رب العمل الذي يخالف أحكام الإنذار أن يدفع أجرة الأيام الداخلة في مدة الإنذار أو الأيام التي لا يجوز له توجيه الإنذار فيها (المادة 53). وصاحب العمل الجديد الذي يتعاقد مع عامل وهو يعلم أنه ترك عمله دون إنذار يكون مسؤولاً بالتكافل والتضامن عما يُحكم به لصاحب العمل الأول.",
+            "cites": [
+              "a16",
+              "a15"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "مهلة الإنذار بحسب مدة الخدمة",
+          "head": [
+            "مدة الخدمة",
+            "مهلة الإنذار"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "3 سنوات فما دون",
+                "شهر واحد"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "أكثر من 3 سنوات وأقل من 6 سنوات",
+                "شهران"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "أكثر من 6 سنوات وأقل من 12 سنة",
+                "3 أشهر"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "12 سنة فأكثر",
+                "4 أشهر"
+              ],
+              "cites": [
+                "a1"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "متى لا يلزم الإنذار؟",
+        "paras": [
+          {
+            "text": "يحق للعامل المعين تحت التجربة ولصاحب العمل أن يفسخ كل منهما العقد دون أي إنذار أو تعويض خلال 3 أشهر تلي الاستخدام.",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "ولرب العمل أيضاً أن يفسخ العقد دون تعويض أو علم سابق في الحالات التي تعددها المادة 74، ومنها انتحال جنسية كاذبة، والعمل المقصود الرامي إلى الإضرار بمصالح رب العمل المادية، وارتكاب مخالفة هامة للنظام الداخلي 3 مرات في السنة رغم التنبيهات الخطية، والتغيب بدون عذر شرعي أكثر من 15 يوماً في السنة أو أكثر من 7 أيام متوالية.",
+            "cites": [
+              "a4"
+            ]
+          },
+          {
+            "text": "ويحق للأجير أن يترك عمله دون علم سابق في الحالات الـ4 التي تعددها المادة 75: خداعه في شروط العمل عند إجراء العقد، وعدم قيام رب العمل بموجباته وفق القانون، وارتكاب جرم مخل بالآداب في شخصه أو أحد أفراد عائلته، وأعمال العنف في شخصه. وتوجب المادة 76 عندها دفع تعويضات الصرف المنصوص عليها في القانون له.",
+            "cites": [
+              "a5",
+              "a6"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "متى لا يجوز توجيه الإنذار، وهل يتغيب العامل للبحث عن عمل؟",
+        "paras": [
+          {
+            "text": "تمنع المادة 52 توجيه الإنذار إلى المرأة الحامل، وإلى المرأة المجازة بداعي الولادة، وإلى كل أجير أثناء الإجازات العادية أو خلال الإجازة المرضية.",
+            "cites": [
+              "a7",
+              "a8",
+              "a9"
+            ]
+          },
+          {
+            "text": "ويصبح رب العمل بحلّ من هذه الموانع إذا استُخدم الأجير في محل آخر خلال تلك المدد (المادة 52).",
+            "cites": [
+              "a17"
+            ]
+          },
+          {
+            "text": "يحق للأجير خلال مدة الإنذار أن يتغيب ساعة واحدة من ساعات العمل في اليوم ليفتش عن عمل آخر (المادة 51).",
+            "cites": [
+              "a10"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما الذي يترتب على الفسخ التعسفي، وما مهلة رفع الدعوى؟",
+        "paras": [
+          {
+            "text": "يعتبر الصرف تعسفياً في الحالات التي تعددها المادة 50، ومنها السبب غير المقبول أو الذي لا يرتبط بأهلية العامل أو تصرفه أو بحسن إدارة المؤسسة، والانتساب إلى نقابة أو القيام بنشاط نقابي مشروع، وتقديم شكوى بحسن نية تتعلق بتطبيق القانون، وممارسة الحريات الشخصية أو العامة.",
+            "cites": [
+              "a19"
+            ]
+          },
+          {
+            "text": "يوجب الفسخ التعسفي من صاحب العمل تعويضاً لا يقل عن أجر شهرين ولا يزيد على أجر 12 شهراً، إضافة إلى التعويضات القانونية التي يستحقها العامل.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "ويدفع العامل الذي يفسخ العقد لغير الأسباب التي يجيزها القانون ويسبب لصاحب العمل ضرراً أو إحراجاً تعويضاً يعادل أجر شهر حتى 4 أشهر، إضافة إلى تعويض الإنذار.",
+            "cites": [
+              "a12"
+            ]
+          },
+          {
+            "text": "تُرفع الدعوى أمام المجلس التحكيمي خلال مهلة شهر من تاريخ إبلاغ الفسخ، وعلى المجلس أن يبت بها في مهلة لا تتجاوز 3 أشهر.",
+            "cites": [
+              "a13",
+              "a18"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما الإنذار الذي يوجهه صاحب العمل إلى الوزارة قبل إنهاء العقود لأسباب اقتصادية أو فنية؟",
+        "paras": [
+          {
+            "text": "عند القوة القاهرة أو الظروف الاقتصادية أو الفنية، يبلغ صاحب العمل وزارة العمل والشؤون الاجتماعية رغبته في إنهاء العقود قبل شهر من تنفيذه.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "ويتمتع العمال المصروفون على هذا النحو، ولمدة سنة تبدأ من تاريخ تركهم العمل، بحق أولوية في العودة إلى المؤسسة إذا عاد العمل فيها إلى طبيعته وأمكن استخدامهم في الأعمال المستحدثة فيها.",
+            "cites": [
+              "a20"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما لا تغطيه هذه الصفحة",
+        "paras": [
+          {
+            "text": "مقدار تعويض الصرف أو تعويض نهاية الخدمة تتناوله صفحة أخرى من هذا الموقع، هي موضوع تعويض نهاية الخدمة.",
+            "note": true
+          },
+          {
+            "text": "لا تتناول الصفحة العقود المحددة المدة ولا الأصول الخاصة بصرف أعضاء مجالس النقابات المنتخبين (الفقرة هـ من المادة 50). ولا تبيّن كيف تطبق المحاكم هذه القواعد. ونص هذا القانون لدينا بالعربية فقط، دون نص فرنسي.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  }
+}

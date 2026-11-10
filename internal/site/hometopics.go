@@ -22,6 +22,9 @@ var homeTopicSlugs = []string{
 	"foreign-workers-work-permits",
 	"building-violations-encroachment",
 	"pre-emption-right",
+	"dismissal-notice-period",
+	"pretrial-detention",
+	"anti-money-laundering-law-44",
 }
 
 // homeTopicRefs are those topics in one language; a slug with no topic file

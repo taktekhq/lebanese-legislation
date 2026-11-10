@@ -82,6 +82,9 @@ func Structure(t *Topic) []string {
 		if n := utf8.RuneCountInString(c.Description); n > 160 {
 			l("description is %d characters, over 160", n)
 		}
+		if n := utf8.RuneCountInString(c.HeadTitle); n > HeadTitleMax {
+			l("head title is %d characters, over %d", n, HeadTitleMax)
+		}
 		if len(c.Sections) < 3 || len(c.Sections) > 6 {
 			l("%d sections, want 3 to 6", len(c.Sections))
 		}
@@ -152,6 +155,9 @@ func Structure(t *Topic) []string {
 			add("cite %s is never used", c.ID)
 		}
 	}
+	if (t.EN.HeadTitle == "") != (t.AR.HeadTitle == "") {
+		add("a head title in one language only")
+	}
 	// the two languages tell the same thing: same shape, same cites
 	if a, b := shape(&t.EN), shape(&t.AR); a != b {
 		add("English and Arabic differ in shape:\n  en %s\n  ar %s", a, b)
@@ -179,7 +185,7 @@ func shape(c *Content) string {
 }
 
 func allStrings(c *Content) []string {
-	out := []string{c.Title, c.Question, c.Description, c.Answer.Text}
+	out := []string{c.Title, c.HeadTitle, c.Question, c.Description, c.Answer.Text}
 	for _, s := range c.Sections {
 		out = append(out, s.Heading)
 		for _, q := range s.Paras {
@@ -272,8 +278,23 @@ func Grounding(t *Topic, src Source) []string {
 			add("[%s] %s: number %s is in no cited article: %.80q", lang, where, strings.Join(bad, ", "), text)
 		}
 	}
+	// A head title may also carry the year the page was last checked.
+	headTitle := func(lang, text string) {
+		set := allowed(every, t.Updated[:min(4, len(t.Updated))])
+		var bad []string
+		for n := range Numbers(stripArticleRefs(text, artNums), true) {
+			if n != "0" && n != "1" && !set[n] {
+				bad = append(bad, n)
+			}
+		}
+		if len(bad) > 0 {
+			sort.Strings(bad)
+			add("[%s] head title: number %s is in no cited article and is not the year last checked: %.80q", lang, strings.Join(bad, ", "), text)
+		}
+	}
 	for lang, c := range map[string]*Content{"en": &t.EN, "ar": &t.AR} {
 		numbers(lang, "title", c.Title, nil, true)
+		headTitle(lang, c.HeadTitle)
 		numbers(lang, "question", c.Question, nil, true)
 		numbers(lang, "answer", c.Answer.Text, c.Answer.Cites, false)
 		for i, s := range c.Sections {

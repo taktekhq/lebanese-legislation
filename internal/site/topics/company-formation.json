@@ -163,10 +163,11 @@
   ],
   "en": {
     "title": "How do you register an LLC (SARL) in Lebanon, and which law governs it?",
+    "head_title": "Lebanon SARL registration: Decree-Law 35/1967, Law 126/2019",
     "question": "What are the legal steps to form and register a limited liability company (SARL) or a joint-stock company (SAL) in Lebanon, and which law governs each?",
-    "description": "SARL: Decree-Law 35 of 1967, 1 to 20 partners, 5,000,000 LBP capital paid into a bank, commercial register. SAL: 3 founders, 30,000,000 LBP, notary.",
+    "description": "Lebanon SARL (limited liability company) registration: Decree-Law 35 of 1967, amended by Law 126 of 2019. 1 to 20 partners, 5,000,000 LBP, commercial register.",
     "answer": {
-      "text": "A limited liability company (SARL) is governed by Legislative Decree 35 of 1967, as amended in 2019: it needs 1 to 20 partners and capital of at least 5,000,000 LBP in equal shares, fully paid and deposited in a bank (Articles 5, 7 and 8). It is set up by an official or private deed and registered in the commercial register, the only publicity it needs (Articles 2 and 11). A joint-stock company (SAL) under the Code of Commerce needs at least 3 founders and 30,000,000 LBP of capital, with statutes deposited with a notary and registration within 1 month of formation (Articles 79, 80, 83 and 98).",
+      "text": "In Lebanon, a limited liability company (SARL) is governed by Legislative Decree 35 of 1967 (Decree-Law 35/1967), as amended by Law 126 of 2019: it needs 1 to 20 partners and capital of at least 5,000,000 LBP in equal shares, fully paid and deposited in a bank (Articles 5, 7 and 8). It is set up by an official or private deed and registered in the commercial register, the only publicity it needs (Articles 2 and 11). A joint-stock company (SAL) under the Code of Commerce needs at least 3 founders and 30,000,000 LBP of capital, with statutes deposited with a notary and registration within 1 month of formation (Articles 79, 80, 83 and 98).",
       "cites": [
         "a4",
         "a8",
@@ -429,10 +430,11 @@
   },
   "ar": {
     "title": "ما الخطوات القانونية لتأسيس شركة محدودة المسؤولية في لبنان، وأي قانون يرعاها؟",
+    "head_title": "تأسيس شركة محدودة المسؤولية في لبنان: مرسوم اشتراعي 35/1967",
     "question": "ما الخطوات القانونية لتأسيس وتسجيل شركة محدودة المسؤولية أو شركة مغفلة (مساهمة) في لبنان، وأي قانون يرعى كلاً منهما؟",
-    "description": "المحدودة المسؤولية: المرسوم الاشتراعي 35/1967، من شريك إلى 20، ورأسمال 5,000,000 ل.ل. مودع في مصرف وسجل تجاري. المغفلة: 3 مؤسسين و30,000,000 ل.ل. وكاتب عدل.",
+    "description": "تأسيس شركة محدودة المسؤولية (SARL) في لبنان: المرسوم الاشتراعي 35/1967 المعدل بالقانون 126/2019. من شريك إلى 20، رأسمال 5,000,000 ل.ل.، والسجل التجاري.",
     "answer": {
-      "text": "ترعى الشركة المحدودة المسؤولية أحكام المرسوم الاشتراعي 35 لعام 1967 كما عُدّل عام 2019، وتتألف من شريك واحد إلى 20 شريكاً برأسمال لا يقل عن 5,000,000 ليرة موزع على حصص متساوية ومحرر بكامله ومودع في مصرف (المواد 5 و7 و8). وتثبت بسند رسمي أو عادي وتسجل في السجل التجاري، وهو موجب النشر الوحيد عند تأسيسها (المادتان 2 و11). أما الشركة المغفلة فيرعاها قانون التجارة، وتحتاج إلى 3 مؤسسين على الأقل ورأسمال 30,000,000 ليرة، ويودع نظامها لدى كاتب عدل وتسجل خلال الشهر الذي يلي تأسيسها (المواد 79 و80 و83 و98).",
+      "text": "في لبنان، ترعى تأسيس الشركة المحدودة المسؤولية (SARL) أحكام المرسوم الاشتراعي 35 لعام 1967 كما عدّله القانون 126 لعام 2019، وتتألف من شريك واحد إلى 20 شريكاً برأسمال لا يقل عن 5,000,000 ليرة موزع على حصص متساوية ومحرر بكامله ومودع في مصرف (المواد 5 و7 و8). وتثبت بسند رسمي أو عادي وتسجل في السجل التجاري، وهو موجب النشر الوحيد عند تأسيسها (المادتان 2 و11). أما الشركة المغفلة فيرعاها قانون التجارة، وتحتاج إلى 3 مؤسسين على الأقل ورأسمال 30,000,000 ليرة، ويودع نظامها لدى كاتب عدل وتسجل خلال الشهر الذي يلي تأسيسها (المواد 79 و80 و83 و98).",
       "cites": [
         "a4",
         "a8",

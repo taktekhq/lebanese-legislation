@@ -2,10 +2,12 @@ package site
 
 import (
 	"context"
+	"html/template"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/taktekhq/lebanese-legislation/internal/site/i18n"
 	"github.com/taktekhq/lebanese-legislation/internal/site/topics"
 )
 
@@ -131,5 +133,47 @@ func TestTopicDate(t *testing.T) {
 	}
 	if got := topicDate("ar", "2026-10-21"); got != "21 تشرين الأول 2026" {
 		t.Errorf("ar: %s", got)
+	}
+}
+
+// A topic with a head title prints it as the whole <title>, uncut and without
+// the site name; the H1 stays the question and lists keep the title. A topic
+// without one keeps the title and the site name.
+func TestTopicHeadTitle(t *testing.T) {
+	if len(topics.All()) == 0 {
+		t.Skip("no topics yet")
+	}
+	s := topicTestServer(t)
+	withHead, without := 0, 0
+	for _, tp := range topics.All() {
+		for _, v := range []struct {
+			prefix, lang string
+			b            *i18n.Bundle
+		}{{"", "ar", arBundle}, {"/en", "en", enBundle}} {
+			c := tp.Lang(v.lang)
+			code, body := topicGet(s, v.prefix+"/topic/"+tp.Slug+"/")
+			if code != 200 {
+				t.Fatalf("%s %s: status %d", tp.Slug, v.lang, code)
+			}
+			want := c.HeadTitle
+			if want == "" {
+				without++
+				want, _ = finishMeta(v.b, c.Title+" · "+v.b.T("brand.name"), "")
+			} else {
+				withHead++
+				if strings.Contains(want, "…") || len([]rune(want)) > titleMax {
+					t.Errorf("%s %s: head title %q would be cut", tp.Slug, v.lang, want)
+				}
+			}
+			if !strings.Contains(body, "<title>"+template.HTMLEscapeString(want)+"</title>") {
+				t.Errorf("%s %s: <title> is not %q", tp.Slug, v.lang, want)
+			}
+			if !strings.Contains(body, ">"+template.HTMLEscapeString(c.Question)+"</h1>") {
+				t.Errorf("%s %s: the H1 is not the question", tp.Slug, v.lang)
+			}
+		}
+	}
+	if withHead == 0 || without == 0 {
+		t.Errorf("%d pages with a head title and %d without: the test needs both", withHead, without)
 	}
 }

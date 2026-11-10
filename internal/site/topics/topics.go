@@ -57,14 +57,21 @@ type Section struct {
 	Table   *Table `json:"table,omitempty"`
 }
 
-// Content is a topic in one language.
+// Content is a topic in one language. Title names the page in lists and
+// links. HeadTitle, when set, is the page's <title> instead of Title and the
+// site name: the keywords people and assistants search with (the law, its
+// number, the country), written to fit HeadTitleMax characters uncut.
 type Content struct {
 	Title       string    `json:"title"`
+	HeadTitle   string    `json:"head_title,omitempty"`
 	Question    string    `json:"question"`
 	Description string    `json:"description"`
 	Answer      Para      `json:"answer"`
 	Sections    []Section `json:"sections"`
 }
+
+// HeadTitleMax is the longest head title: the site cuts a longer <title>.
+const HeadTitleMax = 60
 
 // Topic is one page, in both languages. The articles are shared: the
 // quotes stay in Arabic on either page.

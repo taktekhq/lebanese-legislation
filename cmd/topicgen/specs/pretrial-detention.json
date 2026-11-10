@@ -1,0 +1,48 @@
+{
+  "slug": "pretrial-detention",
+  "title_en": "How long can pretrial detention last in Lebanon?",
+  "title_ar": "كم تبلغ مدة التوقيف الاحتياطي في لبنان؟",
+  "head_title_en": "Lebanon pretrial detention: Criminal Procedure Art. 108, 47",
+  "head_title_ar": "التوقيف الاحتياطي في لبنان: المادتان 108 و47 أصول جزائية",
+  "question_en": "How long can a suspect be held in police custody and in pretrial detention under Lebanon's Code of Criminal Procedure (Articles 47 and 108), and what rights did the 2020 amendment add?",
+  "question_ar": "كم تبلغ مدة الاحتجاز لدى الضابطة العدلية ومدة التوقيف الاحتياطي في قانون أصول المحاكمات الجزائية اللبناني (المادتان 47 و108)، وما الحقوق التي أضافها تعديل 2020؟",
+  "sub_questions": [
+    "How long can pretrial detention last for a misdemeanour and for a felony, and which cases have no limit in Article 108? (a table of the time limits the articles state)",
+    "How long can the police hold a suspect before he is brought to a judge (Articles 47, 32, 42 and 107)?",
+    "What rights does a suspect have in custody since the 2020 amendment of Article 47 (lawyer, family call, interpreter, doctor, recording)?",
+    "When may an investigating judge order detention, and what must the decision say (Article 107)?",
+    "When is release a right, and how is release on bail or judicial supervision requested (Articles 111, 113, 114, 115)?"
+  ],
+  "notes": "Code of Criminal Procedure, Law 328 of 2/8/2001, law id 244483. Article 108 paragraph 1: except for a person previously sentenced to at least 1 year, detention for a misdemeanour may not exceed 2 months, extendable once by the same period in extreme necessity. Paragraph 2, as replaced by Law 111 of 26/6/2010 (law id 226068, Article 1, which is in the pack and whose wording matches): except for the felonies of homicide, drugs, attacks on state security, felonies of comprehensive danger, terrorism offences, and a detainee previously sentenced to a criminal penalty, detention for a felony may not exceed 6 months, renewable once by a reasoned decision. The article states no maximum for the excepted cases: say that the article sets no limit for them, do not say detention is unlimited by law elsewhere. Paragraph 3: travel ban of up to 2 months (misdemeanour) or 1 year (felony) from release. Article 47 was replaced by Article 3 of Law 191 of 16/10/2020 ('to strengthen basic guarantees and activate defence rights', law id 285834, in the pack). IMPORTANT database quirk: the consolidated text of Article 47 the site shows repeats several paragraphs of the rights list (the block from the rights heading down to the 24-hour delay to appoint a lawyer appears twice, and one sentence is a broken merge). Quote only passages that read cleanly, prefer short quotes, and say in the closing note that our consolidated copy of Article 47 repeats some paragraphs and the reader should check Law 191 of 2020 itself. Custody: Article 47 forbids the judicial police from holding a suspect except by a decision of the public prosecution and for no more than 48 hours, extendable by the same period only with the prosecution's approval; the custody period counts toward the detention period. Article 32 (flagrant felony, also amended by Law 191 of 2020): the prosecutor may hold a strongly suspected person up to 48 hours, extendable by the same period. Article 42: read it and state its extension rule only as printed, and do not try to reconcile it with Articles 32 and 47; if the periods differ, say the articles state different periods and leave it there. Article 107: a defendant brought on a warrant is questioned within 24 hours; detention may be ordered only after questioning, where the offence is punished by more than 1 year of prison or the defendant was previously sentenced to a criminal penalty or to more than 3 months of prison without suspension; the decision must be reasoned; appeal within 24 hours does not stop execution. Article 113: release by right after 5 days for a misdemeanour whose maximum penalty does not exceed 2 years, for a Lebanese defendant with a residence in Lebanon and no listed prior sentence. Article 111: judicial supervision instead of detention. Articles 114 and 115: release on request with or without bail. Rights in Article 47 as amended in 2020: contact a lawyer and a family member, employer or acquaintance; a lawyer present at questioning; a confidential meeting of at most 30 minutes; 24 hours to appoint a lawyer; a sworn interpreter; a forensic doctor at the Treasury's expense who reports within 24 hours; audio and video recording of the questioning; prison of 3 months to 1 year and a fine of 2,000,000 to 10,000,000 LBP for an investigator who ignores the guarantees. The words 'pretrial detention' translate التوقيف الاحتياطي. Do not state how long detention lasts in practice, and do not mention prison conditions or court rulings. Detention ordered by trial courts, the Judicial Council's investigator (Article 363 exempts him from Article 108's limits and is not in the pack), military courts and juveniles are not covered: say so in the closing note. End the page with one section headed 'What this page does not cover' whose paragraphs are notes.",
+  "pack": [
+    {
+      "law": 244483,
+      "articles": [
+        "108",
+        "107",
+        "47",
+        "32",
+        "42",
+        "111",
+        "113",
+        "114",
+        "115"
+      ],
+      "why": "Code of Criminal Procedure: limits of pretrial detention, when detention may be ordered, police custody and the suspect's rights, custody in flagrant felonies, judicial supervision, release by right, release on request"
+    },
+    {
+      "law": 226068,
+      "articles": [
+        "1"
+      ],
+      "why": "Law 111 of 2010: the wording that replaced paragraph 2 of Article 108"
+    },
+    {
+      "law": 285834,
+      "articles": [
+        "3"
+      ],
+      "why": "Law 191 of 2020: the wording that replaced Article 47"
+    }
+  ]
+}

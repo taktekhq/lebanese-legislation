@@ -193,10 +193,11 @@
   ],
   "en": {
     "title": "What does Lebanon's banking secrecy law say, and has it been amended?",
+    "head_title": "Lebanon banking secrecy law amendment: Law 306/2022, 1/2025",
     "question": "What does Lebanon's banking secrecy law of 1956 say today, who can lift secrecy, and how was it amended in 2022 and 2025?",
-    "description": "Lebanon's 1956 banking secrecy law, rewritten in 2022 and amended in 2025: who is bound, who is excluded, who can demand data, and 1 to 3 months' jail.",
+    "description": "Lebanon banking secrecy law of 1956 and its amendments, Law 306 of 2022 and Law 1 of 2025: who is bound, who is excluded and who can demand account data.",
     "answer": {
-      "text": "Lebanon's banking secrecy law of 3 September 1956 is still in force: Article 2 binds bank managers, staff and anyone who sees bank records to keep clients' names, funds and affairs secret, and disclosure is punished by 1 to 3 months in jail and a fine of 150 to 300 times the minimum wage. Law 306 of 28 October 2022 rewrote it, removing secrecy for public officials, politicians, election candidates and bank and media board members, and letting courts, the anti-corruption and tax authorities and the banking supervisors demand account data. Law 1 of 24 April 2025 amended Article 7 again, and its Decree 1578 lifts secrecy fully toward the central bank and the Banking Control Commission when they supervise banks.",
+      "text": "Lebanon's banking secrecy law of 3 September 1956 is still in force, as amended in 2022 and 2025: Article 2 binds bank managers, staff and anyone who sees bank records to keep clients' names, funds and affairs secret, and disclosure is punished by 1 to 3 months in jail and a fine of 150 to 300 times the minimum wage. Law 306 of 28 October 2022 rewrote it, removing secrecy for public officials, politicians, election candidates and bank and media board members, and letting courts, the anti-corruption and tax authorities and the banking supervisors demand account data. Law 1 of 24 April 2025 amended Article 7 again, and its Decree 1578 lifts secrecy fully toward the central bank and the Banking Control Commission when they supervise banks.",
       "cites": [
         "s2a",
         "s8a",
@@ -454,10 +455,11 @@
   },
   "ar": {
     "title": "ماذا يقول قانون السرية المصرفية في لبنان، وهل عُدّل؟",
+    "head_title": "تعديل السرية المصرفية في لبنان: القانون 306/2022 و1/2025",
     "question": "ماذا ينص قانون سرية المصارف الصادر عام 1956 اليوم، ومن يحق له رفع السرية، وكيف عُدّل عامَي 2022 و2025؟",
-    "description": "قانون سرية المصارف لعام 1956 بعد تعديلات 2022 و2025: من تلزمه السرية ومن تستثنيه ومن يحق له طلب المعلومات، والحبس من شهر إلى 3 أشهر للإفشاء.",
+    "description": "قانون السرية المصرفية في لبنان لعام 1956 وتعديلاته، القانون 306 لعام 2022 والقانون 1 لعام 2025: من تلزمه السرية ومن تستثنيه ومن يحق له طلب المعلومات.",
     "answer": {
-      "text": "لا يزال قانون سرية المصارف الصادر في 3 أيلول 1956 نافذاً: تُلزم المادة 2 منه مديري المصارف ومستخدميها وكل من يطّلع على قيودها بكتمان أسماء الزبائن وأموالهم وشؤونهم، ويعاقَب الإفشاء بالحبس من شهر إلى 3 أشهر وبغرامة من 150 إلى 300 ضعف الحد الأدنى للأجور. وقد أعاد القانون رقم 306 تاريخ 28 تشرين الأول 2022 صياغته، فرفع السرية عن الموظفين العموميين والسياسيين والمرشحين للانتخابات وأعضاء مجالس إدارة المصارف ووسائل الإعلام، وأجاز للقضاء ولهيئة مكافحة الفساد والإدارة الضريبية وجهات الرقابة المصرفية طلب المعلومات. ثم عدّل القانون رقم 1 تاريخ 24 نيسان 2025 المادة 7 مجدداً، ويرفع مرسومه التطبيقي رقم 1578 السرية كلياً تجاه مصرف لبنان ولجنة الرقابة على المصارف عند رقابتهما على المصارف.",
+      "text": "لا يزال قانون السرية المصرفية في لبنان (قانون سرية المصارف الصادر في 3 أيلول 1956) نافذاً بعد تعديله في 2022 و2025: تُلزم المادة 2 منه مديري المصارف ومستخدميها وكل من يطّلع على قيودها بكتمان أسماء الزبائن وأموالهم وشؤونهم، ويعاقَب الإفشاء بالحبس من شهر إلى 3 أشهر وبغرامة من 150 إلى 300 ضعف الحد الأدنى للأجور. وقد أعاد القانون رقم 306 تاريخ 28 تشرين الأول 2022 صياغته، فرفع السرية عن الموظفين العموميين والسياسيين والمرشحين للانتخابات وأعضاء مجالس إدارة المصارف ووسائل الإعلام، وأجاز للقضاء ولهيئة مكافحة الفساد والإدارة الضريبية وجهات الرقابة المصرفية طلب المعلومات. ثم عدّل القانون رقم 1 تاريخ 24 نيسان 2025 المادة 7 مجدداً، ويرفع مرسومه التطبيقي رقم 1578 السرية كلياً تجاه مصرف لبنان ولجنة الرقابة على المصارف عند رقابتهما على المصارف.",
       "cites": [
         "s2a",
         "s8a",

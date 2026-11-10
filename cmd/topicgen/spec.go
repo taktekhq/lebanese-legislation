@@ -19,6 +19,8 @@ type Spec struct {
 	Slug        string     `json:"slug"`
 	TitleEN     string     `json:"title_en"`
 	TitleAR     string     `json:"title_ar"`
+	HeadTitleEN string     `json:"head_title_en,omitempty"` // the <title>, when not the title and the site name
+	HeadTitleAR string     `json:"head_title_ar,omitempty"`
 	QuestionEN  string     `json:"question_en"`
 	QuestionAR  string     `json:"question_ar"`
 	SubQuestion []string   `json:"sub_questions"`
