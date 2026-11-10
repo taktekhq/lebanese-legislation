@@ -161,7 +161,7 @@
     "question": "How long can a suspect be held in police custody and in pretrial detention under Lebanon's Code of Criminal Procedure (Articles 47 and 108), and what rights did the 2020 amendment add?",
     "description": "Lebanon pretrial detention, Criminal Procedure Code Article 108: 2 months for a misdemeanour, 6 for a felony, with exceptions. Police custody: 48 hours.",
     "answer": {
-      "text": "In Lebanon, Article 108 of the Code of Criminal Procedure caps pretrial detention at 2 months for a misdemeanour, extendable by the same period at most, and at 6 months for a felony, renewable once by a reasoned decision, with the exceptions the article lists. Under Article 47, as replaced by Law 191 of 2020, the judicial police may hold a suspect for no more than 48 hours, extendable by the same period only with the prosecution's approval. Before he is heard, and as soon as he is held for the investigation, the suspect may contact a lawyer and a family member.",
+      "text": "In Lebanon, except in the cases it lists, Article 108 of the Code of Criminal Procedure caps pretrial detention at 2 months for a misdemeanour, extendable by the same period at most, and at 6 months for a felony, renewable once by a reasoned decision. Under Article 47, as replaced by Law 191 of 2020, the judicial police may hold a suspect for no more than 48 hours, extendable by the same period only with the prosecution's approval. Before he is heard, and as soon as he is held for the investigation, the suspect may contact a lawyer and a family member.",
       "cites": [
         "a1",
         "a2",
@@ -206,7 +206,7 @@
             {
               "cells": [
                 "Misdemeanour, previous sentence of at least 1 year",
-                "No limit stated"
+                "Excepted from this limit by Article 108"
               ],
               "cites": [
                 "a1"
@@ -224,7 +224,7 @@
             {
               "cells": [
                 "Felony of homicide, drugs, attacks on state security, comprehensive danger, or terrorism, or detainee with a previous criminal penalty",
-                "No limit stated"
+                "Excepted from this limit by Article 108"
               ],
               "cites": [
                 "a2"
@@ -280,14 +280,14 @@
             ]
           },
           {
-            "text": "He has a sworn interpreter if he does not speak Arabic, and may ask for a forensic doctor at the Treasury's expense, who reports within 24 hours.",
+            "text": "He has a sworn interpreter if he does not speak Arabic, and may ask the public prosecutor, directly or through his lawyer or a family member, to be examined by a forensic doctor at the Treasury's expense, who reports within 24 hours.",
             "cites": [
               "a12",
               "a13"
             ]
           },
           {
-            "text": "Questioning must be recorded in audio and video from the moment his rights are read to him, and the recordings are attached to the record of the preliminary investigation, or the record is void.",
+            "text": "The questioning or hearing must be recorded in audio and video from the moment his rights are read to him, and the recordings are attached to the record of the preliminary investigation, or the record and the steps that follow it are void.",
             "cites": [
               "a14"
             ]
@@ -376,7 +376,7 @@
     "question": "كم تبلغ مدة الاحتجاز لدى الضابطة العدلية ومدة التوقيف الاحتياطي في قانون أصول المحاكمات الجزائية اللبناني (المادتان 47 و108)، وما الحقوق التي أضافها تعديل 2020؟",
     "description": "التوقيف الاحتياطي في لبنان، المادة 108 من أصول المحاكمات الجزائية: شهران في الجنحة و6 أشهر في الجناية مع استثناءات. والاحتجاز لدى الضابطة العدلية 48 ساعة.",
     "answer": {
-      "text": "في لبنان، تحدد المادة 108 من قانون أصول المحاكمات الجزائية مدة التوقيف الاحتياطي بشهرين في الجنحة، يمكن تمديدها مدة مماثلة كحد أقصى، وبـ6 أشهر في الجناية، يمكن تجديدها لمرة واحدة بقرار معلل، مع الاستثناءات التي تعددها المادة. ووفق المادة 47، كما استبدلها القانون 191 لسنة 2020، لا يجوز أن تحتجز الضابطة العدلية المشتبه فيه أكثر من 48 ساعة، ويمكن تمديدها مدة مماثلة بموافقة النيابة العامة فقط. وللمشتبه فيه، قبل الاستماع إلى أقواله وفور احتجازه لضرورات التحقيق، الاتصال بمحام وبأحد أفراد عائلته.",
+      "text": "في لبنان، وما خلا الحالات التي تعددها، تحدد المادة 108 من قانون أصول المحاكمات الجزائية مدة التوقيف الاحتياطي بشهرين في الجنحة، يمكن تمديدها مدة مماثلة كحد أقصى، وبـ6 أشهر في الجناية، يمكن تجديدها لمرة واحدة بقرار معلل. ووفق المادة 47، كما استبدلها القانون 191 لسنة 2020، لا يجوز أن تحتجز الضابطة العدلية المشتبه فيه أكثر من 48 ساعة، ويمكن تمديدها مدة مماثلة بموافقة النيابة العامة فقط. وللمشتبه فيه، قبل الاستماع إلى أقواله وفور احتجازه لضرورات التحقيق، الاتصال بمحام وبأحد أفراد عائلته.",
       "cites": [
         "a1",
         "a2",
@@ -421,7 +421,7 @@
             {
               "cells": [
                 "الجنحة، مع حكم سابق بعقوبة مدتها سنة على الأقل",
-                "لا مهلة منصوصا عليها"
+                "مستثناة من هذه المهلة بنص المادة 108"
               ],
               "cites": [
                 "a1"
@@ -439,7 +439,7 @@
             {
               "cells": [
                 "جنايات القتل والمخدرات والاعتداء على أمن الدولة والخطر الشامل وجرائم الإرهاب، أو الموقوف المحكوم عليه سابقا بعقوبة جنائية",
-                "لا مهلة منصوصا عليها"
+                "مستثناة من هذه المهلة بنص المادة 108"
               ],
               "cites": [
                 "a2"
@@ -495,14 +495,14 @@
             ]
           },
           {
-            "text": "وله الاستعانة بمترجم محلف إن لم يكن يحسن العربية، وطلب معاينة طبيب شرعي على نفقة الخزينة العامة، ويرفع الطبيب تقريره خلال 24 ساعة.",
+            "text": "وله الاستعانة بمترجم محلف إن لم يكن يحسن العربية، وله أن يطلب من النائب العام، مباشرة أو بواسطة وكيله أو أحد أفراد عائلته، عرضه على طبيب شرعي على نفقة الخزينة العامة، ويرفع الطبيب تقريره خلال 24 ساعة.",
             "cites": [
               "a12",
               "a13"
             ]
           },
           {
-            "text": "ويجب تصوير الاستجواب بالصوت والصورة بدءاً من لحظة تلاوة حقوقه عليه، وترفق التسجيلات بمحضر التحقيقات الأولية تحت طائلة بطلانه.",
+            "text": "ويجب تصوير الاستجواب أو الاستماع إلى أقواله بالصوت والصورة بدءاً من لحظة تلاوة حقوقه عليه، وترفق التسجيلات بمحضر التحقيقات الأولية تحت طائلة بطلان المحضر والإجراءات اللاحقة له.",
             "cites": [
               "a14"
             ]
