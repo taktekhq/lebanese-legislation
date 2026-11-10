@@ -1,6 +1,6 @@
 # Architecture
 
-Current setup after the changes of 1 to 4 November 2026. The former private
+Current setup after the changes of 1 to 9 November 2026. The former private
 `taktekhq/lebaneselegislation` repository is folded into this public repository:
 code, scraper, build pipeline, website and MCP.
 
@@ -16,6 +16,9 @@ the container. A `/scan/` link answers with a 301 to the original Gazette PDF on
 SaderLex; Gazette page images are no longer hosted.
 Its [Dockerfile](../workers/static-site/container/Dockerfile) packages
 PostgreSQL 18.6 with the database baked into the image and the Go website server.
+The image also holds tables and search word lists computed at build time, so the
+MCP server reads prepared answers instead of computing them per request. See
+[how the build makes reads fast](performance.md).
 Semantic search uses Cloudflare Vectorize index `lebleg-chunks`: 1,547,937 chunks,
 768 dimensions, model `gemini-embedding-001`. The vectors have moved out of
 PostgreSQL into Vectorize.
@@ -97,10 +100,11 @@ All names use the prefix `ghcr.io/taktekhq/lebanese-legislation`.
 
 | Image | Holds | Used by |
 | --- | --- | --- |
-| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings | Compose, database users, the static render and the base of `-all` |
+| `-db` | PostgreSQL 18.6, pgvector, both databases baked from `data/`, chunk text and hashes without embeddings | Compose, database users and the static render |
+| `-db-prod` | `-db` plus read-optimized tables computed from it at build time ([`db/prod.sql`](../db/prod.sql)); no new data | The base of `-all` |
 | `-api` | Standalone API server, unchanged Dockerfile and amd64/arm64 support | Compose and API users with a separate database |
 | `-mcp` | Standalone MCP server, unchanged Dockerfile and amd64/arm64 support | Compose and MCP clients with a separate database |
-| `-all` | `-db` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges | Compose, Cloudflare Containers and self-hosted sites |
+| `-all` | `-db-prod` plus the Go server for dynamic pages, `/api/v1/`, `/mcp` and badges, and the search word lists | Compose, Cloudflare Containers and self-hosted sites |
 | `-vectors` | `vectorize-sync`, `export-vectors`, DuckDB 1.5.6; downloads Hugging Face vectors at runtime | The vectors workflow and users loading Vectorize or pgvector |
 
 Image builds use the reusable `build-image.yml` workflow. Each image has its own

@@ -69,9 +69,17 @@ Clients that only run local servers can bridge with `mcp-remote`:
 | `list_gazette_issues` | Gazette issues by publication date |
 | `possibly_affected` | General repeal clauses that may touch a law, as a list to check |
 
+## Paging
+
+Since 2.0.0 (6 Nov 2026), `get_law_texts`, `get_links`, `list_legislation` and `list_gazette_issues` page with a cursor: pass the reply's `next_cursor` back as `cursor`. A call with `offset` gets a tool error that says so. Every tool is marked read-only (`readOnlyHint`), so clients that confirm writes do not ask before each call. See [mcp/README.md](../mcp/README.md).
+
+## Speed
+
+Replies are prepared when the server's image is built, not computed per call. Real `get_article` calls on the hosted server had a median of 13 ms and a p95 of 131 ms of server time in the 12 hours after the 9 Nov 2026 change (128 and 1,060 ms in the week before). See [how the build makes reads fast](performance.md).
+
 ## Limits
 
-60 requests a minute per client IP, and at most 30 requests in any 10 seconds per IP at Cloudflare's edge (on `/mcp`, `/api/` and `/search/`). Past either, a 429.
+60 requests a minute per client IP, and at most 30 requests in any 10 seconds per IP at Cloudflare's edge (on `/mcp`, `/api/` and `/search/`). Past either, a 429. Tool calls also share the database: when the server is busy for more than 2 seconds a call gets a 503 with `Retry-After: 2`.
 
 ## Code and datasets
 

@@ -159,7 +159,7 @@ Claude, ChatGPT, Cursor and Gemini setup: [lebaneselegislation.com/ai](https://l
 curl -G 'https://lebaneselegislation.com/api/v1/search/' --data-urlencode 'q=قانون العمل'
 ```
 
-**Get it as PostgreSQL.** `ghcr.io/taktekhq/lebanese-legislation-db:latest` has the databases baked from the same tables. `ghcr.io/taktekhq/lebanese-legislation-all:latest` adds the website, API and MCP server. See [run the services locally](https://github.com/taktekhq/lebanese-legislation#run-the-services-locally).
+**Get it as PostgreSQL.** `ghcr.io/taktekhq/lebanese-legislation-db:latest` has the databases baked from the same tables. `ghcr.io/taktekhq/lebanese-legislation-all:latest` adds the website, API and MCP server. The `-db` image is the data exactly as published here. The hosted site adds tables computed from it when its image is built, which is why its MCP server answers in milliseconds: [how the build makes reads fast](https://github.com/taktekhq/lebanese-legislation/blob/main/docs/performance.md). See [run the services locally](https://github.com/taktekhq/lebanese-legislation#run-the-services-locally).
 
 ## What is in it
 
