@@ -1,0 +1,588 @@
+{
+  "slug": "pretrial-detention",
+  "order": 32,
+  "published": "2026-11-10",
+  "updated": "2026-11-10",
+  "articles": [
+    {
+      "id": "a1",
+      "law": 244483,
+      "article": "108",
+      "quote": "ما خلا حالة المحكوم عليه سابقا بعقوبة مدتها سنة على الاقل, لا يجوز ان تتعدى مدة التوقيف في الجنحة شهرين. يمكن تمديدها مدة مماثلة كحد اقصى في حالة الضرورة القصوى."
+    },
+    {
+      "id": "a2",
+      "law": 226068,
+      "article": "1",
+      "quote": "ما خلا جنايات القتل والمخدرات والاعتداء على أمن الدولة والجنايات ذات الخطر الشامل وجرائم الارهاب وحالة الموقوف المحكوم عليه سابقا بعقوبة جنائية، لا يجوز ان تتعدى مدة التوقيف في الجناية ستة أشهر، يمكن تجديدها لمرة واحدة بقرار معلل»."
+    },
+    {
+      "id": "a3",
+      "law": 244483,
+      "article": "47",
+      "quote": "يحظر عليهم احتجاز المشتبه فيه في نظاراتهم الا بقرار من النيابة العامة وضمن مدة لا تزيد على ثماني واربعين ساعة. يمكن تمديدها مدة مماثلة فقط بناء على موافقة النيابة العامة."
+    },
+    {
+      "id": "a4",
+      "law": 244483,
+      "article": "32",
+      "quote": "إذا وجد، بين الحضور شخص توافرت فيه شبهات قوية فيأمر النائب العام أو المحامي العام بالقبض عليه ويستجوبه ويبقيه محتجزا على ذمة التحقيق مدة لا تزيد عن ثماني واربعين ساعة، ما لم ير أن التحقيق يحتم مهلة إضافية فيقرر تمديد احتجازه مدة مماثلة."
+    },
+    {
+      "id": "a5",
+      "law": 244483,
+      "article": "42",
+      "quote": "اذا كانت الجريمة المشهودة من نوع الجناية, وكانت ضرورات التحقيق تستلزم الابقاء على المشتبه فيه محتجزا مدة اطول, فان تمديد المهلة حتى اربعة ايام على الاكثر يتم بقرار خطي معلل من النائب العام الاستئنافي الذي يصدره بعد اطلاعه على الملف وتثبته من مبررات التمديد."
+    },
+    {
+      "id": "a6",
+      "law": 244483,
+      "article": "107",
+      "quote": "بعد ان يستجوب قاضي التحقيق المدعى عليه, ويستطلع رأي النيابة العامة, يمكنه ان يصدر قرارا بتوقيفه شرط ان يكون الجرم المسند اليه معاقبا عليه بالحبس اكثر من سنة أو ان يكون قد حكم عليه قبلا بعقوبة جنائية أو بالحبس اكثر من ثلاثة اشهر دون وقف التنفيذ."
+    },
+    {
+      "id": "a7",
+      "law": 244483,
+      "article": "107",
+      "quote": "يجب ان يكون قرار التوقيف معللا وان يبين فيه قاضي التحقيق الاسباب الواقعية والمادية التي اعتمدها لاصدار قراره"
+    },
+    {
+      "id": "a8",
+      "law": 244483,
+      "article": "113",
+      "quote": "اذا كانت الجريمة من نوع الجنحة وكان الحد الاقصى للعقوبة لا يتجاوز الحبس مدة سنتين وكان المدعى عليه لبنانيا وله مقام في لبنان فيخلى سبيله بحق بعد انقضاء خمسة ايام على تاريخ توقيفه, شرط الا يكون قد حكم عليه سابقا بعقوبة جرم شائن او بعقوبة الحبس مدة سنة على الاقل."
+    },
+    {
+      "id": "a9",
+      "law": 244483,
+      "article": "114",
+      "quote": "في جميع الجرائم الاخرى, واذا لم تتوافر شروط تخلية السبيل بحق, يمكن لقاضي التحقيق, بعد استطلاع رأي النيابة العامة, ان يقرر اخلاء سبيل المدعى عليه الموقوف, اذا استدعاه وتعهد في استدعائه بحضور جميع معاملات التحقيق والمحاكمة وانفاذ الحكم, لقاء كفالة أو دونها."
+    },
+    {
+      "id": "a10",
+      "law": 244483,
+      "article": "115",
+      "quote": "يقدم المدعى عليه أو وكيله طلب اخلاء السبيل الى قاضي التحقيق قبل اصدار القرار الظني."
+    },
+    {
+      "id": "a11",
+      "law": 285834,
+      "article": "3",
+      "quote": "1 - الاتصال بمحام يختاره وبأحد افراد عائلته او بصاحب العمل او بأحد معارفه."
+    },
+    {
+      "id": "a12",
+      "law": 285834,
+      "article": "3",
+      "quote": "6 - الاستعانة بمترجم محلف اذا لم يكن يحسن اللغة العربية، ولكل اجنبي من دولة لا تكون اللغة العربية لغتها الرسمية، على ان يصار الى تعيين المترجم بأسرع وقت ممكن."
+    },
+    {
+      "id": "a13",
+      "law": 285834,
+      "article": "3",
+      "quote": "7 - تقديم طلب مباشر، او بواسطة وكيله او احد افراد عائلته الى النائب العام، بعرضه على طبيب شرعي متخصص بالصحة الجسدية او النفسية لمعاينته على نفقة الخزينة العامة. يعين النائب العام له طبيبا فور تقديم الطلب اليه. على الطبيب ان يجري المعاينة الجسدية او النفسية دون حضور اي من الضباط العدليين، وان يرفع تقريره الى النائب العام في مدة لا تتجاوز الاربع والعشرين ساعة."
+    },
+    {
+      "id": "a14",
+      "law": 285834,
+      "article": "3",
+      "quote": "في جميع الاحوال، يجب ان تكون اجراءات الاستجواب او الاستماع الى اقوال المشكو منه مصورة بالصوت والصورة بدءا من لحظة تلاوة حقوقه المذكورة في هذه المادة عليه، على ان ترفق التسجيلات بمحضر التحقيقات الاولية تحت طائلة بطلان المحضر والاجراءات اللاحقة له."
+    },
+    {
+      "id": "a15",
+      "law": 285834,
+      "article": "3",
+      "quote": "2 - الاستعانة بمحام لحضور استجوابه او الاستماع الى اقواله ومقابلته."
+    },
+    {
+      "id": "a16",
+      "law": 285834,
+      "article": "3",
+      "quote": "تتم المقابلة بين المشتبه به او المشكو منه والمحامي بصورة تضمن سرية المحادثة بينهما، وعلى ان تكون مدتها ثلاثين دقيقة كحد اقصى."
+    },
+    {
+      "id": "a17",
+      "law": 285834,
+      "article": "3",
+      "quote": "اذا استمهل لتوكيل محام فيمهل مدة اربعة وعشرين ساعة لذلك."
+    },
+    {
+      "id": "a18",
+      "law": 285834,
+      "article": "3",
+      "quote": "لعقوبة الحبس لمدة تتراوح ما بين ثلاثة اشهر الى سنة وبغرامة تتراوح ما بين مليونين ليرة لبنانية الى عشرة ملايين ليرة لبنانية في حال لم يراع اي من الضمانات الاساسية المذكورة في هذه المادة"
+    },
+    {
+      "id": "a19",
+      "law": 244483,
+      "article": "47",
+      "quote": "تحسب فترة احتجازه من مدة توقيفه."
+    },
+    {
+      "id": "a20",
+      "law": 244483,
+      "article": "107",
+      "quote": "اما المدعى عليه الذي احضر بمذكرة احضار فيستجوبه خلال اربع وعشرين ساعة من وقت تنفيذ مذكرة الاحضار في حقه."
+    },
+    {
+      "id": "a21",
+      "law": 244483,
+      "article": "107",
+      "quote": "للمدعى عليه ان يستأنف القرار القاضي بتوقيفه خلال اربع وعشرين ساعة من تاريخ ابلاغه اياه."
+    },
+    {
+      "id": "a22",
+      "law": 244483,
+      "article": "107",
+      "quote": "ان استئناف القرار لا يوقف تنفيذه."
+    },
+    {
+      "id": "a23",
+      "law": 244483,
+      "article": "111",
+      "quote": "ان يستعيض عن توقيف المدعى عليه بوضعه تحت المراقبة القضائية, وبالزامه بموجب أو اكثر من الموجبات التي يعتبرها ضرورية لانفاذ المراقبة."
+    },
+    {
+      "id": "a24",
+      "law": 244483,
+      "article": "108",
+      "quote": "لقاضى التحقيق ان يقرر منع المدعى عليه من السفر مدة لا تتجاوز الشهرين في الجنحة والسنة في الجناية من تاريخ اخلاء سبيله أو تركه."
+    },
+    {
+      "id": "a25",
+      "law": 244483,
+      "article": "113",
+      "quote": "يتعهد المدعى عليه المخلى سبيله بحضور جميع معاملات التحقيق واجراءات المحاكمة وانفاذ الحكم."
+    }
+  ],
+  "en": {
+    "title": "How long can pretrial detention last in Lebanon?",
+    "head_title": "Lebanon pretrial detention: Criminal Procedure Art. 108, 47",
+    "question": "How long can a suspect be held in police custody and in pretrial detention under Lebanon's Code of Criminal Procedure (Articles 47 and 108), and what rights did the 2020 amendment add?",
+    "description": "Lebanon pretrial detention, Criminal Procedure Code Article 108: 2 months for a misdemeanour, 6 for a felony, with exceptions. Police custody: 48 hours.",
+    "answer": {
+      "text": "In Lebanon, except in the cases it lists, Article 108 of the Code of Criminal Procedure caps pretrial detention at 2 months for a misdemeanour, extendable by the same period at most, and at 6 months for a felony, renewable once by a reasoned decision. Under Article 47, as replaced by Law 191 of 2020, the judicial police may hold a suspect for no more than 48 hours, extendable by the same period only with the prosecution's approval. Before he is heard, and as soon as he is held for the investigation, the suspect may contact a lawyer and a family member.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a11"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "How long can pretrial detention last?",
+        "paras": [
+          {
+            "text": "Article 108 sets these limits. Law 111 of 2010 replaced its paragraph on felonies.",
+            "cites": [
+              "a1",
+              "a2"
+            ]
+          },
+          {
+            "text": "After release, the investigating judge may ban the defendant from travel for up to 2 months in a misdemeanour and 1 year in a felony.",
+            "cites": [
+              "a24"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "Article 108",
+          "head": [
+            "Case",
+            "Limit"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Misdemeanour",
+                "2 months, extendable by the same period at most, in extreme necessity"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "Misdemeanour, previous sentence of at least 1 year",
+                "Excepted from this limit by Article 108"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "Felony",
+                "6 months, renewable once by a reasoned decision"
+              ],
+              "cites": [
+                "a2"
+              ]
+            },
+            {
+              "cells": [
+                "Felony of homicide, drugs, attacks on state security, comprehensive danger, or terrorism, or detainee with a previous criminal penalty",
+                "Excepted from this limit by Article 108"
+              ],
+              "cites": [
+                "a2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "How long can the police hold a suspect?",
+        "paras": [
+          {
+            "text": "Article 47 bars the judicial police from holding a suspect in their cells except by a decision of the public prosecution, and for no more than 48 hours. This can be extended by the same period only with the prosecution's approval.",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "In a flagrant felony, Article 32 lets the public prosecutor or the advocate general hold a strongly suspected person for no more than 48 hours, and extend it by the same period if he finds the investigation needs more time.",
+            "cites": [
+              "a4"
+            ]
+          },
+          {
+            "text": "Article 42 allows an extension up to 4 days at most for a flagrant felony, by a reasoned written decision of the appeal prosecutor. The articles state different periods.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "The time spent in custody counts toward the detention period (Article 47).",
+            "cites": [
+              "a19"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What rights does a suspect have since 2020?",
+        "paras": [
+          {
+            "text": "Law 191 of 2020 replaced Article 47. A suspect may contact a lawyer of his choice and a family member, employer or acquaintance.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "He may have a lawyer present at his questioning and meet him in confidence for 30 minutes at most. If he asks for time to appoint a lawyer, he is given 24 hours.",
+            "cites": [
+              "a15",
+              "a16",
+              "a17"
+            ]
+          },
+          {
+            "text": "He has a sworn interpreter if he does not speak Arabic, and may ask the public prosecutor, directly or through his lawyer or a family member, to be examined by a forensic doctor at the Treasury's expense, who reports within 24 hours.",
+            "cites": [
+              "a12",
+              "a13"
+            ]
+          },
+          {
+            "text": "The questioning or hearing must be recorded in audio and video from the moment his rights are read to him, and the recordings are attached to the record of the preliminary investigation, or the record and the steps that follow it are void.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "An investigator who does not respect any of the basic guarantees of the article faces, besides the disciplinary penalty, 3 months to 1 year of prison and a fine of 2,000,000 to 10,000,000 LBP.",
+            "cites": [
+              "a18"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "When may an investigating judge order detention?",
+        "paras": [
+          {
+            "text": "Article 107 allows it after the investigating judge questions the defendant and takes the prosecution's opinion. The offence must carry more than 1 year of prison, or the defendant must have a previous criminal sentence or more than 3 months of prison without suspension.",
+            "cites": [
+              "a6"
+            ]
+          },
+          {
+            "text": "The decision must be reasoned and state its factual and material grounds.",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "A defendant brought in on a warrant is questioned within 24 hours of its execution. The defendant may appeal the detention decision within 24 hours of being notified of it, and the appeal does not stop its execution.",
+            "cites": [
+              "a20",
+              "a21",
+              "a22"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "When is release a right, and how is it requested?",
+        "paras": [
+          {
+            "text": "Whatever the offence, and after taking the prosecution's opinion, the investigating judge may replace detention with judicial supervision and impose the duties he finds necessary (Article 111).",
+            "cites": [
+              "a23"
+            ]
+          },
+          {
+            "text": "Article 113 gives release by right 5 days after detention for a misdemeanour with a maximum of 2 years of prison, if the defendant is Lebanese, resident in Lebanon, and not previously sentenced for a disgraceful offence or to at least 1 year of prison. The released defendant undertakes to attend every step of the investigation and the trial and the enforcement of the judgment.",
+            "cites": [
+              "a8",
+              "a25"
+            ]
+          },
+          {
+            "text": "In other cases, after taking the prosecution's opinion, the investigating judge may release a detainee who asks for it and undertakes in the request to attend every step of the investigation and the trial and the enforcement of the judgment, with or without bail.",
+            "cites": [
+              "a9"
+            ]
+          },
+          {
+            "text": "The defendant or his representative files the request with the investigating judge before the indictment decision.",
+            "cites": [
+              "a10"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "What this page does not cover",
+        "paras": [
+          {
+            "text": "Detention ordered by trial courts, by the Judicial Council's investigator or by military courts, and the detention of juveniles, are not covered. This page does not say how long detention lasts in practice.",
+            "note": true
+          },
+          {
+            "text": "Our consolidated copy of Article 47 repeats some paragraphs, so the rights above are quoted from Law 191 of 2020 itself. The appeal of release decisions and the rules on bail are not covered.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  },
+  "ar": {
+    "title": "كم تبلغ مدة التوقيف الاحتياطي في لبنان؟",
+    "head_title": "التوقيف الاحتياطي في لبنان: المادتان 108 و47 أصول جزائية",
+    "question": "كم تبلغ مدة الاحتجاز لدى الضابطة العدلية ومدة التوقيف الاحتياطي في قانون أصول المحاكمات الجزائية اللبناني (المادتان 47 و108)، وما الحقوق التي أضافها تعديل 2020؟",
+    "description": "التوقيف الاحتياطي في لبنان، المادة 108 من أصول المحاكمات الجزائية: شهران في الجنحة و6 أشهر في الجناية مع استثناءات. والاحتجاز لدى الضابطة العدلية 48 ساعة.",
+    "answer": {
+      "text": "في لبنان، وما خلا الحالات التي تعددها، تحدد المادة 108 من قانون أصول المحاكمات الجزائية مدة التوقيف الاحتياطي بشهرين في الجنحة، يمكن تمديدها مدة مماثلة كحد أقصى، وبـ6 أشهر في الجناية، يمكن تجديدها لمرة واحدة بقرار معلل. ووفق المادة 47، كما استبدلها القانون 191 لسنة 2020، لا يجوز أن تحتجز الضابطة العدلية المشتبه فيه أكثر من 48 ساعة، ويمكن تمديدها مدة مماثلة بموافقة النيابة العامة فقط. وللمشتبه فيه، قبل الاستماع إلى أقواله وفور احتجازه لضرورات التحقيق، الاتصال بمحام وبأحد أفراد عائلته.",
+      "cites": [
+        "a1",
+        "a2",
+        "a3",
+        "a11"
+      ]
+    },
+    "sections": [
+      {
+        "heading": "كم يمكن أن يستمر التوقيف الاحتياطي؟",
+        "paras": [
+          {
+            "text": "تحدد المادة 108 المهل الآتية. وقد استبدل القانون 111 لسنة 2010 فقرتها الخاصة بالجنايات.",
+            "cites": [
+              "a1",
+              "a2"
+            ]
+          },
+          {
+            "text": "ولقاضي التحقيق أن يقرر منع المدعى عليه من السفر مدة لا تتجاوز شهرين في الجنحة وسنة في الجناية من تاريخ إخلاء سبيله أو تركه.",
+            "cites": [
+              "a24"
+            ]
+          }
+        ],
+        "table": {
+          "caption": "المادة 108",
+          "head": [
+            "الحالة",
+            "المهلة"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "الجنحة",
+                "شهران، ويمكن تمديدها مدة مماثلة كحد أقصى في حالة الضرورة القصوى"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "الجنحة، مع حكم سابق بعقوبة مدتها سنة على الأقل",
+                "مستثناة من هذه المهلة بنص المادة 108"
+              ],
+              "cites": [
+                "a1"
+              ]
+            },
+            {
+              "cells": [
+                "الجناية",
+                "6 أشهر، يمكن تجديدها لمرة واحدة بقرار معلل"
+              ],
+              "cites": [
+                "a2"
+              ]
+            },
+            {
+              "cells": [
+                "جنايات القتل والمخدرات والاعتداء على أمن الدولة والخطر الشامل وجرائم الإرهاب، أو الموقوف المحكوم عليه سابقا بعقوبة جنائية",
+                "مستثناة من هذه المهلة بنص المادة 108"
+              ],
+              "cites": [
+                "a2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "heading": "كم تبلغ مدة احتجاز المشتبه فيه لدى الضابطة العدلية؟",
+        "paras": [
+          {
+            "text": "تحظر المادة 47 على الضابطة العدلية احتجاز المشتبه فيه في نظاراتها إلا بقرار من النيابة العامة ولمدة لا تزيد على 48 ساعة. ويمكن تمديدها مدة مماثلة فقط بناء على موافقة النيابة العامة.",
+            "cites": [
+              "a3"
+            ]
+          },
+          {
+            "text": "في الجناية المشهودة، تجيز المادة 32 للنائب العام أو المحامي العام احتجاز من توافرت فيه شبهات قوية مدة لا تزيد على 48 ساعة، وتمديدها مدة مماثلة إذا رأى أن التحقيق يحتم مهلة إضافية.",
+            "cites": [
+              "a4"
+            ]
+          },
+          {
+            "text": "تجيز المادة 42 في الجناية المشهودة تمديد المهلة حتى 4 أيام على الأكثر بقرار خطي معلل من النائب العام الاستئنافي. وتنص المواد على مهل مختلفة.",
+            "cites": [
+              "a5"
+            ]
+          },
+          {
+            "text": "وتُحسب فترة الاحتجاز من مدة التوقيف (المادة 47).",
+            "cites": [
+              "a19"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما الحقوق التي أضافها تعديل 2020 للمشتبه فيه؟",
+        "paras": [
+          {
+            "text": "استبدل القانون 191 لسنة 2020 المادة 47. وللمشتبه فيه الاتصال بمحام يختاره وبأحد أفراد عائلته أو بصاحب العمل أو بأحد معارفه.",
+            "cites": [
+              "a11"
+            ]
+          },
+          {
+            "text": "وله الاستعانة بمحام لحضور استجوابه ومقابلته بصورة تضمن سرية المحادثة لمدة 30 دقيقة كحد أقصى. وإذا استمهل لتوكيل محام يُمهل 24 ساعة.",
+            "cites": [
+              "a15",
+              "a16",
+              "a17"
+            ]
+          },
+          {
+            "text": "وله الاستعانة بمترجم محلف إن لم يكن يحسن العربية، وله أن يطلب من النائب العام، مباشرة أو بواسطة وكيله أو أحد أفراد عائلته، عرضه على طبيب شرعي على نفقة الخزينة العامة، ويرفع الطبيب تقريره خلال 24 ساعة.",
+            "cites": [
+              "a12",
+              "a13"
+            ]
+          },
+          {
+            "text": "ويجب تصوير الاستجواب أو الاستماع إلى أقواله بالصوت والصورة بدءاً من لحظة تلاوة حقوقه عليه، وترفق التسجيلات بمحضر التحقيقات الأولية تحت طائلة بطلان المحضر والإجراءات اللاحقة له.",
+            "cites": [
+              "a14"
+            ]
+          },
+          {
+            "text": "ويتعرض القائم بالتحقيق الذي لا يراعي أياً من الضمانات الأساسية المذكورة في المادة، فضلاً عن العقوبة المسلكية، للحبس من 3 أشهر إلى سنة ولغرامة من 2,000,000 إلى 10,000,000 ليرة لبنانية.",
+            "cites": [
+              "a18"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "متى يجوز لقاضي التحقيق أن يقرر التوقيف؟",
+        "paras": [
+          {
+            "text": "تجيز المادة 107 ذلك بعد أن يستجوب قاضي التحقيق المدعى عليه ويستطلع رأي النيابة العامة، إذا كان الجرم معاقبا عليه بالحبس أكثر من سنة، أو كان محكوما سابقا بعقوبة جنائية أو بالحبس أكثر من 3 أشهر دون وقف التنفيذ.",
+            "cites": [
+              "a6"
+            ]
+          },
+          {
+            "text": "ويجب أن يكون القرار معللا، وأن يبين القاضي الأسباب الواقعية والمادية التي اعتمدها.",
+            "cites": [
+              "a7"
+            ]
+          },
+          {
+            "text": "يُستجوب المدعى عليه الذي أُحضر بمذكرة إحضار خلال 24 ساعة من وقت تنفيذها. وله أن يستأنف قرار توقيفه خلال 24 ساعة من تاريخ إبلاغه إياه، والاستئناف لا يوقف تنفيذ القرار.",
+            "cites": [
+              "a20",
+              "a21",
+              "a22"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "متى يكون إخلاء السبيل حقا وكيف يطلب؟",
+        "paras": [
+          {
+            "text": "لقاضي التحقيق، مهما كان نوع الجرم وبعد استطلاع رأي النيابة العامة، أن يستعيض عن التوقيف بوضع المدعى عليه تحت المراقبة القضائية وإلزامه بالموجبات التي يعتبرها ضرورية (المادة 111).",
+            "cites": [
+              "a23"
+            ]
+          },
+          {
+            "text": "تقرر المادة 113 إخلاء السبيل بحق بعد 5 أيام من التوقيف في الجنحة التي لا يتجاوز حدها الأقصى الحبس سنتين، إذا كان المدعى عليه لبنانيا وله مقام في لبنان، ولم يحكم عليه سابقا بعقوبة جرم شائن أو بالحبس سنة على الأقل. ويتعهد المخلى سبيله بحضور جميع معاملات التحقيق وإجراءات المحاكمة وإنفاذ الحكم.",
+            "cites": [
+              "a8",
+              "a25"
+            ]
+          },
+          {
+            "text": "وفي الحالات الأخرى يجوز لقاضي التحقيق، بعد استطلاع رأي النيابة العامة، إخلاء سبيل الموقوف إذا استدعاه وتعهد في استدعائه بحضور جميع معاملات التحقيق والمحاكمة وإنفاذ الحكم، بكفالة أو دونها.",
+            "cites": [
+              "a9"
+            ]
+          },
+          {
+            "text": "يقدم المدعى عليه أو وكيله الطلب إلى قاضي التحقيق قبل إصدار القرار الظني.",
+            "cites": [
+              "a10"
+            ]
+          }
+        ]
+      },
+      {
+        "heading": "ما لا تغطيه هذه الصفحة",
+        "paras": [
+          {
+            "text": "لا تشمل الصفحة التوقيف الذي تأمر به محاكم الأساس أو المحقق العدلي أو المحاكم العسكرية، ولا توقيف الأحداث. ولا تبيّن كم يستمر التوقيف عملياً.",
+            "note": true
+          },
+          {
+            "text": "تكرر نسختنا الموحدة من المادة 47 بعض الفقرات، ولذلك نُقلت الحقوق أعلاه من نص القانون 191 لسنة 2020 نفسه. ولا تشمل الصفحة استئناف قرارات إخلاء السبيل ولا أحكام الكفالة.",
+            "note": true
+          }
+        ]
+      }
+    ]
+  }
+}

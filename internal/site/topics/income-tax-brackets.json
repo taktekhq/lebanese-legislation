@@ -163,10 +163,11 @@
   ],
   "en": {
     "title": "What are the income tax brackets in Lebanon?",
+    "head_title": "Lebanon salary income tax brackets: Decree-Law 144 of 1959",
     "question": "What are the income tax brackets on salaries and business profits under Lebanon's Income Tax Law, and which deductions and exemptions apply?",
-    "description": "Salary tax runs from 2% up to 360,000,000 LBP to 25% above 13,500,000,000 LBP, after a 450,000,000 LBP personal deduction. Companies pay 17%.",
+    "description": "Lebanon salary income tax brackets (Decree-Law 144 of 1959): 2% up to 360,000,000 LBP to 25% above 13,500,000,000 LBP, after a 450,000,000 LBP deduction.",
     "answer": {
-      "text": "Under Article 58 of the Income Tax Law (Legislative Decree 144 of 1959), salaries are taxed in brackets from 2% on the first 360,000,000 LBP of net taxable income to 25% on income above 13,500,000,000 LBP. Before the rates apply, each taxpayer deducts 450,000,000 LBP, plus 225,000,000 LBP if married and 45,000,000 LBP for each dependent child, up to 5 children (Articles 31 and 56). Business profits of individuals are taxed from 4% to 25%, and capital companies such as SAL and SARL pay a flat 17% (Article 32).",
+      "text": "In Lebanon, salary income tax brackets are set by Article 58 of the Income Tax Law (Legislative Decree 144 of 1959): salaries are taxed in brackets from 2% on the first 360,000,000 LBP of net taxable income to 25% on income above 13,500,000,000 LBP. Before the rates apply, each taxpayer deducts 450,000,000 LBP, plus 225,000,000 LBP if married and 45,000,000 LBP for each dependent child, up to 5 children (Articles 31 and 56). Business profits of individuals are taxed from 4% to 25%, and capital companies such as SAL and SARL pay a flat 17% (Article 32).",
       "cites": [
         "a1",
         "a5",
@@ -539,10 +540,11 @@
   },
   "ar": {
     "title": "ما شرائح ضريبة الدخل في لبنان، وما التنزيلات والإعفاءات؟",
+    "head_title": "شرائح ضريبة دخل الرواتب في لبنان: المرسوم الاشتراعي 144/1959",
     "question": "ما شرائح ضريبة الدخل على الرواتب وأرباح المهن في قانون ضريبة الدخل اللبناني، وما التنزيلات والإعفاءات المطبقة؟",
-    "description": "ضريبة الرواتب من 2% حتى 360,000,000 ل.ل. إلى 25% فوق 13,500,000,000 ل.ل.، بعد تنزيل شخصي قدره 450,000,000 ل.ل. وتدفع شركات الأموال 17%.",
+    "description": "شرائح ضريبة الدخل على الرواتب في لبنان (المرسوم الاشتراعي 144 لعام 1959): من 2% حتى 360,000,000 ل.ل. إلى 25% فوق 13,500,000,000 ل.ل.، بعد تنزيل 450,000,000 ل.ل.",
     "answer": {
-      "text": "وفق المادة 58 من قانون ضريبة الدخل (المرسوم الاشتراعي 144 لعام 1959)، تخضع الرواتب والأجور لشرائح تبدأ بـ2% على أول 360,000,000 ليرة من الواردات الصافية الخاضعة للضريبة وتصل إلى 25% على ما يزيد عن 13,500,000,000 ليرة. وقبل تطبيق المعدلات يُنزَّل لكل مكلف 450,000,000 ليرة، يضاف إليها 225,000,000 ليرة للمتزوج و45,000,000 ليرة عن كل ولد على عاتقه، بحد أقصى 5 أولاد (المادتان 31 و56). وتخضع أرباح المهن للأفراد لمعدلات من 4% إلى 25%، وتدفع شركات الأموال كالشركات المغفلة والمحدودة المسؤولية ضريبة نسبية قدرها 17% (المادة 32).",
+      "text": "تحدد المادة 58 من قانون ضريبة الدخل (المرسوم الاشتراعي 144 لعام 1959) شرائح ضريبة الدخل على الرواتب في لبنان: تخضع الرواتب والأجور لشرائح تبدأ بـ2% على أول 360,000,000 ليرة من الواردات الصافية الخاضعة للضريبة وتصل إلى 25% على ما يزيد عن 13,500,000,000 ليرة. وقبل تطبيق المعدلات يُنزَّل لكل مكلف 450,000,000 ليرة، يضاف إليها 225,000,000 ليرة للمتزوج و45,000,000 ليرة عن كل ولد على عاتقه، بحد أقصى 5 أولاد (المادتان 31 و56). وتخضع أرباح المهن للأفراد لمعدلات من 4% إلى 25%، وتدفع شركات الأموال كالشركات المغفلة والمحدودة المسؤولية ضريبة نسبية قدرها 17% (المادة 32).",
       "cites": [
         "a1",
         "a5",

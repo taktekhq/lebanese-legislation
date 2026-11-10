@@ -193,10 +193,11 @@
   ],
   "en": {
     "title": "Who must register with the NSSF in Lebanon, and what are the contribution rates?",
+    "head_title": "Lebanon NSSF: who must register, branches, Decree 13955/1963",
     "question": "Who has to be registered with the National Social Security Fund (NSSF) in Lebanon, what does it cover, and what do employers and employees pay?",
-    "description": "Lebanese wage earners must be covered. Decrees set 9% for sickness (7% employer, 2% employee), 6% family and 8.5% end-of-service, paid by the employer.",
+    "description": "Lebanon NSSF: who must register, the branches it covers and the contribution rates: 9% sickness (7% employer, 2% employee), 6% family, 8.5% end-of-service.",
     "answer": {
-      "text": "Under Article 9 of the Social Security Law, every Lebanese wage earner working in Lebanon for one or more employers must be covered by the NSSF, whatever the contract, and foreign workers benefit if they hold a work permit and their country treats Lebanese equally. Decrees set contributions at 9% of earnings for sickness and maternity (7% employer, 2% employee), 6% for family allowances and 8.5% for end-of-service, the last two paid by the employer alone. The NSSF covers sickness and maternity, work accidents, family and education allowances, and a pension scheme that is to replace end-of-service pay.",
+      "text": "Who must register with Lebanon's NSSF: under Article 9 of the Social Security Law, every Lebanese wage earner working in Lebanon for one or more employers must be covered by the NSSF, whatever the contract, and foreign workers benefit if they hold a work permit and their country treats Lebanese equally. Decrees set contributions at 9% of earnings for sickness and maternity (7% employer, 2% employee), 6% for family allowances and 8.5% for end-of-service, the last two paid by the employer alone. The NSSF covers sickness and maternity, work accidents, family and education allowances, and a pension scheme that is to replace end-of-service pay.",
       "cites": [
         "a1",
         "a3",
@@ -496,10 +497,11 @@
   },
   "ar": {
     "title": "من يجب أن يُسجَّل في الضمان الاجتماعي في لبنان، وما نسب الاشتراكات؟",
+    "head_title": "الضمان الاجتماعي في لبنان: الخاضعون والفروع، المرسوم 13955",
     "question": "من يجب أن يُسجَّل في الصندوق الوطني للضمان الاجتماعي في لبنان، وماذا يغطي، وكم يدفع صاحب العمل والأجير؟",
-    "description": "يخضع للضمان كل أجير لبناني. والاشتراكات بالمراسيم: 9% للمرض والأمومة (7% صاحب العمل و2% الأجير)، و6% للتقديمات العائلية و8.5% لنهاية الخدمة على صاحب العمل.",
+    "description": "الضمان الاجتماعي في لبنان: الخاضعون للتسجيل، الفروع ونسب الاشتراكات: 9% للمرض والأمومة (7% صاحب العمل و2% الأجير)، 6% للتقديمات العائلية و8.5% لنهاية الخدمة.",
     "answer": {
-      "text": "وفق المادة 9 من قانون الضمان الاجتماعي، يخضع للضمان كل أجير لبناني يعمل في لبنان لحساب رب عمل واحد أو أكثر، أياً كان عقده، ويستفيد الأجراء الأجانب إذا كانوا حائزين على إجازة عمل وكانت دولتهم تعامل اللبنانيين بالمثل. وتحدد المراسيم الاشتراكات بنسبة 9% من الكسب لضمان المرض والأمومة (7% على صاحب العمل و2% على الأجير)، و6% للتقديمات العائلية، و8.5% لتعويض نهاية الخدمة، والأخيرتان على صاحب العمل وحده. ويغطي الضمان المرض والأمومة وطوارئ العمل والتقديمات العائلية والتعليمية ونظاماً للتقاعد يحل محل تعويض نهاية الخدمة.",
+      "text": "الخاضعون للضمان الاجتماعي في لبنان: وفق المادة 9 من قانون الضمان الاجتماعي، يخضع للضمان كل أجير لبناني يعمل في لبنان لحساب رب عمل واحد أو أكثر، أياً كان عقده، ويستفيد الأجراء الأجانب إذا كانوا حائزين على إجازة عمل وكانت دولتهم تعامل اللبنانيين بالمثل. وتحدد المراسيم الاشتراكات بنسبة 9% من الكسب لضمان المرض والأمومة (7% على صاحب العمل و2% على الأجير)، و6% للتقديمات العائلية، و8.5% لتعويض نهاية الخدمة، والأخيرتان على صاحب العمل وحده. ويغطي الضمان المرض والأمومة وطوارئ العمل والتقديمات العائلية والتعليمية ونظاماً للتقاعد يحل محل تعويض نهاية الخدمة.",
       "cites": [
         "a1",
         "a3",

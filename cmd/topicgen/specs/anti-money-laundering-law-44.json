@@ -1,0 +1,44 @@
+{
+  "slug": "anti-money-laundering-law-44",
+  "title_en": "What does Lebanon's anti-money laundering law (Law 44 of 2015) say?",
+  "title_ar": "ماذا يقول قانون مكافحة تبييض الأموال وتمويل الإرهاب في لبنان (القانون 44 لعام 2015)؟",
+  "head_title_en": "Lebanon Law 44/2015: money laundering, terrorist financing",
+  "head_title_ar": "القانون 44 لعام 2015 في لبنان: تبييض الأموال وتمويل الإرهاب",
+  "question_en": "What does Lebanon's Law 44 of 2015 on fighting money laundering and terrorist financing define as money laundering, what are the penalties, and who must report suspicious transactions?",
+  "question_ar": "كيف يعرّف القانون 44 لعام 2015 تبييض الأموال وتمويل الإرهاب في لبنان، وما العقوبات، ومن يُلزَم بالإبلاغ عن العمليات المشبوهة؟",
+  "sub_questions": [
+    "What does the law call illicit funds, and what counts as money laundering?",
+    "What are the penalties for money laundering and for terrorist financing? (a table of the figures the articles state: prison terms, fines, and the penalties for breaching the duties)",
+    "Who must apply customer due diligence and keep records: banks and financial institutions, and which other businesses and professions?",
+    "What is the Special Investigation Commission, who sits on it, and what can it decide (freezing accounts, lifting banking secrecy)?",
+    "Who must report a suspicious transaction, to whom, and what protects the person who reports?",
+    "What happens to laundered funds (confiscation), and which earlier law did Law 44 replace?"
+  ],
+  "notes": "Law 44 of 24/11/2015, 'fighting money laundering and terrorist financing', law id 241399. Its issuing article says it adopts a bill amending Law 318 of 20/4/2001 and takes effect on publication. The database holds no amendment to any article of Law 44: say in the closing note that the page gives the text as published in 2015 as we hold it, and that later Banque du Liban and Special Investigation Commission circulars and decisions that apply the law are not covered. Article 1 lists 21 kinds of offences whose proceeds are illicit funds, whether committed in Lebanon or abroad, ending with tax evasion: name a handful and give the count only if the article's own numbering shows it. Article 2 defines money laundering and says it is an independent offence that needs no conviction for the original offence. Article 3: 3 to 7 years of prison and a fine of up to twice the laundered amount; terrorist financing is punished under the Penal Code articles it names. Article 4: duties of banks and institutions licensed or supervised by Banque du Liban. Article 5: duties of others (read the article for the exact list and any thresholds). Article 6: the Special Investigation Commission at Banque du Liban, its members and powers. Article 7: who reports. Later articles: freezing, banking secrecy, immunity, penalties for breach, confiscation. State a threshold, a period or an amount only if the cited article states it. Do not say what FATF or any foreign body requires, and do not say whether Lebanon is on any list. Do not describe practice. End the page with one section headed 'What this page does not cover' whose paragraphs are notes.",
+  "pack": [
+    {
+      "law": 241399,
+      "articles": [
+        "1 اصدار",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17"
+      ],
+      "why": "Law 44 of 2015, every article: definitions, penalties, duties of banks and of other businesses, the Special Investigation Commission, reporting, freezing, banking secrecy, immunity, sanctions, confiscation, repeal of Law 318 of 2001"
+    }
+  ]
+}

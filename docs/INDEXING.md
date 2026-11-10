@@ -32,6 +32,6 @@ sat: a text on page 12 of 2012 was behind the pager.
 - All of it is in `internal/site/hubs.go`; the hub pages are in the core
   sitemap (640 addresses a language) through `AddCoreSitemap`. No existing
   address changed (`TestHubsLeaveEveryOldAddressAlone`).
-- Not done: the 29 topic pages already link their articles; a topic hub
+- Not done: the 32 topic pages already link their articles; a topic hub
   made of data would need a subject for each text, which the database does not
   have.

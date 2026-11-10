@@ -1,5 +1,10 @@
 # Changes
 
+## 10 November 2026
+
+- Three new topic guides: dismissal notice periods (Labour Code Article 50), the anti money laundering law (Law 44 of 2015) and pretrial detention (Code of Criminal Procedure Articles 108 and 47). 32 guides in all.
+- A topic guide may set `head_title`, its whole `<title>` in place of the title and the site name: the words people and assistants search with, at most 60 characters so it is never cut. Nine guides have one (the three new ones and six retitled as a test); the other 23 are unchanged. The checks ground its numbers like the title's, plus the year the guide was last checked.
+
 ## 9 November 2026
 
 - The hosted MCP server reads answers prepared at build time. `db/prod.sql` runs once on the baked database and makes `-db-prod`, the base of `-all`: `law_card`, `article_card`, `possibly_affected_t`, `law_link`, `search_known` and `law_pub_count`. Each carries a version mark; without it (plain `-db`, an older image) the server computes the same reply with SQL. Real `get_article` calls went from a p95 of 1,060 ms to 131 ms; replies are byte-identical on a 622-call set. `-db` and the Hugging Face dataset do not change. See [performance](performance.md).

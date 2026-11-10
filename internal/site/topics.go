@@ -311,8 +311,13 @@ func (s *Server) topic(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	path := "/topic/" + t.Slug + "/"
+	// A head title is the whole <title>: search keywords, no site name, uncut.
+	title := s.brandTitle(r, c.Title)
+	if c.HeadTitle != "" {
+		title = c.HeadTitle
+	}
 	s.render(w, r, "topic", 200, Page{
-		Title: s.brandTitle(r, c.Title), Desc: c.Description, Path: path, OGType: "article", GoogleNoIndex: topicsHidden,
+		Title: title, Desc: c.Description, Path: path, OGType: "article", GoogleNoIndex: topicsHidden,
 		LD:   []any{s.topicLD(r, t, c, path, ctx), breadcrumbs(s.tr(r, "topics.title"), "/topics/", c.Title, path)},
 		Data: tv})
 }

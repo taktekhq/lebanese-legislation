@@ -1,0 +1,33 @@
+{
+  "slug": "dismissal-notice-period",
+  "title_en": "How much notice is required before dismissal in Lebanon?",
+  "title_ar": "ما مهلة الإنذار قبل الصرف من العمل في لبنان؟",
+  "head_title_en": "Lebanon Labour Code Article 50: dismissal notice periods",
+  "head_title_ar": "المادة 50 من قانون العمل اللبناني: مهلة الإنذار قبل الصرف",
+  "question_en": "How long is the notice period before dismissal or resignation under Article 50 of the Lebanese Labour Code, and what is owed when no notice is given?",
+  "question_ar": "ما مدة الإنذار الواجب قبل الصرف أو الاستقالة وفق المادة 50 من قانون العمل اللبناني، وما الذي يترتب على عدم توجيهه؟",
+  "sub_questions": [
+    "How long is the notice period, by length of service? (a table: one row per band of Article 50 paragraph c)",
+    "What form must the notice take, and what is owed when it is not given?",
+    "When is no notice required (probation, the cases of Article 74, a worker leaving for the reasons of Article 75)?",
+    "When may notice not be served (pregnancy, maternity leave, annual or sick leave), and may the worker be absent to look for work during the notice?",
+    "What is owed for an abusive termination, and how long is there to sue?",
+    "What notice does an employer give the Ministry before ending contracts for economic or technical reasons?"
+  ],
+  "notes": "Labour Code of 23/9/1946, law id 190374; it has no number in the database, so name it 'the Labour Code of 1946' and never give it a law number. Article 50 is the amended wording (the article's note says it was amended by a law put into force by Decree 9640 of 1975; say only that). Article 50 paragraph c: either side of an open-ended contract must tell the other before ending it: 1 month before when the contract has run 3 years or less, 2 months for more than 3 and under 6 years, 3 months for more than 6 and under 12 years, 4 months for 12 years or more. The article's bands leave exactly 6 years uncovered ('more than 3 and less than 6', then 'more than 6'): state the bands as printed and do not fill the gap. Notice must be written and served; the other side may ask for the reasons if the notice does not give them. The side that breaches owes the other the wage of the notice period the law required. A new employer who knew the worker left without notice is jointly liable. During the 3 months of probation either side may end the contract with no notice or indemnity. Paragraph a: abusive termination by the employer costs 2 to 12 months of wages on top of the legal indemnities; a worker who ends the contract outside the lawful reasons and causes harm owes 1 to 4 months of wages on top of the notice indemnity. Paragraph b: the claim goes to the arbitral council within 1 month of being told of the termination, and the council decides within 3 months. Paragraph f: for force majeure or economic or technical reasons the employer tells the Ministry of Labour 1 month before. Article 51: 1 hour off a day during notice to look for work. Article 52 (amended by Law 207 of 2000): no notice to a pregnant woman, a woman on maternity leave, or a worker on ordinary or sick leave. Article 53: an employer who breaches the notice rules pays the wages of the notice days. Article 74: the cases where the employer ends the contract with no notice or indemnity. Articles 75 and 76: the worker may leave with no notice in 4 cases and still gets the dismissal indemnity. The amount of the dismissal or end-of-service indemnity itself (Articles 54 to 59, and the Social Security scheme) is another page of this site: do not restate it; the closing note may say it is not covered here. The articles are in Arabic; the database holds no French text of this law. Do not state how courts apply these rules. End the page with one section headed 'What this page does not cover' whose paragraphs are notes.",
+  "pack": [
+    {
+      "law": 190374,
+      "articles": [
+        "50",
+        "51",
+        "52",
+        "53",
+        "74",
+        "75",
+        "76"
+      ],
+      "why": "Labour Code: notice periods, form and breach of notice, abusive termination, when notice may not be served, termination without notice, a worker leaving for cause"
+    }
+  ]
+}
