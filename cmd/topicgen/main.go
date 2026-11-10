@@ -100,7 +100,11 @@ func main() {
 			}
 		})
 	case "check":
-		bad := 0
+		known, err := parseKnown(knownQuotesTSV)
+		if err != nil {
+			log.Fatal(err)
+		}
+		bad, tolerated := 0, 0
 		for _, slug := range args {
 			t := topics.Get(slug)
 			if strings.HasSuffix(slug, ".json") { // a file outside the embedded set
@@ -116,11 +120,17 @@ func main() {
 				bad++
 				continue
 			}
-			for _, p := range topics.Check(t, db) {
+			problems, kept := applyKnown(t.Slug, topics.Check(t, db), known)
+			for _, p := range problems {
 				fmt.Println(p)
 				bad++
 			}
+			for _, p := range kept {
+				fmt.Println("known: " + p)
+				tolerated++
+			}
 		}
+		fmt.Printf("%d topics checked: %d problems, %d known (cmd/topicgen/known-quotes.tsv)\n", len(args), bad, tolerated)
 		if bad > 0 {
 			os.Exit(1)
 		}
