@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -13,18 +14,44 @@ import (
 )
 
 // DB is a Source over the LebaneseLegislation database. An article's text is
-// the wording the site shows: the latest version that has a text, else the
-// Centre's own.
+// the wording its page on the site prints (Shown).
 type DB struct{ Pool *pgxpool.Pool }
 
-const factsSQL = `SELECT coalesce(
-		(SELECT v.text_ar FROM article_version v WHERE v.law_id = a.law_id AND v.article_number = a.number AND v.text_ar IS NOT NULL
-		 ORDER BY v.major DESC, v.minor DESC LIMIT 1), a.text_ar),
+// factsSQL reads the Centre's text and every version's wording, oldest
+// first, a NULL for a version with none; Shown picks among them.
+const factsSQL = `SELECT coalesce(a.text_ar, ''),
+	ARRAY(SELECT v.text_ar FROM article_version v WHERE v.law_id = a.law_id AND v.article_number = a.number ORDER BY v.major, v.minor),
 	coalesce(a.note, ''), l.title, coalesce(l.number, ''), l.issued_on,
 	coalesce((SELECT string_agg(coalesce(b.number, '') || ' ' || coalesce(to_char(b.issued_on, 'DD/MM/YYYY'), '') || ' ' || b.title, E'\n')
 	          FROM article_version v JOIN amendment m ON m.id = v.amendment_id JOIN legislation b ON b.id = m.by_law_id
 	          WHERE v.law_id = a.law_id AND v.article_number = a.number), '')
 	FROM legislation_article a JOIN legislation l ON l.id = a.law_id WHERE a.law_id = $1 AND a.number = $2`
+
+// repealedNote is how the Centre's note opens on an article it holds as
+// repealed; the site prints the Centre's text then (Article.RepealedNote in
+// internal/site).
+var repealedNote = regexp.MustCompile(`^\s*مادة ملغا`)
+
+// Shown is the wording an article's page prints, the rule of Article.Shown
+// in internal/site: the latest version that has a wording, else the Centre's
+// text; the Centre's text also when its note says the article is repealed.
+// versions are the article's versions oldest first, nil for one without a
+// wording. A test in internal/site holds the two rules together.
+//
+// The latest wording is not always the whole article: where the build read
+// a change to one clause as a new article, the page prints that clause
+// alone, and so does this.
+func Shown(centre, note string, versions []*string) string {
+	if repealedNote.MatchString(note) {
+		return centre
+	}
+	for i := len(versions) - 1; i >= 0; i-- {
+		if versions[i] != nil {
+			return *versions[i]
+		}
+	}
+	return centre
+}
 
 // readingSQL is a Gazette reading's text and facts (reading.go): an annexed
 // table's row (its violation, then its notes) or an article's first wording.
@@ -40,9 +67,10 @@ func (d DB) Article(law int, number string) (Facts, bool, error) {
 	if _, ok := ParseReading(number); ok {
 		return d.reading(law, number)
 	}
-	var text, note, title, num, amending string
+	var centre, note, title, num, amending string
+	var versions []*string
 	var issued *time.Time
-	err := d.Pool.QueryRow(context.Background(), factsSQL, law, number).Scan(&text, &note, &title, &num, &issued, &amending)
+	err := d.Pool.QueryRow(context.Background(), factsSQL, law, number).Scan(&centre, &versions, &note, &title, &num, &issued, &amending)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return Facts{}, false, nil
 	}
@@ -53,7 +81,7 @@ func (d DB) Article(law int, number string) (Facts, bool, error) {
 	if issued != nil {
 		extra = append(extra, issued.Format("2/1/2006"), fmt.Sprint(issued.Year()))
 	}
-	return Facts{Text: text, Extra: strings.Join(extra, "\n")}, true, nil
+	return Facts{Text: Shown(centre, note, versions), Extra: strings.Join(extra, "\n")}, true, nil
 }
 
 // reading looks up a Gazette reading. An older database has no gazette_annex:
