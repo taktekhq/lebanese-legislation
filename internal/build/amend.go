@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/jackc/pgx/v5"
 
@@ -40,6 +41,7 @@ type change struct {
 	resolvedBy string
 	evidence   string
 	amending   string // the amending article in full
+	inside     bool   // the Centre's text of the article has the wording and more (see inside)
 	judgedBy   string // the model whose judgement applied
 	judgement  string // includes, predates, later, unclear
 }
@@ -453,6 +455,21 @@ func (b *builder) versions(changes []*change) ([][]any, error) {
 				c.judgedBy, c.judgement = string(v.Model), string(v.State)
 			}
 		}
+		// A new wording that is only a part of the article never stands as
+		// the article: the Centre's text does, and the change is a note.
+		for _, c := range cs {
+			if c.status != "applied" || c.part != "" || c.text == "" || c.action == amend.Repeal || c.method == "editorial" {
+				continue
+			}
+			switch {
+			case inside(u, c.text):
+				c.inside = true
+				c.reasons = append(c.reasons, "the Centre's text has this wording and more")
+			case short(u, c.text):
+				c.status = "partial"
+				c.reasons = append(c.reasons, "new wording under half the article's length: a part of it, or cut short")
+			}
+		}
 		shown := -1 // the latest change the Centre's text already shows
 		later := -1 // the latest change the Centre's text is later than
 		for i, c := range cs {
@@ -613,12 +630,12 @@ func buildVersions(u string, usrc textSource, cs []*change, at int, unknown bool
 	}
 	for i, c := range cs {
 		// A change that quotes the wording it replaced fills a gap before it.
-		if prev := len(vs) - 1; c.old != "" && c.part == "" && prev >= 0 && vs[prev].text == "" && vs[prev].state == "in_force" {
+		if prev := len(vs) - 1; c.old != "" && c.part == "" && c.status == "applied" && !c.inside && prev >= 0 && vs[prev].text == "" && vs[prev].state == "in_force" {
 			vs[prev].text, vs[prev].source, vs[prev].src = c.old, "amendment", c.published()
 		}
 		major++
 		v := version{major: major, from: c.effective, state: "in_force", source: "none", amendment: c.id}
-		whole := c.part == "" && c.text != "" && c.status == "applied"
+		whole := c.part == "" && c.text != "" && c.status == "applied" && !c.inside
 		switch {
 		case c.action == amend.Repeal && c.part == "":
 			v.state = "repealed"
@@ -662,6 +679,43 @@ func shows(u string, c *change) bool {
 		return false
 	}
 	return coverage(ww, words(u)) >= 0.9
+}
+
+// inside says whether the Centre's text u has the wording w and more: w's
+// letters in order, with text after them or more than a heading before
+// them. Then w is a part of the article (one clause replaced, a paragraph
+// added), or the article changed again since, and u is the article. A
+// wording u only resembles (most of its words, as shows accepts) proves
+// nothing here: u may be the older text with another sum.
+func inside(u, w string) bool {
+	cu, cw := core(u), core(unchangedNote.ReplaceAllString(w, " "))
+	i := strings.Index(cu, cw)
+	if i < 0 || cw == "" {
+		return false
+	}
+	before := utf8.RuneCountInString(cu[:i])
+	after := utf8.RuneCountInString(cu[i+len(cw):])
+	return after >= insideAfter || before+after > insideAround
+}
+
+// The Centre opens some articles with a heading or a note of its own
+// ("ماده 21 المعدله", "المعدله بالقانون المنفذ بالمرسوم رقم 6102 …"), up to
+// 60 letters in the corpus, and closes a few with a short one ("مرسوم
+// تطبيقي لهذه الماده" is 21): a wording that lacks only those is still the
+// whole article.
+const (
+	insideAfter  = 22
+	insideAround = 60
+)
+
+// short says whether the wording w is under half the length of the
+// Centre's text u: read as the whole article it would drop most of it. It
+// is a part (named in a way the patterns missed), or it was cut short, or
+// the article grew since; either way the change is a note until a person
+// confirms it (db/amendments.tsv).
+func short(u, w string) bool {
+	lu, lw := utf8.RuneCountInString(core(u)), utf8.RuneCountInString(core(w))
+	return lu > 0 && lw*2 < lu
 }
 
 // "[والباقي دون تعديل]", "(الباقي بدون تعديل)", "...": an amendment's own

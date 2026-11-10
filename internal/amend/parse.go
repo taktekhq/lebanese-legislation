@@ -53,6 +53,21 @@ var (
 	limited = regexp.MustCompile(` (?:فيما يتعلق|فيما خص|فيما يختص|في ما يتعلق|لجهه|بالنسبه ل|في الشق|في الجزء|باستثناء|ما عدا)`)
 	// The Centre's stand-in where it didn't type the wording out.
 	placeholder = regexp.MustCompile(`^.{0,20}(?:للاطلاع علي|يرجي مراجعه|راجع) (?:التعديلات|الملحق|ملحق)`)
+	// A part named after the article's number: "الماده /9/ البند السادس فقره
+	// (4) (ب) من القانون …", "الماده الرابعه - الفقره 6 من المرسوم …".
+	partAfter = regexp.MustCompile(`^ ?[/,-]? ?-? ?((?:ال)?(?:فقره|فقرتان|فقرتين|فقرات|بند|بندان|بندين|بنود|مقطع|جمله|نبذه) [^:«"]{0,80}?) (?:من|في) `)
+	// Between the text named and its new wording, words that say only a part
+	// changes. An addition: "باضافه فقره الي اخرها", "ليضاف اليها البند
+	// التالي", "حيث تضاف الفقره الاتيه", "لجهه اضافه تعريف …".
+	adding = regexp.MustCompile(`(?:^|[ ,])(?:و?ذلك )?(?:باضافه|لجهه اضافه|(?:بحيث |حيث |ل|و)?(?:يضاف|تضاف)) `)
+	// A part that takes the new wording: "بحيث تصبح الفقره الاخيره كالتالي".
+	becomes = regexp.MustCompile(`(?:تصبح|يصبح) ((?:ال)?(?:فقره|بند|مقطع|جمله|نبذه) [^:«"]{2,60}?) (?:كالتالي|كالاتي|كما يلي|كما ياتي|علي الشكل|علي الوجه|علي النحو|وفقا|وفق)`)
+	// "ثانيا: بدون تعديل": the wording leaves out the items that stay as
+	// they were, so it is not the article's text. ("والباقي دون تعديل" after
+	// a wording is no such sign: the rest may be the text's other articles.)
+	restKept = regexp.MustCompile(`: ?(?:دون|بدون|من دون|بلا) (?:اي )?(?:تعديل|تغيير)`)
+	// "الفقره التاليه" introduces a wording; it names no part.
+	following   = regexp.MustCompile(`^(?:ال)?(?:فقره|بند|مقطع|جمله|نبذه) (?:التاليه|الاتيه|التالي|الاتي)$`)
 	clauseStart = regexp.MustCompile(`^(?:\(?\d{1,2} ?[-.)] ?|\(?(?:اولا|ثانيا|ثالثا|رابعا|خامسا|سادسا|سابعا|ثامنا|تاسعا|عاشرا)\)? ?[-:.)] ?)?و?(?:تعدل|يعدل|تستبدل|يستبدل|تلغي|يلغي|تضاف|يضاف)[^:«]{0,80}?(?:الماده|المواد|المادتان|المادتين|الفقره|البند|القانون|المرسوم|القرار)`)
 )
 
@@ -171,7 +186,8 @@ func parseClause(t Text) (Op, bool) {
 		op.Flags = append(op.Flags, "edits") // "يعدل في الماده 18 … ما ياتي: 1- … 2- …"
 		pos += len("في ")
 	}
-	pos += len(object.FindString(x[pos:]))
+	obj := object.FindString(x[pos:])
+	pos += len(obj)
 
 	var ok bool
 	if op.Action == Insert {
@@ -181,6 +197,9 @@ func parseClause(t Text) (Op, bool) {
 	}
 	if !ok || op.Ref.Self {
 		return Op{}, false
+	}
+	if obj == "مطلع " && op.Part == "" && !op.Whole {
+		op.Part = "مطلع" // the article's opening words, not all of it
 	}
 	op.wording(t, pos)
 	return op, true
@@ -221,6 +240,10 @@ func (op *Op) object(x string, pos int) (int, bool) {
 		}
 		op.Articles = nums
 		pos += m[1] + n
+		if p := partAfter.FindStringSubmatchIndex(x[pos:]); p != nil && len(nums) == 1 {
+			op.Part = strings.TrimSpace(x[pos+p[2] : pos+p[3]])
+			pos += p[3]
+		}
 	default:
 		r, n := ref(rest)
 		if n == 0 || (r.Num == 0 && r.Date.IsZero() && r.Name == "") {
@@ -337,6 +360,20 @@ func (op *Op) wording(t Text, pos int) {
 				break
 			}
 		}
+	}
+	if op.Part == "" && op.Action == Replace && len(op.Articles) == 1 {
+		// What the words before the wording say changes.
+		between := x[pos:at]
+		if b := becomes.FindStringSubmatch(between); b != nil && !following.MatchString(b[1]) {
+			op.Part = strings.TrimSpace(b[1])
+		} else if a := adding.FindStringIndex(between); a != nil && !strings.Contains(between[a[1]:], "صبح") {
+			// Not "لجهه اضافه فقره 7 اليها بحيث تصبح كالاتي": that wording
+			// is the article as it becomes.
+			op.Action, op.Part = Insert, "+"
+		}
+	}
+	if op.Part == "" && restKept.MatchString(x[at:]) {
+		op.Flags = append(op.Flags, "edits")
 	}
 	end := len(x)
 	if q := instead.FindStringIndex(x[at:]); q != nil && q[0] > 0 {
