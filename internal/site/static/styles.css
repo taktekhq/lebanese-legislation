@@ -336,11 +336,9 @@ a { color: inherit; text-decoration: none; }
    section off every phone. There is room for it: at 520px the bar was mostly
    empty between the wordmark and the CTA. It stays now, and the padding that
    widens its hit box is what gives way first when the bar gets tight. */
-/* On a phone the Arabic header can't fit the wordmark, the switch and the
-   long "Law & AI" label: the button goes (the footer links the page). */
-@media (max-width: 520px) {
-  .nav__end .btn { display: none; } /* two language links stand beside it since the French interface */
-}
+/* The language options have their own bar under the header (.langbar,
+   legislation.css), so the "Law & AI" button stays on a phone in every
+   language. */
 
 @media (max-width: 460px) {
   .nav__out { padding-inline: 0; }

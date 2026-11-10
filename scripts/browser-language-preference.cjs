@@ -30,7 +30,7 @@ if (!base) throw Error('Set BASE_URL');
       assert.equal(await page.evaluate(() => localStorage.getItem('lebleg-language')), 'en');
       await page.goto(base + '/topics/?q=tax#top', { waitUntil: 'load' });
       await page.waitForURL(base + '/en/topics/?q=tax#top');
-      await page.locator('.nav .lang-switch').click();
+      await page.locator('.langbar__list .lang-switch').click();
       await page.waitForURL(base + '/topics/?q=tax#top');
       assert.equal(await page.evaluate(() => localStorage.getItem('lebleg-language')), 'ar');
       await page.goto(base + '/en/topics/?q=tax#top', { waitUntil: 'load' });

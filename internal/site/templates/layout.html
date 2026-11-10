@@ -60,14 +60,18 @@
       <a href="{{u "/data/"}}">{{t "nav.database"}}</a>
     </nav>
     <div class="nav__end">
-      <span class="nav__langs">{{if eq (uilang) "ar"}}<a class="nav__out lang-switch" dir="ltr" href="{{template "page:alt" .}}" hreflang="en" lang="en">{{switchLabel}}</a>{{else if eq (uilang) "fr"}}<a class="nav__out lang-switch" href="{{template "page:en" .}}" hreflang="en" lang="en">English</a>{{else}}<a class="nav__out lang-switch" href="{{template "page:alt" .}}" hreflang="ar" lang="ar" dir="rtl">{{switchLabel}}</a>{{end}}{{if eq (uilang) "fr"}}<a class="nav__out lang-switch" href="{{template "page:alt" .}}" hreflang="ar" lang="ar" dir="rtl">العربية</a>{{else}}<a class="nav__out lang-switch" dir="ltr" href="/fr/" hreflang="fr" lang="fr">Français</a>{{end}}</span>
       <a class="btn btn--primary btn--sm" href="{{u "/ai/"}}">{{t "nav.law_ai"}}</a>
     </div>
   </div>
 </header>
 
+<nav class="langbar" aria-label="{{t "langbar.label"}}"><div class="langbar__inner"><ul class="langbar__list">
+  <li>{{if eq (uilang) "ar"}}<a class="langbar__link lang-switch" dir="ltr" href="{{template "page:alt" .}}" hreflang="en" lang="en">English</a>{{else if eq (uilang) "fr"}}<a class="langbar__link lang-switch" href="{{template "page:en" .}}" hreflang="en" lang="en">English</a>{{else}}<span class="langbar__current" aria-current="true" lang="en">English</span>{{end}}</li>
+  <li>{{if eq (uilang) "ar"}}<span class="langbar__current" aria-current="true" lang="ar">العربية</span>{{else}}<a class="langbar__link lang-switch" href="{{template "page:alt" .}}" hreflang="ar" lang="ar" dir="rtl">العربية</a>{{end}}</li>
+  <li>{{if eq (uilang) "fr"}}<span class="langbar__current" aria-current="true" lang="fr">Français</span>{{else}}<a class="langbar__link lang-switch" dir="ltr" href="/fr/" hreflang="fr" lang="fr">Français</a>{{end}}</li>
+</ul>{{if eq (uilang) "ar"}}<span class="lang-note"><a class="link lang-switch" href="{{template "page:en" .}}" hreflang="en" lang="en" dir="ltr">Read this page in English</a></span>{{end}}</div></nav>
+
 <main id="top">
-{{if eq (uilang) "ar"}}<div class="wrap lang-note"><a class="link lang-switch" href="{{template "page:en" .}}" hreflang="en" lang="en" dir="ltr">Read this page in English</a></div>{{end}}
 {{template "page:content" .}}
 </main>
 
