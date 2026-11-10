@@ -1,15 +1,2 @@
 # Quotes "topicgen check" knows to fail, for a reason outside the topic page.
 # Columns, tab separated: topic slug, cite id, reason. See known.go.
-#
-# 10 Nov 2026. Both articles below are printed on the site as one amended
-# clause, not the article: the build read a change to part of the article as
-# a new wording of all of it (amendment.part is empty, status applied).
-# The quotes are exact pieces of the full text the Centre holds, which the
-# site stops printing. Fix the two amendment rows, then remove these lines.
-nssf-registration-contributions	a1	law 244971 art. 9 prints only the clause Law 323/2023 replaced (amendment 3363), 710 of 13,863 characters
-nssf-registration-contributions	a2	law 244971 art. 9 prints only the clause Law 323/2023 replaced (amendment 3363), 710 of 13,863 characters
-nssf-registration-contributions	a3	law 244971 art. 9 prints only the clause Law 323/2023 replaced (amendment 3363), 710 of 13,863 characters
-nssf-registration-contributions	a4	law 244971 art. 9 prints only the clause Law 323/2023 replaced (amendment 3363), 710 of 13,863 characters
-nssf-registration-contributions	a5	law 244971 art. 9 prints only the clause Law 323/2023 replaced (amendment 3363), 710 of 13,863 characters
-inheritance	s17	law 244292 art. 17 prints only the paragraph Law 768/2006 added (amendment 1068), 376 of 1,774 characters
-personal-status-civil-marriage	s17	law 244292 art. 17 prints only the paragraph Law 768/2006 added (amendment 1068), 376 of 1,774 characters
