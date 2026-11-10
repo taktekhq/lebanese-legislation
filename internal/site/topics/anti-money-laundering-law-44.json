@@ -93,6 +93,12 @@
       "law": 241399,
       "article": "5",
       "quote": "اما المحامون فتسري عليهم، عند قيامهم بالخدمات المبينة آنفاً، نفس الموجبات المبينة اعلاه، على ان تحدد اصول تطبيق هذه الموجبات بموجب آلية تضعها نقابتا المحامين في بيروت وطرابلس تأخذ بعين الاعتبار خصوصية مهنة المحاماة وانظمتها."
+    },
+    {
+      "id": "a16",
+      "law": 241399,
+      "article": "8",
+      "quote": "عند تقرير رفع السرية المصرفية عن الحسابات المعنية و/أو تجميدها بصورة نهائية و/أو تقرير طلب الاستمرار بمنع التصرف بالاموال، ترسل «الهيئة» نسخة طبق الاصل عن قرارها الى كل من النائب العام التمييزي والى الهيئة المصرفية العليا بشخص رئيسها والى صاحب العلاقة والى الجهات المعنية بهذا القرار"
     }
   ],
   "en": {
@@ -101,7 +107,7 @@
     "question": "What does Lebanon's Law 44 of 2015 on fighting money laundering and terrorist financing define as money laundering, what are the penalties, and who must report suspicious transactions?",
     "description": "Lebanon Law 44 of 2015 on fighting money laundering and terrorist financing: what it defines, 3 to 7 years of prison, who must report, and the SIC's powers.",
     "answer": {
-      "text": "Lebanon's Law 44 of 2015 on fighting money laundering and terrorist financing treats as money laundering any act meant to hide the true source of illicit funds or to give it a false justification. It is an independent offence that needs no conviction for the original crime. Laundering carries 3 to 7 years in prison and a fine up to twice the laundered amount. Banks, the businesses the law lists, certified accountants and notaries must report suspect transactions at once to the chair of the Special Investigation Commission.",
+      "text": "Lebanon's Law 44 of 2015 on fighting money laundering and terrorist financing treats as money laundering any act meant to hide the true source of illicit funds or to give it a false justification. It is an independent offence that needs no conviction for the original crime. Laundering carries 3 to 7 years in prison and a fine up to twice the laundered amount. Banks, the businesses the law lists, and certified accountants and notaries acting for clients in the activities it lists must report suspect transactions at once to the chair of the Special Investigation Commission.",
       "cites": [
         "a3",
         "a4",
@@ -114,7 +120,7 @@
         "heading": "What counts as illicit funds and money laundering, and which law came before?",
         "paras": [
           {
-            "text": "Article 1 of Law 44 calls illicit funds the physical or non-physical assets, movable or not, that come from the crimes it lists, or from attempting or joining them, whether committed in Lebanon or abroad.",
+            "text": "Article 1 of Law 44 calls illicit funds the physical or non-physical assets, movable or not, that come from committing the crimes it lists, from a punishable attempt to commit them or from taking part in them, whether committed in Lebanon or abroad.",
             "cites": [
               "a2"
             ]
@@ -133,7 +139,7 @@
             ]
           },
           {
-            "text": "The issuing article says Law 44 adopts a bill amending Law 318 of 20/4/2001 on fighting money laundering.",
+            "text": "The issuing article says Law 44 adopts a bill amending Law 318 of 20/4/2001 on fighting money laundering, as amended by the parliamentary subcommittee and by Parliament.",
             "cites": [
               "a1"
             ]
@@ -226,9 +232,10 @@
             ]
           },
           {
-            "text": "After analysis, the Commission can decide on final freezing of accounts or operations. It can lift banking secrecy for the competent judicial authorities and the Higher Banking Commission, for accounts or operations suspected of laundering or terrorist financing.",
+            "text": "After the needed audit and analysis, the Commission decides on the final freezing of the accounts or operations concerned and on lifting banking secrecy, for the competent judicial authorities and the Higher Banking Commission, on accounts or operations suspected of laundering or terrorist financing (Articles 6 and 8). It sends a certified copy of that decision to the cassation public prosecutor, the Higher Banking Commission and the person concerned.",
             "cites": [
-              "a10"
+              "a10",
+              "a16"
             ]
           }
         ]
@@ -237,7 +244,7 @@
         "heading": "Who must report a suspicious transaction, to whom, and what protects the reporter?",
         "paras": [
           {
-            "text": "Article 7 requires the institutions in Articles 4 and 5, including accountants and notaries, to tell the Commission's chair at once the details of executed or attempted transactions they suspect relate to laundering or terrorist financing.",
+            "text": "Article 7 requires those named in Articles 4 and 5, including certified accountants and notaries when they prepare or carry out for clients transactions tied to the activities listed in Article 5, to tell the Commission's chair at once the details of executed or attempted transactions they suspect relate to laundering or terrorist financing.",
             "cites": [
               "a11"
             ]
@@ -258,7 +265,7 @@
             "note": true
           },
           {
-            "text": "Later Banque du Liban and Special Investigation Commission circulars and decisions that apply the law are not covered. Neither are the mechanism the bar associations set for lawyers, the provisional freeze periods or the steps after a freeze.",
+            "text": "Later Banque du Liban and Special Investigation Commission circulars and decisions that apply the law are not covered. Neither are the mechanism the bar associations set for lawyers, the provisional freeze periods or the steps after a freeze. In our copy, item 3 of Article 6 opens with a word that looks misprinted, so we read it together with Article 8, which speaks of the Commission deciding to lift banking secrecy and to freeze accounts finally.",
             "note": true
           }
         ]
@@ -271,7 +278,7 @@
     "question": "كيف يعرّف القانون 44 لعام 2015 تبييض الأموال وتمويل الإرهاب في لبنان، وما العقوبات، ومن يُلزَم بالإبلاغ عن العمليات المشبوهة؟",
     "description": "القانون 44 لعام 2015 في لبنان لمكافحة تبييض الأموال وتمويل الإرهاب: التعريف، الحبس من 3 إلى 7 سنوات، من يُلزَم بالإبلاغ، وصلاحيات هيئة التحقيق الخاصة.",
     "answer": {
-      "text": "يعتبر القانون 44 لعام 2015 لمكافحة تبييض الأموال وتمويل الإرهاب في لبنان تبييضاً للأموال كل فعل يُقصد منه إخفاء المصدر الحقيقي للأموال غير المشروعة أو إعطاء تبرير كاذب له. وهو جريمة مستقلة لا تستلزم الإدانة بالجرم الأصلي. عقوبته الحبس من 3 إلى 7 سنوات وغرامة لا تزيد عن مثلي المبلغ موضوع التبييض. وعلى المصارف والمؤسسات التي يعددها القانون والمحاسبين المجازين وكتاب العدل إبلاغ رئيس هيئة التحقيق الخاصة فوراً بالعمليات المشتبه بها.",
+      "text": "يعتبر القانون 44 لعام 2015 لمكافحة تبييض الأموال وتمويل الإرهاب في لبنان تبييضاً للأموال كل فعل يُقصد منه إخفاء المصدر الحقيقي للأموال غير المشروعة أو إعطاء تبرير كاذب له. وهو جريمة مستقلة لا تستلزم الإدانة بالجرم الأصلي. عقوبته الحبس من 3 إلى 7 سنوات وغرامة لا تزيد عن مثلي المبلغ موضوع التبييض. وعلى المصارف والمؤسسات التي يعددها القانون، وعلى المحاسبين المجازين وكتاب العدل عند قيامهم لصالح عملائهم بالأنشطة التي يعددها، إبلاغ رئيس هيئة التحقيق الخاصة فوراً بالعمليات المشتبه بها.",
       "cites": [
         "a3",
         "a4",
@@ -284,7 +291,7 @@
         "heading": "ما الأموال غير المشروعة وما تبييض الأموال، وما القانون الذي سبقه؟",
         "paras": [
           {
-            "text": "تُعرّف المادة 1 من القانون 44 الأموال غير المشروعة بأنها الأصول المادية أو غير المادية، المنقولة أو غير المنقولة، الناتجة عن الجرائم التي تعددها أو عن محاولة ارتكابها أو الاشتراك فيها، سواء حصلت في لبنان أو خارجه.",
+            "text": "تُعرّف المادة 1 من القانون 44 الأموال غير المشروعة بأنها الأصول المادية أو غير المادية، المنقولة أو غير المنقولة، الناتجة عن ارتكاب الجرائم التي تعددها أو عن محاولة ارتكابها المعاقب عليها أو عن الاشتراك فيها، سواء حصلت في لبنان أو خارجه.",
             "cites": [
               "a2"
             ]
@@ -303,7 +310,7 @@
             ]
           },
           {
-            "text": "تنص مادة الإصدار على أن القانون 44 يصدّق مشروع قانون يعدّل القانون 318 تاريخ 20/4/2001 المتعلق بمكافحة تبييض الأموال.",
+            "text": "تنص مادة الإصدار على أن القانون 44 يصدّق مشروع قانون يعدّل القانون 318 تاريخ 20/4/2001 المتعلق بمكافحة تبييض الأموال، كما عدلته اللجنة الفرعية ومجلس النواب.",
             "cites": [
               "a1"
             ]
@@ -396,9 +403,10 @@
             ]
           },
           {
-            "text": "بعد التدقيق والتحليل، للهيئة أن تقرر التجميد النهائي للحسابات أو العمليات، ورفع السرية المصرفية لصالح المراجع القضائية المختصة والهيئة المصرفية العليا، عن الحسابات أو العمليات المشتبه بصلتها بتبييض الأموال أو تمويل الإرهاب.",
+            "text": "بعد إجراء التدقيق والتحليل اللازمين، تقرر الهيئة التجميد النهائي للحسابات أو العمليات المعنية ورفع السرية المصرفية، لصالح المراجع القضائية المختصة والهيئة المصرفية العليا، عن الحسابات أو العمليات المشتبه بصلتها بتبييض الأموال أو تمويل الإرهاب (المادتان 6 و8). وترسل نسخة طبق الأصل عن قرارها إلى النائب العام التمييزي والهيئة المصرفية العليا وصاحب العلاقة.",
             "cites": [
-              "a10"
+              "a10",
+              "a16"
             ]
           }
         ]
@@ -407,7 +415,7 @@
         "heading": "من يبلّغ عن العملية المشبوهة، ولمن، وما الذي يحميه؟",
         "paras": [
           {
-            "text": "تُلزم المادة 7 المعنيين في المادتين 4 و5، ومنهم المحاسبون المجازون وكتاب العدل، بإبلاغ رئيس الهيئة فوراً بتفاصيل العمليات المنفذة أو التي جرت محاولة تنفيذها والمشتبه بصلتها بتبييض الأموال أو تمويل الإرهاب.",
+            "text": "تُلزم المادة 7 المعنيين في المادتين 4 و5، ومنهم المحاسبون المجازون وكتاب العدل عند إعدادهم أو تنفيذهم لصالح عملائهم معاملات تتعلق بالأنشطة المعددة في المادة 5، بإبلاغ رئيس الهيئة فوراً بتفاصيل العمليات المنفذة أو التي جرت محاولة تنفيذها والمشتبه بصلتها بتبييض الأموال أو تمويل الإرهاب.",
             "cites": [
               "a11"
             ]
@@ -428,7 +436,7 @@
             "note": true
           },
           {
-            "text": "لا تشمل الصفحة التعاميم والقرارات اللاحقة الصادرة عن مصرف لبنان وهيئة التحقيق الخاصة تطبيقاً للقانون. ولا تشمل الآلية التي تضعها نقابتا المحامين، ولا مُدد التجميد الاحترازي، ولا الإجراءات التي تلي التجميد.",
+            "text": "لا تشمل الصفحة التعاميم والقرارات اللاحقة الصادرة عن مصرف لبنان وهيئة التحقيق الخاصة تطبيقاً للقانون. ولا تشمل الآلية التي تضعها نقابتا المحامين، ولا مُدد التجميد الاحترازي، ولا الإجراءات التي تلي التجميد. وفي نسختنا يبدأ البند 3 من المادة 6 بكلمة تبدو خطأ مطبعياً، فقرأناه مع المادة 8 التي تتحدث عن تقرير الهيئة رفع السرية المصرفية والتجميد النهائي للحسابات.",
             "note": true
           }
         ]
