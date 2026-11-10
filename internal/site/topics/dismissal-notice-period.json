@@ -266,13 +266,13 @@
         "heading": "What is owed for an abusive termination, and how long is there to sue?",
         "paras": [
           {
-            "text": "A dismissal is abusive in the cases Article 50 lists, such as a reason that is unacceptable or unrelated to the worker's ability or conduct or to the running of the business, union membership or lawful union activity, a good-faith complaint about the application of the Code, or the use of personal or public freedoms.",
+            "text": "Article 50 treats a dismissal as abusive in 5 cases: a reason that is unacceptable or unrelated to the worker's ability or conduct or to the running of the business, union membership or lawful union activity, standing for or holding union office or acting as the workers' representative, a good-faith complaint or a lawsuit about the application of the Code, and the use of personal or public freedoms.",
             "cites": [
               "a19"
             ]
           },
           {
-            "text": "Abusive termination by the employer costs 2 to 12 months of wages, on top of the worker's legal indemnities.",
+            "text": "When the employer's termination is abusive, the compensation is assessed on the worker's type of work, age, length of service, family and health situation, the harm and the degree of abuse. It may not be under 2 months of wages or over 12 months, and it comes on top of the worker's legal indemnities.",
             "cites": [
               "a11"
             ]
@@ -284,7 +284,7 @@
             ]
           },
           {
-            "text": "The claim goes to the arbitral council within 1 month of being told of the termination, and the council must decide within 3 months.",
+            "text": "The side that claims abuse brings the case to the arbitral council within 1 month of being told of the termination and may prove it by any means of proof. The council must decide within 3 months.",
             "cites": [
               "a13",
               "a18"
@@ -296,7 +296,7 @@
         "heading": "What notice does an employer give the Ministry before ending contracts for economic or technical reasons?",
         "paras": [
           {
-            "text": "For force majeure or economic or technical reasons, the employer must tell the Ministry of Labour and Social Affairs 1 month before ending the contracts.",
+            "text": "For force majeure or economic or technical reasons, the employer must tell the Ministry of Labour and Social Affairs 1 month before ending the contracts, and consult it on a final programme that takes account of the workers' seniority, speciality, age, and family and social situation, and of the means to re-employ them.",
             "cites": [
               "a14"
             ]
@@ -465,13 +465,13 @@
         "heading": "ما الذي يترتب على الفسخ التعسفي، وما مهلة رفع الدعوى؟",
         "paras": [
           {
-            "text": "يعتبر الصرف تعسفياً في الحالات التي تعددها المادة 50، ومنها السبب غير المقبول أو الذي لا يرتبط بأهلية العامل أو تصرفه أو بحسن إدارة المؤسسة، والانتساب إلى نقابة أو القيام بنشاط نقابي مشروع، وتقديم شكوى بحسن نية تتعلق بتطبيق القانون، وممارسة الحريات الشخصية أو العامة.",
+            "text": "تعتبر المادة 50 الصرف تعسفياً في 5 حالات: السبب غير المقبول أو الذي لا يرتبط بأهلية العامل أو تصرفه أو بحسن إدارة المؤسسة، والانتساب إلى نقابة أو القيام بنشاط نقابي مشروع، والتقدم للانتخابات أو الانتخاب عضواً في مكتب نقابة أو ممثلاً للعمال، وتقديم شكوى بحسن نية أو إقامة دعوى تتعلق بتطبيق القانون، وممارسة الحريات الشخصية أو العامة.",
             "cites": [
               "a19"
             ]
           },
           {
-            "text": "يوجب الفسخ التعسفي من صاحب العمل تعويضاً لا يقل عن أجر شهرين ولا يزيد على أجر 12 شهراً، إضافة إلى التعويضات القانونية التي يستحقها العامل.",
+            "text": "إذا كان الفسخ التعسفي صادراً عن صاحب العمل، يقدَّر التعويض على أساس نوع عمل العامل وسنه ومدة خدمته ووضعه العائلي والصحي ومقدار الضرر ومدى الإساءة. ولا يقل عن أجر شهرين ولا يزيد على أجر 12 شهراً، ويضاف إلى التعويضات القانونية التي يستحقها العامل.",
             "cites": [
               "a11"
             ]
@@ -483,7 +483,7 @@
             ]
           },
           {
-            "text": "تُرفع الدعوى أمام المجلس التحكيمي خلال مهلة شهر من تاريخ إبلاغ الفسخ، وعلى المجلس أن يبت بها في مهلة لا تتجاوز 3 أشهر.",
+            "text": "على من يتذرع بالتعسف أن يقيم الدعوى أمام المجلس التحكيمي خلال مهلة شهر من تاريخ إبلاغه الفسخ، وله أن يثبت ادعاءه بجميع طرق الإثبات. وعلى المجلس أن يبت بالقضية في مهلة لا تتجاوز 3 أشهر.",
             "cites": [
               "a13",
               "a18"
@@ -495,7 +495,7 @@
         "heading": "ما الإنذار الذي يوجهه صاحب العمل إلى الوزارة قبل إنهاء العقود لأسباب اقتصادية أو فنية؟",
         "paras": [
           {
-            "text": "عند القوة القاهرة أو الظروف الاقتصادية أو الفنية، يبلغ صاحب العمل وزارة العمل والشؤون الاجتماعية رغبته في إنهاء العقود قبل شهر من تنفيذه.",
+            "text": "عند القوة القاهرة أو الظروف الاقتصادية أو الفنية، يبلغ صاحب العمل وزارة العمل والشؤون الاجتماعية رغبته في إنهاء العقود قبل شهر من تنفيذه، ويتشاور معها لوضع برنامج نهائي يراعي أقدمية العمال واختصاصهم وأعمارهم ووضعهم العائلي والاجتماعي ووسائل إعادة استخدامهم.",
             "cites": [
               "a14"
             ]
