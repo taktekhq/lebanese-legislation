@@ -53,6 +53,30 @@ var (
 	limited = regexp.MustCompile(` (?:فيما يتعلق|فيما خص|فيما يختص|في ما يتعلق|لجهه|بالنسبه ل|في الشق|في الجزء|باستثناء|ما عدا)`)
 	// The Centre's stand-in where it didn't type the wording out.
 	placeholder = regexp.MustCompile(`^.{0,20}(?:للاطلاع علي|يرجي مراجعه|راجع) (?:التعديلات|الملحق|ملحق)`)
+	// A part named after the article's number: "الماده /9/ البند السادس فقره
+	// (4) (ب) من القانون …", "الماده الرابعه - الفقره 6 من المرسوم …".
+	partAfter = regexp.MustCompile(`^ ?[/,-]? ?-? ?((?:ال)?(?:فقره|فقرتان|فقرتين|فقرات|بند|بندان|بندين|بنود|مقطع|جمله|نبذه) [^:«"]{0,80}?) (?:من|في) `)
+	// Between the text named and its new wording, words that say only a part
+	// changes. An addition: "باضافه فقره الي اخرها", "ليضاف اليها البند
+	// التالي", "حيث تضاف الفقره الاتيه", "لجهه اضافه تعريف …".
+	adding = regexp.MustCompile(`(?:^|[ ,])(?:و?ذلك )?(?:باضافه|لجهه اضافه|(?:بحيث |حيث |ل|و)?(?:يضاف|تضاف)) `)
+	// "باضافه" told of the text named, or of an earlier change to it, is not
+	// this article's addition: "المتعلق باضافه رسم علي الاستيراد", "الذي
+	// قضي باضافه فقره اليها". ("المتعلق ب… بحيث يضاف اليها" is: a new
+	// clause, not the description.)
+	described = regexp.MustCompile(`(?:^| )و?(?:المتعلق|المتعلقه|المتضمن|المتضمنه|القاضي|القاضيه|الرامي|الراميه|الخاص|الخاصه|الذي|التي|اللذين|اللتين)(?: [^ ,):]+)? باضافه $`)
+	// A part that takes the new wording: "بحيث تصبح الفقره الاخيره كالتالي".
+	becomes = regexp.MustCompile(`(?:تصبح|يصبح) ((?:ال)?(?:فقره|بند|مقطع|جمله|نبذه) [^:«"]{2,60}?) (?:كالتالي|كالاتي|كما يلي|كما ياتي|علي الشكل|علي الوجه|علي النحو|وفقا|وفق)`)
+	// "ثانيا: بدون تعديل": the wording leaves out the items that stay as
+	// they were, so it is not the article's text. ("والباقي دون تعديل" after
+	// a wording is no such sign: the rest may be the text's other articles.)
+	// It is read where the wording lists its items, never inside « »: quoted
+	// law may say "بالشروط نفسها: دون تعديل في الرسم" of its own subject.
+	restKept = regexp.MustCompile(`: ?(?:دون|بدون|من دون|بلا) (?:اي )?(?:تعديل|تغيير)`)
+	// The amending article's closing note after a wording.
+	restNote = regexp.MustCompile(`[ ,]*و?(?:يبقي )?الباقي (?:دون|بدون|من دون) (?:اي )?(?:تعديل|تغيير) ?\.? ?$`)
+	// "الفقره التاليه" introduces a wording; it names no part.
+	following   = regexp.MustCompile(`^(?:ال)?(?:فقره|بند|مقطع|جمله|نبذه) (?:التاليه|الاتيه|التالي|الاتي)$`)
 	clauseStart = regexp.MustCompile(`^(?:\(?\d{1,2} ?[-.)] ?|\(?(?:اولا|ثانيا|ثالثا|رابعا|خامسا|سادسا|سابعا|ثامنا|تاسعا|عاشرا)\)? ?[-:.)] ?)?و?(?:تعدل|يعدل|تستبدل|يستبدل|تلغي|يلغي|تضاف|يضاف)[^:«]{0,80}?(?:الماده|المواد|المادتان|المادتين|الفقره|البند|القانون|المرسوم|القرار)`)
 )
 
@@ -171,7 +195,8 @@ func parseClause(t Text) (Op, bool) {
 		op.Flags = append(op.Flags, "edits") // "يعدل في الماده 18 … ما ياتي: 1- … 2- …"
 		pos += len("في ")
 	}
-	pos += len(object.FindString(x[pos:]))
+	obj := object.FindString(x[pos:])
+	pos += len(obj)
 
 	var ok bool
 	if op.Action == Insert {
@@ -181,6 +206,9 @@ func parseClause(t Text) (Op, bool) {
 	}
 	if !ok || op.Ref.Self {
 		return Op{}, false
+	}
+	if obj == "مطلع " && op.Part == "" && !op.Whole {
+		op.Part = "مطلع" // the article's opening words, not all of it
 	}
 	op.wording(t, pos)
 	return op, true
@@ -221,6 +249,10 @@ func (op *Op) object(x string, pos int) (int, bool) {
 		}
 		op.Articles = nums
 		pos += m[1] + n
+		if p := partAfter.FindStringSubmatchIndex(x[pos:]); p != nil && len(nums) == 1 {
+			op.Part = strings.TrimSpace(x[pos+p[2] : pos+p[3]])
+			pos += p[3]
+		}
 	default:
 		r, n := ref(rest)
 		if n == 0 || (r.Num == 0 && r.Date.IsZero() && r.Name == "") {
@@ -327,8 +359,10 @@ func (op *Op) wording(t Text, pos int) {
 		}
 		op.Action = Replace
 	}
+	colon := false // the wording is set out after a colon, not told in the sentence
 	if i := strings.IndexAny(x[at:], ":"); i >= 0 && i < 90 && !strings.ContainsAny(x[at:at+i], "«\"") {
 		at += i + 1
+		colon = true
 	} else {
 		// "… بالنص الاتي «…»": no colon.
 		for _, w := range []string{" الاتي", " التالي", " الاتيه", " التاليه", " الاتيين", " التاليين"} {
@@ -338,10 +372,32 @@ func (op *Op) wording(t Text, pos int) {
 			}
 		}
 	}
+	if op.Part == "" && op.Action == Replace && len(op.Articles) == 1 {
+		// What the words before the wording say changes.
+		between := x[pos:at]
+		if b := becomes.FindStringSubmatch(between); b != nil && !following.MatchString(b[1]) {
+			op.Part = strings.TrimSpace(b[1])
+		} else if a := addition(between); a >= 0 && !strings.Contains(between[a:], "صبح") {
+			// Not "لجهه اضافه فقره 7 اليها بحيث تصبح كالاتي": that wording
+			// is the article as it becomes.
+			op.Action, op.Part = Insert, "+"
+		}
+	}
+	if op.Part == "" && restKept.MatchString(unquoted(x[at:])) {
+		op.Flags = append(op.Flags, "edits")
+	}
 	end := len(x)
 	if q := instead.FindStringIndex(x[at:]); q != nil && q[0] > 0 {
-		op.Old = unquote(t.Span(at+q[1], len(x)))
-		end = at + q[0]
+		if colon && len(op.Articles) <= 1 && t.inSentence(at, at+q[0], at+q[1]) {
+			// The sentence is the wording's own; a closing "والباقي دون
+			// تعديل" is the amending article's.
+			if r := restNote.FindStringIndex(x[at:]); r != nil {
+				end = at + r[0]
+			}
+		} else {
+			op.Old = unquote(t.Span(at+q[1], len(x)))
+			end = at + q[0]
+		}
 	}
 	full := unquote(t.Span(at, end))
 	if full == "" || placeholder.MatchString(FoldString(full)) {
@@ -403,6 +459,63 @@ func (op *Op) wording(t Text, pos int) {
 		op.Flags = append(op.Flags, "edits")
 	}
 	op.Wording = []string{full}
+}
+
+// addition finds, in the words between the text named and its new wording,
+// the ones that say the article is added to, and returns where they end; -1
+// when there are none outside a description of the text or of an earlier
+// change to it.
+func addition(between string) int {
+	for _, a := range adding.FindAllStringIndex(between, -1) {
+		if !described.MatchString(between[:a[1]]) {
+			return a[1]
+		}
+	}
+	return -1
+}
+
+// unquoted is s without what it quotes between « and ». An unclosed quote
+// runs to the end.
+func unquoted(s string) string {
+	var b strings.Builder
+	depth := 0
+	for _, r := range s {
+		switch {
+		case r == '«':
+			depth++
+		case r == '»':
+			if depth > 0 {
+				depth--
+			}
+		case depth == 0:
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
+// inSentence says whether the "بدلا من" at N[from:to], in a wording that
+// starts at N[start], sits inside a sentence of the wording itself ("يتولي
+// امين السر العام القيام بمهام المجلس بدلا من المحافظ حتي انتخاب مجلس
+// جديد") and so quotes no replaced wording. It does quote one when it
+// follows the end of a quote, a sentence or a line, or is followed by a
+// colon, a quote or "النص", "العباره".
+func (t Text) inSentence(start, from, to int) bool {
+	m := t.N[from:to]
+	if i := strings.Index(m, "بدلا"); i >= 0 {
+		from += i
+	} else if i := strings.Index(m, "عوضا"); i >= 0 {
+		from += i
+	}
+	if strings.ContainsAny(m, ":«\"") || strings.Contains(m, "النص") || strings.Contains(m, "عباره") {
+		return false
+	}
+	before := strings.TrimRight(t.Orig[t.off[start]:t.off[from]], " \t")
+	if before == "" {
+		return false
+	}
+	r, _ := utf8.DecodeLastRuneInString(before)
+	return unicode.IsLetter(r) || unicode.IsDigit(r) || r == ')' || r == '%'
 }
 
 // unquote trims a wording's surrounding quotes: "«…»." becomes "…", and a
