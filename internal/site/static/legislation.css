@@ -289,6 +289,20 @@ pre.snippet {
 .lawend--closing { white-space: pre-line; text-align: start; }
 
 .ls-hero .sub { max-width: 46ch; text-wrap: balance; }
+/* One plain sentence under the search box: what the site is, with a link to the list of sources. */
+.ls-hero__what { margin-top: 18px; max-width: 62ch; text-wrap: balance; }
+@media (min-width: 760px) { .ls-hero__what { margin-inline: auto; text-align: center; } }
+/* The sources table has 7 columns: fixed shares, so the long cells wrap evenly. */
+table.ref.sources { min-width: 1000px; table-layout: fixed; }
+table.ref.sources th, table.ref.sources td { white-space: normal; overflow-wrap: anywhere; }
+table.ref.sources thead th:nth-child(1) { width: 20%; }
+table.ref.sources thead th:nth-child(2) { width: 14%; }
+table.ref.sources thead th:nth-child(3) { width: 11%; }
+table.ref.sources thead th:nth-child(4) { width: 22%; }
+table.ref.sources thead th:nth-child(5) { width: 11%; }
+table.ref.sources thead th:nth-child(6) { width: 11%; }
+table.ref.sources thead th:nth-child(7) { width: 11%; }
+table.ref.sources tbody th { color: var(--ink); }
 
 /* Year indexes */
 .decade { margin-top: 30px; }

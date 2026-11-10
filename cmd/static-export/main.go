@@ -169,7 +169,7 @@ func export(ctx context.Context, args []string, stdout, stderr io.Writer) error 
 		return err
 	}
 	o := staticexport.Options{Out: *out, Workers: *workers, Crawl: *crawl, Sample: *sampleN, Seed: *seed, Limit: *limit, Shard: shard, Shards: shards,
-		Extra:  []string{"/", "/en/", "/robots.txt", "/llms.txt", "/openapi.json", "/ai/", "/en/ai/", "/run-it-yourself/", "/en/run-it-yourself/", "/about/", "/en/about/", "/data/", "/search/", "/en/search/"},
+		Extra:  []string{"/", "/en/", "/robots.txt", "/llms.txt", "/openapi.json", "/ai/", "/en/ai/", "/run-it-yourself/", "/en/run-it-yourself/", "/about/", "/en/about/", "/sources/", "/en/sources/", "/legiliban/", "/en/legiliban/", "/data/", "/search/", "/en/search/"},
 		Assets: site.StaticFiles(),
 		Record: site.RecordDeps, Group: srv.Route,
 		Log: func(f string, a ...any) { fmt.Fprintf(stderr, time.Now().Format("15:04:05 ")+f+"\n", a...) }}
