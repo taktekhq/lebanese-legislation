@@ -10,7 +10,7 @@
  "doctrine_article": 2574,
  "gazette_entry": 105483,
  "gazette_issue": 6851,
- "graph_edge": 367816,
+ "graph_edge": 367830,
  "legislation": 103112,
  "legislation_alias": 49,
  "legislation_article": 389078,
@@ -20,11 +20,11 @@
  "legislation_title_en": 103106,
  "noindex_page": 203155,
  "opinion": 3633,
- "page_state": 165850,
- "reference": 20969,
+ "page_state": 165849,
+ "reference": 20994,
  "research": 50,
- "ruling": 47657,
+ "ruling": 47656,
  "ruling_file": 44766,
  "ruling_page": 274935,
- "source_page": 266007
+ "source_page": 266006
 }

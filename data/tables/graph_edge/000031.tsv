@@ -3272,7 +3272,6 @@
 158271	ruling/157512	\N	applies	model	unresolved	ruling	157512	\N	\N	76	lb/law/محاماه/art/76	\N	name not found	المادة 76 محاماة	api:claude-sonnet-5-5
 158272	ruling/157513	law/181678/art/144	applies	model	linked	ruling	157513	\N	181678	144	lb/unknown/غابات/art/144	\N	name	المادة 144 غابات المعدلة بموجب المادة 9 من القانون رقم 195 تاريخ 24/5/2000	api:claude-sonnet-5-5
 158273	ruling/157513	law/244139	applies	model	no_article	ruling	157513	\N	244139	9	lb/law/2000-05-24/195/art/9	\N	number and date	المادة 9 من القانون رقم 195 تاريخ 24/5/2000	api:claude-sonnet-5-5
-158274	ruling/157515	law/244611/art/770	applies	model	linked	ruling	157515	\N	244611	770	lb/law/عقوبات/art/770	\N	name	المادة 770 عقوبات	api:claude-sonnet-5-5
 158275	ruling/157516	\N	applies	model	unresolved	ruling	157516	\N	\N	125	lb/law/مخدرات/art/125	\N	name not found	المادة 125/148 مخدرات	api:claude-sonnet-5-5
 158276	ruling/157516	\N	applies	model	unresolved	ruling	157516	\N	\N	148	lb/law/مخدرات/art/148	\N	name not found	المادة 125/148 مخدرات	api:claude-sonnet-5-5
 158277	ruling/157516	law/244611/art/463	applies	model	linked	ruling	157516	\N	244611	463	lb/law/عقوبات/art/463	\N	name	المادة 463 عقوبات	api:claude-sonnet-5-5

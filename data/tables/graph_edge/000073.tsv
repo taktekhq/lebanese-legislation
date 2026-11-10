@@ -2814,8 +2814,6 @@
 367823	law/196076	law/172086	repeals	centre	linked	legislation	196076	\N	172086	\N	\N	\N	the Centre's link	\N	\N
 367824	law/255133	law/172502	repeals	centre	linked	legislation	255133	\N	172502	\N	\N	\N	the Centre's link	\N	\N
 367825	law/336529	law/171662	repeals	centre	linked	legislation	336529	\N	171662	\N	\N	\N	the Centre's link	\N	\N
-367826	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	قرار اللجنة المنصوص عليها في المادة 27 من القرار عدد 16 -ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
-367828	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16	الباب الثاني	this text	بغرامات مفروضة على المزارع لمخالفته للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
 367830	law/172301	law/168846	repeals	centre	linked	legislation	172301	\N	168846	\N	\N	\N	the Centre's link	\N	\N
 367831	law/172776	law/169249	repeals	centre	linked	legislation	172776	\N	169249	\N	\N	\N	the Centre's link	\N	\N
 367832	law/176787	law/168889	repeals	centre	linked	legislation	176787	\N	168889	\N	\N	\N	the Centre's link	\N	\N
@@ -2832,20 +2830,41 @@
 367843	law/169678/art/9 مكرر	law/326220	note_amended_by	model	linked	legislation	169678	9 مكرر	326220	\N	lb/decision/2022-05-27/13440	\N	number and date	كما تعدلت بالقرار 13440 ت 27/5/2022	claude:sonnet
 367844	law/169678/art/9 مكرر	law/169678/art/2	cites	model	linked	legislation	169678	9 مكرر	169678	2	lb/decision/self/7548/art/2	البندين (3) و(4)	this text	البندين (3) و(4) من «المادة 2» من هذا القرار	claude:sonnet
 367845	law/169678/art/9 مكرر	law/169678/art/9 مكرر	cites	model	linked	legislation	169678	9 مكرر	169678	9 مكرر	lb/decision/self/7548/art/9-مكرر	\N	this text	المادة التاسعة (مكرر) هذه	claude:sonnet
-367846	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	انتهاء مدة الستة اشهر المنصوص عليها في المادة نفسها	agy:gemini-4-argon-medium
 367848	law/209556	law/165942	repeals	centre	linked	legislation	209556	\N	165942	\N	\N	\N	the Centre's link	\N	\N
 367849	law/335707	law/9014	repeals	centre	linked	legislation	335707	\N	9014	\N	\N	\N	the Centre's link	\N	\N
 367850	law/335709	law/8430	repeals	centre	linked	legislation	335709	\N	8430	\N	\N	\N	the Centre's link	\N	\N
 367851	law/166716/art/2	law/166716	cites	model	linked	legislation	166716	2	166716	\N	lb/decision/self/6895	\N	this text	تحضر المعلومات المطلوبة وفق البيان المرفق بهذا التعميم	agy:gemini-4-argon-medium
 367852	law/166716/art/2	law/166716	cites	model	linked	legislation	166716	2	166716	\N	lb/decision/self/6895	\N	this text	ينبه الى وجوب تطابق الارصدة الواردة في بيان هذا التعميم	agy:gemini-4-argon-medium
-367853	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16/art/4	الفقرة 3 من دفتر الشروط الملحق	this text	بموجب الانظمة المنصوص عليها في المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
-367854	law/201023/art/1	law/258033/art/50	amend	model	linked	legislation	201023	1	258033	50	lb/decree/1989-09-15/377/art/50	الفصل الثاني	number and date	عدل رسم تأجير وسائل الاتصالات السلكية واللاسلكية الدولية الواردة في الفصل الثاني من المرسوم رقم 377 تاريخ 15/9/1989 - المادة 50 منه	agy:gemini-4-argon-medium
-367855	law/329374/art/1	law/244369	insert	model	linked	legislation	329374	1	244369	\N	lb/law/1994-08-01/367	الباب الأول	number and date	يعدّل قانون مزاولة مهنة الصيدلة (رقم 367 تاريخ 1/8/1994) بإضافة فصل جديد الى الباب الأول منه	agy:gemini-4-argon-medium
-367856	law/329374/art/1	law/244369/art/1	cites	model	linked	legislation	329374	1	244369	1	lb/law/1994-08-01/367/art/1	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-367857	law/329374/art/1	law/244369/art/2	cites	model	linked	legislation	329374	1	244369	2	lb/law/1994-08-01/367/art/2	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-367858	law/329374/art/1	law/244369/art/3	cites	model	linked	legislation	329374	1	244369	3	lb/law/1994-08-01/367/art/3	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-367859	law/329374/art/1	law/244369/art/4	cites	model	linked	legislation	329374	1	244369	4	lb/law/1994-08-01/367/art/4	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-367860	law/329374/art/1	law/244369/art/5	cites	model	linked	legislation	329374	1	244369	5	lb/law/1994-08-01/367/art/5	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-367861	law/329374/art/1	law/244369/art/6	cites	model	linked	legislation	329374	1	244369	6	lb/law/1994-08-01/367/art/6	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-367862	law/329374/art/1	law/244369/art/7	cites	model	linked	legislation	329374	1	244369	7	lb/law/1994-08-01/367/art/7	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-367863	law/329374/art/1	law/244369/art/8	cites	model	linked	legislation	329374	1	244369	8	lb/law/1994-08-01/367/art/8	الفصل الأول	number and date	الفصل الأول: "مزاولة مهنة الصيدلة"، ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
+367864	law/263940	law/242457	repeals	centre	linked	legislation	263940	\N	242457	\N	\N	\N	the Centre's link	\N	\N
+367865	law/334804	law/306621	repeals	centre	linked	legislation	334804	\N	306621	\N	\N	\N	the Centre's link	\N	\N
+367866	ruling/73501	law/244611/art/201	cites	centre	linked	ruling	73501	\N	244611	201	\N	\N	the Centre's link	\N	\N
+367867	ruling/73501	law/244611/art/205	cites	centre	linked	ruling	73501	\N	244611	205	\N	\N	the Centre's link	\N	\N
+367868	ruling/73501	law/244611/art/253	cites	centre	linked	ruling	73501	\N	244611	253	\N	\N	the Centre's link	\N	\N
+367869	ruling/73501	law/244611/art/534	cites	centre	linked	ruling	73501	\N	244611	534	\N	\N	the Centre's link	\N	\N
+367870	ruling/73501	law/244611/art/639	cites	centre	linked	ruling	73501	\N	244611	639	\N	\N	the Centre's link	\N	\N
+367871	ruling/86206	law/244226/art/121	cites	centre	linked	ruling	86206	\N	244226	121	\N	\N	the Centre's link	\N	\N
+367872	ruling/86206	law/244226/art/134	cites	centre	linked	ruling	86206	\N	244226	134	\N	\N	the Centre's link	\N	\N
+367873	ruling/86206	law/244226/art/552	cites	centre	linked	ruling	86206	\N	244226	552	\N	\N	the Centre's link	\N	\N
+367874	ruling/87571	law/244565/art/708	cites	centre	linked	ruling	87571	\N	244565	708	\N	\N	the Centre's link	\N	\N
+367875	ruling/89461	law/244483/art/223	cites	centre	linked	ruling	89461	\N	244483	223	\N	\N	the Centre's link	\N	\N
+367876	ruling/157397	law/244226/art/344	cites	centre	linked	ruling	157397	\N	244226	344	\N	\N	the Centre's link	\N	\N
+367877	ruling/157397	law/244226/art/358	cites	centre	linked	ruling	157397	\N	244226	358	\N	\N	the Centre's link	\N	\N
+367878	ruling/157469	law/180890/art/72	cites	centre	linked	ruling	157469	\N	180890	72	\N	\N	the Centre's link	\N	\N
+367879	ruling/157478	law/244611/art/221	cites	centre	linked	ruling	157478	\N	244611	221	\N	\N	the Centre's link	\N	\N
+367880	ruling/157478	law/244611/art/335	cites	centre	linked	ruling	157478	\N	244611	335	\N	\N	the Centre's link	\N	\N
+367881	ruling/157478	law/244611/art/639	cites	centre	linked	ruling	157478	\N	244611	639	\N	\N	the Centre's link	\N	\N
+367882	ruling/157478	law/244611/art/640	cites	centre	linked	ruling	157478	\N	244611	640	\N	\N	the Centre's link	\N	\N
+367883	ruling/157492	law/244699/art/10	cites	centre	linked	ruling	157492	\N	244699	10	\N	\N	the Centre's link	\N	\N
+367884	ruling/157496	law/190374/art/50	cites	centre	linked	ruling	157496	\N	190374	50	\N	\N	the Centre's link	\N	\N
+367885	ruling/157498	law/244699/art/1	cites	centre	linked	ruling	157498	\N	244699	1	\N	\N	the Centre's link	\N	\N
+367886	ruling/157513	law/181678/art/144	cites	centre	linked	ruling	157513	\N	181678	144	\N	\N	the Centre's link	\N	\N
+367887	ruling/157533	law/244611/art/770	cites	centre	linked	ruling	157533	\N	244611	770	\N	\N	the Centre's link	\N	\N
+367888	ruling/157548	law/244483/art/9	cites	centre	linked	ruling	157548	\N	244483	9	\N	\N	the Centre's link	\N	\N
+367889	ruling/157556	law/244565/art/11	cites	centre	linked	ruling	157556	\N	244565	11	\N	\N	the Centre's link	\N	\N
+367890	ruling/157556	law/244565/art/6	cites	centre	linked	ruling	157556	\N	244565	6	\N	\N	the Centre's link	\N	\N
+367891	ruling/157573	law/244611/art/689	cites	centre	linked	ruling	157573	\N	244611	689	\N	\N	the Centre's link	\N	\N
+367892	ruling/157573	law/244611/art/691	cites	centre	linked	ruling	157573	\N	244611	691	\N	\N	the Centre's link	\N	\N
+367893	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16-ل.ر/art/27	\N	this text	المادة 27 من القرار عدد 16- ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
+367894	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16ل.ر/art/4	الفقرة 3 من دفتر الشروط الملحق	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
+367895	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16ل.ر	الباب الثاني	this text	للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
+367896	law/201023/art/1	law/258033/art/50	replace	model	linked	legislation	201023	1	258033	50	lb/decree/1989-09-15/377/art/50	الفصل الثاني	number and date	عدل رسم تأجير وسائل الاتصالات السلكية واللاسلكية الدولية الواردة في الفصل الثاني من المرسوم رقم 377 تاريخ 15/9/1989- المادة 50 منه وحدد كما يلي	agy:gemini-4-argon-medium
