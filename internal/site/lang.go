@@ -3,11 +3,17 @@ package site
 import (
 	"context"
 	"net/http"
+	"sort"
 	"strings"
+
+	"github.com/taktekhq/lebanese-legislation/internal/site/i18n"
 )
 
 // Arabic is the site's default: its pages live at the root (/law/12/). The
-// English interface lives under /en/. The old /ar/... addresses answer a
+// English interface lives under /en/. The French interface lives under /fr/
+// and covers the site's own pages only (frenchPaths): any other address under
+// /fr/ is sent to its /en/ twin, and French pages link texts, articles and
+// rulings to their existing /en/ pages. The old /ar/... addresses answer a
 // GET or HEAD with a 301 to the same path at the root (query kept), or to
 // where that path has moved since (redirect.go), in one hop; other
 // methods are served as Arabic
@@ -22,7 +28,37 @@ const langCtxKey ctxKey = 1
 
 // langPrefixes are the address prefixes that select a language; the root
 // (no prefix) is Arabic.
-var langPrefixes = map[string]string{"/en": "en", "/ar": "ar"}
+var langPrefixes = map[string]string{"/en": "en", "/ar": "ar", "/fr": "fr"}
+
+// frenchPaths are the pages that have a French version, as root paths
+// (i18n.FrenchPages).
+var frenchPaths = i18n.FrenchPages
+
+// FrenchPage reports whether the page at a root path has a French version.
+func FrenchPage(path string) bool { return frenchPaths[path] }
+
+// FrenchPaths lists the root paths of the pages that have a French version, sorted.
+func FrenchPaths() []string {
+	out := make([]string, 0, len(frenchPaths))
+	for p := range frenchPaths {
+		out = append(out, p)
+	}
+	sort.Strings(out)
+	return out
+}
+
+// frLink is where a French page links an internal path: its French version
+// when there is one, else the English one (a query or fragment is kept).
+func frLink(p string) string {
+	bare := p
+	if i := strings.IndexAny(bare, "?#"); i >= 0 {
+		bare = bare[:i]
+	}
+	if frenchPaths[bare] {
+		return "/fr" + p
+	}
+	return "/en" + p
+}
 
 func (s *Server) withLang(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +79,17 @@ func (s *Server) withLang(next http.Handler) http.Handler {
 				s.redirectFinal(w, r, r.URL.EscapedPath())
 				return
 			}
+			if lang == "fr" && !frenchPaths[strings.TrimPrefix(p, prefix)] {
+				// no French version of this page: its English one, query kept.
+				// Temporary, so a page that gains a French version is found.
+				to := "/en" + strings.TrimPrefix(r.URL.EscapedPath(), prefix)
+				if r.URL.RawQuery != "" {
+					to += "?" + r.URL.RawQuery
+				}
+				w.Header().Set("Cache-Control", "public, max-age=300")
+				http.Redirect(w, r, to, http.StatusFound)
+				return
+			}
 			r2 := r.Clone(context.WithValue(r.Context(), langCtxKey, lang))
 			r2.URL.Path = strings.TrimPrefix(p, prefix)
 			// the raw path loses the same prefix; when it spells it another
@@ -53,6 +100,10 @@ func (s *Server) withLang(next http.Handler) http.Handler {
 			}
 			if lang == "ar" { // a POST under /ar/: redirects it issues go to the root pages
 				next.ServeHTTP(w, r2)
+				return
+			}
+			if lang == "fr" { // a redirect to a page with no French version goes to its English one
+				next.ServeHTTP(&redirectFixer{ResponseWriter: w, prefix: prefix, to: frLink}, r2)
 				return
 			}
 			next.ServeHTTP(&redirectFixer{ResponseWriter: w, prefix: prefix}, r2)
@@ -70,13 +121,19 @@ type redirectFixer struct {
 	http.ResponseWriter
 	prefix string
 	fixed  bool
+	to     func(path string) string // where a root path goes, when not simply under prefix
 }
 
 func (f *redirectFixer) WriteHeader(code int) {
 	if !f.fixed {
 		f.fixed = true
 		if loc := f.Header().Get("Location"); strings.HasPrefix(loc, "/") && !strings.HasPrefix(loc, f.prefix+"/") && loc != f.prefix {
-			f.Header().Set("Location", f.prefix+loc)
+			if f.to != nil {
+				loc = f.to(loc)
+			} else {
+				loc = f.prefix + loc
+			}
+			f.Header().Set("Location", loc)
 		}
 	}
 	f.ResponseWriter.WriteHeader(code)
@@ -89,7 +146,7 @@ func langFromContext(ctx context.Context) string {
 	return "en" // a static copy, which has no prefixes
 }
 
-// lang is the UI language of this request: "en" or "ar".
+// lang is the UI language of this request: "en", "ar" or "fr".
 func (s *Server) lang(r *http.Request) string { return langFromContext(r.Context()) }
 
 // tr looks up a UI string in the request's language, for the Go-side
@@ -105,7 +162,7 @@ func (s *Server) tr(r *http.Request, key string, args ...any) string {
 // fully to ar.json instead of layering a second Arabic phrase onto one
 // that already has one.
 func (s *Server) trOr(r *http.Request, en, key string, args ...any) string {
-	if s.lang(r) == "ar" {
+	if l := s.lang(r); l == "ar" || l == "fr" {
 		return s.tr(r, key, args...)
 	}
 	return en
@@ -121,8 +178,14 @@ func (s *Server) brandTitle(r *http.Request, main string) string {
 // the root), for the handful of links built in Go (handlers.go, docs.go)
 // rather than templates. A static copy has no prefixes.
 func (s *Server) u(r *http.Request, path string) string {
-	if s.lang(r) == "en" && !s.isStatic {
+	if s.isStatic {
+		return path
+	}
+	switch s.lang(r) {
+	case "en":
 		return "/en" + path
+	case "fr":
+		return frLink(path)
 	}
 	return path
 }
@@ -137,7 +200,7 @@ func (s *Server) docPath(r *http.Request, path string, translated bool) string {
 	return path
 }
 
-// stripLang is a path without its /en or /ar prefix.
+// stripLang is a path without its /en, /fr or /ar prefix.
 func stripLang(p string) string {
 	for prefix := range langPrefixes {
 		if strings.HasPrefix(p, prefix+"/") {

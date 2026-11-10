@@ -18,7 +18,7 @@ func ExpandChangedPaths(h http.Handler, paths []string, prev map[string]Entry) (
 	lists := map[string]bool{}
 	for _, p := range paths {
 		selected[p] = true
-		q := strings.TrimPrefix(p, "/en")
+		q := strings.TrimPrefix(strings.TrimPrefix(p, "/en"), "/fr")
 		s := strings.Split(strings.Trim(q, "/"), "/")
 		if len(s) == 2 && (s[0] == "law" || s[0] == "decree" || s[0] == "text") {
 			roots[p] = true

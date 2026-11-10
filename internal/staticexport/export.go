@@ -606,9 +606,11 @@ func (ex *exporter) ok(p string, rec *httptest.ResponseRecorder, e Entry) error 
 // without the /en prefix, with the language kept apart.
 func kindOf(p string) string {
 	lang := "ar"
-	if strings.HasPrefix(p, "/en/") || p == "/en" {
-		lang = "en"
-		p = strings.TrimPrefix(p, "/en")
+	for _, l := range []string{"en", "fr"} {
+		if strings.HasPrefix(p, "/"+l+"/") || p == "/"+l {
+			lang = l
+			p = strings.TrimPrefix(p, "/"+l)
+		}
 	}
 	seg := strings.SplitN(strings.TrimPrefix(p, "/"), "/", 4)
 	switch {
@@ -733,7 +735,7 @@ func cleanLink(href string) string {
 		return ""
 	}
 	for _, s := range skipPrefixes {
-		if strings.HasPrefix(href, s) || strings.HasPrefix(strings.TrimPrefix(href, "/en"), s) {
+		if strings.HasPrefix(href, s) || strings.HasPrefix(strings.TrimPrefix(href, "/en"), s) || strings.HasPrefix(strings.TrimPrefix(href, "/fr"), s) {
 			return ""
 		}
 	}

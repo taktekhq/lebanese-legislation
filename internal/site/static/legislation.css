@@ -444,3 +444,15 @@ html[lang="ar"] :lang(ar){letter-spacing:0}
 
 .journal-resource .btn{height:auto;min-block-size:52px;max-inline-size:100%;padding-block:12px;white-space:normal;text-align:center}
 .local-images code{overflow-wrap:anywhere;direction:ltr;unicode-bidi:isolate}
+
+/* The language switch names the two other languages. The pair stays close;
+   the Arabic and French menus, whose words are longer, give up some of the
+   space between entries so the bar still fits one line on a laptop. */
+.nav__langs { display: flex; align-items: center; gap: 2px; }
+html:not([dir="rtl"]) .nav__links a { white-space: nowrap; }
+html[dir="rtl"] .nav__links, html[lang="fr"] .nav__links { gap: 2px; }
+html[dir="rtl"] .nav__end, html[lang="fr"] .nav__end { gap: 12px; }
+@media (max-width: 460px) { .nav__langs { gap: 14px; } }
+/* Below a small laptop those two bars cannot also hold the "Law & AI" button:
+   it goes, as on a phone (the footer links the page). */
+@media (max-width: 1040px) { html[dir="rtl"] .nav__end .btn, html[lang="fr"] .nav__end .btn { display: none; } }

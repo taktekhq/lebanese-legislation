@@ -18,7 +18,7 @@ func TestLayoutFramesRebuildPages(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(frames) != 2 || frames[0].Lang != "ar" || frames[1].Lang != "en" {
+	if len(frames) != 3 || frames[0].Lang != "ar" || frames[1].Lang != "en" || frames[2].Lang != "fr" {
 		t.Fatalf("frames: %+v", frames)
 	}
 	for _, f := range frames {
@@ -32,13 +32,19 @@ func TestLayoutFramesRebuildPages(t *testing.T) {
 			}
 		}
 	}
-	for _, p := range []string{"/blog/", "/en/blog/", "/ai/", "/en/ai/", "/contribute/", "/en/contribute/", "/no-such-page/", "/en/no-such-page/"} {
+	for _, p := range []string{"/blog/", "/en/blog/", "/ai/", "/en/ai/", "/fr/ai/", "/contribute/", "/en/contribute/", "/fr/contribute/", "/no-such-page/", "/en/no-such-page/"} {
 		w := httptest.NewRecorder()
 		s.ServeHTTP(w, httptest.NewRequest("GET", p, nil))
 		body := w.Body.String()
-		f := frames[1]
-		if !strings.HasPrefix(p, "/en/") {
-			f = frames[0]
+		f := frames[0]
+		switch {
+		case strings.HasPrefix(p, "/en/"):
+			f = frames[1]
+		case strings.HasPrefix(p, "/fr/"):
+			f = frames[2]
+			if !strings.Contains(body, `<html lang="fr" dir="ltr">`) {
+				t.Fatalf("%s: not a French page", p)
+			}
 		}
 		// cut in order, as the exporter does
 		rest, ok := strings.CutPrefix(body, f.Text[0])

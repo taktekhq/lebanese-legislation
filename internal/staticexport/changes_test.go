@@ -70,8 +70,18 @@ func TestChangedRowsToPaths(t *testing.T) {
 			t.Errorf("planned a numbered list page %s", path)
 		}
 	}
-	if len(p.Paths) != 90 {
-		t.Fatalf("nightly fixture: got %d paths, want 90", len(p.Paths))
+	for _, s := range []string{"/fr/", "/fr/laws/", "/fr/changes/", "/fr/codes/", "/fr/data/"} { // the French interface pages that print counts or lists
+		if !slices.Contains(p.Paths, s) {
+			t.Errorf("missing %s", s)
+		}
+	}
+	for _, path := range p.Paths { // a text has no French page
+		if strings.HasPrefix(path, "/fr/law/") || strings.HasPrefix(path, "/fr/decree/") || strings.HasPrefix(path, "/fr/ruling/") {
+			t.Errorf("planned a French page of a text: %s", path)
+		}
+	}
+	if len(p.Paths) != 101 { // 90, and the 11 French interface pages among them
+		t.Fatalf("nightly fixture: got %d paths, want 101", len(p.Paths))
 	}
 	t.Logf("nightly fixture: %d paths", len(p.Paths))
 	none, err := PlanChanges(context.Background(), d, "HEAD", false)

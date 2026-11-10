@@ -21,9 +21,9 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Lebanese Legislation: every Lebanese law, one search away">
-<meta property="og:locale" content="{{if eq (uilang) "ar"}}ar_LB{{else}}en_US{{end}}">
+<meta property="og:locale" content="{{if eq (uilang) "ar"}}ar_LB{{else if eq (uilang) "fr"}}fr_FR{{else}}en_US{{end}}">
 <meta property="og:locale:alternate" content="{{if eq (uilang) "ar"}}en_US{{else}}ar_LB{{end}}">
-<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:locale:alternate" content="{{if eq (uilang) "fr"}}en_US{{else}}fr_FR{{end}}">
 <meta name="twitter:card" content="summary_large_image">
 {{if eq (uilang) "ar"}}<link rel="preload" href="/assets/fonts/plex-arabic-400-arabic.woff2" as="font" type="font/woff2" crossorigin>
 {{else}}<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -60,7 +60,7 @@
       <a href="{{u "/data/"}}">{{t "nav.database"}}</a>
     </nav>
     <div class="nav__end">
-      {{if eq (uilang) "ar"}}<a class="nav__out lang-switch" dir="ltr" href="{{template "page:alt" .}}" hreflang="en" lang="en">{{switchLabel}}</a>{{else}}<a class="nav__out lang-switch" href="{{template "page:alt" .}}" hreflang="ar" lang="ar" dir="rtl">{{switchLabel}}</a>{{end}}
+      <span class="nav__langs">{{if eq (uilang) "ar"}}<a class="nav__out lang-switch" dir="ltr" href="{{template "page:alt" .}}" hreflang="en" lang="en">{{switchLabel}}</a>{{else if eq (uilang) "fr"}}<a class="nav__out lang-switch" href="{{template "page:en" .}}" hreflang="en" lang="en">English</a>{{else}}<a class="nav__out lang-switch" href="{{template "page:alt" .}}" hreflang="ar" lang="ar" dir="rtl">{{switchLabel}}</a>{{end}}{{if eq (uilang) "fr"}}<a class="nav__out lang-switch" href="{{template "page:alt" .}}" hreflang="ar" lang="ar" dir="rtl">العربية</a>{{else}}<a class="nav__out lang-switch" dir="ltr" href="/fr/" hreflang="fr" lang="fr">Français</a>{{end}}</span>
       <a class="btn btn--primary btn--sm" href="{{u "/ai/"}}">{{t "nav.law_ai"}}</a>
     </div>
   </div>
@@ -81,7 +81,7 @@
       <div><h2>{{t "footer.read_heading"}}</h2><ul><li><a href="{{u "/laws/"}}">{{t "footer.read.legislation"}}</a></li><li><a href="{{u "/codes/"}}">{{t "footer.read.codes"}}</a></li><li><a href="{{u "/changes/"}}">{{t "footer.read.changes"}}</a></li><li><a href="{{u "/rulings/"}}">{{t "footer.read.rulings"}}</a></li><li><a href="{{u "/gazette/"}}">{{t "footer.read.gazette"}}</a></li></ul></div>
       <div><h2>{{t "footer.more_heading"}}</h2><ul><li><a href="{{u "/opinions/"}}">{{t "footer.more.opinions"}}</a></li><li><a href="{{u "/agreements/"}}">{{t "footer.more.agreements"}}</a></li><li><a href="{{u "/doctrine/"}}">{{t "footer.more.doctrine"}}</a></li><li><a href="{{u "/research/"}}">{{t "footer.more.research"}}</a></li></ul></div>
       <div><h2>{{t "footer.use_heading"}}</h2><ul><li><a href="{{u "/data/"}}">{{t "footer.use.database"}}</a></li><li><a href="{{datasetURL}}" rel="noopener" data-ga="dataset_download">{{t "footer.use.download"}}</a></li><li><a href="{{u "/ai/"}}">{{t "footer.use.ai"}}</a></li><li><a href="{{u "/run-it-yourself/"}}">{{t "footer.use.run"}}</a></li></ul></div>
-      <div><h2>{{t "footer.info_heading"}}</h2><ul><li><a href="{{u "/blog/"}}">{{if eq (uilang) "ar"}}سجل المشروع{{else}}Project journal{{end}}</a></li><li><a href="{{u "/about/"}}">{{t "footer.info.about"}}</a></li><li><a href="{{u "/sources/"}}">{{t "footer.info.sources"}}</a></li><li><a href="{{u "/legiliban/"}}">{{t "footer.info.legiliban"}}</a></li><li><a href="https://github.com/taktekhq/lebanese-legislation" rel="noopener">{{t "footer.info.github"}}</a></li><li><a href="https://huggingface.co/taktekhq" rel="noopener">{{t "footer.info.hf"}}</a></li><li><a href="{{u "/privacy/"}}">{{t "footer.info.privacy"}}</a></li><li><a href="{{u "/terms/"}}">{{t "footer.info.terms"}}</a></li></ul></div>
+      <div><h2>{{t "footer.info_heading"}}</h2><ul><li><a href="{{u "/blog/"}}">{{if eq (uilang) "ar"}}سجل المشروع{{else if eq (uilang) "fr"}}Journal du projet{{else}}Project journal{{end}}</a></li><li><a href="{{u "/about/"}}">{{t "footer.info.about"}}</a></li><li><a href="{{u "/sources/"}}">{{t "footer.info.sources"}}</a></li><li><a href="{{u "/legiliban/"}}">{{t "footer.info.legiliban"}}</a></li><li><a href="https://github.com/taktekhq/lebanese-legislation" rel="noopener">{{t "footer.info.github"}}</a></li><li><a href="https://huggingface.co/taktekhq" rel="noopener">{{t "footer.info.hf"}}</a></li><li><a href="{{u "/privacy/"}}">{{t "footer.info.privacy"}}</a></li><li><a href="{{u "/terms/"}}">{{t "footer.info.terms"}}</a></li></ul></div>
     </div>
     <div class="footer__report" data-report>
       <button type="button" data-report-open aria-expanded="false" aria-controls="report-form">{{t "report.open"}}</button>

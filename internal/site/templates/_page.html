@@ -22,7 +22,8 @@
 {{end}}{{if .Hreflang}}<link rel="alternate" hreflang="en" href="{{enURL .Path}}">
 <link rel="alternate" hreflang="ar" href="{{arURL .Path}}">
 <link rel="alternate" hreflang="x-default" href="{{arURL .Path}}">
-{{end}}{{end}}
+{{if .French}}<link rel="alternate" hreflang="fr" href="{{frURL .Path}}">
+{{end}}{{end}}{{end}}
 {{define "page:robots"}}{{if .NoIndex}}noindex, follow{{else}}index, follow, max-image-preview:large{{end}}{{end}}
 {{define "page:ogtype"}}{{if .OGType}}{{.OGType}}{{else}}website{{end}}{{end}}
 {{define "page:fonts"}}{{if eq .Lang "ar"}}<link rel="preload" href="/assets/fonts/naskh-arabic.woff2" as="font" type="font/woff2" crossorigin>

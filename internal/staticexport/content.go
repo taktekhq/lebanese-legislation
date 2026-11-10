@@ -16,6 +16,7 @@ import (
 	"strings"
 	"text/template/parse"
 
+	"github.com/taktekhq/lebanese-legislation/internal/site/i18n"
 	"github.com/taktekhq/lebanese-legislation/internal/site/topics"
 )
 
@@ -687,7 +688,12 @@ func changedKeys(ctx context.Context, dir, since string, files []string) ([]stri
 // topicPaths are the pages changed topic guides touch.
 func topicPaths(ctx context.Context, dir, since string, files []string, manifest map[string]Entry) ([]string, []string, error) {
 	var paths, why []string
-	add := func(p string) { paths = append(paths, p, "/en"+p) }
+	add := func(p string) {
+		paths = append(paths, p, "/en"+p)
+		if _, ok := manifest["/fr"+p]; ok && i18n.FrenchPages[p] { // the topic index and the home pages, not a topic's own page
+			paths = append(paths, "/fr"+p)
+		}
+	}
 	listed := false // a title, a question or the set of guides changed: every topic page lists them all
 	for _, f := range files {
 		read := func(b []byte, ok bool) (*topics.Topic, error) {

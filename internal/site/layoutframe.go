@@ -38,7 +38,7 @@ var slotRE = regexp.MustCompile(`@@llslot:([a-z:]+)@@`)
 const slotProbe = `<>"'& é/?#=:`
 
 // LayoutLangs are the interface languages that have a frame.
-var LayoutLangs = []string{"ar", "en"}
+var LayoutLangs = []string{"ar", "en", "fr"}
 
 // LayoutFrames are the frames of the layout this server renders pages with,
 // one per interface language.
@@ -146,8 +146,11 @@ func layoutFrame(src string, funcs template.FuncMap, lang string) (LayoutFrame, 
 // replaced by hole(name), on no data: any use of the Page fails.
 func renderFrame(src string, funcs template.FuncMap, lang string, hole func(string) string) (string, error) {
 	lf := englishFuncs()
-	if lang == "ar" {
+	switch lang {
+	case "ar":
 		lf = arabicFuncs()
+	case "fr":
+		lf = frenchFuncs()
 	}
 	t, err := template.New("layout.html").Funcs(funcs).Funcs(lf).Parse(src)
 	if err != nil {

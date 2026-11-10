@@ -1,6 +1,6 @@
 # Website
 
-The Go website behind [LebaneseLegislation.com](https://lebaneselegislation.com/), with Arabic and English pages and search. It is published as `ghcr.io/taktekhq/lebanese-legislation-all:latest`, and `./setup` at the repository root and `docker compose --profile all up -d all` run it on port 8080 with the public database baked in. The code is shared with the [API](../api/) and the [MCP server](../mcp/) in [`internal/`](../internal/).
+The Go website behind [LebaneseLegislation.com](https://lebaneselegislation.com/), with Arabic and English pages and search, and a French interface under `/fr/` for the site's own pages (laws keep their Arabic and English pages). It is published as `ghcr.io/taktekhq/lebanese-legislation-all:latest`, and `./setup` at the repository root and `docker compose --profile all up -d all` run it on port 8080 with the public database baked in. The code is shared with the [API](../api/) and the [MCP server](../mcp/) in [`internal/`](../internal/).
 
 Cloudflare serves about 760,000 static pages rendered from `data/` by
 [`static-site.yml`](../.github/workflows/static-site.yml) and `cmd/static-export`

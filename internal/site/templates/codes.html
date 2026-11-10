@@ -15,7 +15,7 @@
 {{if not static}}<section class="wrap">
   <h2 class="sec__title">{{t "hub.code.browse_title"}}</h2>
   <p class="lead">{{t "hub.code.browse_lead"}}</p>
-  <ul class="doclist">{{range .Data.Codes}}<li><a class="link" href="{{u (printf "/codes/%s/" .Slug)}}">{{if eq (uilang) "ar"}}<span lang="ar">{{.Title}}</span>{{else}}<bdi>{{.NameEn}}</bdi>{{end}}</a> <span class="tiny">{{num .Articles}}</span></li>{{end}}</ul>
+  <ul class="doclist">{{range .Data.Codes}}<li><a class="link" href="{{u (printf "/codes/%s/" .Slug)}}">{{if eq (uilang) "ar"}}<span lang="ar">{{.Title}}</span>{{else}}<bdi>{{if and (eq (uilang) "fr") .NameFr}}{{.NameFr}}{{else}}{{.NameEn}}{{end}}</bdi>{{end}}</a> <span class="tiny">{{num .Articles}}</span></li>{{end}}</ul>
 </section>{{end}}
 <div style="height:var(--section-y)"></div>
 {{end}}

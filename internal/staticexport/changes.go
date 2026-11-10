@@ -16,6 +16,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/taktekhq/lebanese-legislation/internal/site/i18n"
 	"github.com/taktekhq/lebanese-legislation/internal/site/topics"
 )
 
@@ -67,7 +68,7 @@ func PlanChanges(ctx context.Context, dir, since string, full bool) (ChangePlan,
 // WholeFramePages are the pages in the layout that are stored whole, because
 // the export changes them in the frame (the search page's script, added
 // before </body> by SearchShell). A frame-only change renders them again.
-var WholeFramePages = []string{"/search/", "/en/search/"}
+var WholeFramePages = []string{"/search/", "/en/search/", "/fr/search/"}
 
 // planChanges is PlanChanges; frame is set when layout.html changed in its
 // shared frame only.
@@ -469,7 +470,13 @@ func pathsForRows(tables map[string][]changeRow, changed []tableRow) ChangePlan 
 		}
 	}
 	paths := map[string]bool{}
-	add := func(p string) { paths[p] = true; paths["/en"+p] = true }
+	add := func(p string) {
+		paths[p] = true
+		paths["/en"+p] = true
+		if i18n.FrenchPages[p] {
+			paths["/fr"+p] = true
+		}
+	}
 	for _, p := range []string{"/", "/changes/", "/changes/review/", "/changes/feed.xml", "/laws/", "/laws/years/", "/rulings/", "/rulings/years/", "/gazette/", "/gazette/years/", "/codes/", "/topics/", "/data/", "/llms.txt"} {
 		add(p)
 	}
