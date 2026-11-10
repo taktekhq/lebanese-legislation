@@ -285,33 +285,47 @@ func TestNumberFormsTable(t *testing.T) {
 }
 
 func TestClientKind(t *testing.T) {
-	for _, ua := range []string{"Claude-User", "ChatGPT-User/1.0", "Perplexity-User/1.0", "MistralAI-User/1.0"} {
-		if k := clientKind(ua, ""); k != "assistant" {
-			t.Errorf("%s: %s", ua, k)
+	want := map[string][]string{
+		"assistant": {"Claude-User", "ChatGPT-User/1.0", "Perplexity-User/1.0", "MistralAI-User/1.0", "openai-mcp/1.0.0", "Google",
+			"claude-code/2.1.319 (claude-vscode, agent-sdk/0.3.319)", "codex-mcp-client/0.166.0-alpha.5.1"},
+		"internal": {"livecheck/0.1.0 (+https://github.com/taktekhq/livecheck)", "lebleg-db-prod-check/1", "taktekbot-latency-check",
+			"lebleg-check-corrections", "lebaneselegislation-mcp-parity/1.0", "taktekbot-lebleg-list-check"},
+		"registry": {"mcp-index/0.1 (+https://github.com/0xQuez/mcp-index)", "KoskamoDirectoryCheck/1.0 (+https://koskamo.com/explore)",
+			"AgentToolIndex/1.0 (+https://agenttoolindex.com/method; passive MCP checks: initialize and", "allagents-verify/1 (+https://allagents.app/badges)"},
+		"monitor": {
+			"SentinelOracle/0.1 (+https://glimind.com/opt-out; liveness-only, never invokes tools)", "mcpbeat/0.1 (+https://mcpbeat.com/bot/; liveness check)",
+			"AgentRankProbe/0.1", "rokmcp-collector/0.2 (+https://rokmcp.com/bot)", "agent-collector/0.1 (+health check; no payment is made)",
+			"EveryMCP-Probe/1.0", "FraywickBot/1.0 (+https://fraywick.xyz/docs#bot)", "MCPWatch/0.1.0 longitudinal MCP security research",
+			"reliability-bureau-spike/0.1", "LEGION-tlog/1.0", "TaifoonHarvester/1.0.0", "mcp-rugpull-research/1.0",
+			"histor/0.1.0 (+https://histor.modelmarket.dev/#crawler; read-only: initialize + tools/list", "atpp-scan/1.0",
+			"mcplantern-check/0.2", "AnnalistChecks/0.1 (+https://annalist.dev; independent MCP server checks)", "evyAI MCP Check/1.0 (+https://evyus.com/tools/mcp-check/)"},
+		"library": {"node", "undici", "Python/3.11 aiohttp/3.14.5", "python-httpx/0.28.1", "Go-http-client/2.0", "curl/8.7.1", ""},
+		"other":   {"Enerlio GmbH FACTANKER marc@enerlio.de", "Malaf/0.1 (+legal information service)", "coda-agent-runtime"},
+	}
+	for kind, uas := range want {
+		for _, ua := range uas {
+			if k := clientKind(ua, "", false); k != kind {
+				t.Errorf("%q: %s, want %s", ua, k, kind)
+			}
 		}
 	}
-	if clientKind("node", "claude-ai") != "assistant" || clientKind("node", "cursor-vscode") != "assistant" {
+	if clientKind("node", "claude-ai", false) != "assistant" || clientKind("node", "cursor-vscode", false) != "assistant" {
 		t.Error("assistant client names")
 	}
-	for _, ua := range []string{
-		"SentinelOracle/0.1 (+https://glimind.com/opt-out; liveness-only, never invokes tools)", "mcpbeat/0.1 (+https://mcpbeat.com/bot/; liveness check)",
-		"AgentRankProbe/0.1", "rokmcp-collector/0.2 (+https://rokmcp.com/bot)", "agent-collector/0.1 (+health check; no payment is made)",
-		"EveryMCP-Probe/1.0", "FraywickBot/1.0 (+https://fraywick.xyz/docs#bot)", "MCPWatch/0.1.0 longitudinal MCP security research",
-		"reliability-bureau-spike/0.1", "LEGION-tlog/1.0", "TaifoonHarvester/1.0.0", "mcp-rugpull-research/1.0",
-		"histor/0.1.0 (+https://histor.modelmarket.dev/#crawler; read-only: initialize + tools/list", "atpp-scan/1.0",
-		"livecheck/0.1.0 (+https://github.com/taktekhq/livecheck)", "lebleg-db-prod-check/1", "taktekbot-latency-check",
-	} {
-		if k := clientKind(ua, ""); k != "monitor" {
-			t.Errorf("%s: %s", ua, k)
+	if clientKind("Talaria", "talaria-catalog", false) != "registry" {
+		t.Error("registry client name")
+	}
+	// The repo's .mcp.json header makes our own Claude Code sessions internal.
+	if clientKind("claude-code/2.1.319 (claude-vscode, agent-sdk/0.3.319)", "", true) != "internal" {
+		t.Error("internal header")
+	}
+	for _, k := range []string{"monitor", "registry", "internal"} {
+		if !notPerson(k) {
+			t.Errorf("%s should not make a person", k)
 		}
 	}
-	for _, ua := range []string{"node", "undici", "Python/3.11 aiohttp/3.14.5", "python-httpx/0.28.1", "Go-http-client/2.0", "curl/8.7.1", ""} {
-		if k := clientKind(ua, ""); k != "library" {
-			t.Errorf("%q: %s", ua, k)
-		}
-	}
-	if clientKind("Enerlio GmbH FACTANKER marc@enerlio.de", "") != "other" {
-		t.Error("other")
+	if notPerson("assistant") || notPerson("other") {
+		t.Error("assistant and other are people")
 	}
 }
 

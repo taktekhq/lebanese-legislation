@@ -361,9 +361,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				clientName, _ = v.(string)
 			}
 		}
-		kind := clientKind(ua, clientName)
+		kind := clientKind(ua, clientName, r.Header.Get(internalHeader) == "1")
 		props.set("client_kind", kind)
-		if kind == "monitor" {
+		if notPerson(kind) {
 			props.set("$process_person_profile", false)
 		}
 		s.phCapture(r, []phEvent{{event: rec.event, properties: props, distinctID: visitor}})
@@ -389,10 +389,10 @@ func (s *Server) logRefusal(r *http.Request, ip string) {
 	if c := r.Header.Get("CF-IPCountry"); c != "" {
 		props.set("$geoip_country_code", c)
 	}
-	kind := clientKind(ua, "")
+	kind := clientKind(ua, "", r.Header.Get(internalHeader) == "1")
 	props.set("client_kind", kind)
 	props.set("limit_per_minute", s.limiter.perMinute)
-	if kind == "monitor" {
+	if notPerson(kind) {
 		props.set("$process_person_profile", false)
 	}
 	s.phCapture(r, []phEvent{{event: "mcp_rate_limited", properties: props, distinctID: visitorID(s.cfg.PostHogIDSalt, ip, ua)}})

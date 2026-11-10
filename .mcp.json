@@ -2,7 +2,10 @@
   "mcpServers": {
     "lebaneselegislation": {
       "type": "http",
-      "url": "https://lebaneselegislation.com/mcp"
+      "url": "https://lebaneselegislation.com/mcp",
+      "headers": {
+        "X-Taktek-Internal": "1"
+      }
     }
   }
 }
