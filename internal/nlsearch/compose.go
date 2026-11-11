@@ -96,14 +96,16 @@ func (c *Client) ComposeWith(ctx context.Context, q string, sources []Passage, m
 		"quotes": map[string]any{"type": "array", "maxItems": 3, "items": cite}}}
 	schema := map[string]any{"type": "object", "required": []string{"paragraphs"}, "additionalProperties": false, "properties": map[string]any{"paragraphs": map[string]any{"type": "array", "maxItems": m.Paras, "items": para}}}
 	body, _ := json.Marshal(map[string]any{"systemInstruction": map[string]any{"parts": []map[string]string{{"text": strings.Replace(composePrompt, "{{LENGTH}}", m.Length, 1)}}}, "contents": []map[string]any{{"role": "user", "parts": []map[string]string{{"text": string(input)}}}}, "generationConfig": map[string]any{"maxOutputTokens": m.MaxOut, "temperature": 0.2, "responseMimeType": "application/json", "responseJsonSchema": schema, "thinkingConfig": map[string]int{"thinkingBudget": m.Thinking}}})
+	model := c.cfg.SelectModel
+	if model == "" {
+		model = c.cfg.Model
+	}
 	endpoint := c.cfg.Endpoint
 	if endpoint == "" {
-		model := c.cfg.SelectModel
-		if model == "" {
-			model = c.cfg.Model
-		}
 		endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent"
 	}
+	gen := startGeneration(ctx, "compose", c.cfg.Provider, model)
+	defer gen.end()
 	ctx, cancel := context.WithTimeout(ctx, m.Timeout)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
@@ -120,6 +122,7 @@ func (c *Client) ComposeWith(ctx context.Context, q string, sources []Passage, m
 		return nil, errors.New("answer service unavailable")
 	}
 	defer func() { _ = resp.Body.Close() }()
+	gen.Status = resp.StatusCode
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("answer provider HTTP %d", resp.StatusCode)
 	}
@@ -144,6 +147,7 @@ func (c *Client) ComposeWith(ctx context.Context, q string, sources []Passage, m
 	u := v.UsageMetadata
 	log.Printf("ai answer (%s): %d passages, %d tokens in, %d out", m.Name, len(sources), u.PromptTokenCount, u.CandidatesTokenCount+u.ThoughtsTokenCount)
 	AddUsage(ctx, int64(u.PromptTokenCount), int64(u.CandidatesTokenCount+u.ThoughtsTokenCount))
+	gen.ok(int64(u.PromptTokenCount), int64(u.CandidatesTokenCount+u.ThoughtsTokenCount))
 	var raw strings.Builder
 	for _, p := range v.Candidates[0].Content.Parts {
 		if !p.Thought {
