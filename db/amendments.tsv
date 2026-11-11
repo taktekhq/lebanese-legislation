@@ -3,6 +3,10 @@
 #   apply   the change is right: apply it (and add it if the build missed
 #           it; the new wording is then taken from between the amending
 #           article's « »)
+#           The wording is printed as the whole article, whatever its
+#           length and whatever part the build read: only for a wording
+#           that is the complete article, never for a clause or a phrase
+#           to be put into it
 #   reject  the build or the model misread it: don't show it (the pattern
 #           pass's change and the model's link alike)
 #   repeal  the amending article repeals the article: apply it as a repeal
@@ -18,3 +22,15 @@ by_law_id	by_article	law_id	article	decision	note
 2000200346	4	244483	423	repeal	Law 68/2026, art. 4: «والمواد من ٤٢٠ ضمنا حتى ٤٢٤ ضمنا من القانون رقم ٣٢٨ تاريخ ٢٠٠١/٨/٢ (قانون أصول المحاكمات الجزائية)»; the pattern pass missed this half of the article. 2026-10-28
 2000200346	4	244483	424	repeal	Law 68/2026, art. 4: «والمواد من ٤٢٠ ضمنا حتى ٤٢٤ ضمنا من القانون رقم ٣٢٨ تاريخ ٢٠٠١/٨/٢ (قانون أصول المحاكمات الجزائية)»; the pattern pass missed this half of the article. 2026-10-28
 244683	13	244611	51	reject	The Centre's text of Decree-law 112/1983, art. 13 says «تلغى المادة 51», but the wording it gives is Penal Code art. 251 (mitigating excuses) word for word, and art. 51 (length of imprisonment) keeps its 1943 text; most likely 251 with a digit dropped (centre_errors.tsv). 2026-10-28
+264215	1	243616	2	apply	Decree 3416/2016: art. 2 of Decree 2336/2015 becomes «تمتد فترة عمل المشروع لغاية 31/12/2016», quoting the old article («... 31/1/2016») after «بدلا من». One line, and the whole article. Read against the Centre's text, 2026-11-10
+274514	1	248719	1	apply	Decree 1949/2017: art. 1 of Decree 2686/2016 becomes «تمتد فترة عمل المشروع لغاية 30/6/2018» in place of «... 31/12/2016», which is all art. 1 provides (the rest of the Centre's text is its amending lead-in and the wording it replaced in 2016). Read against the Centre's text, 2026-11-10
+275586	1	273004	1	apply	Decree 2733/2018: art. 1 of Decree 854/2017 becomes «تمتد فترة عمل المشروع لغاية 31/12/2018» in place of «... 31/12/2017», which is all art. 1 provides. Read against the Centre's text, 2026-11-10
+275586	2	273004	2	apply	Decree 2733/2018: art. 2 of Decree 854/2017 becomes «تمتد فترة عمل المشروع لغاية 31/12/2018» in place of «... 31/12/2017», which is all art. 2 provides. Read against the Centre's text, 2026-11-10
+276097	1	274514	1	apply	Decree 3329/2018: art. 1 of Decree 1949/2017 becomes «تمتد فترة عمل المشروع لغاية 30/6/2019» in place of «... 30/6/2018», which is all art. 1 provides. Read against the Centre's text, 2026-11-10
+288244	1	286732	1	apply	Decree 7904/2021: art. 1 of Decree 7273/2020 becomes «تمتد فترة تنفيذ المشروع لغاية 30/6/2022» in place of «... 30/9/2021», which is all art. 1 provides. Read against the Centre's text, 2026-11-10
+300156	1	290376	1	apply	Decree 9475/2022: art. 1 of Decree 8127/2021 becomes «تمتد فترة عمل المشروع لغاية 21/4/2024» in place of the term ending 21/10/2022, which is all art. 1 provides. Read against the Centre's text, 2026-11-10
+335787	1	192823	6	apply	Decree 3009/2026 restates art. 6 of Decree 10942/2003 (CDR staff rules, hiring) in full between « »: three items where the Centre's 2010 text has six, with the competition now run by the Civil Service Board. Shorter, and the whole article. Read against the Centre's text, 2026-11-10
+203639	1	194001	1	apply	Decree 1658/1971 restates art. 1 of Decree 10971/1962 (the list of remote villages) in full: a shorter list, and the whole article. Read against the Centre's text, 2026-11-10
+326182	1	288608	1	apply	Decision 249/2023: art. 1 of Decision 1233/2021 becomes «يتولى رئيس قسم قائمقامية زغرتا السيد شربل سمعان نكد القيام بمهام مجلس بلدية تولا ـ اسلوت بدلا من السيد مارون ريمون صعب حتى انتخاب مجلس بلدي فيها». The «بدلا من» is the sentence's own; the Centre's text is the 2021 one and uses the same words. Read against the Centre's text, 2026-11-10
+327389	1	326577	1	apply	Decision 882/2023: art. 1 of Decision 1451/2022 becomes «يتولى محافظ عكار القيام بمهام مجلس بلدية مشتى حمود بدلا من امين سر عام محافظة عكار حتى انتخاب مجلس بلدي فيها». The Centre's text is the 2022 one, with the two offices the other way round. Read against the Centre's text, 2026-11-10
+2000200594	2	2000197086	2	apply	Law 71/2026 restates art. 2 of Law 23/2025 (bank resolution) without its closing «وتعتبر نافذة عند صدور قانون الانتظام المالي واسترداد الودائع». The Centre still has the 2025 text, which holds the new wording letter for letter and then the clause the law removed. Read against the Centre's text, 2026-11-10
