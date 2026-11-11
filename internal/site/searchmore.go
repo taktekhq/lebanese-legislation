@@ -273,9 +273,11 @@ func (s *Server) searchMoreCited(w http.ResponseWriter, r *http.Request, q, name
 			shown[l.ID] = true
 		}
 		n := len(c.args)
-		rows, err := s.db.Query(ctx, fmt.Sprintf(`SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind
-			WHERE (`+c.cond+`) AND (coalesce(l.issued_on, '0001-01-01'::date), l.id) < ($%d::date, $%d)
-			ORDER BY coalesce(l.issued_on, '0001-01-01'::date) DESC, l.id DESC LIMIT $%d`, n+1, n+2, n+3),
+		// The condition is the lookup's own text, never typed words; it is
+		// joined, not formatted, so nothing in it reads as a verb.
+		rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind
+			WHERE (`+c.cond+`) AND (coalesce(l.issued_on, '0001-01-01'::date), l.id) < `+fmt.Sprintf("($%d::date, $%d)", n+1, n+2)+`
+			ORDER BY coalesce(l.issued_on, '0001-01-01'::date) DESC, l.id DESC LIMIT `+fmt.Sprintf("$%d", n+3),
 			append(append([]any{}, c.args...), date, id, morePerPage+len(shown)+1)...)
 		if err != nil {
 			s.fail(w, r, err)
@@ -307,9 +309,9 @@ func (s *Server) searchMoreCited(w http.ResponseWriter, r *http.Request, q, name
 			shown[d.ID] = true
 		}
 		n := len(c.args)
-		rows, err := s.db.Query(ctx, fmt.Sprintf(`SELECT id, title, coalesce(court, ''), decided_on FROM ruling
-			WHERE (`+c.cond+`) AND (coalesce(decided_on, '0001-01-01'::date), id) < ($%d::date, $%d)
-			ORDER BY coalesce(decided_on, '0001-01-01'::date) DESC, id DESC LIMIT $%d`, n+1, n+2, n+3),
+		rows, err := s.db.Query(ctx, `SELECT id, title, coalesce(court, ''), decided_on FROM ruling
+			WHERE (`+c.cond+`) AND (coalesce(decided_on, '0001-01-01'::date), id) < `+fmt.Sprintf("($%d::date, $%d)", n+1, n+2)+`
+			ORDER BY coalesce(decided_on, '0001-01-01'::date) DESC, id DESC LIMIT `+fmt.Sprintf("$%d", n+3),
 			append(append([]any{}, c.args...), date, id, morePerPage+len(shown)+1)...)
 		if err != nil {
 			s.fail(w, r, err)
