@@ -621,7 +621,7 @@ func (s *Server) apiFindArticles(ctx context.Context, q string, limit int, pos *
 	if pos != nil && pos.phase == phaseDone {
 		return nil
 	}
-	pg, hits, err := s.rankedArticles(ctx, q, limit+len(seen), keyOf(pos), false)
+	pg, hits, _, err := s.rankedArticles(ctx, q, limit+len(seen), keyOf(pos), false)
 	if err != nil {
 		return err
 	}

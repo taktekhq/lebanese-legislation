@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/taktekhq/lebanese-legislation/internal/wordsearch"
 )
 
 // DocRow is any non-legislation document in a list.
@@ -630,6 +631,14 @@ type Results struct {
 	MissingRuling      bool     // ... and it named a ruling
 	AskAI              bool     // the search reads as a question: the page asks for an AI answer (IsQuestion)
 
+	// "Show more" under a part that has rows left (searchmore.go): the cursor
+	// of its next page, and the words it was searched with (a mended search
+	// reads other words than Q). Part is set on a page that lists only the
+	// next rows of one part.
+	LawCursor, ArtCursor, RulCursor string
+	Part                            string
+	lawQ, artQ, rulQ                string
+	lawFull                         int // texts the Arabic titles found by words; 0 when they were not searched
 }
 
 func (s *Server) search(w http.ResponseWriter, r *http.Request) {
@@ -653,6 +662,10 @@ func (s *Server) search(w http.ResponseWriter, r *http.Request) {
 	res := Results{Q: arDigits.Replace(strings.TrimSpace(q))}
 	if len([]rune(res.Q)) > 500 {
 		http.Error(w, "search question is too long", http.StatusBadRequest)
+		return
+	}
+	if part := r.URL.Query().Get("part"); part != "" && res.Q != "" && r.Method == http.MethodGet {
+		s.searchMore(w, r, res.Q, part)
 		return
 	}
 	if res.Q != "" {
@@ -758,6 +771,7 @@ func (s *Server) searchTidy(ctx context.Context, q string) (Results, string, err
 			// A Latin-script search: the texts' English titles ("access information"
 			// found one French article and not Law 28/2017, Right to access information).
 			res.Laws, res.LawCount = s.lawsByEnglishTitle(ctx, q, 10)
+			res.moreEnglish(q)
 		}
 		if res.LawCount == 0 {
 			res.Near = s.closeTitles(ctx, q)
@@ -770,6 +784,7 @@ func (s *Server) searchTidy(ctx context.Context, q string) (Results, string, err
 	}
 	if how == "" {
 		if res.Laws, res.LawCount = s.lawsByEnglishTitle(ctx, q, 10); res.LawCount > 0 {
+			res.moreEnglish(q)
 			return res, "english", nil
 		}
 		res.Near = s.nearTitles(ctx, q)
@@ -777,6 +792,7 @@ func (s *Server) searchTidy(ctx context.Context, q string) (Results, string, err
 	}
 	if alt.LawCount == 0 {
 		alt.Laws, alt.LawCount = s.lawsByEnglishTitle(ctx, q, 10)
+		alt.moreEnglish(q)
 	}
 	alt.Download = res.Download
 	return alt, how, nil
@@ -846,6 +862,12 @@ func (s *Server) findLawsBase(ctx context.Context, res *Results) error {
 		return err
 	}
 	res.LawCount = pg.Full
+	res.lawFull = pg.Full
+	if pg.Full > 10 {
+		// From the first title: the ten shown are reordered below, so the
+		// next pages walk the whole ranking and leave those ten out.
+		res.lawQ, res.LawCursor = q, moreCursor(partLaws, searchPos{phase: phaseRanked})
+	}
 	laws := lawRowsOf(hits)
 	// A number in the query is first the text's own number: "337" is the
 	// notaries' law 337/1994, not customs tariff amendment no. 337. A bare
@@ -935,11 +957,15 @@ func (s *Server) exactTitle(ctx context.Context, q string) *LawRow {
 
 // findArticles lists the articles holding the query's words (rankedArticles).
 func (s *Server) findArticles(ctx context.Context, res *Results) error {
-	pg, hits, err := s.rankedArticles(ctx, articleQuery(res.Q), 15, nil, true)
+	q := articleQuery(res.Q)
+	pg, hits, last, err := s.rankedArticles(ctx, q, 15, nil, true)
 	if err != nil {
 		return err
 	}
 	res.ArtCount = pg.Total
+	if pg.More {
+		res.artQ, res.ArtCursor = q, moreCursor(partArticles, searchPos{phase: phaseRanked, key: keyField(last)})
+	}
 	for _, h := range hits {
 		res.Articles = append(res.Articles, h.LawRow)
 	}
@@ -947,11 +973,26 @@ func (s *Server) findArticles(ctx context.Context, res *Results) error {
 }
 
 func (s *Server) findRulings(ctx context.Context, res *Results) error {
-	hits, n, _, err := s.rulingsPage(ctx, res.Q, 10, nil)
+	hits, n, next, err := s.rulingsPage(ctx, res.Q, 10, nil)
 	if err != nil {
 		return err
 	}
+	// The judgments follow on a later page and count from this one: "يوسف
+	// كنعان" said 11 rulings while its pages listed 185 (11 Nov 2026). Only
+	// here, not in rulingsPage, which the API and the MCP page with. A word
+	// in thousands of rulings is not counted further (the page says
+	// "1,000+"; counting its judgments took 0.5 to 2 s).
+	if next.phase == phaseRanked && n < 1000 {
+		jpg, err := wordsearch.Judgments(ctx, s.db, wordsearch.RulingQuery{Text: res.Q, Full: true, Limit: 1})
+		if err != nil {
+			return err
+		}
+		n += jpg.Total
+	}
 	res.RulCount = n
+	if next.phase != phaseDone {
+		res.rulQ, res.RulCursor = res.Q, moreCursor(partRulings, next)
+	}
 	for _, h := range hits {
 		res.Rulings = append(res.Rulings, DocRow{Type: "ruling", ID: h.ID, Title: h.Title, Kicker: h.Court, Date: h.On, Snippet: h.Snippet})
 	}

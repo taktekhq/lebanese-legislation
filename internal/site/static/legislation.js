@@ -431,3 +431,40 @@
     done.hidden = false;
   });
 })();
+
+/* "Show more" under a part of the search results: the link's own page lists
+   the next rows (it works without this script); here they are appended under
+   the list instead, and the link is replaced by the one for the page after. */
+(function () {
+  "use strict";
+  if (typeof fetch !== "function" || typeof DOMParser !== "function") return;
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest && ev.target.closest("a[data-more]");
+    if (!a || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button) return;
+    var wrap = a.closest("[data-more-wrap]");
+    var list = wrap && wrap.previousElementSibling;
+    if (!list || !list.classList.contains("doclist")) return;
+    ev.preventDefault();
+    if (a.getAttribute("aria-busy") === "true") return;
+    a.setAttribute("aria-busy", "true");
+    fetch(a.href + "&frag=1", { credentials: "same-origin" }).then(function (r) {
+      if (!r.ok) throw new Error(String(r.status));
+      return r.text();
+    }).then(function (html) {
+      var doc = new DOMParser().parseFromString(html, "text/html");
+      var rows = doc.querySelectorAll("ul.doclist > li");
+      var first = null;
+      [].forEach.call(rows, function (li) {
+        var row = document.importNode(li, true);
+        if (!first) first = row.querySelector("a");
+        list.appendChild(row);
+      });
+      var next = doc.querySelector("[data-more-wrap]");
+      if (next && rows.length) wrap.parentNode.replaceChild(document.importNode(next, true), wrap);
+      else wrap.parentNode.removeChild(wrap);
+      if (first) first.focus({ preventScroll: true });
+    }).catch(function () {
+      location.href = a.href;
+    });
+  });
+})();
