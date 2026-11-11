@@ -20,7 +20,14 @@
    editor:CODE so all their sessions sit under one person, and every event
    carries the code (Nizar, 5 Nov 2026: "No replay on long pages ... replay
    for editors only", "These sessions need to be recorded by posthog, and
-   logged by posthog. All of them."). */
+   logged by posthog. All of them.").
+
+   Web vitals: posthog-js sends what it has 5 seconds after a page's first
+   metric (FCP, often LCP), then a second $web_vitals when the page is left
+   (CLS, INP): 7,963 events for 4,171 page views in three days (11 Nov 2026).
+   Waiting 60 seconds puts all four metrics of most pages in one event. A
+   page that is hidden or left sooner still sends at once, by beacon, so no
+   metric is lost. LCP, INP, CLS and FCP are all kept. */
 (function () {
   var editor = null;
   try {
@@ -34,6 +41,7 @@
     person_profiles: "identified_only",
     capture_pageview: true,
     capture_pageleave: true,
+    capture_performance: { web_vitals_delayed_flush_ms: 60000 },
     disable_session_recording: long && !editor,
     session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
   });
