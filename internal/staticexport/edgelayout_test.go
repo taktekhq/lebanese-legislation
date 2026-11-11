@@ -92,12 +92,10 @@ func TestSplitLeavesOtherPagesWhole(t *testing.T) {
 func TestLayoutChangeUploadsNoPage(t *testing.T) {
 	s, l := edgeSite(t)
 	out := t.TempDir()
-	sent := map[string]int{}
 	o := Options{Out: out, Paths: edgePaths, Layout: l, Sink: func(e Entry, b []byte) error {
 		if !bytes.HasPrefix(b, []byte(PartsMagic)) {
 			t.Errorf("%s stored whole", e.Path)
 		}
-		sent[e.Path]++
 		return nil
 	}}
 	st, err := Run(context.Background(), s, o)
