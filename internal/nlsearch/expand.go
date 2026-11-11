@@ -31,6 +31,8 @@ func (c *Client) Expand(ctx context.Context, q string, searched, titles []string
 	if endpoint == "" {
 		endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + c.cfg.Model + ":generateContent"
 	}
+	gen := startGeneration(ctx, "expand", c.cfg.Provider, c.cfg.Model)
+	defer gen.end()
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
@@ -44,6 +46,7 @@ func (c *Client) Expand(ctx context.Context, q string, searched, titles []string
 		return Plan{}, errors.New("expand service unavailable")
 	}
 	defer func() { _ = resp.Body.Close() }()
+	gen.Status = resp.StatusCode
 	if resp.StatusCode != 200 {
 		return Plan{}, fmt.Errorf("expand provider HTTP %d", resp.StatusCode)
 	}
@@ -64,6 +67,7 @@ func (c *Client) Expand(ctx context.Context, q string, searched, titles []string
 	}
 	u := v.UsageMetadata
 	AddUsage(ctx, u.PromptTokenCount, u.CandidatesTokenCount+u.ThoughtsTokenCount)
+	gen.ok(u.PromptTokenCount, u.CandidatesTokenCount+u.ThoughtsTokenCount)
 	var raw strings.Builder
 	for _, p := range v.Candidates[0].Content.Parts {
 		if !p.Thought {

@@ -15,6 +15,7 @@ import (
 	"errors"
 	"io"
 	"log"
+	"math/rand/v2"
 	"net"
 	"net/http"
 	"os"
@@ -89,6 +90,10 @@ type Config struct {
 	// when nil).
 	Now  func() time.Time
 	Logf func(format string, args ...any)
+
+	// Rand draws the number in [0, 1) that samples monitor handshakes
+	// (rand.Float64 when nil).
+	Rand func() float64
 }
 
 // ConfigFromEnv reads the Worker's variable names: GA_MCP_MEASUREMENT_ID,
@@ -180,6 +185,13 @@ func (s *Server) now() time.Time {
 		return s.cfg.Now()
 	}
 	return time.Now()
+}
+
+func (s *Server) rand() float64 {
+	if s.cfg.Rand != nil {
+		return s.cfg.Rand()
+	}
+	return rand.Float64()
 }
 
 func (s *Server) today() string { return s.now().UTC().Format("2006-01-02") }
@@ -365,6 +377,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		props.set("client_kind", kind)
 		if notPerson(kind) {
 			props.set("$process_person_profile", false)
+		}
+		if rate, sampled := handshakeSampleRate(kind, rec.event); sampled {
+			if s.rand() >= rate {
+				writeJSON(w, http.StatusOK, resp, nil)
+				return
+			}
+			props.set("sample_rate", rate)
 		}
 		s.phCapture(r, []phEvent{{event: rec.event, properties: props, distinctID: visitor}})
 	}

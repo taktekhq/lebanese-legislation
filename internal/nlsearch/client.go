@@ -96,10 +96,12 @@ func (c *Client) Rewrite(ctx context.Context, q string) (Plan, error) {
 	if strings.TrimSpace(q) == "" || utf8.RuneCountInString(q) > 500 {
 		return Plan{}, errors.New("search question must be 1-500 characters")
 	}
+	gen := startGeneration(ctx, "rewrite", c.cfg.Provider, c.cfg.Model)
+	defer gen.end()
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	if c.cfg.Provider == "claude" {
-		return c.claude(ctx, q)
+		return c.claude(ctx, q, gen)
 	}
 	var body any
 	url := c.cfg.Endpoint
@@ -131,6 +133,7 @@ func (c *Client) Rewrite(ctx context.Context, q string) (Plan, error) {
 		return Plan{}, errors.New("AI search unavailable")
 	}
 	defer func() { _ = resp.Body.Close() }()
+	gen.Status = resp.StatusCode
 	if resp.StatusCode != 200 {
 		return Plan{}, fmt.Errorf("AI search provider HTTP %d", resp.StatusCode)
 	}
@@ -138,10 +141,14 @@ func (c *Client) Rewrite(ctx context.Context, q string) (Plan, error) {
 	if err != nil {
 		return Plan{}, errors.New("AI search response unreadable")
 	}
+	var p Plan
 	if c.cfg.Provider == "openai" {
-		return parseOpenAI(b)
+		p, err = parseOpenAI(b)
+	} else {
+		p, err = parseGemini(b)
 	}
-	return parseGemini(b)
+	gen.In, gen.Out, gen.Failed = p.InputTokens, p.OutputTokens, err != nil
+	return p, err
 }
 
 func parseOpenAI(b []byte) (Plan, error) {
@@ -206,7 +213,7 @@ func parseGemini(b []byte) (Plan, error) {
 	return p, err
 }
 
-func (c *Client) claude(ctx context.Context, q string) (Plan, error) {
+func (c *Client) claude(ctx context.Context, q string, gen *generation) (Plan, error) {
 	opts := []option.RequestOption{option.WithAPIKey(c.cfg.Key), option.WithMaxRetries(0), option.WithHTTPClient(c.http)}
 	if c.cfg.Endpoint != "" {
 		opts = append(opts, option.WithBaseURL(c.cfg.Endpoint+"/"))
@@ -214,8 +221,14 @@ func (c *Client) claude(ctx context.Context, q string) (Plan, error) {
 	cl := anthropic.NewClient(opts...)
 	msg, err := cl.Messages.New(ctx, anthropic.MessageNewParams{Model: anthropic.Model(c.cfg.Model), MaxTokens: 1024, System: []anthropic.TextBlockParam{{Text: Prompt}}, Messages: []anthropic.MessageParam{anthropic.NewUserMessage(anthropic.NewTextBlock(q))}, OutputConfig: anthropic.OutputConfigParam{Effort: anthropic.OutputConfigEffortLow, Format: anthropic.JSONOutputFormatParam{Schema: schema()}}})
 	if err != nil {
+		var apiErr *anthropic.Error
+		if errors.As(err, &apiErr) {
+			gen.Status = apiErr.StatusCode
+		}
 		return Plan{}, errors.New("AI search unavailable")
 	}
+	gen.Status = http.StatusOK
+	gen.In, gen.Out = msg.Usage.InputTokens, msg.Usage.OutputTokens
 	if msg.StopReason != anthropic.StopReasonEndTurn {
 		return Plan{}, errors.New("AI search did not complete")
 	}
@@ -227,5 +240,6 @@ func (c *Client) claude(ctx context.Context, q string) (Plan, error) {
 	}
 	p, err := parse(raw.String())
 	p.InputTokens, p.OutputTokens = msg.Usage.InputTokens, msg.Usage.OutputTokens
+	gen.Failed = err != nil
 	return p, err
 }

@@ -59,6 +59,8 @@ export function requestRoute(url) {
   return url.search.length > 1 ? route + "?" : route;
 }
 
+export const FAST_SAMPLE_RATE = 0.05;
+
 function originEvent(request, env, ctx, side, status, duration_ms, cache) {
   // Telemetry is best effort, including synchronous scheduling failures.
   try {
@@ -70,7 +72,13 @@ function originEvent(request, env, ctx, side, status, duration_ms, cache) {
     if (isTestRequest(request, env)) return;
     const url = new URL(request.url);
     const kind = requestKind(url);
-    const sample_rate = status >= 500 || duration_ms >= 2000 || kind === "mcp" || kind === "answer" ? 1 : 0.1;
+    // Every 5xx, every slow request (2 s or more), every MCP and answer
+    // request is sent. The rest, fast and fine, is sent 1 time in 20 (1 in 10
+    // until 11 Nov 2026: about 9,200 events a day, most of them never read
+    // one by one). Each event carries its sample_rate and the PostHog charts
+    // count it round(1 / sample_rate) times, so counts, rates and p95 stay
+    // right at any rate. Keep 1 / FAST_SAMPLE_RATE a whole number.
+    const sample_rate = status >= 500 || duration_ms >= 2000 || kind === "mcp" || kind === "answer" ? 1 : FAST_SAMPLE_RATE;
     if (sample_rate !== 1 && Math.random() >= sample_rate) return;
     ctx.waitUntil(Promise.resolve().then(() => fetch("https://eu.i.posthog.com/i/v0/e/", {
       method: "POST",

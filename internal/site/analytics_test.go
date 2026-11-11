@@ -65,6 +65,13 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 			t.Errorf("ph.js must call posthog.init with %s", want)
 		}
 	}
+	// One $web_vitals event a page instead of two: wait a minute for the late
+	// metrics (CLS, INP) before sending. An object with only this key leaves
+	// web vitals, their four metrics and network timing as the project sets
+	// them; "web_vitals: false" or an allow list here would hide a metric.
+	if !strings.Contains(ph, "capture_performance: { web_vitals_delayed_flush_ms: 60000 }") {
+		t.Error("ph.js must delay the web vitals flush to 60 s and set nothing else in capture_performance")
+	}
 	// PostHog's snippet adopts an array; "|| {}" throws on the first capture.
 	if !strings.Contains(ph, "window.posthog||[]") {
 		t.Error("ph.js must end PostHog's snippet with window.posthog||[]")

@@ -416,6 +416,7 @@ func trackedServer(rt *recorder) *Server {
 		GAMCPMeasurementID: "G-MCP", GAMCPAPISecret: "mcp-secret", GAHFMeasurementID: "G-HF", GAHFAPISecret: "hf-secret",
 		PostHogKey: "phc_test", PostHogHost: "https://ph.example", HTTPClient: &http.Client{Transport: rt}, HuggingFaceAPI: "https://hf.example/api",
 		Logf: func(string, ...any) {},
+		Rand: func() float64 { return 0 }, // every sampled event is sent
 	})
 }
 
@@ -536,6 +537,80 @@ func TestPostHogEvents(t *testing.T) {
 		} else if p["client_kind"] != "monitor" || p["$process_person_profile"] != false {
 			t.Errorf("monitor: %v", p)
 		}
+	}
+}
+
+// Liveness monitors only connect and list tools, thousands of times a week:
+// PostHog gets one handshake in ten, marked with its sample_rate so a chart
+// can count it ten times. Everything else is always sent, with no rate.
+func TestMonitorHandshakesAreSampled(t *testing.T) {
+	const monitor, person = "mcpbeat/0.1 (+https://mcpbeat.com/bot/; liveness check)", "Claude-User"
+	initialize := map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{"protocolVersion": "2025-06-18"}}
+	list := map[string]any{"jsonrpc": "2.0", "id": 2, "method": "tools/list"}
+	tool := map[string]any{"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": map[string]any{"name": "nope"}}
+	run := func(draw float64) (monitors, people []map[string]any, ga int) {
+		rt := &recorder{}
+		s := trackedServer(rt)
+		s.cfg.Rand = func() float64 { return draw }
+		for _, ua := range []string{monitor, person} {
+			for _, body := range []any{initialize, list, tool} {
+				if rec := post(s, body, map[string]string{"User-Agent": ua}); rec.Code != http.StatusOK {
+					t.Fatalf("%s: answered %d", ua, rec.Code)
+				}
+			}
+		}
+		s.Flush()
+		for _, e := range phEvents(rt) {
+			p := e["properties"].(map[string]any)
+			p["event"] = e["event"]
+			if p["$user_agent"] == monitor {
+				monitors = append(monitors, p)
+			} else {
+				people = append(people, p)
+			}
+		}
+		return monitors, people, len(gaEvents(rt))
+	}
+
+	// Drawn under the rate: all six events, the monitor's two handshakes weighted.
+	monitors, people, ga := run(0.09)
+	if len(monitors) != 3 || len(people) != 3 || ga != 6 {
+		t.Fatalf("kept draw: %d monitor and %d other events, %d to GA4", len(monitors), len(people), ga)
+	}
+	for _, p := range monitors {
+		want := any(0.1)
+		if p["event"] == "$mcp_tool_call" {
+			want = nil
+		}
+		if p["sample_rate"] != want || p["client_kind"] != "monitor" {
+			t.Errorf("monitor %v: sample_rate %v, kind %v", p["event"], p["sample_rate"], p["client_kind"])
+		}
+	}
+	for _, p := range people {
+		if p["sample_rate"] != nil {
+			t.Errorf("%v from an assistant carries sample_rate %v", p["event"], p["sample_rate"])
+		}
+	}
+
+	// Drawn at or over the rate: the monitor's handshakes are left out, its
+	// tool call and every event of the assistant still arrive.
+	for _, draw := range []float64{0.1, 0.9} {
+		monitors, people, ga = run(draw)
+		if len(monitors) != 1 || monitors[0]["event"] != "$mcp_tool_call" || len(people) != 3 || ga != 6 {
+			t.Errorf("draw %v: monitor events %v, %d other events, %d to GA4", draw, monitors, len(people), ga)
+		}
+	}
+
+	// Only a monitor's handshakes: directories and our own tools are few.
+	for _, kind := range []string{"assistant", "registry", "internal", "library", "other"} {
+		for _, event := range []string{"$mcp_initialize", "mcp_tools_list", "$mcp_tool_call"} {
+			if _, sampled := handshakeSampleRate(kind, event); sampled {
+				t.Errorf("%s %s is sampled", kind, event)
+			}
+		}
+	}
+	if _, sampled := handshakeSampleRate("monitor", "mcp_rate_limited"); sampled {
+		t.Error("a monitor's rate-limit refusal is sampled")
 	}
 }
 

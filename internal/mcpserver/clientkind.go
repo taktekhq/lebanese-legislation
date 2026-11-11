@@ -61,3 +61,22 @@ func clientKind(ua, clientName string, internal bool) string {
 func notPerson(kind string) bool {
 	return kind == "monitor" || kind == "registry" || kind == "internal"
 }
+
+// monitorHandshakeRate is the share of a liveness monitor's handshakes
+// PostHog gets. Monitors connect and list the tools every few minutes and
+// never ask anything: on 11 Nov 2026 they were 2,003 of 2,756 $mcp_initialize
+// and 1,611 of 2,347 mcp_tools_list events in three days. One in ten is
+// enough to see which monitors call and how often.
+const monitorHandshakeRate = 0.1
+
+// handshakeSampleRate says whether an event is sampled and at what rate: a
+// monitor's $mcp_initialize and mcp_tools_list only. A sent event carries the
+// rate as sample_rate, the property origin_request uses, so a chart counts it
+// round(1 / sample_rate) times and an event without one counts once. Tool
+// calls, rate-limit refusals and every other caller are always sent.
+func handshakeSampleRate(kind, event string) (rate float64, sampled bool) {
+	if kind == "monitor" && (event == "$mcp_initialize" || event == "mcp_tools_list") {
+		return monitorHandshakeRate, true
+	}
+	return 1, false
+}

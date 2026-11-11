@@ -3,6 +3,9 @@ package site
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -257,6 +260,174 @@ func TestAIQuestionGoesToPostHog(t *testing.T) {
 	if p["$ip"] != "203.0.113.5" || p["$geoip_disable"] != false {
 		t.Fatalf("visitor IP: %+v", p)
 	}
+}
+
+// Each model call of a question goes to PostHog's LLM analytics as a
+// $ai_generation: model, tokens, time and status, tied to the question by a
+// trace id. The question, the passages and the answer never do. No database:
+// trackAI gets the usage a question would have collected.
+func TestAIGenerationsGoToPostHog(t *testing.T) {
+	const question = "How much annual leave does an employee get?"
+	rewrite := nlsearch.Generation{Kind: "rewrite", Provider: "gemini", Model: "gemini-3.1-flash-lite", In: 400, Out: 20, Latency: 250 * time.Millisecond, Status: 200}
+	compose := nlsearch.Generation{Kind: "compose", Provider: "gemini", Model: "gemini-3.8-flash", In: 2000, Out: 100, Latency: 1500 * time.Millisecond, Status: 200}
+	refused := nlsearch.Generation{Kind: "compose", Provider: "gemini", Model: "gemini-3.8-flash", Latency: 2 * time.Second, Status: 503, Failed: true}
+	dead := nlsearch.Generation{Kind: "rewrite", Provider: "gemini", Model: "gemini-3.1-flash-lite", Latency: 10 * time.Second, Failed: true}
+
+	// track runs trackAI for one question whose model calls were gens, and
+	// returns the events PostHog received, with the raw bodies.
+	track := func(t *testing.T, ph string, view aiView, reason error, gens ...nlsearch.Generation) (questions, generations []map[string]any, raw string) {
+		t.Helper()
+		var mu sync.Mutex
+		var events []map[string]any
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			body, _ := io.ReadAll(r.Body)
+			var b struct{ Batch []map[string]any }
+			_ = json.Unmarshal(body, &b)
+			mu.Lock()
+			events, raw = append(events, b.Batch...), raw+string(body)
+			mu.Unlock()
+		}))
+		defer srv.Close()
+		s := &Server{}
+		s.SetPostHog("k", srv.URL)
+		v := url.Values{"q": {question}}
+		if ph != "" {
+			v.Set("ph", ph)
+		}
+		r := httptest.NewRequest("POST", "/en/search/ai/", strings.NewReader(v.Encode()))
+		r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		r.Header.Set("CF-Connecting-IP", "203.0.113.5")
+		if err := r.ParseForm(); err != nil {
+			t.Fatal(err)
+		}
+		ctx, usage := nlsearch.WithUsage(r.Context())
+		for _, g := range gens {
+			nlsearch.AddGeneration(ctx, g)
+			if !g.Failed {
+				nlsearch.AddUsage(ctx, g.In, g.Out)
+			}
+		}
+		s.trackAI(r, question, view, usage, reason, 2*time.Second)
+		want := 1 + len(gens)
+		for range 100 {
+			mu.Lock()
+			n := len(events)
+			mu.Unlock()
+			if n >= want {
+				break
+			}
+			time.Sleep(10 * time.Millisecond)
+		}
+		time.Sleep(30 * time.Millisecond) // anything sent beyond want
+		mu.Lock()
+		defer mu.Unlock()
+		if len(events) != want {
+			t.Fatalf("want %d events, got %d: %+v", want, len(events), events)
+		}
+		for _, e := range events {
+			p := e["properties"].(map[string]any)
+			switch e["event"] {
+			case "ai_question":
+				questions = append(questions, p)
+			case "$ai_generation":
+				generations = append(generations, p)
+			default:
+				t.Errorf("unexpected event %v", e["event"])
+			}
+		}
+		if len(questions) != 1 {
+			t.Fatalf("ai_question events: %+v", questions)
+		}
+		return questions, generations, raw
+	}
+	answered := aiView{Paras: []aiPara{{}}}
+
+	t.Run("answered", func(t *testing.T) {
+		questions, gens, raw := track(t, "visitor-1", answered, nil, rewrite, compose)
+		q := questions[0]
+		trace, _ := q["$ai_trace_id"].(string)
+		if len(trace) != 32 {
+			t.Fatalf("trace id %q", trace)
+		}
+		byKind := map[string]map[string]any{}
+		for _, g := range gens {
+			byKind[fmt.Sprint(g["$ai_span_name"])] = g
+			if g["$ai_trace_id"] != trace || g["distinct_id"] != "visitor-1" || g["$ai_provider"] != "gemini" || g["$ai_is_error"] != false ||
+				g["$ai_http_status"] != float64(200) || g["mode"] != "quick" || g["$process_person_profile"] != false || g["$geoip_disable"] != true ||
+				g["$lib"] != "lebaneselegislation-server" {
+				t.Errorf("generation: %+v", g)
+			}
+			for _, banned := range []string{"$ai_input", "$ai_output_choices", "$ai_output", "question", "$ip"} {
+				if _, has := g[banned]; has {
+					t.Errorf("a generation carries %s: %+v", banned, g)
+				}
+			}
+		}
+		rw, co := byKind["rewrite"], byKind["compose"]
+		if rw == nil || co == nil {
+			t.Fatalf("kinds: %+v", gens)
+		}
+		if rw["$ai_model"] != "gemini-3.1-flash-lite" || rw["$ai_input_tokens"] != float64(400) || rw["$ai_output_tokens"] != float64(20) || rw["$ai_latency"] != 0.25 {
+			t.Errorf("rewrite: %+v", rw)
+		}
+		// The code has no price for the rewriting model: PostHog prices it.
+		if _, has := rw["$ai_total_cost_usd"]; has {
+			t.Errorf("rewrite carries a cost the code does not know: %+v", rw)
+		}
+		wantCost := 2000*aiUSDPerMIn/1e6 + 100*aiUSDPerMOut/1e6
+		if cost, _ := co["$ai_total_cost_usd"].(float64); co["$ai_model"] != "gemini-3.8-flash" || co["$ai_input_tokens"] != float64(2000) ||
+			co["$ai_output_tokens"] != float64(100) || co["$ai_latency"] != 1.5 || cost < wantCost*0.999 || cost > wantCost*1.001 {
+			t.Errorf("compose: %+v, want cost %v", co, wantCost)
+		}
+		// ai_question's own numbers are as before.
+		if q["outcome"] != "answered" || q["model_calls"] != float64(2) || q["tokens_in"] != float64(2400) || q["tokens_out"] != float64(120) ||
+			q["distinct_id"] != "visitor-1" || q["$ip"] != "203.0.113.5" || q["cached"] != false {
+			t.Errorf("ai_question changed: %+v", q)
+		}
+		// The question text is on ai_question only, as before.
+		if n := strings.Count(raw, "annual leave"); n != 1 {
+			t.Errorf("the question text was sent %d times, want 1 (ai_question only)", n)
+		}
+	})
+
+	t.Run("answered from the cache", func(t *testing.T) {
+		// No model was called: no generation and no trace.
+		questions, gens, _ := track(t, "visitor-1", answered, nil)
+		if _, has := questions[0]["$ai_trace_id"]; has || len(gens) != 0 || questions[0]["cached"] != true {
+			t.Errorf("question %+v, generations %+v", questions[0], gens)
+		}
+	})
+
+	t.Run("failed calls, no browser id", func(t *testing.T) {
+		questions, gens, _ := track(t, "", aiView{Unavailable: true}, errors.New("answer provider HTTP 503"), rewrite, refused, dead)
+		if questions[0]["outcome"] != "unavailable" || questions[0]["model_calls"] != float64(1) || len(fmt.Sprint(questions[0]["$ai_trace_id"])) != 32 {
+			t.Errorf("question: %+v", questions[0])
+		}
+		var sawRefused, sawDead bool
+		for _, g := range gens {
+			if g["distinct_id"] != "lebaneselegislation-server" || g["$ai_trace_id"] != questions[0]["$ai_trace_id"] {
+				t.Errorf("ids: %+v", g)
+			}
+			status, hasStatus := g["$ai_http_status"]
+			switch {
+			case g["$ai_is_error"] == true && status == float64(503):
+				sawRefused = g["$ai_input_tokens"] == float64(0) && g["$ai_latency"] == 2.0 && g["$ai_total_cost_usd"] == float64(0)
+			case g["$ai_is_error"] == true && !hasStatus:
+				// No response came: there is no status to report.
+				sawDead = g["$ai_latency"] == 10.0
+			}
+		}
+		if !sawRefused || !sawDead {
+			t.Errorf("refused %v, dead %v: %+v", sawRefused, sawDead, gens)
+		}
+	})
+
+	t.Run("deep", func(t *testing.T) {
+		_, gens, _ := track(t, "", aiView{Deep: true, Paras: []aiPara{{}}}, nil, compose)
+		if gens[0]["mode"] != "deep" {
+			t.Errorf("mode: %+v", gens[0])
+		}
+	})
 }
 
 func TestDeepAnswerReadsMoreOnceADay(t *testing.T) {

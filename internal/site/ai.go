@@ -366,6 +366,8 @@ const (
 
 // trackAI sends one ai_question event to PostHog for every question the box
 // answers or declines: what happened, what it cost, and how long it took.
+// Each model call the question made follows as its own $ai_generation event
+// (generationProps); a question answered from the cache makes none.
 // The browser's PostHog ID (form field ph) ties it to the visitor's session,
 // and the visitor's IP gives PostHog their country: without $ip PostHog takes
 // the address the event came from, the container's own (104.28.x.x).
@@ -425,7 +427,56 @@ func (s *Server) trackAI(r *http.Request, q string, v aiView, u *nlsearch.Usage,
 	if id := r.PostForm.Get("ph"); id != "" && len(id) <= 80 {
 		props["distinct_id"] = id
 	}
+	gens := u.Generations()
+	if len(gens) > 0 {
+		props["$ai_trace_id"] = newTraceID()
+	}
 	s.captureEvent("ai_question", props)
+	for _, g := range gens {
+		s.captureEvent("$ai_generation", generationProps(g, props["$ai_trace_id"], mode, props["distinct_id"]))
+	}
+}
+
+// aiPrices is what the code knows a model costs, USD per million tokens in
+// and out. A model that is not here is sent without a cost, and PostHog
+// prices it from its own table.
+var aiPrices = map[string][2]float64{"gemini-3.8-flash": {aiUSDPerMIn, aiUSDPerMOut}}
+
+// generationProps describes one model call as PostHog's LLM analytics event
+// ($ai_generation): model, tokens, seconds, HTTP status, and the cost when
+// aiPrices has the model. The calls of one question share its trace id, which
+// the ai_question event carries too. Never the question, the passages or the
+// answer ($ai_input, $ai_output_choices), and no IP: the visitor's country is
+// on ai_question already. distinctID is ai_question's, nil for the server's.
+func generationProps(g nlsearch.Generation, traceID any, mode string, distinctID any) map[string]any {
+	p := map[string]any{
+		"$ai_trace_id":      traceID,
+		"$ai_span_name":     g.Kind,
+		"$ai_provider":      g.Provider,
+		"$ai_model":         g.Model,
+		"$ai_input_tokens":  g.In,
+		"$ai_output_tokens": g.Out,
+		"$ai_latency":       g.Latency.Seconds(),
+		"$ai_is_error":      g.Failed,
+		"mode":              mode,
+	}
+	if g.Status != 0 {
+		p["$ai_http_status"] = g.Status
+	}
+	if price, known := aiPrices[g.Model]; known {
+		p["$ai_total_cost_usd"] = float64(g.In)*price[0]/1e6 + float64(g.Out)*price[1]/1e6
+	}
+	if distinctID != nil {
+		p["distinct_id"] = distinctID
+	}
+	return p
+}
+
+// newTraceID is a random id that ties the model calls of one question together.
+func newTraceID() string {
+	b := make([]byte, 16)
+	_, _ = rand.Read(b)
+	return hex.EncodeToString(b)
 }
 
 // scriptOf names the main script of q: "arabic", "latin" or "other".
