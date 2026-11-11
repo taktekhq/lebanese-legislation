@@ -42,6 +42,9 @@
     capture_pageview: true,
     capture_pageleave: true,
     capture_performance: { web_vitals_delayed_flush_ms: 60000 },
+    // A survey speaks the page's language, not the browser's: an Arabic page in an
+    // English browser showed the English question laid out right to left.
+    override_display_language: document.documentElement.lang || "ar",
     disable_session_recording: long && !editor,
     session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
   });

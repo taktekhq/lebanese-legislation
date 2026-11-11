@@ -72,6 +72,12 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 	if !strings.Contains(ph, "capture_performance: { web_vitals_delayed_flush_ms: 60000 }") {
 		t.Error("ph.js must delay the web vitals flush to 60 s and set nothing else in capture_performance")
 	}
+	// A survey is shown in the page's language. Without this posthog-js picks the
+	// browser's, and an Arabic page in an English browser gets English text set
+	// right to left.
+	if !strings.Contains(ph, `override_display_language: document.documentElement.lang || "ar"`) {
+		t.Error("ph.js must show surveys in the page's language")
+	}
 	// PostHog's snippet adopts an array; "|| {}" throws on the first capture.
 	if !strings.Contains(ph, "window.posthog||[]") {
 		t.Error("ph.js must end PostHog's snippet with window.posthog||[]")
