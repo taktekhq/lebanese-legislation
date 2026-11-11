@@ -638,7 +638,8 @@ type Results struct {
 	LawCursor, ArtCursor, RulCursor string
 	Part                            string
 	lawQ, artQ, rulQ                string
-	lawFull                         int // texts the Arabic titles found by words; 0 when they were not searched
+	lawFull                         int       // texts the Arabic titles found by words; 0 when they were not searched
+	lawCite, rulCite                *citeMore // a citation lookup that found more than it lists (searchmore.go)
 }
 
 func (s *Server) search(w http.ResponseWriter, r *http.Request) {
@@ -852,6 +853,7 @@ func (s *Server) findLawsBase(ctx context.Context, res *Results) error {
 				return err
 			}
 			res.Laws, err = scanLawRows(rows)
+			res.moreCited(false, cw, []any{num, yr})
 			return err
 		}
 	}
