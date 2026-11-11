@@ -92,7 +92,11 @@ jobs:
   image:
     needs: eligible
     if: needs.eligible.outputs.deploy == 'true' && inputs.image == ''
-    runs-on: ubuntu-latest
+    # Pinned: on ubuntu-26.04 (ubuntu-latest since 10 Nov 2026) docker push
+    # of the pulled image leaves layers out and the Cloudflare registry
+    # refuses the manifest with "blob unknown to registry". 3 of 3 pushes
+    # with new layers failed there; 13 of 13 passed on 24.04.
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     outputs:
       image: ${{ steps.image.outputs.image }}
