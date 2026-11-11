@@ -437,7 +437,7 @@
    the list instead, and the link is replaced by the one for the page after. */
 (function () {
   "use strict";
-  if (!window.fetch || !window.DOMParser) return;
+  if (typeof fetch !== "function" || typeof DOMParser !== "function") return;
   document.addEventListener("click", function (ev) {
     var a = ev.target.closest && ev.target.closest("a[data-more]");
     if (!a || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button) return;
