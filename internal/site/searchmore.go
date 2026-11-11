@@ -2,9 +2,12 @@ package site
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/taktekhq/lebanese-legislation/internal/cursor"
 	"github.com/taktekhq/lebanese-legislation/internal/wordsearch"
 )
 
@@ -35,6 +38,10 @@ func moreCursor(part int, pos searchPos) string {
 }
 
 func (s *Server) searchMore(w http.ResponseWriter, r *http.Request, q, name string) {
+	if name == "cited" || name == "cited-rulings" {
+		s.searchMoreCited(w, r, q, name)
+		return
+	}
 	part, ok := moreParts[name]
 	if !ok {
 		http.Error(w, "part is laws, articles or rulings", http.StatusBadRequest)
@@ -67,6 +74,12 @@ func (s *Server) searchMore(w http.ResponseWriter, r *http.Request, q, name stri
 		s.fail(w, r, err)
 		return
 	}
+	s.renderMore(w, r, res)
+}
+
+// renderMore answers a page of next rows: the rows alone with frag=1, else a
+// whole page.
+func (s *Server) renderMore(w http.ResponseWriter, r *http.Request, res Results) {
 	if r.URL.Query().Get("frag") == "1" {
 		pages := s.pages
 		switch lang := s.lang(r); {
@@ -193,4 +206,139 @@ func (s *Server) moreLaws(ctx context.Context, first Results, pos *searchPos, re
 		}
 	}
 	return nil
+}
+
+// A citation lookup ("مرسوم 100", "1/2012", a court and a year) is not ranked
+// by words: it lists the ten texts or rulings nearest to what was typed, in
+// an order of its own. Its next pages list every match newest first, by the
+// date and id of the last row shown (never an offset), without the ten the
+// first page showed.
+
+// citeMore is what a citation lookup matched: a condition on legislation l,
+// or on ruling, and its arguments.
+type citeMore struct {
+	cond string
+	args []any
+}
+
+// citeStart is the cursor before the newest row.
+var citeStart = cursor.DateID("9999-12-31", 1<<31-1)
+
+// moreCited ends the texts (or the rulings) of a citation lookup with a link
+// when it matched more than the page lists.
+func (res *Results) moreCited(rulings bool, cond string, args []any) {
+	c := &citeMore{cond: cond, args: append([]any{}, args...)}
+	switch {
+	case rulings && res.RulCount > len(res.Rulings):
+		res.rulCite, res.RulCursor = c, citeStart
+	case !rulings && res.LawCount > len(res.Laws):
+		res.lawCite, res.LawCursor = c, citeStart
+	}
+}
+
+// LawPart and RulPart name the part a "show more" link continues.
+func (res Results) LawPart() string {
+	if res.lawCite != nil {
+		return "cited"
+	}
+	return "laws"
+}
+
+func (res Results) RulPart() string {
+	if res.rulCite != nil {
+		return "cited-rulings"
+	}
+	return "rulings"
+}
+
+func (s *Server) searchMoreCited(w http.ResponseWriter, r *http.Request, q, name string) {
+	date, id, ok := cursor.ParseDateID(r.URL.Query().Get("cursor"))
+	if !ok || id < 0 || id > 1<<31-1 {
+		http.Error(w, "cursor is not one this page made", http.StatusBadRequest)
+		return
+	}
+	ctx, cancel := s.ctx(r)
+	defer cancel()
+	first, _, err := s.searchCached(ctx, q)
+	if err != nil {
+		s.fail(w, r, err)
+		return
+	}
+	res := Results{Q: first.Q, Part: name, LawCount: first.LawCount, ArtCount: first.ArtCount, RulCount: first.RulCount}
+	shown := map[int]bool{}
+	if name == "cited" && first.lawCite != nil {
+		c := first.lawCite
+		res.lawCite = c
+		for _, l := range first.Laws {
+			shown[l.ID] = true
+		}
+		n := len(c.args)
+		// The condition is the lookup's own text, never typed words; it is
+		// joined, not formatted, so nothing in it reads as a verb.
+		rows, err := s.db.Query(ctx, `SELECT `+lawRowCols+` FROM legislation l JOIN legislation_kind k ON k.name_ar = l.kind
+			WHERE (`+c.cond+`) AND (coalesce(l.issued_on, '0001-01-01'::date), l.id) < `+fmt.Sprintf("($%d::date, $%d)", n+1, n+2)+`
+			ORDER BY coalesce(l.issued_on, '0001-01-01'::date) DESC, l.id DESC LIMIT `+fmt.Sprintf("$%d", n+3),
+			append(append([]any{}, c.args...), date, id, morePerPage+len(shown)+1)...)
+		if err != nil {
+			s.fail(w, r, err)
+			return
+		}
+		laws, err := scanLawRows(rows)
+		if err != nil {
+			s.fail(w, r, err)
+			return
+		}
+		more := len(laws) > morePerPage+len(shown)
+		if more {
+			laws = laws[:len(laws)-1]
+		}
+		for _, l := range laws {
+			if !shown[l.ID] {
+				res.Laws = append(res.Laws, l)
+			}
+		}
+		if more {
+			last := laws[len(laws)-1]
+			res.LawCursor = cursor.DateID(cursor.Date(last.IssuedOn), int64(last.ID))
+		}
+	}
+	if name == "cited-rulings" && first.rulCite != nil {
+		c := first.rulCite
+		res.rulCite = c
+		for _, d := range first.Rulings {
+			shown[d.ID] = true
+		}
+		n := len(c.args)
+		rows, err := s.db.Query(ctx, `SELECT id, title, coalesce(court, ''), decided_on FROM ruling
+			WHERE (`+c.cond+`) AND (coalesce(decided_on, '0001-01-01'::date), id) < `+fmt.Sprintf("($%d::date, $%d)", n+1, n+2)+`
+			ORDER BY coalesce(decided_on, '0001-01-01'::date) DESC, id DESC LIMIT `+fmt.Sprintf("$%d", n+3),
+			append(append([]any{}, c.args...), date, id, morePerPage+len(shown)+1)...)
+		if err != nil {
+			s.fail(w, r, err)
+			return
+		}
+		found, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (DocRow, error) {
+			d := DocRow{Type: "ruling"}
+			err := row.Scan(&d.ID, &d.Title, &d.Kicker, &d.Date)
+			return d, err
+		})
+		if err != nil {
+			s.fail(w, r, err)
+			return
+		}
+		more := len(found) > morePerPage+len(shown)
+		if more {
+			found = found[:len(found)-1]
+		}
+		for _, d := range found {
+			if !shown[d.ID] {
+				res.Rulings = append(res.Rulings, d)
+			}
+		}
+		if more {
+			last := found[len(found)-1]
+			res.RulCursor = cursor.DateID(cursor.Date(last.Date), int64(last.ID))
+		}
+	}
+	s.renderMore(w, r, res)
 }

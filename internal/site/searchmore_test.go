@@ -66,6 +66,11 @@ func TestSearchShowMoreWalksEveryRow(t *testing.T) {
 		{"515", "Texts", 10}, // the English titles add nothing: no empty last page
 		{"2020", "Texts", 10},
 		{"kanoun al 3amal", "Articles", 15}, // a mended search pages the words it read
+		{"مرسوم 100", "Texts", 10},          // a citation lookup: by date and id
+		{"قانون 1", "Texts", 10},
+		{"قرار 5", "Texts", 10},
+		{"محكمة التمييز الجزائية 2006", "Rulings", 10}, // rulings of a court and a year
+		{"شورى 1996", "Rulings", 10},
 	} {
 		code, body := pageGet(t, s, "/en/search/?q="+url.QueryEscape(c.q))
 		if code != 200 {

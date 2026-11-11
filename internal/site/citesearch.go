@@ -95,6 +95,7 @@ func (s *Server) findLawCite(ctx context.Context, res *Results, r queryRead) (bo
 			return false, err
 		}
 		res.LawCount = n
+		res.moreCited(false, t.cond, t.args)
 		// The year is off and the title says so: "(2012) (القرار رقم 1/1 -
 		// الشروط الواجب مراعاتها في المصانع والمستودعات الغذائية)" is decision 1
 		// of 5/1/2015, and listed ten unrelated texts numbered 1 of 2012
@@ -196,6 +197,7 @@ func (s *Server) findRulingCite(ctx context.Context, res *Results, r queryRead) 
 		d.Type = "ruling"
 		res.Rulings = append(res.Rulings, d)
 	}
+	res.moreCited(true, cond, args)
 	return true, rows.Err()
 }
 
