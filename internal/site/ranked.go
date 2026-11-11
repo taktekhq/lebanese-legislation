@@ -174,13 +174,15 @@ type articleHit struct {
 // Arabic article holds every word, those holding the rarest of them. Among
 // the first ones that hold as many words, an exact phrase comes first with
 // phrase, for a page no cursor continues (a reordered page cut short would
-// lose rows).
-func (s *Server) rankedArticles(ctx context.Context, q string, limit int, after *wordsearch.Key, phrase bool) (wordsearch.Page, []articleHit, error) {
+// lose rows). last is the key of the page's last hit by rank, before that
+// reordering: the page after a whole reordered page starts there.
+func (s *Server) rankedArticles(ctx context.Context, q string, limit int, after *wordsearch.Key, phrase bool) (pg wordsearch.Page, hits []articleHit, last wordsearch.Key, err error) {
 	fr := !hasArabic(q)
-	pg, err := wordsearch.Articles(ctx, s.db, wordsearch.ArticleQuery{Text: q, French: fr, Full: fr, Fallback: !fr, Titled: true, Limit: limit, After: after})
+	pg, err = wordsearch.Articles(ctx, s.db, wordsearch.ArticleQuery{Text: q, French: fr, Full: fr, Fallback: !fr, Titled: true, Limit: limit, After: after})
 	if err != nil || len(pg.Hits) == 0 {
-		return pg, nil, err
+		return pg, nil, last, err
 	}
+	last = pg.Hits[len(pg.Hits)-1].Key
 	if phrase {
 		phraseFirst(pg.Hits)
 	}
@@ -200,9 +202,9 @@ func (s *Server) rankedArticles(ctx context.Context, q string, limit int, after 
 		JOIN legislation l ON l.id = a.law_id JOIN legislation_kind k ON k.name_ar = l.kind
 		ORDER BY h.ord`, laws, pos, q)
 	if err != nil {
-		return pg, nil, err
+		return pg, nil, last, err
 	}
-	hits, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (articleHit, error) {
+	hits, err = pgx.CollectRows(rows, func(row pgx.CollectableRow) (articleHit, error) {
 		var h articleHit
 		var snip *string
 		err := row.Scan(append(lawRowDest(&h.LawRow), &h.Article, &h.Position, &snip)...)
@@ -216,7 +218,7 @@ func (s *Server) rankedArticles(ctx context.Context, q string, limit int, after 
 			hits[i].key = pg.Hits[i].Key
 		}
 	}
-	return pg, hits, err
+	return pg, hits, last, err
 }
 
 // phraseFirst puts the hits that hold the question as a phrase first among
@@ -284,6 +286,17 @@ func (s *Server) rulingsPage(ctx context.Context, q string, limit int, pos *sear
 	if phase == phaseRanked {
 		hits = sum
 		if pg.More {
+			// The judgments follow on a later page and count from this one:
+			// "يوسف كنعان" said 11 rulings while its pages listed 185 (11 Nov
+			// 2026). A word in thousands of rulings is not counted further
+			// (the page says "1,000+"; counting its judgments took 0.5 to 2 s).
+			if total < 1000 {
+				jpg, _, err := s.rulingHits(ctx, q, true, 1, nil)
+				if err != nil {
+					return nil, 0, next, err
+				}
+				total += jpg.Total
+			}
 			return hits, total, searchPos{phase: phaseRanked, key: keyField(sum[len(sum)-1].key)}, nil
 		}
 		phase, key = rulingsJudgments, nil

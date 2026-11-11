@@ -356,6 +356,8 @@
   "search.browse_all": "Browse all",
   "search.articles": "Articles",
   "search.rulings": "Rulings",
+  "search.more": "Show more",
+  "search.back_all": "All results for this search",
   "search.title": "Search",
   "search.desc": "Search Lebanese laws, articles, rulings and explanations in Arabic, English or French.",
   "search_static.hint": "Find a text by its name, or by its number and year: «قانون العمل», «44/2015». This preview searches titles and numbers; searching inside articles and rulings comes with the full site.",

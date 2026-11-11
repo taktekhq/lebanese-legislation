@@ -356,6 +356,8 @@
   "search.browse_all": "Tout parcourir",
   "search.articles": "Articles",
   "search.rulings": "Jurisprudence",
+  "search.more": "Afficher plus",
+  "search.back_all": "Tous les résultats de cette recherche",
   "search.title": "Recherche",
   "search.desc": "Recherchez les lois, articles, décisions de justice et explications du droit libanais en arabe, en anglais ou en français.",
   "search_static.hint": "Trouvez un texte par son nom, ou par son numéro et son année : «قانون العمل», «44/2015». Cet aperçu cherche dans les titres et les numéros ; la recherche dans les articles et les décisions vient avec le site complet.",
