@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { register } from 'node:module';
-import { originFetch, requestRoute } from '../src/origin.js';
+import { FAST_SAMPLE_RATE, originFetch, requestRoute } from '../src/origin.js';
 register('./workers-loader.mjs', import.meta.url);
 const { default: worker } = await import('../src/index.js');
 
@@ -44,18 +44,28 @@ test('slow service requests send only anonymous header timing properties', async
     $lib: 'lebleg-static-site-worker', sample_rate: 1,
   } }]);
 });
-for (const [random, count] of [[0.09, 1], [0.1, 0], [0.9, 0]]) {
+for (const [random, count] of [[0.04, 1], [0.05, 0], [0.09, 0], [0.9, 0]]) {
   test(`fast request sampling at ${random}`, async t => {
     const { events } = await run(t, { random });
     assert.equal(events.length, count);
-    if (count) assert.equal(events[0].properties.sample_rate, 0.1);
+    if (count) assert.equal(events[0].properties.sample_rate, 0.05);
   });
 }
+test('the weighted charts can count a fast event a whole number of times', () => {
+  // The PostHog charts repeat each event round(1 / sample_rate) times.
+  assert.equal(FAST_SAMPLE_RATE, 0.05);
+  assert.equal(Math.round(1 / FAST_SAMPLE_RATE), 20);
+  assert.ok(Math.abs(1 / FAST_SAMPLE_RATE - Math.round(1 / FAST_SAMPLE_RATE)) < 1e-9);
+});
+test('fast client errors are sampled like other fast requests', async t => {
+  const { events } = await run(t, { status: 404, random: 0 });
+  assert.equal(events[0].properties.sample_rate, 0.05);
+});
 for (const [path, kind] of [['/mcp', 'mcp'], ['/en/search/answer/', 'answer'], ['/ar/search/ai/deep/', 'answer'], ['/search/?q=law', 'search'], ['/scan/1/a.png', 'scan'], ['/search/', 'page']]) {
   test(`classify ${path}`, async t => {
     const { events } = await run(t, { path, random: 0 });
     assert.equal(events[0].properties.kind, kind);
-    assert.equal(events[0].properties.sample_rate, ['mcp', 'answer'].includes(kind) ? 1 : 0.1);
+    assert.equal(events[0].properties.sample_rate, ['mcp', 'answer'].includes(kind) ? 1 : 0.05);
   });
 }
 for (const [path, route] of [
