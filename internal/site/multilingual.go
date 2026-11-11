@@ -154,7 +154,16 @@ func (s *Server) addEnglishTitles(ctx context.Context, res *Results) {
 		res.Laws = append(res.Laws, l)
 		seen[l.ID] = true
 	}
+	// The count is what the pages list: the Arabic titles, then the English
+	// titles those did not find ("44" said 148 texts and listed 214).
+	terms := titleTerms(strings.Fields(res.Q))
+	if res.lawFull > 0 && n > 0 && len(terms) > 0 {
+		if pg, _, err := s.englishLaws(ctx, res.Q, 0, 1, nil, terms); err == nil {
+			n = res.lawFull + pg.Full
+		}
+	}
 	res.LawCount = max(res.LawCount, n, len(res.Laws))
+	res.moreEnglish(res.Q)
 	if !hasArabic(res.Q) && len(latinTokens(res.Q)) > 0 {
 		for i := range res.Laws {
 			res.Laws[i].TitleEn = s.titles.get(ctx, s, res.Laws[i].ID)

@@ -440,7 +440,7 @@
   if (!window.fetch || !window.DOMParser) return;
   document.addEventListener("click", function (ev) {
     var a = ev.target.closest && ev.target.closest("a[data-more]");
-    if (!a || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button) return;
+    if (!a || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button) return;
     var wrap = a.closest("[data-more-wrap]");
     var list = wrap && wrap.previousElementSibling;
     if (!list || !list.classList.contains("doclist")) return;

@@ -87,6 +87,20 @@ func (s *Server) searchMore(w http.ResponseWriter, r *http.Request, q, name stri
 		Desc: s.trOr(r, "Search every Lebanese law, article and court ruling, in Arabic or French.", "search.desc"), Data: res})
 }
 
+// moreEnglish ends the texts with a link into the English titles of q when
+// those hold more texts than the page lists and the Arabic titles gave no
+// link of their own (theirs leads on to the English ones, moreLaws).
+func (res *Results) moreEnglish(q string) {
+	if res.LawCursor != "" || res.LawCount <= len(res.Laws) || hasArabic(q) || len(latinTokens(q)) == 0 {
+		return
+	}
+	phase := lawsEnglishOnly
+	if res.lawFull > 0 && len(titleTerms(strings.Fields(q))) > 0 {
+		phase = lawsEnglish // leave out what the Arabic titles found
+	}
+	res.lawQ, res.LawCursor = q, moreCursor(partLaws, searchPos{phase: phase})
+}
+
 // moreArticles is the next page of the articles, by rank.
 func (s *Server) moreArticles(ctx context.Context, first Results, pos *searchPos, res *Results) error {
 	if first.artQ == "" {
@@ -144,30 +158,33 @@ func (s *Server) moreLaws(ctx context.Context, first Results, pos *searchPos, re
 	}
 	latin := !hasArabic(first.lawQ) && len(latinTokens(first.lawQ)) > 0
 	english := first.Num == "" && first.Year == 0 && latin
-	if pos.phase == phaseRanked {
-		pg, hits, err := s.rankedLaws(ctx, first.lawQ, first.Year, first.Num, 0, morePerPage, keyOf(pos))
-		if err != nil {
-			return err
-		}
-		add(hits)
-		switch {
-		case pg.More && len(hits) > 0:
-			res.LawCursor = moreCursor(partLaws, searchPos{phase: phaseRanked, key: keyField(hits[len(hits)-1].key)})
-		case english:
-			res.LawCursor = moreCursor(partLaws, searchPos{phase: lawsEnglish})
-		}
-	} else if english {
-		var except []wordsearch.Term
-		if pos.phase == lawsEnglish {
-			except = titleTerms(strings.Fields(first.lawQ))
-		}
-		pg, hits, err := s.englishLaws(ctx, first.lawQ, 0, morePerPage, keyOf(pos), except)
+	phase, key := pos.phase, keyOf(pos)
+	if phase == phaseRanked {
+		pg, hits, err := s.rankedLaws(ctx, first.lawQ, first.Year, first.Num, 0, morePerPage, key)
 		if err != nil {
 			return err
 		}
 		add(hits)
 		if pg.More && len(hits) > 0 {
-			res.LawCursor = moreCursor(partLaws, searchPos{phase: pos.phase, key: keyField(hits[len(hits)-1].key)})
+			res.LawCursor = moreCursor(partLaws, searchPos{phase: phaseRanked, key: keyField(hits[len(hits)-1].key)})
+			english = false
+		}
+		// The Arabic titles end here: the English ones follow on this page,
+		// so no link leads to an empty one.
+		phase, key = lawsEnglish, nil
+	}
+	if english {
+		var except []wordsearch.Term
+		if phase == lawsEnglish {
+			except = titleTerms(strings.Fields(first.lawQ))
+		}
+		pg, hits, err := s.englishLaws(ctx, first.lawQ, 0, morePerPage, key, except)
+		if err != nil {
+			return err
+		}
+		add(hits)
+		if pg.More && len(hits) > 0 {
+			res.LawCursor = moreCursor(partLaws, searchPos{phase: phase, key: keyField(hits[len(hits)-1].key)})
 		}
 	}
 	if latin {

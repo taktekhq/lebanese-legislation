@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -58,6 +59,13 @@ func TestSearchShowMoreWalksEveryRow(t *testing.T) {
 		{"يوسف كنعان", "Rulings", 10},
 		{"قانون العمل", "Texts", 10},
 		{"technology", "Texts", 10},
+		{"tax", "Texts", 10},              // the English titles alone
+		{"money laundering", "Texts", 10}, // ... of a few words
+		{"44", "Texts", 10},               // Arabic titles, then the English ones they did not find
+		{"liban", "Texts", 10},
+		{"515", "Texts", 10}, // the English titles add nothing: no empty last page
+		{"2020", "Texts", 10},
+		{"kanoun al 3amal", "Articles", 15}, // a mended search pages the words it read
 	} {
 		code, body := pageGet(t, s, "/en/search/?q="+url.QueryEscape(c.q))
 		if code != 200 {
@@ -138,7 +146,7 @@ func TestSearchShowMorePage(t *testing.T) {
 			t.Errorf("%s: the page lists %d parts, %d rows", c.prefix, len(parts), len(parts[c.heading].rows))
 		}
 		for _, r := range parts[c.heading].rows {
-			if strings.Contains(strings.Join(first.rows, "\n"), r+"\n") {
+			if slices.Contains(first.rows, r) {
 				t.Errorf("%s: %s is on the first page too", c.prefix, r)
 			}
 		}

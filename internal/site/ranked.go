@@ -286,17 +286,6 @@ func (s *Server) rulingsPage(ctx context.Context, q string, limit int, pos *sear
 	if phase == phaseRanked {
 		hits = sum
 		if pg.More {
-			// The judgments follow on a later page and count from this one:
-			// "يوسف كنعان" said 11 rulings while its pages listed 185 (11 Nov
-			// 2026). A word in thousands of rulings is not counted further
-			// (the page says "1,000+"; counting its judgments took 0.5 to 2 s).
-			if total < 1000 {
-				jpg, _, err := s.rulingHits(ctx, q, true, 1, nil)
-				if err != nil {
-					return nil, 0, next, err
-				}
-				total += jpg.Total
-			}
 			return hits, total, searchPos{phase: phaseRanked, key: keyField(sum[len(sum)-1].key)}, nil
 		}
 		phase, key = rulingsJudgments, nil
