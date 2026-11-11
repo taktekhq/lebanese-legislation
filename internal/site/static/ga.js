@@ -24,7 +24,14 @@
 window.dataLayer = window.dataLayer || [];
 function gtag() { dataLayer.push(arguments); }
 gtag("js", new Date());
-gtag("config", "G-RDYRK422NP");
+/* No advertising features: the site runs no ads (privacy page). Left on,
+   gtag.js also sent each visit to DoubleClick and to Google's ad audiences
+   at the visitor's country domain (www.google.fr/ads/ga-audiences); the
+   Content Security Policy blocked that one and logged an error on every
+   page (11 Nov 2026). Denying the advertising consents, before the config,
+   is what stops both requests; the two config flags alone did not. */
+gtag("consent", "default", { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied", analytics_storage: "granted" });
+gtag("config", "G-RDYRK422NP", { allow_google_signals: false, allow_ad_personalization_signals: false });
 
 function track(name, params) {
   params = params || {};
