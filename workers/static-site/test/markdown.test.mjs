@@ -360,8 +360,41 @@ test('an origin page the converter cannot read is answered as HTML', async () =>
     const res = await worker.fetch(new Request('https://lebaneselegislation.com/?probe=1', { headers: { Accept: 'text/markdown' } }), env, ctx);
     assert.equal(res.status, 200);
     assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8');
+    assert.equal(res.headers.get('Vary'), 'Accept-Encoding, Accept');
+    assert.equal(res.headers.get('ETag'), null);
     assert.equal(await res.text(), deep);
   } finally {
     console.error = error;
   }
+});
+
+test('an origin page too large to convert on every request stays HTML', async () => {
+  const big = '<main><p>' + 'x'.repeat(2_000_001) + '</p></main>';
+  const { env, ctx } = originSite(() => html(big));
+  const res = await worker.fetch(new Request('https://lebaneselegislation.com/?probe=1', { headers: { Accept: 'text/markdown' } }), env, ctx);
+  assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8');
+  assert.equal((await res.text()).length, big.length);
+});
+
+test('an origin page that stops arriving is a 503, not a broken reply', async () => {
+  const { env, ctx } = originSite(() => new Response(new ReadableStream({ pull(c) { c.error(new Error('container went away')); } }),
+    { headers: { 'Content-Type': 'text/html; charset=utf-8' } }));
+  const error = console.error;
+  console.error = () => {};
+  try {
+    const res = await worker.fetch(new Request('https://lebaneselegislation.com/?probe=1', { headers: { Accept: 'text/markdown' } }), env, ctx);
+    assert.equal(res.status, 503);
+    assert.equal(res.headers.get('Retry-After'), '30');
+    assert.equal(res.headers.get('X-Frame-Options'), 'DENY');
+  } finally {
+    console.error = error;
+  }
+});
+
+test('a check with the test header gets the origin\'s answer as it is', async () => {
+  const { env, ctx } = originSite(() => html());
+  env.ORIGIN_TEST_KEY = 'secret';
+  const res = await worker.fetch(new Request('https://lebaneselegislation.com/?probe=1', { headers: { Accept: 'text/markdown', 'x-origin-test': 'secret' } }), env, ctx);
+  assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8');
+  assert.equal(await res.text(), PAGE);
 });
