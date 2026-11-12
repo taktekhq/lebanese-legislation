@@ -287,3 +287,81 @@ test('discovery files are kept at the edge like API answers; a missing one is no
   await Promise.all(waits);
   assert.deepEqual(puts, ['/.well-known/api-catalog']);
 });
+
+// The origin renders what R2 does not hold: a search, a filtered list, any
+// address with a query. isitagentready.com asks for the home page with a
+// query of its own, so its Markdown check reads an origin page.
+function originSite(answer) {
+  const calls = [];
+  globalThis.caches = { default: { match: async () => undefined, put: async () => {} } };
+  const env = { SITE: { get: async key => key === '_build/live-side' ? { text: async () => 'blue' } : null },
+    ORIGIN_BLUE: { fetch: async r => { calls.push(r.method + ' ' + new URL(r.url).pathname + new URL(r.url).search); return answer(r); } } };
+  return { env, calls, ctx: { waitUntil() {} } };
+}
+const html = (body = PAGE, headers = {}) => new Response(body, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=300', 'Content-Length': '999', ETag: '"o1"', Vary: 'Accept-Encoding', ...headers } });
+
+test('a page the origin renders is converted too when Markdown is preferred', async () => {
+  const { env, calls, ctx } = originSite(() => html());
+  const res = await worker.fetch(new Request('https://lebaneselegislation.com/?probe=1', { headers: { Accept: 'text/markdown' } }), env, ctx);
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('Content-Type'), 'text/markdown; charset=utf-8');
+  assert.equal(res.headers.get('Vary'), 'Accept-Encoding, Accept');
+  assert.equal(res.headers.get('ETag'), null);
+  assert.equal(res.headers.get('Content-Length'), null);
+  assert.equal(res.headers.get('Cache-Control'), 'public, max-age=300');
+  assert.equal(res.headers.get('Strict-Transport-Security'), 'max-age=31536000; includeSubDomains');
+  const body = await res.text();
+  assert.match(body, /\n# المادة 50\n/);
+  assert.equal(res.headers.get('X-Markdown-Tokens'), String(Math.ceil(body.length / 4)));
+  assert.deepEqual(calls, ['GET /?probe=1']); // asked once
+});
+
+test('a page R2 does not hold is converted from the origin as well', async () => {
+  const { env, calls, ctx } = originSite(() => html());
+  const res = await worker.fetch(new Request('https://lebaneselegislation.com/en/law/9/', { headers: { Accept: 'text/markdown, text/html;q=0.9' } }), env, ctx);
+  assert.equal(res.headers.get('Content-Type'), 'text/markdown; charset=utf-8');
+  assert.deepEqual(calls, ['GET /en/law/9/']);
+});
+
+test('everything else from the origin passes through as it is', async () => {
+  // a browser
+  let site = originSite(() => html());
+  let res = await worker.fetch(new Request('https://lebaneselegislation.com/en/search/?q=rent', { headers: { Accept: 'text/html,*/*;q=0.8' } }), site.env, site.ctx);
+  assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8');
+  assert.equal(res.headers.get('ETag'), '"o1"');
+  assert.equal(await res.text(), PAGE);
+  // JSON, whatever is asked
+  site = originSite(() => new Response('{"q":"x"}', { headers: { 'Content-Type': 'application/json; charset=utf-8' } }));
+  res = await worker.fetch(new Request('https://lebaneselegislation.com/api/v1/search/?q=x', { headers: { Accept: 'text/markdown' } }), site.env, site.ctx);
+  assert.equal(await res.text(), '{"q":"x"}');
+  // a missing page, an error, a redirect
+  for (const status of [404, 503, 301]) {
+    site = originSite(() => new Response(status === 301 ? null : '<main>x</main>', { status, headers: { 'Content-Type': 'text/html; charset=utf-8', Location: '/x/' } }));
+    res = await worker.fetch(new Request('https://lebaneselegislation.com/en/search/?q=rent', { headers: { Accept: 'text/markdown' } }), site.env, site.ctx);
+    assert.equal(res.status, status);
+    assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8');
+  }
+  // a POST (the search's answer)
+  site = originSite(() => html('<main>answer</main>'));
+  res = await worker.fetch(new Request('https://lebaneselegislation.com/en/search/answer/', { method: 'POST', body: 'q=x', headers: { Accept: 'text/markdown' } }), site.env, site.ctx);
+  assert.equal(await res.text(), '<main>answer</main>');
+  // a HEAD
+  site = originSite(() => html(null));
+  res = await worker.fetch(new Request('https://lebaneselegislation.com/?probe=1', { method: 'HEAD', headers: { Accept: 'text/markdown' } }), site.env, site.ctx);
+  assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8');
+});
+
+test('an origin page the converter cannot read is answered as HTML', async () => {
+  const deep = '<main>' + '<div>'.repeat(20000) + 'x' + '</div>'.repeat(20000) + '</main>';
+  const { env, ctx } = originSite(() => html(deep));
+  const error = console.error;
+  console.error = () => {};
+  try {
+    const res = await worker.fetch(new Request('https://lebaneselegislation.com/?probe=1', { headers: { Accept: 'text/markdown' } }), env, ctx);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8');
+    assert.equal(await res.text(), deep);
+  } finally {
+    console.error = error;
+  }
+});
