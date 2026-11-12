@@ -2836,7 +2836,7 @@
 367890	ruling/157556	law/244565/art/6	cites	centre	linked	ruling	157556	\N	244565	6	\N	\N	the Centre's link	\N	\N
 367891	ruling/157573	law/244611/art/689	cites	centre	linked	ruling	157573	\N	244611	689	\N	\N	the Centre's link	\N	\N
 367892	ruling/157573	law/244611/art/691	cites	centre	linked	ruling	157573	\N	244611	691	\N	\N	the Centre's link	\N	\N
-367896	law/201023/art/1	law/258033/art/50	replace	model	linked	legislation	201023	1	258033	50	lb/decree/1989-09-15/377/art/50	الفصل الثاني	number and date	عدل رسم تأجير وسائل الاتصالات السلكية واللاسلكية الدولية الواردة في الفصل الثاني من المرسوم رقم 377 تاريخ 15/9/1989- المادة 50 منه وحدد كما يلي	agy:gemini-4-argon-medium
+367896	law/201023/art/1	law/258033/art/50	replace	model	linked	legislation	201023	1	258033	50	lb/decree/1989-09-15/377/art/50	الفصل الثاني	number and date	عدل رسم تأجير وسائل الاتصالات السلكية واللاسلكية الدولية الواردة في الفصل الثاني من المرسوم رقم 377 تاريخ 15/9/1989 - المادة 50 منه وحدد كما يلي	agy:gemini-4-argon-medium
 367897	ruling/128857	law/244565/art/373	cites	centre	linked	ruling	128857	\N	244565	373	\N	\N	the Centre's link	\N	\N
 367898	ruling/128857	law/244611/art/359	cites	centre	linked	ruling	128857	\N	244611	359	\N	\N	the Centre's link	\N	\N
 367899	ruling/128859	law/244611/art/738	cites	centre	linked	ruling	128859	\N	244611	738	\N	\N	the Centre's link	\N	\N
@@ -2873,6 +2873,7 @@
 367930	law/329388/art/1	law/244971/art/9	replace	parser	linked	legislation	329388	1	244971	9	\N	البند السادس فقره (4) (ب)	number and date	تعدل الماده /9/ البند السادس فقره (4) (ب) من القانون المنفذ بموجب المرسوم رقم 13955 الصادر في 26/9/1963 (قانون الضمان الاجتماعي), وتع	\N
 367931	law/330190/art/1	law/236094/art/2	insert	parser	linked	legislation	330190	1	236094	2	\N	+	number and date	تعدل الماده الثانيه من القرار رقم 1042/1 تاريخ 7/11/2013 المتعلق ب «تنظيم استيراد الاسمده ومحسنات التربه في لبنان» بحيث يضاف ال	\N
 367932	law/2000198856/art/1	law/2000197242/art/1	insert	parser	linked	legislation	2000198856	1	2000197242	1	\N	+	number and date	عدلت الماده الاولي من المرسوم رقم 1013 تاريخ 2025/9/1 (قبول هبه مقدمه من منظمه الاغذيه والزراعه للامم المتحده FAO لصالح مؤسسه لب	\N
-367942	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المادة 27 من القرار عدد 16- ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
+367942	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المادة 27 من القرار عدد 16 -ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
 367943	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16/art/4	الفقرة 3 من دفتر الشروط الملحق	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
 367944	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16	الباب الثاني	this text	للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
+367945	law/329374/art/1	law/244369	insert	model	linked	legislation	329374	1	244369	\N	lb/law/1994-08-01/367	الباب الأول	number and date	يعدّل قانون مزاولة مهنة الصيدلة (رقم 367 تاريخ 1/8/1994) بإضافة فصل جديد الى الباب الأول منه	agy:gemini-4-argon-medium
