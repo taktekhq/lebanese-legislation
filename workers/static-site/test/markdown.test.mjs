@@ -140,6 +140,13 @@ test('two readings of a scanned word are both kept, in the brackets the API uses
   assert.equal(body('<p><del>100</del><ins>500</ins> m<sup>2</sup> H<sub>2</sub>O</p>'), '~~100~~500 m<sup>2</sup> H<sub>2</sub>O\n');
 });
 
+test('the closing of a law keeps its lines: the date and each signature', () => {
+  assert.equal(body('<div class="lawend lawend--closing"><p>بيروت في 23 ايلول سنة 1946\n  الامضاء: بشارة خليل الخوري\n\nصدر عن رئيس الجمهورية</p></div>'),
+    'بيروت في 23 ايلول سنة 1946  \nالامضاء: بشارة خليل الخوري  \nصدر عن رئيس الجمهورية\n');
+  assert.equal(body('<div class="reading"><div class="reading__page"><p>سطر اول\nسطر ثان</p></div></div>'), 'سطر اول  \nسطر ثان\n');
+  assert.equal(body('<div class="art__ar"><p>سطر اول\nسطر ثان</p></div>'), 'سطر اول سطر ثان\n'); // elsewhere a line break is a space, as in the browser
+});
+
 test('a link around a heading and a paragraph stays a link', () => {
   assert.equal(body('<a href="/t/"><h3>Rent</h3><p>What the law says</p></a>'), '[Rent What the law says](https://x.test/t/)\n');
 });

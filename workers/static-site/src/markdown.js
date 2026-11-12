@@ -5,7 +5,8 @@
 // The words are the page's own, in its order: nothing is summarised, and no
 // character of a legal text is escaped or changed. Only runs of ordinary
 // white space (space, tab, line break) between words become one space, as a
-// browser shows them; a no-break space stays a no-break space. Where a
+// browser shows them, and where the page keeps a text's line breaks (the
+// closing of a law) so does this; a no-break space stays a no-break space. Where a
 // scanned text has two readings, both are kept, as the API gives them:
 // ⟦one | two⟧. What is left out is what only a browser uses: the header,
 // menu and footer, scripts, forms, buttons and decorative marks
@@ -125,6 +126,11 @@ function rawText(n) {
   return n.children.map(rawText).join("");
 }
 
+// Blocks the stylesheet shows line by line (white-space: pre-line in
+// legislation.css): the closing of a law, with its date and signatures, and
+// the reading of a scanned page. Their line breaks are kept.
+const PRE_LINE = /(?:^|\s)(?:lawend--closing|reading)(?:\s|$)/;
+
 // Ordinary white space: what HTML collapses. Not \s, which also matches the
 // no-break spaces and U+FEFF that a French or Arabic text may carry.
 const SPACES = /[ \t\n\r\f]+/g;
@@ -172,7 +178,8 @@ function inline(nodes, ctx) {
   let prev = null; // the element whose text was added last, when nothing came after it
   for (const n of nodes) {
     if (n.text !== undefined) {
-      out += decodeEntities(n.text).replace(SPACES, " ");
+      const text = decodeEntities(n.text);
+      out += ctx.preLine ? text.replace(/[ \t\r\f]*\n[ \t\n\r\f]*/g, "\n").replace(/[ \t\r\f]+/g, " ") : text.replace(SPACES, " ");
       prev = null;
       continue;
     }
@@ -295,11 +302,12 @@ function blocks(nodes, ctx) {
       continue;
     }
     flush();
+    const own = PRE_LINE.test(n.attrs.class || "") ? { ...ctx, preLine: true } : ctx; // what this element's content is read with
     if (/^h[1-6]$/.test(t)) {
-      const text = tidy(inline(n.children, ctx)).replace(/ *\n/g, " ");
-      if (text) out.push(ctx.inLink ? text : "#".repeat(Number(t[1])) + " " + text); // inside a link: its words only
+      const text = tidy(inline(n.children, own)).replace(/ *\n/g, " ");
+      if (text) out.push(own.inLink ? text : "#".repeat(Number(t[1])) + " " + text); // inside a link: its words only
     } else if (t === "ul" || t === "ol") {
-      const l = list(n, ctx);
+      const l = list(n, own);
       if (l) out.push(l);
     } else if (t === "pre") {
       const code = find(n, (x) => x.tag === "code");
@@ -309,18 +317,18 @@ function blocks(nodes, ctx) {
       const fence = "`".repeat(Math.max(3, ...(text.match(/`+/g) || []).map((r) => r.length + 1)));
       if (text) out.push(fence + lang + "\n" + text + "\n" + fence);
     } else if (t === "blockquote") {
-      const inner = blocks(n.children, ctx).join("\n\n");
-      if (inner) out.push(indent(inner, "> ").replace(/^$/gm, ">"));
+      const quoted = blocks(n.children, own).join("\n\n");
+      if (quoted) out.push(indent(quoted, "> ").replace(/^$/gm, ">"));
     } else if (t === "table") {
-      out.push(...table(n, ctx));
+      out.push(...table(n, own));
     } else if (t === "hr") {
       out.push("---");
     } else if (t === "dt" || t === "summary") {
-      const text = hasBlock(n) ? "" : tidy(inline(n.children, ctx));
+      const text = hasBlock(n) ? "" : tidy(inline(n.children, own));
       if (text) out.push("**" + text + "**");
-      else out.push(...blocks(n.children, ctx));
+      else out.push(...blocks(n.children, own));
     } else {
-      out.push(...blocks(n.children, ctx));
+      out.push(...blocks(n.children, own));
     }
   }
   flush();
