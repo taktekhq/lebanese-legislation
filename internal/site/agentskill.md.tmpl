@@ -1,0 +1,44 @@
+---
+name: lebanese-legislation
+description: Find, read and cite Lebanese laws, articles, court rulings and Official Gazette issues, word for word, from LebaneseLegislation.com. Use when a question is about what Lebanese law says, which text amended an article, or how a court applied it.
+---
+
+# Lebanese law: find it, read it, cite it
+
+{SITE} holds every Lebanese law, decree, court ruling and Official Gazette issue published by the Lebanese University's Centre for Research and Studies in Legal Informatics. Everything is free and needs no key and no sign-in. The texts are Arabic, with the French where it was published.
+
+## Rules
+
+1. Quote the text as it is returned. Never rewrite, summarise as if quoting, or translate a legal text and present it as the law. A translation you make is yours: say so.
+2. Cite every article by its address, which never changes: `{SITE}/law/{id}/article/{number}/`. Use the `url` field of the result.
+3. Say whether the text is in force. Each result carries `status`, and an article carries the texts that amended it.
+4. `title_en` is an unofficial English title written by a model from the Arabic one. The Arabic title and text are official.
+5. This is not legal advice. Say so when the user is deciding something.
+
+## With MCP (best)
+
+Connect `{SITE}/mcp` (Streamable HTTP, stateless, no sign-in). Card: `{SITE}/.well-known/mcp/server-card.json`.
+
+1. `search_legislation` with the question or the citation, in Arabic, English or French. A citation such as "المادة 50 من قانون العمل" or "article 50 labour code" finds the article itself.
+2. `get_article` with the law id and the article number for the exact wording and its amendment history. `get_law` for the text's metadata and table of contents, `get_law_texts` to read a whole text page by page.
+3. `get_links` to follow what amends, repeals or cites a text. `possibly_affected` lists general repeals to check; it is never a finding that something was repealed.
+4. `get_ruling` for a court ruling. Give the user its `pdf_url`, the scan of the judgment.
+5. `list_legislation` and `list_gazette_issues` for "everything published since a date".
+
+Long lists come a page at a time: pass `next_cursor` back as `cursor`.
+
+## With plain HTTP
+
+- Search: `GET {SITE}/api/v1/search/?q=...` (add `type=laws|articles|rulings|gazette`, `year=`, `limit=`).
+- One text: `GET {SITE}/api/v1/law/{id}/`. One article: `GET {SITE}/api/v1/law/{id}/article/{number}/`.
+- One ruling: `GET {SITE}/api/v1/ruling/{id}/`. One Gazette issue: `GET {SITE}/api/v1/gazette/{id}/`.
+- The full description: `{SITE}/api/v1/openapi.json`.
+- Any page as Markdown: request it with the header `Accept: text/markdown`.
+
+Keep under 30 requests per 10 seconds. A 429 or 503 carries `Retry-After`: wait that long.
+
+## Where to start a browse
+
+- The codes: `{SITE}/codes/`. Everything by year: `{SITE}/laws/years/`.
+- Latest amendments: `{SITE}/changes/`. An overview for assistants: `{SITE}/llms.txt`.
+- The whole database as files: https://huggingface.co/datasets/taktekhq/lebanese-legislation

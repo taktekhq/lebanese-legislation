@@ -106,7 +106,8 @@
 </footer>
 <script defer src="/main.js?v={{assetVersion}}"></script>
 <script defer src="/legislation.js?v={{assetVersion}}"></script>
-</body>
+{{if not static}}<script defer src="/webmcp.js?v={{assetVersion}}"></script>
+{{end}}</body>
 </html>
 
 

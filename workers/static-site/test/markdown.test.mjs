@@ -1,0 +1,219 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { register } from 'node:module';
+
+import { toMarkdown, prefersMarkdown, decodeEntities } from '../src/markdown.js';
+import { AGENT_LINKS } from '../src/headers.js';
+
+register('./workers-loader.mjs', import.meta.url);
+const { default: worker } = await import('../src/index.js');
+
+const PAGE = `<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<title>Art. 50, Labour Code &middot; Lebanese Legislation</title>
+<meta name="description" content="Article 50 of the Labour Code &amp; its amendments.">
+<link rel="canonical" href="https://lebaneselegislation.com/en/law/190374/article/50/">
+<style>main{color:red}</style>
+<script>if (a<b) document.write("<p>never</p>");</script>
+</head>
+<body>
+<header class="nav"><a href="/en/">Lebanese Legislation</a><nav><a href="/en/laws/">Legislation</a></nav></header>
+<main id="top">
+<section>
+  <a class="back" href="/en/law/190374/#a-50"><span aria-hidden="true">&larr;</span> The whole text</a>
+  <p class="kicker"><b lang="ar">قانون العمل</b><span class="status">No repeal recorded</span></p>
+  <h1 lang="ar">المادة 50</h1>
+  <p>Last amended by <a href="/en/law/243935/">قانون 9640</a> &middot; <time datetime="2026-09-26">26 September 2026</time></p>
+</section>
+<article class="art">
+  <div class="art__head"><h3>المادة 50</h3><div><button type="button" data-cite="x">Cite</button></div></div>
+  <div class="art__ar"><p>آ- يحق لكل من صاحب العمل والعامل ان يفسخ * العقد_المعقود [بينهما].</p><p>- اذا كان الفسخ صادرا<br>من قبل صاحب العمل.</p></div>
+</article>
+<ul><li><a href="/en/ruling/1/">Ruling 1</a> 29/04/2020</li><li>Second<ul><li>Nested</li></ul></li></ul>
+<ol start="3"><li>Three</li><li>Four</li></ol>
+<nav class="filters"><a href="?kind=law">Law</a><a href="?kind=decree">Decree</a></nav>
+<dl><dt>Status</dt><dd>In force</dd></dl>
+<table><thead><tr><th>Year</th><th>Texts</th></tr></thead><tbody><tr><td>2025</td><td>1 | 2</td></tr></tbody></table>
+<pre><code class="language-sh">curl -G 'https://x/api?q=1&amp;y=2'
+  --data &lt;x&gt;</code></pre>
+<blockquote><p>Quoted</p><p>twice</p></blockquote>
+<form action="/search/"><input name="q"><button>Search</button></form>
+<p hidden>Not shown</p>
+<figure><img src="/assets/mcp/claude.svg" alt="Steps in Claude"><figcaption>Figure 1</figcaption></figure>
+</main>
+<footer><div class="footer__legal footer__notice"><p lang="en">Information from published official texts, not legal advice.</p></div><p>Taktek, LLC</p></footer>
+<script defer src="/main.js"></script>
+</body></html>`;
+
+test('a page becomes Markdown: its own words, in order, nothing a browser only needs', () => {
+  const md = toMarkdown(PAGE, 'https://lebaneselegislation.com/en/law/190374/article/50/');
+  assert.equal(md, `---
+title: "Art. 50, Labour Code · Lebanese Legislation"
+description: "Article 50 of the Labour Code & its amendments."
+url: https://lebaneselegislation.com/en/law/190374/article/50/
+lang: en
+---
+
+[The whole text](https://lebaneselegislation.com/en/law/190374/#a-50)
+
+**قانون العمل** No repeal recorded
+
+# المادة 50
+
+Last amended by [قانون 9640](https://lebaneselegislation.com/en/law/243935/) · 26 September 2026
+
+### المادة 50
+
+آ- يحق لكل من صاحب العمل والعامل ان يفسخ * العقد_المعقود [بينهما].
+
+- اذا كان الفسخ صادرا  
+من قبل صاحب العمل.
+
+- [Ruling 1](https://lebaneselegislation.com/en/ruling/1/) 29/04/2020
+- Second
+  - Nested
+
+3. Three
+4. Four
+
+[Law](https://lebaneselegislation.com/en/law/190374/article/50/?kind=law) [Decree](https://lebaneselegislation.com/en/law/190374/article/50/?kind=decree)
+
+**Status**
+
+In force
+
+| Year | Texts |
+| --- | --- |
+| 2025 | 1 \\| 2 |
+
+\`\`\`sh
+curl -G 'https://x/api?q=1&y=2'
+  --data <x>
+\`\`\`
+
+> Quoted
+>
+> twice
+
+![Steps in Claude](https://lebaneselegislation.com/assets/mcp/claude.svg)
+
+Figure 1
+
+---
+
+Information from published official texts, not legal advice.
+`);
+});
+
+test('legal text is never altered: no character is escaped or dropped', () => {
+  const text = 'المادة 12-1: * _ [ ] ( ) # > ` | \\ ⟦أ | ب⟧ 50% & < >';
+  const html = `<html><body><main><p>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></main></body></html>`;
+  assert.ok(toMarkdown(html, 'https://x/').includes('\n\n' + text + '\n'));
+});
+
+test('entities', () => {
+  assert.equal(decodeEntities('&amp;&lt;&gt;&#39;&#x41;&middot;&nbsp;&unknown;&#34;'), '&<>\'A· &unknown;"');
+});
+
+test('a page with no <main> still converts', () => {
+  assert.match(toMarkdown('<p>Hello <b>there</b></p>', 'https://x/'), /Hello \*\*there\*\*/);
+});
+
+for (const [accept, want] of [
+  ['text/markdown', true],
+  ['text/markdown, text/html;q=0.9', true],
+  ['text/markdown, text/html', true],
+  ['text/html, text/markdown', true],
+  ['text/plain, text/x-markdown;q=0.5', true],
+  ['text/html, text/markdown;q=0.8', false],
+  ['text/markdown;q=0', false],
+  ['text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', false],
+  ['*/*', false],
+  ['', false],
+  [null, false],
+]) {
+  test(`Accept ${JSON.stringify(accept)} ${want ? 'gets Markdown' : 'gets HTML'}`, () => {
+    assert.equal(prefersMarkdown(accept), want);
+  });
+}
+
+function site() {
+  const keys = [];
+  const puts = [];
+  globalThis.caches = { default: { match: async key => { keys.push(key.url); }, put: async (key, res) => { puts.push([key.url, res.headers.get('Content-Type')]); } } };
+  const env = { SITE: { get: async key => key === '_export/generation' ? { text: async () => 'run-1\n' }
+    : key === '_export/layout.json' ? null
+    : key === 'en/law/1/index.html' ? { body: PAGE, arrayBuffer: async () => new TextEncoder().encode(PAGE).buffer, httpEtag: '"e1"', uploaded: new Date('2026-11-01T00:00:00Z'), httpMetadata: { contentType: 'text/html; charset=utf-8' } }
+    : key === 'llms.txt' ? { body: '# llms', arrayBuffer: async () => new TextEncoder().encode('# llms').buffer, httpEtag: '"e2"', httpMetadata: { contentType: 'text/markdown; charset=utf-8' } }
+    : null } };
+  return { env, keys, puts, ctx: { waitUntil() {} } };
+}
+
+test('a request that prefers Markdown gets the page as Markdown, under its own cache key', async () => {
+  const { env, keys, puts, ctx } = site();
+  const res = await worker.fetch(new Request('https://lebaneselegislation.com/en/law/1/', { headers: { Accept: 'text/markdown, text/html;q=0.9' } }), env, ctx);
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('Content-Type'), 'text/markdown; charset=utf-8');
+  assert.equal(res.headers.get('Vary'), 'Accept');
+  assert.equal(res.headers.get('Link'), AGENT_LINKS);
+  assert.equal(res.headers.get('ETag'), '"e1-md"');
+  const body = await res.text();
+  assert.match(body, /^---\ntitle: "Art\. 50, Labour Code · Lebanese Legislation"/);
+  assert.match(body, /\n# المادة 50\n/);
+  assert.equal(res.headers.get('X-Markdown-Tokens'), String(Math.ceil(body.length / 4)));
+  assert.equal(new URL(keys[0]).searchParams.get('__markdown'), '1');
+  assert.deepEqual(puts.map(p => p[1]), ['text/markdown; charset=utf-8']);
+
+  const head = await worker.fetch(new Request('https://lebaneselegislation.com/en/law/1/', { method: 'HEAD', headers: { Accept: 'text/markdown' } }), env, ctx);
+  assert.equal(head.headers.get('Content-Type'), 'text/markdown; charset=utf-8');
+  assert.equal(await head.text(), '');
+
+  const same = await worker.fetch(new Request('https://lebaneselegislation.com/en/law/1/', { headers: { Accept: 'text/markdown', 'If-None-Match': '"e1-md"' } }), env, ctx);
+  assert.equal(same.status, 304);
+});
+
+test('a browser gets the HTML page, with the Link header and Vary: Accept', async () => {
+  const { env, keys, ctx } = site();
+  const res = await worker.fetch(new Request('https://lebaneselegislation.com/en/law/1/', { headers: { Accept: 'text/html,application/xhtml+xml,*/*;q=0.8' } }), env, ctx);
+  assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8');
+  assert.equal(res.headers.get('Vary'), 'Accept');
+  assert.equal(res.headers.get('Link'), AGENT_LINKS);
+  assert.equal(res.headers.get('ETag'), '"e1"');
+  assert.equal(await res.text(), PAGE);
+  assert.equal(new URL(keys[0]).searchParams.get('__markdown'), null);
+});
+
+test('a file that is not a page is served as it is, whatever is asked', async () => {
+  const { env, ctx } = site();
+  const res = await worker.fetch(new Request('https://lebaneselegislation.com/llms.txt', { headers: { Accept: 'text/markdown' } }), env, ctx);
+  assert.equal(await res.text(), '# llms');
+  assert.equal(res.headers.get('Link'), null);
+  assert.equal(res.headers.get('ETag'), '"e2"');
+});
+
+test('the A2A lookup reaches the origin: POST, OPTIONS and GET', async () => {
+  for (const method of ['POST', 'OPTIONS', 'GET']) {
+    const calls = [];
+    const env = { SITE: { get: async () => ({ text: async () => 'blue' }) }, ORIGIN_BLUE: { fetch: async r => { calls.push(r.method + ' ' + new URL(r.url).pathname); return new Response('ok'); } } };
+    const res = await worker.fetch(new Request('https://lebaneselegislation.com/a2a', { method, body: method === 'POST' ? '{}' : undefined }), env, { waitUntil() {} });
+    assert.equal(res.status, 200);
+    assert.deepEqual(calls, [method + ' /a2a']);
+  }
+});
+
+test('discovery files are kept at the edge like API answers; a missing one is not', async () => {
+  const { originFetch } = await import('../src/origin.js');
+  const puts = [];
+  globalThis.caches = { default: { match: async () => undefined, put: async key => { puts.push(new URL(key.url).pathname); } } };
+  const env = { SITE: { get: async () => ({ text: async () => 'blue' }) },
+    ORIGIN_BLUE: { fetch: async r => new URL(r.url).pathname.includes('oauth')
+      ? new Response('not found', { status: 404, headers: { 'Cache-Control': 'public, max-age=86400' } })
+      : new Response('{}', { headers: { 'Cache-Control': 'public, max-age=3600, s-maxage=86400' } }) } };
+  const waits = [];
+  const ctx = { waitUntil: p => waits.push(p) };
+  await originFetch(new Request('https://lebaneselegislation.com/.well-known/api-catalog'), env, ctx);
+  await originFetch(new Request('https://lebaneselegislation.com/.well-known/oauth-authorization-server'), env, ctx);
+  await Promise.all(waits);
+  assert.deepEqual(puts, ['/.well-known/api-catalog']);
+});

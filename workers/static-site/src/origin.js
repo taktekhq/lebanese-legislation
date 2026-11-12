@@ -36,6 +36,7 @@ function requestKind(url) {
   const path = url.pathname.replace(/^\/(en|ar)(?=\/)/, "");
   if (path.startsWith("/api/")) return "api";
   if (path === "/mcp" || path.startsWith("/mcp/")) return "mcp";
+  if (path === "/a2a") return "a2a";
   if (/^\/search\/(answer|ai)(\/|$)/.test(path)) return "answer";
   if (path.startsWith("/search/") && url.searchParams.get("q")) return "search";
   if (path.startsWith("/scan/")) return "scan";
@@ -139,7 +140,9 @@ export async function originFetch(request, env, ctx) {
     }
     // API answers are public and say how long they keep (Cache-Control), so
     // repeats are served from the edge and never reach Postgres.
-    const cacheable = !testing && request.method === "GET" && /^\/(en\/)?api\/v1\//.test(url.pathname);
+    // So are the discovery files under /.well-known/ (internal/site/agents.go):
+    // the same for every caller, and asked for by every agent that connects.
+    const cacheable = !testing && request.method === "GET" && /^\/(?:(?:en\/)?api\/v1|\.well-known)\//.test(url.pathname);
     const cacheURL = new URL(url);
     cacheURL.searchParams.set("__origin_side", side);
     const cacheKey = new Request(cacheURL.toString(), { method: "GET" });

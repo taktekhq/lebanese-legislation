@@ -7,7 +7,7 @@
 // endpoint, files read from disk, the pages that need a database.
 const ORIGIN_PREFIXES = [
   "/scan/",
-  "/api/", "/ph/", "/ph", "/gtag/", "/mcp", "/healthz", "/.well-known/", "/ul/",
+  "/api/", "/ph/", "/ph", "/gtag/", "/mcp", "/a2a", "/healthz", "/.well-known/", "/ul/",
   "/ruling-files/", "/official", "/official-files/",
 ];
 

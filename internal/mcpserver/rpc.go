@@ -54,6 +54,10 @@ var (
 	}()
 )
 
+// Tools is the tools/list answer's tools (name, title, description, input
+// schema), for the server card the website publishes.
+func Tools() json.RawMessage { return toolsCompact }
+
 const calculatedCurrentGuidance = "When calculated_current is present, use its text_ar for current monetary amounts and cite its authority.url. " +
 	"Identify this as calculated under the authority, never as verbatim published wording. " +
 	"The article text_ar and source fields remain published wording. "

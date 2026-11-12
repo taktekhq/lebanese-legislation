@@ -13,7 +13,8 @@ export class OriginGreen extends DurableObject {}
 // at a time, and removing its route puts the origin back in charge.
 
 import { route, keyFor, resolve, indexRedirectData } from "./route.js";
-import { SECURITY_HEADERS, EMBEDDABLE } from "./headers.js";
+import { SECURITY_HEADERS, EMBEDDABLE, AGENT_LINKS } from "./headers.js";
+import { toMarkdown, prefersMarkdown } from "./markdown.js";
 import { originFetch, isTestRequest } from "./origin.js";
 import { markdownAsk } from "./markdownask.js";
 import { isParts, parseParts, prepareFrame, assemble, indexPointer } from "./layout.js";
@@ -108,13 +109,25 @@ function lastModified(...dates) {
   return Number.isFinite(t) ? new Date(t).toUTCString() : "";
 }
 
-function withHeaders(obj, request, body = obj.body, etag = obj.httpEtag, modified = lastModified(obj.uploaded)) {
+function withHeaders(obj, request, body = obj.body, etag = obj.httpEtag, modified = lastModified(obj.uploaded), markdown = false) {
   const h = new Headers(SECURITY_HEADERS);
   if (EMBEDDABLE.has(new URL(request.url).pathname)) {
     h.set("Cross-Origin-Resource-Policy", "cross-origin");
     h.set("Access-Control-Allow-Origin", "*");
   }
-  h.set("Content-Type", obj.httpMetadata?.contentType || "application/octet-stream");
+  const type = obj.httpMetadata?.contentType || "application/octet-stream";
+  h.set("Content-Type", markdown ? "text/markdown; charset=utf-8" : type);
+  if (type.startsWith("text/html")) {
+    // A page has two versions, HTML and Markdown, chosen by the Accept
+    // header; both say where the machine-readable descriptions are.
+    h.set("Vary", "Accept");
+    h.set("Link", AGENT_LINKS);
+  }
+  if (markdown) {
+    h.set("X-Markdown-Tokens", String(Math.ceil(body.length / 4))); // an estimate: about four characters a token
+    h.set("Access-Control-Allow-Origin", "*");
+    h.set("Cross-Origin-Resource-Policy", "cross-origin");
+  }
   h.set("Cache-Control", obj.httpMetadata?.cacheControl || "public, max-age=300");
   h.set("ETag", etag);
   if (modified) h.set("Last-Modified", modified);
@@ -127,14 +140,24 @@ function withHeaders(obj, request, body = obj.body, etag = obj.httpEtag, modifie
 // whole (every page before the edge layout, and pages outside the layout)
 // or in parts; the bytes tell which. Its ETag names the frame too, so a new
 // footer is a new ETag.
-export async function pageResponse(obj, request, env) {
+//
+// With markdown set (the request prefers text/markdown), the same page is
+// answered as Markdown, converted here from the HTML (markdown.js).
+export async function pageResponse(obj, request, env, markdown = false) {
   if (!(obj.httpMetadata?.contentType || "").startsWith("text/html")) return withHeaders(obj, request);
-  const bytes = new Uint8Array(await obj.arrayBuffer());
-  if (!isParts(bytes)) return withHeaders(obj, request, bytes);
-  const page = parseParts(bytes);
-  const frame = await frameFor(env, page.key);
-  const etag = obj.httpEtag.replace(/"$/, "") + "-" + frame.id.slice(0, 12) + '"';
-  return withHeaders(obj, request, assemble(frame, page), etag, lastModified(obj.uploaded, frame.uploaded));
+  let bytes = new Uint8Array(await obj.arrayBuffer());
+  let etag = obj.httpEtag, modified = lastModified(obj.uploaded);
+  if (isParts(bytes)) {
+    const page = parseParts(bytes);
+    const frame = await frameFor(env, page.key);
+    bytes = assemble(frame, page);
+    etag = obj.httpEtag.replace(/"$/, "") + "-" + frame.id.slice(0, 12) + '"';
+    modified = lastModified(obj.uploaded, frame.uploaded);
+  }
+  if (!markdown) return withHeaders(obj, request, bytes, etag, modified);
+  const url = new URL(request.url);
+  const md = toMarkdown(new TextDecoder().decode(bytes), url.origin + url.pathname);
+  return withHeaders(obj, request, md, etag.replace(/"$/, "") + '-md"', modified, true);
 }
 
 export default {
@@ -159,7 +182,8 @@ export default {
     const postAllowed = /^(?:\/(?:en|ar))?\/(?:search\/|search\/answer\/|search\/ai\/|search\/ai\/deep\/)$/.test(url.pathname)
       || url.pathname.startsWith("/ph/");
     // MCP (streamable HTTP) uses POST, GET, DELETE and OPTIONS; the server checks them itself.
-    const mcpPath = url.pathname === "/mcp" || url.pathname === "/mcp/";
+    // So does the A2A lookup at /a2a (JSON-RPC over POST).
+    const mcpPath = url.pathname === "/mcp" || url.pathname === "/mcp/" || url.pathname === "/a2a";
     if (!mcpPath && request.method !== "GET" && request.method !== "HEAD" && !(request.method === "POST" && postAllowed)) {
       return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: postAllowed ? "GET, HEAD, POST" : "GET, HEAD" } });
     }
@@ -173,16 +197,20 @@ export default {
         const cache = caches.default;
         const gen = await exportGeneration(env);
         const layout = await layoutPointer(env);
+        // A request that prefers Markdown gets the page converted, kept
+        // under its own cache key. A browser never asks for it.
+        const markdown = prefersMarkdown(request.headers.get("Accept"));
         const q = new URLSearchParams();
         if (gen) q.set("__export", gen);
         if (layout) q.set("__layout", layout.etag);
+        if (markdown) q.set("__markdown", "1");
         const qs = q.toString();
         const cacheKey = new Request(url.origin + url.pathname + (qs ? "?" + qs : ""), { method: "GET" });
         const hit = await cache.match(cacheKey);
         if (hit && request.method === "GET") return notModified(request, hit.headers) ? notModifiedResponse(hit.headers) : hit;
         const obj = await env.SITE.get(key);
         if (obj) {
-          const res = await pageResponse(obj, request, env);
+          const res = await pageResponse(obj, request, env, markdown);
           if (res.status === 200 && request.method === "GET") ctx.waitUntil(cache.put(cacheKey, res.clone()));
           return res;
         }

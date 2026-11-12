@@ -17,3 +17,16 @@ export const SECURITY_HEADERS = {
 // as the server's icons, and directory sites (mcptry, Glama) and MCP clients
 // load them from their own pages. same-site would leave a blank square there.
 export const EMBEDDABLE = new Set(["/assets/mark.png", "/assets/favicon.svg"]);
+
+// Where an agent finds the API catalog, the API description and llms.txt
+// (RFC 8288 Link header), on every HTML page and its Markdown version. The Go
+// server sends the same value on the pages it renders (AgentLinks in
+// internal/site/agents.go, whose test reads this list).
+export const AGENT_LINKS = [
+  '</.well-known/api-catalog>; rel="api-catalog"',
+  '</api/v1/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
+  '</developers/>; rel="service-doc"; type="text/html"',
+  '</llms.txt>; rel="describedby"; type="text/markdown"',
+  '</.well-known/mcp/server-card.json>; rel="https://modelcontextprotocol.io/server-card"; type="application/json"',
+  '</sitemap.xml>; rel="sitemap"; type="application/xml"',
+].join(", ");

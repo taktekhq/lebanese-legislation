@@ -116,6 +116,8 @@ Cloudflare serves the static pages and ruling PDFs from R2 through the Worker in
 
 AI crawlers are welcome. `robots.txt` lets every named AI crawler (GPTBot, ClaudeBot, PerplexityBot, ShapBot and others) read the pages, search, the API and the MCP server. Every client gets the same limit on dynamic paths: 30 requests per 10 seconds from one address.
 
+Agents find the API and the MCP server by themselves: every page carries `Link` headers and answers `Accept: text/markdown` with Markdown, and `/.well-known/` holds the API catalog, the MCP server card, an A2A agent card and an agent skill. See [what AI agents find here](docs/agents.md).
+
 ## Update the data yourself
 
 Run `scripts/nightly.sh` on your own machine to scrape, rebuild, check and
