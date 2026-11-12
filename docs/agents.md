@@ -46,13 +46,19 @@ Nothing here needs a sign-in, so `/.well-known/oauth-authorization-server`, `/.w
 
 ## Check it
 
-[isitagentready.com](https://isitagentready.com/) scans the site:
+[isitagentready.com](https://isitagentready.com/) scans the site. The site sells nothing and has no sign-in, so scan it with the commerce and sign-in checks switched off:
 
 ```sh
-curl -X POST https://isitagentready.com/api/scan -H 'Content-Type: application/json' -d '{"url":"https://lebaneselegislation.com"}'
+curl -X POST https://isitagentready.com/api/scan -H 'Content-Type: application/json' -d '{
+  "url": "https://lebaneselegislation.com",
+  "enabledChecks": ["robotsTxt", "sitemap", "linkHeaders", "dnsAid", "markdownNegotiation",
+    "robotsTxtAiRules", "contentSignals", "webBotAuth", "apiCatalog", "mcpServerCard",
+    "a2aAgentCard", "agentSkills", "webMcp", "ard", "personalAgentProtocol"]}'
 ```
 
-The three OAuth checks (`oauthDiscovery`, `oauthProtectedResource`, `authMd`) fail by design. Every other check passes. Space scans 25 seconds apart: the scanner limits how often it will open a page in its browser.
+Left out: `oauthDiscovery`, `oauthProtectedResource` and `authMd` (sign-in), and `x402`, `mpp`, `ucp`, `acp` and `ap2` (commerce). A check that is left out comes back `neutral`. On the website, the same choice is under "Customize scan". Every check in the list passes; `webBotAuth` is neutral, since the site sends no bots of its own. A scan with everything on fails the three sign-in checks, by design (see above).
+
+Space scans 25 seconds apart: the scanner limits how often it will open a page in its browser.
 
 ## Deploy
 
