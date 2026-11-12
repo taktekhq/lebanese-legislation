@@ -5,7 +5,7 @@ An agent that lands on LebaneseLegislation.com can find the API, the MCP server 
 | What | Where | Served by |
 | --- | --- | --- |
 | Link headers on every page (`api-catalog`, `service-desc`, `service-doc`, `describedby`) | any HTML page | Worker for static pages, Go server for the rest |
-| A Markdown version of every static page | the page's own address, with `Accept: text/markdown` | Worker ([`markdown.js`](../workers/static-site/src/markdown.js)) |
+| A Markdown version of every page | the page's own address, with `Accept: text/markdown` | Worker ([`markdown.js`](../workers/static-site/src/markdown.js)) |
 | Content Signals: `search=yes, ai-input=yes, ai-train=yes` | `/robots.txt`, in every group | Go server |
 | API catalog (RFC 9727) | `/.well-known/api-catalog` | Go server |
 | MCP server card | `/.well-known/mcp/server-card.json` | Go server |
@@ -26,7 +26,9 @@ curl -H 'Accept: text/markdown' https://lebaneselegislation.com/en/law/190374/ar
 
 The Worker converts the HTML page it already serves, so nothing is stored twice. The reply starts with a short front matter (title, description, address, language), then the content of `<main>`, then the footer's "not legal advice" notice. The header, menu, footer, forms and buttons are left out. No character of a legal text is escaped or changed. `X-Markdown-Tokens` is an estimate, four characters a token.
 
-Markdown is served when the `Accept` header names `text/markdown` with a weight at least as high as `text/html`. A browser never does, so it always gets HTML. Markdown must be wanted more than HTML, or as much and named first (`text/markdown, text/html`). Pages the origin renders (search results, filtered lists) are HTML only, and so is the self-hosted image, which has no Worker in front.
+Markdown is served when the `Accept` header names `text/markdown` with a weight higher than `text/html`, or the same weight and named first (`text/markdown, text/html`). A browser never does, so it always gets HTML.
+
+Pages the origin renders (a search, a filtered list, any address with a query) are converted the same way, after the origin has answered, and are not kept at the edge. isitagentready.com asks for the home page with a query of its own, so its Markdown check reads one of these. The self-hosted image has no Worker in front and answers HTML only.
 
 ## A2A
 

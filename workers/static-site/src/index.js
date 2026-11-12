@@ -167,6 +167,49 @@ export async function pageResponse(obj, request, env, markdown = false) {
   return withHeaders(obj, request, md, etag.replace(/"$/, "") + '-md"', modified, true);
 }
 
+// originPage is originFetch for the pages the origin renders (a search, a
+// filtered list, any address with a query, a page not exported yet). A
+// request that prefers Markdown gets that page converted too, so every page
+// of the site has a Markdown version, whichever side serves it. Anything
+// else the origin answers (JSON, a redirect, an error, a HEAD, whose body
+// is not there to convert) and every request that does not ask for Markdown
+// pass through untouched.
+const ORIGIN_MARKDOWN_MAX = 2_000_000; // characters of HTML; the largest text's page is about 1.5 MB
+
+export async function originPage(request, env, ctx) {
+  const res = await originFetch(request, env, ctx);
+  if (request.method !== "GET" || res.status !== 200) return res;
+  if (!(res.headers.get("Content-Type") || "").startsWith("text/html")) return res;
+  if (!markdownFirst(request.headers.get("Accept"))) return res;
+  let html;
+  try {
+    html = await res.text();
+  } catch (err) {
+    // the container went away mid-page: say so, as originFetch does
+    console.error("markdown: the origin's page did not arrive:", err && err.message);
+    return new Response("Service unavailable", { status: 503, headers: { ...SECURITY_HEADERS, "Retry-After": "30" } });
+  }
+  const headers = new Headers(res.headers);
+  // the body is no longer the origin's bytes
+  for (const h of ["Content-Length", "Content-Encoding", "ETag"]) headers.delete(h);
+  headers.append("Vary", "Accept");
+  // These conversions are not kept at the edge (the address has a query), so
+  // a page too large to convert on every request stays HTML.
+  if (html.length > ORIGIN_MARKDOWN_MAX) return new Response(html, { status: 200, headers });
+  let md;
+  try {
+    md = toMarkdown(html, request.url); // with its query: a search's address, when the page names no canonical one
+  } catch (err) {
+    console.error("markdown: serving the origin's HTML instead:", new URL(request.url).pathname, err && err.message);
+    return new Response(html, { status: 200, headers });
+  }
+  headers.set("Content-Type", "text/markdown; charset=utf-8");
+  headers.set("X-Markdown-Tokens", String(Math.ceil(md.length / 4)));
+  headers.set("Access-Control-Allow-Origin", "*");
+  headers.set("Cross-Origin-Resource-Policy", "cross-origin");
+  return new Response(md, { status: 200, headers });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -198,7 +241,7 @@ export default {
       return originFetch(request, env, ctx);
     }
     try {
-      if (route(request.method, url.pathname, url.search) === "origin") return originFetch(request, env, ctx);
+      if (route(request.method, url.pathname, url.search) === "origin") return originPage(request, env, ctx);
       const key = keyFor(url.pathname);
       if (key) {
         const cache = caches.default;
@@ -237,6 +280,6 @@ export default {
     } catch (err) {
       console.error("static site: falling back to the origin:", err && err.message);
     }
-    return originFetch(request, env, ctx);
+    return originPage(request, env, ctx);
   },
 };
