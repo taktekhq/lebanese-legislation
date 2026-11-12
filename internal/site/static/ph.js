@@ -45,6 +45,15 @@
     // A survey speaks the page's language, not the browser's: an Arabic page in an
     // English browser showed the English question laid out right to left.
     override_display_language: document.documentElement.lang || "ar",
+    // On a phone a survey took 292 of 640 pixels and hid the page under it. A
+    // shorter answer box and no helper line bring it to about 200. PostHog hands
+    // us its survey stylesheet before it is attached; other stylesheets pass through.
+    prepare_external_dependency_stylesheet: function (style) {
+      if (style && style.textContent.indexOf(".ph-survey") !== -1) {
+        style.textContent += "@media (max-width:600px){.ph-survey textarea{height:3.6em;min-height:0}.ph-survey .survey-question-description{display:none}}";
+      }
+      return style;
+    },
     disable_session_recording: long && !editor,
     session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
   });
