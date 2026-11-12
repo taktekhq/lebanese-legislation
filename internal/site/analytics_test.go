@@ -78,6 +78,13 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 	if !strings.Contains(ph, `override_display_language: document.documentElement.lang || "ar"`) {
 		t.Error("ph.js must show surveys in the page's language")
 	}
+	// On a phone the survey must not take half the screen: a short answer box and
+	// no helper line. The hook must hand the stylesheet back or PostHog drops it.
+	for _, want := range []string{"prepare_external_dependency_stylesheet: function (style)", "@media (max-width:600px){.ph-survey textarea{height:3.6em;min-height:0}", "return style;"} {
+		if !strings.Contains(ph, want) {
+			t.Errorf("ph.js must shrink surveys on phones: missing %q", want)
+		}
+	}
 	// PostHog's snippet adopts an array; "|| {}" throws on the first capture.
 	if !strings.Contains(ph, "window.posthog||[]") {
 		t.Error("ph.js must end PostHog's snippet with window.posthog||[]")
