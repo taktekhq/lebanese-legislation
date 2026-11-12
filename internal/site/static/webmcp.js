@@ -47,7 +47,7 @@
       var q = new URLSearchParams({ q: String((a && a.query) || "") });
       if (a && a.kind) q.set("type", String(a.kind)); // the API's name for it
       if (a && a.year) q.set("year", String(a.year));
-      if (a && a.limit) q.set("limit", String(Math.min(Number(a.limit) || 10, 20)));
+      if (a && a.limit) q.set("limit", String(Math.max(1, Math.min(Math.trunc(Number(a.limit)) || 10, 20))));
       return get("/api/v1/search/?" + q.toString());
     }
   });

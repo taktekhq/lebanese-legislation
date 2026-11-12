@@ -184,9 +184,16 @@ func TestWebMCPToolsMatchTheMCPServer(t *testing.T) {
 			continue
 		}
 		want := defs[i].InputSchema
-		for _, arg := range regexp.MustCompile(`(?m)^\s+([a-z_]+): \{ type:`).FindAllStringSubmatch(m[2], -1) {
+		args := regexp.MustCompile(`(?m)^\s+([a-z_]+): \{ type:`).FindAllStringSubmatch(m[2], -1)
+		if len(args) != len(want.Properties) {
+			t.Errorf("%s: webmcp.js takes %d arguments, the MCP tool %d", m[1], len(args), len(want.Properties))
+		}
+		for _, arg := range args {
 			if _, ok := want.Properties[arg[1]]; !ok {
 				t.Errorf("%s: webmcp.js takes %q, the MCP tool does not", m[1], arg[1])
+			}
+			if !strings.Contains(string(js), "a."+arg[1]) {
+				t.Errorf("%s: webmcp.js declares %q and never reads it", m[1], arg[1])
 			}
 		}
 		required := strings.Join(want.Required, `", "`)
