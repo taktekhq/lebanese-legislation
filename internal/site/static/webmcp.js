@@ -1,7 +1,10 @@
 /* The site's search and article lookup as tools for an AI assistant that runs
    in the visitor's browser (WebMCP, document.modelContext). They call the
    same JSON API as everyone else (/api/v1/) and return its answer unchanged:
-   the texts word for word. In a browser without WebMCP this does nothing. */
+   the texts word for word. Names and arguments are those of the MCP server's
+   tools (internal/mcpserver/tools.json; a test compares them), so an agent
+   that knows one knows the other. In a browser without WebMCP this does
+   nothing. */
 (function () {
   "use strict";
   var mc = document.modelContext || navigator.modelContext;
@@ -33,18 +36,18 @@
       type: "object",
       properties: {
         query: { type: "string", description: "What to look for, under 200 characters" },
-        type: { type: "string", enum: ["laws", "articles", "rulings", "gazette"], description: "Only one kind of result; all four when left out" },
+        kind: { type: "string", enum: ["laws", "articles", "rulings", "gazette"], description: "Only one kind of result; all four when left out" },
         year: { type: "integer", description: "Only texts of this year" },
-        limit: { type: "integer", description: "Results of each kind, 10 by default, at most 50" }
+        limit: { type: "integer", description: "Results of each kind, 10 by default, at most 20" }
       },
       required: ["query"]
     },
     annotations: { readOnlyHint: true },
     execute: function (a) {
       var q = new URLSearchParams({ q: String((a && a.query) || "") });
-      if (a && a.type) q.set("type", String(a.type));
+      if (a && a.kind) q.set("type", String(a.kind)); // the API's name for it
       if (a && a.year) q.set("year", String(a.year));
-      if (a && a.limit) q.set("limit", String(a.limit));
+      if (a && a.limit) q.set("limit", String(Math.min(Number(a.limit) || 10, 20)));
       return get("/api/v1/search/?" + q.toString());
     }
   });
@@ -52,20 +55,20 @@
   register({
     name: "get_article",
     description: "The exact wording of one article of a Lebanese law or decree, with its status and the texts that amended it. " +
-      "Give the text's id (from search_legislation) and the article number. Cite it by the url in the answer. Not legal advice.",
+      "Give the text's id (from search_legislation) and the article's number. Cite it by the url in the answer. Not legal advice.",
     inputSchema: {
       type: "object",
       properties: {
         law_id: { type: "integer", description: "Id of the law or decree, e.g. 190374 for the Labour Code" },
-        article: { type: "string", description: "Article number as the text writes it, e.g. \"50\" or \"12-1\"" }
+        number: { type: "string", description: "The article's printed number, e.g. \"50\", \"12-1\" or \"12 مكرر\"" }
       },
-      required: ["law_id", "article"]
+      required: ["law_id", "number"]
     },
     annotations: { readOnlyHint: true },
     execute: function (a) {
       var id = parseInt(a && a.law_id, 10);
-      var n = String((a && a.article) || "").trim();
-      if (!(id > 0) || !n) return Promise.resolve(text("Give law_id (a number) and article."));
+      var n = String((a && a.number) || "").trim();
+      if (!(id > 0) || !n) return Promise.resolve(text("Give law_id (a positive integer) and number."));
       return get("/api/v1/law/" + id + "/article/" + encodeURIComponent(n) + "/");
     }
   });

@@ -192,7 +192,7 @@ export async function originPage(request, env, ctx) {
   const headers = new Headers(res.headers);
   // the body is no longer the origin's bytes
   for (const h of ["Content-Length", "Content-Encoding", "ETag"]) headers.delete(h);
-  headers.append("Vary", "Accept");
+  if (!/(?:^|,)\s*accept\s*(?:,|$)/i.test(headers.get("Vary") || "")) headers.append("Vary", "Accept"); // the origin names it since 12 Nov 2026
   // These conversions are not kept at the edge (the address has a query), so
   // a page too large to convert on every request stays HTML.
   if (html.length > ORIGIN_MARKDOWN_MAX) return new Response(html, { status: 200, headers });
