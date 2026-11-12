@@ -144,6 +144,7 @@ test('the closing of a law keeps its lines: the date and each signature', () => 
   assert.equal(body('<div class="lawend lawend--closing"><p>بيروت في 23 ايلول سنة 1946\n  الامضاء: بشارة خليل الخوري\n\nصدر عن رئيس الجمهورية</p></div>'),
     'بيروت في 23 ايلول سنة 1946  \nالامضاء: بشارة خليل الخوري  \nصدر عن رئيس الجمهورية\n');
   assert.equal(body('<div class="reading"><div class="reading__page"><p>سطر اول\nسطر ثان</p></div></div>'), 'سطر اول  \nسطر ثان\n');
+  assert.equal(body('<figure class="topic__quote"><blockquote>المادة 50\nسطر ثان</blockquote></figure><p>بعد\nذلك</p>'), '> المادة 50  \n> سطر ثان\n\nبعد ذلك\n');
   assert.equal(body('<div class="art__ar"><p>سطر اول\nسطر ثان</p></div>'), 'سطر اول سطر ثان\n'); // elsewhere a line break is a space, as in the browser
 });
 

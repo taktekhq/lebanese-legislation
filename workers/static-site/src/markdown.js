@@ -127,9 +127,10 @@ function rawText(n) {
 }
 
 // Blocks the stylesheet shows line by line (white-space: pre-line in
-// legislation.css): the closing of a law, with its date and signatures, and
-// the reading of a scanned page. Their line breaks are kept.
-const PRE_LINE = /(?:^|\s)(?:lawend--closing|reading)(?:\s|$)/;
+// legislation.css and assets/topics.css): the closing of a law, with its
+// date and signatures, the reading of a scanned page, and an article quoted
+// in a topic guide. Their line breaks are kept.
+const PRE_LINE = /(?:^|\s)(?:lawend--closing|reading|topic__quote)(?:\s|$)/;
 
 // Ordinary white space: what HTML collapses. Not \s, which also matches the
 // no-break spaces and U+FEFF that a French or Arabic text may carry.
