@@ -316,6 +316,14 @@ test('a page the origin renders is converted too when Markdown is preferred', as
   assert.deepEqual(calls, ['GET /?probe=1']); // asked once
 });
 
+test('Vary names Accept once, whether or not the origin already did', async () => {
+  for (const vary of ['Accept-Encoding, Accept', 'Accept', 'accept-encoding,ACCEPT']) {
+    const { env, ctx } = originSite(() => html(PAGE, { Vary: vary }));
+    const res = await worker.fetch(new Request('https://lebaneselegislation.com/?probe=1', { headers: { Accept: 'text/markdown' } }), env, ctx);
+    assert.equal(res.headers.get('Vary'), vary);
+  }
+});
+
 test('a page R2 does not hold is converted from the origin as well', async () => {
   const { env, calls, ctx } = originSite(() => html());
   const res = await worker.fetch(new Request('https://lebaneselegislation.com/en/law/9/', { headers: { Accept: 'text/markdown, text/html;q=0.9' } }), env, ctx);

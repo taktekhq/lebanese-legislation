@@ -301,6 +301,9 @@ func (s *Server) write(w http.ResponseWriter, r *http.Request, code int, html st
 	w.Header().Set("Cache-Control", htmlCacheControl(r, code))
 	if code == http.StatusOK {
 		w.Header().Set("Link", AgentLinks) // where agents find the API, the MCP server and llms.txt (agents.go)
+		// The site's Worker answers the same address with Markdown when a
+		// request prefers it, so a cache between must keep the two apart.
+		w.Header().Add("Vary", "Accept")
 	}
 	w.WriteHeader(code)
 	fmt.Fprint(w, html)

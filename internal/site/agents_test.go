@@ -4,10 +4,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"io/fs"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 
@@ -147,6 +149,72 @@ func TestAgentSkillNamesRealTools(t *testing.T) {
 		if !known[m[1]] {
 			t.Errorf("the skill names %s, which is not an MCP tool", m[1])
 		}
+	}
+}
+
+// The browser tools (webmcp.js) carry the names and the arguments of the MCP
+// server's tools of the same name, so an agent that knows one knows the other.
+func TestWebMCPToolsMatchTheMCPServer(t *testing.T) {
+	js, err := fs.ReadFile(StaticFiles(), "webmcp.js")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var defs []struct {
+		Name        string
+		InputSchema struct {
+			Properties map[string]json.RawMessage
+			Required   []string
+		}
+	}
+	if err := json.Unmarshal(mcpserver.Tools(), &defs); err != nil {
+		t.Fatal(err)
+	}
+	mcp := map[string]int{}
+	for i, d := range defs {
+		mcp[d.Name] = i
+	}
+	tools := regexp.MustCompile(`(?s)register\(\{\s*name: "([a-z_]+)".*?properties: \{(.*?)\n      \},\s*required: \[([^\]]*)\]`).FindAllStringSubmatch(string(js), -1)
+	if len(tools) != 2 {
+		t.Fatalf("found %d tools in webmcp.js, want 2", len(tools))
+	}
+	for _, m := range tools {
+		i, ok := mcp[m[1]]
+		if !ok {
+			t.Errorf("webmcp.js registers %s, which is not an MCP tool", m[1])
+			continue
+		}
+		want := defs[i].InputSchema
+		args := regexp.MustCompile(`(?m)^\s+([a-z_]+): \{ type:`).FindAllStringSubmatch(m[2], -1)
+		if len(args) != len(want.Properties) {
+			t.Errorf("%s: webmcp.js takes %d arguments, the MCP tool %d", m[1], len(args), len(want.Properties))
+		}
+		for _, arg := range args {
+			if _, ok := want.Properties[arg[1]]; !ok {
+				t.Errorf("%s: webmcp.js takes %q, the MCP tool does not", m[1], arg[1])
+			}
+			if !strings.Contains(string(js), "a."+arg[1]) {
+				t.Errorf("%s: webmcp.js declares %q and never reads it", m[1], arg[1])
+			}
+		}
+		required := strings.Join(want.Required, `", "`)
+		if got := strings.Trim(strings.TrimSpace(m[3]), `"`); got != required {
+			t.Errorf("%s: required %q in webmcp.js, %q in the MCP tool", m[1], got, required)
+		}
+	}
+}
+
+// A page says its answer depends on Accept: the Worker gives the same address
+// as Markdown to a request that prefers it.
+func TestPagesVaryOnAccept(t *testing.T) {
+	s, err := New(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := agentGet(t, s, "/en/privacy/").Header().Values("Vary"); !slices.Contains(got, "Accept") {
+		t.Errorf("Vary on a page = %q, want Accept in it", got)
+	}
+	if got := agentGet(t, s, "/robots.txt").Header().Values("Vary"); slices.Contains(got, "Accept") {
+		t.Errorf("Vary on robots.txt = %q: only pages have a Markdown version", got)
 	}
 }
 

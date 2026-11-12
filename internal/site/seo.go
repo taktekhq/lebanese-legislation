@@ -85,7 +85,7 @@ func (s *Server) llms(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(&b, "- [%s](%s%s)\n", l[0], Base, l[1])
 	}
 	b.WriteString("\n## For AI assistants\n\n- MCP server (search, get_law, get_article, get_law_texts, get_ruling; verbatim texts only): " + Base + "/mcp\n- Read-only JSON API: " + Base + "/ai/\n- The JSON API as OpenAPI 3.1: " + Base + "/api/v1/openapi.json\n" +
-		"- A law, an article, a ruling or a list page as Markdown: ask for its address with the header Accept: text/markdown\n" +
+		"- Any page as Markdown: ask for its address with the header Accept: text/markdown\n" +
 		"- A skill for agents (how to find, read and cite a text): " + Base + "/.well-known/agent-skills/lebanese-legislation/SKILL.md\n" +
 		"- Discovery files: " + Base + "/.well-known/api-catalog , " + Base + "/.well-known/mcp/server-card.json , " + Base + "/.well-known/agent-card.json (A2A lookup at " + Base + "/a2a) , " + Base + "/.well-known/ai-catalog.json\n" +
 		"- No sign-in anywhere: send no key and no token\n")
