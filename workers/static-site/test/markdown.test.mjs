@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { register } from 'node:module';
 
-import { toMarkdown, prefersMarkdown, decodeEntities } from '../src/markdown.js';
+import { toMarkdown, decodeEntities } from '../src/markdown.js';
 import { AGENT_LINKS } from '../src/headers.js';
 
 register('./workers-loader.mjs', import.meta.url);
@@ -22,7 +22,7 @@ const PAGE = `<!doctype html>
 <main id="top">
 <section>
   <a class="back" href="/en/law/190374/#a-50"><span aria-hidden="true">&larr;</span> The whole text</a>
-  <p class="kicker"><b lang="ar">قانون العمل</b><span class="status">No repeal recorded</span></p>
+  <p class="kicker"><b lang="ar">قانون العمل</b> <span class="status">No repeal recorded</span></p>
   <h1 lang="ar">المادة 50</h1>
   <p>Last amended by <a href="/en/law/243935/">قانون 9640</a> &middot; <time datetime="2026-09-26">26 September 2026</time></p>
 </section>
@@ -112,31 +112,55 @@ test('legal text is never altered: no character is escaped or dropped', () => {
   assert.ok(toMarkdown(html, 'https://x/').includes('\n\n' + text + '\n'));
 });
 
+const body = (html) => toMarkdown('<html><body><main>' + html + '</main></body></html>', 'https://x.test/').split('---\n\n')[1];
+
+test('adjacent elements are not pulled apart: 46/2021 stays 46/2021', () => {
+  assert.equal(body('<p><bdi>46</bdi><bdi>/2021</bdi> <span>ال</span><span>مادة</span></p>'), '46/2021 المادة\n');
+  // only links in a row, and a card's title and its line, get a space
+  assert.equal(body('<p><a href="/a/">One</a><a href="/b/">Two</a></p>'), '[One](https://x.test/a/) [Two](https://x.test/b/)\n');
+  assert.equal(body('<p><a href="/a/"><b>Title</b><span>12 articles</span></a></p>'), '[**Title** 12 articles](https://x.test/a/)\n');
+  assert.equal(body('<p><b>المادة</b><span>5</span></p>'), '**المادة**5\n');
+});
+
+test('no-break spaces and U+FEFF are kept as they are', () => {
+  const text = 'Art.\u00a05 «\u00a0texte\u00a0» 1\u202f000 a\ufeffb';
+  assert.equal(body('<p>  Art.&nbsp;5 «&nbsp;texte&nbsp;»\n 1\u202f000   a\ufeffb </p>'), text + '\n');
+  assert.equal(body('<p><b>\u00a0x\u00a0</b></p>'), '**\u00a0x\u00a0**\n');
+});
+
+test('text after a script or style is not lost when the page has an İ before it', () => {
+  const md = toMarkdown('<html><head><title>İİİİİİİİİİİİİİİİ</title><style>p{}</style></head><body><main><p>' + 'İ'.repeat(40) +
+    '</p><script>var a = "</p>";</script><p>after script</p><style>x{}</style><p>after style</p></main></body></html>', 'https://x.test/');
+  assert.match(md, /after script\n\nafter style\n$/);
+  assert.ok(!md.includes('var a'));
+});
+
+test('two readings of a scanned word are both kept, in the brackets the API uses', () => {
+  assert.equal(body('<p>مبلغ <mark class="unsure" title="قراءتان">١٠٠<span class="unsure__or"> / </span>١٥٠</mark> ليرة</p>'), 'مبلغ ⟦١٠٠ | ١٥٠⟧ ليرة\n');
+  assert.equal(body('<p><del>100</del><ins>500</ins> m<sup>2</sup> H<sub>2</sub>O</p>'), '~~100~~500 m<sup>2</sup> H<sub>2</sub>O\n');
+});
+
+test('a link around a heading and a paragraph stays a link', () => {
+  assert.equal(body('<a href="/t/"><h3>Rent</h3><p>What the law says</p></a>'), '[Rent What the law says](https://x.test/t/)\n');
+});
+
+test('code that holds a fence gets a longer one', () => {
+  assert.equal(body('<pre>a\n```\nb</pre>'), '````\na\n```\nb\n````\n');
+});
+
+test('an address with brackets or a space cannot end the link early', () => {
+  const md = toMarkdown('<main><p><a href="/law/1/?x=(a)&amp;y=b c">Text</a></p></main>', 'https://x.test/');
+  assert.ok(md.includes('[Text](https://x.test/law/1/?x=%28a%29&y=b%20c)'), md);
+});
+
 test('entities', () => {
+  assert.equal(decodeEntities('&constructor;&toString;&__proto__;'), '&constructor;&toString;&__proto__;');
   assert.equal(decodeEntities('&amp;&lt;&gt;&#39;&#x41;&middot;&nbsp;&unknown;&#34;'), '&<>\'A· &unknown;"');
 });
 
 test('a page with no <main> still converts', () => {
   assert.match(toMarkdown('<p>Hello <b>there</b></p>', 'https://x/'), /Hello \*\*there\*\*/);
 });
-
-for (const [accept, want] of [
-  ['text/markdown', true],
-  ['text/markdown, text/html;q=0.9', true],
-  ['text/markdown, text/html', true],
-  ['text/html, text/markdown', true],
-  ['text/plain, text/x-markdown;q=0.5', true],
-  ['text/html, text/markdown;q=0.8', false],
-  ['text/markdown;q=0', false],
-  ['text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', false],
-  ['*/*', false],
-  ['', false],
-  [null, false],
-]) {
-  test(`Accept ${JSON.stringify(accept)} ${want ? 'gets Markdown' : 'gets HTML'}`, () => {
-    assert.equal(prefersMarkdown(accept), want);
-  });
-}
 
 function site() {
   const keys = [];
@@ -173,6 +197,24 @@ test('a request that prefers Markdown gets the page as Markdown, under its own c
   assert.equal(same.status, 304);
 });
 
+// One rule decides (markdownFirst, markdownask.js): Markdown must be wanted
+// more than HTML, or as much and named first.
+for (const [accept, type] of [
+  ['text/markdown', 'text/markdown'],
+  ['text/markdown, text/html, */*', 'text/markdown'],
+  ['text/plain, text/x-markdown;q=0.5', 'text/markdown'],
+  ['text/html, text/markdown', 'text/html'],
+  ['text/html, text/markdown;q=0.8', 'text/html'],
+  ['text/markdown;q=0', 'text/html'],
+  ['*/*', 'text/html'],
+]) {
+  test(`Accept: ${accept} gets ${type}`, async () => {
+    const { env, ctx } = site();
+    const res = await worker.fetch(new Request('https://lebaneselegislation.com/en/law/1/', { headers: { Accept: accept } }), env, ctx);
+    assert.equal(res.headers.get('Content-Type'), type + '; charset=utf-8');
+  });
+}
+
 test('a browser gets the HTML page, with the Link header and Vary: Accept', async () => {
   const { env, keys, ctx } = site();
   const res = await worker.fetch(new Request('https://lebaneselegislation.com/en/law/1/', { headers: { Accept: 'text/html,application/xhtml+xml,*/*;q=0.8' } }), env, ctx);
@@ -184,10 +226,30 @@ test('a browser gets the HTML page, with the Link header and Vary: Accept', asyn
   assert.equal(new URL(keys[0]).searchParams.get('__markdown'), null);
 });
 
-test('a file that is not a page is served as it is, whatever is asked', async () => {
+test('a page the converter cannot read is answered as HTML, not as an error', async () => {
   const { env, ctx } = site();
+  const deep = '<main>' + '<div>'.repeat(20000) + 'x' + '</div>'.repeat(20000) + '</main>';
+  const get = env.SITE.get;
+  env.SITE.get = async key => key === 'en/law/2/index.html'
+    ? { body: deep, arrayBuffer: async () => new TextEncoder().encode(deep).buffer, httpEtag: '"e3"', httpMetadata: { contentType: 'text/html; charset=utf-8' } }
+    : get(key);
+  const error = console.error;
+  console.error = () => {};
+  try {
+    const res = await worker.fetch(new Request('https://lebaneselegislation.com/en/law/2/', { headers: { Accept: 'text/markdown' } }), env, ctx);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8');
+    assert.equal(res.headers.get('ETag'), '"e3"');
+  } finally {
+    console.error = error;
+  }
+});
+
+test('a file that is not a page is served as it is, whatever is asked', async () => {
+  const { env, keys, ctx } = site();
   const res = await worker.fetch(new Request('https://lebaneselegislation.com/llms.txt', { headers: { Accept: 'text/markdown' } }), env, ctx);
   assert.equal(await res.text(), '# llms');
+  assert.equal(new URL(keys[0]).searchParams.get('__markdown'), null); // one cache entry, not two
   assert.equal(res.headers.get('Link'), null);
   assert.equal(res.headers.get('ETag'), '"e2"');
 });

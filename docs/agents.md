@@ -26,11 +26,11 @@ curl -H 'Accept: text/markdown' https://lebaneselegislation.com/en/law/190374/ar
 
 The Worker converts the HTML page it already serves, so nothing is stored twice. The reply starts with a short front matter (title, description, address, language), then the content of `<main>`, then the footer's "not legal advice" notice. The header, menu, footer, forms and buttons are left out. No character of a legal text is escaped or changed. `X-Markdown-Tokens` is an estimate, four characters a token.
 
-Markdown is served when the `Accept` header names `text/markdown` with a weight at least as high as `text/html`. A browser never does, so it always gets HTML. Pages the origin renders (search results, filtered lists) are HTML only, and so is the self-hosted image, which has no Worker in front.
+Markdown is served when the `Accept` header names `text/markdown` with a weight at least as high as `text/html`. A browser never does, so it always gets HTML. Markdown must be wanted more than HTML, or as much and named first (`text/markdown, text/html`). Pages the origin renders (search results, filtered lists) are HTML only, and so is the self-hosted image, which has no Worker in front.
 
 ## A2A
 
-`POST /a2a` takes one JSON-RPC message (`message/send` for A2A 0.3, `SendMessage` for 1.0) and replies with one message: the texts that match, as plain text and as the same JSON `/api/v1/search/` returns. It is a search with no language model behind it, limited per address like the rest of the site.
+`POST /a2a` takes one JSON-RPC message (`message/send` for A2A 0.3, `SendMessage` for 1.0) and replies with one message: the texts that match, as plain text and as the same JSON `/api/v1/search/` returns. It is a search with no language model behind it. It has the per-address limit and the database queue of `/api/v1/`: a 429 or a 503 carries `Retry-After`.
 
 ```sh
 curl -X POST https://lebaneselegislation.com/a2a -H 'Content-Type: application/json' -d '{

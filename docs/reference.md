@@ -46,7 +46,7 @@ docker compose up -d --force-recreate api mcp
 
 Arabic, English and French queries can retrieve multilingual source passages. English discovery titles are unofficial aids, not authoritative translations. Availability of a language depends on the source material.
 
-All published ports bind to your own computer. The API has no user authentication and is meant for local use. Before exposing it publicly, set `RATE_LIMIT_PER_MINUTE` or limit at your reverse proxy (LebaneseLegislation.com limits each address at Cloudflare: 30 requests in 10 seconds on /api/, /mcp and /search/), and add HTTPS and an appropriate cost limit.
+All published ports bind to your own computer. The API has no user authentication and is meant for local use. Before exposing it publicly, set `RATE_LIMIT_PER_MINUTE` or limit at your reverse proxy (LebaneseLegislation.com limits each address at Cloudflare: 30 requests in 10 seconds on /api/, /mcp, /a2a and /search/), and add HTTPS and an appropriate cost limit.
 
 Stop services with `docker compose down`. This preserves the database volume. Volume lifecycle belongs to the operator. There is no automatic refresh. Use a different Compose project and fresh volumes to select a new snapshot.
 

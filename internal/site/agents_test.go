@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/taktekhq/lebanese-legislation/internal/mcpserver"
 )
 
 func agentGet(t *testing.T, s *Server, path string) *httptest.ResponseRecorder {
@@ -98,7 +100,8 @@ func TestAgentFilesNameOnlyWhatExists(t *testing.T) {
 	seen := map[string]bool{}
 	check := func(where, path string) {
 		path, _, _ = strings.Cut(path, "?")
-		if path == "" || seen[path] || strings.Contains(path, "{") {
+		path = regexp.MustCompile(`\{[a-z]+\}`).ReplaceAllString(path, "1") // /law/{id}/article/{number}/ as /law/1/article/1/
+		if path == "" || seen[path] {
 			return
 		}
 		seen[path] = true
@@ -118,8 +121,32 @@ func TestAgentFilesNameOnlyWhatExists(t *testing.T) {
 	for _, m := range regexp.MustCompile(`<(/[^>]*)>`).FindAllStringSubmatch(AgentLinks, -1) {
 		check("the Link header", m[1])
 	}
-	if len(seen) < 12 {
-		t.Errorf("only %d addresses checked: %v", len(seen), seen)
+	for _, want := range []string{"/api/v1/law/1/article/1/", "/api/v1/ruling/1/", "/api/v1/gazette/1/", "/law/1/article/1/", "/codes/", "/llms.txt"} {
+		if !seen[want] {
+			t.Errorf("%s was not checked: %v", want, seen)
+		}
+	}
+}
+
+// The skill tells an agent which MCP tools to call. Each one it names is a
+// tool the server lists, and the fields it names are fields of the answers.
+func TestAgentSkillNamesRealTools(t *testing.T) {
+	var defs []struct{ Name string }
+	if err := json.Unmarshal(mcpserver.Tools(), &defs); err != nil {
+		t.Fatal(err)
+	}
+	known := map[string]bool{"title_en": true, "next_cursor": true, "pdf_url": true} // answer fields
+	for _, d := range defs {
+		known[d.Name] = true
+	}
+	named := regexp.MustCompile("`([a-z]+(?:_[a-z]+)+)`").FindAllStringSubmatch(agentSkillTemplate, -1)
+	if len(named) < 8 {
+		t.Fatalf("the skill names only %d tools or fields", len(named))
+	}
+	for _, m := range named {
+		if !known[m[1]] {
+			t.Errorf("the skill names %s, which is not an MCP tool", m[1])
+		}
 	}
 }
 
@@ -217,6 +244,31 @@ func TestA2ARefusals(t *testing.T) {
 	if status, _ := a2aCall(t, s, `{"jsonrpc":"2.0","method":"message/send"}`); status != http.StatusAccepted {
 		t.Errorf("a notification: %d, want 202", status)
 	}
+	if status, out := a2aCall(t, s, `{"jsonrpc":"2.0","id":1,"method":"message/send","params":"`+strings.Repeat("x", a2aMaxBody)+`"}`); status != http.StatusRequestEntityTooLarge || out.Error == nil {
+		t.Errorf("a body over the cap: %d %+v, want 413", status, out.Error)
+	}
+}
+
+// One address cannot flood the lookup: past the burst it gets 429 with
+// Retry-After, as JSON.
+func TestA2ARateLimit(t *testing.T) {
+	s, err := New(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	last := 0
+	var rec *httptest.ResponseRecorder
+	for i := 0; i < 40 && last != http.StatusTooManyRequests; i++ {
+		req := httptest.NewRequest("POST", "/a2a", strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"tasks/get"}`))
+		req.Header.Set("CF-Connecting-IP", "203.0.113.9")
+		rec = httptest.NewRecorder()
+		s.ServeHTTP(rec, req)
+		last = rec.Code
+	}
+	var out rpcResponse
+	if last != http.StatusTooManyRequests || rec.Header().Get("Retry-After") == "" || json.Unmarshal(rec.Body.Bytes(), &out) != nil || out.Error == nil {
+		t.Errorf("after 40 requests: %d, Retry-After %q, body %q", last, rec.Header().Get("Retry-After"), rec.Body.String())
+	}
 }
 
 func TestA2AText(t *testing.T) {
@@ -238,12 +290,19 @@ func TestA2AText(t *testing.T) {
 	}
 }
 
-// With the corpus: a question gets a reply that links real texts, in both
-// versions of the protocol.
+// With a database (the fictional fixture in CI, else a copy of the corpus):
+// a question gets a reply that links the texts it matched, in both versions
+// of the protocol.
 func TestA2ASearch(t *testing.T) {
-	s := testServer(t)
+	var s *Server
+	q := "قانون العمل"
+	if os.Getenv("DEMO_DATABASE_URL") != "" {
+		s, q = frenchServer(t), "المكتبة العامة"
+	} else {
+		s = testServer(t)
+	}
 	for method, role := range map[string]string{"message/send": "agent", "SendMessage": "ROLE_AGENT"} {
-		status, out := a2aCall(t, s, `{"jsonrpc":"2.0","id":"q1","method":"`+method+`","params":{"message":{"role":"user","contextId":"c1","parts":[{"kind":"text","text":"قانون العمل"}]}}}`)
+		status, out := a2aCall(t, s, `{"jsonrpc":"2.0","id":"q1","method":"`+method+`","params":{"message":{"role":"user","contextId":"c1","parts":[{"kind":"text","text":"`+q+`"}]}}}`)
 		if status != 200 || out.Error != nil {
 			t.Fatalf("%s: %d %+v", method, status, out.Error)
 		}

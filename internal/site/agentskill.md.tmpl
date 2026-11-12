@@ -33,9 +33,9 @@ Long lists come a page at a time: pass `next_cursor` back as `cursor`.
 - One text: `GET {SITE}/api/v1/law/{id}/`. One article: `GET {SITE}/api/v1/law/{id}/article/{number}/`.
 - One ruling: `GET {SITE}/api/v1/ruling/{id}/`. One Gazette issue: `GET {SITE}/api/v1/gazette/{id}/`.
 - The full description: `{SITE}/api/v1/openapi.json`.
-- Any page as Markdown: request it with the header `Accept: text/markdown`.
+- A law, an article, a ruling, a Gazette issue or a list page as Markdown: request its address with the header `Accept: text/markdown`. Search results come as HTML or, better, from the API.
 
-Keep under 30 requests per 10 seconds. A 429 or 503 carries `Retry-After`: wait that long.
+Keep under 60 requests a minute and 30 in any 10 seconds. A 429 or 503 carries `Retry-After`: wait that long.
 
 ## Where to start a browse
 

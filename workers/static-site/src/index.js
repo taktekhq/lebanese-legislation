@@ -14,9 +14,9 @@ export class OriginGreen extends DurableObject {}
 
 import { route, keyFor, resolve, indexRedirectData } from "./route.js";
 import { SECURITY_HEADERS, EMBEDDABLE, AGENT_LINKS } from "./headers.js";
-import { toMarkdown, prefersMarkdown } from "./markdown.js";
+import { toMarkdown } from "./markdown.js";
 import { originFetch, isTestRequest } from "./origin.js";
-import { markdownAsk } from "./markdownask.js";
+import { markdownAsk, markdownFirst } from "./markdownask.js";
 import { isParts, parseParts, prepareFrame, assemble, indexPointer } from "./layout.js";
 
 // The export generation (the workflow run that last finished uploading) is
@@ -156,7 +156,14 @@ export async function pageResponse(obj, request, env, markdown = false) {
   }
   if (!markdown) return withHeaders(obj, request, bytes, etag, modified);
   const url = new URL(request.url);
-  const md = toMarkdown(new TextDecoder().decode(bytes), url.origin + url.pathname);
+  let md;
+  try {
+    md = toMarkdown(new TextDecoder().decode(bytes), url.origin + url.pathname);
+  } catch (err) {
+    // A page the converter cannot read is still a page: answer with the HTML.
+    console.error("markdown: serving HTML instead:", url.pathname, err && err.message);
+    return withHeaders(obj, request, bytes, etag, modified);
+  }
   return withHeaders(obj, request, md, etag.replace(/"$/, "") + '-md"', modified, true);
 }
 
@@ -197,9 +204,10 @@ export default {
         const cache = caches.default;
         const gen = await exportGeneration(env);
         const layout = await layoutPointer(env);
-        // A request that prefers Markdown gets the page converted, kept
-        // under its own cache key. A browser never asks for it.
-        const markdown = prefersMarkdown(request.headers.get("Accept"));
+        // A request that prefers Markdown to HTML (markdownFirst, the rule
+        // the markdown_requested event already reports) gets the page
+        // converted, kept under its own cache key. A browser never asks.
+        const markdown = key.endsWith("index.html") && markdownFirst(request.headers.get("Accept"));
         const q = new URLSearchParams();
         if (gen) q.set("__export", gen);
         if (layout) q.set("__layout", layout.etag);

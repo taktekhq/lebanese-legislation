@@ -70,7 +70,7 @@ func (s *Server) a2aPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-store")
 	if wait, ok := s.ipLim.Allow(clientIP(r)); !ok {
 		w.Header().Set("Retry-After", strconv.Itoa(int(wait.Seconds()+0.999)))
-		http.Error(w, "too many requests, slow down", http.StatusTooManyRequests)
+		writeRPC(w, http.StatusTooManyRequests, rpcErrorResponse(nil, rpcInvalidRequest, "too many requests, slow down"))
 		return
 	}
 	body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, a2aMaxBody))
@@ -121,7 +121,17 @@ func (s *Server) a2aPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// The API's own search, asked in process: the same rescue of a question
-	// that finds nothing, the same ranking, the same JSON.
+	// that finds nothing, the same ranking, the same JSON. It runs up to four
+	// queries at once, so it waits for a database slot as /api/v1/ and /mcp
+	// do (apiLimited, api.go): a burst here must not take the pool from the
+	// pages.
+	release, ok := s.dbSem.acquire(r.Context(), apiSemaphoreWait)
+	if !ok {
+		w.Header().Set("Retry-After", "2")
+		writeRPC(w, http.StatusServiceUnavailable, rpcErrorResponse(req.ID, rpcInternalError, "the server is busy, try again shortly"))
+		return
+	}
+	defer release()
 	sub := r.Clone(r.Context())
 	sub.Method, sub.Body = http.MethodGet, http.NoBody
 	sub.URL = &url.URL{Path: "/api/v1/search/", RawQuery: url.Values{"q": {q}, "limit": {strconv.Itoa(a2aPerPart)}}.Encode()}

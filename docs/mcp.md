@@ -79,7 +79,7 @@ Replies are prepared when the server's image is built, not computed per call. Re
 
 ## Limits
 
-60 requests a minute per client IP, and at most 30 requests in any 10 seconds per IP at Cloudflare's edge (on `/mcp`, `/api/` and `/search/`). Past either, a 429. Tool calls also share the database: when the server is busy for more than 2 seconds a call gets a 503 with `Retry-After: 2`.
+60 requests a minute per client IP, and at most 30 requests in any 10 seconds per IP at Cloudflare's edge (on `/mcp`, `/a2a`, `/api/` and `/search/`). Past either, a 429. Tool calls also share the database: when the server is busy for more than 2 seconds a call gets a 503 with `Retry-After: 2`.
 
 ## Code and datasets
 

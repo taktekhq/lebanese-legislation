@@ -3,10 +3,14 @@
 // every static page has a Markdown version and none is stored twice.
 //
 // The words are the page's own, in its order: nothing is summarised, and no
-// character of a legal text is escaped or changed. What is left out is what
-// only a browser uses: the header, menu and footer, scripts, forms, buttons
-// and decorative marks (aria-hidden). The footer's "not legal advice" notice
-// is kept, as the last lines.
+// character of a legal text is escaped or changed. Only runs of ordinary
+// white space (space, tab, line break) between words become one space, as a
+// browser shows them; a no-break space stays a no-break space. Where a
+// scanned text has two readings, both are kept, as the API gives them:
+// ⟦one | two⟧. What is left out is what only a browser uses: the header,
+// menu and footer, scripts, forms, buttons and decorative marks
+// (aria-hidden). The footer's "not legal advice" notice is kept, as the last
+// lines.
 
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"]);
 // Their content is not markup; the parser jumps to the closing tag.
@@ -28,14 +32,16 @@ export function decodeEntities(s) {
       const n = e[1] === "x" || e[1] === "X" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
       return n > 0 && n <= 0x10ffff ? String.fromCodePoint(n) : m;
     }
-    return NAMED[e] ?? NAMED[e.toLowerCase()] ?? m;
+    if (Object.hasOwn(NAMED, e)) return NAMED[e];
+    const lower = e.toLowerCase();
+    return Object.hasOwn(NAMED, lower) ? NAMED[lower] : m;
   });
 }
 
 const ATTR = /([^\s=\/"'<>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+)))?/g;
 
 function attributes(src) {
-  const a = {};
+  const a = Object.create(null);
   if (!src) return a;
   for (const m of src.matchAll(ATTR)) {
     const k = m[1].toLowerCase();
@@ -50,7 +56,7 @@ const TOKEN = /<!--[\s\S]*?-->|<![^>]*>|<(\/?)([a-zA-Z][a-zA-Z0-9-]*)((?:"[^"]*"
 // lenient the way our own pages need: a closing tag closes every open tag
 // inside it, and one that matches nothing is ignored.
 export function parse(html) {
-  const root = { tag: "#root", attrs: {}, children: [] };
+  const root = { tag: "#root", attrs: Object.create(null), children: [] };
   const stack = [root];
   TOKEN.lastIndex = 0;
   let m;
@@ -76,8 +82,9 @@ export function parse(html) {
     top.children.push(node);
     if (VOID.has(tag) || /\/\s*$/.test(m[3])) continue;
     if (RAW.has(tag)) {
-      const close = html.toLowerCase().indexOf("</" + tag, TOKEN.lastIndex);
-      const end = close < 0 ? html.length : close;
+      const closing = new RegExp("</" + tag, "ig");
+      closing.lastIndex = TOKEN.lastIndex;
+      const end = closing.exec(html)?.index ?? html.length;
       node.children.push({ text: html.slice(TOKEN.lastIndex, end), raw: true });
       const gt = html.indexOf(">", end);
       TOKEN.lastIndex = gt < 0 ? html.length : gt + 1;
@@ -118,9 +125,16 @@ function rawText(n) {
   return n.children.map(rawText).join("");
 }
 
+// Ordinary white space: what HTML collapses. Not \s, which also matches the
+// no-break spaces and U+FEFF that a French or Arabic text may carry.
+const SPACES = /[ \t\n\r\f]+/g;
+const strip = (s) => s.replace(/^[ \t\n\r\f]+|[ \t\n\r\f]+$/g, "");
+const startsWithSpace = (s) => /^[ \t\n\r\f]/.test(s);
+const endsWithSpace = (s) => /[ \t\n\r\f]$/.test(s);
+
 // tidy makes a run of inline text one paragraph: spaces collapsed, a line per <br>.
 function tidy(s) {
-  return s.split("\n").map((l) => l.replace(/[ \t\r\f\v]+/g, " ").trim()).filter(Boolean).join("  \n");
+  return s.split("\n").map((l) => strip(l.replace(/[ \t\r\f]+/g, " "))).filter(Boolean).join("  \n");
 }
 
 function absolute(href, base) {
@@ -131,73 +145,89 @@ function absolute(href, base) {
   }
 }
 
-function wrap(mark, s) {
-  const t = s.trim();
+// linkTarget is an address that cannot end a Markdown link early: brackets
+// and spaces are percent-encoded (encodeURIComponent leaves brackets alone).
+function linkTarget(href, base) {
+  return absolute(href, base).replace(/[()\s]/g, (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0"));
+}
+
+function wrap(mark, s, close = mark) {
+  const t = strip(s);
   if (!t) return "";
-  return (/^\s/.test(s) ? " " : "") + mark + t + mark + (/\s$/.test(s) ? " " : "");
+  return (startsWithSpace(s) ? " " : "") + mark + t + close + (endsWithSpace(s) ? " " : "");
+}
+
+// Two links with nothing between them (a row of filter links), or a card's
+// bold title and the line after it inside one link, are set apart by the
+// stylesheet; here, by a space. Nowhere else: "<bdi>46</bdi><bdi>/2021</bdi>"
+// is the ruling number 46/2021.
+function setApart(prev, n, ctx) {
+  if (!prev) return false;
+  if (prev.tag === "a" && n.tag === "a") return true;
+  return ctx.inLink && (prev.tag === "b" || prev.tag === "strong");
 }
 
 function inline(nodes, ctx) {
   let out = "";
-  let wasElement = false; // the last thing added came from an element
+  let prev = null; // the element whose text was added last, when nothing came after it
   for (const n of nodes) {
     if (n.text !== undefined) {
-      out += decodeEntities(n.text).replace(/\s+/g, " ");
-      wasElement = false;
+      out += decodeEntities(n.text).replace(SPACES, " ");
+      prev = null;
       continue;
     }
     if (hidden(n)) continue;
-    // Two elements with nothing between them (a card's title and its line,
-    // a row of filter links) are set apart by the stylesheet; here, by a space.
-    const before = out;
-    out = inlineOne(n, ctx, out);
-    if (out.length > before.length) {
-      if (wasElement && before && !/\s$/.test(before) && !/^\s/.test(out.slice(before.length))) {
-        out = before + " " + out.slice(before.length);
-      }
-      wasElement = true;
-    }
+    const piece = inlineOne(n, ctx);
+    if (!piece) continue;
+    if (setApart(prev, n, ctx) && out && !endsWithSpace(out) && !startsWithSpace(piece)) out += " ";
+    out += piece;
+    prev = n;
   }
   return out;
 }
 
-function inlineOne(n, ctx, out) {
-  {
-    switch (n.tag) {
-      case "br":
-        out += "\n";
-        break;
-      case "a": {
-        const text = inline(n.children, ctx);
-        const href = n.attrs.href || "";
-        const label = text.replace(/\s+/g, " ").trim();
-        if (!label) break;
-        if (!href || href.startsWith("#") || /^javascript:/i.test(href)) out += text;
-        else out += (/^\s/.test(text) ? " " : "") + "[" + label + "](" + absolute(href, ctx.base).replace(/[()\s]/g, encodeURIComponent) + ")" + (/\s$/.test(text) ? " " : "");
-        break;
-      }
-      case "strong":
-      case "b":
-        out += wrap("**", inline(n.children, ctx));
-        break;
-      case "em":
-      case "i":
-        out += wrap("*", inline(n.children, ctx));
-        break;
-      case "code":
-      case "kbd":
-      case "samp":
-        out += wrap("`", rawText(n));
-        break;
-      case "img":
-        if (n.attrs.alt && n.attrs.src) out += "![" + n.attrs.alt.replace(/\s+/g, " ") + "](" + absolute(n.attrs.src, ctx.base) + ")";
-        break;
-      default:
-        // a block inside inline text (rare): its words, on the same line
-        out += hasBlock(n) || BLOCK.has(n.tag) ? " " + blocks([n], ctx).join(" ").replace(/\n+/g, " ") + " " : inline(n.children, ctx);
+function inlineOne(n, ctx) {
+  switch (n.tag) {
+    case "br":
+      return "\n";
+    case "a": {
+      const text = inline(n.children, { ...ctx, inLink: true });
+      const href = n.attrs.href || "";
+      const label = strip(text.replace(SPACES, " "));
+      if (!label) return "";
+      if (!href || href.startsWith("#") || /^javascript:/i.test(href)) return text;
+      return (startsWithSpace(text) ? " " : "") + "[" + label + "](" + linkTarget(href, ctx.base) + ")" + (endsWithSpace(text) ? " " : "");
     }
+    case "strong":
+    case "b":
+      return wrap("**", inline(n.children, ctx));
+    case "em":
+    case "i":
+      return wrap("*", inline(n.children, ctx));
+    case "del":
+    case "s":
+      return wrap("~~", inline(n.children, ctx));
+    case "sup":
+    case "sub":
+      return wrap("<" + n.tag + ">", inline(n.children, ctx), "</" + n.tag + ">");
+    case "mark":
+      // Two readings of a scanned word (marks in internal/site/scans.go):
+      // both, in the brackets the API uses, so neither passes for the text.
+      if (/(?:^|\s)unsure(?:\s|$)/.test(n.attrs.class || "")) {
+        const readings = n.children.map((c) => (c.text === undefined && /unsure__or/.test(c.attrs.class || "") ? " | " : inline([c], ctx)));
+        return "\u27e6" + strip(readings.join("")) + "\u27e7";
+      }
+      return inline(n.children, ctx);
+    case "code":
+    case "kbd":
+    case "samp":
+      return wrap("`", rawText(n));
+    case "img":
+      return n.attrs.alt && n.attrs.src ? "![" + n.attrs.alt.replace(SPACES, " ") + "](" + linkTarget(n.attrs.src, ctx.base) + ")" : "";
+    default:
+      // a block inside inline text (rare): its words, on the same line
+      return hasBlock(n) || BLOCK.has(n.tag) ? " " + blocks([n], ctx).join(" ").replace(/\n+/g, " ") + " " : inline(n.children, ctx);
   }
-  return out;
 }
 
 function indent(s, pad) {
@@ -219,7 +249,7 @@ function list(n, ctx) {
 }
 
 function cell(n, ctx) {
-  return blocks(n.children, ctx).join(" ").replace(/\s*\n\s*/g, " ").replace(/\|/g, "\\|").trim();
+  return strip(blocks(n.children, ctx).join(" ").replace(/[ \t]*\n[ \t]*/g, " ").replace(/\|/g, "\\|"));
 }
 
 function table(n, ctx) {
@@ -259,22 +289,25 @@ function blocks(nodes, ctx) {
     }
     if (hidden(n)) continue;
     const t = n.tag;
-    if (!BLOCK.has(t) && !hasBlock(n)) {
+    // A link stays a link even around a heading and a paragraph (a card).
+    if (t === "a" || (!BLOCK.has(t) && !hasBlock(n))) {
       run.push(n);
       continue;
     }
     flush();
     if (/^h[1-6]$/.test(t)) {
-      const text = tidy(inline(n.children, ctx)).replace(/\s*\n/g, " ");
-      if (text) out.push("#".repeat(Number(t[1])) + " " + text);
+      const text = tidy(inline(n.children, ctx)).replace(/ *\n/g, " ");
+      if (text) out.push(ctx.inLink ? text : "#".repeat(Number(t[1])) + " " + text); // inside a link: its words only
     } else if (t === "ul" || t === "ol") {
       const l = list(n, ctx);
       if (l) out.push(l);
     } else if (t === "pre") {
       const code = find(n, (x) => x.tag === "code");
       const lang = /(?:^|\s)language-([\w-]+)/.exec(code?.attrs.class || "")?.[1] || "";
-      const text = rawText(n).replace(/^\n+|\s+$/g, "");
-      if (text) out.push("```" + lang + "\n" + text + "\n```");
+      const text = rawText(n).replace(/^\n+|[ \t\n\r\f]+$/g, "");
+      // a fence longer than any run of backticks in the code
+      const fence = "`".repeat(Math.max(3, ...(text.match(/`+/g) || []).map((r) => r.length + 1)));
+      if (text) out.push(fence + lang + "\n" + text + "\n" + fence);
     } else if (t === "blockquote") {
       const inner = blocks(n.children, ctx).join("\n\n");
       if (inner) out.push(indent(inner, "> ").replace(/^$/gm, ">"));
@@ -295,7 +328,7 @@ function blocks(nodes, ctx) {
 }
 
 function yaml(s) {
-  return JSON.stringify(s.replace(/\s+/g, " ").trim());
+  return JSON.stringify(strip(s.replace(SPACES, " ")));
 }
 
 // toMarkdown is the page at url as Markdown: a short front matter (title,
@@ -321,23 +354,4 @@ export function toMarkdown(html, url) {
     if (lines.length) body.push("---", ...lines);
   }
   return front.join("\n") + "\n\n" + body.join("\n\n") + "\n";
-}
-
-// prefersMarkdown reads an Accept header: Markdown is named, not refused
-// (q=0), and wanted at least as much as HTML when HTML is named too. A
-// browser never sends text/markdown, so it always gets the HTML page.
-export function prefersMarkdown(accept) {
-  if (!accept || !/markdown/i.test(accept)) return false;
-  let md = -1, html = -1;
-  for (const part of accept.split(",")) {
-    const [type, ...params] = part.trim().toLowerCase().split(";").map((x) => x.trim());
-    let q = 1;
-    for (const p of params) {
-      const m = /^q\s*=\s*([0-9.]+)$/.exec(p);
-      if (m) q = Number(m[1]);
-    }
-    if (type === "text/markdown" || type === "text/x-markdown") md = Math.max(md, q);
-    else if (type === "text/html" || type === "application/xhtml+xml") html = Math.max(html, q);
-  }
-  return md > 0 && md >= html;
 }
