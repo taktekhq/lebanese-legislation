@@ -48,10 +48,10 @@ func admitExempt(r *http.Request) bool {
 	p := r.URL.Path
 	switch p {
 	case "/healthz", "/robots.txt", "/sitemap.xml", "/blog-sitemap.xml",
-		"/styles.css", "/legislation.css", "/main.js", "/legislation.js", "/language.js", "/ga.js", "/ph.js":
+		"/styles.css", "/legislation.css", "/main.js", "/legislation.js", "/language.js", "/webmcp.js", "/ga.js", "/ph.js":
 		return true
 	}
-	return strings.HasPrefix(p, "/assets/") || strings.HasPrefix(p, "/sitemaps/")
+	return strings.HasPrefix(p, "/assets/") || strings.HasPrefix(p, "/sitemaps/") || strings.HasPrefix(p, "/.well-known/")
 }
 
 var (

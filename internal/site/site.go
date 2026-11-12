@@ -175,7 +175,7 @@ func newServer(db *pgxpool.Pool, static bool) (*Server, error) {
 		}
 	}
 	files := http.FileServerFS(StaticFiles())
-	for _, p := range []string{"/styles.css", "/legislation.css", "/main.js", "/legislation.js", "/language.js", "/ga.js", "/ph.js", "/assets/"} {
+	for _, p := range []string{"/styles.css", "/legislation.css", "/main.js", "/legislation.js", "/language.js", "/webmcp.js", "/ga.js", "/ph.js", "/assets/"} {
 		s.mux.Handle("GET "+p, cache(files))
 	}
 	s.routes()
@@ -299,6 +299,9 @@ func (s *Server) execute(r *http.Request, name string, p Page) (string, error) {
 func (s *Server) write(w http.ResponseWriter, r *http.Request, code int, html string) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", htmlCacheControl(r, code))
+	if code == http.StatusOK {
+		w.Header().Set("Link", AgentLinks) // where agents find the API, the MCP server and llms.txt (agents.go)
+	}
 	w.WriteHeader(code)
 	fmt.Fprint(w, html)
 }

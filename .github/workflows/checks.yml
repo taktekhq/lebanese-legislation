@@ -37,6 +37,8 @@ jobs:
           bash scraper/bin/check-archive_test.sh
       - name: Site scripts (legislation.js, language.js)
         run: node --test scripts/*.test.cjs
+      - name: Site Worker (workers/static-site)
+        run: node --test workers/static-site/test/*.test.mjs
       - name: Go tests without a database
         run: |
           go test -count=1 ./internal/release/... ./internal/embedding/... ./internal/hfhub/... \

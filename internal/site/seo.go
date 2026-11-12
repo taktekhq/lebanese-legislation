@@ -39,11 +39,12 @@ func (s *Server) robots(w http.ResponseWriter, r *http.Request) {
 	// short, so a change (like the noindex preview ending) reaches crawlers
 	// through Cloudflare's cache within minutes, not its default 4 hours
 	w.Header().Set("Cache-Control", "public, max-age=600")
-	rules := "Allow: /\nDisallow: /search/\nDisallow: /en/search/\nDisallow: /api/\nDisallow: /changes/review/\nDisallow: /en/changes/review/\nDisallow: /fr/search/\nDisallow: /*?\n"
+	// Each group ends with the Content Signal (agents.go): a crawler reads only its own group.
+	rules := "Allow: /\nDisallow: /search/\nDisallow: /en/search/\nDisallow: /api/\nDisallow: /changes/review/\nDisallow: /en/changes/review/\nDisallow: /fr/search/\nDisallow: /*?\n" + contentSignal
 	var b strings.Builder
 	b.WriteString("# Lebanese Legislation: every Lebanese law, free to read, cite and build on.\n")
 	b.WriteString("# Search engines and AI assistants are welcome; please cite the article's address.\n\n")
-	aiRules := "Allow: /\nDisallow: /changes/review/\nDisallow: /en/changes/review/\n"
+	aiRules := "Allow: /\nDisallow: /changes/review/\nDisallow: /en/changes/review/\n" + contentSignal
 	b.WriteString("User-agent: *\n" + rules + "\n")
 	for _, bot := range aiCrawlers {
 		b.WriteString("User-agent: " + bot + "\n" + aiRules + "\n")
@@ -83,7 +84,11 @@ func (s *Server) llms(w http.ResponseWriter, r *http.Request) {
 		{"Where to read Lebanese law online: every source, free and paid, in one table", "/en/sources/"}, {"Legiliban and Lebanese Legislation: the main source of the texts, and what this site adds", "/en/legiliban/"}} {
 		fmt.Fprintf(&b, "- [%s](%s%s)\n", l[0], Base, l[1])
 	}
-	b.WriteString("\n## For AI assistants\n\n- MCP server (search, get_law, get_article, get_law_texts, get_ruling; verbatim texts only): " + Base + "/mcp\n- Read-only JSON API: " + Base + "/ai/\n- The JSON API as OpenAPI 3.1: " + Base + "/api/v1/openapi.json\n")
+	b.WriteString("\n## For AI assistants\n\n- MCP server (search, get_law, get_article, get_law_texts, get_ruling; verbatim texts only): " + Base + "/mcp\n- Read-only JSON API: " + Base + "/ai/\n- The JSON API as OpenAPI 3.1: " + Base + "/api/v1/openapi.json\n" +
+		"- A law, an article, a ruling or a list page as Markdown: ask for its address with the header Accept: text/markdown\n" +
+		"- A skill for agents (how to find, read and cite a text): " + Base + "/.well-known/agent-skills/lebanese-legislation/SKILL.md\n" +
+		"- Discovery files: " + Base + "/.well-known/api-catalog , " + Base + "/.well-known/mcp/server-card.json , " + Base + "/.well-known/agent-card.json (A2A lookup at " + Base + "/a2a) , " + Base + "/.well-known/ai-catalog.json\n" +
+		"- No sign-in anywhere: send no key and no token\n")
 	b.WriteString("\n## Notes\n\n- Texts come from Legiliban, the database of the Lebanese University's Centre for Legal Informatics; the Official Gazette is authoritative.\n- This site is independent: it is not affiliated with, endorsed by or operated by the Lebanese University or the Centre.\n- Nothing here is legal advice.\n")
 	fmt.Fprint(w, b.String())
 }

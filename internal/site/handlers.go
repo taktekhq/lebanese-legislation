@@ -91,6 +91,8 @@ func (s *Server) routes() {
 	s.hubRoutes()
 	s.blogRoutes()
 	m.HandleFunc("GET /.well-known/", probe404)
+	s.agentRoutes() // the discovery files under /.well-known/ (agents.go)
+	s.a2aRoutes()
 	// A GET to /mcp gets the MCP server's answer (mcpGet), not a redirect to
 	// a 404 page; POST and OPTIONS are mcpRoutes'.
 	m.HandleFunc("GET /mcp", s.mcpGet)
