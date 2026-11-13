@@ -35,10 +35,10 @@ Write the answer in the same language as the question, whatever language it is (
 
 Return only JSON {"paragraphs":[{"text":"...","quotes":[{"source":"supplied ID","quote":"..."}]}]}.
 - {{LENGTH}} The first paragraph answers the question directly in one or two sentences (yes, no, it depends on ...), then the rest explains the conditions and exceptions.
-- Every paragraph has 1 to 3 quotes: the passage ID and the exact words from that passage that support the paragraph, copied character for character in the passage's own language (do not translate, fix spelling or shorten inside a quote), one sentence or clause each, at most 300 characters. Name the law and article in the text when the passage gives them.
+- Every paragraph has 1 to 3 quotes: the passage ID and the exact words from that passage that support the paragraph, copied character for character in the passage's own language (do not translate, fix spelling or shorten inside a quote), one sentence or clause each, at most 300 characters. A quote is one unbroken stretch of the passage: never skip words with \"...\", and never add or change a letter at its start or end to make it read as a sentence. Name the law and article in the text when the passage gives them.
 - Passages marked as court rulings are decisions in one case: say so, do not present them as general rules.
 - Plain words, no headings, no lists, no markdown, no legal advice wording ("you should hire ..."), no disclaimers: the page adds its own.
-- If the passages do not answer the question, return {"paragraphs":[]}. A partial answer is fine if you say what the passages do not cover.`
+- If the passages do not answer the question, return {"paragraphs":[]}. A partial answer is fine: say what the passages do not cover inside a paragraph that also quotes what they do say, never in a paragraph of its own.`
 
 // Compose makes one tool-free Gemini call that writes a short answer from the
 // supplied passages only. Every paragraph must name at least one supplied
@@ -158,9 +158,10 @@ func (c *Client) ComposeWith(ctx context.Context, q string, sources []Passage, m
 }
 
 // ParseComposed checks a written answer: known passage IDs only, bounded
-// length, and every quote found word for word in its passage (spacing
-// aside). A quote that is not in the passage is dropped; a paragraph left
-// with none rejects the whole answer rather than showing unbacked text.
+// length, and every quote found in its passage (see ownWords). A quote that
+// is not in the passage is dropped; a paragraph whose quotes are all dropped
+// rejects the whole answer rather than showing unbacked text, and a
+// paragraph that came with no quote is left out.
 func ParseComposed(raw string, sources []Passage) ([]Para, error) {
 	return parseComposed(raw, sources, Quick)
 }
@@ -190,21 +191,37 @@ func parseComposed(raw string, sources []Passage, m Mode) ([]Para, error) {
 		if n == 0 || n > m.ParaChars || total > m.All || len(p.Quotes) > 3 {
 			return nil, errors.New("invalid written paragraph")
 		}
+		if len(p.Quotes) == 0 {
+			// A paragraph the model gave no quote for says what the
+			// passages lack. It cannot be backed, so it is left out, and
+			// the paragraphs that are backed still make the answer.
+			continue
+		}
 		para := Para{Text: p.Text, Quotes: []Cite{}, Sources: []string{}}
 		seen := map[string]bool{}
+		add := func(source, quote string) {
+			para.Quotes = append(para.Quotes, Cite{Source: source, Quote: quote})
+			if !seen[source] {
+				seen[source] = true
+				para.Sources = append(para.Sources, source)
+			}
+		}
 		for _, c := range p.Quotes {
+			before := len(para.Quotes)
 			body, ok := text[c.Source]
 			if !ok {
 				return nil, errors.New("written answer cites an unknown source")
 			}
 			q := squash(strings.Trim(strings.TrimSpace(c.Quote), "\"«»“”'.…"))
-			if utf8.RuneCountInString(q) < 8 || utf8.RuneCountInString(q) > 400 || !strings.Contains(body, q) {
-				continue // not the passage's own words
+			for _, own := range ownWords(body, q) {
+				add(c.Source, own)
 			}
-			para.Quotes = append(para.Quotes, Cite{Source: c.Source, Quote: q})
-			if !seen[c.Source] {
-				seen[c.Source] = true
-				para.Sources = append(para.Sources, c.Source)
+			if len(para.Quotes) == before {
+				// The right words under the wrong ID: another supplied
+				// passage has the quote word for word.
+				if id := elsewhere(sources, text, q); id != "" {
+					add(id, q)
+				}
 			}
 		}
 		if len(para.Quotes) == 0 {
@@ -213,6 +230,127 @@ func parseComposed(raw string, sources []Passage, m Mode) ([]Para, error) {
 		out = append(out, para)
 	}
 	return out, nil
+}
+
+const (
+	minQuote   = 8   // runes in a quote
+	minPartial = 20  // runes in a quote that is matched leniently
+	maxQuote   = 400 // runes shown
+)
+
+// ownWords returns the quote as the passage has it: one excerpt, or one per
+// part when the model skipped words with "...". It returns nothing when any
+// part is not in the passage, so an invented word still drops the quote.
+//
+// Gemini copies most quotes character for character, and alters about one in
+// twenty in ways that do not change the words: it skips the middle of a long
+// sentence with "...", swaps or adds the one-letter particle on the first
+// word so the excerpt reads as a sentence (و for ب), drops a tatweel, or
+// runs past the length limit. Each of those is matched to the passage, and
+// what is shown is always the passage's own text.
+func ownWords(body, q string) []string {
+	if n := utf8.RuneCountInString(q); n >= minQuote && n <= maxQuote && strings.Contains(body, q) {
+		return []string{q}
+	}
+	plain, at := plainRunes(body)
+	var out []string
+	for _, part := range strings.FieldsFunc(strings.ReplaceAll(q, "...", "…"), func(r rune) bool { return r == '…' }) {
+		part = strings.Trim(strings.TrimSpace(part), "[]() ")
+		if part == "" {
+			continue
+		}
+		start, end := find(plain, part)
+		if start < 0 {
+			return nil
+		}
+		b := []rune(body)
+		from, to := at[start], at[end-1]+1
+		if to-from > maxQuote { // cut at the end of a word
+			to = from + maxQuote
+			for to > from && b[to] != ' ' && b[to-1] != ' ' {
+				to--
+			}
+		}
+		own := strings.TrimSpace(string(b[from:to]))
+		if utf8.RuneCountInString(own) < minQuote {
+			return nil
+		}
+		out = append(out, own)
+	}
+	return out
+}
+
+// plainRunes drops the tatweel, which only stretches a letter, and returns
+// for each rune kept its place in s.
+func plainRunes(s string) (string, []int) {
+	var b strings.Builder
+	var at []int
+	i := 0
+	for _, r := range s {
+		if r != 'ـ' {
+			b.WriteRune(r)
+			at = append(at, i)
+		}
+		i++
+	}
+	return b.String(), at
+}
+
+// find returns where part is in the passage, in runes of the plain text, or
+// -1. A part of minPartial runes or more may differ from the passage in the
+// first letter of its first word: one letter added, or one swapped.
+func find(plain, part string) (int, int) {
+	part, _ = plainRunes(part)
+	n := utf8.RuneCountInString(part)
+	if n < minQuote {
+		return -1, -1
+	}
+	if i := strings.Index(plain, part); i >= 0 {
+		start := utf8.RuneCountInString(plain[:i])
+		return start, start + n
+	}
+	if n < minPartial {
+		return -1, -1
+	}
+	_, size := utf8.DecodeRuneInString(part)
+	rest := part[size:]
+	if strings.HasPrefix(rest, " ") {
+		return -1, -1 // the first word is a single letter: nothing to compare
+	}
+	for from := 0; ; {
+		i := strings.Index(plain[from:], rest)
+		if i < 0 {
+			return -1, -1
+		}
+		i += from
+		before := plain[:i]
+		start := utf8.RuneCountInString(before)
+		switch {
+		case before == "" || strings.HasSuffix(before, " "): // a letter added
+			return start, start + n - 1
+		default: // a letter swapped: the one before must start the word
+			_, w := utf8.DecodeLastRuneInString(before)
+			if lead := before[:len(before)-w]; lead == "" || strings.HasSuffix(lead, " ") {
+				return start - 1, start + n - 1
+			}
+		}
+		_, w := utf8.DecodeRuneInString(plain[i:])
+		from = i + w
+	}
+}
+
+// elsewhere names another supplied passage that has the quote word for word,
+// in the order the passages were supplied.
+func elsewhere(sources []Passage, text map[string]string, q string) string {
+	if n := utf8.RuneCountInString(q); n < minPartial || n > maxQuote {
+		return ""
+	}
+	for _, p := range sources {
+		if strings.Contains(text[p.ID], q) {
+			return p.ID
+		}
+	}
+	return ""
 }
 
 // squash collapses runs of white space, so a quote that only differs in
