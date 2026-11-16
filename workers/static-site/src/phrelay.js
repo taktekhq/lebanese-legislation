@@ -59,10 +59,32 @@ function decodeURIComponentSafe(s) {
   try { return decodeURIComponent(s); } catch { return s; }
 }
 
+// Networks whose visitors PostHog never sees. From 10 Nov 2026 a crawler that
+// runs JavaScript loaded pages from thousands of Huawei Cloud and Tencent Cloud
+// addresses with a zh-CN browser. Each hit had a new IP and no cookie, so
+// PostHog counted every one as a new person: 8,804 page view persons on
+// 16 Nov, 8,497 of them zh-CN, against about 300 real readers. Real readers
+// do not browse from these cloud networks. Mainland China (country CN) sent
+// the rest of it from Shanghai ISP addresses, and about one real reader a day.
+export const BOT_ASNS = new Set([
+  136907, 55990, 265443, // Huawei Cloud
+  132203, 45090,         // Tencent Cloud
+  45102, 37963,          // Alibaba Cloud
+]);
+
+// botNetwork reports whether a request's Cloudflare cf object names a network
+// whose visitors are crawlers. A request without cf (tests, wrangler dev) is not.
+export function botNetwork(cf) {
+  if (!cf) return false;
+  return BOT_ASNS.has(Number(cf.asn)) || cf.country === "CN";
+}
+
 export async function phRelay(request, notFoundHeaders) {
   const url = new URL(request.url);
   const target = phTarget(url);
   if (!target) return new Response(null, { status: 404, headers: notFoundHeaders });
+  // An empty answer: no library, no config, no events, so nothing is counted.
+  if (botNetwork(request.cf)) return new Response(null, { status: 204, headers: notFoundHeaders });
   const headers = new Headers();
   for (const name of FORWARD_HEADERS) {
     const value = request.headers.get(name);

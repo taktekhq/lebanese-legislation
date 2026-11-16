@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { register } from 'node:module';
 
 import { originFetch, sameSecret } from '../src/origin.js';
-import { PH_TOKEN, phTarget } from '../src/phrelay.js';
+import { PH_TOKEN, phTarget, botNetwork } from '../src/phrelay.js';
 
 register('./workers-loader.mjs', import.meta.url);
 const { default: worker } = await import('../src/index.js');
@@ -130,4 +130,32 @@ test('sameSecret', () => {
   assert.equal(sameSecret(null, 'secret'), false);
   assert.equal(sameSecret('', ''), false);
   assert.equal(sameSecret('x', undefined), false);
+});
+
+// The JavaScript crawler on Huawei and Tencent Cloud (Nov 2026) must not reach
+// PostHog: not the library, not events. Real visitors still do.
+function withCf(path, cf, method = 'GET') {
+  const req = new Request('https://lebaneselegislation.com' + path, { method, body: method === 'POST' ? 'data=1' : undefined });
+  Object.defineProperty(req, 'cf', { value: cf });
+  return req;
+}
+for (const cf of [{ asn: 136907, country: 'HK' }, { asn: 132203, country: 'SG' }, { asn: 4811, country: 'CN' }]) {
+  for (const [method, path] of [['GET', '/ph/static/array.js'], ['POST', '/ph/i/v0/e/?compression=gzip-js'], ['POST', '/ph/e/']]) {
+    test(`${method} ${path} from AS${cf.asn} ${cf.country} is a 204 that never reaches PostHog`, async t => {
+      const calls = stubFetch(t);
+      const res = await originFetch(withCf(path, cf, method), env, { waitUntil() {} });
+      assert.equal(res.status, 204);
+      assert.equal(calls.length, 0);
+    });
+  }
+}
+test('a visitor from a Lebanese ISP is relayed', async t => {
+  const calls = stubFetch(t);
+  const res = await originFetch(withCf('/ph/i/v0/e/', { asn: 42003, country: 'LB' }, 'POST'), env, { waitUntil() {} });
+  assert.equal(res.status, 200);
+  assert.equal(calls.length, 1);
+});
+test('botNetwork without a cf object is false', () => {
+  assert.equal(botNetwork(undefined), false);
+  assert.equal(botNetwork({ asn: 16509, country: 'US' }), false);
 });
