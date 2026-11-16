@@ -16,6 +16,7 @@ import { route, keyFor, resolve, indexRedirectData } from "./route.js";
 import { SECURITY_HEADERS, EMBEDDABLE, AGENT_LINKS } from "./headers.js";
 import { toMarkdown } from "./markdown.js";
 import { originFetch, isTestRequest } from "./origin.js";
+import { mcpHost } from "./mcphost.js";
 import { markdownAsk, markdownFirst } from "./markdownask.js";
 import { isParts, parseParts, prepareFrame, assemble, indexPointer } from "./layout.js";
 
@@ -212,6 +213,10 @@ export async function originPage(request, env, ctx) {
 
 export default {
   async fetch(request, env, ctx) {
+    // mcp.lebaneselegislation.com: the MCP endpoint as lebaneselegislation.com/mcp, the rest redirected (mcphost.js).
+    const mcp = mcpHost(request);
+    if (mcp && mcp.response) return mcp.response;
+    if (mcp) request = mcp.request;
     const url = new URL(request.url);
     // Count requests that ask for Markdown (sent after the response; nothing for others).
     markdownAsk(request, env, ctx);
