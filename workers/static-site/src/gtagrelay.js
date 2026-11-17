@@ -4,6 +4,8 @@
 // someone else's container. The page asks for gtag.js here instead, and the
 // Worker fetches only the site's own measurement id.
 
+import { botVisitor } from "./phrelay.js";
+
 // The measurement id in internal/site/static/assets/load.js (a test keeps them equal).
 export const GA_ID = "G-RDYRK422NP";
 
@@ -12,6 +14,11 @@ export async function gtagRelay(request, notFoundHeaders) {
   const params = [...url.searchParams];
   if (url.pathname !== "/gtag/js" || params.length !== 1 || params[0][0] !== "id" || params[0][1] !== GA_ID) {
     return new Response(null, { status: 404, headers: notFoundHeaders });
+  }
+  // The crawler phrelay.js keeps out of PostHog gets no gtag.js either, so GA4
+  // does not count it.
+  if (botVisitor(request)) {
+    return new Response(null, { status: 204, headers: { ...notFoundHeaders, "Cache-Control": "no-store" } });
   }
   const res = await fetch(`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`, {
     method: "GET",
