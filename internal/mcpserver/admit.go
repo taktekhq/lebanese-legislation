@@ -61,3 +61,29 @@ func (s *Server) admitCall(ctx context.Context, p map[string]any) (release func(
 	}
 	return func() { s.calls.Release(w) }, true
 }
+
+// timingMethods are the JSON-RPC methods Server-Timing may name; anything
+// else is "other", so a caller never chooses what we print.
+var timingMethods = map[string]bool{
+	"initialize": true, "ping": true, "tools/list": true, "tools/call": true,
+	"notifications/initialized": true, "notifications/cancelled": true,
+}
+
+func timingMethod(m string) string {
+	if timingMethods[m] {
+		return m
+	}
+	return "other"
+}
+
+// timingTool is the tool a tools/call names, when it is one of ours, "other"
+// for a call to an unknown name, and "" for any other method.
+func timingTool(req rpcRequest) string {
+	if req.methodName() != "tools/call" {
+		return ""
+	}
+	if n := jsString(objectParams(req.params)["name"]); isKnownTool(n) {
+		return n
+	}
+	return "other"
+}

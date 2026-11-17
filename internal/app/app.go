@@ -13,6 +13,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/taktekhq/lebanese-legislation/internal/servertiming"
 	"io"
 	"log"
 	"net"
@@ -208,7 +209,9 @@ func run(ctx context.Context, cfg config) error {
 		handler = site.Private(handler, user, pass)
 		log.Print("preview mode: password required, noindex")
 	}
-	return serve(ctx, cfg.addr, cfg.mode, handler)
+	// Outermost, so every answer (pages, API, MCP, 401s) says how long it
+	// spent in this process; the Worker puts that in origin_request.
+	return serve(ctx, cfg.addr, cfg.mode, servertiming.Middleware(handler))
 }
 
 // serve listens until ctx ends, then lets the requests in hand finish (for up

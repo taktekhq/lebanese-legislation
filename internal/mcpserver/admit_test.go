@@ -3,7 +3,11 @@ package mcpserver
 import (
 	"context"
 	"fmt"
+	"github.com/taktekhq/lebanese-legislation/internal/servertiming"
+	"net/http"
 	"net/http/httptest"
+	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -120,5 +124,51 @@ func TestRateLimitIPIgnoresForwardedFor(t *testing.T) {
 	r.Header.Set("CF-Connecting-IP", "203.0.113.5")
 	if got := rateLimitIP(r); got != "203.0.113.5" {
 		t.Fatalf("got %q", got)
+	}
+}
+
+func timingOf(h http.Handler, body string) string {
+	req := httptest.NewRequest("POST", "https://lebaneselegislation.com/mcp", strings.NewReader(body))
+	req.Header.Set("CF-Connecting-IP", "203.0.113.9")
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, req)
+	return rec.Result().Header.Get("Server-Timing")
+}
+
+// Server-Timing names the JSON-RPC method and a tool from our fixed list,
+// never what the caller typed.
+func TestServerTimingNamesMethodAndTool(t *testing.T) {
+	h := servertiming.Middleware(newServer(&heldDB{release: make(chan struct{})}, Config{}))
+	if got := timingOf(h, `{"jsonrpc":"2.0","id":1,"method":"tools/list"}`); !strings.Contains(got, `rpc;desc="tools/list"`) || strings.Contains(got, "tool;") || strings.Contains(got, "gate;") {
+		t.Errorf("tools/list: %q", got)
+	}
+	if got := timingOf(h, `{"jsonrpc":"2.0","id":1,"method":"my secret method"}`); !strings.Contains(got, `rpc;desc="other"`) {
+		t.Errorf("unknown method: %q", got)
+	}
+	if got := timingOf(h, `{"jsonrpc":"2.0","method":"notifications/initialized"}`); !strings.Contains(got, `rpc;desc="notifications/initialized"`) {
+		t.Errorf("notification: %q", got)
+	}
+	got := timingOf(h, `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"drop table","arguments":{}}}`)
+	if !strings.Contains(got, `tool;desc="other"`) || !strings.Contains(got, "gate;dur=") || strings.Contains(got, "drop") {
+		t.Errorf("unknown tool: %q", got)
+	}
+}
+
+// A call refused by the gate reports the wait it spent there.
+func TestServerTimingGateWait(t *testing.T) {
+	db := &heldDB{release: make(chan struct{})}
+	defer close(db.release)
+	s := newServer(db, Config{CallUnits: 1})
+	h := servertiming.Middleware(s)
+	body := `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_law","arguments":{"id":1}}}`
+	go callFrom(s, "203.0.113.8", body) // takes the only unit and holds it
+	time.Sleep(200 * time.Millisecond)
+	got := timingOf(h, body)
+	m := regexp.MustCompile(`gate;dur=([0-9.]+)`).FindStringSubmatch(got)
+	if m == nil {
+		t.Fatalf("no gate in %q", got)
+	}
+	if v, _ := strconv.ParseFloat(m[1], 64); v < float64(callWait.Milliseconds())*0.9 {
+		t.Fatalf("gate %s ms, want about %d", m[1], callWait.Milliseconds())
 	}
 }
