@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 import { register } from 'node:module';
 
 import { originFetch, sameSecret } from '../src/origin.js';
-import { PH_TOKEN, phTarget, botNetwork } from '../src/phrelay.js';
+import { PH_TOKEN, phTarget, botNetwork, botVisitor } from '../src/phrelay.js';
+import { GA_ID } from '../src/gtagrelay.js';
 
 register('./workers-loader.mjs', import.meta.url);
 const { default: worker } = await import('../src/index.js');
@@ -159,3 +160,40 @@ test('botNetwork without a cf object is false', () => {
   assert.equal(botNetwork(undefined), false);
   assert.equal(botNetwork({ asn: 16509, country: 'US' }), false);
 });
+
+// The same crawler from home addresses: only its Chinese browser gives it away.
+function withLang(path, lang, method = 'GET') {
+  const req = new Request('https://lebaneselegislation.com' + path, {
+    method, headers: { 'Accept-Language': lang }, body: method === 'POST' ? 'data=1' : undefined,
+  });
+  Object.defineProperty(req, 'cf', { value: { asn: 3215, country: 'FR' } });
+  return req;
+}
+for (const lang of ['zh-CN,zh;q=0.9', 'zh', 'ZH-tw', 'zh;q=1']) {
+  for (const [method, path] of [['GET', '/ph/static/array.js'], ['POST', '/ph/i/v0/e/'], ['GET', `/gtag/js?id=${GA_ID}`]]) {
+    test(`${method} ${path} with Accept-Language ${lang} is a 204 that never leaves the Worker`, async t => {
+      const calls = stubFetch(t);
+      const res = await originFetch(withLang(path, lang, method), env, { waitUntil() {} });
+      assert.equal(res.status, 204);
+      assert.equal(res.headers.get('Cache-Control'), 'no-store');
+      assert.equal(calls.length, 0);
+    });
+  }
+}
+test('gtag.js from a Huawei Cloud address is a 204', async t => {
+  const calls = stubFetch(t);
+  const res = await originFetch(withCf(`/gtag/js?id=${GA_ID}`, { asn: 136907, country: 'HK' }), env, { waitUntil() {} });
+  assert.equal(res.status, 204);
+  assert.equal(calls.length, 0);
+});
+for (const lang of ['ar-LB,ar;q=0.9,en;q=0.8', 'en-US,en;q=0.9,zh-CN;q=0.5', 'fr-FR', '']) {
+  test(`Accept-Language "${lang}" from a French ISP still reaches PostHog and gtag.js`, async t => {
+    const calls = stubFetch(t);
+    assert.equal(botVisitor(withLang('/ph/e/', lang)), false);
+    const ph = await originFetch(withLang('/ph/i/v0/e/', lang, 'POST'), env, { waitUntil() {} });
+    assert.equal(ph.status, 200);
+    const ga = await originFetch(withLang(`/gtag/js?id=${GA_ID}`, lang), env, { waitUntil() {} });
+    assert.equal(ga.status, 200);
+    assert.equal(calls.length, 2);
+  });
+}

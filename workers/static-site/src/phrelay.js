@@ -59,13 +59,14 @@ function decodeURIComponentSafe(s) {
   try { return decodeURIComponent(s); } catch { return s; }
 }
 
-// Networks whose visitors PostHog never sees. From 10 Nov 2026 a crawler that
-// runs JavaScript loaded pages from thousands of Huawei Cloud and Tencent Cloud
-// addresses with a zh-CN browser. Each hit had a new IP and no cookie, so
-// PostHog counted every one as a new person: 8,804 page view persons on
-// 16 Nov, 8,497 of them zh-CN, against about 300 real readers. Real readers
-// do not browse from these cloud networks. Mainland China (country CN) sent
-// the rest of it from Shanghai ISP addresses, and about one real reader a day.
+// Visitors the analytics never see (PostHog here, GA4 in gtagrelay.js).
+// From 10 Nov 2026 a crawler that runs JavaScript loaded one page per visit with
+// a zh-CN browser, a new IP each time and no cookie, so every hit counted as a
+// new person: 8,804 page view persons on 16 Nov, 8,497 of them zh-CN, against
+// about 300 real readers. It came first from Huawei Cloud and Tencent Cloud,
+// then, once those were dropped, from home addresses across Europe (a
+// residential proxy pool). Real readers do not browse from these cloud
+// networks, and before 10 Nov at most two a day had a Chinese browser.
 export const BOT_ASNS = new Set([
   136907, 55990, 265443, // Huawei Cloud
   132203, 45090,         // Tencent Cloud
@@ -79,12 +80,20 @@ export function botNetwork(cf) {
   return BOT_ASNS.has(Number(cf.asn)) || cf.country === "CN";
 }
 
+// botVisitor adds the browser's first language: Chinese means the crawler,
+// whatever network it comes from.
+export function botVisitor(request) {
+  const lang = (request.headers.get("accept-language") || "").split(/[,;]/)[0].trim().toLowerCase();
+  return botNetwork(request.cf) || lang === "zh" || lang.startsWith("zh-");
+}
+
 export async function phRelay(request, notFoundHeaders) {
   const url = new URL(request.url);
   const target = phTarget(url);
   if (!target) return new Response(null, { status: 404, headers: notFoundHeaders });
   // An empty answer: no library, no config, no events, so nothing is counted.
-  if (botNetwork(request.cf)) return new Response(null, { status: 204, headers: notFoundHeaders });
+  // Not cached anywhere, so a real reader on the same address still gets PostHog.
+  if (botVisitor(request)) return new Response(null, { status: 204, headers: { ...notFoundHeaders, "Cache-Control": "no-store" } });
   const headers = new Headers();
   for (const name of FORWARD_HEADERS) {
     const value = request.headers.get(name);
