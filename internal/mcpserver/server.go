@@ -13,6 +13,7 @@ import (
 	"context"
 	_ "embed"
 	"errors"
+	"github.com/taktekhq/lebanese-legislation/internal/servertiming"
 	"io"
 	"log"
 	"math/rand/v2"
@@ -322,6 +323,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, rpcError(req.id, rpcInvalidRequest, "not a JSON-RPC 2.0 request"), nil)
 		return
 	}
+	tm := servertiming.From(r.Context())
+	tm.SetRPC(timingMethod(req.methodName()), timingTool(req))
 	if req.id == nil {
 		// A notification gets no response body, only the status.
 		setCORS(w.Header())
@@ -330,7 +333,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.methodName() == "tools/call" {
+		waited := time.Now()
 		release, ok := s.admitCall(r.Context(), objectParams(req.params))
+		tm.SetGate(time.Since(waited))
 		if !ok {
 			s.logf("mcp tools/call: busy, refused %s", ip)
 			writeJSON(w, http.StatusServiceUnavailable, rpcError(req.id, rpcServerBusy, "the server is busy, try again shortly"), map[string]string{"Retry-After": "2"})

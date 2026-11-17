@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { register } from 'node:module';
-import { FAST_SAMPLE_RATE, originFetch, requestRoute } from '../src/origin.js';
+import { FAST_SAMPLE_RATE, originFetch, parseServerTiming, requestRoute } from '../src/origin.js';
 register('./workers-loader.mjs', import.meta.url);
 const { default: worker } = await import('../src/index.js');
 
-async function run(t, { path = '/healthz', duration = 0, random = 0.9, status = 200, hit = false, fail = false, r2 = false, staticPage = false, serviceFail = false, probe = false } = {}) {
+async function run(t, { path = '/healthz', duration = 0, random = 0.9, status = 200, hit = false, fail = false, r2 = false, staticPage = false, serviceFail = false, probe = false, timing } = {}) {
   let now = 100_000;
   const events = [], pending = [];
   t.mock.method(Date, 'now', () => now);
@@ -19,11 +19,11 @@ async function run(t, { path = '/healthz', duration = 0, random = 0.9, status = 
   });
   const saved = globalThis.caches;
   globalThis.caches = { default: {
-    match: async () => { now += hit ? duration : 500; return hit ? new Response('cached') : undefined; },
+    match: async () => { now += hit ? duration : 500; return hit ? new Response('cached', { headers: timing ? { 'Server-Timing': timing } : {} }) : undefined; },
     put: async () => {},
   } };
   t.after(() => { globalThis.caches = saved; });
-  const service = { fetch: async () => { now += duration; if (serviceFail) throw Error('offline'); return new Response('origin', { status }); } };
+  const service = { fetch: async () => { now += duration; if (serviceFail) throw Error('offline'); return new Response('origin', { status, headers: timing ? { 'Server-Timing': timing } : {} }); } };
   const env = { POSTHOG_KEY: 'test-key', ORIGIN_TEST_KEY: 'probe-key',
     SITE: { get: async key => key === '_export/generation' || key === '_export/layout.json' ? null : key === '_build/live-side' ? { text: async () => 'green' }
       : (r2 || staticPage) ? { body: 'file', httpEtag: '"x"' } : null },
@@ -115,4 +115,31 @@ test('a pending PostHog request does not delay the response', async t => {
     ORIGIN_BLUE: { fetch: async () => new Response('ready') },
   }, { waitUntil() {} });
   assert.equal(await response.text(), 'ready');
+});
+
+const TIMING = 'app;dur=12.3, gate;dur=0.4, rpc;desc="tools/call", tool;desc="get_article", load;desc="0.42"';
+test('parseServerTiming reads every field', () => {
+  assert.deepEqual(parseServerTiming(TIMING), { server_ms: 12.3, gate_ms: 0.4, rpc: 'tools/call', tool: 'get_article', load1: 0.42 });
+  assert.deepEqual(parseServerTiming('app;dur=3.0'), { server_ms: 3 });
+});
+test('parseServerTiming leaves out what is missing or wrong', () => {
+  for (const bad of [null, undefined, '', 'cfRequestDuration;dur=5', 'app;dur=abc, rpc;desc="a b; drop"', 'app, tool;desc="../x"', 'app;dur=-1, load;desc=NaN'])
+    assert.deepEqual(parseServerTiming(bad), {}, String(bad));
+});
+test('origin_request carries the server timing of a miss', async t => {
+  const { events, response } = await run(t, { path: '/mcp', random: 0, timing: TIMING });
+  assert.deepEqual(
+    Object.fromEntries(['server_ms', 'gate_ms', 'rpc', 'tool', 'load1'].map(k => [k, events[0].properties[k]])),
+    { server_ms: 12.3, gate_ms: 0.4, rpc: 'tools/call', tool: 'get_article', load1: 0.42 });
+  assert.equal(response.headers.get('Server-Timing'), TIMING);
+});
+test('origin_request has no timing fields when the image sent no header', async t => {
+  const { events } = await run(t, { path: '/mcp', random: 0 });
+  for (const k of ['server_ms', 'gate_ms', 'rpc', 'tool', 'load1']) assert.ok(!(k in events[0].properties), k);
+});
+test('a cached answer reports no stale timing and does not pass the header on', async t => {
+  const { events, response } = await run(t, { path: '/en/api/v1/search/?q=x', hit: true, random: 0, timing: TIMING });
+  assert.equal(events[0].properties.cache, 'hit');
+  assert.ok(!('server_ms' in events[0].properties));
+  assert.equal(response.headers.get('Server-Timing'), null);
 });

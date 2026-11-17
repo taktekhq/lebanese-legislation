@@ -62,7 +62,35 @@ export function requestRoute(url) {
 
 export const FAST_SAMPLE_RATE = 0.05;
 
-function originEvent(request, env, ctx, side, status, duration_ms, cache) {
+// parseServerTiming reads the Server-Timing header the Go server sets
+// (internal/servertiming): app;dur is the time inside the container up to the
+// response header, gate;dur the MCP admission wait, rpc and tool the JSON-RPC
+// method and tool name, load the container's 1-minute load average. Fields
+// the header lacks are left out (an old image during a blue/green rollout
+// sends none), and values that do not look right are dropped.
+export function parseServerTiming(header) {
+  const out = {};
+  if (typeof header !== "string") return out;
+  const num = v => { const n = Number(v); return v !== undefined && Number.isFinite(n) && n >= 0 && n < 1e7 ? n : undefined; };
+  const word = v => (typeof v === "string" && /^[a-z][a-z0-9_/]{0,40}$/.test(v) ? v : undefined);
+  for (const part of header.split(",")) {
+    const [name, ...params] = part.trim().split(";");
+    const p = {};
+    for (const x of params) {
+      const i = x.indexOf("=");
+      if (i > 0) p[x.slice(0, i).trim()] = x.slice(i + 1).trim().replace(/^"|"$/g, "");
+    }
+    if (name === "app") out.server_ms = num(p.dur);
+    else if (name === "gate") out.gate_ms = num(p.dur);
+    else if (name === "rpc") out.rpc = word(p.desc);
+    else if (name === "tool") out.tool = word(p.desc);
+    else if (name === "load") out.load1 = num(p.desc);
+  }
+  for (const k of Object.keys(out)) if (out[k] === undefined) delete out[k];
+  return out;
+}
+
+function originEvent(request, env, ctx, side, status, duration_ms, cache, timing) {
   // Telemetry is best effort, including synchronous scheduling failures.
   try {
     if (!env.POSTHOG_KEY || !ctx?.waitUntil) return;
@@ -87,7 +115,7 @@ function originEvent(request, env, ctx, side, status, duration_ms, cache) {
       body: JSON.stringify({
         api_key: env.POSTHOG_KEY, event: "origin_request", distinct_id: "lebleg-origin",
         properties: { kind, route: requestRoute(url), status, duration_ms, side, cache, colo: request.cf?.colo,
-          method: request.method, $lib: "lebleg-static-site-worker", sample_rate },
+          method: request.method, $lib: "lebleg-static-site-worker", sample_rate, ...timing },
       }),
     })).catch(() => {}));
   } catch {}
@@ -132,7 +160,7 @@ export async function originFetch(request, env, ctx) {
     if (testing && admin) {
       started = Date.now();
       const res = await originService(env, side).fetch(request);
-      originEvent(request, env, ctx, side, res.status, Date.now() - started, "miss");
+      originEvent(request, env, ctx, side, res.status, Date.now() - started, "miss", parseServerTiming(res.headers.get("Server-Timing")));
       started = undefined;
       const headers = new Headers(res.headers);
       for (const [key, value] of Object.entries(SECURITY_HEADERS)) headers.set(key, value);
@@ -159,8 +187,11 @@ export async function originFetch(request, env, ctx) {
         ctx?.waitUntil(caches.default.put(cacheKey, res.clone()));
       }
     }
-    originEvent(request, env, ctx, side, res.status, duration, cache);
+    // A cached answer carries the Server-Timing of the request that filled
+    // the cache: not this request's, so it is not reported or passed on.
+    originEvent(request, env, ctx, side, res.status, duration, cache, cache === "miss" ? parseServerTiming(res.headers.get("Server-Timing")) : undefined);
     const headers = new Headers(res.headers);
+    if (cache === "hit") headers.delete("Server-Timing");
     for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
       if (!headers.has(key)) headers.set(key, value);
     }
