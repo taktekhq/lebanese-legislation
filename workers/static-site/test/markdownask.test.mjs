@@ -70,6 +70,9 @@ async function ask(t, headers) {
 test('one anonymous event per Markdown request, none otherwise', async t => {
   assert.deepEqual(await ask(t, { Accept: 'text/html', 'User-Agent': 'ChatGPT-User/1.0' }), []);
   assert.deepEqual(await ask(t, { Accept: 'text/markdown', 'x-origin-test': 'probe' }), []);
+  assert.deepEqual(await ask(t, { Accept: 'text/markdown', 'User-Agent': 'ExaSearchBot/1.0' }), [], 'index crawlers are not counted');
+  assert.deepEqual(await ask(t, { Accept: 'text/markdown', 'User-Agent': 'GPTBot/1.2' }), [], 'training crawlers are not counted');
+  assert.equal((await ask(t, { Accept: 'text/markdown', 'User-Agent': 'ExaUser/1.0' })).length, 1, 'a user fetch is counted');
   const [e] = await ask(t, { Accept: 'text/markdown, text/html;q=0.9', 'User-Agent': 'Claude-User' });
   assert.equal(e.event, 'markdown_requested');
   assert.equal(e.properties.agent, 'claude-user');
