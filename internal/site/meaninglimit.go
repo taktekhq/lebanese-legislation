@@ -27,6 +27,7 @@ type meaningSearch struct {
 	clients     *ipLimiter   // per IP, for the quote box (answer.go)
 	devices     dailyCounter // AI questions per device a day (ai.go)
 	networks    dailyCounter // AI questions per IP a day, for bans
+	asked       dailyCounter // device + quick question already counted today (ai.go)
 	ipUnits     dailyCounter // allowance units each IP spent today, on any path
 	ipDaily     int          // units one IP may spend a day
 	bans        banList

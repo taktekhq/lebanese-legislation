@@ -188,6 +188,13 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 	view.Question, view.IP = q, ip
 	wait := untilMidnight(time.Now())
 	view.WaitH, view.WaitM = int(wait/time.Hour), int(wait%time.Hour/time.Minute)
+	// A quick question this device already asked today (the reader opened a
+	// cited source and came back) is the same question, not a new one: it
+	// takes nothing from the device's questions or the IP's counts. It is
+	// usually answered from the cache; if the cache dropped it, the model
+	// calls still count against the IP's units and the site allowance.
+	asked := "quick\x00" + who + "\x00" + q
+	repeat := !deep && s.meaning.asked.count(asked) > 0
 	// Misbehaving: 100 questions in a day from one IP. With 10 a device,
 	// that is ten devices maxed out on one network, or a script.
 	if s.meaning.bans.banned(ip) {
@@ -195,7 +202,11 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 		render()
 		return
 	}
-	if n, _ := s.meaning.networks.take(ip, 0); n >= banPerDay {
+	n := s.meaning.networks.count(ip)
+	if !repeat {
+		n, _ = s.meaning.networks.take(ip, 0)
+	}
+	if n >= banPerDay {
 		s.meaning.bans.ban(ip)
 		log.Printf("ai answers: banned %s for %v after %d questions today", ip, banFor, n)
 		s.captureEvent("ai_ip_banned", map[string]any{"questions_today": n, "ban_days": int(banFor / (24 * time.Hour))})
@@ -215,7 +226,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 	}
 	// Every path that spends the allowance counts toward one daily share per
 	// IP, weighted by what it spent; take enforces it, this says so early.
-	if !s.meaning.ipHas(ip, need) {
+	if !repeat && !s.meaning.ipHas(ip, need) {
 		view.Limited = true
 		render()
 		return
@@ -226,6 +237,9 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 			render()
 			return
 		}
+	} else if repeat {
+		view.Left = questionsPerDay - s.meaning.devices.count(who)
+		view.DeepLeft = deepPerDay - s.meaning.devices.count("deep:"+who)
 	} else {
 		used, ok := s.meaning.devices.take(who, questionsPerDay)
 		if !ok {
@@ -233,6 +247,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 			render()
 			return
 		}
+		s.meaning.asked.take(asked, 0)
 		view.Left = questionsPerDay - used
 		view.DeepLeft = deepPerDay - s.meaning.devices.count("deep:"+who)
 	}
