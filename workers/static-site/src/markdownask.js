@@ -108,12 +108,16 @@ export function markdownAsk(request, env, ctx) {
     const accept = request.headers.get("Accept") || "";
     if (!asksMarkdown(accept)) return;
     if (isTestRequest(request, env)) return;
+    const ua = request.headers.get("User-Agent") || "";
+    const who = agentInfo(ua);
+    // Index and training crawlers are not counted: the question is whether
+    // assistants reading for a person ask. ExaSearchBot alone sent 84,361 of
+    // 85,834 events in the week to 18 Nov 2026 and always asks.
+    if (who.purpose === "search-index" || who.purpose === "training") return;
     const now = Date.now();
     if (now - windowStart >= 60_000) { windowStart = now; sent = 0; }
     if (++sent > CAP_PER_MINUTE) return;
-    const ua = request.headers.get("User-Agent") || "";
     const url = new URL(request.url);
-    const who = agentInfo(ua);
     ctx.waitUntil(Promise.resolve().then(() => fetch("https://eu.i.posthog.com/i/v0/e/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
