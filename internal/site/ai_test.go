@@ -134,8 +134,8 @@ func TestAIAnswerAsksForARating(t *testing.T) {
 			t.Fatalf("no %q under the answer: %.800s", want, body)
 		}
 	}
-	for range 10 {
-		body = askAs(s, me, "1.1.1.1", q)
+	for i := range 10 {
+		body = askAs(s, me, "1.1.1.1", fmt.Sprintf("%s (%d)", q, i))
 	}
 	if !strings.Contains(body, "used your 10 AI questions") || strings.Contains(body, "data-ai-rate") {
 		t.Fatalf("a limit message must not ask for a rating: %.600s", body)
@@ -151,10 +151,10 @@ func TestAILimitIsTenADayPerDevice(t *testing.T) {
 	if body := askAs(s, me, "1.1.1.1", q); !strings.Contains(body, "9 of 10 AI questions left today") {
 		t.Fatalf("no counter: %.400s", body)
 	}
-	for range 9 {
-		askAs(s, me, "1.1.1.1", q)
+	for i := range 9 {
+		askAs(s, me, "1.1.1.1", fmt.Sprintf("%s (%d)", q, i))
 	}
-	body := askAs(s, me, "1.1.1.1", q)
+	body := askAs(s, me, "1.1.1.1", q+" (again)")
 	if !strings.Contains(body, "used your 10 AI questions for today") || !strings.Contains(body, "midnight Beirut time") || strings.Contains(body, "ai-box__text") ||
 		!strings.Contains(body, "mailto:nizar@taktek.io?subject=Urgent%20question") || !strings.Contains(body, "body=How%20much%20annual%20leave%20%26%20pay") {
 		t.Fatalf("no limit message or email link: %.800s", body)
@@ -162,6 +162,35 @@ func TestAILimitIsTenADayPerDevice(t *testing.T) {
 	// A new device on the same network is not affected.
 	if body := askAs(s, other, "1.1.1.1", q); !strings.Contains(body, "9 of 10 AI questions left today") {
 		t.Fatalf("another device was limited too: %.400s", body)
+	}
+}
+
+// A reader who opens a cited source and presses Back gets the same question
+// sent again (an older page, or sessionStorage off). It must not spend one of
+// their ten questions, nor count toward the IP's ban count.
+func TestAIRepeatQuestionCountsOnce(t *testing.T) {
+	s := testServer(t)
+	f := &composeFake{fakeRewrite: fakeRewrite{queries: []string{"الإجازة السنوية"}}}
+	s.SetMeaningSearch(f, "Google Gemini", false, 1000)
+	q := "How much annual leave does an employee get?"
+	me := strings.Repeat("9", 32)
+	for i := range 3 {
+		if body := askAs(s, me, "3.3.3.3", q); !strings.Contains(body, "ai-box__text") || !strings.Contains(body, "9 of 10 AI questions left today") {
+			t.Fatalf("ask %d: %.400s", i+1, body)
+		}
+	}
+	if used := s.meaning.devices.count("v:" + me); used != 1 {
+		t.Fatalf("same question three times used %d questions, want 1", used)
+	}
+	if n := s.meaning.networks.count("3.3.3.3"); n != 1 {
+		t.Fatalf("IP counted %d questions, want 1", n)
+	}
+	if body := askAs(s, me, "3.3.3.3", q+" Really?"); !strings.Contains(body, "8 of 10 AI questions left today") {
+		t.Fatalf("a new question must count: %.400s", body)
+	}
+	// Another device asking the same question pays for its own.
+	if body := askAs(s, strings.Repeat("8", 32), "3.3.3.3", q); !strings.Contains(body, "9 of 10 AI questions left today") {
+		t.Fatalf("other device: %.400s", body)
 	}
 }
 

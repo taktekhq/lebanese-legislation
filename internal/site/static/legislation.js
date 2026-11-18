@@ -271,6 +271,20 @@
   var body = new URLSearchParams({q: section.getAttribute("data-q"), empty: section.getAttribute("data-empty") || ""});
   var visitor = visitorID();
   if (visitor) body.set("ph", visitor);
+  /* A reader who opens a cited source and comes back (Back button) gets the
+     answer they already had from this tab's sessionStorage: no second
+     question to the server, none of their daily questions spent. Keyed by
+     question, mode (the URL) and language; answers only, never a limit or
+     error message. Storage can be off or full, so every use is guarded.
+     A page restored from the back/forward cache never runs this again. */
+  var saveKey = "lebleg_ai:" + (document.documentElement || {}).lang + ":" + section.getAttribute("data-url") + ":" +
+    (section.getAttribute("data-empty") || "") + ":" + section.getAttribute("data-q");
+  var saved = null;
+  try { saved = window.sessionStorage.getItem(saveKey); } catch (e) {}
+  if (saved) {
+    show(saved, true);
+    return;
+  }
   var controller = new AbortController();
   var timeout = setTimeout(function () { controller.abort(); }, 30000);
   fetch(section.getAttribute("data-url"), {
@@ -279,6 +293,17 @@
     if (!response.ok) throw new Error("answer unavailable");
     return response.text();
   }).then(function (html) {
+    show(html, false);
+  }).catch(function () {
+    target.textContent = section.getAttribute("data-error");
+    if (fallback) fallback.hidden = false;
+    settle();
+  }).finally(function () { clearTimeout(timeout); });
+
+  /* show puts an answer (fresh, or restored from this tab) in the box. A
+     restored one is tracked with restored: true, so it never counts as a
+     new answer. */
+  function show(html, restored) {
     var tpl = document.createElement("template");
     tpl.innerHTML = html;
     var results = tpl.content.querySelector("[data-ai-results]");
@@ -293,8 +318,12 @@
     settle();
     placeRating();
     var text = target.querySelector(".ai-box__text");
-    track(text ? "ai_answer_shown" : target.querySelector(".ai-box__limit") ? "ai_limit_shown" : "ai_no_answer_shown",
-      { sources: target.querySelectorAll(".ai-box__src").length, brought_results: !!results });
+    if (text && !restored) {
+      try { window.sessionStorage.setItem(saveKey, html); } catch (e) {}
+    }
+    var shown = { sources: target.querySelectorAll(".ai-box__src").length, brought_results: !!results };
+    if (restored) shown.restored = true;
+    track(text ? "ai_answer_shown" : target.querySelector(".ai-box__limit") ? "ai_limit_shown" : "ai_no_answer_shown", shown);
     target.addEventListener("click", function (e) {
       var a = e.target.closest(".ai-box__src");
       if (a) track("ai_source_clicked", { href: a.getAttribute("href"), position: Number((a.querySelector(".ai-box__n") || {}).textContent) || 0 });
@@ -353,11 +382,7 @@
     target.addEventListener("click", function (e) {
       if (e.target.closest(".ai-box__ref") && box.classList.contains("ai-box--collapsed")) more.click();
     });
-  }).catch(function () {
-    target.textContent = section.getAttribute("data-error");
-    if (fallback) fallback.hidden = false;
-    settle();
-  }).finally(function () { clearTimeout(timeout); });
+  }
 })();
 
 /* Editors and error reports.

@@ -39,6 +39,7 @@ async function ask({ posthog, cookie = '' }) {
   });
   const document = {
     cookie,
+    documentElement: { lang: 'ar' },
     addEventListener() {},
     createElement() { return el({ content: el() }); },
     querySelector(s) { return s === '[data-ai-answer]' ? section : null; },
