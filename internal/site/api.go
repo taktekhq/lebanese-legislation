@@ -17,7 +17,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"slices"
 	"strconv"
@@ -130,8 +129,7 @@ func (s *Server) apiNotFound(w http.ResponseWriter, what string) {
 }
 
 func (s *Server) apiFail(w http.ResponseWriter, r *http.Request, err error) {
-	log.Printf("api error %s: %v", r.URL.RequestURI(), err)
-	s.captureError(r, "error", err)
+	logError(r, "api error", err)
 	s.writeJSON(w, http.StatusInternalServerError, apiErrorBody{Error: "internal error"})
 }
 

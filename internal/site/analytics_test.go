@@ -65,12 +65,19 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 			t.Errorf("ph.js must call posthog.init with %s", want)
 		}
 	}
-	// One $web_vitals event a page instead of two: wait a minute for the late
-	// metrics (CLS, INP) before sending. An object with only this key leaves
-	// web vitals, their four metrics and network timing as the project sets
-	// them; "web_vitals: false" or an allow list here would hide a metric.
-	if !strings.Contains(ph, "capture_performance: { web_vitals_delayed_flush_ms: 60000 }") {
-		t.Error("ph.js must delay the web vitals flush to 60 s and set nothing else in capture_performance")
+	// Only page views and page leaves come from posthog-js itself: clicks,
+	// dead clicks, web vitals and network timing, and JavaScript errors are
+	// off in the code, so a project setting cannot bring them back.
+	for _, want := range []string{"autocapture: false", "capture_dead_clicks: false", "capture_performance: false", "capture_exceptions: false"} {
+		if !strings.Contains(ph, want) {
+			t.Errorf("ph.js must call posthog.init with %s", want)
+		}
+	}
+	// Paid student editors are identified and always recorded.
+	for _, want := range []string{"posthog.register({ editor: editor })", `posthog.identify("editor:" + editor, { editor: editor })`, "posthog.startSessionRecording(true)", "disable_session_recording: long && !editor"} {
+		if !strings.Contains(ph, want) {
+			t.Errorf("ph.js must keep the editor tracking: %s", want)
+		}
 	}
 	// A survey is shown in the page's language. Without this posthog-js picks the
 	// browser's, and an Arabic page in an English browser gets English text set

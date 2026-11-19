@@ -174,7 +174,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 			s.dateSources(r, view.Sources)
 		}
 		if err := ts["search"].ExecuteTemplate(w, "ai_answer", view); err != nil {
-			s.captureError(r, "ai answer render", err)
+			logError(r, "ai answer render", err)
 		}
 	}
 	if s.meaning == nil {

@@ -91,7 +91,7 @@ func (s *Server) renderMore(w http.ResponseWriter, r *http.Request, res Results)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Header().Set("X-Robots-Tag", "noindex")
 		if err := pages["search"].ExecuteTemplate(w, "results", res); err != nil {
-			s.captureError(r, "search more render", err)
+			logError(r, "search more render", err)
 		}
 		return
 	}

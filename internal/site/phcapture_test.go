@@ -1,11 +1,11 @@
 package site
 
 import (
-	"context"
+	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -33,86 +33,86 @@ func phSink(t *testing.T) (*httptest.Server, chan map[string]any) {
 	return srv, got
 }
 
-func firstEvent(t *testing.T, got chan map[string]any) map[string]any {
+// logged runs f and returns what it wrote to the server log.
+func logged(t *testing.T, f func()) string {
+	t.Helper()
+	var buf bytes.Buffer
+	old, flags := log.Writer(), log.Flags()
+	log.SetOutput(&buf)
+	log.SetFlags(0)
+	defer func() { log.SetOutput(old); log.SetFlags(flags) }()
+	f()
+	return buf.String()
+}
+
+// nothingSent fails when PostHog got an event.
+func nothingSent(t *testing.T, got chan map[string]any) {
 	t.Helper()
 	select {
 	case body := <-got:
-		batch := body["batch"].([]any)
-		return batch[0].(map[string]any)
-	case <-time.After(3 * time.Second):
-		t.Fatal("nothing was sent to PostHog")
-		return nil
-	}
-}
-
-func TestCaptureNoKey(t *testing.T) {
-	srv, got := phSink(t)
-	s := &Server{}
-	s.SetPostHog("", srv.URL)
-	s.fail(httptest.NewRecorder(), httptest.NewRequest("GET", "/law/1", nil), errors.New("boom"))
-	select {
-	case <-got:
-		t.Fatal("sent an event with no key")
+		t.Fatalf("an error was sent to PostHog: %v", body)
 	case <-time.After(200 * time.Millisecond):
 	}
 }
 
-func TestFailCapturesException(t *testing.T) {
+// Server errors go to the server log only, never to PostHog (19 Nov 2026):
+// one line with the kind, the method, the address and the error text.
+func TestFailLogsAndSendsNothing(t *testing.T) {
 	srv, got := phSink(t)
 	s := &Server{}
 	s.SetPostHog("phc_test", srv.URL)
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest("GET", "/law/123?q=x", nil)
-	r.Header.Set("User-Agent", "Mozilla/5.0 test")
-	s.fail(w, r, errors.New("template: boom"))
+	out := logged(t, func() {
+		s.fail(w, httptest.NewRequest("GET", "/law/123?q=x", nil), errors.New("template: boom"))
+	})
 	if w.Code != http.StatusInternalServerError {
 		t.Fatalf("status %d, want 500", w.Code)
 	}
-	ev := firstEvent(t, got)
-	if ev["event"] != "$exception" {
-		t.Fatalf("event %v, want $exception", ev["event"])
+	if out != "error GET /law/123?q=x: template: boom\n" {
+		t.Errorf("log %q", out)
 	}
-	p := ev["properties"].(map[string]any)
-	for _, key := range []string{"$current_url", "$pathname", "$ip", "$user_agent"} {
-		if _, ok := p[key]; ok {
-			t.Errorf("private property %s was sent", key)
-		}
-	}
-	list := p["$exception_list"].([]any)
-	if list[0].(map[string]any)["value"] != "Server request failed" {
-		t.Errorf("$exception_list %v", list)
-	}
-	if p["status"].(float64) != 500 {
-		t.Errorf("status %v", p["status"])
-	}
+	nothingSent(t, got)
 }
 
-func TestPanicRecovered(t *testing.T) {
+func TestPanicLoggedAndRecovered(t *testing.T) {
 	srv, got := phSink(t)
 	s := &Server{handler: http.HandlerFunc(func(http.ResponseWriter, *http.Request) { panic("nil map") })}
 	s.SetPostHog("phc_test", srv.URL)
 	w := httptest.NewRecorder()
-	s.ServeHTTP(w, httptest.NewRequest("GET", "/search?q=x", nil))
+	out := logged(t, func() { s.ServeHTTP(w, httptest.NewRequest("POST", "/search?q=x", nil)) })
 	if w.Code != http.StatusInternalServerError {
 		t.Fatalf("status %d, want 500", w.Code)
 	}
-	ev := firstEvent(t, got)
-	p := ev["properties"].(map[string]any)
-	if ev["event"] != "$exception" || p["$exception_list"].([]any)[0].(map[string]any)["value"] != "Server request failed" {
-		t.Fatalf("got %v", ev)
+	if out != "panic POST /search?q=x: nil map\n" {
+		t.Errorf("log %q", out)
 	}
+	nothingSent(t, got)
 }
 
-func TestCaptureDoesNotUseBrowserDistinctID(t *testing.T) {
+func TestAPIFailLogsAndSendsNothing(t *testing.T) {
 	srv, got := phSink(t)
 	s := &Server{}
 	s.SetPostHog("phc_test", srv.URL)
-	r := httptest.NewRequest("GET", "/", nil)
-	r.AddCookie(&http.Cookie{Name: "ph_phc_test_posthog", Value: `%7B%22distinct_id%22%3A%22abc-123%22%7D`})
-	s.fail(httptest.NewRecorder(), r, errors.New("x"))
-	p := firstEvent(t, got)["properties"].(map[string]any)
-	if p["distinct_id"] != "lebaneselegislation-server" {
-		t.Errorf("distinct_id %v, want anonymous server identifier", p["distinct_id"])
+	w := httptest.NewRecorder()
+	out := logged(t, func() {
+		s.apiFail(w, httptest.NewRequest("GET", "/api/v1/law/1/", nil), errors.New("db down"))
+	})
+	if w.Code != http.StatusInternalServerError {
+		t.Fatalf("status %d", w.Code)
+	}
+	if out != "api error GET /api/v1/law/1/: db down\n" {
+		t.Errorf("log %q", out)
+	}
+	nothingSent(t, got)
+}
+
+// A request the mux matched also names its route pattern.
+func TestLogErrorNamesTheRoute(t *testing.T) {
+	r := httptest.NewRequest("GET", "/en/law/7/", nil)
+	r.Pattern = "GET /{lang}/law/{id}/"
+	out := logged(t, func() { logError(r, "answer render", errors.New("broken pipe")) })
+	if out != "answer render GET /en/law/7/ (route GET /{lang}/law/{id}/): broken pipe\n" {
+		t.Errorf("log %q", out)
 	}
 }
 
@@ -125,55 +125,6 @@ func TestPostHogScriptServed(t *testing.T) {
 	s.ServeHTTP(w, httptest.NewRequest("GET", "/ph.js", nil))
 	if w.Code != http.StatusOK || !strings.Contains(w.Body.String(), `api_host: "/ph"`) {
 		t.Fatalf("GET /ph.js: %d, body has api_host: %v", w.Code, strings.Contains(w.Body.String(), "api_host"))
-	}
-}
-
-func TestCaptureSkipsClientDisconnects(t *testing.T) {
-	srv, got := phSink(t)
-	s := &Server{}
-	s.SetPostHog("phc_test", srv.URL)
-	s.fail(httptest.NewRecorder(), httptest.NewRequest("GET", "/law/1", nil), fmt.Errorf("query: %w", context.Canceled))
-	select {
-	case <-got:
-		t.Fatal("a client disconnect was sent as an error")
-	case <-time.After(200 * time.Millisecond):
-	}
-}
-
-func TestCaptureIsRateLimited(t *testing.T) {
-	srv, got := phSink(t)
-	s := &Server{}
-	s.SetPostHog("phc_test", srv.URL)
-	for i := 0; i < 50; i++ {
-		s.fail(httptest.NewRecorder(), httptest.NewRequest("GET", "/law/1", nil), errors.New("db down"))
-	}
-	n := 0
-	deadline := time.After(500 * time.Millisecond)
-loop:
-	for {
-		select {
-		case <-got:
-			n++
-		case <-deadline:
-			break loop
-		}
-	}
-	if n < 1 || n > phBurst {
-		t.Fatalf("sent %d events for 50 errors in a burst, want 1..%d", n, phBurst)
-	}
-}
-
-func TestAPIFailCapturesException(t *testing.T) {
-	srv, got := phSink(t)
-	s := &Server{}
-	s.SetPostHog("phc_test", srv.URL)
-	w := httptest.NewRecorder()
-	s.apiFail(w, httptest.NewRequest("GET", "/api/v1/law/1/", nil), errors.New("db down"))
-	if w.Code != http.StatusInternalServerError {
-		t.Fatalf("status %d", w.Code)
-	}
-	if ev := firstEvent(t, got); ev["event"] != "$exception" {
-		t.Fatalf("got %v", ev["event"])
 	}
 }
 
