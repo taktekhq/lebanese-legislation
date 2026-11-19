@@ -193,8 +193,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if v == http.ErrAbortHandler {
 				panic(v)
 			}
-			log.Printf("panic %s: %v", r.URL.RequestURI(), v)
-			s.captureError(r, "panic", v)
+			logError(r, "panic", v)
 			http.Error(w, "Something went wrong on our side.", http.StatusInternalServerError)
 		}
 	}()
@@ -333,8 +332,7 @@ func htmlCacheControl(r *http.Request, code int) string {
 }
 
 func (s *Server) fail(w http.ResponseWriter, r *http.Request, err error) {
-	log.Printf("error %s: %v", r.URL.RequestURI(), err)
-	s.captureError(r, "error", err)
+	logError(r, "error", err)
 	if overloaded(err) { // out of time or the database away: ask the client to come back, not a bug
 		busy(w, busyAfter)
 		return

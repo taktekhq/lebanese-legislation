@@ -1,5 +1,10 @@
 # Changes
 
+## 19 November 2026
+
+- Fewer PostHog events, about 10,000 a day down to about 3,000. No longer sent: `origin_request` (the Worker's timing of each origin request), server `$exception`, a liveness monitor's `$mcp_initialize` and `mcp_tools_list`, and from the browser click autocapture, dead clicks, web vitals and JavaScript errors. The speed charts in PostHog stop updating.
+- A server error (a 500 or a recovered panic) is one line in the server log: kind, method, address and error text. The container log is the only place errors are seen.
+
 ## 10 November 2026
 
 - Three new topic guides: dismissal notice periods (Labour Code Article 50), the anti money laundering law (Law 44 of 2015) and pretrial detention (Code of Criminal Procedure Articles 108 and 47). 32 guides in all.

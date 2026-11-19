@@ -122,7 +122,7 @@ func (s *Server) answer(w http.ResponseWriter, r *http.Request) {
 			ts = s.pagesAr
 		}
 		if err := ts["search"].ExecuteTemplate(w, "answer", view); err != nil {
-			s.captureError(r, "answer render", err)
+			logError(r, "answer render", err)
 		}
 	}
 	if s.meaning == nil {
