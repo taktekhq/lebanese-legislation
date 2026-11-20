@@ -4092,8 +4092,81 @@
 369171	ruling/75452	law/243942/art/127	cites	centre	linked	ruling	75452	\N	243942	127	\N	\N	the Centre's link	\N	\N
 369172	ruling/75452	law/244611/art/253	cites	centre	linked	ruling	75452	\N	244611	253	\N	\N	the Centre's link	\N	\N
 369173	ruling/75452	law/244611/art/254	cites	centre	linked	ruling	75452	\N	244611	254	\N	\N	the Centre's link	\N	\N
-369174	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المادة 27 من القرار عدد 16 -ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
-369175	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16/art/4	الفقرة 3 من دفتر الشروط الملحق	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
+369174	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المادة 27 من القرار عدد 16- ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
 369176	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16	الباب الثاني	this text	للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
-369177	law/201023/art/1	law/258033/art/50	amend	model	linked	legislation	201023	1	258033	50	lb/decree/1989-09-15/377/art/50	الفصل الثاني	number and date	عدل رسم تأجير وسائل الاتصالات السلكية واللاسلكية الدولية الواردة في الفصل الثاني من المرسوم رقم 377 تاريخ 15/9/1989 - المادة 50 منه	agy:gemini-4-argon-medium
-369178	law/329374/art/1	law/244369	insert	model	linked	legislation	329374	1	244369	\N	lb/law/1994-08-01/367	الباب الأول	number and date	يعدّل قانون مزاولة مهنة الصيدلة (رقم 367 تاريخ 1/8/1994) بإضافة فصل جديد الى الباب الأول منه	agy:gemini-4-argon-medium
+369179	ruling/70791	law/244565/art/45	cites	centre	linked	ruling	70791	\N	244565	45	\N	\N	the Centre's link	\N	\N
+369180	ruling/70791	law/244565/art/718	cites	centre	linked	ruling	70791	\N	244565	718	\N	\N	the Centre's link	\N	\N
+369181	ruling/70792	law/244565/art/120	cites	centre	linked	ruling	70792	\N	244565	120	\N	\N	the Centre's link	\N	\N
+369182	ruling/70792	law/244565/art/60	cites	centre	linked	ruling	70792	\N	244565	60	\N	\N	the Centre's link	\N	\N
+369183	ruling/70792	law/244565/art/61	cites	centre	linked	ruling	70792	\N	244565	61	\N	\N	the Centre's link	\N	\N
+369184	ruling/70792	law/244565/art/710	cites	centre	linked	ruling	70792	\N	244565	710	\N	\N	the Centre's link	\N	\N
+369185	ruling/70990	law/244611/art/253	cites	centre	linked	ruling	70990	\N	244611	253	\N	\N	the Centre's link	\N	\N
+369186	ruling/70990	law/244611/art/638	cites	centre	linked	ruling	70990	\N	244611	638	\N	\N	the Centre's link	\N	\N
+369187	ruling/70997	law/244138/art/51	cites	centre	linked	ruling	70997	\N	244138	51	\N	\N	the Centre's link	\N	\N
+369188	ruling/71019	law/244611/art/216	cites	centre	linked	ruling	71019	\N	244611	216	\N	\N	the Centre's link	\N	\N
+369189	ruling/71019	law/244611/art/569	cites	centre	linked	ruling	71019	\N	244611	569	\N	\N	the Centre's link	\N	\N
+369190	ruling/71021	law/177709/art/56	cites	centre	linked	ruling	71021	\N	177709	56	\N	\N	the Centre's link	\N	\N
+369191	ruling/71021	law/177709/art/74	cites	centre	linked	ruling	71021	\N	177709	74	\N	\N	the Centre's link	\N	\N
+369192	ruling/71021	law/177709/art/76	cites	centre	linked	ruling	71021	\N	177709	76	\N	\N	the Centre's link	\N	\N
+369193	ruling/71021	law/244565/art/537	cites	centre	linked	ruling	71021	\N	244565	537	\N	\N	the Centre's link	\N	\N
+369194	ruling/71021	law/244565/art/708	cites	centre	linked	ruling	71021	\N	244565	708	\N	\N	the Centre's link	\N	\N
+369195	ruling/71022	law/190374/art/50	cites	centre	linked	ruling	71022	\N	190374	50	\N	\N	the Centre's link	\N	\N
+369196	ruling/71022	law/190374/art/58	cites	centre	linked	ruling	71022	\N	190374	58	\N	\N	the Centre's link	\N	\N
+369197	ruling/71022	law/190374/art/79	cites	centre	linked	ruling	71022	\N	190374	79	\N	\N	the Centre's link	\N	\N
+369198	ruling/71022	law/244226/art/624	cites	centre	linked	ruling	71022	\N	244226	624	\N	\N	the Centre's link	\N	\N
+369199	ruling/71022	law/244226/art/643	cites	centre	linked	ruling	71022	\N	244226	643	\N	\N	the Centre's link	\N	\N
+369200	ruling/71049	law/244565/art/888	cites	centre	linked	ruling	71049	\N	244565	888	\N	\N	the Centre's link	\N	\N
+369201	ruling/71049	law/244565/art/890	cites	centre	linked	ruling	71049	\N	244565	890	\N	\N	the Centre's link	\N	\N
+369202	ruling/71049	law/244565/art/896	cites	centre	linked	ruling	71049	\N	244565	896	\N	\N	the Centre's link	\N	\N
+369203	ruling/71136	law/190374/art/50	cites	centre	linked	ruling	71136	\N	190374	50	\N	\N	the Centre's link	\N	\N
+369204	ruling/71136	law/244565/art/132	cites	centre	linked	ruling	71136	\N	244565	132	\N	\N	the Centre's link	\N	\N
+369205	ruling/71136	law/244565/art/708	cites	centre	linked	ruling	71136	\N	244565	708	\N	\N	the Centre's link	\N	\N
+369206	ruling/71138	law/244611/art/219	cites	centre	linked	ruling	71138	\N	244611	219	\N	\N	the Centre's link	\N	\N
+369207	ruling/71138	law/244611/art/471	cites	centre	linked	ruling	71138	\N	244611	471	\N	\N	the Centre's link	\N	\N
+369208	ruling/71138	law/244611/art/639	cites	centre	linked	ruling	71138	\N	244611	639	\N	\N	the Centre's link	\N	\N
+369209	ruling/71138	law/244611/art/655	cites	centre	linked	ruling	71138	\N	244611	655	\N	\N	the Centre's link	\N	\N
+369210	ruling/71193	law/244611/art/200	cites	centre	linked	ruling	71193	\N	244611	200	\N	\N	the Centre's link	\N	\N
+369211	ruling/71193	law/244611/art/636	cites	centre	linked	ruling	71193	\N	244611	636	\N	\N	the Centre's link	\N	\N
+369212	ruling/71193	law/244611/art/639	cites	centre	linked	ruling	71193	\N	244611	639	\N	\N	the Centre's link	\N	\N
+369213	ruling/71197	law/244565/art/690	cites	centre	linked	ruling	71197	\N	244565	690	\N	\N	the Centre's link	\N	\N
+369214	ruling/71197	law/244565/art/734	cites	centre	linked	ruling	71197	\N	244565	734	\N	\N	the Centre's link	\N	\N
+369215	ruling/71236	law/190374/art/50	cites	centre	linked	ruling	71236	\N	190374	50	\N	\N	the Centre's link	\N	\N
+369216	ruling/71236	law/190374/art/58	cites	centre	linked	ruling	71236	\N	190374	58	\N	\N	the Centre's link	\N	\N
+369217	ruling/71236	law/190374/art/74	cites	centre	linked	ruling	71236	\N	190374	74	\N	\N	the Centre's link	\N	\N
+369218	ruling/71236	law/244226/art/624	cites	centre	linked	ruling	71236	\N	244226	624	\N	\N	the Centre's link	\N	\N
+369219	ruling/71270	law/244611/art/639	cites	centre	linked	ruling	71270	\N	244611	639	\N	\N	the Centre's link	\N	\N
+369220	ruling/71270	law/244611/art/640	cites	centre	linked	ruling	71270	\N	244611	640	\N	\N	the Centre's link	\N	\N
+369221	ruling/71280	law/244565/art/257	cites	centre	linked	ruling	71280	\N	244565	257	\N	\N	the Centre's link	\N	\N
+369222	ruling/71377	law/244611/art/638	cites	centre	linked	ruling	71377	\N	244611	638	\N	\N	the Centre's link	\N	\N
+369223	ruling/71457	law/243942/art/126	cites	centre	linked	ruling	71457	\N	243942	126	\N	\N	the Centre's link	\N	\N
+369224	ruling/71457	law/244483/art/10	cites	centre	linked	ruling	71457	\N	244483	10	\N	\N	the Centre's link	\N	\N
+369225	ruling/71603	law/244565/art/652	cites	centre	linked	ruling	71603	\N	244565	652	\N	\N	the Centre's link	\N	\N
+369226	ruling/71603	law/244565/art/734	cites	centre	linked	ruling	71603	\N	244565	734	\N	\N	the Centre's link	\N	\N
+369227	ruling/71607	law/244611/art/639	cites	centre	linked	ruling	71607	\N	244611	639	\N	\N	the Centre's link	\N	\N
+369228	ruling/71724	law/244611/art/690	cites	centre	linked	ruling	71724	\N	244611	690	\N	\N	the Centre's link	\N	\N
+369229	ruling/71827	law/244565/art/45	cites	centre	linked	ruling	71827	\N	244565	45	\N	\N	the Centre's link	\N	\N
+369230	ruling/71827	law/244565/art/721	cites	centre	linked	ruling	71827	\N	244565	721	\N	\N	the Centre's link	\N	\N
+369231	ruling/71829	law/244138/art/51	cites	centre	linked	ruling	71829	\N	244138	51	\N	\N	the Centre's link	\N	\N
+369232	ruling/71830	law/244565/art/741	cites	centre	linked	ruling	71830	\N	244565	741	\N	\N	the Centre's link	\N	\N
+369233	ruling/71889	law/244483/art/275	cites	centre	linked	ruling	71889	\N	244483	275	\N	\N	the Centre's link	\N	\N
+369234	ruling/71889	law/244483/art/296	cites	centre	linked	ruling	71889	\N	244483	296	\N	\N	the Centre's link	\N	\N
+369235	ruling/71889	law/244483/art/47	cites	centre	linked	ruling	71889	\N	244483	47	\N	\N	the Centre's link	\N	\N
+369236	ruling/72042	law/244483/art/335	cites	centre	linked	ruling	72042	\N	244483	335	\N	\N	the Centre's link	\N	\N
+369237	ruling/72116	law/244483/art/68	cites	centre	linked	ruling	72116	\N	244483	68	\N	\N	the Centre's link	\N	\N
+369238	ruling/72116	law/244483/art/70	cites	centre	linked	ruling	72116	\N	244483	70	\N	\N	the Centre's link	\N	\N
+369239	ruling/72116	law/244483/art/73	cites	centre	linked	ruling	72116	\N	244483	73	\N	\N	the Centre's link	\N	\N
+369240	ruling/72116	law/244565/art/65	cites	centre	linked	ruling	72116	\N	244565	65	\N	\N	the Centre's link	\N	\N
+369241	ruling/72320	law/244483/art/328	cites	centre	linked	ruling	72320	\N	244483	328	\N	\N	the Centre's link	\N	\N
+369242	ruling/72384	law/244483/art/296	cites	centre	linked	ruling	72384	\N	244483	296	\N	\N	the Centre's link	\N	\N
+369243	ruling/72384	law/244611/art/359	cites	centre	linked	ruling	72384	\N	244611	359	\N	\N	the Centre's link	\N	\N
+369244	ruling/72384	law/244611/art/360	cites	centre	linked	ruling	72384	\N	244611	360	\N	\N	the Centre's link	\N	\N
+369245	ruling/72386	law/244483/art/328	cites	centre	linked	ruling	72386	\N	244483	328	\N	\N	the Centre's link	\N	\N
+369246	ruling/72386	law/244611/art/666	cites	centre	linked	ruling	72386	\N	244611	666	\N	\N	the Centre's link	\N	\N
+369247	ruling/72461	law/244483/art/6	cites	centre	linked	ruling	72461	\N	244483	6	\N	\N	the Centre's link	\N	\N
+369248	ruling/72461	law/244565/art/143	cites	centre	linked	ruling	72461	\N	244565	143	\N	\N	the Centre's link	\N	\N
+369249	ruling/72461	law/244565/art/145	cites	centre	linked	ruling	72461	\N	244565	145	\N	\N	the Centre's link	\N	\N
+369250	ruling/72461	law/244611/art/454	cites	centre	linked	ruling	72461	\N	244611	454	\N	\N	the Centre's link	\N	\N
+369251	ruling/72461	law/244611/art/459	cites	centre	linked	ruling	72461	\N	244611	459	\N	\N	the Centre's link	\N	\N
+369252	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16/art/4	الفقرة 3	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
+369253	law/201023/art/1	law/258033/art/50	replace	model	linked	legislation	201023	1	258033	50	lb/decree/1989-09-15/377/art/50	الفصل الثاني	number and date	عدل رسم تأجير وسائل الاتصالات السلكية واللاسلكية الدولية الواردة في الفصل الثاني من المرسوم رقم 377 تاريخ 15/9/1989- المادة 50 منه وحدد كما يلي	agy:gemini-4-argon-medium
+369254	law/329374/art/1	law/329374	cites	model	linked	legislation	329374	1	329374	\N	lb/law/self/322	\N	this text	يعمل بهذا القانون فور نشره في الجريدة الرسمية	agy:gemini-4-argon-medium
