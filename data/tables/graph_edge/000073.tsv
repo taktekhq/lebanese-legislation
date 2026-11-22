@@ -4092,8 +4092,6 @@
 369171	ruling/75452	law/243942/art/127	cites	centre	linked	ruling	75452	\N	243942	127	\N	\N	the Centre's link	\N	\N
 369172	ruling/75452	law/244611/art/253	cites	centre	linked	ruling	75452	\N	244611	253	\N	\N	the Centre's link	\N	\N
 369173	ruling/75452	law/244611/art/254	cites	centre	linked	ruling	75452	\N	244611	254	\N	\N	the Centre's link	\N	\N
-369174	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16/art/27	\N	this text	المادة 27 من القرار عدد 16 -ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
-369176	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16	الباب الثاني	this text	للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
 369179	ruling/70791	law/244565/art/45	cites	centre	linked	ruling	70791	\N	244565	45	\N	\N	the Centre's link	\N	\N
 369180	ruling/70791	law/244565/art/718	cites	centre	linked	ruling	70791	\N	244565	718	\N	\N	the Centre's link	\N	\N
 369181	ruling/70792	law/244565/art/120	cites	centre	linked	ruling	70792	\N	244565	120	\N	\N	the Centre's link	\N	\N
@@ -4167,14 +4165,8 @@
 369249	ruling/72461	law/244565/art/145	cites	centre	linked	ruling	72461	\N	244565	145	\N	\N	the Centre's link	\N	\N
 369250	ruling/72461	law/244611/art/454	cites	centre	linked	ruling	72461	\N	244611	454	\N	\N	the Centre's link	\N	\N
 369251	ruling/72461	law/244611/art/459	cites	centre	linked	ruling	72461	\N	244611	459	\N	\N	the Centre's link	\N	\N
-369252	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16/art/4	الفقرة 3	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
-369255	law/201023/art/1	law/258033/art/50	amend	model	linked	legislation	201023	1	258033	50	lb/decree/1989-09-15/377/art/50	الفصل الثاني	number and date	عدل رسم تأجير وسائل الاتصالات السلكية واللاسلكية الدولية الواردة في الفصل الثاني من المرسوم رقم 377 تاريخ 15/9/1989 - المادة 50 منه	agy:gemini-4-argon-medium
-369256	law/329374/art/1	law/244369	insert	model	linked	legislation	329374	1	244369	\N	lb/law/1994-08-01/367	الباب الأول	number and date	يعدّل قانون مزاولة مهنة الصيدلة (رقم 367 تاريخ 1/8/1994) بإضافة فصل جديد الى الباب الأول منه	agy:gemini-4-argon-medium
-369257	law/329374/art/1	law/244369/art/1	cites	model	linked	legislation	329374	1	244369	1	lb/law/1994-08-01/367/art/1	الباب الأول - الفصل الأول	number and date	ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-369258	law/329374/art/1	law/244369/art/2	cites	model	linked	legislation	329374	1	244369	2	lb/law/1994-08-01/367/art/2	الباب الأول - الفصل الأول	number and date	ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-369259	law/329374/art/1	law/244369/art/3	cites	model	linked	legislation	329374	1	244369	3	lb/law/1994-08-01/367/art/3	الباب الأول - الفصل الأول	number and date	ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-369260	law/329374/art/1	law/244369/art/4	cites	model	linked	legislation	329374	1	244369	4	lb/law/1994-08-01/367/art/4	الباب الأول - الفصل الأول	number and date	ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-369261	law/329374/art/1	law/244369/art/5	cites	model	linked	legislation	329374	1	244369	5	lb/law/1994-08-01/367/art/5	الباب الأول - الفصل الأول	number and date	ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-369262	law/329374/art/1	law/244369/art/6	cites	model	linked	legislation	329374	1	244369	6	lb/law/1994-08-01/367/art/6	الباب الأول - الفصل الأول	number and date	ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-369263	law/329374/art/1	law/244369/art/7	cites	model	linked	legislation	329374	1	244369	7	lb/law/1994-08-01/367/art/7	الباب الأول - الفصل الأول	number and date	ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
-369264	law/329374/art/1	law/244369/art/8	cites	model	linked	legislation	329374	1	244369	8	lb/law/1994-08-01/367/art/8	الباب الأول - الفصل الأول	number and date	ويضم الـمواد من الاولى إلى 8	agy:gemini-4-argon-medium
+369265	law/182618/art/28	law/182618/art/27	cites	model	linked	legislation	182618	28	182618	27	lb/decision/self/16-ل.ر/art/27	\N	this text	المادة 27 من القرار عدد 16- ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
+369266	law/182618/art/28	law/182618/art/4	cites	model	linked	legislation	182618	28	182618	4	lb/decision/self/16ل.ر/art/4	الفقرة 3	this text	المادة 4 الفقرة 3 من دفتر الشروط الملحق بالقرار رقم 16 ل.ر الصادر في 30 كانون الثاني 1935	agy:gemini-4-argon-medium
+369267	law/182618/art/28	law/182618	cites	model	linked	legislation	182618	28	182618	\N	lb/decision/self/16ل.ر	الباب الثاني	this text	للباب الثاني من القرار رقم 16 ل.ر الصادر في 30 كانون الثاني سنة 1935	agy:gemini-4-argon-medium
+369268	law/201023/art/1	law/258033/art/50	replace	model	linked	legislation	201023	1	258033	50	lb/decree/1989-09-15/377/art/50	الفصل الثاني	number and date	عدل رسم تأجير وسائل الاتصالات السلكية واللاسلكية الدولية الواردة في الفصل الثاني من المرسوم رقم 377 تاريخ 15/9/1989- المادة 50 منه وحدد كما يلي	agy:gemini-4-argon-medium
+369269	law/329374/art/1	law/329374	cites	model	linked	legislation	329374	1	329374	\N	lb/law/self	\N	this text	يعمل بهذا القانون فور نشره في الجريدة الرسمية	agy:gemini-4-argon-medium
