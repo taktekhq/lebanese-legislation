@@ -34,7 +34,6 @@ Every flag is optional. The same flags work for `api/` and `mcp/`, which serve o
 | --- | --- |
 | `-db` | PostgreSQL connection string. Default `DATABASE_URL`, then `LEBLEG_DSN` |
 | `-addr` | Address to listen on. Default `LISTEN_ADDR`, then `127.0.0.1:8080` (`8000` for the API) |
-| `-events DIR` | Keep the anonymous usage record (search words and result counts, reads, AI sign-ups) in `DIR`, 90 days. Turns on the sign-up form on `/ai/`. `go run ./cmd/usage-stats -events DIR` adds up a day |
 | `-official DIR` | Page images and PDFs of texts published from official scans |
 | `-ruling-files DIR` | Judgment PDFs, served at `/ruling-files/<id>.pdf` |
 | `-noindex` | Keep every page out of search engines |
@@ -55,7 +54,6 @@ A leading `serve` is accepted, so `web serve -addr ... -db ...` works too.
 
 | Command | What it does |
 | --- | --- |
-| [`cmd/usage-stats`](../cmd/usage-stats/) | Adds up one day of the `-events` record, as JSON |
 | [`cmd/journal-sitemap`](../cmd/journal-sitemap/) | Prints the project journal's sitemap; no database |
 | [`cmd/searchindex`](../cmd/searchindex/) | Builds the semantic index in its own pgvector database |
 | [`cmd/topicgen`](../cmd/topicgen/) | Writes and checks the topic pages (`internal/site/topics`) with a model that sees only the cited articles |

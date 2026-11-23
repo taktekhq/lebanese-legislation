@@ -15,35 +15,6 @@ import (
 // put gtag on, such as the Hugging Face dataset card (Markdown, no
 // scripts). Each badge shows a current number from the corpus, so the card
 // never goes stale between uploads.
-//
-// One badge per page also counts the view: the card adds ?src=hf to
-// exactly one of its badges, and that request records a GA4 page_view in
-// the page's own stream. Hugging Face doesn't proxy external images, so
-// each visitor's browser fetches the badge itself. Badges without src
-// (e.g. in a GitHub README, which GitHub proxies through its image cache
-// and would miscount) only show the number.
-
-type badgePage struct {
-	location string
-	title    string
-}
-
-// badgePages are the pages whose views a badge may count, by ?src= value.
-// location must be on the GA stream's own domain: GA dropped page_views
-// whose page_location was huggingface.co.
-var badgePages = map[string]badgePage{
-	"hf": {
-		location: "https://lebaneselegislation.com/huggingface",
-		title:    "Lebanese Legislation dataset (Hugging Face)",
-	},
-	// GitHub serves README images through its camo proxy, which honours
-	// no-store, so each README view fetches the badge once. The count is
-	// views, not people: every fetch comes from camo's addresses.
-	"gh": {
-		location: "https://lebaneselegislation.com/github",
-		title:    "Lebanese Legislation repository (GitHub)",
-	},
-}
 
 type badgeStats struct{ legislation, articles, rulings int }
 
@@ -169,16 +140,10 @@ func renderBadge(label, value, color string) string {
 		`</g></svg>`
 }
 
-// Crawlers and link previewers that fetch images are not readers.
-var botUA = regexp.MustCompile(`(?i)bot|crawl|spider|slurp|preview|fetch|curl|wget|python|httpx|go-http|java/|headless`)
-
-func isBot(ua string) bool { return ua == "" || botUA.MatchString(ua) }
-
 func svgResponse(w http.ResponseWriter, r *http.Request, svg string, status int) {
 	h := w.Header()
 	h.Set("Content-Type", "image/svg+xml; charset=utf-8")
-	// Every view must reach the server (for the count and the live
-	// number), not a browser or edge cache.
+	// Every view must get the live number, not a browser or edge cache's.
 	h.Set("Cache-Control", "no-store, max-age=0")
 	h.Set("Access-Control-Allow-Origin", "*")
 	// Badges are embedded on other sites (the Hugging Face card loads them
@@ -211,10 +176,6 @@ func (s *Server) serveBadge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	name := m[1]
-	if page, has := badgePages[r.URL.Query().Get("src")]; has && r.Method == http.MethodGet && !isBot(r.Header.Get("User-Agent")) {
-		ref := r.Header.Get("Referer")
-		s.track(s.hfStream(), r, []gaEvent{{name: "page_view", params: obj{{"page_location", page.location}, {"page_title", page.title}, {"page_referrer", ref}, {"badge", name}}}})
-	}
 	ctx := r.Context()
 	if def.load != nil {
 		v, err := def.load(s, ctx)

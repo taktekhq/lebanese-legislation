@@ -61,6 +61,12 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 	if !strings.Contains(load, "/gtag/js?id=G-RDYRK422NP") {
 		t.Error("assets/load.js must fetch gtag.js")
 	}
+	// Page views only: no custom events (Nizar, 23 Nov 2026).
+	for _, banned := range []string{"track(", `gtag("event"`, "addEventListener"} {
+		if strings.Contains(ga, banned) {
+			t.Errorf("ga.js contains %q: it must send page views only", banned)
+		}
+	}
 	// No PostHog anywhere in the browser code (stopped 23 Nov 2026).
 	for _, path := range []string{"/ga.js", "/assets/load.js", "/legislation.js"} {
 		if strings.Contains(strings.ToLower(get(path)), "posthog") {

@@ -367,64 +367,22 @@ const browserUA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/5
 
 func trackedServer(rt *recorder) *Server {
 	return noDBServer(Config{
-		GAMCPMeasurementID: "G-MCP", GAMCPAPISecret: "mcp-secret", GAHFMeasurementID: "G-HF", GAHFAPISecret: "hf-secret",
 		HTTPClient: &http.Client{Transport: rt}, HuggingFaceAPI: "https://hf.example/api",
 		Logf: func(string, ...any) {},
 	})
 }
 
-func TestNothingSentWithoutKeys(t *testing.T) {
-	rt := &recorder{}
-	s := noDBServer(Config{HTTPClient: &http.Client{Transport: rt}})
-	post(s, map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}, nil)
-	call(t, s, "get_law", map[string]any{"id": -1})
-	s.Flush()
-	if len(rt.reqs) != 0 {
-		t.Errorf("sent %d requests without keys", len(rt.reqs))
-	}
-}
-
-func gaEvents(rt *recorder) []map[string]any {
-	var out []map[string]any
-	for _, r := range rt.sent(gaEndpoint) {
-		for _, e := range r.body["events"].([]any) {
-			out = append(out, e.(map[string]any))
-		}
-	}
-	return out
-}
-
-func TestGAEvents(t *testing.T) {
+// The MCP server sends no analytics: a session of calls makes no outside
+// request at all (23 Nov 2026).
+func TestNothingSent(t *testing.T) {
 	rt := &recorder{}
 	s := trackedServer(rt)
-	post(s, map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{"protocolVersion": "2025-06-18", "clientInfo": map[string]any{"name": "claude-ai", "version": "0.1"}}},
-		map[string]string{"User-Agent": "node"})
-	s.Flush()
-	if gas := gaEvents(rt); len(gas) != 1 || gas[0]["name"] != "mcp_initialize" || gas[0]["params"].(map[string]any)["client_name"] != "claude-ai" ||
-		gas[0]["params"].(map[string]any)["page_location"] != mcpPage {
-		t.Errorf("GA initialize: %v", gas)
-	}
-
-	rt2 := &recorder{}
-	s = trackedServer(rt2)
+	post(s, map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{"protocolVersion": "2025-06-18"}}, nil)
 	post(s, map[string]any{"jsonrpc": "2.0", "id": 2, "method": "tools/list"}, nil)
 	post(s, map[string]any{"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": map[string]any{"name": "nope"}}, nil)
 	call(t, s, "get_law", map[string]any{"id": -1})
-	post(s, map[string]any{"jsonrpc": "2.0", "id": 6, "method": "ping"}, nil)
-	s.Flush()
-	var calls int
-	for _, e := range gaEvents(rt2) {
-		if e["name"] == "mcp_tool_call" {
-			calls++
-		}
-	}
-	if calls != 2 {
-		t.Errorf("GA tool calls: %d", calls)
-	}
-	for _, r := range rt2.reqs {
-		if !strings.HasPrefix(r.url, gaEndpoint) {
-			t.Errorf("sent to %s, want GA4 only", r.url)
-		}
+	if len(rt.reqs) != 0 {
+		t.Errorf("sent %d requests: %v", len(rt.reqs), rt.reqs)
 	}
 }
 
@@ -448,20 +406,8 @@ func TestBadges(t *testing.T) {
 	if got := rec.Header().Get("Cross-Origin-Resource-Policy"); got != "cross-origin" {
 		t.Errorf("badge CORP %q: browsers hide it on other sites", got)
 	}
-	get(s, "/badge/mcp.svg", map[string]string{"User-Agent": browserUA})
-	get(s, "/badge/mcp.svg?src=hf", map[string]string{"User-Agent": "Googlebot-Image/1.0"})
-	s.Flush()
-	ga := rt.sent(gaEndpoint)
-	if len(ga) != 1 || !strings.Contains(ga[0].url, "measurement_id=G-HF") {
-		t.Fatalf("one view in the HF stream: %v", ga)
-	}
-	ev := ga[0].body["events"].([]any)[0].(map[string]any)
-	p := ev["params"].(map[string]any)
-	if ev["name"] != "page_view" || p["page_location"] != "https://lebaneselegislation.com/huggingface" || p["page_referrer"] != "https://huggingface.co/" || p["badge"] != "mcp" {
-		t.Errorf("view: %v", ev)
-	}
-	if !isBot("") || isBot(browserUA) {
-		t.Error("isBot")
+	if len(rt.reqs) != 0 {
+		t.Errorf("a badge view sent %d requests", len(rt.reqs))
 	}
 	if rec := get(s, "/badge/nope.svg", nil); rec.Code != 404 || !strings.Contains(rec.Body.String(), "not found") {
 		t.Errorf("unknown badge: %d", rec.Code)
@@ -521,9 +467,9 @@ func TestResultCache(t *testing.T) {
 }
 
 func TestConfigFromEnv(t *testing.T) {
-	env := map[string]string{"GA_MCP_MEASUREMENT_ID": "G-1", "GA_MCP_API_SECRET": "s", "MCP_RATE_LIMIT": "-1"}
+	env := map[string]string{"MCP_RATE_LIMIT": "-1"}
 	c := ConfigFromEnv(func(k string) string { return env[k] })
-	if c.GAMCPMeasurementID != "G-1" || c.GAMCPAPISecret != "s" || c.RateLimitPerMinute != -1 || c.GAHFMeasurementID != "" {
+	if c.RateLimitPerMinute != -1 {
 		t.Errorf("%+v", c)
 	}
 	if s := newServer(noDB{}, c); s.limiter != nil {

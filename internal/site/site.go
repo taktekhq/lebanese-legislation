@@ -48,8 +48,7 @@ type Server struct {
 	pagesFr       map[string]*template.Template // French, under /fr/, for the pages of frenchPaths; nil when isStatic
 	handler       http.Handler                  // mux wrapped in the /ar language middleware
 	mux           *http.ServeMux
-	isStatic      bool // rendering a static copy: see NewStatic
-	ev            *Events
+	isStatic      bool                  // rendering a static copy: see NewStatic
 	analytics     bool                  // load the browser analytics (ga.js): SetAnalytics
 	mcpRegistered bool                  // mcpRoutes has run
 	rulingDir     string                // the judgment PDFs, one per ruling: see rulingfiles.go
@@ -78,9 +77,6 @@ type Server struct {
 
 	funcs template.FuncMap // the shared template funcs, before the language ones: LayoutFrames
 }
-
-// SetEvents turns on the anonymous usage record (see events.go).
-func (s *Server) SetEvents(e *Events) { s.ev = e }
 
 // SetAnalytics turns on the browser analytics: pages load ga.js, which
 // sends to LebaneseLegislation.com's own Google Analytics property. internal/app turns it on unless ANALYTICS=off, which the

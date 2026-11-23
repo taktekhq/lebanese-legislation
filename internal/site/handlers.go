@@ -863,7 +863,6 @@ func (s *Server) lawPage(w http.ResponseWriter, r *http.Request, part int) {
 			return
 		}
 	}
-	s.trackRead(r, l, "")
 	bn := s.bundle(r)
 	l.Answer = lawAnswer(bn, l)
 	l.Updated = s.pageUpdated(r, l.Changed, l.lastAmendment())
@@ -969,7 +968,6 @@ func (s *Server) article(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		p := s.articlePage(r, l, i)
-		s.trackRead(r, l, a.Number)
 		p.NoIndex = shortTextHidden(len(l.List)) || s.noindexed(ctx, "article", l.ID, a.Position)
 		s.weakText(ctx, r, &p, l.ID)
 		p.Data.(map[string]any)["Topics"] = s.topicsFor(r, l.ID, a.Number)

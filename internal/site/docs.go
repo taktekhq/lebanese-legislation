@@ -672,23 +672,15 @@ func (s *Server) search(w http.ResponseWriter, r *http.Request) {
 	if res.Q != "" {
 		// "المادة 248 موجبات وعقود": straight to the article when one code matches.
 		if to := s.articleRef(ctx, res.Q); to != "" {
-			s.track(r, map[string]any{"k": "search", "q": NormQuery(res.Q), "n": 1, "via": "article"})
 			http.Redirect(w, r, to, http.StatusFound)
 			return
 		}
-		var how string
 		var err error
-		res, how, err = s.searchCached(ctx, res.Q)
+		res, _, err = s.searchCached(ctx, res.Q)
 		if err != nil {
 			s.fail(w, r, err)
 			return
 		}
-		ev := map[string]any{"k": "search", "q": NormQuery(res.Q)}
-		if how != "" {
-			ev["via"] = how
-		}
-		ev["n"], ev["laws"], ev["articles"], ev["rulings"] = res.LawCount+res.ArtCount+res.RulCount, res.LawCount, res.ArtCount, res.RulCount
-		s.track(r, ev)
 	}
 	res.AskAI = s.meaning != nil && IsQuestion(res.Q)
 	title := s.brandTitle(r, s.trOr(r, "Search", "search.title"))

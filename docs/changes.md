@@ -2,6 +2,8 @@
 
 ## 23 November 2026
 
+- The student editor program is gone: no students section on the contribute page or in the READMEs, no student journal post, no contribute share image that advertised it.
+- No analytics events. `ga.js` is the plain GA4 page tag: page views only, no custom events (`document_open`, `search`, `cite_copy`, `navigation_click` and the rest are gone). The server keeps no usage record (`-events` and `cmd/usage-stats` are removed), and the MCP server and badges send nothing to GA4.
 - PostHog is gone. Nothing on the site, the server, the MCP server or the Workers sends to PostHog any more: no `ph.js`, no `/ph/` relay, no server `ai_question` or `$ai_generation` events, no MCP or badge events, no Markdown request counter, and no daily `stats.yml` job (`cmd/repo-stats` is deleted). Google Analytics stays.
 - With it go the features that only fed PostHog: the "Was this answer helpful?" thumbs under an AI answer, the footer's "Report an error on this page" note, and the editor link tracking (`?editor=`). The privacy page says we stopped using PostHog.
 

@@ -189,48 +189,23 @@ func optString(v any) any {
 	return nil
 }
 
-// handleRPC answers one JSON-RPC request and appends what happened to
-// events, for GA4.
-func (s *Server) handleRPC(r *http.Request, req rpcRequest, events *[]gaEvent) obj {
+// handleRPC answers one JSON-RPC request.
+func (s *Server) handleRPC(r *http.Request, req rpcRequest) obj {
 	switch req.methodName() {
 	case "initialize":
 		p := objectParams(req.params)
-		info, _ := p["clientInfo"].(map[string]any)
-		ev := gaEvent{name: "mcp_initialize", params: obj{
-			{"client_name", optString(info["name"])}, {"client_version", optString(info["version"])}, {"protocol_version", optString(p["protocolVersion"])},
-		}}
-		*events = append(*events, ev)
 		return rpcResult(req.id, initializeResult(p))
 	case "ping":
 		return rpcResult(req.id, obj{})
 	case "tools/list":
-		*events = append(*events, gaEvent{name: "mcp_tools_list", params: obj{}})
 		return rpcResult(req.id, obj{{"tools", toolsCompact}})
 	case "tools/call":
-		return s.handleToolsCall(r.Context(), req, events)
+		return s.handleToolsCall(r.Context(), req)
 	}
 	return rpcError(req.id, rpcMethodNotFound, "unknown method "+req.methodName())
 }
 
-// toolCallEvent describes one tools/call for GA4: which tool, whether it
-// came from the cache or failed, and for searches what was searched.
-func toolCallEvent(name string, a map[string]any, cacheHit, isError bool) gaEvent {
-	p := obj{{"tool_name", name}, {"cache_hit", b2i(cacheHit)}, {"is_error", b2i(isError)}}
-	if name == "search_legislation" {
-		p.set("search_term", optString(a["query"]))
-		p.set("search_kind", optString(a["kind"]))
-	}
-	return gaEvent{name: "mcp_tool_call", params: p}
-}
-
-func b2i(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
-}
-
-func (s *Server) handleToolsCall(ctx context.Context, req rpcRequest, events *[]gaEvent) obj {
+func (s *Server) handleToolsCall(ctx context.Context, req rpcRequest) obj {
 	p := objectParams(req.params)
 	if !truthy(p["name"]) {
 		return rpcError(req.id, rpcInvalidParams, "tools/call needs a tool name")
@@ -241,13 +216,11 @@ func (s *Server) handleToolsCall(ctx context.Context, req rpcRequest, events *[]
 		a = map[string]any{}
 	}
 	if !isKnownTool(name) {
-		*events = append(*events, toolCallEvent(name, map[string]any{}, false, true))
 		return rpcError(req.id, rpcInvalidParams, "unknown tool "+name)
 	}
 	argsJSON := mustMarshal(a)
 	key := name + "\x00" + argsJSON
 	if hit, found := s.results.get(key); found {
-		*events = append(*events, toolCallEvent(name, a, true, false))
 		return rpcResult(req.id, toolContent(hit.text, false))
 	}
 
@@ -262,10 +235,8 @@ func (s *Server) handleToolsCall(ctx context.Context, req rpcRequest, events *[]
 			err = errTimeout
 		}
 		s.logf("mcp tools/call %s: %v", name, err)
-		*events = append(*events, toolCallEvent(name, a, false, true))
 		return rpcError(req.id, rpcInternalError, "internal error")
 	}
-	*events = append(*events, toolCallEvent(name, a, false, res.isError))
 	text := mustMarshal(res.body)
 	count := resultCount(res.body)
 	if !res.isError {

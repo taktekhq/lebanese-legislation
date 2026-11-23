@@ -35,8 +35,7 @@
   <a href="https://lebaneselegislation.com/ai/">AI and MCP</a> ·
   <a href="https://lebaneselegislation.com/developers/">API</a> ·
   <a href="https://huggingface.co/taktekhq">Data on Hugging Face</a> ·
-  <a href="https://lebaneselegislation.com/blog/">Journal</a> ·
-  <a href="#students-get-paid-to-study-with-it">Students</a>
+  <a href="https://lebaneselegislation.com/blog/">Journal</a>
 </p>
 
 <p align="center">
@@ -91,7 +90,6 @@ git clone https://github.com/taktekhq/lebanese-legislation.git && cd lebanese-le
 | The original court scans | [Court scans on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-court-scans) |
 | Every source page as it was served | [Archive dataset on Hugging Face](https://huggingface.co/datasets/taktekhq/lebanese-legislation-archive) and [its repository](https://github.com/taktekhq/lebanese-legislation-archive) |
 | What changed and why | The [project journal](https://lebaneselegislation.com/blog/) and [docs/changes.md](docs/changes.md) |
-| Get paid to study with it (students in Lebanon) | [The student program](#students-get-paid-to-study-with-it) |
 
 Data lives on Hugging Face. Code and Docker images live here. Each GitHub release is a code version, never a data download.
 
@@ -206,14 +204,6 @@ existing immutable release versions are retained and new versions are added when
 | [`workers/`](workers/) | Cloudflare Workers, including the static-site router and its dynamic container. |
 
 `compose.yaml` runs the four images. `compose.build.yaml` builds them from this checkout instead. `compose.local.yaml` selects an already built database image. `server.json` is the [MCP Registry](https://registry.modelcontextprotocol.io/) entry and `.mcp.json` the client configuration for the hosted server.
-
-## Students: get paid to study with it
-
-If you study law or political science at a Lebanese university right now, we pay
-$10 for every week you study with the site (at least 2 days a week), paid monthly,
-until March 2027. You tell us what is wrong, missing or hard to use, and fill in
-a 10-minute form once a month. We chose to spend this money on students instead
-of ads. [Apply on LinkedIn](https://www.linkedin.com/jobs/view/4483994893/).
 
 ## Contribute and licence
 

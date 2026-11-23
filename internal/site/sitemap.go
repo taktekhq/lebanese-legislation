@@ -556,8 +556,7 @@ func (s *Server) lawMods(ctx context.Context, ids []int) (map[int]time.Time, err
 	return out, rows.Err()
 }
 
-// mostRead are the texts people read most in the last two weeks (the usage
-// record, people only), then the most cited by rulings and other texts, up to n.
+// mostRead are the texts most cited by rulings and other texts, up to n.
 func (s *Server) mostRead(ctx context.Context, n int) ([]int, error) {
 	var ids []int
 	seen := map[int]bool{}
@@ -565,22 +564,6 @@ func (s *Server) mostRead(ctx context.Context, n int) ([]int, error) {
 		if id > 0 && !seen[id] && len(ids) < n {
 			seen[id] = true
 			ids = append(ids, id)
-		}
-	}
-	if s.ev != nil {
-		reads := map[string]int{}
-		for d := 0; d < 14; d++ {
-			day, err := lawReads(s.ev.dir, time.Now().UTC().AddDate(0, 0, -d).Format("2006-01-02"))
-			if err != nil {
-				continue
-			}
-			for _, c := range top(day, nil, 15) { // each day's top texts, as the day's stats list them
-				reads[c.Key] += c.N
-			}
-		}
-		for _, c := range top(reads, nil, n) {
-			id, _ := strconv.Atoi(c.Key)
-			add(id)
 		}
 	}
 	rows, err := s.db.Query(ctx, `SELECT x.law_id FROM reference x JOIN legislation l ON l.id = x.law_id

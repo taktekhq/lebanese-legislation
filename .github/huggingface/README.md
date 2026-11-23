@@ -113,8 +113,7 @@ configs:
   <a href="https://lebaneselegislation.com/ai/">AI and MCP</a> ·
   <a href="https://lebaneselegislation.com/developers/">API</a> ·
   <a href="https://github.com/taktekhq/lebanese-legislation">Code on GitHub</a> ·
-  <a href="https://lebaneselegislation.com/blog/">Journal</a> ·
-  <a href="#students-get-paid-to-study-with-it">Students</a>
+  <a href="https://lebaneselegislation.com/blog/">Journal</a>
 </p>
 
 <p align="center">
@@ -247,10 +246,6 @@ runs `build`, then `publish` and `vectorize`. `cmd/export-vectors` exports the
 chunks; `cmd/embed-missing` embeds new chunks under a daily budget ($1, 20,000
 chunks), and nothing is published while a current chunk has no vector;
 `cmd/vectorize-sync` uploads only changed vectors on later runs.
-
-## Students: get paid to study with it
-
-Studying law or political science at a Lebanese university? We pay current students to study with the site and tell us what to fix, instead of spending on ads: [the student program](https://lebaneselegislation.com/contribute/#students).
 
 ## Citation
 

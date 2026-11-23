@@ -39,22 +39,12 @@ const (
 	callTimeout     = 5 * time.Second  // per tools/call budget
 	cacheTTL        = 60 * time.Second // identical tool calls, briefly
 	defaultLimitMin = 60               // requests per IP per minute
-	mcpPage         = "https://lebaneselegislation.com/mcp"
 	setupPage       = "https://lebaneselegislation.com/ai/"
 )
 
 // Config holds the optional settings. The zero value serves the tools with
-// the per-IP limit on and every analytics stream off.
+// the per-IP limit on.
 type Config struct {
-	// GA4 Measurement Protocol, one stream per source; a stream is off
-	// unless both its measurement ID and its API secret are set. Never point
-	// them at the website's own property: machine calls then read as site
-	// visitors.
-	GAMCPMeasurementID string
-	GAMCPAPISecret     string
-	GAHFMeasurementID  string
-	GAHFAPISecret      string
-
 	// RateLimitPerMinute is the per-IP limit on /mcp (60 when 0, off when
 	// negative).
 	RateLimitPerMinute int
@@ -85,19 +75,13 @@ type Config struct {
 	Logf func(format string, args ...any)
 }
 
-// ConfigFromEnv reads the Worker's variable names: GA_MCP_MEASUREMENT_ID,
-// GA_MCP_API_SECRET, GA_HF_MEASUREMENT_ID, GA_HF_API_SECRET, plus MCP_RATE_LIMIT (requests per IP per
-// minute, negative for none) and MCP_CALL_UNITS (CallUnits). getenv is os.Getenv when nil.
+// ConfigFromEnv reads MCP_RATE_LIMIT (requests per IP per minute, negative
+// for none) and MCP_CALL_UNITS (CallUnits). getenv is os.Getenv when nil.
 func ConfigFromEnv(getenv func(string) string) Config {
 	if getenv == nil {
 		getenv = os.Getenv
 	}
-	c := Config{
-		GAMCPMeasurementID: getenv("GA_MCP_MEASUREMENT_ID"),
-		GAMCPAPISecret:     getenv("GA_MCP_API_SECRET"),
-		GAHFMeasurementID:  getenv("GA_HF_MEASUREMENT_ID"),
-		GAHFAPISecret:      getenv("GA_HF_API_SECRET"),
-	}
+	c := Config{}
 	if v, err := strconv.Atoi(getenv("MCP_RATE_LIMIT")); err == nil {
 		c.RateLimitPerMinute = v
 	}
@@ -117,7 +101,6 @@ type Server struct {
 	limiter   *rateLimiter        // nil when off
 	calls     *semaphore.Weighted // tools/call DB work in flight; nil when off
 	callUnits int
-	bg        sync.WaitGroup
 
 	counts memo.Map // the paged tools' totals (count.go)
 
@@ -160,9 +143,6 @@ func newServer(db querier, cfg Config) *Server {
 	return s
 }
 
-// Flush waits for the analytics sends still in flight (at shutdown).
-func (s *Server) Flush() { s.bg.Wait() }
-
 func (s *Server) now() time.Time {
 	if s.cfg.Now != nil {
 		return s.cfg.Now()
@@ -179,11 +159,6 @@ func (s *Server) logf(format string, args ...any) {
 	}
 	log.Printf(format, args...)
 }
-
-func (s *Server) mcpStream() gaStream {
-	return gaStream{s.cfg.GAMCPMeasurementID, s.cfg.GAMCPAPISecret}
-}
-func (s *Server) hfStream() gaStream { return gaStream{s.cfg.GAHFMeasurementID, s.cfg.GAHFAPISecret} }
 
 func setCORS(h http.Header) {
 	h.Set("Access-Control-Allow-Origin", "*")
@@ -212,15 +187,6 @@ func writeJSON(w http.ResponseWriter, status int, body any, extra map[string]str
 // address, else the connection's address. X-Forwarded-For is not used: a
 // client sets it freely, so a new value each time would be a new bucket.
 func rateLimitIP(r *http.Request) string {
-	if v := r.Header.Get("CF-Connecting-IP"); v != "" {
-		return v
-	}
-	return remoteHost(r)
-}
-
-// analyticsIP is the visitor address the analytics hash: Cloudflare's
-// client address, else the connection's address.
-func analyticsIP(r *http.Request) string {
 	if v := r.Header.Get("CF-Connecting-IP"); v != "" {
 		return v
 	}
@@ -318,15 +284,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		defer release()
 	}
 
-	var events []gaEvent
-	resp := s.handleRPC(r, req, &events)
-	ua := r.Header.Get("User-Agent")
-	for i := range events {
-		events[i].params.set("page_location", mcpPage)
-		events[i].params.set("page_title", "MCP server")
-		events[i].params.set("client_ua", clip(ua, gaMaxValue))
-	}
-	s.track(s.mcpStream(), r, events)
+	resp := s.handleRPC(r, req)
 	writeJSON(w, http.StatusOK, resp, nil)
 }
 
