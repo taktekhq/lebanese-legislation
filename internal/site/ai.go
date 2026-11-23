@@ -33,8 +33,9 @@ type composedEntry struct {
 }
 
 type aiPara struct {
-	Text string
-	Refs []int // 1-based, into aiView.Sources
+	Text  string
+	Refs  []int  // 1-based, into aiView.Sources
+	Basis string // what it rests on: articles of a law, a ruling, or neither (labelBases)
 }
 
 // aiSource is a cited page and the exact words of it the answer quotes.
@@ -168,6 +169,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 		}
 		if len(view.Paras) > 0 {
 			s.dateSources(r, view.Sources)
+			s.labelBases(r, &view)
 		}
 		if err := ts["search"].ExecuteTemplate(w, "ai_answer", view); err != nil {
 			logError(r, "ai answer render", err)
@@ -286,7 +288,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 		moreVec, moreTerms := s.deepSources(ctx, q, res, append(append([]answerSource{}, vec...), terms...))
 		vec, terms = append(vec, moreVec...), append(terms, moreTerms...)
 	}
-	sources := vectorFirst(vec, terms, limit)
+	sources := exactSources(vectorFirst(vec, terms, limit))
 	if len(sources) == 0 {
 		render()
 		return

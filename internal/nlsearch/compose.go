@@ -36,7 +36,8 @@ Write the answer in the same language as the question, whatever language it is (
 Return only JSON {"paragraphs":[{"text":"...","quotes":[{"source":"supplied ID","quote":"..."}]}]}.
 - {{LENGTH}} The first paragraph answers the question directly in one or two sentences (yes, no, it depends on ...), then the rest explains the conditions and exceptions.
 - Every paragraph has 1 to 3 quotes: the passage ID and the exact words from that passage that support the paragraph, copied character for character in the passage's own language (do not translate, fix spelling or shorten inside a quote), one sentence or clause each, at most 300 characters. A quote is one unbroken stretch of the passage: never skip words with \"...\", and never add or change a letter at its start or end to make it read as a sentence. Name the law and article in the text when the passage gives them.
-- Passages marked as court rulings are decisions in one case: say so, do not present them as general rules.
+- Passages marked as court rulings are decisions in one case: say so, name the court and date when the passage gives them, and do not present them as general rules.
+- Never state an exception, a condition or an interpretation without its conditions and the passage it comes from. If no supplied passage supports a point, say plainly that the texts found do not cover it; never point the reader to a search instead.
 - Plain words, no headings, no lists, no markdown, no legal advice wording ("you should hire ..."), no disclaimers: the page adds its own.
 - If the passages do not answer the question, return {"paragraphs":[]}. A partial answer is fine: say what the passages do not cover inside a paragraph that also quotes what they do say, never in a paragraph of its own.`
 

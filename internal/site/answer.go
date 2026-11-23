@@ -163,6 +163,7 @@ func (s *Server) answer(w http.ResponseWriter, r *http.Request) {
 			sources = mergeAnswerSources(sources, extra)
 		}
 	}
+	sources = exactSources(sources)
 	if len(sources) == 0 {
 		render()
 		return
