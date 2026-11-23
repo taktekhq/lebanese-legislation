@@ -11,9 +11,8 @@
 //
 // It checks, per device and page:
 //   GA4      a page_view for G-RDYRK422NP with the page's real title and the
-//            full address (utm_source kept), and no ep.source/medium/campaign
-//   named    the event the page sends besides the page view:
-//            "search" with search_term, "blog_read" or "document_open"
+//            full address (utm_source kept), no ep.source/medium/campaign,
+//            and no event besides page_view
 // Exit 0 when all pass, 1 otherwise. Needs Node 18.17 or newer.
 "use strict";
 const { chromium, devices } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
@@ -47,12 +46,7 @@ async function visit(browser, device, path) {
   await page.mouse.move(200, 200);
   const title = await page.title();
   const deadline = Date.now() + 20000;
-  const isSearch = path.startsWith("/search/");
-  // The named event each kind of page sends besides the page view.
-  const bare = path.replace(/^\/en\//, "/");
-  const named = isSearch ? "search" : /^\/blog\/[^/]+\//.test(bare) ? "blog_read"
-    : /^\/(law|decree|text|ruling|gazette|opinion|agreement|doctrine|research)\/\d/.test(bare) ? "document_open" : null;
-  const done = () => ga.some((e) => e.en === "page_view") && (!named || ga.some((e) => e.en === named));
+  const done = () => ga.some((e) => e.en === "page_view");
   while (!done() && Date.now() < deadline) await page.waitForTimeout(250);
   await context.close();
 
@@ -67,11 +61,8 @@ async function visit(browser, device, path) {
   for (const e of ga) {
     for (const k of ["ep.source", "ep.medium", "ep.campaign"]) if (k in e) fails.push(`GA4: ${e.en} carries ${k}=${e[k]}`);
   }
-  if (named) {
-    const gn = ga.find((e) => e.en === named);
-    if (!gn) fails.push(`GA4: no ${named}`);
-    if (isSearch && !(gn && gn["ep.search_term"])) fails.push("search: search_term missing");
-  }
+  // Page views only: no custom events (23 Nov 2026).
+  for (const e of ga) if (e.en !== "page_view") fails.push(`GA4: custom event ${e.en}`);
   return {
     device, path, title, fails,
     ga: [...new Set(ga.map((e) => e.en))],

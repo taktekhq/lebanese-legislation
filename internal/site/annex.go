@@ -18,8 +18,7 @@ import (
 // under the article (the Social Security Law's Articles 49 to 54 in 1963).
 // Machine transcription by two Gemini readings; where they differed, a Gemini
 // model decided from the page, and those rows say so. Nizar, 5 Nov 2026: "No
-// one will [check them], just put them live. And the students will check
-// whatever they are studying." The University's text stays the text: a first
+// one will [check them], just put them live." The University's text stays the text: a first
 // wording sits beside it, never instead of it.
 
 // Annex is the tables annexed to a text, as read from the Gazette's pages.

@@ -1027,12 +1027,8 @@
         "Body": "The footer of every page now has \"Report an error on this page\". It opens a short note and sends it with the page's address and language. This is how a reader tells us a text is wrong, cut short or missing, without writing an email."
       },
       {
-        "Heading": "Student editors see that their link worked.",
-        "Body": "Students in our paid program open the site through a personal link. The site now shows a small label, \"Editor: \" and their name, at the bottom corner of every page, in English and Arabic. Before, a student could not tell whether a visit counted."
-      },
-      {
         "Heading": "Smaller things.",
-        "Body": "The contribute page has its own share image in each language, so a link sent to a student shows what the program is and that it pays $10 a week to accepted students. Arabic filter chips are 12% larger: on the laws list at phone width, 27 chips fit and none runs off the screen."
+        "Body": "Arabic filter chips are 12% larger: on the laws list at phone width, 27 chips fit and none runs off the screen."
       }
     ],
     "SectionsAr": [
@@ -1049,12 +1045,8 @@
         "Body": "صار في تذييل كل صفحة «أبلغ عن خطأ في هذه الصفحة». يفتح ملاحظة قصيرة ويرسلها مع عنوان الصفحة ولغتها. هكذا يخبرنا القارئ أن نصاً خاطئ أو مبتور أو ناقص، من دون كتابة بريد إلكتروني."
       },
       {
-        "Heading": "الطلاب المحررون يرون أن رابطهم نجح.",
-        "Body": "يفتح الطلاب في برنامجنا المدفوع الموقع عبر رابط شخصي. صار الموقع يعرض شارة صغيرة، «المحرّر:» مع الاسم، في الزاوية السفلى من كل صفحة، بالعربية والإنكليزية. قبل ذلك لم يكن الطالب يعرف إن كانت زيارته قد احتُسبت."
-      },
-      {
         "Heading": "أشياء أصغر.",
-        "Body": "صار لصفحة المساهمة صورة مشاركة خاصة بكل لغة، فالرابط المرسل إلى طالب يُظهر ما هو البرنامج وأنه يدفع 10 دولارات في الأسبوع للطلاب المقبولين. وكبرت أزرار التصفية العربية بـ12%: في قائمة القوانين بعرض الهاتف تتسع 27 زراً ولا يخرج أي منها عن الشاشة."
+        "Body": "كبرت أزرار التصفية العربية بـ12%: في قائمة القوانين بعرض الهاتف تتسع 27 زراً ولا يخرج أي منها عن الشاشة."
       }
     ],
     "Action": "Ask a question",
@@ -1074,16 +1066,6 @@
         "URL": "https://github.com/taktekhq/lebanese-legislation/pull/145",
         "Label": "Report an error on every page",
         "LabelAr": "الإبلاغ عن خطأ في كل صفحة"
-      },
-      {
-        "URL": "https://github.com/taktekhq/lebanese-legislation/pull/168",
-        "Label": "The editor label",
-        "LabelAr": "شارة المحرّر"
-      },
-      {
-        "URL": "/contribute/",
-        "Label": "The student program",
-        "LabelAr": "برنامج الطلاب"
       }
     ],
     "ResourceURL": "",
@@ -1588,79 +1570,6 @@
     "ResourceLabel": "How to update the data",
     "ResourceLabelAr": "كيف تحدّث البيانات",
     "Updated": "2026-11-04"
-  },
-  {
-    "Slug": "students-paid-instead-of-ads",
-    "Milestone": "2026-11-03",
-    "Published": "2026-11-03",
-    "Commit": "",
-    "EvidenceKind": "publication-record",
-    "Title": "We pay students to study with the site, instead of buying ads",
-    "TitleAr": "ندفع للطلاب ليدرسوا بالموقع بدلاً من شراء الإعلانات",
-    "Summary": "Current law and political science students at Lebanese universities get $10 for every week they study with Lebanese Legislation and tell us what is wrong. The money we would have spent on ads goes to them.",
-    "SummaryAr": "يتقاضى طلاب الحقوق والعلوم السياسية الحاليون في الجامعات اللبنانية 10 دولارات عن كل أسبوع يدرسون فيه باستخدام موقع التشريع اللبناني ويخبروننا بما هو خاطئ. المال الذي كنا سننفقه على الإعلانات يذهب إليهم.",
-    "Sections": [
-      {
-        "Heading": "Why students, and why not ads.",
-        "Body": "A free public library is only useful if people use it and it is right. Ads would bring visits. Students bring visits and corrections: they read these texts every week for their exams, and they notice when an article is missing, a date is wrong or a search finds nothing. So the budget we had for ads goes to them."
-      },
-      {
-        "Heading": "What we ask.",
-        "Body": "Use the site when you study, at least 2 days a week. Tell us when something is wrong, missing or hard to use. Fill in a 10-minute feedback form once a month. Be honest: what is bad helps us more than what is good."
-      },
-      {
-        "Heading": "What we pay.",
-        "Body": "$10 for every week you study with it, paid monthly. Errors you report carry your name on that law, linked to your LinkedIn profile, and you get a public contributor profile you can put on your CV. The program runs until March 2027."
-      },
-      {
-        "Heading": "Who can apply.",
-        "Body": "Students currently enrolled in law or political science at a Lebanese university, in any year, who study Lebanese law in Arabic. Graduates and professionals cannot apply to this one. Intake is rolling: apply on LinkedIn at any time and we reply within a week. If you are picked, we ask for your student ID or university email."
-      },
-      {
-        "Heading": "Independent, and open.",
-        "Body": "Lebanese Legislation is an independent project by Taktek. It is not affiliated with the Lebanese University, any other university or any government body. The texts come from the Lebanese University's Centre for Research and Studies in Legal Informatics, every page links to the Centre's record, and the code and data are public on GitHub and Hugging Face."
-      }
-    ],
-    "SectionsAr": [
-      {
-        "Heading": "لماذا الطلاب، ولماذا لا الإعلانات.",
-        "Body": "لا تفيد مكتبة عامة مجانية إلا إذا استخدمها الناس وكانت صحيحة. الإعلانات تجلب الزيارات. أما الطلاب فيجلبون الزيارات والتصحيحات: يقرأون هذه النصوص كل أسبوع استعداداً لامتحاناتهم، ويلاحظون حين تنقص مادة أو يكون تاريخ خاطئاً أو لا يجد البحث شيئاً. لذلك تذهب الميزانية التي خصصناها للإعلانات إليهم."
-      },
-      {
-        "Heading": "ما نطلبه.",
-        "Body": "استخدم الموقع حين تدرس، يومين في الأسبوع على الأقل. أخبرنا حين يكون شيء خاطئاً أو ناقصاً أو صعب الاستخدام. واملأ استمارة ملاحظات من 10 دقائق مرة في الشهر. كن صريحاً: ما هو سيئ يفيدنا أكثر مما هو جيد."
-      },
-      {
-        "Heading": "ما ندفعه.",
-        "Body": "10 دولارات عن كل أسبوع تدرس فيه باستخدامه، تُدفع شهرياً. الأخطاء التي تبلّغ عنها تحمل اسمك على ذلك القانون، مع رابط إلى حسابك على LinkedIn، وتحصل على صفحة مساهم علنية يمكنك وضعها في سيرتك الذاتية. يستمر البرنامج حتى آذار 2027."
-      },
-      {
-        "Heading": "من يمكنه التقديم.",
-        "Body": "الطلاب المسجلون حالياً في الحقوق أو العلوم السياسية في جامعة لبنانية، في أي سنة، ممن يدرسون القانون اللبناني بالعربية. لا يمكن للخريجين والمهنيين التقديم إلى هذا البرنامج. القبول مفتوح باستمرار: قدّم على LinkedIn في أي وقت ونرد خلال أسبوع. إذا وقع الاختيار عليك، نطلب بطاقتك الجامعية أو بريدك الجامعي."
-      },
-      {
-        "Heading": "مستقل ومفتوح.",
-        "Body": "التشريع اللبناني مشروع مستقل من Taktek. لا يتبع الجامعة اللبنانية ولا أي جامعة أخرى ولا أي جهة حكومية. تأتي النصوص من مركز الدراسات والأبحاث في المعلوماتية القانونية في الجامعة اللبنانية، وكل صفحة تربط بسجل المركز، والشيفرة والبيانات منشورة للعموم على GitHub وHugging Face."
-      }
-    ],
-    "Action": "Read about the student program",
-    "ActionPath": "/contribute/",
-    "Sources": [
-      {
-        "URL": "https://www.linkedin.com/jobs/view/4483994893/",
-        "Label": "The student program listing on LinkedIn",
-        "LabelAr": "إعلان برنامج الطلاب على LinkedIn"
-      },
-      {
-        "URL": "https://x.com/nizarmah_/status/2117298198557364240",
-        "Label": "The announcement by Nizar Mahmoud",
-        "LabelAr": "إعلان نزار محمود"
-      }
-    ],
-    "ResourceURL": "https://www.linkedin.com/jobs/view/4483994893/",
-    "ResourceLabel": "Apply on LinkedIn",
-    "ResourceLabelAr": "قدّم طلبك على LinkedIn",
-    "Updated": "2026-11-03"
   },
   {
     "Slug": "cloudflare-only-latest-images",

@@ -47,7 +47,6 @@ type config struct {
 	addr        string // -addr, or LISTEN_ADDR, or the mode's usual port
 	authFile    string // -auth: a file holding user:password; every page asks for it
 	noindex     bool   // -noindex: keep the site out of search engines
-	events      string // -events: folder for the anonymous usage record
 	official    string // -official: page images and PDFs of texts from official scans
 	rulingFiles string // -ruling-files: the judgment PDFs, served at /ruling-files/<id>.pdf
 }
@@ -105,7 +104,6 @@ func parseFlags(mode string, args []string, stderr io.Writer) (config, error) {
 	fs.StringVar(&cfg.addr, "addr", listenAddr(mode), "address to listen on (default $LISTEN_ADDR, then the mode's port on loopback)")
 	fs.StringVar(&cfg.authFile, "auth", "", "preview mode: a file holding user:password; every page then asks for it and is marked noindex")
 	fs.BoolVar(&cfg.noindex, "noindex", false, "keep the site out of search engines")
-	fs.StringVar(&cfg.events, "events", "", "keep the anonymous usage record (searches, reads, AI sign-ups) in this folder")
 	fs.StringVar(&cfg.official, "official", "", "folder of page images and PDFs for texts published from official scans")
 	fs.StringVar(&cfg.rulingFiles, "ruling-files", "", "folder of judgment PDFs, served at /ruling-files/<id>.pdf (empty: none)")
 	if err := fs.Parse(args); err != nil {
@@ -174,13 +172,6 @@ func run(ctx context.Context, cfg config) error {
 		return err
 	}
 	h.SetRateLimit(perMinute, burst)
-	if cfg.events != "" {
-		ev, err := site.OpenEvents(cfg.events)
-		if err != nil {
-			return err
-		}
-		h.SetEvents(ev)
-	}
 	go h.WarmSitemaps(ctx) // Build the big sitemap files before a crawler needs them.
 	handler, err := modeHandler(site.SecurityHeaders(site.Compress(h)), cfg.mode)
 	if err != nil {
@@ -189,7 +180,6 @@ func run(ctx context.Context, cfg config) error {
 	// The origin shares the canonical pool with the ten-tool MCP server.
 	if os.Getenv("MCP_SHARED_SERVER") == "1" {
 		mcp := mcpserver.New(pool, mcpserver.ConfigFromEnv(nil))
-		defer mcp.Flush()
 		handler = withMCP(handler, mcp)
 	}
 	if cfg.noindex {

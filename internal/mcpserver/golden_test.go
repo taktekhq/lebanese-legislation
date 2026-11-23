@@ -133,16 +133,6 @@ func TestGoldenDateBound(t *testing.T) {
 	}
 }
 
-func TestGoldenIDs(t *testing.T) {
-	g := loadGolden(t)
-	for _, r := range rows(t, g["visitorIds"]) {
-		c, s := visitorIDs(str(t, r[0]), str(t, r[1]), str(t, r[2]))
-		if !sameJSON(t, map[string]string{"clientId": c, "sessionId": s}, r[3]) {
-			t.Errorf("visitorIDs(%s, %s, %s) = %s %s, the Worker gives %s", r[0], r[1], r[2], c, s, r[3])
-		}
-	}
-}
-
 func TestGoldenBadges(t *testing.T) {
 	g := loadGolden(t)
 	for _, r := range rows(t, g["thousands"]) {
@@ -169,28 +159,4 @@ func TestGoldenBadges(t *testing.T) {
 			t.Errorf("badgeDay(%s) = %s, the Worker gives %s", r[0], got, r[1])
 		}
 	}
-}
-
-func TestGoldenGAPayload(t *testing.T) {
-	var want []json.RawMessage
-	if err := json.Unmarshal(loadGolden(t)["gaPayload"], &want); err != nil {
-		t.Fatal(err)
-	}
-	got := []obj{
-		gaPayload("1.2", "99", location{"LB", "Beirut", "BA"}, []gaEvent{{name: "mcp_tool_call", params: obj{{"tool_name", "get_law"}, {"search_term", nil}, {"search_kind", ""}}}}),
-		gaPayload("1.2", "9", location{}, []gaEvent{{name: "e", params: obj{{"search_term", stringsRepeat("ق", 300)}, {"n", 3}}}}),
-	}
-	for i := range got {
-		if b := mustMarshal(got[i]); !sameJSON(t, got[i], want[i]) {
-			t.Errorf("gaPayload %d = %s, the Worker gives %s", i, b, want[i])
-		}
-	}
-}
-
-func stringsRepeat(s string, n int) string {
-	out := ""
-	for i := 0; i < n; i++ {
-		out += s
-	}
-	return out
 }

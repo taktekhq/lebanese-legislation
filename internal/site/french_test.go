@@ -66,7 +66,7 @@ func TestFrenchSendsOtherPagesToEnglish(t *testing.T) {
 		}
 	}
 	for p, want := range map[string]string{"/law/1/": "/en/law/1/", "/about/": "/fr/about/", "/laws/?kind=x": "/fr/laws/?kind=x",
-		"/contribute/#students": "/fr/contribute/#students", "/topic/rent/": "/en/topic/rent/", "/blog/": "/en/blog/"} {
+		"/contribute/#code": "/fr/contribute/#code", "/topic/rent/": "/en/topic/rent/", "/blog/": "/en/blog/"} {
 		if got := frLink(p); got != want {
 			t.Errorf("frLink(%s) = %s, want %s", p, got, want)
 		}

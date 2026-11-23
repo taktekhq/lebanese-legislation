@@ -400,8 +400,6 @@ func (s *Server) apiSearch(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	out.NextCursor = encodeSearchCursor(typ, out.next)
-	s.track(r, map[string]any{"k": "search", "q": NormQuery(q), "api": true,
-		"n": out.LawCount + out.ArtCount + out.RulCount + out.GazCount})
 	s.writeJSON(w, 200, out)
 }
 
@@ -808,8 +806,7 @@ func (s *Server) loadLawOutline(ctx context.Context, id int) (*Law, error) {
 
 // lawDetail loads a law and builds the shape /api/v1/law/{id} and the (not
 // yet wired) MCP get_law tool both return; see api.go's package doc. It
-// returns the loaded Law too, so a caller can track a read (trackRead) the
-// way the HTTP handler does.
+// returns the loaded Law too.
 func (s *Server) lawDetail(ctx context.Context, id int) (*Law, apiLawDetail, error) {
 	l, err := s.loadLawOutline(ctx, id)
 	if err != nil {
@@ -866,7 +863,7 @@ func (s *Server) apiLaw(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-	l, out, err := s.lawDetail(ctx, id)
+	_, out, err := s.lawDetail(ctx, id)
 	if err != nil {
 		if errorIsNoRows(err) {
 			s.apiNotFound(w, "law")
@@ -875,7 +872,6 @@ func (s *Server) apiLaw(w http.ResponseWriter, r *http.Request) {
 		s.apiFail(w, r, err)
 		return
 	}
-	s.trackRead(r, l, "")
 	s.writeJSON(w, 200, out)
 }
 
@@ -1012,7 +1008,7 @@ func (s *Server) apiArticle(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := s.ctx(r)
 	defer cancel()
-	l, a, out, err := s.articleDetail(ctx, id, r.PathValue("n"))
+	_, a, out, err := s.articleDetail(ctx, id, r.PathValue("n"))
 	if err != nil {
 		if errorIsNoRows(err) {
 			s.apiNotFound(w, "law")
@@ -1025,7 +1021,6 @@ func (s *Server) apiArticle(w http.ResponseWriter, r *http.Request) {
 		s.apiNotFound(w, "article")
 		return
 	}
-	s.trackRead(r, l, a.Number)
 	s.writeJSON(w, 200, out)
 }
 
