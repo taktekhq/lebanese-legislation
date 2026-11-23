@@ -190,7 +190,7 @@ func TestFileFor(t *testing.T) {
 func TestLinks(t *testing.T) {
 	html := `<a href="/law/1/">x</a><a href="/en/decree/2/article/3/#a">y</a><a href="/laws/?q=1">q</a>
 	<a href="//evil.example/">e</a><a href="https://other.example/">o</a><a href="/api/v1/laws/">api</a>
-	<a href="/en/api/v1/">api</a><a href="/ph/e/">ph</a><link href="/styles.css"><a href="/data/laws.parquet">f</a>
+	<a href="/en/api/v1/">api</a><link href="/styles.css"><a href="/data/laws.parquet">f</a>
 	<a href="/changes/feed.xml">feed</a><a data-href="/codes/">c</a>`
 	want := map[string]bool{"/law/1/": true, "/en/decree/2/article/3/": true, "/changes/feed.xml": true, "/codes/": true}
 	got := Links([]byte(html))

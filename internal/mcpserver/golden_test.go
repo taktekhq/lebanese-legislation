@@ -133,31 +133,12 @@ func TestGoldenDateBound(t *testing.T) {
 	}
 }
 
-func TestGoldenClientKind(t *testing.T) {
-	for _, r := range rows(t, loadGolden(t)["clientKind"]) {
-		ua, name, want := str(t, r[0]), str(t, r[1]), str(t, r[2])
-		if got := clientKind(ua, name, false); got != want {
-			t.Errorf("clientKind(%q, %q) = %q, the Worker gives %q", ua, name, got, want)
-		}
-	}
-}
-
 func TestGoldenIDs(t *testing.T) {
 	g := loadGolden(t)
-	for _, r := range rows(t, g["mcpSessionId"]) {
-		if got := mcpSessionID(str(t, r[0]), str(t, r[1])); got != str(t, r[2]) {
-			t.Errorf("mcpSessionID(%s, %s) = %s, the Worker gives %s", r[0], r[1], got, r[2])
-		}
-	}
 	for _, r := range rows(t, g["visitorIds"]) {
 		c, s := visitorIDs(str(t, r[0]), str(t, r[1]), str(t, r[2]))
 		if !sameJSON(t, map[string]string{"clientId": c, "sessionId": s}, r[3]) {
 			t.Errorf("visitorIDs(%s, %s, %s) = %s %s, the Worker gives %s", r[0], r[1], r[2], c, s, r[3])
-		}
-	}
-	for _, r := range rows(t, g["visitorId"]) {
-		if got := visitorID(str(t, r[0]), str(t, r[1]), str(t, r[2])); got != str(t, r[3]) {
-			t.Errorf("visitorID(%s, %s, %s) = %s, the Worker gives %s", r[0], r[1], r[2], got, r[3])
 		}
 	}
 }

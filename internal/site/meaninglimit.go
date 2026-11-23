@@ -185,7 +185,6 @@ func (m *meaningSearch) Rewrite(ctx context.Context, q string) (nlsearch.Plan, e
 	p, err := m.rw.Rewrite(ctx, q)
 	if err == nil {
 		log.Printf("ai rewrite: %d tokens in, %d out", p.InputTokens, p.OutputTokens)
-		nlsearch.AddUsage(ctx, p.InputTokens, p.OutputTokens)
 		m.mu.Lock()
 		if !m.keep(len(m.cache)) {
 			clear(m.cache)

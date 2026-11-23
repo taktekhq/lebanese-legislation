@@ -1,5 +1,10 @@
 # Changes
 
+## 23 November 2026
+
+- PostHog is gone. Nothing on the site, the server, the MCP server or the Workers sends to PostHog any more: no `ph.js`, no `/ph/` relay, no server `ai_question` or `$ai_generation` events, no MCP or badge events, no Markdown request counter, and no daily `stats.yml` job (`cmd/repo-stats` is deleted). Google Analytics stays.
+- With it go the features that only fed PostHog: the "Was this answer helpful?" thumbs under an AI answer, the footer's "Report an error on this page" note, and the editor link tracking (`?editor=`). The privacy page says we stopped using PostHog.
+
 ## 19 November 2026
 
 - Fewer PostHog events, about 10,000 a day down to about 3,000. No longer sent: `origin_request` (the Worker's timing of each origin request), server `$exception`, a liveness monitor's `$mcp_initialize` and `mcp_tools_list`, and from the browser click autocapture, dead clicks, web vitals and JavaScript errors. The speed charts in PostHog stop updating.

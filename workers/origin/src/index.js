@@ -7,7 +7,7 @@ export class Origin extends Container {
   constructor(ctx, env) {
     super(ctx, env);
     this.envVars = Object.fromEntries([
-      "GEMINI_API_KEY", "POSTHOG_KEY", "LEBLEG_SEARCH_PROVIDER",
+      "GEMINI_API_KEY", "LEBLEG_SEARCH_PROVIDER",
       "LEBLEG_VECTORIZE_INDEX", "CLOUDFLARE_ACCOUNT_ID", "LEBLEG_VECTORIZE_TOKEN",
       "LEBLEG_SEARCH_MODEL", "LEBLEG_SEARCH_SELECT_MODEL",
       "LEBLEG_SEARCH_DAILY_LIMIT", "LEBLEG_SEARCH_SHARES_DATA",

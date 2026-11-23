@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode"
 
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 )
@@ -161,11 +160,8 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 		return
 	}
 	view := aiView{PerDay: questionsPerDay, Deep: deep}
-	start := time.Now()
-	ctx, usage := nlsearch.WithUsage(r.Context())
-	var reason error // why the answer is unavailable, for the event
+	ctx := r.Context()
 	render := func() {
-		s.trackAI(r, q, view, usage, reason, time.Since(start))
 		ts := s.pages
 		if s.lang(r) == "ar" {
 			ts = s.pagesAr
@@ -178,8 +174,8 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 		}
 	}
 	if s.meaning == nil {
-		view.Unavailable, reason = true, errors.New("AI search is off")
-		log.Printf("answer unavailable: meaning search: %v", reason)
+		view.Unavailable = true
+		log.Printf("answer unavailable: meaning search: AI search is off")
 		render()
 		return
 	}
@@ -209,7 +205,6 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 	if n >= banPerDay {
 		s.meaning.bans.ban(ip)
 		log.Printf("ai answers: banned %s for %v after %d questions today", ip, banFor, n)
-		s.captureEvent("ai_ip_banned", map[string]any{"questions_today": n, "ban_days": int(banFor / (24 * time.Hour))})
 		view.Banned = true
 		render()
 		return
@@ -263,7 +258,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 	}
 	if err != nil {
 		log.Printf("answer unavailable: SearchMeaning: %v", err)
-		view.Unavailable, reason = true, err
+		view.Unavailable = true
 		render()
 		return
 	}
@@ -275,7 +270,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 	terms, err := s.answerSources(ctx, q, res)
 	if err != nil {
 		log.Printf("answer unavailable: answerSources: %v", err)
-		view.Unavailable, reason = true, err
+		view.Unavailable = true
 		render()
 		return
 	}
@@ -311,7 +306,7 @@ func (s *Server) serveAI(w http.ResponseWriter, r *http.Request, deep bool) {
 	paras, err := s.meaning.composeAnswer(ctx, q, passages, mode)
 	if err != nil {
 		log.Printf("answer unavailable: composeAnswer: %v", err)
-		view.Unavailable, reason = true, err
+		view.Unavailable = true
 		render()
 		return
 	}
@@ -367,155 +362,6 @@ func aiVisitor(w http.ResponseWriter, r *http.Request) string {
 	http.SetCookie(w, &http.Cookie{Name: "ll_ai", Value: id, Path: "/", MaxAge: 365 * 24 * 3600,
 		HttpOnly: true, Secure: r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https", SameSite: http.SameSiteLaxMode})
 	return "v:" + id
-}
-
-// Gemini 3.8 Flash and gemini-embedding-001, USD per million tokens
-// (ai.google.dev pricing, 30 Oct 2026; Flash doubles on 1 Jan 2027). Only for
-// the cost estimate in events; the rewrite runs on a cheaper Flash Lite, so
-// the estimate is on the high side.
-const (
-	aiUSDPerMIn    = 0.75
-	aiUSDPerMOut   = 3.75
-	aiUSDPerMEmbed = 0.15
-)
-
-// trackAI sends one ai_question event to PostHog for every question the box
-// answers or declines: what happened, what it cost, and how long it took.
-// Each model call the question made follows as its own $ai_generation event
-// (generationProps); a question answered from the cache makes none.
-// The browser's PostHog ID (form field ph) ties it to the visitor's session,
-// and the visitor's IP gives PostHog their country: without $ip PostHog takes
-// the address the event came from, the container's own (104.28.x.x).
-func (s *Server) trackAI(r *http.Request, q string, v aiView, u *nlsearch.Usage, reason error, took time.Duration) {
-	outcome := "answered"
-	switch {
-	case v.Banned:
-		outcome = "banned"
-	case v.SiteFull:
-		outcome = "site_full"
-	case v.Limited:
-		outcome = "limited"
-	case v.Unavailable:
-		outcome = "unavailable"
-	case v.Missing:
-		outcome = "missing_text"
-	case len(v.Paras) == 0:
-		outcome = "no_answer"
-	}
-	calls, in, out := u.Totals()
-	embeds, embedTokens := u.Embeddings()
-	mode := "quick"
-	if v.Deep {
-		mode = "deep"
-	}
-	quotes := 0
-	for _, src := range v.Sources {
-		quotes += len(src.Quotes)
-	}
-	props := map[string]any{
-		"question":        cut(q, 300),
-		"question_lang":   scriptOf(q),
-		"page_lang":       s.lang(r),
-		"outcome":         outcome,
-		"model_calls":     calls,
-		"tokens_in":       in,
-		"tokens_out":      out,
-		"embedding_calls": embeds,
-		"cost_usd":        float64(in)*aiUSDPerMIn/1e6 + float64(out)*aiUSDPerMOut/1e6 + float64(embedTokens)*aiUSDPerMEmbed/1e6,
-		"cached":          outcome == "answered" && calls == 0,
-		"mode":            mode,
-		"deep_left":       v.DeepLeft,
-		"duration_ms":     took.Milliseconds(),
-		"paragraphs":      len(v.Paras),
-		"sources":         len(v.Sources),
-		"quotes":          quotes,
-		"questions_left":  v.Left,
-		"wait_minutes":    v.WaitH*60 + v.WaitM,
-		"brought_results": v.Results != nil,
-		"bot":             IsBot(r),
-		"$ip":             clientIP(r),
-		"$geoip_disable":  false,
-	}
-	if reason != nil {
-		props["reason"] = cut(reason.Error(), 120)
-	}
-	if id := r.PostForm.Get("ph"); id != "" && len(id) <= 80 {
-		props["distinct_id"] = id
-	}
-	gens := u.Generations()
-	if len(gens) > 0 {
-		props["$ai_trace_id"] = newTraceID()
-	}
-	s.captureEvent("ai_question", props)
-	for _, g := range gens {
-		s.captureEvent("$ai_generation", generationProps(g, props["$ai_trace_id"], mode, props["distinct_id"]))
-	}
-}
-
-// aiPrices is what the code knows a model costs, USD per million tokens in
-// and out. A model that is not here is sent without a cost, and PostHog
-// prices it from its own table.
-var aiPrices = map[string][2]float64{"gemini-3.8-flash": {aiUSDPerMIn, aiUSDPerMOut}}
-
-// generationProps describes one model call as PostHog's LLM analytics event
-// ($ai_generation): model, tokens, seconds, HTTP status, and the cost when
-// aiPrices has the model. The calls of one question share its trace id, which
-// the ai_question event carries too. Never the question, the passages or the
-// answer ($ai_input, $ai_output_choices), and no IP: the visitor's country is
-// on ai_question already. distinctID is ai_question's, nil for the server's.
-func generationProps(g nlsearch.Generation, traceID any, mode string, distinctID any) map[string]any {
-	p := map[string]any{
-		"$ai_trace_id":      traceID,
-		"$ai_span_name":     g.Kind,
-		"$ai_provider":      g.Provider,
-		"$ai_model":         g.Model,
-		"$ai_input_tokens":  g.In,
-		"$ai_output_tokens": g.Out,
-		"$ai_latency":       g.Latency.Seconds(),
-		"$ai_is_error":      g.Failed,
-		"mode":              mode,
-	}
-	if g.Status != 0 {
-		p["$ai_http_status"] = g.Status
-	}
-	if price, known := aiPrices[g.Model]; known {
-		p["$ai_total_cost_usd"] = float64(g.In)*price[0]/1e6 + float64(g.Out)*price[1]/1e6
-	}
-	if distinctID != nil {
-		p["distinct_id"] = distinctID
-	}
-	return p
-}
-
-// newTraceID is a random id that ties the model calls of one question together.
-func newTraceID() string {
-	b := make([]byte, 16)
-	_, _ = rand.Read(b)
-	return hex.EncodeToString(b)
-}
-
-// scriptOf names the main script of q: "arabic", "latin" or "other".
-func scriptOf(q string) string {
-	var ar, lat, other int
-	for _, c := range q {
-		switch {
-		case unicode.Is(unicode.Arabic, c):
-			ar++
-		case unicode.Is(unicode.Latin, c):
-			lat++
-		case unicode.IsLetter(c):
-			other++
-		}
-	}
-	switch {
-	case ar >= lat && ar >= other && ar > 0:
-		return "arabic"
-	case lat >= other && lat > 0:
-		return "latin"
-	case other > 0:
-		return "other"
-	}
-	return "none"
 }
 
 // numberSources numbers the cited passages in the order the answer first

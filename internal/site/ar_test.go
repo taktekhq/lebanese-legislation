@@ -127,7 +127,7 @@ func langTaggedLinks(body, lang string) map[string]int {
 // neutralPath is a path shared by both interfaces by design: static files,
 // feeds, scans, the API.
 func neutralPath(p string) bool {
-	for _, pre := range []string{"/assets/", "/styles", "/legislation", "/scan/", "/ruling-files/", "/api/", "/mcp", "/ph/", "/sitemap"} {
+	for _, pre := range []string{"/assets/", "/styles", "/legislation", "/scan/", "/ruling-files/", "/api/", "/mcp", "/sitemap"} {
 		if strings.HasPrefix(p, pre) {
 			return true
 		}

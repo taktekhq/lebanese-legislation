@@ -364,3 +364,23 @@ export function toMarkdown(html, url) {
   }
   return front.join("\n") + "\n\n" + body.join("\n\n") + "\n";
 }
+
+// markdownFirst says whether Markdown is preferred over HTML: a higher q, or
+// the same q and listed first (or HTML not listed).
+export function markdownFirst(accept) {
+  const prefs = [];
+  for (const [i, part] of String(accept || "").split(",").entries()) {
+    const [type, ...params] = part.trim().toLowerCase().split(";");
+    let q = 1;
+    for (const p of params) {
+      const m = /^\s*q\s*=\s*([0-9.]+)\s*$/.exec(p);
+      if (m) q = Number(m[1]);
+    }
+    prefs.push({ type: type.trim(), q, i });
+  }
+  const best = re => prefs.filter(p => re.test(p.type)).sort((a, b) => b.q - a.q || a.i - b.i)[0];
+  const md = best(/^text\/(x-)?markdown$/), html = best(/^text\/html$|^\*\/\*$|^text\/\*$/);
+  if (!md || md.q === 0) return false;
+  if (!html) return true;
+  return md.q > html.q || (md.q === html.q && md.i < html.i);
+}

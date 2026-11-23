@@ -68,8 +68,6 @@
     if (aiBox) { aiBox.remove(); aiBox = null; }
     if (!q) return;
     var body = new URLSearchParams({ q: q });
-    var ph = window.posthog && window.posthog.get_distinct_id ? window.posthog : null;
-    try { if (ph) body.set("ph", ph.get_distinct_id() || ""); } catch (e) {}
     fetch((ar ? "" : "/en") + "/search/ai/", { method: "POST", credentials: "same-origin", body: body })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
       .then(function (html) {

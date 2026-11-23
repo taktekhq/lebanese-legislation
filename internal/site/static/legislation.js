@@ -133,144 +133,11 @@
     fallback.parentNode.insertBefore(wait, fallback);
   }
 
-  /* "Was this answer helpful?": the answer brings it, and it moves below the
-     box so a collapsed answer can still be rated. Ratings and notes go to
-     PostHog only, with the question and the answer they are about; our
-     server never stores them. */
-  function placeRating() {
-    box.querySelectorAll(":scope > [data-ai-rate]").forEach(function (el) { el.remove(); });
-    var rate = target.querySelector("[data-ai-rate]");
-    if (rate) box.append(rate);
-  }
-  function rated(rate) {
-    var text = target.querySelector(".ai-box__text");
-    return {
-      question: section.getAttribute("data-q"),
-      mode: rate.getAttribute("data-mode"),
-      answer: text ? text.innerText.slice(0, 3000) : "",
-      sources: [].map.call(target.querySelectorAll(".ai-box__src"), function (a) { return a.getAttribute("href"); })
-    };
-  }
-  box.addEventListener("click", function (e) {
-    var btn = e.target.closest("[data-rate]");
-    if (!btn || btn.getAttribute("aria-pressed") === "true") return;
-    var rate = btn.closest("[data-ai-rate]");
-    var value = btn.getAttribute("data-rate");
-    rate.querySelectorAll("[data-rate]").forEach(function (b) { b.setAttribute("aria-pressed", String(b === btn)); });
-    var props = rated(rate);
-    props.rating = value;
-    props.changed = rate.hasAttribute("data-rated");
-    track("ai_answer_rated", props);
-    rate.setAttribute("data-rated", "");
-    var why = rate.querySelector("[data-ai-why]");
-    var thanks = rate.querySelector("[data-ai-thanks]");
-    why.hidden = value !== "down";
-    thanks.textContent = value === "down" ? "" : rate.getAttribute("data-thanks");
-  });
-  /* After a thumbs down: one tap on a reason sends it; "Something else"
-     opens a box for their own words. */
-  function noted(rate, reason, note) {
-    var props = rated(rate);
-    props.rating = "down";
-    props.reason = reason;
-    props.note = note.slice(0, 500);
-    track("ai_answer_note", props);
-  }
-  /* the thanks line is a live region that is always there, so a screen
-     reader hears it; focus moves (to the thumb, or to what the reply points
-     at) before the reasons go */
-  function thank(rate, said, focus) {
-    (focus || rate.querySelector('[data-rate="down"]')).focus();
-    rate.querySelector("[data-ai-why]").hidden = true;
-    /* reset, so a later thumbs down starts from the reasons again */
-    var form = rate.querySelector("[data-ai-note]");
-    form.hidden = true;
-    form.querySelector("textarea").value = "";
-    rate.querySelector('[data-reason="other"]').setAttribute("aria-expanded", "false");
-    rate.querySelector("[data-ai-thanks]").textContent = rate.getAttribute(said);
-  }
-  /* Answer the reason where it was given: a wrong law shows the laws the
-     answer used, out of date shows when each was last updated and amended,
-     no answer points to the deep answer when one is left. */
-  function openBox() {
-    var more = box.querySelector(".ai-box__more");
-    if (more && box.classList.contains("ai-box--collapsed")) more.click();
-  }
-  function reply(reason) {
-    var list = target.querySelector(".ai-box__sources");
-    var first = list && list.querySelector(".ai-box__src");
-    if (reason === "wrong_law" && first) {
-      openBox();
-      [].forEach.call(list.children, function (li) { li.classList.add("ai-box__flash"); });
-      return { said: "data-reply-wrong_law", focus: first };
-    }
-    var dates = target.querySelectorAll("[data-ai-updated]");
-    if (reason === "out_of_date" && dates.length && first) {
-      openBox();
-      [].forEach.call(dates, function (d) { d.hidden = false; });
-      return { said: "data-reply-out_of_date", focus: first };
-    }
-    var deep = target.querySelector("[data-ai-deep]:not([disabled])");
-    if (reason === "no_answer" && deep) {
-      openBox();
-      return { said: "data-reply-no_answer", focus: deep };
-    }
-    return { said: "data-reason-sent" };
-  }
-  box.addEventListener("click", function (e) {
-    var btn = e.target.closest("[data-reason]");
-    if (!btn) return;
-    var rate = btn.closest("[data-ai-rate]");
-    var reason = btn.getAttribute("data-reason");
-    if (reason !== "other") {
-      noted(rate, reason, "");
-      var r = reply(reason);
-      thank(rate, r.said, r.focus);
-      return;
-    }
-    var form = rate.querySelector("[data-ai-note]");
-    form.hidden = !form.hidden;
-    btn.setAttribute("aria-expanded", String(!form.hidden));
-    /* focus the box only with a mouse: on a phone it would zoom and open
-       the keyboard before they chose to type */
-    if (!form.hidden && matchMedia("(hover: hover)").matches) form.querySelector("textarea").focus();
-  });
-  box.addEventListener("submit", function (e) {
-    var form = e.target.closest("[data-ai-note]");
-    if (!form) return;
-    e.preventDefault();
-    var rate = form.closest("[data-ai-rate]");
-    var note = form.querySelector("textarea").value.trim();
-    if (note) noted(rate, "other", note);
-    thank(rate, note ? "data-sent" : "data-thanks");
-  });
-
   function settle() {
     box.removeAttribute("aria-busy");
     if (wait) wait.remove();
   }
-  /* PostHog loads after the first touch or two idle seconds (assets/load.js),
-     usually after this runs, so look it up on every call: until then
-     window.posthog is load.js's queue, and ph.js sends what is in it. */
-  function track(name, props) {
-    var ph = window.posthog;
-    if (ph && ph.capture) ph.capture(name, props);
-  }
-  /* The visitor's PostHog ID, so the server's ai_question joins their
-     session: from PostHog once it has loaded, else from the cookie it kept
-     on an earlier page. A first page has neither and sends none. */
-  function visitorID() {
-    var ph = window.posthog;
-    try { if (ph && ph.__loaded && ph.get_distinct_id) return ph.get_distinct_id() || ""; } catch (e) {}
-    try {
-      var m = document.cookie.match(/(?:^|;\s*)ph_phc_[A-Za-z0-9]+_posthog=([^;]*)/);
-      if (m) return JSON.parse(decodeURIComponent(m[1])).distinct_id || "";
-    } catch (e) {}
-    return "";
-  }
   var body = new URLSearchParams({q: section.getAttribute("data-q"), empty: section.getAttribute("data-empty") || ""});
-  var visitor = visitorID();
-  if (visitor) body.set("ph", visitor);
   /* A reader who opens a cited source and comes back (Back button) gets the
      answer they already had from this tab's sessionStorage: no second
      question to the server, none of their daily questions spent. Keyed by
@@ -300,9 +167,7 @@
     settle();
   }).finally(function () { clearTimeout(timeout); });
 
-  /* show puts an answer (fresh, or restored from this tab) in the box. A
-     restored one is tracked with restored: true, so it never counts as a
-     new answer. */
+  /* show puts an answer (fresh, or restored from this tab) in the box. */
   function show(html, restored) {
     var tpl = document.createElement("template");
     tpl.innerHTML = html;
@@ -316,23 +181,14 @@
     }
     if (fallback) fallback.hidden = false;
     settle();
-    placeRating();
     var text = target.querySelector(".ai-box__text");
     if (text && !restored) {
       try { window.sessionStorage.setItem(saveKey, html); } catch (e) {}
     }
-    var shown = { sources: target.querySelectorAll(".ai-box__src").length, brought_results: !!results };
-    if (restored) shown.restored = true;
-    track(text ? "ai_answer_shown" : target.querySelector(".ai-box__limit") ? "ai_limit_shown" : "ai_no_answer_shown", shown);
-    target.addEventListener("click", function (e) {
-      var a = e.target.closest(".ai-box__src");
-      if (a) track("ai_source_clicked", { href: a.getAttribute("href"), position: Number((a.querySelector(".ai-box__n") || {}).textContent) || 0 });
-    });
     target.addEventListener("click", function (e) {
       var btn = e.target.closest("[data-ai-deep]");
       if (!btn) return;
       btn.disabled = true;
-      track("ai_deep_requested", {});
       var deepBody = new URLSearchParams(body);
       deepBody.delete("empty");
       box.classList.remove("ai-box--collapsed");
@@ -344,8 +200,7 @@
       wait.textContent = section.getAttribute("data-deep-loading");
       target.textContent = "";
       target.append(wait);
-      placeRating();
-      var dc = new AbortController();
+        var dc = new AbortController();
       var dt = setTimeout(function () { dc.abort(); }, 90000);
       fetch(section.getAttribute("data-deep-url"), { method: "POST", credentials: "same-origin", body: deepBody, signal: dc.signal })
         .then(function (r) { if (!r.ok) throw new Error("deep answer unavailable"); return r.text(); })
@@ -354,9 +209,7 @@
           t2.innerHTML = html;
           target.textContent = "";
           target.append(t2.content);
-          placeRating();
-          track(target.querySelector(".ai-box__text") ? "ai_deep_shown" : "ai_deep_no_answer", { sources: target.querySelectorAll(".ai-box__src").length });
-        })
+              })
         .catch(function () { target.textContent = section.getAttribute("data-error"); })
         .finally(function () { clearTimeout(dt); box.removeAttribute("aria-busy"); });
     });
@@ -375,86 +228,13 @@
       var open = box.classList.toggle("ai-box--collapsed") === false;
       more.setAttribute("aria-expanded", String(open));
       more.textContent = section.getAttribute(open ? "data-less" : "data-more");
-      if (open) track("ai_answer_expanded", {});
     });
-    box.insertBefore(more, box.querySelector(":scope > [data-ai-rate]"));
+    box.appendChild(more);
     /* a citation number opens the box before jumping to its source */
     target.addEventListener("click", function (e) {
       if (e.target.closest(".ai-box__ref") && box.classList.contains("ai-box--collapsed")) more.click();
     });
   }
-})();
-
-/* Editors and error reports.
-
-   An editor (a paid student reviewer) gets a personal link that ends in
-   ?editor=CODE. The code, not a name, is kept in this browser and ph.js sends
-   it with every PostHog event, so their study days and reports can be counted.
-   The address is cleaned so the code is not shared with the page, and a
-   small "Editor: <Name>" pill, named from the code, shows the link worked.
-
-   "Report an error on this page" in the footer sends the note to PostHog as
-   error_report (with the page, the language and the editor code if any).
-   Only PostHog gets the text: GA4 must not hold free text. */
-(function () {
-  "use strict";
-  try {
-    var m = location.search.match(/[?&]editor=([A-Za-z0-9-]{3,24})(?=&|$)/);
-    if (m) {
-      localStorage.setItem("lebleg_editor", m[1].toLowerCase());
-      var rest = location.search.replace(/([?&])editor=[^&]*&?/, "$1").replace(/[?&]$/, "");
-      history.replaceState(null, "", location.pathname + rest + location.hash);
-    }
-    // Show the editor their name, so they can see the link worked:
-    // "rachele-kotaiche" reads "Editor: Rachele Kotaiche".
-    var code = localStorage.getItem("lebleg_editor");
-    if (code) {
-      var name = code.split("-").filter(Boolean).map(function (w) {
-        return w.charAt(0).toUpperCase() + w.slice(1);
-      }).join(" ");
-      var badge = document.createElement("p");
-      badge.className = "status editor-badge";
-      badge.setAttribute("data-editor-badge", "");
-      var ar = document.documentElement.lang === "ar";
-      badge.appendChild(document.createTextNode(ar ? "المحرّر: " : "Editor: "));
-      var who = document.createElement("bdi");
-      who.textContent = name;
-      badge.appendChild(who);
-      document.body.appendChild(badge);
-    }
-  } catch (e) {}
-
-  var box = document.querySelector("[data-report]");
-  if (!box) return;
-  var open = box.querySelector("[data-report-open]");
-  var form = box.querySelector("[data-report-form]");
-  var done = box.querySelector("[data-report-done]");
-  open.addEventListener("click", function () {
-    var show = form.hidden;
-    form.hidden = !show;
-    done.hidden = true;
-    open.setAttribute("aria-expanded", String(show));
-    if (show && matchMedia("(hover: hover)").matches) form.querySelector("textarea").focus();
-  });
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    var note = form.querySelector("textarea").value.trim();
-    if (!note) return;
-    var ph = window.posthog;
-    var sent = !!(ph && ph.capture);
-    if (sent) {
-      ph.capture("error_report", {
-        note: note.slice(0, 1000),
-        page: location.pathname,
-        language: document.documentElement.lang === "ar" ? "ar" : "en"
-      });
-      form.querySelector("textarea").value = "";
-      form.hidden = true;
-      open.setAttribute("aria-expanded", "false");
-    }
-    done.textContent = done.getAttribute(sent ? "data-thanks" : "data-failed");
-    done.hidden = false;
-  });
 })();
 
 /* "Show more" under a part of the search results: the link's own page lists

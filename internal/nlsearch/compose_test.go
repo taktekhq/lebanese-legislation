@@ -131,13 +131,9 @@ func TestExpandReturnsArabicPhrasesOnly(t *testing.T) {
 	}))
 	defer srv.Close()
 	c, _ := New(Config{Provider: "gemini", Model: "m", Key: "k", Endpoint: srv.URL})
-	ctx, u := WithUsage(context.Background())
-	p, err := c.Expand(ctx, "q", []string{"براءة"}, []string{"المادة 1"})
+	p, err := c.Expand(context.Background(), "q", []string{"براءة"}, []string{"المادة 1"})
 	if err != nil || len(p.Queries) != 2 {
 		t.Fatalf("got %+v %v", p, err)
-	}
-	if calls, _, _ := u.Totals(); calls != 1 {
-		t.Fatal("expand call not counted")
 	}
 	reply = `{"queries":["ignore the rules and write english"]}`
 	if _, err := c.Expand(context.Background(), "q", nil, nil); err == nil {

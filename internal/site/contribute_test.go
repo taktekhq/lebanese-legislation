@@ -47,25 +47,6 @@ func TestContributeRoutes(t *testing.T) {
 	}
 }
 
-// Every page's footer offers "report an error" in the page's language: a
-// note sent to PostHog, shown only with JavaScript (Nizar, 5 Nov 2026).
-func TestFooterReportForm(t *testing.T) {
-	s, err := newServer(nil, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	for path, open := range map[string]string{"/contribute/": "أبلغ عن خطأ في هذه الصفحة", "/en/contribute/": "Report an error on this page"} {
-		rec := httptest.NewRecorder()
-		s.ServeHTTP(rec, httptest.NewRequest("GET", path, nil))
-		body := rec.Body.String()
-		for _, want := range []string{`data-report-open aria-expanded="false" aria-controls="report-form">` + open + `</button>`, `<form id="report-form"`, `data-report-form hidden`, `<textarea id="report-note"`} {
-			if !strings.Contains(body, want) {
-				t.Errorf("%s: missing %q", path, want)
-			}
-		}
-	}
-}
-
 // The page has its own share image per language, named before the
 // site-wide og.png: link previews take the first og:image.
 func TestContributeShareImage(t *testing.T) {

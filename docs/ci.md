@@ -31,7 +31,6 @@ act workflow_dispatch -W .github/workflows/data.yml --input publish=true \
 | `data.yml` | Loads `data/` into PostgreSQL, exports and checks the Parquet tables, and (job `publish`) uploads them to Hugging Face. | `HF_TOKEN` (write token for the dataset) |
 | `hf-card.yml` | Uploads the dataset card, `METHODS.md` and `SCHEMA.md` from `.github/huggingface/` when they change on main, keeping the card's release block. | `HF_TOKEN` |
 | `vectors.yml` | Embeds missing chunks, publishes `vectors/vectors.parquet` and syncs Vectorize. | `LEBLEG_GEMINI_API_KEY`, `HF_TOKEN`, R2 and Cloudflare tokens |
-| `stats.yml` | Daily GitHub and Hugging Face counters to PostHog. | `GH_STATS_TOKEN` (optional, for traffic) |
 
 On GitHub, `HF_TOKEN` lives only in the `huggingface` environment, which
 deploys from `main` only, and the token can write to the

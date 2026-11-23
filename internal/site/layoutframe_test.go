@@ -26,7 +26,7 @@ func TestLayoutFramesRebuildPages(t *testing.T) {
 			t.Errorf("%s: the last hole is %s, want page:content", f.Lang, f.Slots[len(f.Slots)-1])
 		}
 		frame := strings.Join(f.Text, "")
-		for _, tag := range []string{`src="/ga.js?v=`, `src="/assets/load.js?v=`, `data-ph="/ph.js?v=`, `<footer class="footer">`, `<header class="nav" id="nav">`} {
+		for _, tag := range []string{`src="/ga.js?v=`, `src="/assets/load.js?v=`, `<footer class="footer">`, `<header class="nav" id="nav">`} {
 			if !strings.Contains(frame, tag) {
 				t.Errorf("%s frame has no %s", f.Lang, tag)
 			}

@@ -284,52 +284,6 @@ func TestNumberFormsTable(t *testing.T) {
 	}
 }
 
-func TestClientKind(t *testing.T) {
-	want := map[string][]string{
-		"assistant": {"Claude-User", "ChatGPT-User/1.0", "Perplexity-User/1.0", "MistralAI-User/1.0", "openai-mcp/1.0.0", "Google",
-			"claude-code/2.1.319 (claude-vscode, agent-sdk/0.3.319)", "codex-mcp-client/0.166.0-alpha.5.1"},
-		"internal": {"livecheck/0.1.0 (+https://github.com/taktekhq/livecheck)", "lebleg-db-prod-check/1", "taktekbot-latency-check",
-			"lebleg-check-corrections", "lebaneselegislation-mcp-parity/1.0", "taktekbot-lebleg-list-check"},
-		"registry": {"mcp-index/0.1 (+https://github.com/0xQuez/mcp-index)", "KoskamoDirectoryCheck/1.0 (+https://koskamo.com/explore)",
-			"AgentToolIndex/1.0 (+https://agenttoolindex.com/method; passive MCP checks: initialize and", "allagents-verify/1 (+https://allagents.app/badges)"},
-		"monitor": {
-			"SentinelOracle/0.1 (+https://glimind.com/opt-out; liveness-only, never invokes tools)", "mcpbeat/0.1 (+https://mcpbeat.com/bot/; liveness check)",
-			"AgentRankProbe/0.1", "rokmcp-collector/0.2 (+https://rokmcp.com/bot)", "agent-collector/0.1 (+health check; no payment is made)",
-			"EveryMCP-Probe/1.0", "FraywickBot/1.0 (+https://fraywick.xyz/docs#bot)", "MCPWatch/0.1.0 longitudinal MCP security research",
-			"reliability-bureau-spike/0.1", "LEGION-tlog/1.0", "TaifoonHarvester/1.0.0", "mcp-rugpull-research/1.0",
-			"histor/0.1.0 (+https://histor.modelmarket.dev/#crawler; read-only: initialize + tools/list", "atpp-scan/1.0",
-			"mcplantern-check/0.2", "AnnalistChecks/0.1 (+https://annalist.dev; independent MCP server checks)", "evyAI MCP Check/1.0 (+https://evyus.com/tools/mcp-check/)"},
-		"library": {"node", "undici", "Python/3.11 aiohttp/3.14.5", "python-httpx/0.28.1", "Go-http-client/2.0", "curl/8.7.1", ""},
-		"other":   {"Enerlio GmbH FACTANKER marc@enerlio.de", "Malaf/0.1 (+legal information service)", "coda-agent-runtime"},
-	}
-	for kind, uas := range want {
-		for _, ua := range uas {
-			if k := clientKind(ua, "", false); k != kind {
-				t.Errorf("%q: %s, want %s", ua, k, kind)
-			}
-		}
-	}
-	if clientKind("node", "claude-ai", false) != "assistant" || clientKind("node", "cursor-vscode", false) != "assistant" {
-		t.Error("assistant client names")
-	}
-	if clientKind("Talaria", "talaria-catalog", false) != "registry" {
-		t.Error("registry client name")
-	}
-	// The repo's .mcp.json header makes our own Claude Code sessions internal.
-	if clientKind("claude-code/2.1.319 (claude-vscode, agent-sdk/0.3.319)", "", true) != "internal" {
-		t.Error("internal header")
-	}
-	for _, k := range []string{"monitor", "registry", "internal"} {
-		if !notPerson(k) {
-			t.Errorf("%s should not make a person", k)
-		}
-	}
-	if notPerson("assistant") || notPerson("other") {
-		t.Error("assistant and other are people")
-	}
-}
-
-// calculatedCurrent accepts only a record that matches the article exactly.
 func TestCalculatedCurrentValidation(t *testing.T) {
 	const source = "تحدد القيمة بمبلغ 100000 ليرة لبنانية"
 	const calculated = "تحدد القيمة بمبلغ 5000000 ليرة لبنانية (خمسة ملايين ليرة لبنانية)"
@@ -414,7 +368,7 @@ const browserUA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/5
 func trackedServer(rt *recorder) *Server {
 	return noDBServer(Config{
 		GAMCPMeasurementID: "G-MCP", GAMCPAPISecret: "mcp-secret", GAHFMeasurementID: "G-HF", GAHFAPISecret: "hf-secret",
-		PostHogKey: "phc_test", PostHogHost: "https://ph.example", HTTPClient: &http.Client{Transport: rt}, HuggingFaceAPI: "https://hf.example/api",
+		HTTPClient: &http.Client{Transport: rt}, HuggingFaceAPI: "https://hf.example/api",
 		Logf: func(string, ...any) {},
 	})
 }
@@ -430,16 +384,6 @@ func TestNothingSentWithoutKeys(t *testing.T) {
 	}
 }
 
-func phEvents(rt *recorder) []map[string]any {
-	var out []map[string]any
-	for _, r := range rt.sent("https://ph.example/batch/") {
-		for _, e := range r.body["batch"].([]any) {
-			out = append(out, e.(map[string]any))
-		}
-	}
-	return out
-}
-
 func gaEvents(rt *recorder) []map[string]any {
 	var out []map[string]any
 	for _, r := range rt.sent(gaEndpoint) {
@@ -450,24 +394,12 @@ func gaEvents(rt *recorder) []map[string]any {
 	return out
 }
 
-func TestPostHogEvents(t *testing.T) {
+func TestGAEvents(t *testing.T) {
 	rt := &recorder{}
 	s := trackedServer(rt)
 	post(s, map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{"protocolVersion": "2025-06-18", "clientInfo": map[string]any{"name": "claude-ai", "version": "0.1"}}},
 		map[string]string{"User-Agent": "node"})
 	s.Flush()
-	ph := phEvents(rt)
-	if len(ph) != 1 || ph[0]["event"] != "$mcp_initialize" {
-		t.Fatalf("initialize: %v", ph)
-	}
-	p := ph[0]["properties"].(map[string]any)
-	if p["$mcp_client_name"] != "claude-ai" || p["$mcp_client_version"] != "0.1" || p["$mcp_server_name"] != "lebaneselegislation" || p["client_kind"] != "assistant" ||
-		p["$ip"] != "203.0.113.1" || p["$lib"] != "lebaneselegislation-worker" || p["distinct_id"] != visitorID("", "203.0.113.1", "node") {
-		t.Errorf("initialize properties: %v", p)
-	}
-	if !regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$`).MatchString(fmt.Sprint(p["$session_id"])) {
-		t.Errorf("session id %v", p["$session_id"])
-	}
 	if gas := gaEvents(rt); len(gas) != 1 || gas[0]["name"] != "mcp_initialize" || gas[0]["params"].(map[string]any)["client_name"] != "claude-ai" ||
 		gas[0]["params"].(map[string]any)["page_location"] != mcpPage {
 		t.Errorf("GA initialize: %v", gas)
@@ -479,38 +411,7 @@ func TestPostHogEvents(t *testing.T) {
 	post(s, map[string]any{"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": map[string]any{"name": "nope"}}, nil)
 	call(t, s, "get_law", map[string]any{"id": -1})
 	post(s, map[string]any{"jsonrpc": "2.0", "id": 6, "method": "ping"}, nil)
-	post(s, map[string]any{"jsonrpc": "2.0", "id": 7, "method": "ping"}, map[string]string{"User-Agent": "SentinelOracle/0.1 (liveness-only)"})
 	s.Flush()
-	ph = phEvents(rt2)
-	if len(ph) != 3 {
-		t.Fatalf("events: %v", ph)
-	}
-	sort.Slice(ph, func(i, j int) bool { return fmt.Sprint(ph[i]["event"]) < fmt.Sprint(ph[j]["event"]) })
-	var list, unknown, invalid map[string]any
-	for _, e := range ph {
-		pr := e["properties"].(map[string]any)
-		switch {
-		case e["event"] == "mcp_tools_list":
-			list = pr
-		case pr["$mcp_tool_name"] == "nope":
-			unknown = pr
-		default:
-			invalid = pr
-		}
-	}
-	if !strings.Contains(fmt.Sprint(list["$mcp_listed_tool_names"]), "search_legislation") {
-		t.Errorf("tools/list: %v", list)
-	}
-	if unknown["$mcp_is_error"] != true || unknown["$mcp_error_type"] != "validation" {
-		t.Errorf("unknown tool: %v", unknown)
-	}
-	if invalid["$mcp_is_error"] != true || invalid["$mcp_error_type"] != "validation" || invalid["$mcp_tool_name"] != "get_law" ||
-		!strings.Contains(fmt.Sprint(invalid["$mcp_response"]), "positive integer") || invalid["$mcp_cache_hit"] != false {
-		t.Errorf("a rejected argument: %v", invalid)
-	}
-	if _, isNum := invalid["$mcp_duration_ms"].(float64); !isNum {
-		t.Errorf("duration: %v", invalid["$mcp_duration_ms"])
-	}
 	var calls int
 	for _, e := range gaEvents(rt2) {
 		if e["name"] == "mcp_tool_call" {
@@ -520,127 +421,11 @@ func TestPostHogEvents(t *testing.T) {
 	if calls != 2 {
 		t.Errorf("GA tool calls: %d", calls)
 	}
-
-	// a monitor is tagged and makes no person
-	rt3 := &recorder{}
-	s = trackedServer(rt3)
-	post(s, map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}, map[string]string{"User-Agent": "mcpbeat/0.1 (+https://mcpbeat.com/bot/; liveness check)"})
-	post(s, map[string]any{"jsonrpc": "2.0", "id": 2, "method": "tools/list"}, map[string]string{"User-Agent": "Claude-User"})
-	s.Flush()
-	for _, e := range phEvents(rt3) {
-		p := e["properties"].(map[string]any)
-		if p["$user_agent"] == "Claude-User" {
-			if p["client_kind"] != "assistant" || p["$process_person_profile"] != nil {
-				t.Errorf("assistant: %v", p)
-			}
-		} else if p["client_kind"] != "monitor" || p["$process_person_profile"] != false {
-			t.Errorf("monitor: %v", p)
+	for _, r := range rt2.reqs {
+		if !strings.HasPrefix(r.url, gaEndpoint) {
+			t.Errorf("sent to %s, want GA4 only", r.url)
 		}
 	}
-}
-
-// Liveness monitors only connect and list tools, thousands of times a week:
-// PostHog gets none of their handshakes. Their tool calls and everything
-// from other callers are always sent, and GA4 still gets every event.
-func TestMonitorHandshakesAreNotSent(t *testing.T) {
-	const monitor, person = "mcpbeat/0.1 (+https://mcpbeat.com/bot/; liveness check)", "Claude-User"
-	initialize := map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{"protocolVersion": "2025-06-18"}}
-	list := map[string]any{"jsonrpc": "2.0", "id": 2, "method": "tools/list"}
-	tool := map[string]any{"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": map[string]any{"name": "nope"}}
-	rt := &recorder{}
-	s := trackedServer(rt)
-	for _, ua := range []string{monitor, person} {
-		for _, body := range []any{initialize, list, tool} {
-			if rec := post(s, body, map[string]string{"User-Agent": ua}); rec.Code != http.StatusOK {
-				t.Fatalf("%s: answered %d", ua, rec.Code)
-			}
-		}
-	}
-	s.Flush()
-	var monitors, people []map[string]any
-	for _, e := range phEvents(rt) {
-		p := e["properties"].(map[string]any)
-		p["event"] = e["event"]
-		if p["$user_agent"] == monitor {
-			monitors = append(monitors, p)
-		} else {
-			people = append(people, p)
-		}
-	}
-	if len(monitors) != 1 || monitors[0]["event"] != "$mcp_tool_call" || monitors[0]["client_kind"] != "monitor" {
-		t.Errorf("monitor events %v, want its tool call only", monitors)
-	}
-	if len(people) != 3 {
-		t.Errorf("%d events from an assistant, want 3", len(people))
-	}
-	if ga := len(gaEvents(rt)); ga != 6 {
-		t.Errorf("%d events to GA4, want 6", ga)
-	}
-	for _, p := range append(monitors, people...) {
-		if p["sample_rate"] != nil {
-			t.Errorf("%v carries sample_rate %v", p["event"], p["sample_rate"])
-		}
-	}
-
-	// Only a monitor's handshakes: directories and our own tools are few.
-	for _, kind := range []string{"assistant", "registry", "internal", "library", "other"} {
-		for _, event := range []string{"$mcp_initialize", "mcp_tools_list", "$mcp_tool_call"} {
-			if monitorHandshake(kind, event) {
-				t.Errorf("%s %s is left out", kind, event)
-			}
-		}
-	}
-	for _, event := range []string{"$mcp_tool_call", "mcp_rate_limited"} {
-		if monitorHandshake("monitor", event) {
-			t.Errorf("a monitor's %s is left out", event)
-		}
-	}
-}
-
-func TestRateLimitedEvent(t *testing.T) {
-	rt := &recorder{}
-	s := trackedServer(rt)
-	s.limiter, s.refusal = newRateLimiter(1), newRateLimiter(1)
-	var statuses []int
-	for i := 0; i < 3; i++ {
-		statuses = append(statuses, post(s, map[string]any{"jsonrpc": "2.0", "id": i, "method": "ping"}, map[string]string{"CF-Connecting-IP": "203.0.113.30", "User-Agent": "curl/8"}).Code)
-	}
-	s.Flush()
-	var refused []map[string]any
-	for _, e := range phEvents(rt) {
-		if e["event"] == "mcp_rate_limited" {
-			refused = append(refused, e["properties"].(map[string]any))
-		}
-	}
-	if fmt.Sprint(statuses) != "[200 429 429]" || len(refused) != 1 || refused[0]["client_kind"] != "library" || refused[0]["limit_per_minute"] != float64(1) {
-		t.Errorf("statuses %v, refused %v", statuses, refused)
-	}
-}
-
-func TestPostHogClientAndIDs(t *testing.T) {
-	if a, b := visitorID("s1", "203.0.113.9", "UA"), visitorID("s2", "203.0.113.9", "UA"); a == b || len(a) != 64 || a != visitorID("s1", "203.0.113.9", "UA") {
-		t.Error("visitor ids")
-	}
-	long := strings.Repeat("x", 20000)
-	out := clipProps(obj{{"s", long}, {"n", 3}, {"o", map[string]any{"a": map[string]any{"b": long}}}, {"l", []any{long}}, {"u", nil}}, phMaxString)
-	b := mustMarshal(out)
-	if strings.Count(b, "x") != 30000 || strings.Contains(b, `"u"`) {
-		t.Errorf("clipProps: %d x", strings.Count(b, "x"))
-	}
-	a := mcpSessionID(strings.Repeat("ab", 32), "2026-10-20")
-	if a != mcpSessionID(strings.Repeat("ab", 32), "2026-10-20") || a == mcpSessionID(strings.Repeat("ab", 32), "2026-10-21") {
-		t.Error("session ids")
-	}
-	if mcpErrorType(errTimeout) != "timeout" || mcpErrorType(fmt.Errorf("boom")) != "internal" || mcpErrorType(context.DeadlineExceeded) != "timeout" {
-		t.Error("error types")
-	}
-	// PostHog answering 500 is logged, never returned
-	rt := &recorder{answer: func(r *http.Request) *http.Response { return jsonResponse(r, 500, "{}") }}
-	s := trackedServer(rt)
-	if rec := post(s, map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}, nil); rec.Code != 200 {
-		t.Errorf("status %d", rec.Code)
-	}
-	s.Flush()
 }
 
 func TestBadges(t *testing.T) {
@@ -674,17 +459,6 @@ func TestBadges(t *testing.T) {
 	p := ev["params"].(map[string]any)
 	if ev["name"] != "page_view" || p["page_location"] != "https://lebaneselegislation.com/huggingface" || p["page_referrer"] != "https://huggingface.co/" || p["badge"] != "mcp" {
 		t.Errorf("view: %v", ev)
-	}
-	ph := phEvents(rt)
-	if len(ph) != 1 || ph[0]["event"] != "$pageview" || ph[0]["properties"].(map[string]any)["$current_url"] != "https://huggingface.co/datasets/taktekhq/lebanese-legislation" {
-		t.Errorf("$pageview: %v", ph)
-	}
-	ghrt := &recorder{}
-	gh := trackedServer(ghrt)
-	get(gh, "/badge/legislation.svg?src=gh", map[string]string{"User-Agent": "github-camo (876de43e)"})
-	gh.Flush()
-	if ph := phEvents(ghrt); len(ph) != 1 || ph[0]["properties"].(map[string]any)["$current_url"] != "https://github.com/taktekhq/lebanese-legislation" {
-		t.Errorf("README view: %v", ph)
 	}
 	if !isBot("") || isBot(browserUA) {
 		t.Error("isBot")
@@ -728,31 +502,6 @@ func TestBadgeStatsDB(t *testing.T) {
 	}
 }
 
-func TestHFStats(t *testing.T) {
-	rt := &recorder{answer: func(r *http.Request) *http.Response {
-		if strings.HasPrefix(r.URL.String(), "https://hf.example/") {
-			return jsonResponse(r, 200, `{"downloads":12,"downloadsAllTime":40,"likes":3}`)
-		}
-		return jsonResponse(r, 200, `{}`)
-	}}
-	s := trackedServer(rt)
-	if err := s.SendHFStats(context.Background()); err != nil {
-		t.Fatal(err)
-	}
-	s.Flush()
-	ph := phEvents(rt)
-	if len(ph) != 1 || ph[0]["event"] != "hf_dataset_stats" {
-		t.Fatalf("events: %v", ph)
-	}
-	p := ph[0]["properties"].(map[string]any)
-	if p["downloads_30d"] != float64(12) || p["downloads_all_time"] != float64(40) || p["likes"] != float64(3) || p["dataset"] != HFDataset || p["distinct_id"] != "lebaneselegislation-hf-stats" {
-		t.Errorf("properties: %v", p)
-	}
-	if err := noDBServer(Config{}).SendHFStats(context.Background()); err != nil {
-		t.Errorf("PostHog off: %v", err)
-	}
-}
-
 func TestResultCache(t *testing.T) {
 	c := newResultCache(50*time.Millisecond, 2)
 	c.put("a", "1", 1)
@@ -772,9 +521,9 @@ func TestResultCache(t *testing.T) {
 }
 
 func TestConfigFromEnv(t *testing.T) {
-	env := map[string]string{"GA_MCP_MEASUREMENT_ID": "G-1", "GA_MCP_API_SECRET": "s", "POSTHOG_KEY": "phc", "MCP_RATE_LIMIT": "-1"}
+	env := map[string]string{"GA_MCP_MEASUREMENT_ID": "G-1", "GA_MCP_API_SECRET": "s", "MCP_RATE_LIMIT": "-1"}
 	c := ConfigFromEnv(func(k string) string { return env[k] })
-	if c.GAMCPMeasurementID != "G-1" || c.GAMCPAPISecret != "s" || c.PostHogKey != "phc" || c.RateLimitPerMinute != -1 || c.GAHFMeasurementID != "" {
+	if c.GAMCPMeasurementID != "G-1" || c.GAMCPAPISecret != "s" || c.RateLimitPerMinute != -1 || c.GAHFMeasurementID != "" {
 		t.Errorf("%+v", c)
 	}
 	if s := newServer(noDB{}, c); s.limiter != nil {

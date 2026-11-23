@@ -720,7 +720,7 @@ var linkRE = regexp.MustCompile(`(?:href|data-href)="(/[^"]*)"`)
 
 // skipPrefixes are addresses the origin answers by itself (the API, the
 // analytics proxy, files from disk) or that are not pages.
-var skipPrefixes = []string{"/api/", "/ph/", "/ph", "/ul/", "/scan/", "/ruling-files/", "/official-files/", "/mcp", "/healthz", "/.well-known/", "/assets/"}
+var skipPrefixes = []string{"/api/", "/ul/", "/scan/", "/ruling-files/", "/official-files/", "/mcp", "/healthz", "/.well-known/", "/assets/"}
 
 // cleanLink turns an href into a crawlable escaped path, or "".
 func cleanLink(href string) string {

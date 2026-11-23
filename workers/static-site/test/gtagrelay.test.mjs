@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { GA_ID, gtagRelay } from '../src/gtagrelay.js';
+import { GA_ID, gtagRelay, botNetwork, botVisitor } from '../src/gtagrelay.js';
 import { CSP } from '../src/headers.js';
 import { route } from '../src/route.js';
 
@@ -53,4 +53,28 @@ test('an upstream failure is a 502, not a cached page', async (t) => {
   stub(t, 500);
   const res = await gtagRelay(req(`/gtag/js?id=${GA_ID}`), {});
   assert.equal(res.status, 502);
+});
+
+// The crawler that runs JavaScript from cloud networks or with a Chinese
+// browser gets no gtag.js, so GA4 never counts it.
+function visitor(cf, lang) {
+  const r = new Request(`https://lebaneselegislation.com/gtag/js?id=${GA_ID}`, { headers: lang ? { 'Accept-Language': lang } : {} });
+  Object.defineProperty(r, 'cf', { value: cf });
+  return r;
+}
+for (const [cf, lang] of [[{ asn: 136907, country: 'HK' }, ''], [{ asn: 4811, country: 'CN' }, ''], [{ asn: 3215, country: 'FR' }, 'zh-CN,zh;q=0.9']]) {
+  test(`gtag.js for AS${cf.asn} ${cf.country} ${lang} is a 204 that never leaves the Worker`, async (t) => {
+    const calls = stub(t);
+    const res = await gtagRelay(visitor(cf, lang), {});
+    assert.equal(res.status, 204);
+    assert.equal(res.headers.get('Cache-Control'), 'no-store');
+    assert.equal(calls.length, 0);
+  });
+}
+test('real readers are not bots', () => {
+  assert.equal(botNetwork(undefined), false);
+  assert.equal(botNetwork({ asn: 16509, country: 'US' }), false);
+  for (const lang of ['ar-LB,ar;q=0.9,en;q=0.8', 'en-US,en;q=0.9,zh-CN;q=0.5', 'fr-FR', '']) {
+    assert.equal(botVisitor(visitor({ asn: 3215, country: 'FR' }, lang)), false, lang);
+  }
 });

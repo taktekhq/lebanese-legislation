@@ -1,7 +1,7 @@
 /* Google Analytics 4: property lebaneselegislation.com (G-RDYRK422NP), the
    standard gtag.js install. A file, not an inline script, so the Content
-   Security Policy needs no extra hash. assets/load.js fetches gtag.js and
-   PostHog (ph.js) after the page; what is queued here is sent then.
+   Security Policy needs no extra hash. assets/load.js fetches gtag.js after
+   the page; what is queued here is sent then.
 
    Loaded unless the server runs with ANALYTICS=off. No consent
    banner: when on, analytics are always on. GA4 gets each
@@ -10,8 +10,7 @@
    itself, so no event here may carry a source, medium or campaign parameter:
    GA4 reads those as the visit's source.
 
-   Events, besides page views. Each goes to GA4 and to PostHog under the same
-   name and properties (track below), so the two can be compared:
+   Events, besides page views (track below):
      search              a search was run (search_term, results)
      search_no_results   ... and found nothing (search_term)
      document_open       a law, decree, ruling or other document was opened
@@ -30,7 +29,6 @@ function track(name, params) {
   params = params || {};
   params.language = document.documentElement.lang === "ar" ? "ar" : "en";
   gtag("event", name, params);
-  if (window.posthog && window.posthog.capture) window.posthog.capture(name, params);
 }
 
 document.addEventListener("DOMContentLoaded", function () {

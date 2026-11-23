@@ -32,7 +32,7 @@ function fakeStorage() {
 
 // load runs legislation.js on one search page load. reply is the server's
 // HTML; storage is the tab's sessionStorage (shared across loads). It
-// resolves with how many POSTs were sent and the events tracked.
+// resolves with how many POSTs were sent.
 async function load({ storage, reply = '<p class="ai-box__text">answer</p>', q = 'ما هي مهلة الطعن؟', lang = 'ar' }) {
   const attrs = { 'data-q': q, 'data-url': '/search/ai/', 'data-empty': '' };
   let html = '';
@@ -63,33 +63,26 @@ async function load({ storage, reply = '<p class="ai-box__text">answer</p>', q =
     querySelectorAll() { return []; },
     getElementById() { return null; }
   };
-  const captured = [];
-  const posthog = { __loaded: true, get_distinct_id: () => 'id', capture: (n, p) => captured.push([n, p]) };
   let posts = 0;
   const fetch = () => {
     posts++;
     return Promise.resolve({ ok: true, text: () => Promise.resolve(reply) });
   };
   vm.runInNewContext(code, {
-    document, window: { posthog, sessionStorage: storage }, fetch, URLSearchParams, AbortController,
+    document, window: { sessionStorage: storage }, fetch, URLSearchParams, AbortController,
     setTimeout: () => 0, clearTimeout() {}
   });
   await new Promise(r => setTimeout(r, 10));
-  return { posts, events: captured };
+  return { posts };
 }
 
 test('Back to the search page shows the saved answer and sends no second question', async () => {
   const storage = fakeStorage();
   const first = await load({ storage });
   assert.equal(first.posts, 1);
-  assert.deepEqual(first.events.map(e => e[0]), ['ai_answer_shown']);
-  assert.equal(first.events[0][1].restored, undefined);
 
   const back = await load({ storage });
   assert.equal(back.posts, 0);
-  assert.deepEqual(back.events.map(e => e[0]), ['ai_answer_shown']);
-  assert.equal(back.events[0][1].restored, true);
-  assert.equal(back.events[0][1].sources, 2);
 });
 
 test('another question or language asks the server', async () => {
@@ -110,5 +103,4 @@ test('storage that throws (private mode, blocked) still asks and shows the answe
   const storage = { getItem() { throw new Error('denied'); }, setItem() { throw new Error('denied'); } };
   const r = await load({ storage });
   assert.equal(r.posts, 1);
-  assert.deepEqual(r.events.map(e => e[0]), ['ai_answer_shown']);
 });

@@ -14,10 +14,9 @@ export class OriginGreen extends DurableObject {}
 
 import { route, keyFor, resolve, indexRedirectData } from "./route.js";
 import { SECURITY_HEADERS, EMBEDDABLE, AGENT_LINKS } from "./headers.js";
-import { toMarkdown } from "./markdown.js";
+import { toMarkdown, markdownFirst } from "./markdown.js";
 import { originFetch, isTestRequest } from "./origin.js";
 import { mcpHost } from "./mcphost.js";
-import { markdownAsk, markdownFirst } from "./markdownask.js";
 import { isParts, parseParts, prepareFrame, assemble, indexPointer } from "./layout.js";
 
 // The export generation (the workflow run that last finished uploading) is
@@ -218,8 +217,6 @@ export default {
     if (mcp && mcp.response) return mcp.response;
     if (mcp) request = mcp.request;
     const url = new URL(request.url);
-    // Count requests that ask for Markdown (sent after the response; nothing for others).
-    markdownAsk(request, env, ctx);
     // The exporter asks this before it stores pages in parts: an older Worker
     // answers 404 here and would serve the parts as they are.
     if (url.pathname === "/_build/layout") {
@@ -234,8 +231,7 @@ export default {
         headers: { ...SECURITY_HEADERS, Location: "https://lebaneselegislation.com" + url.pathname + url.search },
       });
     }
-    const postAllowed = /^(?:\/(?:en|ar))?\/(?:search\/|search\/answer\/|search\/ai\/|search\/ai\/deep\/)$/.test(url.pathname)
-      || url.pathname.startsWith("/ph/");
+    const postAllowed = /^(?:\/(?:en|ar))?\/(?:search\/|search\/answer\/|search\/ai\/|search\/ai\/deep\/)$/.test(url.pathname);
     // MCP (streamable HTTP) uses POST, GET, DELETE and OPTIONS; the server checks them itself.
     // So does the A2A lookup at /a2a (JSON-RPC over POST).
     const mcpPath = url.pathname === "/mcp" || url.pathname === "/mcp/" || url.pathname === "/a2a";
