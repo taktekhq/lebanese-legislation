@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 // An answer's sources are exact pages: one article, one ruling, one
@@ -46,6 +47,17 @@ func TestAnswerSourcesAreExactPages(t *testing.T) {
 
 // Every paragraph says what it rests on: the text of a law and which
 // article, a court ruling in one case, or neither.
+// An Arabic court name in an English line keeps its place before the date.
+func TestRulingLabelIsolatesTheCourt(t *testing.T) {
+	on := time.Date(1995, 12, 26, 0, 0, 0, 0, time.UTC)
+	if got, want := rulingLabel("en", "تمييز مدني", &on), "\u2068تمييز مدني\u2069, 26 December 1995"; got != want {
+		t.Errorf("rulingLabel = %q, want %q", got, want)
+	}
+	if got := rulingLabel("en", "", nil); got != "" {
+		t.Errorf("no court, no date: %q", got)
+	}
+}
+
 func TestAnswerBasisLabels(t *testing.T) {
 	s, err := newServer(nil, false)
 	if err != nil {
