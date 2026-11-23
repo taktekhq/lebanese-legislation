@@ -60,14 +60,7 @@ func (s *Server) basisOf(ctx context.Context, lang, path string) (kind, label st
 		if s.db != nil {
 			_ = s.db.QueryRow(ctx, `SELECT coalesce(court,''), decided_on FROM ruling WHERE id=$1`, id).Scan(&court, &on)
 		}
-		parts := []string{}
-		if court != "" {
-			parts = append(parts, court)
-		}
-		if on != nil {
-			parts = append(parts, longDate(lang, *on))
-		}
-		return "ruling", strings.Join(parts, ", ")
+		return "ruling", rulingLabel(lang, court, on)
 	}
 	return "", ""
 }
@@ -128,4 +121,18 @@ func dedupe(in []string) []string {
 		}
 	}
 	return out
+}
+
+// rulingLabel names a ruling's court and date: "<court>, 26 December 1995".
+// The court is isolated (FSI ... PDI): an Arabic court name inside an
+// English or French line would otherwise swap places with the date's day.
+func rulingLabel(lang, court string, on *time.Time) string {
+	var parts []string
+	if court != "" {
+		parts = append(parts, "\u2068"+court+"\u2069")
+	}
+	if on != nil {
+		parts = append(parts, longDate(lang, *on))
+	}
+	return strings.Join(parts, ", ")
 }
