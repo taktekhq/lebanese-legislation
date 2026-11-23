@@ -151,10 +151,8 @@ func run(ctx context.Context, cfg config) error {
 		return err
 	}
 	h.SetRulingFiles(cfg.rulingFiles)
-	// Server events (AI questions and answers) to PostHog when POSTHOG_KEY is set. The
-	// browser analytics (LebaneseLegislation.com's own projects) are on
-	// unless ANALYTICS=off; the published images set it.
-	h.SetPostHog(os.Getenv("POSTHOG_KEY"), os.Getenv("POSTHOG_HOST"))
+	// The browser analytics (LebaneseLegislation.com's own GA4 property) are
+	// on unless ANALYTICS=off; the published images set it.
 	h.SetAnalytics(os.Getenv("ANALYTICS") != "off")
 	closeVectors, err := enableSearch(ctx, h, pool)
 	if err != nil {

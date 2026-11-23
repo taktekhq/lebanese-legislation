@@ -11,9 +11,7 @@ async function run(t, { path = '/healthz', duration = 0, status = 200, hit = fal
   const events = [], pending = [];
   t.mock.method(Date, 'now', () => now);
   t.mock.method(globalThis, 'fetch', async (url, options) => {
-    if (String(url).startsWith('https://eu.i.posthog.com/i/v0/e/')) {
-      events.push(JSON.parse(options.body));
-    }
+    if (String(url).includes('posthog')) events.push(String(url));
     return new Response('proxy');
   });
   const saved = globalThis.caches;
@@ -23,7 +21,7 @@ async function run(t, { path = '/healthz', duration = 0, status = 200, hit = fal
   } };
   t.after(() => { globalThis.caches = saved; });
   const service = { fetch: async () => { now += duration; if (serviceFail) throw Error('offline'); return new Response('origin', { status, headers: timing ? { 'Server-Timing': timing } : {} }); } };
-  const env = { POSTHOG_KEY: 'test-key', ORIGIN_TEST_KEY: 'probe-key',
+  const env = { ORIGIN_TEST_KEY: 'probe-key',
     SITE: { get: async key => key === '_export/generation' || key === '_export/layout.json' ? null : key === '_build/live-side' ? { text: async () => 'green' }
       : (r2 || staticPage) ? { body: 'file', httpEtag: '"x"' } : null },
     ORIGIN_BLUE: service, ORIGIN_GREEN: service };
@@ -44,12 +42,11 @@ for (const [path, route] of [
     assert.equal(requestRoute(new URL('https://example.com' + path)), route);
   });
 }
-// origin_request events stopped on 19 Nov 2026: the Worker sends PostHog
-// nothing about a request it passes to the origin, whatever its kind, speed
-// or status.
+// The Worker sends no analytics event about a request (PostHog removed
+// 23 Nov 2026), whatever its kind, speed or status.
 for (const options of [{ path: '/en/api/v1/search/?q=private', duration: 2000 }, { path: '/mcp' }, { path: '/en/search/answer/' },
   { status: 503 }, { status: 404 }, { path: '/api/v1/law/1/', hit: true }, { path: '/api/v1/search/?limit=1&q=law', probe: true },
-  { path: '/ruling-files/9.pdf', r2: true }, { path: '/law/1/', staticPage: true }, { path: '/ph/e/' }]) {
+  { path: '/ruling-files/9.pdf', r2: true }, { path: '/law/1/', staticPage: true }]) {
   test(`no events for ${JSON.stringify(options)}`, async t => {
     const { events } = await run(t, options);
     assert.deepEqual(events, []);

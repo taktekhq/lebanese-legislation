@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { register } from 'node:module';
 
-import { toMarkdown, decodeEntities } from '../src/markdown.js';
+import { toMarkdown, decodeEntities, markdownFirst } from '../src/markdown.js';
 import { AGENT_LINKS } from '../src/headers.js';
 
 register('./workers-loader.mjs', import.meta.url);
@@ -205,7 +205,7 @@ test('a request that prefers Markdown gets the page as Markdown, under its own c
   assert.equal(same.status, 304);
 });
 
-// One rule decides (markdownFirst, markdownask.js): Markdown must be wanted
+// One rule decides (markdownFirst, markdown.js): Markdown must be wanted
 // more than HTML, or as much and named first.
 for (const [accept, type] of [
   ['text/markdown', 'text/markdown'],
@@ -405,4 +405,13 @@ test('a check with the test header gets the origin\'s answer as it is', async ()
   const res = await worker.fetch(new Request('https://lebaneselegislation.com/?probe=1', { headers: { Accept: 'text/markdown', 'x-origin-test': 'secret' } }), env, ctx);
   assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8');
   assert.equal(await res.text(), PAGE);
+});
+
+test('Markdown comes first only when preferred', () => {
+  assert.equal(markdownFirst('text/markdown, text/html;q=0.9'), true);
+  assert.equal(markdownFirst('text/html, text/markdown;q=0.5'), false);
+  assert.equal(markdownFirst('text/html, text/markdown'), false);
+  assert.equal(markdownFirst('text/markdown'), true);
+  assert.equal(markdownFirst('text/markdown;q=0, text/html'), false);
+  assert.equal(markdownFirst('text/x-markdown, */*;q=0.1'), true);
 });

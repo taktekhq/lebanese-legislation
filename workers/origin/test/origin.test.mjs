@@ -31,8 +31,8 @@ test('all requests use the one instance named main; admin endpoints use log port
 });
 
 test('Origin forwards container env and waits for readiness once per start', async () => {
-  const origin = new Origin({}, { GEMINI_API_KEY: 'key', POSTHOG_KEY: 'posthog', OTHER: 'excluded' });
-  assert.deepEqual(origin.envVars, { GEMINI_API_KEY: 'key', POSTHOG_KEY: 'posthog' });
+  const origin = new Origin({}, { GEMINI_API_KEY: 'key', LEBLEG_SEARCH_MODEL: 'm', OTHER: 'excluded' });
+  assert.deepEqual(origin.envVars, { GEMINI_API_KEY: 'key', LEBLEG_SEARCH_MODEL: 'm' });
   assert.equal(origin.sleepAfter, '72h');
   let waits = 0;
   origin.startAndWaitForPorts = async options => {

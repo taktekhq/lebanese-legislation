@@ -174,13 +174,6 @@ func initializeResult(params map[string]any) obj {
 	}
 }
 
-// callRecord is what one JSON-RPC request did, for PostHog ($mcp_*
-// properties, the shape PostHog's MCP analytics screens read).
-type callRecord struct {
-	event string
-	props obj
-}
-
 func objectParams(raw json.RawMessage) map[string]any {
 	var p map[string]any
 	if len(raw) == 0 || decodeJSON(raw, &p) != nil || p == nil {
@@ -197,8 +190,8 @@ func optString(v any) any {
 }
 
 // handleRPC answers one JSON-RPC request and appends what happened to
-// events, for GA4, and to rec, for PostHog.
-func (s *Server) handleRPC(r *http.Request, req rpcRequest, events *[]gaEvent, rec *callRecord) obj {
+// events, for GA4.
+func (s *Server) handleRPC(r *http.Request, req rpcRequest, events *[]gaEvent) obj {
 	switch req.methodName() {
 	case "initialize":
 		p := objectParams(req.params)
@@ -207,20 +200,14 @@ func (s *Server) handleRPC(r *http.Request, req rpcRequest, events *[]gaEvent, r
 			{"client_name", optString(info["name"])}, {"client_version", optString(info["version"])}, {"protocol_version", optString(p["protocolVersion"])},
 		}}
 		*events = append(*events, ev)
-		rec.event = "$mcp_initialize"
-		rec.props.set("$mcp_client_name", optString(info["name"]))
-		rec.props.set("$mcp_client_version", optString(info["version"]))
-		rec.props.set("$mcp_protocol_version", optString(p["protocolVersion"]))
 		return rpcResult(req.id, initializeResult(p))
 	case "ping":
 		return rpcResult(req.id, obj{})
 	case "tools/list":
 		*events = append(*events, gaEvent{name: "mcp_tools_list", params: obj{}})
-		rec.event = "mcp_tools_list"
-		rec.props.set("$mcp_listed_tool_names", toolNames)
 		return rpcResult(req.id, obj{{"tools", toolsCompact}})
 	case "tools/call":
-		return s.handleToolsCall(r.Context(), req, events, rec)
+		return s.handleToolsCall(r.Context(), req, events)
 	}
 	return rpcError(req.id, rpcMethodNotFound, "unknown method "+req.methodName())
 }
@@ -243,7 +230,7 @@ func b2i(b bool) int {
 	return 0
 }
 
-func (s *Server) handleToolsCall(ctx context.Context, req rpcRequest, events *[]gaEvent, rec *callRecord) obj {
+func (s *Server) handleToolsCall(ctx context.Context, req rpcRequest, events *[]gaEvent) obj {
 	p := objectParams(req.params)
 	if !truthy(p["name"]) {
 		return rpcError(req.id, rpcInvalidParams, "tools/call needs a tool name")
@@ -253,14 +240,7 @@ func (s *Server) handleToolsCall(ctx context.Context, req rpcRequest, events *[]
 	if !isObj {
 		a = map[string]any{}
 	}
-	rec.event = "$mcp_tool_call"
-	rec.props.set("$mcp_tool_name", name)
-	rec.props.set("$mcp_parameters", a)
-	rec.props.set("$mcp_cache_hit", false)
-	rec.props.set("$mcp_is_error", false)
 	if !isKnownTool(name) {
-		rec.props.set("$mcp_is_error", true)
-		rec.props.set("$mcp_error_type", "validation")
 		*events = append(*events, toolCallEvent(name, map[string]any{}, false, true))
 		return rpcError(req.id, rpcInvalidParams, "unknown tool "+name)
 	}
@@ -268,9 +248,6 @@ func (s *Server) handleToolsCall(ctx context.Context, req rpcRequest, events *[]
 	key := name + "\x00" + argsJSON
 	if hit, found := s.results.get(key); found {
 		*events = append(*events, toolCallEvent(name, a, true, false))
-		rec.props.set("$mcp_cache_hit", true)
-		rec.props.set("$mcp_response", hit.text)
-		rec.props.set("$mcp_result_count", hit.count)
 		return rpcResult(req.id, toolContent(hit.text, false))
 	}
 
@@ -285,21 +262,13 @@ func (s *Server) handleToolsCall(ctx context.Context, req rpcRequest, events *[]
 			err = errTimeout
 		}
 		s.logf("mcp tools/call %s: %v", name, err)
-		rec.props.set("$mcp_is_error", true)
-		rec.props.set("$mcp_error_type", mcpErrorType(err))
-		rec.props.set("$mcp_error_message", "Error: "+err.Error())
 		*events = append(*events, toolCallEvent(name, a, false, true))
 		return rpcError(req.id, rpcInternalError, "internal error")
 	}
 	*events = append(*events, toolCallEvent(name, a, false, res.isError))
 	text := mustMarshal(res.body)
 	count := resultCount(res.body)
-	rec.props.set("$mcp_response", text)
-	rec.props.set("$mcp_result_count", count)
-	if res.isError {
-		rec.props.set("$mcp_is_error", true)
-		rec.props.set("$mcp_error_type", "validation")
-	} else {
+	if !res.isError {
 		s.results.put(key, text, count)
 	}
 	return rpcResult(req.id, toolContent(text, res.isError))

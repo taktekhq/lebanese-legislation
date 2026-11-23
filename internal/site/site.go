@@ -50,10 +50,9 @@ type Server struct {
 	mux           *http.ServeMux
 	isStatic      bool // rendering a static copy: see NewStatic
 	ev            *Events
-	analytics     bool                  // load the browser analytics (ga.js, ph.js): SetAnalytics
+	analytics     bool                  // load the browser analytics (ga.js): SetAnalytics
 	mcpRegistered bool                  // mcpRoutes has run
 	rulingDir     string                // the judgment PDFs, one per ruling: see rulingfiles.go
-	ph            *phClient             // server errors to PostHog: see phcapture.go
 	titles        titlesEn              // unofficial English titles for the JSON API: see apititles.go
 	pageDates     pageDates             // page_state dates for the JSON API's lists: see lastchanged.go
 	vocab         atomic.Pointer[vocab] // the title words, for typos and Latin spellings: see vocab.go
@@ -83,9 +82,8 @@ type Server struct {
 // SetEvents turns on the anonymous usage record (see events.go).
 func (s *Server) SetEvents(e *Events) { s.ev = e }
 
-// SetAnalytics turns on the browser analytics: pages load ga.js and ph.js,
-// which send to LebaneseLegislation.com's own Google Analytics and PostHog
-// projects. internal/app turns it on unless ANALYTICS=off, which the
+// SetAnalytics turns on the browser analytics: pages load ga.js, which
+// sends to LebaneseLegislation.com's own Google Analytics property. internal/app turns it on unless ANALYTICS=off, which the
 // published images set, so a copy hosted elsewhere sends nothing to them.
 func (s *Server) SetAnalytics(on bool) { s.analytics = on }
 
@@ -175,7 +173,7 @@ func newServer(db *pgxpool.Pool, static bool) (*Server, error) {
 		}
 	}
 	files := http.FileServerFS(StaticFiles())
-	for _, p := range []string{"/styles.css", "/legislation.css", "/main.js", "/legislation.js", "/language.js", "/webmcp.js", "/ga.js", "/ph.js", "/assets/"} {
+	for _, p := range []string{"/styles.css", "/legislation.css", "/main.js", "/legislation.js", "/language.js", "/webmcp.js", "/ga.js", "/assets/"} {
 		s.mux.Handle("GET "+p, cache(files))
 	}
 	s.routes()

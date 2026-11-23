@@ -10,7 +10,6 @@ package mcpserver
 
 import (
 	"bytes"
-	"context"
 	_ "embed"
 	"errors"
 	"github.com/taktekhq/lebanese-legislation/internal/servertiming"
@@ -56,14 +55,8 @@ type Config struct {
 	GAHFMeasurementID  string
 	GAHFAPISecret      string
 
-	// PostHog: the project token (public), the capture host (default the EU
-	// cloud) and the secret that salts visitor ids. Off unless the token is set.
-	PostHogKey    string
-	PostHogHost   string
-	PostHogIDSalt string
-
 	// RateLimitPerMinute is the per-IP limit on /mcp (60 when 0, off when
-	// negative). Refusals are logged to PostHog about once per IP per minute.
+	// negative).
 	RateLimitPerMinute int
 
 	// CallUnits caps the database work of tools/call in flight across all
@@ -79,7 +72,7 @@ type Config struct {
 	SearchIndex string
 
 	// HuggingFaceAPI is the Hugging Face API base (https://huggingface.co/api
-	// when empty), for the "last updated" badge and SendHFStats.
+	// when empty), for the "last updated" and downloads badges.
 	HuggingFaceAPI string
 
 	// HTTPClient sends the analytics and reads Hugging Face (a client with a
@@ -93,8 +86,7 @@ type Config struct {
 }
 
 // ConfigFromEnv reads the Worker's variable names: GA_MCP_MEASUREMENT_ID,
-// GA_MCP_API_SECRET, GA_HF_MEASUREMENT_ID, GA_HF_API_SECRET, POSTHOG_KEY,
-// POSTHOG_HOST, POSTHOG_ID_SALT, plus MCP_RATE_LIMIT (requests per IP per
+// GA_MCP_API_SECRET, GA_HF_MEASUREMENT_ID, GA_HF_API_SECRET, plus MCP_RATE_LIMIT (requests per IP per
 // minute, negative for none) and MCP_CALL_UNITS (CallUnits). getenv is os.Getenv when nil.
 func ConfigFromEnv(getenv func(string) string) Config {
 	if getenv == nil {
@@ -105,9 +97,6 @@ func ConfigFromEnv(getenv func(string) string) Config {
 		GAMCPAPISecret:     getenv("GA_MCP_API_SECRET"),
 		GAHFMeasurementID:  getenv("GA_HF_MEASUREMENT_ID"),
 		GAHFAPISecret:      getenv("GA_HF_API_SECRET"),
-		PostHogKey:         getenv("POSTHOG_KEY"),
-		PostHogHost:        getenv("POSTHOG_HOST"),
-		PostHogIDSalt:      getenv("POSTHOG_ID_SALT"),
 	}
 	if v, err := strconv.Atoi(getenv("MCP_RATE_LIMIT")); err == nil {
 		c.RateLimitPerMinute = v
@@ -125,8 +114,7 @@ type Server struct {
 	cfg       Config
 	client    *http.Client
 	results   *resultCache
-	limiter   *rateLimiter // nil when off
-	refusal   *rateLimiter
+	limiter   *rateLimiter        // nil when off
 	calls     *semaphore.Weighted // tools/call DB work in flight; nil when off
 	callUnits int
 	bg        sync.WaitGroup
@@ -168,7 +156,6 @@ func newServer(db querier, cfg Config) *Server {
 			n = defaultLimitMin
 		}
 		s.limiter = newRateLimiter(n)
-		s.refusal = newRateLimiter(1)
 	}
 	return s
 }
@@ -287,7 +274,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ip := rateLimitIP(r)
 	if s.limiter != nil && !s.limiter.allow(ip) {
-		s.logRefusal(r, ip)
 		writeJSON(w, http.StatusTooManyRequests, obj{{"error", "too many requests, slow down"}}, map[string]string{"Retry-After": "2"})
 		return
 	}
@@ -333,9 +319,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var events []gaEvent
-	rec := callRecord{}
-	started := time.Now()
-	resp := s.handleRPC(r, req, &events, &rec)
+	resp := s.handleRPC(r, req, &events)
 	ua := r.Header.Get("User-Agent")
 	for i := range events {
 		events[i].params.set("page_location", mcpPage)
@@ -343,86 +327,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		events[i].params.set("client_ua", clip(ua, gaMaxValue))
 	}
 	s.track(s.mcpStream(), r, events)
-	if rec.event != "" && s.phOn() {
-		visitor := visitorID(s.cfg.PostHogIDSalt, ip, ua)
-		props := obj{}
-		if ua != "" {
-			props.set("$mcp_client_name", ua)
-		}
-		props.merge(rec.props)
-		props.merge(serverProps())
-		props.set("$mcp_duration_ms", time.Since(started).Milliseconds())
-		props.set("$session_id", mcpSessionID(visitor, s.now().UTC().Format("2006-01-02")))
-		props.set("$current_url", mcpPage)
-		props.set("$user_agent", ua)
-		if c := r.Header.Get("CF-IPCountry"); c != "" {
-			props.set("$geoip_country_code", c)
-		}
-		props.set("jsonrpc_method", req.methodName())
-		// Monitoring bots stay countable but out of the people list.
-		clientName := ""
-		if req.methodName() == "initialize" {
-			if v, has := rec.props.get("$mcp_client_name"); has {
-				clientName, _ = v.(string)
-			}
-		}
-		kind := clientKind(ua, clientName, r.Header.Get(internalHeader) == "1")
-		props.set("client_kind", kind)
-		if notPerson(kind) {
-			props.set("$process_person_profile", false)
-		}
-		if monitorHandshake(kind, rec.event) {
-			writeJSON(w, http.StatusOK, resp, nil)
-			return
-		}
-		s.phCapture(r, []phEvent{{event: rec.event, properties: props, distinctID: visitor}})
-	}
 	writeJSON(w, http.StatusOK, resp, nil)
-}
-
-func serverProps() obj {
-	return obj{{"$mcp_server_name", ServerName}, {"$mcp_server_version", ServerVersion}, {"$mcp_source", "lebaneselegislation_worker"}}
-}
-
-// logRefusal sends PostHog an mcp_rate_limited event for a request the
-// per-IP limit refused, about one per IP per minute, so we see who hits the
-// limit without a flood of refusals becoming a flood of events.
-func (s *Server) logRefusal(r *http.Request, ip string) {
-	if !s.phOn() || !s.refusal.allow(ip) {
-		return
-	}
-	ua := r.Header.Get("User-Agent")
-	props := serverProps()
-	props.set("$current_url", mcpPage)
-	props.set("$user_agent", ua)
-	if c := r.Header.Get("CF-IPCountry"); c != "" {
-		props.set("$geoip_country_code", c)
-	}
-	kind := clientKind(ua, "", r.Header.Get(internalHeader) == "1")
-	props.set("client_kind", kind)
-	props.set("limit_per_minute", s.limiter.perMinute)
-	if notPerson(kind) {
-		props.set("$process_person_profile", false)
-	}
-	s.phCapture(r, []phEvent{{event: "mcp_rate_limited", properties: props, distinctID: visitorID(s.cfg.PostHogIDSalt, ip, ua)}})
-}
-
-// mcpSessionID groups one machine's calls on one UTC day into a session: a
-// UUIDv7 (PostHog's session id shape) whose time is the day's start and
-// whose random bits come from the visitor id.
-func mcpSessionID(visitor, day string) string {
-	t, _ := time.Parse("2006-01-02", day)
-	ms := strconv.FormatInt(t.UnixMilli(), 16)
-	for len(ms) < 12 {
-		ms = "0" + ms
-	}
-	h := visitor
-	for len(h) < 32 {
-		h += "0"
-	}
-	nib, _ := strconv.ParseUint(h[16:17], 16, 8)
-	variant := strconv.FormatUint((nib&0x3)|0x8, 16)
-	return ms[0:8] + "-" + ms[8:12] + "-7" + h[0:3] + "-" + variant + h[17:20] + "-" + h[20:32]
 }
 
 // ---------------------------------------------------------------- rate limiting
@@ -523,13 +428,3 @@ func (c *resultCache) put(key, text string, count any) {
 
 // errTimeout is a tools/call that ran past its budget.
 var errTimeout = errors.New("tool call timed out")
-
-// mcpErrorType buckets a failed tools/call the way PostHog's MCP analytics
-// does; tool-level errors (bad arguments, not found) are "validation" and
-// set where they happen.
-func mcpErrorType(err error) string {
-	if errors.Is(err, errTimeout) || errors.Is(err, context.DeadlineExceeded) || strings.Contains(err.Error(), "timed out") {
-		return "timeout"
-	}
-	return "internal"
-}

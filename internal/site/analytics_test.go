@@ -9,11 +9,9 @@ import (
 
 // The analytics install is the standard one: no consent banner, analytics
 // always on once the server turns them on (SetAnalytics). On 30 Oct a
-// consent banner and then a hand-written sender replaced both SDKs: GA4 saw
+// consent banner and then a hand-written sender replaced gtag.js: GA4 saw
 // one page title for the whole site and a "source" parameter that turned
-// ChatGPT visits into "direct", and PostHog's page views stopped coming from
-// posthog-js, so the website-silent alarm (it counts $lib = 'web') fired
-// while people were reading the site.
+// ChatGPT visits into "direct".
 func TestAnalyticsStandardInstall(t *testing.T) {
 	s, err := New(nil)
 	if err != nil {
@@ -28,7 +26,7 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 		return w.Body.String()
 	}
 
-	scripts := []string{`src="/ga.js?v=`, `src="/assets/load.js?v=`, `data-ph="/ph.js?v=`}
+	scripts := []string{`src="/ga.js?v=`, `src="/assets/load.js?v=`}
 	// Off by default: a copy hosted elsewhere sends nothing to our projects.
 	page := get("/blog/")
 	for _, script := range scripts {
@@ -59,53 +57,17 @@ func TestAnalyticsStandardInstall(t *testing.T) {
 		t.Errorf("ga.js sends an event parameter GA4 reads as the traffic source: %q", m)
 	}
 
-	ph := get("/ph.js")
-	for _, want := range []string{`api_host: "/ph"`, "capture_pageview: true", "capture_pageleave: true", `person_profiles: "identified_only"`} {
-		if !strings.Contains(ph, "posthog.init(") || !strings.Contains(ph, want) {
-			t.Errorf("ph.js must call posthog.init with %s", want)
-		}
-	}
-	// Only page views and page leaves come from posthog-js itself: clicks,
-	// dead clicks, web vitals and network timing, and JavaScript errors are
-	// off in the code, so a project setting cannot bring them back.
-	for _, want := range []string{"autocapture: false", "capture_dead_clicks: false", "capture_performance: false", "capture_exceptions: false"} {
-		if !strings.Contains(ph, want) {
-			t.Errorf("ph.js must call posthog.init with %s", want)
-		}
-	}
-	// Paid student editors are identified and always recorded.
-	for _, want := range []string{"posthog.register({ editor: editor })", `posthog.identify("editor:" + editor, { editor: editor })`, "posthog.startSessionRecording(true)", "disable_session_recording: long && !editor"} {
-		if !strings.Contains(ph, want) {
-			t.Errorf("ph.js must keep the editor tracking: %s", want)
-		}
-	}
-	// A survey is shown in the page's language. Without this posthog-js picks the
-	// browser's, and an Arabic page in an English browser gets English text set
-	// right to left.
-	if !strings.Contains(ph, `override_display_language: document.documentElement.lang || "ar"`) {
-		t.Error("ph.js must show surveys in the page's language")
-	}
-	// On a phone the survey must not take half the screen: a short answer box and
-	// no helper line. The hook must hand the stylesheet back or PostHog drops it.
-	for _, want := range []string{"prepare_external_dependency_stylesheet: function (style)", "@media (max-width:600px){.ph-survey textarea{height:3.6em;min-height:0}", "return style;"} {
-		if !strings.Contains(ph, want) {
-			t.Errorf("ph.js must shrink surveys on phones: missing %q", want)
-		}
-	}
-	// PostHog's snippet adopts an array; "|| {}" throws on the first capture.
-	if !strings.Contains(ph, "window.posthog||[]") {
-		t.Error("ph.js must end PostHog's snippet with window.posthog||[]")
-	}
-	// A paid editor's sessions are all recorded and identified; long pages are
-	// not recorded for anyone else (5 Nov 2026).
-	for _, want := range []string{`localStorage.getItem("lebleg_editor")`, `posthog.identify("editor:" + editor`, `posthog.startSessionRecording(true)`, `disable_session_recording: long && !editor`} {
-		if !strings.Contains(ph, want) {
-			t.Errorf("ph.js must contain %s", want)
-		}
-	}
-
 	load := get("/assets/load.js")
-	if !strings.Contains(load, "/gtag/js?id=G-RDYRK422NP") || !strings.Contains(load, "data-ph") {
-		t.Error("assets/load.js must fetch gtag.js and the PostHog script")
+	if !strings.Contains(load, "/gtag/js?id=G-RDYRK422NP") {
+		t.Error("assets/load.js must fetch gtag.js")
+	}
+	// No PostHog anywhere in the browser code (stopped 23 Nov 2026).
+	for _, path := range []string{"/ga.js", "/assets/load.js", "/legislation.js"} {
+		if strings.Contains(strings.ToLower(get(path)), "posthog") {
+			t.Errorf("%s still mentions posthog", path)
+		}
+	}
+	if strings.Contains(page, "ph.js") {
+		t.Error("the page still loads ph.js")
 	}
 }

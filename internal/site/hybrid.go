@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode/utf8"
 
 	"github.com/taktekhq/lebanese-legislation/internal/nlsearch"
 	"github.com/taktekhq/lebanese-legislation/internal/semantic"
@@ -49,9 +48,6 @@ func (m *meaningSearch) vectorHits(ctx context.Context, q string, v vectorSearch
 	if err != nil {
 		return nil, err
 	}
-	// The embedding API reports no token count: about one token per two
-	// characters is close for Arabic and on the safe side for English.
-	nlsearch.AddEmbedding(ctx, int64(utf8.RuneCountInString(q)/2+1))
 	m.mu.Lock()
 	if m.vectors == nil || !m.keep(len(m.vectors)) {
 		m.vectors = make(map[[32]byte]vectorEntry)

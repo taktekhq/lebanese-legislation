@@ -747,7 +747,7 @@ func loadTable(out string) (map[string]staticexport.Entry, *staticexport.Redirec
 }
 
 // newSite is the site the export renders. Its pages are what visitors read,
-// so they load the browser analytics (GA4, PostHog) exactly as the live
+// so they load the browser analytics (GA4) exactly as the live
 // server does (internal/app): on unless ANALYTICS=off.
 func newSite(pool *pgxpool.Pool, getenv func(string) string) (*site.Server, error) {
 	srv, err := site.New(pool)

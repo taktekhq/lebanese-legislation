@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"net/http"
-	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -27,7 +26,6 @@ import (
 type badgePage struct {
 	location string
 	title    string
-	url      string // the page's real address, for PostHog
 }
 
 // badgePages are the pages whose views a badge may count, by ?src= value.
@@ -37,7 +35,6 @@ var badgePages = map[string]badgePage{
 	"hf": {
 		location: "https://lebaneselegislation.com/huggingface",
 		title:    "Lebanese Legislation dataset (Hugging Face)",
-		url:      "https://huggingface.co/datasets/taktekhq/lebanese-legislation",
 	},
 	// GitHub serves README images through its camo proxy, which honours
 	// no-store, so each README view fetches the badge once. The count is
@@ -45,7 +42,6 @@ var badgePages = map[string]badgePage{
 	"gh": {
 		location: "https://lebaneselegislation.com/github",
 		title:    "Lebanese Legislation repository (GitHub)",
-		url:      "https://github.com/taktekhq/lebanese-legislation",
 	},
 }
 
@@ -218,14 +214,6 @@ func (s *Server) serveBadge(w http.ResponseWriter, r *http.Request) {
 	if page, has := badgePages[r.URL.Query().Get("src")]; has && r.Method == http.MethodGet && !isBot(r.Header.Get("User-Agent")) {
 		ref := r.Header.Get("Referer")
 		s.track(s.hfStream(), r, []gaEvent{{name: "page_view", params: obj{{"page_location", page.location}, {"page_title", page.title}, {"page_referrer", ref}, {"badge", name}}}})
-		pu, _ := url.Parse(page.url)
-		props := obj{{"$current_url", page.url}, {"$host", pu.Host}, {"$pathname", pu.Path}, {"$title", page.title}}
-		if _, has := r.Header["Referer"]; has {
-			props.set("$referrer", ref)
-		}
-		props.set("$user_agent", r.Header.Get("User-Agent"))
-		props.set("badge", name)
-		s.phCapture(r, []phEvent{{event: "$pageview", properties: props}})
 	}
 	ctx := r.Context()
 	if def.load != nil {

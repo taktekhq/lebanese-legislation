@@ -104,8 +104,6 @@ func (c *Client) ComposeWith(ctx context.Context, q string, sources []Passage, m
 	if endpoint == "" {
 		endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent"
 	}
-	gen := startGeneration(ctx, "compose", c.cfg.Provider, model)
-	defer gen.end()
 	ctx, cancel := context.WithTimeout(ctx, m.Timeout)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
@@ -122,7 +120,6 @@ func (c *Client) ComposeWith(ctx context.Context, q string, sources []Passage, m
 		return nil, errors.New("answer service unavailable")
 	}
 	defer func() { _ = resp.Body.Close() }()
-	gen.Status = resp.StatusCode
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("answer provider HTTP %d", resp.StatusCode)
 	}
@@ -146,8 +143,6 @@ func (c *Client) ComposeWith(ctx context.Context, q string, sources []Passage, m
 	// What each answer costs, for the bill: tokens in and out.
 	u := v.UsageMetadata
 	log.Printf("ai answer (%s): %d passages, %d tokens in, %d out", m.Name, len(sources), u.PromptTokenCount, u.CandidatesTokenCount+u.ThoughtsTokenCount)
-	AddUsage(ctx, int64(u.PromptTokenCount), int64(u.CandidatesTokenCount+u.ThoughtsTokenCount))
-	gen.ok(int64(u.PromptTokenCount), int64(u.CandidatesTokenCount+u.ThoughtsTokenCount))
 	var raw strings.Builder
 	for _, p := range v.Candidates[0].Content.Parts {
 		if !p.Thought {
