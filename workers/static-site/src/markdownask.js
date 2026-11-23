@@ -110,10 +110,11 @@ export function markdownAsk(request, env, ctx) {
     if (isTestRequest(request, env)) return;
     const ua = request.headers.get("User-Agent") || "";
     const who = agentInfo(ua);
-    // Index and training crawlers are not counted: the question is whether
-    // assistants reading for a person ask. ExaSearchBot alone sent 84,361 of
-    // 85,834 events in the week to 18 Nov 2026 and always asks.
-    if (who.purpose === "search-index" || who.purpose === "training") return;
+    // Only assistants reading for a person are counted: that is the question.
+    // A list of crawlers to skip was not enough: ExaSearchBot sent 84,361
+    // events in the week to 18 Nov 2026, then ShapBot, not on the list, sent
+    // about 57,000 an hour from 22 Nov. Unknown agents are not counted.
+    if (who.purpose !== "user-fetch") return;
     const now = Date.now();
     if (now - windowStart >= 60_000) { windowStart = now; sent = 0; }
     if (++sent > CAP_PER_MINUTE) return;
