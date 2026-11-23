@@ -2172,6 +2172,8 @@ table.ref .ar {
   line-height: 1.65;
 }
 .ai-box__note { margin-top: 12px; }
+/* What a paragraph rests on (aibasis.go): a law's article, a ruling, or neither. */
+.ai-box__text .ai-box__basis { margin-top: 4px; font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
 .ai-box__left { margin-top: 4px; }
 .ai-box__kind { margin: -4px 0 10px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
 .ai-box__deep { margin-top: 14px; display: grid; gap: 6px; justify-items: start; }
