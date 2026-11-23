@@ -174,6 +174,13 @@
 .lawparts { margin-block: 20px 0; }
 .lawparts ul { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 8px 0 0; padding: 0; list-style: none; }
 .pager__gap { align-self: center; color: var(--faint); }
+/* A code's table of contents (codehub.html): chapter headings on the body
+   scale (1.25rem, about 1.2x body text), each close above its own articles,
+   which start where the heading starts. */
+.codetoc__heading { font-size: 1.25rem; line-height: 1.45; font-weight: 600; letter-spacing: 0; text-wrap: balance; margin: 28px 0 10px; }
+.codetoc__heading:first-child { margin-top: 0; }
+.codetoc__chips { justify-content: flex-start; }
+.codetoc__chips + .codetoc__chips { margin-top: 6px; }
 .chip[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--canvas); }
 
 /* --- Home ---------------------------------------------------------------- */

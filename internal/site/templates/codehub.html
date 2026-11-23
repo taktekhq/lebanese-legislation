@@ -7,10 +7,10 @@
   {{template "updated-line" .Updated}}
   <p><a class="link" href="{{lawURL $law}}">{{t "hub.code.read_text"}}</a> <span lang="ar">&middot; {{.Title}}</span></p>
 </section>
-<section class="wrap">
+<section class="wrap codetoc">
   {{range .Groups}}
-  {{with .Heading}}<h2 class="sec__title" lang="ar" dir="rtl">{{.}}</h2>{{end}}
-  <ul class="pager__nums" dir="rtl" lang="ar">{{range .Numbers}}<li id="a-{{slug .}}"><a class="chip" href="{{artURL $law .}}">المادة {{.}}</a></li>{{end}}</ul>
+  {{with .Heading}}<h2 class="codetoc__heading" lang="ar" dir="rtl">{{.}}</h2>{{end}}
+  <ul class="pager__nums codetoc__chips" dir="rtl" lang="ar">{{range .Numbers}}<li id="a-{{slug .}}"><a class="chip" href="{{artURL $law .}}">المادة {{.}}</a></li>{{end}}</ul>
   {{end}}
   {{template "numpager" .}}
 </section>
