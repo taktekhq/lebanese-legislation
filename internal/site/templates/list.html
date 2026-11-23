@@ -8,6 +8,7 @@
   {{with .Updated}}<p class="updated"><time datetime="{{.ISO}}">{{.Label}}</time></p>{{end}}
   {{if .Filters}}<h2 class="sr-only">{{t "seo.h2_filters"}}</h2>{{template "filters" .}}{{end}}
   <div class="listhead"><h2 class="finder__count">{{plural .Total (index $k "Noun") (index $k "Many")}}, {{t "list.newest_first"}}</h2>{{with index $k "Years"}}<a class="sec__more" href="{{u .}}">{{t "list.browse_by_year"}} <span class="arrow" aria-hidden="true">{{fwdArrow}}</span></a>{{end}}</div>
+  {{template "listfilter" ".doclist > li"}}
   <ul class="doclist">{{range .Rows}}{{template "docrow" .}}{{end}}</ul>
   {{template "pager" .}}
 </section>

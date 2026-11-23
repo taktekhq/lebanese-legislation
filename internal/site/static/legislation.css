@@ -493,3 +493,14 @@ html:not([dir="rtl"]) .nav__links a { white-space: nowrap; }
   html[lang="fr"] .nav__links, html[dir="rtl"] .nav__links { gap: 0; }
   html[lang="fr"] .nav__links a, html[dir="rtl"] .nav__links a { padding-inline: 6px; }
 }
+
+/* The filter box above a list (listfilter, legislation.js). */
+.listfilter { display: grid; gap: 6px; margin: 20px 0 16px; max-width: 34rem; }
+.listfilter__input {
+  width: 100%; height: 44px; padding: 0 14px; border: 0; border-radius: var(--radius);
+  background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink);
+  font: inherit; font-size: 1rem;
+}
+.listfilter__input:focus { outline: 2px solid transparent; box-shadow: 0 0 0 2px var(--accent); }
+.listfilter__count:empty { display: none; }
+[data-filtered-out] { display: none !important; }

@@ -6,6 +6,7 @@
   <p class="lead" data-reveal style="--d:120ms">{{t "topics.lead"}}</p>
 </section>
 <section class="wrap" style="padding-bottom:var(--section-y)">
+  {{template "listfilter" ".topiclist > a"}}
   <div class="codes topiclist" data-reveal>{{range .}}
     <a class="code" href="{{u (printf "/topic/%s/" .Slug)}}"><b>{{.Title}}</b><span>{{.Question}}</span></a>{{end}}
   </div>
