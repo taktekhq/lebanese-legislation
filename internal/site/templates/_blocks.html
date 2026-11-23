@@ -28,6 +28,10 @@
 <div class="scroller filters" role="group" aria-label="{{t "aria.filter"}}">{{range $chips}}<a class="chip" href="{{query $l.Q $param .Value}}"{{if eq .Value $sel}} aria-current="true"{{end}}><span dir="auto">{{.Label}}</span>{{if .Count}} <b>{{num .Count}}</b>{{end}}</a>{{end}}</div>
 {{end}}{{end}}
 
+{{/* listfilter narrows the titles already on the page as one types
+   (legislation.js): no request, no new address, no event. Hidden without
+   JavaScript. Its argument is the CSS selector of the items it filters. */}}
+{{define "listfilter"}}<div class="listfilter" data-filter="{{.}}" hidden><input class="listfilter__input" type="search" dir="auto" autocomplete="off" spellcheck="false" placeholder="{{t "filter.placeholder"}}" aria-label="{{t "filter.label"}}"><p class="tiny listfilter__count" role="status" aria-live="polite" data-filter-none="{{t "filter.none"}}" data-filter-some="{{t "filter.some"}}"></p></div>{{end}}
 {{define "pager"}}{{if or .Older .Newer}}<nav class="pager" aria-label="{{t "aria.pages"}}">
   {{if .Newer}}<a class="btn btn--ghost btn--sm" rel="prev" href="{{.Newer}}">{{backArrow}} {{t "pager.newer"}}</a>{{end}}
   {{if .Older}}<a class="btn btn--ghost btn--sm" rel="next" href="{{.Older}}">{{t "pager.older"}} {{fwdArrow}}</a>{{end}}

@@ -273,3 +273,45 @@
     });
   });
 })();
+
+/* The filter box above a list (listfilter in _blocks.html): typing hides the
+   titles on this page that do not hold every typed word. Arabic matches
+   without its diacritics and tatweel, and alef forms (أ إ آ ٱ), ya and
+   alef maqsura (ي ى), and ta marbuta and ha (ة ه) count as one letter;
+   Arabic digits match Western ones and Latin accents are ignored. Nothing
+   is sent anywhere. */
+(function () {
+  "use strict";
+  var boxes = document.querySelectorAll("[data-filter]");
+  if (!boxes.length) return;
+  function fold(s) {
+    s = String(s || "").toLowerCase();
+    if (s.normalize) s = s.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    return s
+      .replace(/[ً-ٰٟـ]/g, "")
+      .replace(/[أإآٱ]/g, "ا")
+      .replace(/ى/g, "ي")
+      .replace(/ة/g, "ه")
+      .replace(/[٠-٩]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/\s+/g, " ").trim();
+  }
+  [].forEach.call(boxes, function (box) {
+    var items = [].slice.call(document.querySelectorAll(box.getAttribute("data-filter")));
+    if (items.length < 2) return;
+    var input = box.querySelector("input");
+    var count = box.querySelector(".listfilter__count");
+    var texts = items.map(function (el) { return fold(el.textContent); });
+    box.hidden = false;
+    input.addEventListener("input", function () {
+      var words = fold(input.value).split(" ").filter(Boolean);
+      var shown = 0;
+      items.forEach(function (el, i) {
+        var hit = words.every(function (w) { return texts[i].indexOf(w) >= 0; });
+        if (hit) { el.removeAttribute("data-filtered-out"); shown++; } else el.setAttribute("data-filtered-out", "");
+      });
+      if (!words.length) count.textContent = "";
+      else if (!shown) count.textContent = count.getAttribute("data-filter-none");
+      else count.textContent = count.getAttribute("data-filter-some").replace("%n", shown).replace("%t", items.length);
+    });
+  });
+})();
