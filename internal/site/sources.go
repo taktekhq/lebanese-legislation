@@ -48,6 +48,7 @@ var sourceRows = []struct {
 	{"mustachar", []sourceLink{{"https://almustachar.com/", "almustachar.com"}}},
 	{"sader", []sourceLink{{"https://www.saderlex.com/", "saderlex.com"}}},
 	{"hamorabi", []sourceLink{{"https://hamorabi.com/", "hamorabi.com"}}},
+	{"mizan", []sourceLink{{"https://mizanlebanon.com/", "mizanlebanon.com"}}},
 	{"legal_agenda", []sourceLink{{"https://legal-agenda.com/", "legal-agenda.com"}, {"https://english.legal-agenda.com/", "english.legal-agenda.com"}}},
 	{"natlex", []sourceLink{{"https://natlex.ilo.org/", "natlex.ilo.org"}}},
 	{"wipo", []sourceLink{{"https://www.wipo.int/wipolex/en/members/profile/LB", "wipo.int/wipolex"}}},

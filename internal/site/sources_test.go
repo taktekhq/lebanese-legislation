@@ -63,7 +63,7 @@ func TestSourcesPage(t *testing.T) {
 			}
 		}
 		for _, want := range []string{"Legiliban", `"@type":"ItemList"`, `"dateModified":"` + iso + `"`, `<time datetime="` + iso + `">`,
-			`"numberOfItems":13`, `href="` + prefix + `/legiliban/"`, `hreflang="en" href="` + Base + `/en/sources/"`, `hreflang="ar" href="` + Base + `/sources/"`} {
+			`"numberOfItems":14`, `href="` + prefix + `/legiliban/"`, `hreflang="en" href="` + Base + `/en/sources/"`, `hreflang="ar" href="` + Base + `/sources/"`} {
 			if !strings.Contains(body, want) {
 				t.Errorf("%s/sources/: missing %q", prefix, want)
 			}
